@@ -55,7 +55,7 @@ test('the Delt finisher keeps a member on every tier once the card\'s own should
 });
 
 test('the chest accessories leave the Accessory two names and Chest + knee one on every tier', () => {
-  const CHEST_ACC = ['Dumbbell incline press', 'Dumbbell bench press', 'Dips', 'Pushups (slow tempo)', 'Diamond pushups', 'Dumbbell decline press', 'Dumbbell floor press'];
+  const CHEST_ACC = ['Dumbbell incline press', 'Dumbbell bench press', 'Dips', 'Pushups (slow tempo)', 'Diamond pushups', 'Dumbbell decline press', 'Dumbbell floor press', 'Single-arm dumbbell bench press'];   // D241
   const SHOULDER_ACC = ['Barbell overhead press', 'Dumbbell Arnold press', 'Kettlebell single-arm press', 'Dumbbell lateral raise', 'Barbell push press', 'Landmine rotational press'];
   assert.deepEqual(CHEST_ACC.filter((n) => SHOULDER_ACC.includes(n)), [], 'the Main pairing can take at most one chest accessory name');
   for (const e of D.EQUIP) {

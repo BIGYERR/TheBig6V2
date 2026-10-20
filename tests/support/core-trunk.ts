@@ -21,21 +21,22 @@ function forEachDay(prog: Program, fn: (day: Day, week: number, dayKey: DayKey) 
 
 // ── D46-a: the rotational power pillar ──────────────────────────────────────────────────────────────────────────────
 // Declaration order, typed by hand. Pairs computed by hand from the ruling's rule: index by the pillar's own clock T,
-// pair = (2T-1, 2T) mod k. Hot-tomorrow T = R/2; clear-runway T = floor((R-1)/3). Commercial owns every member (k = 7).
+// pair = (2T-1, 2T) mod k. Hot-tomorrow T = R/2; clear-runway T = floor((R-1)/3). Commercial owns every member (k = 8
+// since D241 added the Russian twist, v0.242.0; k = 7 before).
 const ROT_ORDER = [
   'Windshield wipers', 'Medicine ball rotary toss', 'Cable woodchoppers', 'Landmine rotations',
-  'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)',
+  'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)', 'Russian twist (heels down)',
 ];
 const ROT_HOT_TABLE: Record<number, string[]> = {
   2: ['Medicine ball rotary toss', 'Cable woodchoppers'],
   4: ['Landmine rotations', 'Standing torso rotations (slow)'],
   6: ['Side plank thread-the-needle', 'Band woodchopper (door anchor)'],
-  8: ['Windshield wipers', 'Medicine ball rotary toss'],
-  10: ['Cable woodchoppers', 'Landmine rotations'],
-  12: ['Standing torso rotations (slow)', 'Side plank thread-the-needle'],
+  8: ['Russian twist (heels down)', 'Windshield wipers'],
+  10: ['Medicine ball rotary toss', 'Cable woodchoppers'],
+  12: ['Landmine rotations', 'Standing torso rotations (slow)'],
 };
 const ROT_RUN_TABLE: Record<number, string[]> = {
-  3: ['Band woodchopper (door anchor)', 'Windshield wipers'],
+  3: ['Russian twist (heels down)', 'Windshield wipers'],
   6: ['Medicine ball rotary toss', 'Cable woodchoppers'],
   9: ['Landmine rotations', 'Standing torso rotations (slow)'],
   12: ['Side plank thread-the-needle', 'Band woodchopper (door anchor)'],
@@ -43,12 +44,12 @@ const ROT_RUN_TABLE: Record<number, string[]> = {
 // The gear legal members per tier (D46-c), typed from the movement names and the wizard cards: cables commercial
 // only, med balls commercial and crossfit, a landmine is a barbell, bands on every tier whose card names bands.
 const ROT_LEGAL: Record<Equipment, string[]> = {
-  bodyweight: ['Windshield wipers', 'Standing torso rotations (slow)', 'Side plank thread-the-needle'],
-  minimal: ['Windshield wipers', 'Standing torso rotations (slow)', 'Side plank thread-the-needle'],
-  home_basic: ['Windshield wipers', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)'],
-  home_full: ['Windshield wipers', 'Landmine rotations', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)'],
+  bodyweight: ['Windshield wipers', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Russian twist (heels down)'],
+  minimal: ['Windshield wipers', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Russian twist (heels down)'],
+  home_basic: ['Windshield wipers', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)', 'Russian twist (heels down)'],
+  home_full: ['Windshield wipers', 'Landmine rotations', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)', 'Russian twist (heels down)'],
   commercial: ROT_ORDER.slice(),
-  crossfit: ['Windshield wipers', 'Medicine ball rotary toss', 'Landmine rotations', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)'],
+  crossfit: ['Windshield wipers', 'Medicine ball rotary toss', 'Landmine rotations', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)', 'Russian twist (heels down)'],
 };
 /** Distinct pairs a stride-2 walk over a k-member list visits for T = 1..6 (arithmetic, not the engine). */
 function expectedRotPairs(k: number): number {
@@ -75,13 +76,15 @@ const AR_MEMBERS: { name: string; need: 'load' | 'bands' | null }[] = [
   { name: 'Farmer carry', need: 'load' },
   { name: 'Suitcase carry', need: 'load' },
 ];
-const AE_MEMBERS = ['Plank hold', 'Bird dogs', 'McGill curl-up', 'Superman', 'RKC plank'];
+const AE_MEMBERS = ['Plank hold', 'Bird dogs', 'McGill curl-up', 'Superman', 'RKC plank', 'Wall-press dead bug'];
+/** The protect-tier trunk draws the pillar less the wall-press dead bug, which both protect plans drop before the draw (D241). */
+const AE_PROTECT = AE_MEMBERS.filter((n) => n !== 'Wall-press dead bug');
 /** The anti-rotation names a protect-tier day may draw on a tier: the day strips carries, the gear gate the rest. */
 const arLegal = (e: Equipment): string[] => AR_MEMBERS.filter((m) => !/carry/i.test(m.name)).filter((m) => m.need === null || TIER_GEAR[e][m.need]).map((m) => m.name);
 /** The hand draw for week w: rotation index (w-1+k) mod len, anti-extension takes slots 0 and 2, anti-rotation re-draws past a collision. */
 function derivedTrunk(equipment: Equipment, w: number): { ar: string[]; ae: string[]; plain: string[]; collided: boolean } {
   const rot = <T>(arr: readonly T[], k: number): T => arr[((((w - 1 + k) % arr.length) + arr.length) % arr.length)];
-  const ae = [rot(AE_MEMBERS, 0), rot(AE_MEMBERS, 2)];
+  const ae = [rot(AE_PROTECT, 0), rot(AE_PROTECT, 2)];
   const legal = arLegal(equipment);
   const taken: Record<string, number> = Object.fromEntries(ae.map((n) => [n, 1]));
   const ar: string[] = [];
@@ -138,7 +141,7 @@ function protectTrunkRows(IA: App): { rows: TrunkRow[]; doubled: string[] } {
 }
 
 // ── D50: the trunk floor, with the session cost model typed by hand ─────────────────────────────────────────────────
-const HALF = /carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i;
+const HALF = /carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises|sit-up|v-up|russian twist|farmer march|torso rotation/i;   // D241: the new core drills price like their siblings (A2: and the torso rotation)
 const STRETCH = /stretch|mobility|90\/90|foam|worlds greatest|cossack|pigeon/i;   // D239: the hip block's mobility pieces are free too
 const handSets = (det: unknown): number => {
   const m = String(det || '').match(/(\d+)\s*[×x]/);
@@ -244,7 +247,7 @@ const CORE_CLAUSE = "  if(_auxFamily(name)==='core') return 0;\n";
 export {
   clean, host, DAYS, EQUIP, forEachDay,
   ROT_ORDER, ROT_HOT_TABLE, ROT_RUN_TABLE, ROT_LEGAL, expectedRotPairs,
-  TIER_GEAR, AR_MEMBERS, AE_MEMBERS, arLegal, derivedTrunk, isSub, protectTrunkRows,
+  TIER_GEAR, AR_MEMBERS, AE_MEMBERS, AE_PROTECT, arLegal, derivedTrunk, isSub, protectTrunkRows,
   handTotal, trunkDay, AR2, AE2, trunkItems, trunkSecs, handLongRunTier, handRaceWindow, wideLattice, trunkFloorScan,
   CORE_CLAUSE,
 };

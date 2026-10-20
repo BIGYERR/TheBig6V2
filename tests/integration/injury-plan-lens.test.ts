@@ -112,7 +112,7 @@ test('Mario\'s knee overlay: W5 swap, aux and add sheets offer nothing the knee 
   const aux = I.rejSum(o5, I.L9.mario, ['aux'], null, judge);
   const add = I.rejSum(o5, I.L9.mario, ['add'], null, judge);
   assert.deepEqual([swap.rej, aux.rej, add.rej], [0, 0, 0], [...swap.ex, ...aux.ex, ...add.ex].join('; '));
-  assert.deepEqual([swap.rows, swap.offers, aux.offers, add.rows, add.offers], [22, 222, 66, 5, 79]);
+  assert.deepEqual([swap.rows, swap.offers, aux.offers, add.rows, add.offers], [22, 224, 84, 5, 79]);   // 222 and 66 until D241 widened the pools and families
   const f5 = I.weekLists(I.progAt(I.L9.mario, 'CFG', W5, undefined, 1).X, 5);
   const eq = I.listsEqual(o5, f5);
   assert.ok(eq.all && eq.n === 32, JSON.stringify(eq));
@@ -126,9 +126,12 @@ test('a plan written from a Thursday governs Thursday on, and the days before it
   const L = I.weekLists(X, 5);
   assert.deepEqual(['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map((d) => !!L[d].stamp), [false, false, false, true, true, true]);
   for (const d of ['thu', 'fri', 'sat']) assert.equal(I.rejSum(L, I.L9.mario, ['pat', 'aux', 'add'], [d], judge).rej, 0, d);
-  // an unstamped Tuesday is still the uninjured program's: it offers the jump squats the knee plan would refuse
+  // an unstamped day is still the uninjured program's: it offers what the knee plan would refuse. Since D241 (v0.242.0)
+  // W5 Tuesday's sheets happen to offer nothing it would refuse, so the week before carries the check: W4 Thursday.
   const tue = I.rejSum(L, I.L9.mario, ['pat', 'aux', 'add'], ['tue'], judge);
-  assert.deepEqual([tue.rej, tue.offers, tue.ex], [2, 77, ['tue Sumo deadlift: Jump squats', 'tue (add): g:Jump squats']]);
+  assert.deepEqual([tue.rej, tue.offers, tue.ex], [0, 77, []]);
+  const thu4 = I.rejSum(I.weekLists(X, 4), I.L9.mario, ['pat', 'aux', 'add'], ['thu'], judge);
+  assert.deepEqual([thu4.rej, thu4.offers, thu4.ex], [1, 61, ['thu Barbell box squat: Jump squats']]);
   const U = I.weekLists(I.progAt(I.L9.mario_noinj, 'CFG', W5, undefined, 1).X, 5);
   for (const d of ['mon', 'tue']) assert.ok(I.listsEqual(L, U, [d]).all, d);
 });

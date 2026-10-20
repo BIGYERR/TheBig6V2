@@ -40,3 +40,22 @@ test('the holds and planks are timed, the drills counted in reps or yards are no
     'Side plank (top leg raised)', 'Glute bridge hold'];
   for (const n of PREHAB) assert.equal(isTimeExercise(n), TIMED.includes(n), n);
 });
+
+// ── D241 (P-BENCH-STRENGTH, v0.242.0): slice 2 ────────────────────────────────────────────────────────────────────
+// Hand table from the ruling: the pattern each new name must read as. The core drills are exempt by name, the step-downs
+// are a lunge (they would otherwise read as nothing), the hip flexor raise is prehab.
+test('the slice 2 names read as the ruling files them: core and prehab exempt, the rest by their pattern', () => {
+  const WANT: [string, string | null][] = [
+    ['Wall-press dead bug', null], ['Hollow hold dumbbell press', null], ['Overhead sit-up', null], ['V-ups', null],
+    ['Farmer march', null], ['Russian twist (heels down)', null], ['Kettlebell hip flexor raise', null], ['Copenhagen plank (long lever)', null],
+    ['Step-downs (KB)', 'lunge'], ['Deficit reverse lunge (KB)', 'lunge'], ['Goblet side lunge to knee drive', 'lunge'], ['Barbell reverse lunge', 'lunge'],
+    ['Barbell pin squat', 'squat'], ['Heel-elevated goblet squat', 'squat'], ['Dumbbell split-stance calf raise', 'calf_iso'],
+    ['Single-arm dumbbell bench press', 'hpress'], ['Seated dumbbell shoulder press', 'vpress'],
+  ];
+  for (const [n, want] of WANT) assert.equal(_pattern(n), want, n);
+});
+
+test('the new holds are timed and the rest are counted (guards behaviour that must not change)', () => {
+  for (const n of ['Hollow hold dumbbell press', 'Copenhagen plank (long lever)']) assert.equal(isTimeExercise(n), true, n);
+  for (const n of ['Wall-press dead bug', 'Overhead sit-up', 'V-ups', 'Farmer march', 'Russian twist (heels down)', 'Kettlebell hip flexor raise', 'Step-downs (KB)']) assert.equal(isTimeExercise(n), false, n);
+});

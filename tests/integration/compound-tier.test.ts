@@ -31,13 +31,16 @@ const note = (out: string) => 'Much lighter than ' + out.toLowerCase() + '. Volu
 const CORE23 = ['Ab wheel rollouts', 'Bird dogs', 'Dead bugs', 'Dead bug (slow tempo)', 'Garhammer raises', 'Hanging knee raises',
   'Hanging leg raises', 'Hanging hold', 'L-sit hold', 'McGill curl-up', 'Pallof press', 'Plank hold', 'RKC plank', 'Side plank',
   'Superman', 'Toes-to-bar', 'Windshield wipers', 'Cable woodchoppers', 'Landmine rotations', 'Medicine ball rotary toss',
-  'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)'];
+  'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Band woodchopper (door anchor)',
+  // D241 (v0.242.0): two of these are presses by _isCompound's words ('Hollow hold dumbbell press', 'Wall-press dead bug'),
+  // so the clause is what keeps them tier 0.
+  'Wall-press dead bug', 'Hollow hold dumbbell press', 'Overhead sit-up', 'V-ups', 'Farmer march', 'Russian twist (heels down)'];
 
-test('the 23 names declared core in _AUX_FAMILY are the hand table, and every one is tier 0', () => {
+test('the 29 names declared core in _AUX_FAMILY are the hand table, and every one is tier 0 (23 until D241)', () => {
   // A0a, A0b, A1, A2
   const fam = IA.eval('_AUX_FAMILY');
   const declared = Object.keys(fam).filter((n) => fam[n] === 'core');
-  assert.equal(declared.length, 23);
+  assert.equal(declared.length, 29);
   assert.deepEqual(declared.slice().sort(), CORE23.slice().sort());
   assert.deepEqual(CORE23.filter((n) => T(n) !== 0), []);
   assert.equal(T('Pallof press'), 0);
@@ -159,13 +162,15 @@ CFGS.forEach((cfg, ci) => {
   }
 });
 
-test('on the 49-config lattice exactly one cell moves, HALF_MANNY W11 Monday, in the ruled shape, and no day loses a core section', () => {
+test('on the 49-config lattice no cell moves since D241 (HALF_MANNY W11 Monday did until then), and no day loses a core section', () => {
+  // D241 (v0.242.0) reshuffled HALF_MANNY's core and accessory draws; W11 Monday's Pallof press no longer meets the budget,
+  // so the clause decides no cell here. Its effect is held by the tier table above and the swap tag test.
   // F2a, F2b, F2c, F3, F4a, F4b, F4c, F5
   assert.equal(CFGS.length, 49);
   assert.equal(L.lines, 1798);
   assert.equal(L.lenMismatch, 0);
   assert.equal(L.pallof, 35, 'cells carrying Pallof press without the clause');
-  assert.deepEqual(L.changed, ['cfg0 W11 MON']);
+  assert.deepEqual(L.changed, []);
   assert.deepEqual(L.other, []);
   assert.equal(L.coreLost, 0);
 });

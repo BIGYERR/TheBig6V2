@@ -123,7 +123,12 @@ function getDynamicCoreBlock(week: number, role: string, isHardRunToday: boolean
     const key = ['dynamic_bracing','anti_extension_loaded','rotational_power'][((R-1)%3+3)%3] as 'dynamic_bracing' | 'anti_extension_loaded' | 'rotational_power';
     if(key==='anti_extension_loaded'){
       pillar='anti_extension';
-      items=[rot(P.anti_extension.loaded, R), rot(P.anti_extension.static, R)];
+      // D241 (F1, F2): this branch fires only when R ≡ 2 (mod 3), so rot(arr, R) is index 0 forever; it rotates on the
+      // pillar's own firing count, like rotational power, and the loaded list goes through the gear lens (no loaded
+      // member is legal on bodyweight, which draws two static members instead).
+      const T3L = Math.floor((R-1)/3);
+      const _ld = equip===undefined ? P.anti_extension.loaded : (equip==='bodyweight' ? [] : P.anti_extension.loaded.filter(it=>_auxGearOK(it.name, equip)));
+      items = _ld.length ? [rotOn(T3L,_ld,0), rotOn(T3L,P.anti_extension.static,0)] : [rotOn(T3L,P.anti_extension.static,0), rotOn(T3L,P.anti_extension.static,1)];
     } else {
       pillar=key;
       // V193 (D46): key cycles three ways on ((R-1)%3), so rotational_power (the index-2 slot)
@@ -134,7 +139,7 @@ function getDynamicCoreBlock(week: number, role: string, isHardRunToday: boolean
       // Same rotation + dedup shape dynamic_bracing already uses, one line below.
       const T3 = Math.floor((R-1)/3);
       items = (key==='dynamic_bracing')
-        ? [rot(_pi('dynamic_bracing'), R), rot(_pi('dynamic_bracing'), R+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)
+        ? [rotOn(T3,_pi('dynamic_bracing'),T3), rotOn(T3,_pi('dynamic_bracing'),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)   // D241: R steps by 3 here, so six members locked on two
         : [rotOn(T3,_pi(key),T3), rotOn(T3,_pi(key),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
     }
   }

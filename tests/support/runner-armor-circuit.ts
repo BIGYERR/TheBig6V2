@@ -3,7 +3,7 @@
 // counterfactuals, the coach's lattice constructor).
 //
 // HAND ORACLES (typed here, never asked of the app): the ruling's strings (the fourth item and its detail, the Tuesday
-// calf and carry strings), HALF_MANNY's swap universe (99 names since D239) and its W1 to W12 Tuesday circuits (typed once off
+// calf and carry strings), HALF_MANNY's swap universe (107 names since D241) and its W1 to W12 Tuesday circuits (typed once off
 // V230, unchanged since), the three hand legs days and their hand-worked trims, the two typed cells' cards (coach's
 // prints), g215's knee protect lattice and the floor (b) line.
 import { progDigest } from './app.ts';
@@ -39,6 +39,9 @@ const UNIVERSE = [
   'Copenhagen plank (bent knee)', 'Side plank (top leg raised)', 'Glute bridge hold', 'Cossack squat shift', 'Half-kneeling hip flexor stretch',
   'Pigeon lift-offs', 'Single-leg balance hold (eyes closed)', 'Single-leg KB pass-around', 'Kettlebell tibialis raise (seated)',
   'Split-squat heel-raise hold', 'Knee-to-wall ankle rocks', 'Towel scrunches', 'Tiptoe walks',
+  // D241 (v0.242.0): the eight its pools draw.
+  'Deficit reverse lunge (KB)', 'Goblet side lunge to knee drive', 'Barbell reverse lunge', 'Step-downs (KB)',
+  'Single-arm dumbbell bench press', 'Seated dumbbell shoulder press', 'Dumbbell split-stance calf raise', 'Kettlebell hip flexor raise',
 ];
 /** HALF_MANNY's runner armor circuit on W1 to W12 Tuesday before the fourth item: lunge, hold, hinge ([name, detail]). */
 const TUE: Record<number, Pair[]> = {
@@ -46,14 +49,16 @@ const TUE: Record<number, Pair[]> = {
   2: [['Dumbbell Bulgarian split squat', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Barbell Romanian deadlift', '2×6–10 @ RPE 7']],
   3: [['Dumbbell goblet side lunge', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell swing', '2×8']],
   4: [['Dumbbell goblet side lunge', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell swing', '2×8']],
-  5: [['Dumbbell Bulgarian split squat', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Kettlebell swing', '2×8']],
-  6: [['Dumbbell Bulgarian split squat', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Kettlebell swing', '2×8']],
-  7: [['Walking lunge (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
-  8: [['Walking lunge (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
+  // D241 (v0.242.0) drew the KB step-downs into W5 to W8's lunge slot and the goblet side lunge to knee drive into W11
+  // and W12's; the hold and the hinge are unchanged.
+  5: [['Step-downs (KB)', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Kettlebell swing', '2×8']],
+  6: [['Step-downs (KB)', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Kettlebell swing', '2×8']],
+  7: [['Step-downs (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
+  8: [['Step-downs (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
   9: [['Dumbbell goblet side lunge', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Dumbbell split-stance deadlift', '2×6–10 @ RPE 7']],
   10: [['Dumbbell goblet side lunge', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Dumbbell split-stance deadlift', '2×6–10 @ RPE 7']],
-  11: [['Step-ups (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
-  12: [['Step-ups (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
+  11: [['Goblet side lunge to knee drive', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
+  12: [['Goblet side lunge to knee drive', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
 };
 const hasSec = (day: AppDay, re: RegExp): boolean => liveSecs(day).some((s) => re.test(clean(s.label)));
 const circuit = (day: AppDay): AppDay | null => liveSecs(day).find((s) => CIRCUIT_RE.test(clean(s.label))) || null;
@@ -105,20 +110,21 @@ const CELL_FH = { tag: 'shoulder/protect | test (run_base) | commercial | interm
   cfg: { name: 'M', primaryPath: 'event', cardioTypes: ['run'], cardioGoals: { run: { id: 'run_base', label: 'run_base', mileBestMins: '8', mileBestSecs: '0', baselineDist: '3', baseline: '3mi' } }, eventTargeted: false, liftingFocus: 'support_prevention', experience: 'intermediate', ageBracket: '18-35', equipment: 'commercial', unit: 'lbs', restDays: ['sat', 'sun'], days: DAYS.slice(), bench: 135, squat: 155, deadlift: 185, seed: 87747, injury: { region: 'shoulder', tier: 'protect' } } };
 const CARD_F1 = [
   'Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
-  'Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7',
+  // D241 (v0.242.0) drew the deficit reverse lunge into the circuit and the KB hip flexor raise into the hip block.
+  'Leg circuit — runner armor (SS 2) :: Deficit reverse lunge (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7',
   'Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower',
   // D239 (v0.241.0) moved the cell's two prehab blocks, nothing else.
-  'Hip stability :: Glute bridge hold 2×30 sec | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each',
+  'Hip stability :: Glute bridge hold 2×30 sec | Kettlebell hip flexor raise 2×10 each | IT band stretch 2×30 sec each',
   'Foot & ankle :: Knee-to-wall ankle rocks 2×10 each | Towel scrunches 2×20 each foot',
   'Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each',
 ];
 /** The same cell without D195 (parts A and B): the circuit's three, and no carry (coach's print of V230). */
 const CARD_F1_THREE = CARD_F1.slice(0, 1)
-  .concat(['Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8'], CARD_F1.slice(2));
+  .concat(['Leg circuit — runner armor (SS 2) :: Deficit reverse lunge (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8'], CARD_F1.slice(2));
 const CARD_FH = [
   'Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
   'Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7',
-  'Calf — achilles armor :: Machine seated calf raise 2×12–15 each, slow 3-sec lower',
+  'Calf — achilles armor :: Dumbbell split-stance calf raise 2×12–15 each, slow 3-sec lower',   // D241 drew the split-stance calf raise
   // D239 (v0.241.0) moved the cell's hip block, nothing else.
   'Hip stability :: Side plank (top leg raised) 2×20 sec each | Banded side steps 2×15–20 each @ RPE 7 | Pigeon lift-offs 2×8 each',
   'Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each',

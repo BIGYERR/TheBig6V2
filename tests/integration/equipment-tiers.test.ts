@@ -26,8 +26,8 @@ const noComments = SRC.replace(/(^|\n)([ \t]*)\/\/[^\n]*/g, '$1$2').replace(/\/\
 // ══ D43: the dumbbell floor press; D42-b: the landmine is barbell-tier ═════════════════════════════════════════
 const FP = 'Dumbbell floor press', LM = 'Landmine rotational press';
 
-test('the floor press is the last member of both chest accessory pools, the earlier members unchanged', () => {
-  assert.deepEqual(EXLIB.chest_acc, ['Dumbbell incline press', 'Dumbbell bench press', 'Dips', 'Pushups (slow tempo)', 'Diamond pushups', 'Dumbbell decline press', FP]);
+test('the floor press follows the decline press in both chest accessory pools, the earlier members unchanged (D241 appends the single-arm press)', () => {
+  assert.deepEqual(EXLIB.chest_acc, ['Dumbbell incline press', 'Dumbbell bench press', 'Dips', 'Pushups (slow tempo)', 'Diamond pushups', 'Dumbbell decline press', FP, 'Single-arm dumbbell bench press']);
   assert.deepEqual(EXLIB.chest_acc_joint, ['Dumbbell incline press', 'Dumbbell bench press', 'Machine chest press', 'Cable crossover', 'Pec deck', 'Dumbbell decline press', FP]);
   assert.equal(EXLIB.chest_acc.filter((x: string) => x === FP).length, 1);
   assert.equal(EXLIB.chest_acc_joint.filter((x: string) => x === FP).length, 1);
@@ -89,7 +89,7 @@ test('the landmine press prints only on barbell tiers, and the floor press on lo
 test('the shoulder pool\'s no-barbell branch is EXLIB.shoulder without the landmine, in order', () => {
   const line = SRC.split('\n').find((l) => /const shoulderAccPool\s*=/.test(l)) || '';
   const inner = (line.match(/\[([^\]]*)\]/) || [null, ''])[1];
-  assert.deepEqual(inner.split(',').map((x) => x.trim().replace(/^'|'$/g, '')), ['Barbell overhead press', 'Dumbbell Arnold press', 'Kettlebell single-arm press', 'Dumbbell lateral raise', 'Barbell push press']);
+  assert.deepEqual(inner.split(',').map((x) => x.trim().replace(/^'|'$/g, '')), ['Barbell overhead press', 'Dumbbell Arnold press', 'Kettlebell single-arm press', 'Dumbbell lateral raise', 'Barbell push press', 'Seated dumbbell shoulder press']);
   assert.match(line.replace(/\s/g, ''), /hasBarbell\?EXLIB\.shoulder/);
 });
 
@@ -101,8 +101,8 @@ test('the landmine press is a horizontal press; rotational core drills keep thei
   assert.notEqual(IA._pattern(LM), 'vpress');
 });
 
-test('the landmine press ends EXLIB.shoulder and lives in no other pool', () => {
-  assert.deepEqual(EXLIB.shoulder, ['Barbell overhead press', 'Dumbbell Arnold press', 'Kettlebell single-arm press', 'Dumbbell lateral raise', 'Barbell push press', LM]);
+test('the landmine press sits in EXLIB.shoulder before D241\'s seated press and lives in no other pool', () => {
+  assert.deepEqual(EXLIB.shoulder, ['Barbell overhead press', 'Dumbbell Arnold press', 'Kettlebell single-arm press', 'Dumbbell lateral raise', 'Barbell push press', LM, 'Seated dumbbell shoulder press']);
   assert.deepEqual(Object.keys(EXLIB).filter((k) => Array.isArray(EXLIB[k]) && EXLIB[k].includes(LM)), ['shoulder']);
 });
 
@@ -148,7 +148,8 @@ test('the landmine rule is exact-anchored live code above the core exemption, wi
   const loose = [], re = /\/[^/\n]*landmine[^/\n]*press[^/\n]*\//gi;
   for (let m; (m = re.exec(noComments));) if (m[0] !== '/^landmine rotational press$/' && !authored(m[0], m.index)) loose.push(m[0]);
   assert.deepEqual(loose, []);
-  assert.equal((noComments.match(/\|landmine rotational\//g) || []).length, 2);
+  // both lowback drop lists name it; since D241 more names follow it in each list
+  assert.equal((noComments.match(/\|landmine rotational[|/]/g) || []).length, 2);
 });
 
 // ══ D42-c: a one-hand press in the shoulder slot prints a side ═════════════════════════════════════════════════
@@ -257,9 +258,10 @@ test('over budget, an optional core finisher pays before the prehab rail; a fixe
   const session = (optional: boolean) => [
     { label: 'Main', items: [{ name: 'Barbell back squat', detail: '6×5' }] },
     { label: 'Chest + knee', superset: true, items: [{ name: 'Dumbbell lateral raise', detail: '5×12' }, { name: 'Spanish squat hold (KB)', detail: '4×30 sec' }, { name: 'Wall sit', detail: '4×45 sec' }] },
-    Object.assign({ label: '', core: true, coreHeader: 'Core — Rotational Power', items: [{ name: 'Standing torso rotations (slow)', detail: '5×10 each' }, { name: 'Side plank thread-the-needle', detail: '4×10 each' }] }, optional ? { optional: true } : {}),
+    Object.assign({ label: '', core: true, coreHeader: 'Core — Rotational Power', items: [{ name: 'Landmine rotations', detail: '5×10 each' }, { name: 'Side plank thread-the-needle', detail: '4×10 each' }] }, optional ? { optional: true } : {}),
   ];
-  // Hand cost: squat 6 + raise 5 + squat hold 2 + wall sit 2 + torso rotations 5 + thread-the-needle 2 = 22 against 20.
+  // Hand cost: squat 6 + raise 5 + squat hold 2 + wall sit 2 + landmine rotations 5 + thread-the-needle 2 = 22 against 20.
+  // (The torso rotation held this place until D241 A2 priced it at half, like its siblings; the landmine rotation is full.)
   IA.ctx.__et_opt = session(true);
   IA.ctx.__et_fix = session(false);
   const opt = D.clone(IA.eval('capSessionBudget(__et_opt, null)')), fix = D.clone(IA.eval('capSessionBudget(__et_fix, null)'));
@@ -349,9 +351,10 @@ test('no tier prints, keeps in its swap universe or offers on its swap sheet a t
   assert.equal(IS.sheet.crash, 0);
 });
 
-test('HALF_MANNY\'s swap universe holds 99 names: commercial owns everything, so the lens removes none', () => {
-  // 86 until D239 added the thirteen prehab names (v0.241.0); HALF_MANNY is CrossFit, which owns them all.
-  assert.equal((IA.buildProgram(fixtures.HALF_MANNY)._swapUniverse || []).length, 99);
+test('HALF_MANNY\'s swap universe holds 107 names: commercial owns everything, so the lens removes none', () => {
+  // 86 until D239 added the thirteen prehab names (v0.241.0), 99 until D241 added the eight its pools draw (v0.242.0);
+  // HALF_MANNY is CrossFit, which owns them all.
+  assert.equal((IA.buildProgram(fixtures.HALF_MANNY)._swapUniverse || []).length, 107);
 });
 
 test('the swap sheet withholds the front squat under every shoulder and elbow plan, and offers it with none', () => {

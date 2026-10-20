@@ -17,7 +17,7 @@ function buildHipSection(seed: number,bodyweight: boolean,keep?: (n: string) => 
   // D239 Amendment 1: keep is the injury plan's drop list, applied before the draw (all names when healthy).
   const _keep=(n: string): boolean => !keep||keep(n);
   const stabPool=(bodyweight
-    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction','Copenhagen plank (bent knee)','Side plank (top leg raised)','Glute bridge hold']
+    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction','Copenhagen plank (bent knee)','Side plank (top leg raised)','Glute bridge hold','Copenhagen plank (long lever)']
     : EXLIB.hip_stability).filter(_keep);
   const stab=pick(stabPool,2,seed);
   const mob=pick(EXLIB.hip_mobility.filter(_keep),1,seed+7);
@@ -28,7 +28,8 @@ function buildHipSection(seed: number,bodyweight: boolean,keep?: (n: string) => 
     "Side-lying leg raises":"2×15 each","Clamshells (bodyweight)":"2×20 each","Fire hydrants":"2×15 each","Standing hip abduction":"2×20 each",
     "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side",
     "Copenhagen plank (bent knee)":"2×20 sec each","Side plank (top leg raised)":"2×20 sec each","Glute bridge hold":"2×30 sec",
-    "Cossack squat shift":"2×6 each side, slow","Half-kneeling hip flexor stretch":"2×45 sec each","Pigeon lift-offs":"2×8 each"
+    "Cossack squat shift":"2×6 each side, slow","Half-kneeling hip flexor stretch":"2×45 sec each","Pigeon lift-offs":"2×8 each",
+    "Copenhagen plank (long lever)":"2×20 sec each","Kettlebell hip flexor raise":"2×10 each"
   };
   return {label:'Hip stability',hip:true,items:selected.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }
@@ -127,12 +128,14 @@ const CORE_PILLARS: CorePillars = {
       {name:'Bird dogs', detail:'3×20 alternating'},             // NSW + McGill Big 3
       {name:'McGill curl-up', detail:'3×6 each, 8 sec holds'},  // McGill Big 3
       {name:'Superman', detail:'3×12'},                         // NSW
-      {name:'RKC plank', detail:'3×20 sec max tension'}
+      {name:'RKC plank', detail:'3×20 sec max tension'},
+      {name:'Wall-press dead bug', detail:'3×8 each, slow'}            // D241 (P-BENCH): hands press a wall overhead
     ],
     loaded: [
       {name:'Ab wheel rollouts', detail:'3×8–10'},
       {name:'Weighted dead bugs', detail:'3×8 each'},
-      {name:'Barbell rollouts', detail:'3×8'}
+      {name:'Barbell rollouts', detail:'3×8'},
+      {name:'Hollow hold dumbbell press', detail:'3×30 sec'}           // D241 (P-BENCH): a hollow hold with a press riding on it
     ]
   },
   anti_rotation: { // Lateral stability — low fatigue, safe before anything
@@ -165,7 +168,10 @@ const CORE_PILLARS: CorePillars = {
       {name:'Hanging knee raises', detail:'3×12'},              // NSW
       {name:'Hanging leg raises', detail:'3×10'},
       {name:'Garhammer raises', detail:'3×12'},
-      {name:'Toes-to-bar', detail:'3×8'}
+      {name:'Toes-to-bar', detail:'3×8'},
+      {name:'Overhead sit-up', detail:'3×8'},                           // D241 (P-BENCH): NSW trains the sit-up for the PST
+      {name:'V-ups', detail:'3×8'},                                     // D241: the sit-up's harder rung
+      {name:'Farmer march', detail:'3×20 marches'}                      // D241: loaded hip flexion and bracing in place; the pillar's one member with no bar
     ]
   },
   rotational_power: { // Thoracic mobility / rotation — moderate, non-compressive
@@ -183,7 +189,8 @@ const CORE_PILLARS: CorePillars = {
       // rotational exposure. Each addition is DERIVED from a member already here, not invented.
       {name:'Standing torso rotations (slow)', detail:'3×10 each'},  // V178 _BW_SUBS target for Landmine rotations, promoted from substitution target to member; dose from the member it stands in for
       {name:'Side plank thread-the-needle', detail:'3×10 each'},     // NSW p.7 item 7 asks static AND dynamic trunk work; dynamic rotational form of Side plank, already prescribed from the NSW trunk table
-      {name:'Band woodchopper (door anchor)', detail:'3×12 each'}    // band form of Cable woodchoppers; dose copied from that member exactly
+      {name:'Band woodchopper (door anchor)', detail:'3×12 each'},   // band form of Cable woodchoppers; dose copied from that member exactly
+      {name:'Russian twist (heels down)', detail:'3×8 each'}            // D241 (P-BENCH): Mario's add, bodyweight only, heels down
     ]
   }
 };

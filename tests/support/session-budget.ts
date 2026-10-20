@@ -329,8 +329,13 @@ export const RULED_DELETABLE = ['Leg isolation'];
 export const V192_RULED_DEL: PerTier = { bodyweight: 72, minimal: 72, home_basic: 72, home_full: 72, commercial: 72, crossfit: 72 };
 /** D85: prehab whose name is on the list, outside the four displaced names, per tier on WIDE (V197). A floor. */
 export const D85_DISPLACED_NAMES = ['Spanish squat hold (KB)', 'Terminal knee extension (band)', 'Wall sit', 'Single-leg wall sit'];
-export const V197_PREHAB_OTHER: PerTier = { bodyweight: 330, minimal: 426, home_basic: 394, home_full: 333, commercial: 333, crossfit: 291 };
-export const V197_PREHAB_OTHER_SUM = 2107;
+// D241 Amendment 3 (coach, 2026-10-19): the loaded tiers' floors move to the D241 census. The shoulder slot gained the seated
+// dumbbell press, which takes a share of the Main's second item and the Accessory's from the lateral raise (on minimal and
+// home_basic the Main's raise 510 → 378, the press 342); the budget deletes no more prehab than before (the D47 rail below
+// holds). Bodyweight keeps its V197 floor. V197: { bodyweight: 330, minimal: 426, home_basic: 394, home_full: 333,
+// commercial: 333, crossfit: 291 }.
+export const V197_PREHAB_OTHER: PerTier = { bodyweight: 330, minimal: 356, home_basic: 336, home_full: 319, commercial: 313, crossfit: 271 };
+export const V197_PREHAB_OTHER_SUM = 1925;   // 2107 until D241 A3
 /** D47: items inside hip:true sections, per tier on WIDE. The budget cannot reach a protected section. */
 export const D47_RAIL_PER_TIER = 3072;
 /** D81: leg compound section emptyings may not rise above V197's census (41 + 855; the same 896 D85's leg family read). */

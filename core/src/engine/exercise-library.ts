@@ -10,7 +10,7 @@ export interface ExWeightRow { name: string; entries: ExWeightEntry[] }
 // EXERCISE LIBRARY
 const EXLIB: Record<string, string[]>={
   chest_compound:['Barbell bench press','Incline barbell press','Close-grip bench press','Dumbbell bench press'],
-  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press'],
+  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press','Single-arm dumbbell bench press'],
   chest_acc_joint:['Dumbbell incline press','Dumbbell bench press','Machine chest press','Cable crossover','Pec deck','Dumbbell decline press','Dumbbell floor press'],
   back_compound:['Deadlift','Trap bar deadlift','Sumo deadlift','Barbell Romanian deadlift'],
   back_row:['Barbell row','Pendlay row','Kettlebell single-arm row','Dumbbell row'],
@@ -20,7 +20,7 @@ const EXLIB: Record<string, string[]>={
   // shoulder and finishes forward at chest height, driven by hip rotation. It lives in
   // the shoulder pool because the pattern is a press, not a core drill; _pattern reads
   // it as 'hpress' for exactly that reason.
-  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Landmine rotational press'],
+  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Landmine rotational press','Seated dumbbell shoulder press'],
   shoulder_iso:['Dumbbell lateral raise','Cable lateral raise','Dumbbell front raise','Dumbbell rear delt fly','Face pull'],
   // BODYWEIGHT DELT ISOLATION (V127). Every entry in shoulder_iso above is a dumbbell or a
   // cable, so once _gearOK gained its dumbbell clause the pool emptied on the bodyweight
@@ -33,8 +33,8 @@ const EXLIB: Record<string, string[]>={
   // Two heads, two movements. Gastroc loads knee-straight, soleus loads knee-bent, so a
   // pool of standing-only variants trains half the calf. The machine seated raise is
   // cable-tier only, which left every other tier gastroc-only until the DB seated entry.
-  calves:['Dumbbell standing calf raise','Dumbbell seated calf raise','Machine seated calf raise'],
-  squat:['Back squat','Front squat','Paused back squat','Barbell box squat'],
+  calves:['Dumbbell standing calf raise','Dumbbell seated calf raise','Machine seated calf raise','Dumbbell split-stance calf raise'],
+  squat:['Back squat','Front squat','Paused back squat','Barbell box squat','Barbell pin squat'], // D241: pin squat, a dead-stop concentric from the safeties (positional: REP_AFFINITY 6)
   squat_joint:['Leg press','Dumbbell goblet squat','Hack squat (machine)','Barbell box squat'],
   // V178 (D1): landmine reverse lunge — the loaded unilateral knee-dominant lunge with a
   // fixed bar path (name says landmine → RACK class, barbell-gated by the pool's own
@@ -45,7 +45,10 @@ const EXLIB: Record<string, string[]>={
   // the anterior counterweight makes the pattern self-coaching and leaves a bail path.
   // The name deliberately avoids the word 'lateral' — _isCompound's exclusion regex
   // vetoes any name containing it, which would strip this of compound status.
-  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge'],
+  // D241 (P-BENCH): the deficit reverse lunge (more range), the goblet side lunge to a knee drive (frontal plane into a
+  // single-leg finish; no 'lateral', which _isCompound vetoes), the barbell reverse lunge (a step back is the bail) and
+  // KB step-downs (the eccentric single-leg quad drill).
+  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge','Deficit reverse lunge (KB)','Goblet side lunge to knee drive','Barbell reverse lunge','Step-downs (KB)'],
   // V178 (D1): standing cable hamstring curl — knee flexion in a running-relevant standing
   // posture. Lives in leg_accessory (which is _gear'd, so the cable gate applies) NOT in
   // hinge (which is not). _pattern reads 'hamstring curl' → leg_iso, added the same session.
@@ -84,7 +87,7 @@ const EXLIB: Record<string, string[]>={
   // with the top leg raised (glute med) and the glute bridge hold; three mobility pieces, the
   // Cossack shift (V192 kept it out of the lunge pool as mobility), the half-kneeling hip
   // flexor stretch and pigeon lift-offs. All prehab: _pattern null, doses fixed.
-  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion","Copenhagen plank (bent knee)","Side plank (top leg raised)","Glute bridge hold"],
+  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion","Copenhagen plank (bent knee)","Side plank (top leg raised)","Glute bridge hold","Copenhagen plank (long lever)","Kettlebell hip flexor raise"], // D241: the Copenhagen's long-lever rung (advanced, EX_MIN_EXP) and loaded hip flexion past 90°
   hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch","Cossack squat shift","Half-kneeling hip flexor stretch","Pigeon lift-offs"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
   // V178 (D3): FOOT & ANKLE prehab pool. The calves pool loads gastroc/soleus in plantar
   // flexion only; nothing in the file trained the tibialis, dorsiflexion, the bent-knee
@@ -135,7 +138,7 @@ function _carryRx(dist: string,name: string | null | undefined,qual?: string | n
 // that knows a press is one-handed. Barbell overhead press, Dumbbell Arnold press,
 // Dumbbell lateral raise and Barbell push press are two-hand or two-side movements
 // and must NOT print 'each'.
-const _PRESS_PER_SIDE: Record<string, number>={'Kettlebell single-arm press':1,'Landmine rotational press':1};
+const _PRESS_PER_SIDE: Record<string, number>={'Kettlebell single-arm press':1,'Landmine rotational press':1,'Single-arm dumbbell bench press':1};
 function _isOneArmPress(name: string | null | undefined): boolean{ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
 // ── REP-AFFINITY (V160, D2-b) ────────────────────────────────────────────────────────
 // A movement declares the MAX reps a wave-driven prescription may ask of it.
@@ -145,12 +148,12 @@ function _isOneArmPress(name: string | null | undefined): boolean{ return !!_PRE
 // not quads — wrong limiter — so it must never ride the endurance/hypertrophy/
 // fatloss/balanced waves. SIDECAR MAP on purpose: EXLIB stays flat strings and
 // every existing consumer is byte-identical. Untagged = unconstrained.
-const REP_AFFINITY: Record<string, { maxReps: number }>={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6}};
+const REP_AFFINITY: Record<string, { maxReps: number }>={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6},'Barbell pin squat':{maxReps:6}};
 // ── MIN EXPERIENCE (V178, D4) ─────────────────────────────────────────────────────
 // Same sidecar shape as REP_AFFINITY. A movement declares the LEAST experience tier
 // that may be handed it. Untagged = any. Applied at pool construction (buildEx) so
 // every consumer of the pool inherits it; the power pools already do this by cost.
-const EX_MIN_EXP: Record<string, Experience>={'Zercher single-leg deadlift':'advanced'};
+const EX_MIN_EXP: Record<string, Experience>={'Zercher single-leg deadlift':'advanced','Copenhagen plank (long lever)':'advanced'};
 const _EXP_RANK: Record<string, number>={beginner:0,intermediate:1,advanced:2};
 function _expOK(name: string,experience: string | null | undefined): boolean{const m=EX_MIN_EXP[name];if(!m)return true;return (_EXP_RANK[experience||'intermediate']??1)>=(_EXP_RANK[m]??0);}// V161: box squat is a dead-stop power variant — honest pause dies past ~6 reps (Mario's ruling D1-b)
 // ── STATION CLASS (V164, D1/D6) ──────────────────────────────────────────────

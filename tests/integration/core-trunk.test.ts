@@ -22,7 +22,7 @@ const clean = CT.clean;
 
 // ── the rotational power pillar (D46-a) ─────────────────────────────────────────────────────────────────────────────
 
-test('the rotational power pillar holds its seven members in the hand-typed rotation order', () => {
+test('the rotational power pillar holds its eight members in the hand-typed rotation order (seven until D241)', () => {
   const live = CT.host(IA.eval('CORE_PILLARS').rotational_power.items.map((i: { name: string }) => i.name));
   assert.deepEqual(live, CT.ROT_ORDER);
 });
@@ -91,7 +91,8 @@ test('the rotational draw is not the first two members forever, and both own-tur
   assert.doesNotMatch(body, /_pi\(\s*[A-Za-z_$][\w$]*\s*\)\s*\.slice\(0,2\)/);
   assert.doesNotMatch(body, /P\[[^\]]+\]\.items\.slice\(0,2\)/);
   const clocks = (body.match(/Math\.floor\(R\/2\)/g) || []).length + (body.match(/Math\.floor\(\(R-1\)\/3\)/g) || []).length;
-  assert.equal(clocks, 2);
+  // D241 (v0.242.0): the loaded anti-extension tier rotates on its own copy of the three-way clock, so three.
+  assert.equal(clocks, 3);
 });
 
 // ── the protect-tier upper-limb trunk block (D46-c third reader, D49 collision) ─────────────────────────────────────
@@ -105,7 +106,7 @@ test('the anti-rotation and anti-extension pillars hold the hand-typed members i
 test('every tier keeps at least two anti-rotation names the anti-extension section cannot claim (hand count)', () => {
   for (const e of CT.EQUIP) {
     const legal = CT.arLegal(e);
-    const distinct = legal.filter((n) => !CT.AE_MEMBERS.includes(n)).length;
+    const distinct = legal.filter((n) => !CT.AE_PROTECT.includes(n)).length;
     assert.ok(legal.length >= 2 && distinct >= 2, `${e}: ${legal.length} legal, ${distinct} distinct`);
   }
 });
@@ -244,12 +245,14 @@ test('a day whose only trunk section is anti-extension is floored too: the floor
 
 // ── the core-off counterfactual (D89) ────────────────────────────────────────────────────────────────────────────────
 
-test('with the family-core clause removed, Mario\'s program builds the core-off digest, and the clause moves it', () => {
+test('with the family-core clause removed, Mario\'s program builds the core-off digest, which since D241 is his own program', () => {
+  // D241 (v0.242.0) reshuffled his core and accessory draws, and the one day the clause decided (W11 Monday's Pallof press)
+  // no longer meets the budget there. The clause stays live: every core name is tier 0 by it (compound-tier.test.ts).
   const off = loadApp({ file: appCopy('core-off', [[CT.CORE_CLAUSE, '']]) });
   const a = progDigest(off.buildProgram(structuredClone(fixtures.HALF_MANNY)));
   assert.equal(progDigest(off.buildProgram(structuredClone(fixtures.HALF_MANNY))), a, 'the counterfactual equals itself');
   const shipped = progDigest(IA.buildProgram(structuredClone(fixtures.HALF_MANNY)));
-  assert.notEqual(a, shipped, 'the clause reaches Mario\'s program');
+  assert.equal(a, shipped, 'since D241 the clause decides nothing on Mario\'s program');
   matchSnapshot('core-trunk', { 'half-manny core-off digest': a });
 });
 

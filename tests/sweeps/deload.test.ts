@@ -84,12 +84,14 @@ test('Leg isolation and Explosive finisher: what the deload drops, and what it w
 });
 
 test('the trap (a posterior Main, no posterior accessory) and the swap (A gives way to B) are two disjoint populations', () => {
-  assert.equal(N.trapAnyE, 2166, 'the engine lens');
-  assert.equal(N.trapAny, 2214, 'the hand lens');
+  // D241 (v0.242.0) reshuffled the draws: the engine lens 2166 → 2160 and the hand lens 2214 → 2193; both trap populations
+  // still land on a survivor with no violation.
+  assert.equal(N.trapAnyE, 2160, 'the engine lens');
+  assert.equal(N.trapAny, 2193, 'the hand lens');
   assert.equal(N.trapCandE, 2160);
   assert.equal(N.trapCand, 2160);
   assert.equal(N.trapSurvViolE + N.trapSurvViol, 0);
-  assert.deepEqual([N.trapNoCandE, N.trapNoCandSurvViolE, N.trapNoCand, N.trapNoCandSurvViol], [6, 0, 54, 0]);
+  assert.deepEqual([N.trapNoCandE, N.trapNoCandSurvViolE, N.trapNoCand, N.trapNoCandSurvViol], [0, 0, 33, 0]);   // [6, 0, 54, 0] until D241
   assert.equal(N.swapPop, 2160);
   assert.equal(N.trapAndSwap, 0);
 });

@@ -61,8 +61,9 @@ test("the stand-in's tier C Saturdays (W1 W2 W3 W4 W8) keep a normal day", () =>
   const WANT: Record<string, string> = {
     1: '[Strength] ' + S + ', ' + RB + ' ; [' + EXP + '] Ball slams, Kettlebell swing',
     2: '[Strength] ' + S + ', ' + RB + ' ; [' + EXP + '] Ball slams, Kettlebell swing',
-    3: '[Strength] ' + PU + ', ' + RB + ' ; [' + EXP + '] Broad jumps, Ball slams',
-    4: '[Strength] ' + PU + ', ' + RB,
+    // D241 (v0.242.0): the full day's push excludes the chest accessories, which grew, so W3 and W4 draw the dips
+    3: '[Strength] ' + S + ', ' + RB + ' ; [' + EXP + '] Broad jumps, Ball slams',
+    4: '[Strength] ' + S + ', ' + RB,
     8: '[Strength] ' + PU + ', ' + RB,
   };
   for (const w of Object.keys(WANT)) assert.equal(T.shape(stand().weeks[w].sat), WANT[w], 'W' + w);

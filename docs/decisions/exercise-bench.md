@@ -254,7 +254,7 @@ injury plans named.
 
 - **Date:** 2026-10-19. Mario sent 12 more screenshots after v0.241.0. **Ruled by:** coach, in the main session, on
   measure m1's block reach (unchanged by D239 for these pools); Mario concurred 2026-10-19 ("Add all to the next build").
-  **D-codes:** when slice 2 is slotted. **Shipped:** not yet; rides slice 2.
+  **D-codes:** D241 (slice 2). **Shipped:** v0.242.0 (2026-10-19), with slice 2.
 - **The sources (12 screenshots, 6 distinct; 46 entries, 41 distinct names):** the S8 lower-body post again (Instagram
   and Meta AI, twice each: already P-BENCH); B1 Bernardo Rebeil, NFL core (hollow press 3×30-40, ball slams,
   woodchoppers, side to sides), twice; B2 Joey Bronston, stronger runner legs, four supersets (barbell Bulgarian split
@@ -343,3 +343,111 @@ Standing rule from the same exchange: every reject or fold is listed to Mario wi
 
 The folds (a movement read as one already on the bench) are listed in P-BENCH-2 and P-BENCH-6; each can be split back
 out by a ruling.
+
+## D241 P-BENCH-STRENGTH: slice 2, the strength, power and core movements, F1 and F2 (ruled 2026-10-19, building as v0.242.0)
+
+- **Date:** 2026-10-19. **Ruled by:** coach, on P-BENCH-1 #14 to #26 and P-BENCH-5 #27 to #34 and W as Mario concurred,
+  with the integration measure below. **Bump:** MINOR, v0.242.0 (Mario, 2026-10-19); Mario took the reshuffle of his
+  future core and accessory picks. **D-code:** D241 (v0.241.1, built alongside by another session, took D240).
+  **Shipped:** v0.242.0 (2026-10-19), with Amendments 1 to 3.
+- **What the integration measure found** (900 configs: 504 healthy over 7 focuses, 6 tiers, 3 experiences, run and
+  bike; 396 injured over 11 plans; HEAD's page against coach's source-surgery copy):
+  1. **A price latch.** The cost row `split-?squat jump` takes a hyphen only, so `Bulgarian split squat jumps` priced
+     0, which reads as "not power work" and walks every gate: it led a beginner's CrossFit day under a shoulder
+     protect plan. The row reads `split[- ]?squat jump`; no existing name changes price.
+  2. **Rotation locks.** The loaded anti-extension tier fires when R ≡ 2 (mod 3), so `rot(arr, R)` is index 0 forever
+     (F1); with the wall-press dead bug the static list has 6 members and its second slot `rot(static, R)` would lock
+     on index 3 the same way; dynamic bracing advances R by 3, so its 6 bodyweight members (the hanging raises, the
+     sit-up, the V-ups) would lock on two. All three now rotate on the pillar's own firing count (`T3`), the clock the
+     rotational branch already uses.
+  3. **The rehab day's trunk** draws `anti_extension.static` too: the wall-press dead bug (arms overhead, pressing a
+     wall) would reach shoulder and elbow protect plans. Both protect plans drop it, and the rehab trunk filters the
+     plan's drops before its draw (Amendment 1's `_prehabKeep`), so that day is unchanged.
+  4. **Cost asymmetry.** The bodyweight Russian twist priced full while its sibling, windshield wipers, prices half,
+     and cut a bodyweight leg accessory. The new core drills price like their siblings: `sit-up`, `v-up`, `russian
+     twist`, `farmer march` join `_isHalf` beside the hanging raises, wipers and carries.
+- **The ruling, whole:**
+  - **Pools:** `EXLIB.squat` + `Barbell pin squat` (`REP_AFFINITY` 6; the name carries `Barbell` so every gear lens
+    sees the bar); `EXLIB.squat_joint` and the no-barbell loaded squat list + `Heel-elevated goblet squat`;
+    `EXLIB.lunge` + `Deficit reverse lunge (KB)`, `Goblet side lunge to knee drive`, `Barbell reverse lunge`,
+    `Step-downs (KB)`, the no-barbell loaded lunge list the three without the bar; `EXLIB.calves` + `Dumbbell
+    split-stance calf raise`; `EXLIB.chest_acc` + `Single-arm dumbbell bench press` (in `_PRESS_PER_SIDE`, and the
+    Pump, Accessory, Chest + knee and hypertrophy Chest volume sites print `each` for a one-arm press; the fourth site
+    was found by the feature test during the build); `EXLIB.shoulder` and the no-barbell
+    shoulder list + `Seated dumbbell shoulder press`; the power lists: barbell + `Split-squat jumps`, `Bulgarian split
+    squat jumps`, `Plyo pushups`, `Single-leg box jumps`, `Seated box jumps`; no-barbell loaded + `Split-squat jumps`,
+    `Bulgarian split squat jumps`, `Plyo pushups`; bodyweight + `Bulgarian split squat jumps`, `Plyo pushups`; a cost
+    row `seated box jump` 1.0 above the `box jump` row. Core: `anti_extension.static` + `Wall-press dead bug` 3×8
+    each, slow; `.loaded` + `Hollow hold dumbbell press` 3×30 sec; `dynamic_bracing` + `Overhead sit-up` 3×8, `V-ups`
+    3×8, `Farmer march` 3×20 marches (`_AUX_GEAR` loaded); `rotational_power` + `Russian twist (heels down)` 3×8 each.
+    Hip block: `hip_stability` + `Copenhagen plank (long lever)` 2×20 sec each (`EX_MIN_EXP` advanced, read by
+    `_prehabKeep`) and `Kettlebell hip flexor raise` 2×10 each; the bodyweight list + the long lever. Wildcard: `Lap
+    and Station` in the fat loss and athletic pools.
+  - **F1 and F2:** the loaded anti-extension pick is `rotOn(T3, legal loaded, 0)` beside `rotOn(T3, static, 0)`, the
+    loaded list through `_auxGearOK`; bodyweight (no legal loaded member) draws two static members. Dynamic bracing
+    draws `rotOn(T3, …, T3)` and `T3+1`, like rotational power.
+  - **Classifier and doses:** the core exemption line names `sit-up|v-up|russian twist|farmer march`; the prehab line
+    `hip flexor raise`; the lunge row `step-down`; `_BW_KEEP_FIXED` gains `hip flexor raise`.
+  - **Injury plans:** shoulder/protect drops the hollow hold press and the wall-press dead bug; shoulder/workaround
+    drops `shoulder press`, `plyo push` and the hollow hold press (its `overhead` token already takes the overhead
+    sit-up, a conservative read kept on purpose); elbow/protect drops the hollow hold press and the wall-press dead bug;
+    elbow/workaround drops `plyo push` and the hollow hold press; both lowback plans drop `sit-up|v-up|russian twist`;
+    hip/protect drops `hip flexor raise`; a no-carry plan (lowback, elbow) drops `farmer march` with the carries.
+    Patterns do the rest (knee and ankle drop the jumps, the lunges and the squats as they drop the old ones).
+- **Before and after (source-surgery copy against HEAD's page; v0.241.1 touched no engine file):** THE HALF MANNY
+  b7ca51befcf96a9e → **edde70565043d2db** (self-stable). 20 days change, weeks 5 to 12: his accessory and Main second
+  items draw the single-arm DB bench and the seated DB press (W8 Monday's accessory, before `Diamond pushups 2 sets`,
+  after `Single-arm dumbbell bench press 2×8–12 each @ RPE 7`), his Tuesday runner armor circuit draws the KB
+  step-downs (W8), his rotational core days draw the Russian twist. 0 violations over the 900 configs (gear, tier,
+  runner, experience, injury, the power gates by cost, every dose, the side on every one-arm press).
+- **Knock-ons, classified (after Amendments 1 to 3):** on the 7-focus lattice 54,500 days change: 51,514 keep their item
+  count (redraws: a pick that excludes another pick, such as the full day's push excluding the chest accessories,
+  re-draws when those change; a Main's label follows its new lift); 2,680 gain items and 306 lose one (692 before A2), the budget re-trimming a day whose
+  cost moved because a pillar's rotation now lands on a member priced differently (a `Standing torso rotations` priced
+  full where a `Side plank thread-the-needle` priced half stood). No name prints where the tables above do not allow.
+- **Tests** (`tests/unit/exercise-bench.test.ts`, `tests/integration/exercise-bench.test.ts`): every power-pool member
+  has a price; each new name prints with its dose on its tiers and nowhere else; the one-arm press prints a side; the
+  long lever only for advanced; the injury drops beside healthy twins; the core rotations reach every member on every
+  tier; bodyweight never prints a loaded anti-extension member; the rehab trunk never prints the wall press; the new
+  core drills cost half; the wildcard holds the session; THE HALF MANNY's digest in the program-output snapshot.
+
+### D241 Amendment 1: the lowback plans keep the barbell reverse lunge out of the draw (coach, 2026-10-19, during the build)
+
+- **Found by re-pinning a typed card:** the full-lower and leg superset A slots drew `Barbell reverse lunge` 135 times
+  on each lowback plan (protect and workaround) over 60 lift-only programs, while those plans print no barbell squat at
+  all (their pool overrides keep every one away). A back-racked bar on a protected back contradicts the plan.
+- **Amended:** both lowback plans drop `barbell reverse lunge`, and Engine C filters the lunge pool by the plan's drop
+  list before `_preInj` (so the injury guard does not read it as a redirect), the way D239 A1 filters the prehab pools:
+  the slot draws a held lunge instead of printing short. No other lunge pool name is in any drop list, so nothing else
+  moves; the swap and add sheets stop offering it to a lowback athlete through the same list. 0 barbell lunges and 0
+  short lunge supersets under either lowback plan after; THE HALF MANNY unchanged (edde70565043d2db).
+
+### D241 Amendment 2: the lowback swaps, the torso rotation price, and the older lifter's squat (coach, 2026-10-19, during the build)
+
+- **Found by the sweeps' floors:** (a) dropping the sit-up, V-ups and Russian twist under lowback emptied core blocks
+  that drew two of them: lowback/protect core sections fell to 1,188 under the V192 census floor of 1,224. (b) On
+  bodyweight the eight-member rotation lands more often on `Standing torso rotations (slow)`, the one rotational member
+  priced at full sets while wipers and thread-the-needle price half; the budget then cut a delt prehab drill and the
+  D85/D47 floor fell (bodyweight 318 against 330). (c) `Heel-elevated goblet squat` in `EXLIB.squat_joint` broke V210's
+  lock (older hypertrophy on CrossFit and home full squats the goblet or the front squat), and heel elevation loads
+  the knee forward, which is the wrong half of a joint-friendly pool.
+- **Amended:** (a) under both lowback plans the three swap through `SPINE_SWAP` like the hanging raises (`Overhead
+  sit-up` → `Dead bugs`, `V-ups` → `Bird dogs`, `Russian twist (heels down)` → `Standing torso rotations (slow)`, a rotation with no
+  flexion, so the rotational block keeps its job) and leave the drop lists,
+  which keep only `barbell reverse lunge` of D241's names; (b) `torso rotation` joins `_isHalf` beside its siblings
+  (the hand cost oracles in the tests follow); (c) `Heel-elevated goblet squat` leaves `EXLIB.squat_joint` and stays in
+  the no-barbell loaded squat list only. THE HALF MANNY stays edde70565043d2db; the build equals the source-surgery
+  copy on all 1,728 lattice programs; 0 violations over the 900 configs; days that lose an item fall from 692 to 306.
+
+### D241 Amendment 3: the delt prehab floors on the loaded tiers move with the shoulder slot (coach, 2026-10-19)
+
+- **Found by the sweep's V197 floor ("prehab outside the four D85 names stays at or above V197"):** every loaded tier fell
+  under it (minimal 426 → 356, home_basic 394 → 336, home_full 333 → 319, commercial 333 → 313, CrossFit 291 → 271;
+  bodyweight 336, above its 330). The cause is the draw, not the budget: the shoulder slot gained `Seated dumbbell
+  shoulder press`, which takes a share of the Main's second item and the Accessory's from `Dumbbell lateral raise` (on
+  minimal and home_basic the Main's raise 510 → 378, the press 342; home_full 282 → 252, the press 258). A real press
+  as the press partner at 8 reps is the better prescription; the Delt finisher and Delts sections are unchanged or up.
+- **Ruled:** the floor's job (the budget may not delete prehab: D85 confinement and the D47 rail) is intact; the floors
+  of the loaded tiers move to the D241 census (bodyweight keeps 330), written beside the old values in
+  `tests/support/session-budget.ts`. No code change. Mario may push back: the alternative is to keep the seated press
+  off the no-barbell shoulder list, which costs a dumbbell gym its only strict vertical press.

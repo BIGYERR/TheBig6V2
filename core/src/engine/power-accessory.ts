@@ -37,9 +37,10 @@ const _STACK_LOADED=/^(face pull|pec deck|leg extension|rope tricep extension)\b
 // prescribes, and the guide's own volume-DOWN-as-intensity-climbs progression falls out
 // of the arithmetic instead of needing a second rule.
 const _POWER_COST: [RegExp, number][] = [
+  [/seated box jump/i,                                                    1.0], // D241: a seated takeoff onto the box, no countermovement and no landing from height
   [/depth jump|depth fall|box jump|in-?depth/i,                         2.0], // shock: landing from height. V178: 'depth fall' — same drop, same landing
   [/single-?leg landing|\bsl landing\b/i,                                1.5], // V178 (D2): a bilateral takeoff that LANDS on one leg is priced by the landing
-  [/single-?leg hop|single-?arm k[bB] snatch|bounding|split-?squat jump/i, 1.5], // unilateral landing
+  [/single-?leg hop|single-?arm k[bB] snatch|bounding|split[- ]?squat jump/i, 1.5], // unilateral landing
   [/broad jump|jump squat|tuck jump|skater bound|lateral bound|trap bar jump|\bjump\b|pogo/i, 1.0], // double-leg. V178: pogo hops priced here — unpriced they were the swing latch all over again (cost 0 = 'not power work')
   [/ball slam|wall ball|plyo push|clap push|kettlebell swing/i,         0.5], // no landing, low CNS: med-ball work + hip ballistics
   // V143: loaded weightlifting derivatives moved 0.5 → 1.0. At 0.5 they shared a tier with
@@ -217,7 +218,7 @@ function _powerAllowed(name: string, experience: string | null | undefined, inju
   const ageCap = _POWER_AGE_MAX_COST[ageBracket||'18-35'] || 2.0;
   return c <= Math.min(expCap, ageCap);
 }
-const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation|ankle rock|towel scrunch|tiptoe walk|cossack|pigeon/i;   // D239: the slice 1 prehab doses are fixed
+const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation|ankle rock|towel scrunch|tiptoe walk|cossack|pigeon|hip flexor raise/i;   // D239: the slice 1 prehab doses are fixed
 function _bwSetsFromDetail(detail: string | null | undefined, wk?: number, exp?: string | null, prev?: boolean): string{
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;

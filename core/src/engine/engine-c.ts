@@ -47,7 +47,8 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
   const _inj = injuryPlan(cfg);
   // D239 Amendment 1: the plan's drop list comes out of the prehab pools before the draw, so an injured athlete's hip
   // and foot & ankle blocks keep their full count instead of losing a drawn drill to applyInjuryFilter afterwards.
-  const _prehabKeep = (n: string): boolean => !(_inj && _inj.dropNames && _inj.dropNames.test(n));
+  // D241: and the experience floor (EX_MIN_EXP), so the long-lever Copenhagen reaches only an advanced athlete.
+  const _prehabKeep = (n: string): boolean => !(_inj && _inj.dropNames && _inj.dropNames.test(n)) && _expOK(n, cfg.experience);
   // V153 (F2): set by buildSections from opts.hotNext at entry, read by scheme(). A
   // closure variable rather than a scheme() parameter because scheme has ~30 call sites
   // and _inj/strengthSupport already travel this exact road. Days build serially, so a
@@ -313,7 +314,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
   const olderHyp=(goal==='hypertrophy')&&(cfg.ageBracket==='55+'||cfg.ageBracket==='36-54');
   let chestCompoundPool=hasBarbell?_gear(olderHyp?['Dumbbell bench press','Dumbbell incline press','Machine chest press','Close-grip bench press']:EXLIB.chest_compound):_bw(['Incline pushups (hands on bed)','Pushups (slow 3s eccentric)','Decline pushups (feet elevated)','Diamond pushups','Archer pushups'],['Dumbbell bench press','Dumbbell incline press','Dumbbell decline press','Pushup variation (weighted)']);
   let backCompoundPool=hasBarbell?EXLIB.back_compound:_bw(['Inverted row (knees bent, under a table)','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell single-leg deadlift','Dumbbell Romanian deadlift']);
-  let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)']);
+  let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)','Heel-elevated goblet squat']);
   // V210 (2b): advanced 55+ older hypertrophy on crossfit or home_full draws goblet OR front
   // squat, once, for the whole program (hypertrophy is locked; the lock outranks alternation).
   // Under any shoulder or elbow plan the front rack is withheld on every tier: it loads wrist
@@ -326,7 +327,11 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
   // V192 (D41): the frontal-plane lunge reaches the no-barbell tier through the LOADED
   // list only. The bodyweight list beside it is a rung ladder (easy->hard, windowed by
   // _bwRung); a goblet needs a bell, and inserting it there would also shift the window.
-  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat','Dumbbell goblet side lunge']);
+  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat','Dumbbell goblet side lunge','Deficit reverse lunge (KB)','Goblet side lunge to knee drive','Step-downs (KB)']);
+  // D241: a plan's drop list leaves the lunge pool before the draw (filtered here, before _preInj, so the injury guard
+  // does not read it as a redirect). Today it takes one name: the back-racked barbell reverse lunge under either lowback
+  // plan, which already keeps every barbell squat away; the slot draws a held lunge instead of printing short.
+  { const _ip=injuryPlan(cfg), _dn=_ip&&_ip.dropNames; if(_dn) lungePool=lungePool.filter(n=>!_dn.test(n)); }
   let hingePool=hasBarbell?EXLIB.hinge.filter(n=>_expOK(n,cfg.experience)):_bw(['Bodyweight back extension','Single-leg glute bridge','Single-leg Romanian deadlift (bodyweight)','Nordic hamstring curl (anchored)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell Romanian deadlift','Double Kettlebell deadlift']);
   // Loaded posterior-chain / hip-extension pool. Complements the hinge (RDL is hamstring/
   // erector-biased; these are glute- and eccentric-hamstring-biased). GHR/Nordic are the
@@ -358,7 +363,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
   // through on every tier including bodyweight. Gated here the way lungePool is
   // gated one screen above. The no-barbell branch is EXLIB.shoulder minus the
   // landmine, member for member, so no other tier's shoulder content moves.
-  const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press']);
+  const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Seated dumbbell shoulder press']);
   // V193 (same-card, slice 5): the chest-accessory pool was an inline literal at its ONE
   // draw site, so buildSections had no legal way to re-walk it when the name it was handed
   // turned out to be the name the day's Main lift already held. It is a named pool now, on
@@ -379,8 +384,10 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
   // shares the same internal 'athletic' goal but keeps the standard calisthenic day.)
   const athleticSupport=cfg.liftingFocus==='support_athletic';
   const powerPool=hasBarbell
-    ?['Broad jumps','Box jumps','Jump squats','Kettlebell swing','Power clean (light & explosive)','Trap bar jump','Pogo hops','Rotational jump to single-leg landing','Depth fall to single-leg bounds']
-    :_bwFlat(['Jump squats','Broad jumps','Tuck jumps','Skater bounds','Split-squat jumps','Lateral bounds','Pogo hops','Rotational jump to single-leg landing'],['Broad jumps','Jump squats','Tuck jumps','Lateral bounds','Kettlebell swing','Single-arm KB snatch','Pogo hops']);
+    ?['Broad jumps','Box jumps','Jump squats','Kettlebell swing','Power clean (light & explosive)','Trap bar jump','Pogo hops','Rotational jump to single-leg landing','Depth fall to single-leg bounds','Split-squat jumps','Bulgarian split squat jumps','Plyo pushups','Single-leg box jumps','Seated box jumps']
+    :_bwFlat(['Jump squats','Broad jumps','Tuck jumps','Skater bounds','Split-squat jumps','Lateral bounds','Pogo hops','Rotational jump to single-leg landing','Bulgarian split squat jumps','Plyo pushups'],['Broad jumps','Jump squats','Tuck jumps','Lateral bounds','Kettlebell swing','Single-arm KB snatch','Pogo hops','Split-squat jumps','Bulgarian split squat jumps','Plyo pushups']);
+  // D241 (P-BENCH): split-squat jumps reach the loaded tiers; the Bulgarian split squat jumps, plyo pushups and the single-leg
+  // and seated box jumps join, each priced by _POWER_COST (1.5, 0.5, 2.0, 1.0), so _powerAllowed gates them by cost.
   // V178 (D2/D4): three additions. Pogo hops (1.0, stiffness/elastic), rotational jump to
   // single-leg landing (1.5, priced by the landing), depth fall to single-leg bounds (2.0
   // shock — advanced AND 18–35 only, by the existing min(exp,age) cap; no new gate). The
@@ -875,7 +882,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
         // the floor case at 3 — Bird dogs, Side plank, Plank shoulder taps, the three members
         // _AUX_GEAR (search '_AUX_GEAR=') leaves untagged. Re-derive, do not trust this line.
         const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));
-        const _ae=CORE_PILLARS.anti_extension.static;
+        const _ae=CORE_PILLARS.anti_extension.static.filter(it=>_prehabKeep(it.name));   // D241: the plan's drops leave before the draw (the overhead wall press on a protect shoulder or elbow)
         // V193 (slice 4): 'Bird dogs' is a member of BOTH pillars — D49 added it to
         // anti-rotation and anti_extension.static has always held it — and these two sections
         // draw from two independent rotations, so the same movement could land on both and
@@ -943,7 +950,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
         const lightPress=pick(lightPressPool.length?lightPressPool:[_lpFallback],1,blockSeed(w)+40)[0];
         const lightTri=pick(_bw(['Bench dips (chair)','Close-grip pushups','Diamond pushups'],_gear(EXLIB.triceps)),1,blockSeed(w)+41)[0];
         s.push({label:'Main — '+lightPress,items:[{name:lightPress,detail:vsets(3)+'×12 — RPE 6–7, leave 3+ in reserve'+restNote},{name:ex.shoulder[1],detail:vsets(3)+'×12'+(_isOneArmPress(ex.shoulder[1])?' each':'')}]});
-        s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'},{name:lightTri,detail:vsets(3)+'×15'}]});
+        s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'+(_isOneArmPress(ex.chestAcc[1])?' each':'')},{name:lightTri,detail:vsets(3)+'×15'}]});
         if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)
           s.push({label:'Light finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[2],detail:vsets(3)+'×15'},{name:ex.cond[3],detail:vsets(3)+'×12'}]});
         else {
@@ -1009,7 +1016,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
         // 2) Secondary varied compound (3 sets)
         s.push({label:'Secondary compound — '+secondary,items:[{name:secondary,detail:hsets+'×'+repA}]});
         // 3) Hypertrophy/pump accessories (chest angle + 2 delts)
-        s.push({label:'Chest volume',items:[{name:chest2[0],detail:hsets+'×'+repB}]});
+        s.push({label:'Chest volume',items:[{name:chest2[0],detail:hsets+'×'+repB+(_isOneArmPress(chest2[0])?' each':'')}]});   // D241: a one-arm press prints its side
         s.push({label:'Delts',superset:true,rounds:hsets,items:[{name:delts[0],detail:hsets+'×'+repB},{name:delts[1],detail:hsets+'×'+repB}]});
         // 4) Direct isolation slot (triceps)
         s.push({label:'Triceps',superset:true,rounds:hsets,items:[{name:tris[0],detail:hsets+'×'+repA},{name:tris[1],detail:hsets+'×'+repB}]});
@@ -1054,12 +1061,12 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
         const _accA=_accFresh([ex.chestAcc[0],ex.chestAcc[1]]);
         if(_accA){
           const _sp=_ssPair(_accA,ex.shoulder[1],[],shoulderAccPool.filter(n=>n!==ex.shoulder[0]));
-          s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
+          s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'+(_isOneArmPress(_sp.a)?' each':'')},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
         }
       }
       if(!isBeginner){
         const _ckA=_accFresh([ex.chestAcc[1],ex.chestAcc[0]]);
-        if(_ckA) s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:_ckA,detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
+        if(_ckA) s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:_ckA,detail:vsets(3)+'×12'+(_isOneArmPress(_ckA)?' each':'')},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
       }
       }
     } else if(role==='pull'){

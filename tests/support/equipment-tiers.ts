@@ -68,7 +68,7 @@ const GATED: { name: string; need: keyof Gear }[] = [
 ];
 const UNGATED_CORE = ['Windshield wipers', 'Standing torso rotations (slow)', 'Side plank thread-the-needle', 'Bird dogs', 'Plank shoulder taps', 'Side plank'];
 // Legal rotational_power members per tier, counted by hand off the table above.
-const ROT_LEGAL: Record<string, number> = { bodyweight: 3, minimal: 3, home_basic: 4, home_full: 5, commercial: 7, crossfit: 6 };
+const ROT_LEGAL: Record<string, number> = { bodyweight: 4, minimal: 4, home_basic: 5, home_full: 6, commercial: 8, crossfit: 7 };   // D241: the bodyweight Russian twist is legal on every tier
 const AR_MEMBERS: { name: string; need: keyof Gear | null }[] = [
   { name: 'Bird dogs', need: null }, { name: 'Side plank', need: null }, { name: 'Plank shoulder taps', need: null },
   { name: 'Pallof press', need: 'bands' }, { name: 'Dumbbell renegade rows', need: 'load' },

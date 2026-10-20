@@ -1,7 +1,7 @@
 {
   "wide lattice": {
-    "chestKneeSections": 4770,
-    "chestKneeWithoutChest": 891,
+    "chestKneeSections": 4758,
+    "chestKneeWithoutChest": 909,
     "elbowWorkaroundOneItemBiceps": 412
   }
 }

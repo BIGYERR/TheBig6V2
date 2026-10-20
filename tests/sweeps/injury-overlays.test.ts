@@ -192,7 +192,7 @@ test('the lite lattice on the overlay path: W5 sheets offer nothing the plan rej
       for (const r of o3[d].rows) { const x = K[r.k]; x.n3++; if (o3[d].stamp) x.st3++; x.rej3 += judge(r.L, cfg).length; }
     }
   }
-  const WANT: Record<string, number> = { pat: 4608, aux: 1814, add: 1440 };
+  const WANT: Record<string, number> = { pat: 4613, aux: 1829, add: 1440 };   // pat 4608, aux 1814 until D241 widened the pools and families
   for (const k of Object.keys(WANT)) {
     const x = K[k];
     assert.deepEqual([x.n5, x.st5, x.rej, x.rows, x.eqFix], [WANT[k], WANT[k], 0, 0, WANT[k]], `${k}: rows, stamped, rejected names, rows with one, == fixture`);
@@ -255,7 +255,7 @@ test('every capped single hop of the seven D190 configs holds, live and at boot,
       }
     }
   }
-  assert.deepEqual(tally, { cued: 14, bw7: 196, bw8: 0, above: 114, aboveHold: 114 });
+  assert.deepEqual(tally, { cued: 8, bw7: 188, bw8: 0, above: 108, aboveHold: 108 });   // { 14, 196, 0, 114, 114 } until D241 reshuffled the hops; every hop above 7 still holds
 });
 
 // ── D193 (k) and (l): every Main and Power swap pair of the lite lattice, overlay shape and fixture ──────────────────
@@ -278,12 +278,13 @@ test('every Main and Power swap pair of the lite lattice reads the hand hold and
   }
   assert.equal(differ, 0, 'the overlay shape and the fixture print the same card and toast on every pair');
   assert.deepEqual(S.ex, []);
-  assert.deepEqual([S.pairs, S.thr], [150989, 0]);
-  assert.deepEqual([S.clamp, S.hv, S.hvK, S.hvMiss], [1253, 1253, { verbatim: 694, unloadable: 360, window: 199 }, 0], 'every clamp pair prints its hold toast');
-  assert.deepEqual([S.fals, S.holdOff, S.info], [0, 0, 458], 'no false same-numbers claim on a clamp pair, no hold toast off it');
-  assert.deepEqual([S.G3a, S.G3aCls, S.G3aMiss], [839, { donor: 529, window: 199, verbatim: 111 }, 0], 'every Main card is the hand card');
+  assert.deepEqual([S.pairs, S.thr], [156872, 0]);   // 150989 pairs until D241
+  // 1253 clamp pairs (694 verbatim) until D241 reshuffled the draws; every pair still prints its toast
+  assert.deepEqual([S.clamp, S.hv, S.hvK, S.hvMiss], [1241, 1241, { verbatim: 682, unloadable: 360, window: 199 }, 0], 'every clamp pair prints its hold toast');
+  assert.deepEqual([S.fals, S.holdOff, S.info], [0, 0, 380], 'no false same-numbers claim on a clamp pair, no hold toast off it');   // 458 info toasts until D241
+  assert.deepEqual([S.G3a, S.G3aCls, S.G3aMiss], [851, { donor: 529, window: 199, verbatim: 123 }, 0], 'every Main card is the hand card');   // 839 (verbatim 111) until D241
   assert.ok(S.pow > 0 && S.powChg === 0, 'power cards keep their dose');
-  assert.deepEqual([S.off, S.offMiss, S.at, S.atMiss, S.nul, S.nulMiss, S.win, S.winMiss], [172, 0, 263, 0, 205, 0, 199, 0]);
+  assert.deepEqual([S.off, S.offMiss, S.at, S.atMiss, S.nul, S.nulMiss, S.win, S.winMiss], [184, 0, 263, 0, 205, 0, 199, 0]);   // off 172 until D241
   assert.deepEqual({ clamp: S.bt.clamp, hv: S.bt.hv, G3a: S.bt.G3a, off: S.bt.off, nul: S.bt.nul }, { clamp: 10, hv: 10, G3a: 7, off: 4, nul: 3 }, 'the bed-thrust donor');
   for (const k of ['G3a', 'off', 'at', 'nul', 'win', 'hv', 'fals'] as const) assert.equal(F[k], S[k], `fixture ${k}`);
 });

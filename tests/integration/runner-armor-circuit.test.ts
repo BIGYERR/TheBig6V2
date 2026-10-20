@@ -60,22 +60,23 @@ test('the Tuesday calf and carry strings read YYY-YYY-YYY--- over the 14 weeks',
   assert.equal(carry, RA.CARRY_STR);
 });
 
-test("HALF_MANNY's swap universe is the 99 names, with the fourth item and without it", () => {
-  // D195-A-a: a-uni (86 names; D239 adds the thirteen prehab names its pools register)
+test("HALF_MANNY's swap universe is the 107 names, with the fourth item and without it", () => {
+  // D195-A-a: a-uni (86 names; D239 adds the thirteen prehab names its pools register, D241 the eight more)
   for (const prog of [p, q]) {
     const U = Array.from(prog._swapUniverse || []);
-    assert.equal(U.length, 99);
+    assert.equal(U.length, 107);
     assert.deepEqual(U.slice().sort(), RA.UNIVERSE.slice().sort());
   }
 });
 
-test('part A without part B is 3e88e365246858f3, part B without part A is b1b15c80f1a703f1 (the ruling printed both, moved by D239)', () => {
-  // D195-A-a: a-cfA, a-cfB. D239 (v0.241.0) moved both: its prehab draws reach every Tuesday (were f5ed630033ebe3db, 0ac7da6b1691a8e1).
+test('part A without part B is 93fd2d1d3a43f192, part B without part A is c17e854e54e86f57 (the ruling printed both, moved by D239 and D241)', () => {
+  // D195-A-a: a-cfA, a-cfB. D239 (v0.241.0) moved both (were f5ed630033ebe3db, 0ac7da6b1691a8e1), D241 (v0.242.0) again
+  // (were 3e88e365246858f3, b1b15c80f1a703f1): their draws reach his Tuesdays and his core days.
   const A = SB.twice(SB.noCostLens(), fixtures.HALF_MANNY);
   assert.ok(A.self);
-  assert.equal(A.dig, '3e88e365246858f3');
-  assert.equal(N.dig, 'b1b15c80f1a703f1');
-  assert.equal(Array.from(A.prog._swapUniverse || []).length, 99);
+  assert.equal(A.dig, '93fd2d1d3a43f192');
+  assert.equal(N.dig, 'c17e854e54e86f57');
+  assert.equal(Array.from(A.prog._swapUniverse || []).length, 107);
 });
 
 // ── the regional trim (A3c, A5) ──────────────────────────────────────────────────────────────────────────────────

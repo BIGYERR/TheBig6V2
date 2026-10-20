@@ -497,9 +497,10 @@ export const HEP_CARDS: HepCard[] = [
       'Hip extension + push (SS 2) :: ' + BRIDGE + ' ' + R7_2 + ' | Pushups (slow 3s eccentric) ' + R7_2],
     pre: ['Lower strength (SS 2) :: Reverse lunge ' + R7_2 + ' | ' + BED + ' ' + R7_2, 'Hip extension + push :: Pushups (slow 3s eccentric) ' + R7_2] },
   { tag: 'commercial balanced beginner pace, W9 Saturday', key: 'commercial|balanced|beginner|pace|lowback/protect|sun|1013', at: [['9', 'sat']],
-    after: ['Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust ' + R7_2,
+    // D241 (v0.242.0) drew the KB step-downs into this lunge slot, nothing else on the card.
+    after: ['Lower strength (SS 2) :: Step-downs (KB) 2×8–12 each @ RPE 8 | Banded hip thrust ' + R7_2,
       'Hip extension + push (SS 2) :: ' + SLHT + ' 2×10 — hold RPE 7, three in the tank | Diamond pushups ' + R7_2],
-    pre: ['Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust ' + R7_2,
+    pre: ['Lower strength (SS 2) :: Step-downs (KB) 2×8–12 each @ RPE 8 | Banded hip thrust ' + R7_2,
       'Hip extension + push (SS 2) :: Banded hip thrust ' + R7_2 + ' | Diamond pushups ' + R7_2] },
   { tag: 'bodyweight hypertrophy advanced, W1 Saturday', key: 'bodyweight|hypertrophy|advanced|liftonly|lowback/protect|sun|1013', at: [['1', 'sat']],
     after: ['Lower strength (SS 4) :: Bulgarian split squat (foot on chair) ' + R8_4 + ' | ' + BRIDGE + ' ' + R7_4,

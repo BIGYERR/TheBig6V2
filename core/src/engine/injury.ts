@@ -95,7 +95,7 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
       P.drop=new Set(['hinge','lunge','hip_ext']);
       P.cap=new Set(['squat']);
       // D239: the prehab block's adductor plank, end-range Cossack and bridge hold sit out with hip extension.
-      P.dropNames=/swing|pull-through|pull through|copenhagen|cossack|glute bridge hold/i;
+      P.dropNames=/swing|pull-through|pull through|copenhagen|cossack|glute bridge hold|hip flexor raise/i;
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','lunge','hip_ext','squat']);
@@ -118,13 +118,13 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
       // athlete rotates from the hip rather than the lumbar spine. Matches
       // 'landmine rotational', which does not touch 'Landmine rotations' (no 'al')
       // or 'Landmine reverse lunge'.
-      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through|landmine rotational/i;
+      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through|landmine rotational|barbell reverse lunge/i;   // D241: a back-racked lunge sits out (the flexion drills swap, below)
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','squat','row','hip_ext']);
       // V192 (D42): same reason as the protect tier above. 'hpress' is uncapped here
       // too, so the only lever that reaches this movement is the name.
-      P.dropNames=/good morning|swing|pendlay|landmine rotational/i;
+      P.dropNames=/good morning|swing|pendlay|landmine rotational|barbell reverse lunge/i;
       P.cardioMode='easy';
     }
   } else if(R==='shoulder'){
@@ -137,7 +137,7 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
       // Ab wheel and hanging work are named too — _pattern() returns null for core,
       // so P.drop can never reach them, and both load an irritated shoulder hard.
       P.drop=new Set(['hpress','vpress','tri_iso']);
-      P.dropNames=/\bdips\b|bench dips|lateral raise|front raise|ab wheel|hanging|l-sit|dragon flag/i;
+      P.dropNames=/\bdips\b|bench dips|lateral raise|front raise|ab wheel|hanging|l-sit|dragon flag|hollow hold dumbbell press|wall-press dead bug/i;   // D241
       P.cardioMode='swimout';
     } else {
       P.cap=new Set(['hpress','vpress','delt_iso']);
@@ -146,7 +146,7 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
       // Lateral raise out, front raise stays. The previous list had this backwards:
       // loaded abduction is the impingement arc, while a front raise in the scapular
       // plane is generally tolerated. Face pulls and rear delt work stay either way.
-      P.dropNames=/overhead|arnold|push press|military|pike pushup|pike pushups|handstand|wall walk|\bdips\b|bench dips|lateral raise/i;
+      P.dropNames=/overhead|arnold|push press|military|pike pushup|pike pushups|handstand|wall walk|\bdips\b|bench dips|lateral raise|shoulder press|plyo push|hollow hold dumbbell press/i;   // D241
       // V192 (D43): the workaround tier's job is to substitute, not just subtract.
       // The floor stops the elbow at torso depth — the impingement-adjacent range
       // the dropNames above already avoid. Runs after dropNames, so nothing here
@@ -159,14 +159,14 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
     if(T==='protect'){
       P.drop=new Set(['tri_iso','bi_iso','hpress','vpress']);
       P.cap=new Set(['row','vpull']);
-      P.dropNames=/\bdips\b|bench dips|skullcrush/i;
+      P.dropNames=/\bdips\b|bench dips|skullcrush|hollow hold dumbbell press|wall-press dead bug/i;   // D241
     } else {
       // V185 (D2-c): vpull added. D2 moved pulldowns off 'row', which would have handed a
       // cranky elbow an UNCAPPED lat pulldown. Chinups were already uncapped here, so this
       // is an existing gap the reclassification exposed rather than one it created: loaded
       // elbow flexion is loaded elbow flexion whichever direction you pull.
       P.cap=new Set(['hpress','tri_iso','bi_iso','row','vpull']);
-      P.dropNames=/\bdips\b|bench dips/i;
+      P.dropNames=/\bdips\b|bench dips|plyo push|hollow hold dumbbell press/i;   // D241
       P.swapNames={'Dumbbell skullcrushers':'Cable pushdown','Barbell curl':'Dumbbell hammer curl','Preacher curl':'Cable curl'};
     }
   }
@@ -214,7 +214,8 @@ function _capRpeClamp<T>(d: T): T | string{
 function applyInjuryFilter(sections: Section[],cfg: Cfg | null | undefined): Section[]{
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
-  const SPINE_SWAP: Record<string, string | null>={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};
+  // D241 A2: the new flexion and twist drills swap to spine-safe ones the way the hanging raises do, so a lowback core block keeps its count.
+  const SPINE_SWAP: Record<string, string | null>={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs','Overhead sit-up':'Dead bugs','V-ups':'Bird dogs','Russian twist (heels down)':'Standing torso rotations (slow)'};
   const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck/i;
   const out: Section[]=[];
   sections.forEach(s=>{
@@ -232,7 +233,7 @@ function applyInjuryFilter(sections: Section[],cfg: Cfg | null | undefined): Sec
       if(pat&&P.drop.has(pat)) return;
       if(P.dropNames&&P.dropNames.test(name)) return;
       if(P.noJumps&&JUMPS.test(name)) return;
-      if(P.noCarry&&/carry/i.test(name)) return;
+      if(P.noCarry&&/carry|farmer march/i.test(name)) return;   // D241: a farmer march is a carry in place
       if(P.spineSafeCore&&Object.prototype.hasOwnProperty.call(SPINE_SWAP,name)){
         const sw=SPINE_SWAP[name];
         if(!sw) return;

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.241.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.242.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1762,7 +1762,7 @@ function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg
 // EXERCISE LIBRARY
 const EXLIB={
   chest_compound:['Barbell bench press','Incline barbell press','Close-grip bench press','Dumbbell bench press'],
-  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press'],
+  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press','Single-arm dumbbell bench press'],
   chest_acc_joint:['Dumbbell incline press','Dumbbell bench press','Machine chest press','Cable crossover','Pec deck','Dumbbell decline press','Dumbbell floor press'],
   back_compound:['Deadlift','Trap bar deadlift','Sumo deadlift','Barbell Romanian deadlift'],
   back_row:['Barbell row','Pendlay row','Kettlebell single-arm row','Dumbbell row'],
@@ -1772,7 +1772,7 @@ const EXLIB={
   // shoulder and finishes forward at chest height, driven by hip rotation. It lives in
   // the shoulder pool because the pattern is a press, not a core drill; _pattern reads
   // it as 'hpress' for exactly that reason.
-  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Landmine rotational press'],
+  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Landmine rotational press','Seated dumbbell shoulder press'],
   shoulder_iso:['Dumbbell lateral raise','Cable lateral raise','Dumbbell front raise','Dumbbell rear delt fly','Face pull'],
   // BODYWEIGHT DELT ISOLATION (V127). Every entry in shoulder_iso above is a dumbbell or a
   // cable, so once _gearOK gained its dumbbell clause the pool emptied on the bodyweight
@@ -1785,8 +1785,8 @@ const EXLIB={
   // Two heads, two movements. Gastroc loads knee-straight, soleus loads knee-bent, so a
   // pool of standing-only variants trains half the calf. The machine seated raise is
   // cable-tier only, which left every other tier gastroc-only until the DB seated entry.
-  calves:['Dumbbell standing calf raise','Dumbbell seated calf raise','Machine seated calf raise'],
-  squat:['Back squat','Front squat','Paused back squat','Barbell box squat'],
+  calves:['Dumbbell standing calf raise','Dumbbell seated calf raise','Machine seated calf raise','Dumbbell split-stance calf raise'],
+  squat:['Back squat','Front squat','Paused back squat','Barbell box squat','Barbell pin squat'], // D241: pin squat, a dead-stop concentric from the safeties (positional: REP_AFFINITY 6)
   squat_joint:['Leg press','Dumbbell goblet squat','Hack squat (machine)','Barbell box squat'],
   // V178 (D1): landmine reverse lunge — the loaded unilateral knee-dominant lunge with a
   // fixed bar path (name says landmine → RACK class, barbell-gated by the pool's own
@@ -1797,7 +1797,10 @@ const EXLIB={
   // the anterior counterweight makes the pattern self-coaching and leaves a bail path.
   // The name deliberately avoids the word 'lateral' — _isCompound's exclusion regex
   // vetoes any name containing it, which would strip this of compound status.
-  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge'],
+  // D241 (P-BENCH): the deficit reverse lunge (more range), the goblet side lunge to a knee drive (frontal plane into a
+  // single-leg finish; no 'lateral', which _isCompound vetoes), the barbell reverse lunge (a step back is the bail) and
+  // KB step-downs (the eccentric single-leg quad drill).
+  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge','Deficit reverse lunge (KB)','Goblet side lunge to knee drive','Barbell reverse lunge','Step-downs (KB)'],
   // V178 (D1): standing cable hamstring curl — knee flexion in a running-relevant standing
   // posture. Lives in leg_accessory (which is _gear'd, so the cable gate applies) NOT in
   // hinge (which is not). _pattern reads 'hamstring curl' → leg_iso, added the same session.
@@ -1836,7 +1839,7 @@ const EXLIB={
   // with the top leg raised (glute med) and the glute bridge hold; three mobility pieces, the
   // Cossack shift (V192 kept it out of the lunge pool as mobility), the half-kneeling hip
   // flexor stretch and pigeon lift-offs. All prehab: _pattern null, doses fixed.
-  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion","Copenhagen plank (bent knee)","Side plank (top leg raised)","Glute bridge hold"],
+  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion","Copenhagen plank (bent knee)","Side plank (top leg raised)","Glute bridge hold","Copenhagen plank (long lever)","Kettlebell hip flexor raise"], // D241: the Copenhagen's long-lever rung (advanced, EX_MIN_EXP) and loaded hip flexion past 90°
   hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch","Cossack squat shift","Half-kneeling hip flexor stretch","Pigeon lift-offs"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
   // V178 (D3): FOOT & ANKLE prehab pool. The calves pool loads gastroc/soleus in plantar
   // flexion only; nothing in the file trained the tibialis, dorsiflexion, the bent-knee
@@ -1887,7 +1890,7 @@ function _carryRx(dist,name,qual){
 // that knows a press is one-handed. Barbell overhead press, Dumbbell Arnold press,
 // Dumbbell lateral raise and Barbell push press are two-hand or two-side movements
 // and must NOT print 'each'.
-const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1};
+const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1,'Single-arm dumbbell bench press':1};
 function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
 // ── REP-AFFINITY (V160, D2-b) ────────────────────────────────────────────────────────
 // A movement declares the MAX reps a wave-driven prescription may ask of it.
@@ -1897,12 +1900,12 @@ function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]
 // not quads — wrong limiter — so it must never ride the endurance/hypertrophy/
 // fatloss/balanced waves. SIDECAR MAP on purpose: EXLIB stays flat strings and
 // every existing consumer is byte-identical. Untagged = unconstrained.
-const REP_AFFINITY={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6}};
+const REP_AFFINITY={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6},'Barbell pin squat':{maxReps:6}};
 // ── MIN EXPERIENCE (V178, D4) ─────────────────────────────────────────────────────
 // Same sidecar shape as REP_AFFINITY. A movement declares the LEAST experience tier
 // that may be handed it. Untagged = any. Applied at pool construction (buildEx) so
 // every consumer of the pool inherits it; the power pools already do this by cost.
-const EX_MIN_EXP={'Zercher single-leg deadlift':'advanced'};
+const EX_MIN_EXP={'Zercher single-leg deadlift':'advanced','Copenhagen plank (long lever)':'advanced'};
 const _EXP_RANK={beginner:0,intermediate:1,advanced:2};
 function _expOK(name,experience){const m=EX_MIN_EXP[name];if(!m)return true;return (_EXP_RANK[experience||'intermediate']??1)>=(_EXP_RANK[m]??0);}// V161: box squat is a dead-stop power variant — honest pause dies past ~6 reps (Mario's ruling D1-b)
 // ── STATION CLASS (V164, D1/D6) ──────────────────────────────────────────────
@@ -6726,7 +6729,7 @@ function buildHipSection(seed,bodyweight,keep){
   // D239 Amendment 1: keep is the injury plan's drop list, applied before the draw (all names when healthy).
   const _keep=(n) => !keep||keep(n);
   const stabPool=(bodyweight
-    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction','Copenhagen plank (bent knee)','Side plank (top leg raised)','Glute bridge hold']
+    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction','Copenhagen plank (bent knee)','Side plank (top leg raised)','Glute bridge hold','Copenhagen plank (long lever)']
     : EXLIB.hip_stability).filter(_keep);
   const stab=pick(stabPool,2,seed);
   const mob=pick(EXLIB.hip_mobility.filter(_keep),1,seed+7);
@@ -6737,7 +6740,8 @@ function buildHipSection(seed,bodyweight,keep){
     "Side-lying leg raises":"2×15 each","Clamshells (bodyweight)":"2×20 each","Fire hydrants":"2×15 each","Standing hip abduction":"2×20 each",
     "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side",
     "Copenhagen plank (bent knee)":"2×20 sec each","Side plank (top leg raised)":"2×20 sec each","Glute bridge hold":"2×30 sec",
-    "Cossack squat shift":"2×6 each side, slow","Half-kneeling hip flexor stretch":"2×45 sec each","Pigeon lift-offs":"2×8 each"
+    "Cossack squat shift":"2×6 each side, slow","Half-kneeling hip flexor stretch":"2×45 sec each","Pigeon lift-offs":"2×8 each",
+    "Copenhagen plank (long lever)":"2×20 sec each","Kettlebell hip flexor raise":"2×10 each"
   };
   return {label:'Hip stability',hip:true,items:selected.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }
@@ -6836,12 +6840,14 @@ const CORE_PILLARS = {
       {name:'Bird dogs', detail:'3×20 alternating'},             // NSW + McGill Big 3
       {name:'McGill curl-up', detail:'3×6 each, 8 sec holds'},  // McGill Big 3
       {name:'Superman', detail:'3×12'},                         // NSW
-      {name:'RKC plank', detail:'3×20 sec max tension'}
+      {name:'RKC plank', detail:'3×20 sec max tension'},
+      {name:'Wall-press dead bug', detail:'3×8 each, slow'}            // D241 (P-BENCH): hands press a wall overhead
     ],
     loaded: [
       {name:'Ab wheel rollouts', detail:'3×8–10'},
       {name:'Weighted dead bugs', detail:'3×8 each'},
-      {name:'Barbell rollouts', detail:'3×8'}
+      {name:'Barbell rollouts', detail:'3×8'},
+      {name:'Hollow hold dumbbell press', detail:'3×30 sec'}           // D241 (P-BENCH): a hollow hold with a press riding on it
     ]
   },
   anti_rotation: { // Lateral stability — low fatigue, safe before anything
@@ -6874,7 +6880,10 @@ const CORE_PILLARS = {
       {name:'Hanging knee raises', detail:'3×12'},              // NSW
       {name:'Hanging leg raises', detail:'3×10'},
       {name:'Garhammer raises', detail:'3×12'},
-      {name:'Toes-to-bar', detail:'3×8'}
+      {name:'Toes-to-bar', detail:'3×8'},
+      {name:'Overhead sit-up', detail:'3×8'},                           // D241 (P-BENCH): NSW trains the sit-up for the PST
+      {name:'V-ups', detail:'3×8'},                                     // D241: the sit-up's harder rung
+      {name:'Farmer march', detail:'3×20 marches'}                      // D241: loaded hip flexion and bracing in place; the pillar's one member with no bar
     ]
   },
   rotational_power: { // Thoracic mobility / rotation — moderate, non-compressive
@@ -6892,7 +6901,8 @@ const CORE_PILLARS = {
       // rotational exposure. Each addition is DERIVED from a member already here, not invented.
       {name:'Standing torso rotations (slow)', detail:'3×10 each'},  // V178 _BW_SUBS target for Landmine rotations, promoted from substitution target to member; dose from the member it stands in for
       {name:'Side plank thread-the-needle', detail:'3×10 each'},     // NSW p.7 item 7 asks static AND dynamic trunk work; dynamic rotational form of Side plank, already prescribed from the NSW trunk table
-      {name:'Band woodchopper (door anchor)', detail:'3×12 each'}    // band form of Cable woodchoppers; dose copied from that member exactly
+      {name:'Band woodchopper (door anchor)', detail:'3×12 each'},   // band form of Cable woodchoppers; dose copied from that member exactly
+      {name:'Russian twist (heels down)', detail:'3×8 each'}            // D241 (P-BENCH): Mario's add, bodyweight only, heels down
     ]
   }
 };
@@ -7021,9 +7031,10 @@ const _STACK_LOADED=/^(face pull|pec deck|leg extension|rope tricep extension)\b
 // prescribes, and the guide's own volume-DOWN-as-intensity-climbs progression falls out
 // of the arithmetic instead of needing a second rule.
 const _POWER_COST = [
+  [/seated box jump/i,                                                    1.0], // D241: a seated takeoff onto the box, no countermovement and no landing from height
   [/depth jump|depth fall|box jump|in-?depth/i,                         2.0], // shock: landing from height. V178: 'depth fall' — same drop, same landing
   [/single-?leg landing|\bsl landing\b/i,                                1.5], // V178 (D2): a bilateral takeoff that LANDS on one leg is priced by the landing
-  [/single-?leg hop|single-?arm k[bB] snatch|bounding|split-?squat jump/i, 1.5], // unilateral landing
+  [/single-?leg hop|single-?arm k[bB] snatch|bounding|split[- ]?squat jump/i, 1.5], // unilateral landing
   [/broad jump|jump squat|tuck jump|skater bound|lateral bound|trap bar jump|\bjump\b|pogo/i, 1.0], // double-leg. V178: pogo hops priced here — unpriced they were the swing latch all over again (cost 0 = 'not power work')
   [/ball slam|wall ball|plyo push|clap push|kettlebell swing/i,         0.5], // no landing, low CNS: med-ball work + hip ballistics
   // V143: loaded weightlifting derivatives moved 0.5 → 1.0. At 0.5 they shared a tier with
@@ -7201,7 +7212,7 @@ function _powerAllowed(name, experience, injury, ageBracket){
   const ageCap = _POWER_AGE_MAX_COST[ageBracket||'18-35'] || 2.0;
   return c <= Math.min(expCap, ageCap);
 }
-const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation|ankle rock|towel scrunch|tiptoe walk|cossack|pigeon/i;   // D239: the slice 1 prehab doses are fixed
+const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation|ankle rock|towel scrunch|tiptoe walk|cossack|pigeon|hip flexor raise/i;   // D239: the slice 1 prehab doses are fixed
 function _bwSetsFromDetail(detail, wk, exp, prev){
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;
@@ -7490,7 +7501,12 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
     const key = ['dynamic_bracing','anti_extension_loaded','rotational_power'][((R-1)%3+3)%3];
     if(key==='anti_extension_loaded'){
       pillar='anti_extension';
-      items=[rot(P.anti_extension.loaded, R), rot(P.anti_extension.static, R)];
+      // D241 (F1, F2): this branch fires only when R ≡ 2 (mod 3), so rot(arr, R) is index 0 forever; it rotates on the
+      // pillar's own firing count, like rotational power, and the loaded list goes through the gear lens (no loaded
+      // member is legal on bodyweight, which draws two static members instead).
+      const T3L = Math.floor((R-1)/3);
+      const _ld = equip===undefined ? P.anti_extension.loaded : (equip==='bodyweight' ? [] : P.anti_extension.loaded.filter(it=>_auxGearOK(it.name, equip)));
+      items = _ld.length ? [rotOn(T3L,_ld,0), rotOn(T3L,P.anti_extension.static,0)] : [rotOn(T3L,P.anti_extension.static,0), rotOn(T3L,P.anti_extension.static,1)];
     } else {
       pillar=key;
       // V193 (D46): key cycles three ways on ((R-1)%3), so rotational_power (the index-2 slot)
@@ -7501,7 +7517,7 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
       // Same rotation + dedup shape dynamic_bracing already uses, one line below.
       const T3 = Math.floor((R-1)/3);
       items = (key==='dynamic_bracing')
-        ? [rot(_pi('dynamic_bracing'), R), rot(_pi('dynamic_bracing'), R+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)
+        ? [rotOn(T3,_pi('dynamic_bracing'),T3), rotOn(T3,_pi('dynamic_bracing'),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)   // D241: R steps by 3 here, so six members locked on two
         : [rotOn(T3,_pi(key),T3), rotOn(T3,_pi(key),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
     }
   }
@@ -8473,7 +8489,7 @@ function injuryPlan(cfg){
       P.drop=new Set(['hinge','lunge','hip_ext']);
       P.cap=new Set(['squat']);
       // D239: the prehab block's adductor plank, end-range Cossack and bridge hold sit out with hip extension.
-      P.dropNames=/swing|pull-through|pull through|copenhagen|cossack|glute bridge hold/i;
+      P.dropNames=/swing|pull-through|pull through|copenhagen|cossack|glute bridge hold|hip flexor raise/i;
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','lunge','hip_ext','squat']);
@@ -8496,13 +8512,13 @@ function injuryPlan(cfg){
       // athlete rotates from the hip rather than the lumbar spine. Matches
       // 'landmine rotational', which does not touch 'Landmine rotations' (no 'al')
       // or 'Landmine reverse lunge'.
-      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through|landmine rotational/i;
+      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through|landmine rotational|barbell reverse lunge/i;   // D241: a back-racked lunge sits out (the flexion drills swap, below)
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','squat','row','hip_ext']);
       // V192 (D42): same reason as the protect tier above. 'hpress' is uncapped here
       // too, so the only lever that reaches this movement is the name.
-      P.dropNames=/good morning|swing|pendlay|landmine rotational/i;
+      P.dropNames=/good morning|swing|pendlay|landmine rotational|barbell reverse lunge/i;
       P.cardioMode='easy';
     }
   } else if(R==='shoulder'){
@@ -8515,7 +8531,7 @@ function injuryPlan(cfg){
       // Ab wheel and hanging work are named too — _pattern() returns null for core,
       // so P.drop can never reach them, and both load an irritated shoulder hard.
       P.drop=new Set(['hpress','vpress','tri_iso']);
-      P.dropNames=/\bdips\b|bench dips|lateral raise|front raise|ab wheel|hanging|l-sit|dragon flag/i;
+      P.dropNames=/\bdips\b|bench dips|lateral raise|front raise|ab wheel|hanging|l-sit|dragon flag|hollow hold dumbbell press|wall-press dead bug/i;   // D241
       P.cardioMode='swimout';
     } else {
       P.cap=new Set(['hpress','vpress','delt_iso']);
@@ -8524,7 +8540,7 @@ function injuryPlan(cfg){
       // Lateral raise out, front raise stays. The previous list had this backwards:
       // loaded abduction is the impingement arc, while a front raise in the scapular
       // plane is generally tolerated. Face pulls and rear delt work stay either way.
-      P.dropNames=/overhead|arnold|push press|military|pike pushup|pike pushups|handstand|wall walk|\bdips\b|bench dips|lateral raise/i;
+      P.dropNames=/overhead|arnold|push press|military|pike pushup|pike pushups|handstand|wall walk|\bdips\b|bench dips|lateral raise|shoulder press|plyo push|hollow hold dumbbell press/i;   // D241
       // V192 (D43): the workaround tier's job is to substitute, not just subtract.
       // The floor stops the elbow at torso depth — the impingement-adjacent range
       // the dropNames above already avoid. Runs after dropNames, so nothing here
@@ -8537,14 +8553,14 @@ function injuryPlan(cfg){
     if(T==='protect'){
       P.drop=new Set(['tri_iso','bi_iso','hpress','vpress']);
       P.cap=new Set(['row','vpull']);
-      P.dropNames=/\bdips\b|bench dips|skullcrush/i;
+      P.dropNames=/\bdips\b|bench dips|skullcrush|hollow hold dumbbell press|wall-press dead bug/i;   // D241
     } else {
       // V185 (D2-c): vpull added. D2 moved pulldowns off 'row', which would have handed a
       // cranky elbow an UNCAPPED lat pulldown. Chinups were already uncapped here, so this
       // is an existing gap the reclassification exposed rather than one it created: loaded
       // elbow flexion is loaded elbow flexion whichever direction you pull.
       P.cap=new Set(['hpress','tri_iso','bi_iso','row','vpull']);
-      P.dropNames=/\bdips\b|bench dips/i;
+      P.dropNames=/\bdips\b|bench dips|plyo push|hollow hold dumbbell press/i;   // D241
       P.swapNames={'Dumbbell skullcrushers':'Cable pushdown','Barbell curl':'Dumbbell hammer curl','Preacher curl':'Cable curl'};
     }
   }
@@ -8592,7 +8608,8 @@ function _capRpeClamp(d){
 function applyInjuryFilter(sections,cfg){
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
-  const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};
+  // D241 A2: the new flexion and twist drills swap to spine-safe ones the way the hanging raises do, so a lowback core block keeps its count.
+  const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs','Overhead sit-up':'Dead bugs','V-ups':'Bird dogs','Russian twist (heels down)':'Standing torso rotations (slow)'};
   const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck/i;
   const out=[];
   sections.forEach(s=>{
@@ -8610,7 +8627,7 @@ function applyInjuryFilter(sections,cfg){
       if(pat&&P.drop.has(pat)) return;
       if(P.dropNames&&P.dropNames.test(name)) return;
       if(P.noJumps&&JUMPS.test(name)) return;
-      if(P.noCarry&&/carry/i.test(name)) return;
+      if(P.noCarry&&/carry|farmer march/i.test(name)) return;   // D241: a farmer march is a carry in place
       if(P.spineSafeCore&&Object.prototype.hasOwnProperty.call(SPINE_SWAP,name)){
         const sw=SPINE_SWAP[name];
         if(!sw) return;
@@ -8687,7 +8704,8 @@ function engineC_kinematics(cfg, A, B){
   const _inj = injuryPlan(cfg);
   // D239 Amendment 1: the plan's drop list comes out of the prehab pools before the draw, so an injured athlete's hip
   // and foot & ankle blocks keep their full count instead of losing a drawn drill to applyInjuryFilter afterwards.
-  const _prehabKeep = (n) => !(_inj && _inj.dropNames && _inj.dropNames.test(n));
+  // D241: and the experience floor (EX_MIN_EXP), so the long-lever Copenhagen reaches only an advanced athlete.
+  const _prehabKeep = (n) => !(_inj && _inj.dropNames && _inj.dropNames.test(n)) && _expOK(n, cfg.experience);
   // V153 (F2): set by buildSections from opts.hotNext at entry, read by scheme(). A
   // closure variable rather than a scheme() parameter because scheme has ~30 call sites
   // and _inj/strengthSupport already travel this exact road. Days build serially, so a
@@ -8953,7 +8971,7 @@ function engineC_kinematics(cfg, A, B){
   const olderHyp=(goal==='hypertrophy')&&(cfg.ageBracket==='55+'||cfg.ageBracket==='36-54');
   let chestCompoundPool=hasBarbell?_gear(olderHyp?['Dumbbell bench press','Dumbbell incline press','Machine chest press','Close-grip bench press']:EXLIB.chest_compound):_bw(['Incline pushups (hands on bed)','Pushups (slow 3s eccentric)','Decline pushups (feet elevated)','Diamond pushups','Archer pushups'],['Dumbbell bench press','Dumbbell incline press','Dumbbell decline press','Pushup variation (weighted)']);
   let backCompoundPool=hasBarbell?EXLIB.back_compound:_bw(['Inverted row (knees bent, under a table)','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell single-leg deadlift','Dumbbell Romanian deadlift']);
-  let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)']);
+  let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)','Heel-elevated goblet squat']);
   // V210 (2b): advanced 55+ older hypertrophy on crossfit or home_full draws goblet OR front
   // squat, once, for the whole program (hypertrophy is locked; the lock outranks alternation).
   // Under any shoulder or elbow plan the front rack is withheld on every tier: it loads wrist
@@ -8966,7 +8984,11 @@ function engineC_kinematics(cfg, A, B){
   // V192 (D41): the frontal-plane lunge reaches the no-barbell tier through the LOADED
   // list only. The bodyweight list beside it is a rung ladder (easy->hard, windowed by
   // _bwRung); a goblet needs a bell, and inserting it there would also shift the window.
-  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat','Dumbbell goblet side lunge']);
+  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat','Dumbbell goblet side lunge','Deficit reverse lunge (KB)','Goblet side lunge to knee drive','Step-downs (KB)']);
+  // D241: a plan's drop list leaves the lunge pool before the draw (filtered here, before _preInj, so the injury guard
+  // does not read it as a redirect). Today it takes one name: the back-racked barbell reverse lunge under either lowback
+  // plan, which already keeps every barbell squat away; the slot draws a held lunge instead of printing short.
+  { const _ip=injuryPlan(cfg), _dn=_ip&&_ip.dropNames; if(_dn) lungePool=lungePool.filter(n=>!_dn.test(n)); }
   let hingePool=hasBarbell?EXLIB.hinge.filter(n=>_expOK(n,cfg.experience)):_bw(['Bodyweight back extension','Single-leg glute bridge','Single-leg Romanian deadlift (bodyweight)','Nordic hamstring curl (anchored)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell Romanian deadlift','Double Kettlebell deadlift']);
   // Loaded posterior-chain / hip-extension pool. Complements the hinge (RDL is hamstring/
   // erector-biased; these are glute- and eccentric-hamstring-biased). GHR/Nordic are the
@@ -8998,7 +9020,7 @@ function engineC_kinematics(cfg, A, B){
   // through on every tier including bodyweight. Gated here the way lungePool is
   // gated one screen above. The no-barbell branch is EXLIB.shoulder minus the
   // landmine, member for member, so no other tier's shoulder content moves.
-  const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press']);
+  const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Seated dumbbell shoulder press']);
   // V193 (same-card, slice 5): the chest-accessory pool was an inline literal at its ONE
   // draw site, so buildSections had no legal way to re-walk it when the name it was handed
   // turned out to be the name the day's Main lift already held. It is a named pool now, on
@@ -9019,8 +9041,10 @@ function engineC_kinematics(cfg, A, B){
   // shares the same internal 'athletic' goal but keeps the standard calisthenic day.)
   const athleticSupport=cfg.liftingFocus==='support_athletic';
   const powerPool=hasBarbell
-    ?['Broad jumps','Box jumps','Jump squats','Kettlebell swing','Power clean (light & explosive)','Trap bar jump','Pogo hops','Rotational jump to single-leg landing','Depth fall to single-leg bounds']
-    :_bwFlat(['Jump squats','Broad jumps','Tuck jumps','Skater bounds','Split-squat jumps','Lateral bounds','Pogo hops','Rotational jump to single-leg landing'],['Broad jumps','Jump squats','Tuck jumps','Lateral bounds','Kettlebell swing','Single-arm KB snatch','Pogo hops']);
+    ?['Broad jumps','Box jumps','Jump squats','Kettlebell swing','Power clean (light & explosive)','Trap bar jump','Pogo hops','Rotational jump to single-leg landing','Depth fall to single-leg bounds','Split-squat jumps','Bulgarian split squat jumps','Plyo pushups','Single-leg box jumps','Seated box jumps']
+    :_bwFlat(['Jump squats','Broad jumps','Tuck jumps','Skater bounds','Split-squat jumps','Lateral bounds','Pogo hops','Rotational jump to single-leg landing','Bulgarian split squat jumps','Plyo pushups'],['Broad jumps','Jump squats','Tuck jumps','Lateral bounds','Kettlebell swing','Single-arm KB snatch','Pogo hops','Split-squat jumps','Bulgarian split squat jumps','Plyo pushups']);
+  // D241 (P-BENCH): split-squat jumps reach the loaded tiers; the Bulgarian split squat jumps, plyo pushups and the single-leg
+  // and seated box jumps join, each priced by _POWER_COST (1.5, 0.5, 2.0, 1.0), so _powerAllowed gates them by cost.
   // V178 (D2/D4): three additions. Pogo hops (1.0, stiffness/elastic), rotational jump to
   // single-leg landing (1.5, priced by the landing), depth fall to single-leg bounds (2.0
   // shock — advanced AND 18–35 only, by the existing min(exp,age) cap; no new gate). The
@@ -9515,7 +9539,7 @@ function engineC_kinematics(cfg, A, B){
         // the floor case at 3 — Bird dogs, Side plank, Plank shoulder taps, the three members
         // _AUX_GEAR (search '_AUX_GEAR=') leaves untagged. Re-derive, do not trust this line.
         const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));
-        const _ae=CORE_PILLARS.anti_extension.static;
+        const _ae=CORE_PILLARS.anti_extension.static.filter(it=>_prehabKeep(it.name));   // D241: the plan's drops leave before the draw (the overhead wall press on a protect shoulder or elbow)
         // V193 (slice 4): 'Bird dogs' is a member of BOTH pillars — D49 added it to
         // anti-rotation and anti_extension.static has always held it — and these two sections
         // draw from two independent rotations, so the same movement could land on both and
@@ -9583,7 +9607,7 @@ function engineC_kinematics(cfg, A, B){
         const lightPress=pick(lightPressPool.length?lightPressPool:[_lpFallback],1,blockSeed(w)+40)[0];
         const lightTri=pick(_bw(['Bench dips (chair)','Close-grip pushups','Diamond pushups'],_gear(EXLIB.triceps)),1,blockSeed(w)+41)[0];
         s.push({label:'Main — '+lightPress,items:[{name:lightPress,detail:vsets(3)+'×12 — RPE 6–7, leave 3+ in reserve'+restNote},{name:ex.shoulder[1],detail:vsets(3)+'×12'+(_isOneArmPress(ex.shoulder[1])?' each':'')}]});
-        s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'},{name:lightTri,detail:vsets(3)+'×15'}]});
+        s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'+(_isOneArmPress(ex.chestAcc[1])?' each':'')},{name:lightTri,detail:vsets(3)+'×15'}]});
         if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)
           s.push({label:'Light finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[2],detail:vsets(3)+'×15'},{name:ex.cond[3],detail:vsets(3)+'×12'}]});
         else {
@@ -9649,7 +9673,7 @@ function engineC_kinematics(cfg, A, B){
         // 2) Secondary varied compound (3 sets)
         s.push({label:'Secondary compound — '+secondary,items:[{name:secondary,detail:hsets+'×'+repA}]});
         // 3) Hypertrophy/pump accessories (chest angle + 2 delts)
-        s.push({label:'Chest volume',items:[{name:chest2[0],detail:hsets+'×'+repB}]});
+        s.push({label:'Chest volume',items:[{name:chest2[0],detail:hsets+'×'+repB+(_isOneArmPress(chest2[0])?' each':'')}]});   // D241: a one-arm press prints its side
         s.push({label:'Delts',superset:true,rounds:hsets,items:[{name:delts[0],detail:hsets+'×'+repB},{name:delts[1],detail:hsets+'×'+repB}]});
         // 4) Direct isolation slot (triceps)
         s.push({label:'Triceps',superset:true,rounds:hsets,items:[{name:tris[0],detail:hsets+'×'+repA},{name:tris[1],detail:hsets+'×'+repB}]});
@@ -9694,12 +9718,12 @@ function engineC_kinematics(cfg, A, B){
         const _accA=_accFresh([ex.chestAcc[0],ex.chestAcc[1]]);
         if(_accA){
           const _sp=_ssPair(_accA,ex.shoulder[1],[],shoulderAccPool.filter(n=>n!==ex.shoulder[0]));
-          s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
+          s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'+(_isOneArmPress(_sp.a)?' each':'')},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
         }
       }
       if(!isBeginner){
         const _ckA=_accFresh([ex.chestAcc[1],ex.chestAcc[0]]);
-        if(_ckA) s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:_ckA,detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
+        if(_ckA) s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:_ckA,detail:vsets(3)+'×12'+(_isOneArmPress(_ckA)?' each':'')},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
       }
       }
     } else if(role==='pull'){
@@ -10194,7 +10218,7 @@ function _pattern(name){
   // Without this classification the movement is _pattern-null: invisible to all three
   // region caps, and KEPT by applyInjuryFilter even at shoulder/protect.
   if(/^landmine rotational press$/.test(N)) return 'hpress';
-  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up/.test(N)) return null; // core, exempt
+  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up|sit-up|v-up|russian twist|farmer march/.test(N)) return null; // core, exempt (D241 names the four new drills) // core, exempt
   // REHAB DRILLS ARE NOT REGIONAL VOLUME. Wrist/forearm and scapular work is low-load
   // corrective loading; scoring it against a ceiling misreads the day. Without this the
   // generic catch-alls below swallowed them and the injury filter then DROPPED them from
@@ -10209,7 +10233,7 @@ function _pattern(name){
   // D239 (P-BENCH): the slice 1 prehab names. Three of them would otherwise be read as training
   // patterns: 'Split-squat heel-raise hold' and 'Cossack squat shift' by the /squat/ catch-all,
   // 'Glute bridge hold' by the hip_ext rule. The two new planks already left at the core line.
-  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90|balance hold|pass-around|heel-raise hold|ankle rock|towel scrunch|tiptoe walk|glute bridge hold|cossack|hip flexor stretch|pigeon/.test(N)) return null;
+  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90|balance hold|pass-around|heel-raise hold|ankle rock|towel scrunch|tiptoe walk|glute bridge hold|cossack|hip flexor stretch|pigeon|hip flexor raise/.test(N)) return null;
   // Wall slides are scap/rear-delt work, not a press. Classified on introduction (V127) so
   // the movement is never invisible to capRegionalFatigue or deconflictAdjacentDupes — the
   // mistake Ball slams is still living with. Must precede the wall-walk rule: both contain
@@ -10280,7 +10304,7 @@ function _pattern(name){
   if(/curl/.test(N)) return 'bi_iso';
   if(/back squat|front squat|box squat|hack squat|leg press|goblet squat/.test(N)) return 'squat';
   if(/deadlift|romanian|good morning|swing|hinge/.test(N)) return 'hinge';
-  if(/lunge|split squat|step-up|step up/.test(N)) return 'lunge';
+  if(/lunge|split squat|step-up|step up|step-down/.test(N)) return 'lunge';   // D241: 'Step-downs (KB)' is a lunge
   if(/leg extension|leg curl|leg iso/.test(N)) return 'leg_iso';
   if(/calf|calves/.test(N)) return 'calf_iso';
   if(/squat/.test(N)) return 'squat';
@@ -10309,12 +10333,15 @@ const _AUX_FAMILY={
   'Cable woodchoppers':'core','Landmine rotations':'core','Medicine ball rotary toss':'core',
   'Standing torso rotations (slow)':'core','Side plank thread-the-needle':'core',
   'Band woodchopper (door anchor)':'core',
+  // D241 (P-BENCH): the new core and power names get their swap families.
+  'Wall-press dead bug':'core','Hollow hold dumbbell press':'core','Overhead sit-up':'core','V-ups':'core','Farmer march':'core','Russian twist (heels down)':'core',
   'Farmer carry':'carry','Suitcase carry':'carry','Overhead carry':'carry',
   'Trap bar farmer carry':'carry',
   'Ball slams':'power','Broad jumps':'power','Dumbbell snatch':'power','Kettlebell clean':'power',
   'Lateral bounds':'power','Power clean (light & explosive)':'power',
   'Single-arm KB snatch':'power','Skater bounds':'power','Trap bar jump':'power','Tuck jumps':'power',
   'Wall ball shots':'power',
+  'Plyo pushups':'power','Bulgarian split squat jumps':'power','Single-leg box jumps':'power','Seated box jumps':'power',
   'Burpees':'cond','High knees':'cond','Mountain climbers':'cond',
   'Wall sit':'hold','Single-leg wall sit':'hold','Spanish squat hold (KB)':'hold',
   'Cable crossover':'chest_iso','Pec deck':'chest_iso'
@@ -10335,7 +10362,7 @@ const _AUX_FAMILY_LABEL={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLIST
 // bodyweight athlete. Band, not cable, is the right tag: the band is the looser implement
 // and the movement genuinely runs off one, so the tier set is the /\bband\b/ clause's
 // (everything that owns bands: not bodyweight, not minimal).
-const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
+const _AUX_GEAR={'Farmer march':'loaded','Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
 function _auxGearOK(name,equip){
   const _g=_AUX_GEAR[String(name||'').trim()];
   if(_g==='loaded') return equip!=='bodyweight';
@@ -11071,7 +11098,7 @@ function capSessionBudget(sections, cardio){
   if(!Array.isArray(sections)||!sections.length) return sections;
   // D239: the hip block's mobility piece stays free; the Cossack shift and pigeon lift-offs are mobility pieces.
   const _isStretch=n=>/stretch|mobility|90\/90|foam|worlds greatest|cossack|pigeon/i.test(n||'');
-  const _isHalf=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n||'');
+  const _isHalf=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises|sit-up|v-up|russian twist|farmer march|torso rotation/i.test(n||'');
   const _prehabHalf=new Set([].concat(EXLIB.hip_stability,EXLIB.knee_stability,EXLIB.foot_ankle,EXLIB.foot_ankle_bw)); const _cost=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return (_isHalf(it.name)||_prehabHalf.has(it.name))?s*0.5:s; };
   const _total=list=>list.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+_cost(it),0),0);
   const cap=Math.max(12, SESSION_SET_BUDGET - Math.round(_cardioInterference(cardio)*2));
@@ -11819,6 +11846,7 @@ const RAND_POOLS={
     {title:'Core Hypertrophy',sections:[{label:'Core as a muscle — train it heavy',items:[{name:'Ab wheel rollouts',detail:'4×12'},{name:'Hanging knee raises',detail:'4×15'},{name:'L-sit hold',detail:'4×20 sec'},{name:'Dead bugs',detail:'3×12 each'},{name:'Plank hold',detail:'3×45 sec'}]}]},
   ],
   fatloss:[
+    {title:'Lap and Station',cardio:{type:'run',detail:'One lap (400 m) before each station. Eight laps, steady.'},sections:[{label:'Run a lap, then the station. One round.',items:[{name:'Jump squats',detail:'20 reps'},{name:'Pushups',detail:'20 reps'},{name:'Mountain climbers',detail:'20 each leg'},{name:'Walking lunge',detail:'10 each leg'},{name:'Burpees',detail:'10 reps'},{name:'Sit-ups',detail:'20 reps'},{name:'Spiderman pushups',detail:'5 each side'},{name:'Side lunge (bodyweight)',detail:'10 each side, moving'}]}]},
     {title:'Cardio Shred',sections:[{label:'Superset A — 4 rounds',superset:true,items:[{name:'Ball slams',detail:'12 reps'},{name:'Burpees',detail:'8 reps'}]},{label:'Superset B — 3 rounds',superset:true,items:[{name:'Jump squats',detail:'15 reps'},{name:'Mountain climbers',detail:'20 reps'}]},{label:'Core',items:[{name:'Ab wheel rollouts',detail:'3×10'},{name:'Dead bugs',detail:'3×12 each'}]}]},
     {title:'The Hurricane',sections:[{label:'Round 1 — 3 sets',superset:true,items:[{name:'Ball slams',detail:'15 reps'},{name:'Burpees',detail:'10 reps'},{name:'Mountain climbers',detail:'20 reps'}]},{label:'Round 2 — 3 sets',superset:true,items:[{name:'Kettlebell swing',detail:'20 reps'},{name:'Broad jumps',detail:'8 reps'},{name:'Plank hold',detail:'30 sec'}]}]},
     {title:'AMRAP 20 Min',sections:[{label:'As many rounds as possible',superset:true,rounds:null,items:[{name:'Kettlebell swing',detail:'15 reps'},{name:'Pushups',detail:'10 reps'},{name:'Chinups',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'}]}]},
@@ -11849,6 +11877,7 @@ const RAND_POOLS={
     {title:'Navy Grinder',sections:[{label:'5 rounds, 90s rest',superset:true,items:[{name:'Chinups',detail:'10 reps'},{name:'Pushups',detail:'20 reps'},{name:'Ab wheel rollouts',detail:'10 reps'},{name:'Ball slams',detail:'10 reps'},{name:'Kettlebell swing',detail:'20 reps'}]}]},
   ],
   athletic:[
+    {title:'Lap and Station',cardio:{type:'run',detail:'One lap (400 m) before each station. Eight laps, steady.'},sections:[{label:'Run a lap, then the station. One round.',items:[{name:'Jump squats',detail:'20 reps'},{name:'Pushups',detail:'20 reps'},{name:'Mountain climbers',detail:'20 each leg'},{name:'Walking lunge',detail:'10 each leg'},{name:'Burpees',detail:'10 reps'},{name:'Sit-ups',detail:'20 reps'},{name:'Spiderman pushups',detail:'5 each side'},{name:'Side lunge (bodyweight)',detail:'10 each side, moving'}]}]},
     {title:'Explosive Power',sections:[{label:'Power — 5 rounds',superset:true,items:[{name:'Broad jumps',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'},{name:'Kettlebell swing',detail:'10 reps'}]},{label:'Strength',items:[{name:'Deadlift',detail:'4×3 @ RPE 9'},{name:'Barbell bench press',detail:'4×3 @ RPE 9'}]}]},
     {title:'Full Body Athletic',sections:[{label:'Power circuit — 4 rounds',superset:true,items:[{name:'Kettlebell swing',detail:'15 reps'},{name:'Ball slams',detail:'10 reps'},{name:'Broad jumps',detail:'8 reps'}]},{label:'Strength',items:[{name:'Barbell bench press',detail:'3×5 heavy'},{name:'Deadlift',detail:'3×3 heavy'}]}]},
     {title:'Sprint + Lift',cardio:{type:'run',detail:'6×100m strides — walk back recovery'},sections:[{label:'Strength',items:[{name:'Back squat',detail:'4×5 @ RPE 9'},{name:'Barbell bench press',detail:'4×5 @ RPE 9'}]},{label:'Explosive',superset:true,items:[{name:'Broad jumps',detail:'4×6'},{name:'Ball slams',detail:'4×10'}]}]},

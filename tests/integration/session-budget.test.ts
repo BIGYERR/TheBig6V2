@@ -209,11 +209,12 @@ test('on the census sample: 18 core sections on every healthy program, no empty 
 
 // ── D195-B: the cost lens ────────────────────────────────────────────────────────────────────────────────────────
 const TUE_9 = [
-  'Main — Front squat :: Front squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
+  // D241 (v0.242.0) drew the pin squat into the squat main and the KB hip flexor raise into the hip block.
+  'Main — Barbell pin squat :: Barbell pin squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
   'Leg superset A (SS 3) :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8 | Terminal knee extension (band) 3×25 sec',
   'Leg superset B (SS 3) :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8 | 45° back extension 3 sets — RPE 8 (stop 2 reps short of failure)',
   // D239 (v0.241.0) moved these two prehab blocks, nothing else on the card.
-  'Hip stability :: Glute bridge hold 2×30 sec | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each',
+  'Hip stability :: Kettlebell hip flexor raise 2×10 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each',
   'Foot & ankle :: Split-squat heel-raise hold 2×30 sec each | Single-leg KB pass-around 2×5 each direction, each leg',
   'Loaded carry finisher :: Overhead carry 3×40 yards each, heavy',
 ];
@@ -231,7 +232,7 @@ test('the cost lens prices the prehab rails at half, so PRT TING keeps what the 
   // D195-B-a: a-digest, a-tue, a-mon
   const C = SB.twice(null, SB.PRT);
   assert.ok(C.self, 'PRT TING equals itself');
-  assert.equal(C.dig, 'f61dab1548de2a20');   // 1119727db3f37832 until D239
+  assert.equal(C.dig, '997add753ad41179');   // 1119727db3f37832 until D239, f61dab1548de2a20 until D241
   assert.deepEqual(SB.cardLines(C.prog.weeks[9].tue), TUE_9);
   assert.deepEqual(SB.cardLines(C.prog.weeks[9].mon), MON_9);
 });
@@ -240,7 +241,7 @@ test('without the cost lens PRT TING is the program the ruling measured before i
   // D195-B-a: a-cells, and the before half of a-v230/a-before on the app without the lens
   const N = SB.twice(SB.noCostLens(), SB.PRT), C = SB.twice(null, SB.PRT);
   assert.ok(N.self);
-  assert.equal(N.dig, 'c6f054bee6f8b22b');   // 3a053a2ac8cb2b44 until D239
+  assert.equal(N.dig, '81742326331d5c5b');   // 3a053a2ac8cb2b44 until D239, c6f054bee6f8b22b until D241
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].tue), TUE_9_WITHOUT);
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].mon), MON_9_WITHOUT);
   const differ: string[] = [];
@@ -252,11 +253,11 @@ test('without the cost lens PRT TING is the program the ruling measured before i
 
 test("the cost lens alone is PRT TING whole, and moves no byte of HALF_MANNY", () => {
   // D195-B-a: a-cfB; D195-B-c: c-cfB, c-bytes (B alone = the app without D195-A; neither = without A and B)
-  assert.equal(SB.twice(SB.noHipExtA(), SB.PRT).dig, 'f61dab1548de2a20');
+  assert.equal(SB.twice(SB.noHipExtA(), SB.PRT).dig, '997add753ad41179');
   const B = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY), V = SB.twice(SB.noD195(), fixtures.HALF_MANNY);
   assert.ok(B.self && V.self);
-  assert.equal(B.dig, 'b1b15c80f1a703f1');   // 0ac7da6b1691a8e1 until D239
-  assert.equal(V.dig, 'b1b15c80f1a703f1');
+  assert.equal(B.dig, 'c17e854e54e86f57');   // 0ac7da6b1691a8e1 until D239, b1b15c80f1a703f1 until D241
+  assert.equal(V.dig, 'c17e854e54e86f57');
   assert.equal(SB.dayJ(B.prog.weeks), SB.dayJ(V.prog.weeks));
   assert.equal(SB.weekKeys(V.prog).length * 7, 98);
 });

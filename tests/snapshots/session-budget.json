@@ -1,9 +1,9 @@
 {
   "budgetCorpus": {
     "days": 3708,
-    "trimmed": 970,
+    "trimmed": 950,
     "items": 24077,
-    "capSessionBudget": "6be03983288738c911e207419b94562ca482169d477584880ef5d75cf4a904be",
+    "capSessionBudget": "fb54392e967ef87b70c6bddb9ab52a3aa7b6bbd681996c444cbc24047ed95caa",
     "setCount": "f5a34d9cf980d05e9b2a6594b4093361fbf7324561afc3b2686aa5ed8e0087f8",
     "itemCost": "f026dbc4b39d120546af57a4753b66f78adb56442ab7b8feb4f306b279a6e649"
   }

@@ -81,7 +81,7 @@ test('the thirteen names sit in the pools the ruling named, and the bodyweight f
   for (const n of HIP_MOB) assert.ok(E.hip_mobility.includes(n), 'hip_mobility: ' + n);
   assert.equal(E.foot_ankle.length, 11);
   assert.equal(E.foot_ankle_bw.length, 8);
-  assert.equal(E.hip_stability.length, 9);
+  assert.equal(E.hip_stability.length, 11);   // nine at D239; D241 adds the long-lever Copenhagen and the KB hip flexor raise
   assert.equal(E.hip_mobility.length, 7);
 });
 
@@ -154,5 +154,193 @@ test('the hip block\'s mobility piece costs nothing in the session budget: a day
   for (const mob of ['IT band stretch', 'Cossack squat shift', 'Pigeon lift-offs', 'Half-kneeling hip flexor stretch']) {
     const at = day(mob);
     assert.equal(csb(at, null), at, mob + ': a day at the cap comes back as it went in');
+  }
+});
+
+// ── D241 (P-BENCH-STRENGTH, v0.242.0): slice 2, with F1, F2 and Amendment 1 ─────────────────────────────────────────
+// Oracles from the ruling: the pools, the prices (_POWER_COST rows: plyo push 0.5, seated box jump 1.0, split squat
+// jump 1.5, box jump 2.0), the gear each name needs, the experience caps (beginner 1.0, intermediate 1.5, advanced 2.0),
+// the drop lists, the half price of a core drill, and the wildcard as posted.
+const PRICE: Record<string, number> = { 'Plyo pushups': 0.5, 'Seated box jumps': 1.0, 'Split-squat jumps': 1.5, 'Bulgarian split squat jumps': 1.5, 'Single-leg box jumps': 2.0 };
+const CAP: Record<string, number> = { beginner: 1.0, intermediate: 1.5, advanced: 2.0 };
+const S2 = ['Heel-elevated goblet squat', 'Barbell pin squat', 'Deficit reverse lunge (KB)', 'Goblet side lunge to knee drive', 'Dumbbell split-stance calf raise',
+  'Single-arm dumbbell bench press', 'Seated dumbbell shoulder press', 'Plyo pushups', 'Wall-press dead bug', 'Overhead sit-up', 'V-ups', 'Farmer march',
+  'Russian twist (heels down)', 'Hollow hold dumbbell press', 'Bulgarian split squat jumps', 'Copenhagen plank (long lever)', 'Single-leg box jumps',
+  'Seated box jumps', 'Barbell reverse lunge', 'Step-downs (KB)', 'Kettlebell hip flexor raise'];
+const S2_DOSE: Record<string, string> = { 'Wall-press dead bug': '3×8 each, slow', 'Overhead sit-up': '3×8', 'V-ups': '3×8', 'Farmer march': '3×20 marches',
+  'Russian twist (heels down)': '3×8 each', 'Hollow hold dumbbell press': '3×30 sec', 'Copenhagen plank (long lever)': '2×20 sec each', 'Kettlebell hip flexor raise': '2×10 each' };
+const LOADED = /KB|Kettlebell|Dumbbell|dumbbell|Barbell|Goblet|goblet|Farmer|box jump/;
+const BAR = /Barbell|box jump/;
+const liftCfg = (over: Partial<Cfg>): Cfg => ({ ...cfgOf(over), cardioTypes: [], cardioGoals: {}, eventTargeted: false, raceDate: null, primaryPath: 'body' } as Cfg);
+const S2_LAT: { over: Partial<Cfg>; bike: boolean; tag: string }[] = [];
+for (const equipment of TIERS) for (const liftingFocus of ['balanced', 'hypertrophy', 'support_athletic', 'fatloss'] as LiftingFocus[]) for (const experience of ['beginner', 'advanced'] as Cfg['experience'][]) for (const seed of [1013, 76308]) for (const bike of [false, true])
+  S2_LAT.push({ over: { equipment, liftingFocus, experience, seed }, bike, tag: `${equipment} ${liftingFocus} ${experience} ${seed}${bike ? ' bike' : ''}` });
+const S2_RUN = (() => {
+  const prints: Record<string, Record<string, number>> = {}, bad: string[] = [];
+  const pillar: Record<string, Set<string>> = {};
+  for (const c of S2_LAT) {
+    const p: any = IA.buildProgram(c.bike ? cfgOf({ ...c.over, primaryPath: 'body' }, true) : liftCfg(c.over));
+    for (const w of Object.keys(p.weeks)) for (const d of Object.keys(p.weeks[w])) for (const s of (p.weeks[w][d] && p.weeks[w][d].sections) || []) {
+      if (s.core) { const k = s.pillar + '|' + c.over.equipment; (pillar[k] = pillar[k] || new Set()); for (const it of s.items || []) pillar[k].add(clean(it.name)); }
+      for (const it of s.items || []) {
+        const n = clean(it.name), eq = String(c.over.equipment);
+        if (!S2.includes(n)) continue;
+        ((prints[n] = prints[n] || {})[eq] = (prints[n][eq] || 0) + 1);
+        if (S2_DOSE[n] && it.detail !== S2_DOSE[n]) bad.push(`dose ${n} '${it.detail}' ${c.tag}`);
+        if (eq === 'bodyweight' && LOADED.test(n)) bad.push('bodyweight ' + n);
+        if (BAR.test(n) && !['home_full', 'commercial', 'crossfit'].includes(eq)) bad.push('no bar ' + n + ' ' + eq);
+        if (n === 'Copenhagen plank (long lever)' && c.over.experience !== 'advanced') bad.push('long lever ' + c.tag);
+        if (n === 'Single-arm dumbbell bench press' && !/ each\b/.test(String(it.detail))) bad.push('no side ' + it.detail + ' ' + c.tag);
+        if (n in PRICE && PRICE[n]! > CAP[String(c.over.experience)]!) bad.push('power over the experience cap ' + n + ' ' + c.tag);
+      }
+    }
+  }
+  return { prints, bad, pillar };
+})();
+
+test('every power-pool name has a price: the split squat row reads a space, so the Bulgarian jumps cost 1.5, not 0 (the latch)', () => {
+  const cost = IA.eval('_powerCost');
+  for (const [n, want] of Object.entries(PRICE)) assert.equal(cost(n), want, n);
+});
+
+test('the slice 2 names sit in the pools the ruling named, and the one-arm press is a per-side press', () => {
+  const E = IA.EXLIB;
+  assert.ok(!IA.EXLIB.squat_joint.includes('Heel-elevated goblet squat'), 'A2: not in the older lifter\'s joint-friendly pool');
+  for (const [pool, names] of [['squat', ['Barbell pin squat']], ['calves', ['Dumbbell split-stance calf raise']],
+    ['lunge', ['Deficit reverse lunge (KB)', 'Goblet side lunge to knee drive', 'Barbell reverse lunge', 'Step-downs (KB)']], ['chest_acc', ['Single-arm dumbbell bench press']],
+    ['shoulder', ['Seated dumbbell shoulder press']], ['hip_stability', ['Copenhagen plank (long lever)', 'Kettlebell hip flexor raise']]] as [string, string[]][]) {
+    for (const n of names) assert.ok(E[pool].includes(n), pool + ': ' + n);
+  }
+  const P = IA.eval('CORE_PILLARS');
+  const names = (a: any[]) => Array.from(a, (i: any) => i.name);
+  assert.ok(names(P.anti_extension.static).includes('Wall-press dead bug'));
+  assert.ok(names(P.anti_extension.loaded).includes('Hollow hold dumbbell press'));
+  for (const n of ['Overhead sit-up', 'V-ups', 'Farmer march']) assert.ok(names(P.dynamic_bracing.items).includes(n), n);
+  assert.ok(names(P.rotational_power.items).includes('Russian twist (heels down)'));
+  assert.equal(IA.eval("_isOneArmPress('Single-arm dumbbell bench press')"), true);
+  assert.equal(IA.eval("REP_AFFINITY['Barbell pin squat'].maxReps"), 6);
+  assert.equal(IA.eval("EX_MIN_EXP['Copenhagen plank (long lever)']"), 'advanced');
+});
+
+test('every slice 2 name prints, with its dose, only on tiers that own its gear, the long lever only for advanced, the one-arm press with a side, power under the experience cap', () => {
+  assert.deepEqual(S2_RUN.bad, []);
+  // the five power names print rarely (one power block a week, two picks); their pools are held by the next test
+  for (const n of S2.filter((x) => !(x in PRICE))) assert.ok(Object.values(S2_RUN.prints[n] || {}).reduce((a, b) => a + b, 0) > 0, n + ' never printed');
+});
+
+test('the power pools hold the new names on the tiers that own them: every pool a program draws is in its swap universe', () => {
+  const uni = (equipment: Equipment) => new Set(Array.from(IA.buildProgram(cfgOf({ equipment, liftingFocus: 'support_athletic', experience: 'advanced', seed: 3039, primaryPath: 'event' }))._swapUniverse || []));
+  const cf = uni('crossfit'), hb = uni('home_basic'), bw = uni('bodyweight');
+  for (const n of Object.keys(PRICE)) assert.ok(cf.has(n), 'crossfit ' + n);
+  for (const n of ['Split-squat jumps', 'Bulgarian split squat jumps', 'Plyo pushups']) { assert.ok(hb.has(n), 'home_basic ' + n); }
+  for (const n of ['Bulgarian split squat jumps', 'Plyo pushups']) assert.ok(bw.has(n), 'bodyweight ' + n);
+  for (const n of ['Single-leg box jumps', 'Seated box jumps']) { assert.ok(!hb.has(n), 'no box on home_basic: ' + n); assert.ok(!bw.has(n), 'no box on bodyweight: ' + n); }
+});
+
+// The core rotations, by hand: getDynamicCoreBlock(R, role, hardRun, hotTomorrow, slot, equip) at each R where the branch
+// fires. rotOn(T, arr, n) is arr[(T - 1 + n) mod len]. The loaded anti-extension branch fires at R ≡ 2 (mod 3), T = (R - 1) / 3
+// floored, and draws [loaded at n = 0, static at n = 0]; with no legal loaded member, [static at 0, static at 1]. Dynamic
+// bracing fires at R ≡ 1 (mod 3) and draws n = T and T + 1. Lists typed from the ruling's pillars.
+const AE_STATIC = ['Plank hold', 'Bird dogs', 'McGill curl-up', 'Superman', 'RKC plank', 'Wall-press dead bug'];
+const AE_LOADED = ['Ab wheel rollouts', 'Weighted dead bugs', 'Barbell rollouts', 'Hollow hold dumbbell press'];
+const DB_BW = ['Hanging knee raises', 'Hanging leg raises', 'Garhammer raises', 'Toes-to-bar', 'Overhead sit-up', 'V-ups'];
+const at = (arr: string[], T: number, n: number) => arr[(((T - 1 + n) % arr.length) + arr.length) % arr.length];
+const coreAt = (R: number, equip: string) => {
+  const b = IA.eval(`getDynamicCoreBlock(${R}, 'push', false, false, 0, '${equip}')`);
+  return { pillar: String(b.pillar), items: Array.from(b.items || [], (i: any) => clean(i.name)) };
+};
+
+test('F1 and F2: the loaded anti-extension tier walks every loaded member on its own clock, and bodyweight draws two static members', () => {
+  for (const R of [2, 5, 8, 11, 14]) {
+    const T = Math.floor((R - 1) / 3);
+    const c = coreAt(R, 'commercial');
+    assert.equal(c.pillar, 'anti_extension', 'R=' + R);
+    assert.deepEqual(c.items, [at(AE_LOADED, T, 0), at(AE_STATIC, T, 0)], 'commercial R=' + R);
+    assert.deepEqual(coreAt(R, 'bodyweight').items, [at(AE_STATIC, T, 0), at(AE_STATIC, T, 1)], 'bodyweight R=' + R);
+  }
+  const seen = new Set([2, 5, 8, 11].map((R) => coreAt(R, 'commercial').items[0]));
+  assert.deepEqual([...seen].sort(), AE_LOADED.slice().sort(), 'four firings reach all four loaded members');
+});
+
+test('dynamic bracing walks all six bodyweight members on its own clock (R steps by 3, so six used to lock on two)', () => {
+  const seen = new Set<string>();
+  for (const R of [1, 4, 7, 10]) {
+    const T = Math.floor((R - 1) / 3);
+    const c = coreAt(R, 'bodyweight');
+    assert.equal(c.pillar, 'dynamic_bracing', 'R=' + R);
+    assert.deepEqual(c.items, [at(DB_BW, T, T), at(DB_BW, T, T + 1)], 'R=' + R);
+    c.items.forEach((n) => seen.add(n));
+  }
+  assert.deepEqual([...seen].sort(), DB_BW.slice().sort());
+  assert.ok(!coreAt(7, 'bodyweight').items.includes('Farmer march'));
+});
+
+// One item through the injury filter (applyInjuryFilter on a one-item section): DROPPED, or the name it keeps.
+const filtered = (name: string, region: string, tier: string) => {
+  const out = IA.applyInjuryFilter([{ label: 'T', items: [{ name, detail: '3×10' }] }], { injury: { region, tier } });
+  const it = out && out[0] && out[0].items && out[0].items[0];
+  return it ? clean(it.name) : 'DROPPED';
+};
+
+test('the injury plans drop what the ruling drops and keep what it keeps (hand table)', () => {
+  const TABLE: [string, string, string, boolean][] = [
+    ['Barbell reverse lunge', 'lowback', 'protect', true], ['Barbell reverse lunge', 'lowback', 'workaround', true], ['Farmer march', 'lowback', 'workaround', true],
+    ['Farmer march', 'elbow', 'workaround', true], ['Seated dumbbell shoulder press', 'shoulder', 'workaround', true], ['Plyo pushups', 'shoulder', 'workaround', true],
+    ['Hollow hold dumbbell press', 'shoulder', 'protect', true], ['Hollow hold dumbbell press', 'elbow', 'workaround', true], ['Plyo pushups', 'elbow', 'workaround', true],
+    ['Wall-press dead bug', 'shoulder', 'protect', true], ['Wall-press dead bug', 'elbow', 'protect', true], ['Kettlebell hip flexor raise', 'hip', 'protect', true],
+    ['Copenhagen plank (long lever)', 'hip', 'workaround', true], ['Bulgarian split squat jumps', 'knee', 'workaround', true], ['Step-downs (KB)', 'knee', 'protect', true],
+    // kept where the ruling keeps them
+    ['Wall-press dead bug', 'shoulder', 'workaround', false], ['Kettlebell hip flexor raise', 'hip', 'workaround', false], ['Russian twist (heels down)', 'knee', 'protect', false],
+    ['Plyo pushups', 'knee', 'workaround', false], ['Farmer march', 'knee', 'protect', false],
+  ];
+  for (const [n, region, tier, drop] of TABLE) assert.equal(filtered(n, region, tier), drop ? 'DROPPED' : n, `${n} under ${region}/${tier}`);
+  // Amendment 2: under either lowback plan the flexion and twist drills swap to spine-safe drills, so the core block keeps its count
+  const SWAP: [string, string][] = [['Overhead sit-up', 'Dead bugs'], ['V-ups', 'Bird dogs'], ['Russian twist (heels down)', 'Standing torso rotations (slow)']];
+  for (const tier of ['protect', 'workaround']) for (const [n, to] of SWAP) assert.equal(filtered(n, 'lowback', tier), to, `${n} under lowback/${tier}`);
+});
+
+test('the rehab day\'s trunk never draws the wall press under a shoulder or elbow protect plan (its drops leave before the draw)', () => {
+  assert.ok(Array.from(IA.eval('CORE_PILLARS').anti_extension.static, (i: any) => i.name).includes('Wall-press dead bug'), 'the pillar the trunk draws from holds it');
+  for (const region of ['shoulder', 'elbow']) for (const equipment of TIERS) for (const seed of [1013, 3039]) {
+    const p: any = IA.buildProgram(liftCfg({ equipment, seed, liftingFocus: 'balanced', experience: 'advanced', injury: { region, tier: 'protect' } }));
+    for (const [n, , lab] of items(p)) assert.ok(!(n === 'Wall-press dead bug'), `${region}/protect ${equipment} ${seed} ${lab}`);
+    let trunk = 0;
+    for (const w of Object.keys(p.weeks)) for (const d of Object.keys(p.weeks[w])) for (const sec of (p.weeks[w][d] && p.weeks[w][d].sections) || []) if (/^Trunk — /.test(sec.label || '')) trunk++;
+    assert.ok(trunk > 0, `${region}/protect ${equipment} ${seed} has a rehab trunk`);
+  }
+});
+
+test('Amendment 1: under either lowback plan the lunge slots draw a held lunge, never print short (guards behaviour that must not change)', () => {
+  assert.ok(IA.EXLIB.lunge.includes('Barbell reverse lunge'), 'the barbell lunge is in the pool the lowback plans filter');
+  for (const tier of ['protect', 'workaround'] as const) for (const equipment of ['home_full', 'commercial', 'crossfit'] as Equipment[]) for (const seed of [1013, 3039]) {
+    const p: any = IA.buildProgram(liftCfg({ equipment, liftingFocus: 'balanced', experience: 'advanced', seed, injury: { region: 'lowback', tier } }));
+    for (const w of Object.keys(p.weeks)) for (const d of Object.keys(p.weeks[w])) for (const s of (p.weeks[w][d] && p.weeks[w][d].sections) || []) {
+      if (/^(Leg superset A|Lower strength)/.test(s.label || '') && s.superset) assert.equal(s.items.length, 2, `lowback/${tier} ${equipment} ${seed} W${w} ${d}`);
+    }
+  }
+});
+
+test('the new core drills cost half in the session budget, like their siblings (and the torso rotation, A2): a day at the cap with one is untouched', () => {
+  const csb = IA.eval('capSessionBudget');
+  // 12 + 3 + 3 working sets = 18; a 3-set core drill at half is 1.5, so 19.5 sits under the 20 cap. At full price it is 21.
+  for (const n of ['Russian twist (heels down)', 'Overhead sit-up', 'V-ups', 'Farmer march', 'Standing torso rotations (slow)']) {
+    const day = [
+      { label: 'Main lift', items: [{ name: 'Back squat', detail: '12×5' }] },
+      { label: 'Accessory', items: [{ name: 'Dumbbell curl', detail: '3×12' }, { name: 'Hammer curl', detail: '3×12' }] },
+      { label: '', core: true, pillar: 'rotational_power', coreHeader: 'Core', items: [{ name: n, detail: '3×8' }] },
+    ];
+    assert.equal(csb(day, null), day, n + ': a day under the cap comes back as it went in');
+  }
+});
+
+test('the lap and station circuit is a wildcard session in the fat loss and athletic pools, as posted', () => {
+  const RAND = IA.eval('RAND_POOLS');
+  const STATIONS = ['Jump squats 20 reps', 'Pushups 20 reps', 'Mountain climbers 20 each leg', 'Walking lunge 10 each leg', 'Burpees 10 reps', 'Sit-ups 20 reps',
+    'Spiderman pushups 5 each side', 'Side lunge (bodyweight) 10 each side, moving'];
+  for (const pool of ['fatloss', 'athletic']) {
+    const w = Array.from(RAND[pool] as any[]).find((x: any) => x.title === 'Lap and Station');
+    assert.ok(w, pool + ' holds it');
+    assert.equal(w.cardio.type, 'run');
+    assert.deepEqual(Array.from(w.sections[0].items, (i: any) => i.name + ' ' + i.detail), STATIONS);
   }
 });

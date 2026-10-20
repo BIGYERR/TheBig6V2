@@ -163,7 +163,7 @@ function _pattern(name: string | null | undefined): Pattern | null{
   // Without this classification the movement is _pattern-null: invisible to all three
   // region caps, and KEPT by applyInjuryFilter even at shoulder/protect.
   if(/^landmine rotational press$/.test(N)) return 'hpress';
-  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up/.test(N)) return null; // core, exempt
+  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up|sit-up|v-up|russian twist|farmer march/.test(N)) return null; // core, exempt (D241 names the four new drills) // core, exempt
   // REHAB DRILLS ARE NOT REGIONAL VOLUME. Wrist/forearm and scapular work is low-load
   // corrective loading; scoring it against a ceiling misreads the day. Without this the
   // generic catch-alls below swallowed them and the injury filter then DROPPED them from
@@ -178,7 +178,7 @@ function _pattern(name: string | null | undefined): Pattern | null{
   // D239 (P-BENCH): the slice 1 prehab names. Three of them would otherwise be read as training
   // patterns: 'Split-squat heel-raise hold' and 'Cossack squat shift' by the /squat/ catch-all,
   // 'Glute bridge hold' by the hip_ext rule. The two new planks already left at the core line.
-  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90|balance hold|pass-around|heel-raise hold|ankle rock|towel scrunch|tiptoe walk|glute bridge hold|cossack|hip flexor stretch|pigeon/.test(N)) return null;
+  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90|balance hold|pass-around|heel-raise hold|ankle rock|towel scrunch|tiptoe walk|glute bridge hold|cossack|hip flexor stretch|pigeon|hip flexor raise/.test(N)) return null;
   // Wall slides are scap/rear-delt work, not a press. Classified on introduction (V127) so
   // the movement is never invisible to capRegionalFatigue or deconflictAdjacentDupes — the
   // mistake Ball slams is still living with. Must precede the wall-walk rule: both contain
@@ -249,7 +249,7 @@ function _pattern(name: string | null | undefined): Pattern | null{
   if(/curl/.test(N)) return 'bi_iso';
   if(/back squat|front squat|box squat|hack squat|leg press|goblet squat/.test(N)) return 'squat';
   if(/deadlift|romanian|good morning|swing|hinge/.test(N)) return 'hinge';
-  if(/lunge|split squat|step-up|step up/.test(N)) return 'lunge';
+  if(/lunge|split squat|step-up|step up|step-down/.test(N)) return 'lunge';   // D241: 'Step-downs (KB)' is a lunge
   if(/leg extension|leg curl|leg iso/.test(N)) return 'leg_iso';
   if(/calf|calves/.test(N)) return 'calf_iso';
   if(/squat/.test(N)) return 'squat';
@@ -278,12 +278,15 @@ const _AUX_FAMILY: Record<string, AuxFamily>={
   'Cable woodchoppers':'core','Landmine rotations':'core','Medicine ball rotary toss':'core',
   'Standing torso rotations (slow)':'core','Side plank thread-the-needle':'core',
   'Band woodchopper (door anchor)':'core',
+  // D241 (P-BENCH): the new core and power names get their swap families.
+  'Wall-press dead bug':'core','Hollow hold dumbbell press':'core','Overhead sit-up':'core','V-ups':'core','Farmer march':'core','Russian twist (heels down)':'core',
   'Farmer carry':'carry','Suitcase carry':'carry','Overhead carry':'carry',
   'Trap bar farmer carry':'carry',
   'Ball slams':'power','Broad jumps':'power','Dumbbell snatch':'power','Kettlebell clean':'power',
   'Lateral bounds':'power','Power clean (light & explosive)':'power',
   'Single-arm KB snatch':'power','Skater bounds':'power','Trap bar jump':'power','Tuck jumps':'power',
   'Wall ball shots':'power',
+  'Plyo pushups':'power','Bulgarian split squat jumps':'power','Single-leg box jumps':'power','Seated box jumps':'power',
   'Burpees':'cond','High knees':'cond','Mountain climbers':'cond',
   'Wall sit':'hold','Single-leg wall sit':'hold','Spanish squat hold (KB)':'hold',
   'Cable crossover':'chest_iso','Pec deck':'chest_iso'
@@ -304,7 +307,7 @@ const _AUX_FAMILY_LABEL: Record<AuxFamily, string>={core:'CORE',carry:'CARRY / G
 // bodyweight athlete. Band, not cable, is the right tag: the band is the looser implement
 // and the movement genuinely runs off one, so the tier set is the /\bband\b/ clause's
 // (everything that owns bands: not bodyweight, not minimal).
-const _AUX_GEAR: Record<string, 'loaded' | 'band'>={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
+const _AUX_GEAR: Record<string, 'loaded' | 'band'>={'Farmer march':'loaded','Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
 function _auxGearOK(name: string | null | undefined,equip: Equipment): boolean{
   const _g=_AUX_GEAR[String(name||'').trim()];
   if(_g==='loaded') return equip!=='bodyweight';
