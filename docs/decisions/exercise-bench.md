@@ -314,3 +314,32 @@ leg raise = `Windshield wipers`; Russian twist = #26; kneeling rotation = `Landm
   drills), so slice 2 carries #14 to #34 and the wildcard, with F1 and F2.
 - **Counter:** slice 2 grows from 13 names to 21 and the wildcard; if Mario wants a smaller release, the power trio
   (#28, #30, #31) and the wildcard can ride a slice 3.
+
+## Parked: the movements rejected or held, kept to revisit (Mario, 2026-10-19)
+
+Mario concurred with every rejection and fold in P-BENCH-2, -3, -6 and -7 on 2026-10-19 ("i concur with your
+rulings"), and asked that the rejected ones be kept because they will come up again. Nothing here is built. Each line
+is the movement as the source named it, where it came from, and why it is out today; reopening one is a new ruling.
+Standing rule from the same exchange: every reject or fold is listed to Mario with its reason before a ruling is final.
+
+| # | Movement | Source | Status | Why it is out today | What would bring it back |
+|---|---|---|---|---|---|
+| 1 | Russian flys | S4 | rejected | resolves to no movement (V178 D5) | the clip showing a real drill |
+| 2 | Pistol squat on a Bosu | S5 | rejected | a loaded single-leg squat on an unstable base; `Assisted pistol squat` and the balance hold cover the halves | not the small-gear step: out on merit |
+| 3 | Forward to reverse taps (slant board) | S5 | rejected | needs a slant board; the caption does not resolve to a drill | the clip, and the small-gear step |
+| 4 | Lacrosse ball squeezes | S5 | rejected | a cue on a calf raise (heels together), not a movement | a cue field on a movement |
+| 5 | Roll out fascia | S5 | rejected | self-massage, not training | a recovery-day slot beyond the foam roll |
+| 6 | Overhead load + band + med ball dead bug (Lu Xiaojun) | S6 | rejected | three implements at once; `Weighted dead bugs` is the rung | the small-gear step, as an advanced rung |
+| 7 | Adductor magnus slide-out | S7 | rejected | needs sliders; the Copenhagen and the Cossack cover the adductors | the small-gear step (sliders) |
+| 8 | Hamstring curl on a rower seat | S3 | rejected | only rower tiers could do it, and they own better curls | the small-gear step (sliders), as a slider curl |
+| 9 | Overcoming isometrics | S7 | rejected | a method, not a movement | a named position (an isometric mid-thigh pull, a pin squat push) |
+| 10 | Single-leg band + KB drill with a sandball | S7 | rejected | needs an anchor and a sandbag | the HYROX odd-object modifier |
+| 11 | Offset walk (PVC pipe) | S2 | rejected | needs a pipe; `Suitcase carry` is the one-sided carry | the small-gear step (PVC) |
+| 12 | Barbell Bulgarian split squat | B2 | rejected | back-racked bar, rear foot on a bench: no bail | a safety-bar or front-rack form |
+| 13 | Plyo pistol squat | B2 | rejected | lands on one leg at full knee depth | an advanced-only power rung, by ruling |
+| 14 | Vertical jump to deep squat | B4 | rejected | the deep landing is a cue on `Jump squats`, a poor default for a runner's knee | a landing-skill block |
+| 15 | Bosu balance and squats, Bosu pistol squat to RDL, the Bosu balance holds | S5, B4, B5 | held | Bosu not modeled | the small-gear step (the pistol stays out on merit) |
+| 16 | Stir the pot | S2 | held | stability ball not modeled | the small-gear step |
+
+The folds (a movement read as one already on the bench) are listed in P-BENCH-2 and P-BENCH-6; each can be split back
+out by a ruling.
