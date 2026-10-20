@@ -249,3 +249,68 @@ injury plans named.
   plan's drop list among the prehab pools, so nothing older moves. Race week's fixed pair is not filtered.
 - **Tests:** the injury-drop test in `tests/integration/exercise-bench.test.ts`, and a guard that no injured
   athlete's hip block prints under three items or foot block under two.
+
+## P-BENCH-5 to -7: the second batch of screenshots, 2026-10-19 (concurred, not built)
+
+- **Date:** 2026-10-19. Mario sent 12 more screenshots after v0.241.0. **Ruled by:** coach, in the main session, on
+  measure m1's block reach (unchanged by D239 for these pools); Mario concurred 2026-10-19 ("Add all to the next build").
+  **D-codes:** when slice 2 is slotted. **Shipped:** not yet; rides slice 2.
+- **The sources (12 screenshots, 6 distinct; 46 entries, 41 distinct names):** the S8 lower-body post again (Instagram
+  and Meta AI, twice each: already P-BENCH); B1 Bernardo Rebeil, NFL core (hollow press 3×30-40, ball slams,
+  woodchoppers, side to sides), twice; B2 Joey Bronston, stronger runner legs, four supersets (barbell Bulgarian split
+  squat, plyo Bulgarian split squat, bench pistol squat, plyo pistol squat, crossover single-arm RDL, plyo lateral step
+  overs 60 s, lateral lunge to knee drive, Copenhagen plank hip dips); B3 Jake Pilon, marathon leg day 31 days out
+  (single-leg box jump, seated jump, trap bar deadlift, barbell hip thrust, barbell reverse lunge, weighted calf raise,
+  bent-knee calf raise); B4 an injury-prevention leg session (Bosu balance and squats, balance on toes, Bulgarian split
+  squats, loaded step downs, loaded calf raise, full-range goblet squat, KB single-leg RDL, Copenhagen iso holds, box
+  jumps, single-leg box jumps, vertical jump to deep squat, pogo hops, hip flexor band work, monster walks); B5 Jake
+  Pilon, runner accessories (KB cross-body Bulgarian split squat, Bosu pistol squat to RDL, KB hip flexor raise,
+  Copenhagen plank 2×45 s); B6 Jake Pilon, landmine core circuit (overhead sit-up, side-to-side leg raise, Russian
+  twist heels down, kneeling rotation); B7 a Threads "hybrid endurance workout" (a lap between each of eight stations).
+- **What B6 tells P-BENCH:** batch 1's core circuit (S9) is this landmine circuit written out without the bar. The
+  landmine Russian twist is the bench's `Landmine rotations` (barbell tiers); Mario's #26 bodyweight twist covers every
+  other tier, so the two together give the twist everywhere, and #26 stands as he ruled it.
+
+### P-BENCH-5, admit eight movements and one session
+
+| # | Name | Source | Pool | Reaches | Tiers | Dose | Why, and the injury rule |
+|---|---|---|---|---|---|---|---|
+| 27 | Hollow hold dumbbell press | B1 hollow press | `anti_extension.loaded` | non-runners today (F3), and only once F1 is fixed | all but bodyweight | 3×30 sec | A hollow hold with a press riding on it, the loaded anti-extension rung. Timed (`hold`). Rides slice 2 with F1. |
+| 28 | Bulgarian split squat jumps | B2 plyo Bulgarian split squat | power pool, all three lists | athletic support, CrossFit | all (a chair on bodyweight) | the power slot's | The rear-foot-elevated rung above split-squat jumps; the existing `split-squat jump` row prices it 1.5, so intermediate and up. Knee plans drop it with the jumps. |
+| 29 | Copenhagen plank (long lever) | B2 hip dips, B4 iso holds, B5 2×45 s | `hip_stability` | every program, leg day | all | 2×20 sec each | The rung above D239's bent knee. Advanced only (`EX_MIN_EXP`, wired into the hip block's draw). The hip plans' `copenhagen` drops already cover it. |
+| 30 | Single-leg box jumps | B3, B4 | barbell power list | athletic support, CrossFit | home full, commercial, CrossFit (a box) | the power slot's | Single-leg takeoff. The existing `box jump` row prices it 2.0, so advanced and 18 to 35 only. |
+| 31 | Seated box jumps | B3 seated jump | barbell power list | athletic support, CrossFit | home full, commercial, CrossFit | the power slot's | Takeoff with no countermovement, landing on the box. Needs its own cost row at 1.0 above the `box jump` row: it has no landing from height. |
+| 32 | Barbell reverse lunge | B3 | `EXLIB.lunge` | every focus but prevention | home full, commercial, CrossFit | the slot's | The heavy loaded reverse lunge; a step back is the bail. Knee plan drops it with the lunges. |
+| 33 | Step-downs (KB) | B4 loaded step downs | `EXLIB.lunge`, no-barbell loaded lunge list | every focus but prevention | all but bodyweight | the slot's, each side | The eccentric single-leg quad drill, the runner's knee control. Needs a `_pattern` lunge row (`step-down`), so the knee plan drops it. |
+| 34 | Kettlebell hip flexor raise | B5 | `hip_stability` | every program, leg day | all but bodyweight | 2×10 each | Loaded hip flexion past 90°, the rung above seated banded hip flexion. **Resolution:** a standing knee drive with a light KB hooked on the foot. |
+| W | Lap and station circuit | B7 | `RAND_POOLS`, fat loss and athletic | the wildcard | all (a track or a 400 m loop) | as posted: a lap between 20 squat jumps, 20 pushups, 20 mountain climbers each leg, 20 lunges, 10 burpees, 20 sit-ups, 10 spiderman pushups, 20 moving side lunges | A whole session, which only the wildcard can carry; it prescribes nothing in a program. |
+
+### P-BENCH-6, already on the bench or a variant of a kept name
+
+S8 again (all six, P-BENCH #10, #14, #16, #17, swing, soleus); ball slams; woodchoppers = `Cable woodchoppers`; side to
+sides = `Medicine ball rotary toss`; bench pistol squat = `Assisted pistol squat`; crossover single-arm RDL =
+`Kettlebell single-leg deadlift` (the contralateral bell is how it is done); plyo lateral step overs = `Lateral bounds`;
+lateral lunge to knee drive = #17; Copenhagen hip dips and iso holds = the Copenhagen family (#29, D239); trap bar
+deadlift; barbell hip thrust; weighted and loaded calf raise = `Dumbbell standing calf raise`; bent-knee calf raise;
+Bulgarian split squats; full-range goblet squat; KB single-leg RDL; box jumps; pogo hops; hip flexor band work =
+`Seated banded hip flexion`; monster walks; balance on toes = D239's heel-raise hold and balance hold; KB cross-body
+Bulgarian split squat = `Dumbbell Bulgarian split squat` (the load side is a cue); overhead sit-up = #23; side-to-side
+leg raise = `Windshield wipers`; Russian twist = #26; kneeling rotation = `Landmine rotations`.
+
+### P-BENCH-7, rejected or held
+
+- **Barbell Bulgarian split squat:** a back-racked bar with the rear foot on a bench has no bail (V192's Zercher
+  reasoning); the dumbbell version stays the loaded one.
+- **Plyo pistol squat:** a single-leg jump out of a pistol loads the knee at full depth on landing; the bench's
+  single-leg landings (bounds, #28, #30) train the running quality without it.
+- **Vertical jump to deep squat:** the deep landing is a cue on `Jump squats`, and a deep-flexion landing is the wrong
+  default for a runner's knee.
+- **Bosu pistol squat to RDL, Bosu balance and squats:** held for the small-gear step (and the pistol stays out on
+  merit, as in P-BENCH-3).
+
+### Recommendation and counter
+
+- **Recommendation:** fold P-BENCH-5 into slice 2 (it is the same kind of work: strength, power, core and two hip
+  drills), so slice 2 carries #14 to #34 and the wildcard, with F1 and F2.
+- **Counter:** slice 2 grows from 13 names to 21 and the wildcard; if Mario wants a smaller release, the power trio
+  (#28, #30, #31) and the wildcard can ride a slice 3.
