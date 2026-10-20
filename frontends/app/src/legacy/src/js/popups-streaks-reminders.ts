@@ -298,7 +298,7 @@ function fireCompletionPopup(week: any,dayKey: any){
   if(streakMilestone(streak)){ fireStreakPopup(streak); return; }
   fireWorkoutPopup(week,dayKey);
 }
-// Day-after reminder: most recent strictly-past pending non-rest day not yet reminded.
+// Day-after reminder: most recent strictly-past pending non-rest day not yet reminded, since the last marked day.
 function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
 function markReminded(week: any,d: any){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
 // v0.240.1 (D238, P-REMINDSWITCH): nothing records when a program became active, so a program switched to would ask
@@ -320,7 +320,9 @@ function maybeShowReminder(){
   const rem=remindedSet(); let target=null;
   for(let i=days.length-1;i>=0;i--){
     const x=days[i];
-    if(statusOf(x.week,x.d)) continue;            // already resolved
+    // v0.241.1 (D240, P-REMINDGAP): a marked day ends the walk. The days before it are behind the athlete and never
+    // asked about: never chase missed work. Before, the walk skipped it and asked about an old gap one day at a time.
+    if(statusOf(x.week,x.d)) break;               // already resolved
     if(rem[completedKey(x.week,x.d)]) continue;    // already reminded
     target=x; break;
   }

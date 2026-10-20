@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.241.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.241.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -18677,7 +18677,7 @@ function fireCompletionPopup(week,dayKey){
   if(streakMilestone(streak)){ fireStreakPopup(streak); return; }
   fireWorkoutPopup(week,dayKey);
 }
-// Day-after reminder: most recent strictly-past pending non-rest day not yet reminded.
+// Day-after reminder: most recent strictly-past pending non-rest day not yet reminded, since the last marked day.
 function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
 function markReminded(week,d){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
 // v0.240.1 (D238, P-REMINDSWITCH): nothing records when a program became active, so a program switched to would ask
@@ -18699,7 +18699,9 @@ function maybeShowReminder(){
   const rem=remindedSet(); let target=null;
   for(let i=days.length-1;i>=0;i--){
     const x=days[i];
-    if(statusOf(x.week,x.d)) continue;            // already resolved
+    // v0.241.1 (D240, P-REMINDGAP): a marked day ends the walk. The days before it are behind the athlete and never
+    // asked about: never chase missed work. Before, the walk skipped it and asked about an old gap one day at a time.
+    if(statusOf(x.week,x.d)) break;               // already resolved
     if(rem[completedKey(x.week,x.d)]) continue;    // already reminded
     target=x; break;
   }

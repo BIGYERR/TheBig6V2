@@ -1,4 +1,4 @@
-page ia-version 0.240.0
+page ia-version 0.241.0
 HALF_MANNY built twice equal: true
 startDate 2026-08-31, race W14 sun 2026-12-06, totalWeeks 14
 2026-10-18 is W7 sun
@@ -43,3 +43,15 @@ away 8 days (2026-10-10 to 2026-10-17), back on HALF_MANNY 2026-10-18, answer: s
   2026-10-22 asks: Monday, Wk 7 · Strength Support. The week ahead stays as written.  <- a day spent on the other program
   2026-10-23 asks: Saturday, Wk 6 · Post-Run Mobility. The week ahead stays as written.  <- a day spent on the other program
   over 28 days back: 6 pop-ups, 6 about away days (of 6), streak after: 20
+
+backlog, current page: away 2026-10-05 to 10-11 (5 training days), back 2026-10-12, opened daily for 21 days
+  2026-10-12 asks: Saturday, Wk 6 · Post-Run Mobility  <- a day on the other program
+  2026-10-13 asks: Friday, Wk 6 · Recovery Lift  <- a day on the other program
+  2026-10-14 asks: Thursday, Wk 6 · Posterior Chain  <- a day on the other program
+  2026-10-15 asks: Tuesday, Wk 6 · Leg Strength + Mobility  <- a day on the other program
+  2026-10-16 asks: Monday, Wk 6 · Strength Support  <- a day on the other program
+  5 pop-ups, 5 about days on the other program
+
+backlog, surgery: the walk stops at the first marked day: away 2026-10-05 to 10-11 (5 training days), back 2026-10-12, opened daily for 21 days
+  2026-10-12 asks: Saturday, Wk 6 · Post-Run Mobility  <- a day on the other program
+  1 pop-ups, 1 about days on the other program

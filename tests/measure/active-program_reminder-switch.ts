@@ -2,6 +2,7 @@
 // training on another one. Read-only (measure). Reported by Mario on 2026-10-18, Week 8 of THE HALF MANNY: the pop-up
 // asked about Saturday, Wk 7, a day he spent on another program.
 // Usage: node tests/measure/active-program_reminder-switch.ts > <scratch>/active-program_reminder-switch.out 2>&1
+// Part 1 is the switch (v0.240.1, D238); part 2, at the foot, is the backlog behind a marked day (v0.241.1, D240).
 // TypeScript for the harness imports; node runs it with its types stripped. Not in the tests' type check.
 // The scenario, for each length of time away: HALF_MANNY (seeded fixture, week 1 back-dated so Race Day lands on its
 // raceDate, as tests/integration/pop-ups.test.ts does) is trained day for day up to the switch, every training day after
@@ -99,3 +100,44 @@ function run(awayDays: number, answer: 'outside' | 'skip') {
 }
 [3, 8, 14].forEach((a) => run(a, 'outside'));
 run(8, 'skip');
+
+// Part 2 (2026-10-19, Mario's second screenshot: Week 9, the pop-up asking about Thursday, Wk 7). A program that was
+// already active when v0.240.1 landed: no switch marks its backlog. Weeks 1 to 5 marked, week 6 (2026-10-05 to 10-11,
+// the fixture's place for Mario's week 7) left unmarked on the other program, and the athlete back from Monday 2026-10-12,
+// training and marking each day after the pop-up. Printed for the current page and for a surgery copy where the walk
+// stops at the first marked day (`continue` becomes `break` on the resolved check).
+function backlog(label: string) {
+  LS.clear();
+  Q.eval("activeProgId='" + PID + "'");
+  Q.eval('activeProg=' + JSON.stringify(prog));
+  Q.eval(DOM_STUB);
+  const away0 = new Date(2026, 9, 5), back0 = new Date(2026, 9, 12);
+  const comp: Record<string, unknown> = {};
+  train.filter((x) => x.date < away0).forEach((x) => { comp['w' + x.w + '_' + x.d] = { title: x.title, ts: 1, status: 'complete' }; });
+  LS.setItem('ia_comp_' + PID, JSON.stringify(comp));
+  const away = train.filter((x) => x.date >= away0 && x.date < back0);
+  let asked = 0, askedAway = 0; const lines: string[] = [];
+  for (let n = 0; n < 21; n++) {
+    const today = addDays(back0, n); setNow(today);
+    Q.eval('__pcEls={}'); Q.eval('maybeShowReminder()'); Q.flushTimers();
+    if (el('popKicker') === 'UNFINISHED BUSINESS') {
+      asked++; const sub = el('popSub') || '';
+      const hit = away.find((x) => sub.startsWith(Q.eval('DAY_FULL.' + x.d) + ', Wk ' + x.w + ' '));
+      if (hit) askedAway++;
+      lines.push('  ' + iso(today) + ' asks: ' + sub.split('.')[0] + (hit ? '  <- a day on the other program' : ''));
+    }
+    const t = at(today);
+    if (t) { const c = JSON.parse(LS.getItem('ia_comp_' + PID)); c['w' + t.w + '_' + t.d] = { title: t.title, ts: 3, status: 'complete' }; LS.setItem('ia_comp_' + PID, JSON.stringify(c)); }
+    Q.eval('popClose()');
+  }
+  out('');
+  out('backlog, ' + label + ': away 2026-10-05 to 10-11 (' + away.length + ' training days), back 2026-10-12, opened daily for 21 days');
+  lines.forEach(out);
+  out('  ' + asked + ' pop-ups, ' + askedAway + ' about days on the other program');
+}
+backlog('current page');
+const SRC = Q.eval('maybeShowReminder.toString()');
+const CUT = 'if(statusOf(x.week,x.d)) continue;';
+if (SRC.split(CUT).length !== 2) throw new Error('surgery anchor not found once');
+Q.eval(SRC.replace(CUT, 'if(statusOf(x.week,x.d)) break;'));
+backlog('surgery: the walk stops at the first marked day');

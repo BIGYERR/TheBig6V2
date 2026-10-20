@@ -421,3 +421,44 @@ test('guard, must not change: Set Active on an archived program is refused and m
   assert.equal(asked(w.LS, 'P2'), null);
   assert.equal(asked(w.LS, 'P0'), null);
 });
+
+// ── D240 (P-REMINDGAP): the reminder never reaches back past a day the athlete marked ──────────────────────────────
+// Oracle, typed by hand: P0 is the program already active (no switch). The clock is Sunday 2026-10-11, so week 5 is
+// Monday 2026-10-05 to Saturday 2026-10-10; HALF_MANNY rests Wednesday and Sunday, so its week 5 training days are
+// Monday, Tuesday, Thursday, Friday and Saturday.
+const P0_PAST = pastTraining(cP[0]);
+const markAll = (keys: string[]) => JSON.stringify(Object.fromEntries(keys.map(k => [k, { title: 'X', ts: 1, status: 'complete' }])));
+const P0_W1_4 = P0_PAST.filter(k => !k.startsWith('w5_'));
+function gapWorld(marked: string[]) {
+  const w = cWorld(W_P0, 'P0');
+  w.LS.setItem('ia_comp_P0', markAll(marked));
+  assert.equal(w.run('init()'), '');
+  return w;
+}
+
+test('the reminder oracle agrees with itself: P0 trains Monday, Tuesday, Thursday, Friday and Saturday of week 5', () => {
+  assert.deepEqual(P0_PAST.filter(k => k.startsWith('w5_')), ['w5_mon', 'w5_tue', 'w5_thu', 'w5_fri', 'w5_sat']);
+});
+
+test('the reminder stops at the last marked day: a gap behind it is never asked about', () => {
+  // Friday marked, Saturday not: it asks about Saturday, the newest unmarked day after the mark
+  const a = gapWorld(P0_W1_4.concat(['w5_fri']));
+  assert.equal(a.run('maybeShowReminder()'), '');
+  assert.deepEqual(asked(a.LS, 'P0'), ['w5_sat']);
+  // Friday and Saturday marked, Monday to Thursday not: nothing to ask (before D240 it asked about Thursday, Wk 5)
+  const b = gapWorld(P0_W1_4.concat(['w5_fri', 'w5_sat']));
+  assert.equal(b.run('maybeShowReminder()'), '');
+  assert.equal(b.LS.getItem('ia_remind_last_P0'), null, 'no reminder');
+  assert.equal(asked(b.LS, 'P0'), null, 'nothing asked');
+});
+
+test('guard, must not change: within an unmarked stretch the reminder still asks newest first, once a day', () => {
+  const w = gapWorld(P0_W1_4);
+  assert.equal(w.run('maybeShowReminder()'), '');
+  assert.deepEqual(asked(w.LS, 'P0'), ['w5_sat'], 'Sunday 2026-10-11 asks about Saturday, Wk 5');
+  assert.equal(w.run('maybeShowReminder()'), '');
+  assert.deepEqual(asked(w.LS, 'P0'), ['w5_sat'], 'once a day');
+  pinClock(w.I, new Date(2026, 9, 12, 10, 0, 0));
+  assert.equal(w.run('maybeShowReminder()'), '');
+  assert.deepEqual(asked(w.LS, 'P0'), ['w5_fri', 'w5_sat'], 'Monday 2026-10-12 asks about Friday, Wk 5');
+});

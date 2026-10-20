@@ -45,3 +45,30 @@ and `tests/measure/v221_rulings/p_active_ruling.md`). The switch is `setActive` 
   hand (one complete, one skipped); `ia_comp_P1` is byte for byte what it was; nothing is written for P0; the reminder
   that day finds nothing to ask. On Tuesday 2026-10-13 it asks about Monday, Wk 6 (2026-10-12), the first day missed
   after the switch.
+
+## D240: P-REMINDGAP, the reminder never reaches back past a day you marked (v0.241.1; amends D238)
+
+- **Date:** reported and ruled 2026-10-19. **Ruled by:** Mario, choosing "stop at the last mark" over a 7-day cap and a
+  one-time clear on update. **Bump:** PATCH (Mario). **Shipped:** v0.241.1.
+- **The report (Mario):** Monday of Week 9, the reminder asked about `Thursday, Wk 7 · Recovery Lift`, the next day back
+  in the same week spent on the other program. "I think I seen it pop up again."
+- **The finding (measure, part 2 of `tests/measure/active-program_reminder-switch.ts`, on v0.241.0):** the phone did not
+  have D238 (the last install was 2026-10-09, and Pages serves V239). D238 also cannot reach a program that was already
+  active when it landed: no switch happens, so nothing marks the backlog. `maybeShowReminder` skips a marked day and
+  keeps walking back, so a gap behind marked days is asked about one day at a time. On the fixture, away a week and
+  back marking every day: 5 pop-ups over 5 days, each about a day on the other program. With the walk stopping at the
+  first marked day: 1, on the day back.
+- **What changes:** the reminder walks back from the most recent past training day and stops at the first day that
+  holds a mark (complete, partial or skipped). It asks only about the newest unmarked day not yet asked in the stretch
+  since the last mark. Once a later day is marked, the days before it are behind the athlete and never asked about.
+  The doctrine is the re-entry line's own: never chase missed work.
+- **What deliberately does not change:** D238's switch marking stays (a switch back after time away still gives 0
+  pop-ups instead of 1). Within an unmarked stretch the reminder still asks newest first, once a day, and a day already
+  asked is still skipped. The gap count, the copy, the re-entry message after a week off and the once-a-day key are
+  unchanged. Nothing is written to the record.
+- **Accepted cost:** with two days missed and the third marked, only the second is asked about the next morning; the
+  first never is. Mario chose this over the 7-day cap, which would still walk back through a week of unmarked days.
+- **Expected values (typed by hand, the clock Sunday 2026-10-11, the program from Monday 2026-09-07):** weeks 1 to 4
+  marked, week 5 Monday to Thursday unmarked, Friday 2026-10-09 marked, Saturday 2026-10-10 unmarked: the reminder asks
+  about Saturday, Wk 5. With Saturday marked as well, it asks nothing (before: Thursday, Wk 5). With nothing marked after
+  week 4, it asks about Saturday, Wk 5, then the next day (Saturday asked) about Friday, Wk 5.
