@@ -298,6 +298,20 @@ does in a checkout: `backend/` (with the app as `backend/app-web/`), `frontends/
 is a fast-forward; nothing is force-pushed. `heroku.sh verify` with no commit checks that `/healthz` reports
 `origin/main`, which is what the automatic deploy ships.
 
+**Heroku's build and dyno on this Mac, offline: `npm run heroku:local`** (here in `backend/`; it is
+`heroku.sh local`). It needs no Heroku CLI and no network. It copies what Heroku's GitHub deploy would receive into
+`temp/heroku-local/slug` (this checkout's tracked and new files as they are on disk, uncommitted edits included; or a
+ref's, `npm run heroku:local -- origin/main`) and builds it as the Node buildpack does: `NODE_ENV=production`, `npm ci`
+at the root, the root's `npm run build`, the dev dependencies pruned, with npm offline (it installs from this Mac's npm
+cache; `-- --online` lets it fetch, once, when the cache lacks a package). Then it starts the Procfile's `web` process
+with a dyno's variables (`DYNO`, `HEROKU_SLUG_COMMIT`) behind a small local router that, like Heroku's, hands the dyno
+each request as one that arrived over https. It reads back the website, the admin, the app (and its version against
+its sources), the icon and `/healthz`, and that plain http to the dyno is sent to https, then stays up at
+http://localhost:5006 (admin / asylum unless you export `ADMIN_USER` and `ADMIN_PASSWORD`) until Ctrl-C.
+`npm run heroku:local -- --check` stops after the read-back and exits non-zero if any read failed; `PORT=<n>` moves
+it. What it cannot show: Heroku's own Node (the newest of `engines.node`; it warns when this Mac's major differs) and
+Heroku's Ubuntu image.
+
 ### One-time setup
 
 1. Install the CLI and log in:

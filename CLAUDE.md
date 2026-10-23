@@ -363,7 +363,8 @@ wants to see an edit, check it answers (`curl -s localhost:3000/healthz`), run `
 and hand him the link to the page that changed. It shows; it proves nothing: no test or CI result comes
 from it, and a version ships only through the session rhythm. The other paths stay for devices, deploys and full
 builds: `frontends/app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`; `backend/` `docker:up`, `mac-local-backend`,
-`heroku.sh deploy`.
+`heroku.sh deploy`, and `heroku:local` (Heroku's build and dyno on this Mac, offline: `npm run heroku:local -- --check`
+before a merge into `main` touches the build).
 
 ## Native (iOS) (Mario, Post-v0.240.0): the iOS app is the product, and its proof runs in lanes
 - **What is tracked:** `frontends/app/config.xml`, `plugins-src/ia-island` and `scripts/ios.mjs`. `platforms/`, `plugins/` and

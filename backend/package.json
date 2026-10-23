@@ -28,6 +28,7 @@
     "mac-local-backend:status": "node ../tools/run.mjs backend-mac-local-status -- bash scripts/mac-local-backend.sh status",
     "mac-local-backend:logs": "node ../tools/run.mjs server-backend-mac-local -- bash scripts/mac-local-backend.sh logs",
     "heroku": "node ../tools/run.mjs heroku --sub -- bash scripts/heroku.sh",
+    "heroku:local": "node ../tools/run.mjs heroku-local -- bash scripts/heroku.sh local",
     "lint": "node ../tools/run.mjs backend-lint -- eslint .",
     "logs": "node ../tools/logs.mjs"
   },

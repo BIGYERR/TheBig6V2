@@ -7,6 +7,8 @@
 #   bash backend/scripts/heroku.sh logs               tail the logs
 #   bash backend/scripts/heroku.sh open               open /admin/ in the browser
 #   bash backend/scripts/heroku.sh tree [ref]         print the tree deploy would push for ref (default HEAD)
+#   bash backend/scripts/heroku.sh local [ref]        build and run what Heroku would, on this Mac and offline
+#                                                     (--check: stop after the read-back; --online: npm may fetch)
 #
 # Heroku deploys the branch main by itself (automatic deploys from GitHub, Mario, Post-v0.242.0; main changes only
 # through a pull request whose checks passed):
@@ -197,6 +199,171 @@ cmd_verify() {
   die "pushed, but $url/healthz did not report $want within 2 minutes (it reports '${got:-nothing}'). Check: bash backend/scripts/heroku.sh logs"
 }
 
+# Heroku's build and dyno on this Mac, offline, with no Heroku CLI. The tree is what Heroku's GitHub deploy receives: a
+# ref's files, or with no ref this checkout's tracked and new files as they are on disk. It is built in
+# temp/heroku-local/slug the way the Node buildpack builds it (NODE_ENV=production; heroku-prebuild; npm ci at the root;
+# heroku-postbuild, else build; the dev dependencies pruned; heroku-cleanup), with npm held offline: it installs from
+# this Mac's npm cache and never asks the registry (--online lets it). Then the Procfile's web process starts with the
+# variables a dyno has, and the website, the admin, the app and /healthz are read back. It stays up until Ctrl-C;
+# --check stops it after the read-back and exits non-zero if any read failed. PORT moves it off 5006.
+cmd_local() {
+  local ref="" check="" online="" arg
+  for arg in "$@"; do
+    case "$arg" in
+      --check) check=1 ;;
+      --online) online=1 ;;
+      -*) die "local: unknown option $arg (--check, --online)" ;;
+      *) ref="$arg" ;;
+    esac
+  done
+  local top out slug port url commit label web
+  top="$(git rev-parse --show-toplevel)"
+  out="$top/temp/heroku-local"
+  slug="$out/slug"
+  port="${PORT:-5006}"
+  url="http://localhost:$port"
+  curl -s -o /dev/null "$url" 2>/dev/null && die "something already answers on port $port; PORT=<another> moves this run"
+
+  rm -rf "$slug"
+  mkdir -p "$slug"
+  if [ -n "$ref" ]; then
+    commit="$(git rev-parse --verify --quiet "$ref^{commit}")" || die "no such ref: $ref"
+    label="$ref ($(git rev-parse --short "$commit"))"
+    git -C "$top" archive "$commit" | tar -x -C "$slug" || die "cannot extract $ref"
+  else
+    commit="$(git rev-parse HEAD)"
+    label="this checkout (HEAD $(git rev-parse --short HEAD))"
+    [ -z "$(git -C "$top" status --porcelain)" ] || label="this checkout (HEAD $(git rev-parse --short HEAD) with its uncommitted changes)"
+    # Tracked and new files, as they are on disk: not the ignored ones, and not the tracked ones deleted from disk.
+    (cd "$top" && git ls-files -z -co --exclude-standard | while IFS= read -r -d '' f; do [ -e "$f" ] && printf '%s\0' "$f"; done |
+      tar --null -T - -cf -) | tar -x -C "$slug" || die "cannot copy this checkout"
+  fi
+
+  # Detect, as the buildpack does: a package.json at the root, and the Procfile's web process.
+  [ -f "$slug/package.json" ] || die "no package.json at the root of $label: Heroku's Node buildpack would not detect the app"
+  [ -f "$slug/Procfile" ] || die "no Procfile at the root of $label: Heroku would start no web process"
+  web="$(sed -n 's/^web:[[:space:]]*//p' "$slug/Procfile")"
+  [ -n "$web" ] || die "the Procfile at the root of $label has no web process"
+  local engine have
+  engine="$(SLUG="$slug" node -p 'require(process.env.SLUG + "/package.json").engines?.node ?? ""')"
+  have="$(node -p process.versions.node)"
+  if [[ "$engine" =~ ^([0-9]+)\.x$ ]] && [ "${BASH_REMATCH[1]}" != "${have%%.*}" ]; then
+    echo "heroku local: warning: Heroku runs Node $engine; this Mac runs $have, so the build here may differ" >&2
+  fi
+
+  local npm_env=(NODE_ENV=production NPM_CONFIG_LOGLEVEL=error NG_CLI_ANALYTICS=false) hint=""
+  if [ -z "$online" ]; then
+    npm_env+=(npm_config_offline=true)
+    hint=" (npm is offline: a package missing from this Mac's npm cache fails here; run it once with --online)"
+  fi
+  in_slug() { (cd "$slug" && env "${npm_env[@]}" "$@"); }
+  has_script() { SLUG="$slug" node -e 'process.exit(require(process.env.SLUG + "/package.json").scripts?.[process.argv[1]] ? 0 : 1)' "$1"; }
+
+  local started=$SECONDS build=build
+  echo "-----> Building $label in temp/heroku-local/slug, Node $have, npm $([ -n "$online" ] && echo online || echo offline)"
+  if has_script heroku-prebuild; then
+    echo "-----> npm run heroku-prebuild"; in_slug npm run heroku-prebuild || die "heroku-prebuild failed$hint"
+  fi
+  echo "-----> Installing dependencies: npm ci"
+  in_slug npm ci --no-audit --no-fund || die "npm ci at the root failed$hint"
+  has_script heroku-postbuild && build=heroku-postbuild
+  echo "-----> Build: npm run $build"
+  in_slug npm run "$build" || die "npm run $build failed$hint"
+  echo "-----> Pruning devDependencies"
+  in_slug npm prune --omit=dev --no-audit --no-fund || die "npm prune failed$hint"
+  if has_script heroku-cleanup; then
+    echo "-----> npm run heroku-cleanup"; in_slug npm run heroku-cleanup || die "heroku-cleanup failed$hint"
+  fi
+  echo "-----> Built in $((SECONDS - started)) s; the slug is $(du -sh "$slug" | cut -f1) before compression (Heroku's limit: 500 MB compressed)"
+
+  # The dyno: the Procfile's command, with what Heroku puts in a dyno's environment (DYNO makes the server say heroku
+  # and trust the router's forwarded headers; HEROKU_SLUG_COMMIT is what /healthz reports, runtime-dyno-metadata's).
+  # It listens on its own PORT, as a dyno does; $port is the router's.
+  # pid and router are globals, not locals: the EXIT trap that stops them runs after this function has returned.
+  local admin_user="${ADMIN_USER:-admin}" admin_pass="${ADMIN_PASSWORD:-asylum}" dyno_port=$((port + 1))
+  pid=""
+  router=""
+  curl -s -o /dev/null "http://localhost:$dyno_port" 2>/dev/null && die "something already answers on port $dyno_port, the dyno's; PORT=<another> moves this run"
+  echo "-----> Starting web: $web"
+  (cd "$slug" && exec env PORT="$dyno_port" NODE_ENV=production DYNO=web.1 HEROKU_APP_NAME=heroku-local \
+    HEROKU_SLUG_COMMIT="$commit" HEROKU_RELEASE_VERSION=local ADMIN_USER="$admin_user" ADMIN_PASSWORD="$admin_pass" \
+    bash -c "$web") &
+  pid=$!
+  # Heroku's router, for this Mac: it ends TLS, so it hands the dyno every request as one that arrived over https,
+  # with the caller in X-Forwarded-For. Without it the server, trusting a router that is not there, sends every plain
+  # http request to https (308), as Heroku itself does for http://.
+  ROUTER_PORT="$port" DYNO_PORT="$dyno_port" node -e '
+    const http = require("node:http");
+    http.createServer((req, res) => {
+      const headers = { ...req.headers, "x-forwarded-proto": "https", "x-forwarded-port": "443", "x-forwarded-for": req.socket.remoteAddress };
+      const up = http.request({ host: "127.0.0.1", port: +process.env.DYNO_PORT, path: req.url, method: req.method, headers }, (r) => {
+        res.writeHead(r.statusCode, r.headers);
+        r.pipe(res);
+      });
+      up.on("error", (e) => { res.writeHead(503); res.end(`router: the dyno did not answer (${e.code})\n`); });
+      req.pipe(up);
+    }).listen(+process.env.ROUTER_PORT);' &
+  router=$!
+  stop_web() {
+    local p
+    for p in ${pid:-} ${router:-}; do
+      pkill -TERM -P "$p" 2>/dev/null || true
+      kill "$p" 2>/dev/null || true
+      wait "$p" 2>/dev/null || true
+    done
+  }
+  trap stop_web EXIT
+  local up="" _
+  for _ in $(seq 1 60); do
+    if curl -fsS -o /dev/null "$url/healthz" 2>/dev/null; then up=1; break; fi
+    kill -0 "$pid" 2>/dev/null || die "the web process exited before it answered (its output is above)"
+    kill -0 "$router" 2>/dev/null || die "the local router exited (its output is above)"
+    sleep 0.5
+  done
+  [ -n "$up" ] || die "the web process did not answer $url/healthz within 30 s"
+
+  # The read-back, through the router: every piece the dyno serves, and the app and the commit it serves; then the
+  # dyno itself, asked over plain http, sends the caller to https.
+  local fails=0 code want_app got_app health redirect
+  probe() {
+    code="$(curl -s -o "$out/body" -w '%{http_code}' "$url$1" || true)"
+    if [ "$code" = 200 ]; then echo "       ok    $1  $2"; else echo "       FAIL  $1  $2: HTTP $code"; fails=$((fails + 1)); fi
+  }
+  probe / 'the website'
+  probe /admin/ 'the admin'
+  probe /app/ 'the app'
+  got_app="$(sed -nE 's/.*name="ia-version" content="([^"]+)".*/\1/p' "$out/body" | head -1)"
+  probe /app/apple-touch-icon.png "the app's icon"
+  want_app="$(sed -nE 's/.*name="ia-version" content="([^"]+)".*/\1/p' "$slug/frontends/app/src/legacy/src/html/head.html" 2>/dev/null | head -1)"
+  if [ -n "$want_app" ] && [ "$got_app" != "$want_app" ]; then
+    echo "       FAIL  /app/ serves ${got_app:-no version}; its sources say $want_app"; fails=$((fails + 1))
+  else
+    echo "       ok    /app/ serves ${got_app:-no version}"
+  fi
+  health="$(curl -s "$url/healthz" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const h=JSON.parse(s);console.log(h.ok===true?`${h.backend} ${h.commit}`:"not ok")}catch{console.log("not JSON")}})')"
+  if [ "$health" = "heroku $commit" ]; then
+    echo "       ok    /healthz  heroku, commit $(git rev-parse --short "$commit")"
+  else
+    echo "       FAIL  /healthz  reports '$health', wanted 'heroku $commit'"; fails=$((fails + 1))
+  fi
+  redirect="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://localhost:$dyno_port/admin/" || true)"
+  if [ "$redirect" = "308 https://localhost:$dyno_port/admin/" ]; then
+    echo "       ok    plain http straight to the dyno is sent to https (308), as on Heroku"
+  else
+    echo "       FAIL  plain http straight to the dyno answered '$redirect', wanted a 308 to https"; fails=$((fails + 1))
+  fi
+  rm -f "$out/body"
+  [ "$fails" = 0 ] || die "$fails of the read-backs failed"
+
+  if [ -n "$check" ]; then
+    echo "-----> All read-backs passed; stopped (--check)."
+    return 0
+  fi
+  echo "-----> Up as Heroku would run it: $url/ (the website), $url/admin/ (admin / asylum unless you exported"
+  echo "       ADMIN_USER and ADMIN_PASSWORD), $url/app/ (the app). Ctrl-C stops it."
+  wait "$pid"
+}
+
 cmd_status() {
   need_cli
   local app; app="$(app_name)"
@@ -216,5 +383,6 @@ case "${1:-}" in
   logs) cmd_logs ;;
   open) cmd_open ;;
   tree) deploy_tree "${2:-HEAD}" ;;
-  *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  local) shift; cmd_local "$@" ;;
+  *) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
