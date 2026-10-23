@@ -1,0 +1,47 @@
+{
+  "name": "iron-asylum-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Iron Asylum backend: the device heartbeat API and the admin API, serving the website, the admin and the app that frontends/ and the repo root build.",
+  "type": "module",
+  "main": "dist/server/server.js",
+  "engines": {
+    "node": "26.x"
+  },
+  "scripts": {
+    "start": "node --enable-source-maps dist/server/server.js",
+    "dev": "node ../tools/run.mjs server-backend-dev -- node scripts/dev.ts",
+    "dev:down": "node ../tools/run.mjs backend-dev-down -- docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "dev:server": "node ../tools/run.mjs server-backend-dev-server -- node --watch server/server.ts",
+    "build": "node scripts/app-bundle.ts && npm run build:server",
+    "build:server": "node -e \"require('node:fs').rmSync('dist/server', { recursive: true, force: true })\" && tsc -p tsconfig.server.json",
+    "app:bundle": "node scripts/app-bundle.ts",
+    "pretest": "npm run typecheck",
+    "test": "node ../tools/run.mjs backend-test -- node --test --test-reporter=spec test/",
+    "typecheck": "node ../tools/run.mjs backend-typecheck -- sh -c 'tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.test.json'",
+    "predocker:up": "node scripts/app-bundle.ts",
+    "docker:up": "node ../tools/run.mjs backend-docker-up -- docker compose up --build -d --wait",
+    "docker:down": "node ../tools/run.mjs backend-docker-down -- docker compose down",
+    "docker:logs": "node ../tools/run.mjs server-backend-docker -- docker compose logs -f --timestamps api",
+    "mac-local-backend": "node ../tools/run.mjs backend-mac-local --sub -- bash scripts/mac-local-backend.sh",
+    "mac-local-backend:down": "node ../tools/run.mjs backend-mac-local-down -- bash scripts/mac-local-backend.sh down",
+    "mac-local-backend:status": "node ../tools/run.mjs backend-mac-local-status -- bash scripts/mac-local-backend.sh status",
+    "mac-local-backend:logs": "node ../tools/run.mjs server-backend-mac-local -- bash scripts/mac-local-backend.sh logs",
+    "heroku": "node ../tools/run.mjs heroku --sub -- bash scripts/heroku.sh",
+    "heroku:local": "node ../tools/run.mjs heroku-local -- bash scripts/heroku.sh local",
+    "lint": "node ../tools/run.mjs backend-lint -- eslint .",
+    "logs": "node ../tools/logs.mjs"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.69.0"
+  }
+}

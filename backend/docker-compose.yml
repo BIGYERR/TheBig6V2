@@ -1,0 +1,26 @@
+# The backend in docker, production build, on http://localhost:3000 (API_PORT to change).
+#   npm run docker:up      build and start, wait for the health check
+#   npm run docker:logs    follow the logs
+#   npm run docker:down    stop (the devices volume stays; add -v to wipe it)
+name: iron-asylum-backend
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    ports:
+      - "127.0.0.1:${API_PORT:-3000}:3000"
+    environment:
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-asylum}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://bigyerr.github.io,app://localhost,http://localhost:*,http://127.0.0.1:*}
+      DATA_FILE: /srv/data/devices.json
+      # The container's own hostname is a random id; name it so the app's debug section and the admin can.
+      IA_BACKEND_NAME: ${IA_BACKEND_NAME:-docker on this Mac}
+      CLIENT_DEMO: "1"
+    volumes:
+      - devices:/srv/data
+    restart: unless-stopped
+
+volumes:
+  devices:

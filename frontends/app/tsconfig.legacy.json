@@ -1,0 +1,23 @@
+/* The legacy app's own files turned TypeScript (phase E's logic move, from v0.239.43): src/legacy/src/js/*.ts, which the
+ * page build strips back to the JavaScript they were (scripts/build-index.mjs, tools/engine-move.mjs proves the text and
+ * tools/same-script.mjs the tokens). Strict, with the DOM, as the engine's own config is: the types are written onto
+ * the code as it ran, a parameter with no type yet says so (`: any`), and a check the code cannot meet yet without
+ * changing a token is marked where it fails with a `// @ts-expect-error` line (tools/ts-expect.mjs), so the debt is
+ * listed, never hidden. Tightening comes
+ * file by file, under the tests. The Angular app keeps its own tsconfig.app.json; these files are not part of it. */
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "types": [],
+    "skipLibCheck": true
+  },
+  "include": ["src/legacy/src/js/*.ts"]
+}

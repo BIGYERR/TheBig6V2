@@ -1,0 +1,37 @@
+page /Users/CanasBangin/Developer/TheBig6V2/dist-github-pages/index.html ia-version 0.240.0
+functions: _longRunTier function, sessionTimeEst function, paceChartLookup function
+
+== (c) NSW LSD cards, 960 builds, 0 crashes, 16492 cards (9424 long)
+dose.tgt present 16492/16492; "Recovery Pace: m:ss/mi" 16492/16492; "(Zone 2)" 16492/16492; "max HR" 16492/16492
+engine own-row lookup agrees with the hand table (+-1 s) on 960/960 builds
+tgt vs own row: faster 6916, equal 1148, slower 8428 (of 16492); max faster 28 s/mi
+faster by (s/mi): {"1-4":2800,"5-9":1596,"10-19":2100,"20+":420}
+long-run tier moves with tgt on the own row: {"B>A":40,"B>C":80} of 9424 long cards
+  run_pace_goal 1.5mi: cards 6412, faster 2100, long 3664, tier moves 64; first faster: beginner mile default evt false W7 fri tgt 14:04 own 14:05
+  run_pace_goal 1mi: cards 2688, faster 1792, long 1536, tier moves 8; first faster: beginner mile default evt false W2 fri tgt 14:03 own 14:05
+  run_mile_time: cards 3696, faster 1512, long 2112, tier moves 24; first faster: beginner mile default evt false W7 fri tgt 14:04 own 14:05
+  run_15_under10: cards 3696, faster 1512, long 2112, tier moves 24; first faster: beginner mile default evt false W7 fri tgt 14:04 own 14:05
+  faster by goal and event: run_pace_goal 1.5mi evt=false 1078/3206
+  faster by goal and event: run_pace_goal 1.5mi evt=true 1022/3206
+  faster by goal and event: run_pace_goal 1mi evt=false 896/1344
+  faster by goal and event: run_pace_goal 1mi evt=true 896/1344
+  faster by goal and event: run_mile_time evt=false 770/1848
+  faster by goal and event: run_mile_time evt=true 742/1848
+  faster by goal and event: run_15_under10 evt=false 770/1848
+  faster by goal and event: run_15_under10 evt=true 742/1848
+examples:
+  run_pace_goal 1.5mi intermediate mile 9:00 rest sun evt false seed 76308 W10 sat 6.6 mi tgt 11:20 -> 11:35 tier B>A
+  run_pace_goal 1.5mi intermediate mile 9:00 rest sun evt false seed 1234 W10 sat 6.6 mi tgt 11:20 -> 11:35 tier B>A
+  run_pace_goal 1.5mi intermediate mile 9:00 rest sun/wed evt false seed 76308 W10 sat 6.6 mi tgt 11:20 -> 11:35 tier B>A
+  run_pace_goal 1.5mi intermediate mile 9:00 rest sun/wed evt false seed 1234 W10 sat 6.6 mi tgt 11:20 -> 11:35 tier B>A
+  run_pace_goal 1.5mi intermediate mile 9:00 rest sun/tue/thu evt false seed 76308 W10 sat 6.6 mi tgt 11:20 -> 11:35 tier B>A
+  run_pace_goal 1.5mi intermediate mile 9:00 rest sun/tue/thu evt false seed 1234 W10 sat 6.6 mi tgt 11:20 -> 11:35 tier B>A
+hero estimate (rounded to 5 min) on 16492 LSD days: changes if the pace leaves the detail under today's code 13469/16492, deltas -25:176 -20:1082 -15:2356 -10:4171 -5:3927 0:3023 5:1719 10:38
+  read off the dose with the own-row tgt (r2): changes 1980/16492, deltas -5:788 0:14512 5:1192
+
+== (d) default-anchor builds 240: D189 note on an LSD 0, on another run 240, on none 0
+  of the 0 on an LSD: moves to {}; no other paced W1 run, so it vanishes: 0
+
+== (e) HALF_MANNY digest 2d35e8f743680cfa twice-equal true; NSW LSD cards 0 of 56 runs; snapshot entry keys weeks,digest,grid
+  snapshot digest 2d35e8f743680cfa equal true
+  snapshot programs that are NSW test goals (their LSD cards would move): 2 of 10: 1.5 mile test goal, minimal, fat loss, beginner | 1.5 mile test goal, commercial, balanced

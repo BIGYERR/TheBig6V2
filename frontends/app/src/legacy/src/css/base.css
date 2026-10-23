@@ -1,0 +1,30 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+:root{
+  color-scheme: light;
+  --bg:#F4F1E8;--surface:#FBFAF5;--surface2:#ECE7DA;--surface3:#E0DACA;
+  --border:#D5CEBD;--border2:#BCB29B;
+  --text:#181712;--muted:#6B6557;--accent:#181712;--accent-dim:rgba(24,23,18,0.06);
+  --on-ink:#F4F1E8;
+  --signal:#CF4E1A;--signal-press:#AE3F12;--on-signal:#FBF6EE;
+  --font-display:'Helvetica Now Text','Helvetica Neue',Helvetica,'Geist',Arial,sans-serif;--font-text:'Helvetica Neue',Helvetica,'Geist','Helvetica Now Text',Arial,sans-serif;--font-mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --run:#5e8c54;--run-dim:rgba(94,140,84,0.15);
+  --bike:#3f6e96;--bike-dim:rgba(63,110,150,0.15);
+  --lift:#bc6a43;--lift-dim:rgba(188,106,67,0.15);
+  --hip:#7e5e96;--hip-dim:rgba(126,94,150,0.15);
+  --swim:#3f6e96;--swim-dim:rgba(63,110,150,0.15);
+  --core:#a6822f;--core-dim:rgba(166,130,47,0.15);
+  --red:#9e3328;--green:#5e8c54;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{background:#F4F1E8 !important;}
+html,body{background:#F4F1E8 !important;color:#181712 !important;font-family:var(--font-text);min-height:100vh;overscroll-behavior:none;font-variant-numeric:tabular-nums;touch-action:manipulation;}
+/* Lock light regardless of system or WebView color scheme */
+@media (prefers-color-scheme: dark) {
+  html{background:#F4F1E8 !important;}
+  html,body{background:#F4F1E8 !important;color:#181712 !important;}
+  .screen{background:#F4F1E8 !important;}
+}
+.screen{display:none;flex-direction:column;min-height:100vh;max-width:430px;margin:0 auto;background:var(--bg) !important;}
+.screen.active{display:flex;}
+

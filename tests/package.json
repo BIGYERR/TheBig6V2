@@ -1,0 +1,28 @@
+{
+  "name": "iron-asylum-tests",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The TypeScript test suite: the feature tests in unit/, integration/ and sweeps/, run by Vitest and type-checked with @ia/core, and the Docker e2e in e2e/ (Puppeteer, run by Node; npm run e2e).",
+  "scripts": {
+    "test": "node ../tools/run.mjs tests -- vitest run",
+    "typecheck": "node ../tools/run.mjs tests-typecheck -- sh -c 'tsc -p ../core && tsc -p ../core/tsconfig.engine.json && tsc -p .'",
+    "e2e": "node ../tools/run.mjs e2e -- node e2e/launch.ts"
+  },
+  "packageManager": "npm@11.19.0",
+  "dependencies": {
+    "@ia/core": "file:../core"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/pngjs": "^6.0.5",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
+    "puppeteer": "^25.13.0",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.3"
+  },
+  "allowScripts": {
+    "puppeteer@25.13.0": true,
+    "fsevents": false
+  }
+}

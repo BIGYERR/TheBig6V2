@@ -1,0 +1,95 @@
+artifact ia-version 237
+
+== EXAMPLE pace 1.5mi 12:00 intermediate mile 9:00 event=false weeks=11 paceProgression=undefined own row rec=11:35 cap=11:03
+ W1 quality: Short Interval@8:58, Long Interval@9:59
+  W1 fri easy 2.1mi tgt=11:52 cap=none tier null->null | 2.1 mi at Recovery Pace: 11:52/mi (Zone 2).
+  W1 sat long 3mi tgt=11:52 cap=none tier C->C | 3 mi at Recovery Pace: 11:52/mi (Zone 2).
+ W2 quality: Short Interval@8:55, Long Interval@9:55
+  W2 fri easy 2.6mi tgt=11:48 cap=none tier null->null | 2.6 mi at Recovery Pace: 11:48/mi (Zone 2).
+  W2 sat long 3.5mi tgt=11:48 cap=none tier C->C | 3.5 mi at Recovery Pace: 11:48/mi (Zone 2).
+ W3 quality: Short Interval@8:52, Long Interval@9:52
+  W3 fri easy 3.1mi tgt=11:45 cap=none tier null->null | 3.1 mi at Recovery Pace: 11:45/mi (Zone 2).
+  W3 sat long 4mi tgt=11:45 cap=none tier B->B | 4 mi at Recovery Pace: 11:45/mi (Zone 2).
+ W4 quality: Short Interval@8:52, Long Interval@9:52
+  W4 fri easy 2.2mi tgt=11:45 cap=none tier null->null | 2.2 mi at Recovery Pace: 11:45/mi (Zone 2).
+  W4 sat long 2.8mi tgt=11:45 cap=none tier C->C | 2.8 mi at Recovery Pace: 11:45/mi (Zone 2).
+ W5 quality: Short Interval@8:46, Long Interval@9:46
+  W5 fri easy 3.6mi tgt=11:38 cap=none tier null->null | 3.6 mi at Recovery Pace: 11:38/mi (Zone 2).
+  W5 sat long 4.5mi tgt=11:38 cap=none tier B->B | 4.5 mi at Recovery Pace: 11:38/mi (Zone 2).
+ W6 quality: Short Interval@8:43, Long Interval@9:42
+  W6 fri easy 4.1mi tgt=11:34 cap=none tier null->null | 4.1 mi at Recovery Pace: 11:34/mi (Zone 2).
+  W6 sat long 5mi tgt=11:34 cap=none tier B->B | 5 mi at Recovery Pace: 11:34/mi (Zone 2).
+ W7 quality: Short Interval@8:40, Long Interval@9:39
+  W7 fri easy 4.6mi tgt=11:31 cap=none tier null->null | 4.6 mi at Recovery Pace: 11:31/mi (Zone 2).
+  W7 sat long 5.5mi tgt=11:31 cap=none tier B->B | 5.5 mi at Recovery Pace: 11:31/mi (Zone 2).
+ W8 quality: Short Interval@8:40, Long Interval@9:39
+  W8 fri easy 3.2mi tgt=11:31 cap=none tier null->null | 3.2 mi at Recovery Pace: 11:31/mi (Zone 2).
+  W8 sat long 3.8mi tgt=11:31 cap=none tier C->C | 3.8 mi at Recovery Pace: 11:31/mi (Zone 2).
+ W9 quality: Short Interval@8:34, Long Interval@9:33
+  W9 fri easy 5.1mi tgt=11:24 cap=none tier null->null | 5.1 mi at Recovery Pace: 11:24/mi (Zone 2).
+  W9 sat long 6mi tgt=11:24 cap=none tier B->B | 6 mi at Recovery Pace: 11:24/mi (Zone 2).
+ W10 quality: Short Interval@8:31, Long Interval@9:29
+  W10 fri easy 5.2mi tgt=11:20 cap=none tier null->null | 5.2 mi at Recovery Pace: 11:20/mi (Zone 2).
+  W10 sat long 6.6mi tgt=11:20 cap=none tier B->A | 6.6 mi at Recovery Pace: 11:20/mi (Zone 2).
+ W11 quality: Short Interval@8:28, Long Interval@9:26
+  W11 fri easy 5.2mi tgt=11:17 cap=none tier null->null | 5.2 mi at Recovery Pace: 11:17/mi (Zone 2).
+  W11 sat long 7.3mi tgt=11:17 cap=none tier A->A | 7.3 mi at Recovery Pace: 11:17/mi (Zone 2).
+
+-- weekGrid W1 and final (event=false)
+W1 MON Strength Support {Short Interval (SI)} :: Main — Close-grip bench press[Close-grip bench press, Dumbbell Arnold press] | Accessory[Dumbbell decline press, Kettlebell single-arm press] | Chest + knee[Spanish squat hold (KB)] | Core — Anti-Rotation[Suitcase carry, Bird dogs]
+W1 TUE Leg Strength + Mobility :: Main — Front squat[Front squat] | Leg circuit — runner armor[Dumbbell Bulgarian split squat, Spanish squat hold (KB), Barbell Romanian deadlift, Single-leg hip thrust] | Calf — achilles armor[Dumbbell seated calf raise] | Hip stability[Seated banded hip flexion, Hip airplane (light KB), Hip 90/90 stretch] | Foot & ankle[Single-leg bent-knee soleus raise, Standing ankle CARs] | Loaded carry finisher[Suitcase carry]
+W1 THU Posterior Chain {Long Interval (LI)} :: Main — Barbell Romanian deadlift[Barbell Romanian deadlift] | Pull superset A[Barbell row, Weighted chinups] | Pull superset B[Dumbbell row, Ball slams]
+W1 FRI Recovery Lift {Long Slow Distance (LSD)} :: Main — Dumbbell bench press[Dumbbell bench press, Kettlebell single-arm press] | Pump[Diamond pushups, Overhead dumbbell extension] | Core — Rotational Power[Medicine ball rotary toss, Landmine rotations]
+W1 SAT Full Body Support {Long Slow Distance (LSD)} :: Power — explosive first[Kettlebell swing] | Strength[Dips, Inverted rows (rings)]
+W11 MON Strength Support {Short Interval (SI)} :: Main — Incline barbell press[Incline barbell press, Dumbbell lateral raise] | Accessory[Diamond pushups, Landmine rotational press] | Chest + knee[Dumbbell bench press, Wall sit] | Core — Anti-Rotation[Plank shoulder taps]
+W11 TUE Leg Strength + Mobility :: Main — Back squat[Back squat] | Leg circuit — runner armor[Step-ups (KB), Wall sit, Kettlebell single-leg deadlift, Single-leg hip thrust] | Calf — achilles armor[Dumbbell standing calf raise] | Hip stability[Seated banded hip flexion, Hip airplane (light KB), Weighted 90/90 hip switch] | Foot & ankle[Tibialis raise (wall lean), Single-leg bent-knee soleus raise] | Loaded carry finisher[Overhead carry]
+W11 THU Posterior Chain {Long Interval (LI)} :: Main — Barbell Romanian deadlift[Barbell Romanian deadlift] | Pull superset A[Barbell row, Weighted chinups] | Pull superset B[Dumbbell row, Jump squats]
+W11 FRI Recovery Lift {Long Slow Distance (LSD)} :: Main — Dumbbell incline press[Dumbbell incline press, Landmine rotational press] | Pump[Dumbbell bench press, Bench dips] | Delt finisher[Dumbbell front raise] | Core — Rotational Power[Band woodchopper (door anchor)]
+W11 SAT Post-Run Mobility {Long Slow Distance (LSD)} :: Post-run mobility[Standing calf stretch, Couch stretch, Hip 90/90 stretch, T-spine mobility, Foam roll]
+
+-- full LSD card text W1 sat (long) and W1 fri (easy)
+  [fri Long Slow Distance (LSD)] 2.1 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower.  || note: LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here.
+  [sat Long Slow Distance (LSD)] 3 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.  || note: LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs.
+
+== EXAMPLE pace 1.5mi 12:00 intermediate mile 9:00 event=true weeks=11 paceProgression=undefined own row rec=11:35 cap=11:03
+ W1 quality: Short Interval@8:58, Long Interval@9:59
+  W1 fri easy 2.1mi tgt=11:52 cap=none tier null->null | 2.1 mi at Recovery Pace: 11:52/mi (Zone 2).
+  W1 sat long 3mi tgt=11:52 cap=none tier C->C | 3 mi at Recovery Pace: 11:52/mi (Zone 2).
+ W2 quality: Short Interval@8:55, Long Interval@9:55
+  W2 fri easy 2.6mi tgt=11:48 cap=none tier null->null | 2.6 mi at Recovery Pace: 11:48/mi (Zone 2).
+  W2 sat long 3.5mi tgt=11:48 cap=none tier C->C | 3.5 mi at Recovery Pace: 11:48/mi (Zone 2).
+ W3 quality: Short Interval@8:52, Long Interval@9:52
+  W3 fri easy 3.1mi tgt=11:45 cap=none tier null->null | 3.1 mi at Recovery Pace: 11:45/mi (Zone 2).
+  W3 sat long 4mi tgt=11:45 cap=none tier B->B | 4 mi at Recovery Pace: 11:45/mi (Zone 2).
+ W4 quality: Short Interval@8:52, Long Interval@9:52
+  W4 fri easy 2.2mi tgt=11:45 cap=none tier null->null | 2.2 mi at Recovery Pace: 11:45/mi (Zone 2).
+  W4 sat long 2.8mi tgt=11:45 cap=none tier C->C | 2.8 mi at Recovery Pace: 11:45/mi (Zone 2).
+ W5 quality: Short Interval@8:46, Long Interval@9:46
+  W5 fri easy 3.6mi tgt=11:38 cap=none tier null->null | 3.6 mi at Recovery Pace: 11:38/mi (Zone 2).
+  W5 sat long 4.5mi tgt=11:38 cap=none tier B->B | 4.5 mi at Recovery Pace: 11:38/mi (Zone 2).
+ W6 quality: Short Interval@8:43, Long Interval@9:42
+  W6 fri easy 4.1mi tgt=11:34 cap=none tier null->null | 4.1 mi at Recovery Pace: 11:34/mi (Zone 2).
+  W6 sat long 5mi tgt=11:34 cap=none tier B->B | 5 mi at Recovery Pace: 11:34/mi (Zone 2).
+ W7 quality: Short Interval@8:40, Long Interval@9:39
+  W7 fri easy 4.6mi tgt=11:31 cap=none tier null->null | 4.6 mi at Recovery Pace: 11:31/mi (Zone 2).
+  W7 sat long 5.5mi tgt=11:31 cap=none tier B->B | 5.5 mi at Recovery Pace: 11:31/mi (Zone 2).
+ W8 quality: Short Interval@8:40, Long Interval@9:39
+  W8 fri easy 3.2mi tgt=11:31 cap=none tier null->null | 3.2 mi at Recovery Pace: 11:31/mi (Zone 2).
+  W8 sat long 3.8mi tgt=11:31 cap=none tier C->C | 3.8 mi at Recovery Pace: 11:31/mi (Zone 2).
+ W9 quality: Short Interval@8:34, Long Interval@9:33
+  W9 fri easy 5.1mi tgt=11:24 cap=none tier null->null | 5.1 mi at Recovery Pace: 11:24/mi (Zone 2).
+  W9 sat long 6mi tgt=11:24 cap=none tier B->B | 6 mi at Recovery Pace: 11:24/mi (Zone 2).
+ W10 quality: Short Interval@8:34, Long Interval@9:33
+  W10 fri easy 4.4mi tgt=11:24 cap=none tier null->null | 4.4 mi at Recovery Pace: 11:24/mi (Zone 2).
+  W10 sat long 5.2mi tgt=11:24 cap=none tier B->B | 5.2 mi at Recovery Pace: 11:24/mi (Zone 2). Taper week. Distance reduc
+ W11 quality: Short Interval@8:34, Long Interval@9:33
+  W11 fri easy 3.7mi tgt=11:24 cap=none tier null->null | 3.7 mi at Recovery Pace: 11:24/mi (Zone 2).
+  W11 sat long 4.4mi tgt=11:24 cap=none tier B->B | 4.4 mi at Recovery Pace: 11:24/mi (Zone 2). Taper week. Distance reduc
+
+== LATTICE pace family: builds 960, LSD sessions 16492, weeks with LSD 9424
+clock tgt vs own-row recovery: faster 6916 (max 28s), slower 8428, equal 1148
+D187 tier moves if tgt -> own-row recovery (long runs 9424): {"B->A":40,"B->C":80}
+crossing, own-row ceiling steadyCap(own) <= slowest quality tgt in the same week: 0/9424 weeks; own-row recovery <= slowest quality: 0/9424
+crossing, clock-row ceiling steadyCap(clockRow) <= slowest quality tgt: 0/16492 sessions (what a cap on the clock row would allow today)
+crossing, slower-of-both ceiling: 0/16492 sessions
+per goal: {"run_pace_goal 1.5mi":{"n":6412,"faster":2100,"tier":64,"crossCap":0,"crossClockCap":0},"run_pace_goal 1mi":{"n":2688,"faster":1792,"tier":8,"crossCap":0,"crossClockCap":0},"run_mile_time":{"n":3696,"faster":1512,"tier":24,"crossCap":0,"crossClockCap":0},"run_15_under10":{"n":3696,"faster":1512,"tier":24,"crossCap":0,"crossClockCap":0}}

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Every commit runs the 60-second check on what it touches (tools/check.mjs --staged): the gate suite's fast part when
+# index.html or tests/ changed, the app's checks for frontends/app/ or tools/, the backend's for backend/, nothing for docs alone.
+# The full suite runs in GitHub Actions on the pull request from dev into main. Skip this once: git commit --no-verify.
+# Enabled per clone with: git config core.hooksPath .githooks
+root="$(git rev-parse --show-toplevel)" || exit 1
+command -v node >/dev/null 2>&1 || { echo "pre-commit: node is not on PATH; skipping the check" >&2; exit 0; }
+exec node "$root/tools/check.mjs" --staged

@@ -1,0 +1,51 @@
+{
+  "builds": 3528,
+  "dayCells": 134946,
+  "legIsolationSections": 2020,
+  "sectionsWithAHarvestedName": 1820,
+  "wallSitsInTheSection": 1386,
+  "sameCardDuplicates": 0,
+  "bodyweightSectionNames": {
+    "Wall sit": 240,
+    "Single-leg glute bridge": 70,
+    "Single-leg hip thrust": 42,
+    "Nordic hamstring curl (anchored)": 80
+  },
+  "denials": {
+    "commercial": {
+      "machine": 0,
+      "cable": 0,
+      "names": {}
+    },
+    "home_full": {
+      "machine": 0,
+      "cable": 0,
+      "names": {}
+    },
+    "crossfit": {
+      "machine": 0,
+      "cable": 0,
+      "names": {}
+    },
+    "home_basic": {
+      "machine": 0,
+      "cable": 0,
+      "names": {}
+    },
+    "bodyweight": {
+      "machine": 0,
+      "cable": 0,
+      "names": {}
+    },
+    "minimal": {
+      "machine": 0,
+      "cable": 0,
+      "names": {}
+    },
+    "travel_room_only": {
+      "machine": 0,
+      "cable": 0,
+      "names": {}
+    }
+  }
+}

@@ -1,0 +1,32 @@
+#!/bin/sh
+# Only local dev, from the main checkout, ever reaches GitHub (CLAUDE.md Pipeline, "A worktree never pushes"; Mario,
+# Post-V239). For a push to the GitHub repo this refuses:
+#   - any push from a linked git worktree (.claude/worktrees/*), branch or tag;
+#   - from the main checkout, any branch push other than local dev's own commit to dev. Tags pass (the release tag).
+# Other remotes are not checked: backend/scripts/heroku.sh deploy pushes to heroku-backend.
+# Enabled per clone with: git config core.hooksPath .githooks (worktrees share it).
+url_lc="$(printf '%s' "$2" | tr '[:upper:]' '[:lower:]')"
+case "$url_lc" in
+  *github.com[:/]bigyerr/thebig6v2*) ;;
+  *) exit 0 ;;
+esac
+
+git_dir="$(cd "$(git rev-parse --git-dir)" && pwd -P)" || exit 1
+common_dir="$(cd "$(git rev-parse --git-common-dir)" && pwd -P)" || exit 1
+if [ "$git_dir" != "$common_dir" ]; then
+  echo "pre-push: refused. $(git rev-parse --show-toplevel) is a worktree, and a worktree never pushes." >&2
+  echo "pre-push: rebase this branch onto local dev, then in the main checkout run: git merge --ff-only $(git branch --show-current)" >&2
+  exit 1
+fi
+
+dev_sha="$(git rev-parse --verify --quiet refs/heads/dev)"
+status=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/tags/*) continue ;;
+    refs/heads/dev) [ -n "$dev_sha" ] && [ "$local_sha" = "$dev_sha" ] && continue ;;
+  esac
+  echo "pre-push: refused $local_ref -> $remote_ref. Only local dev pushes to GitHub, and only to dev; main changes by Mario's pull request." >&2
+  status=1
+done
+exit $status

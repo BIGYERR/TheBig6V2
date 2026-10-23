@@ -1,0 +1,189 @@
+artifact ia-version 237
+render fns exported via eval: buildCardioHTML function, _doseStripHTML function, buildHeroPreview function, _runClass function
+
+== LATTICE: 1920 builds (10 goals x 3 exp x 4 mile anchors {none,7:00,9:00,10:30} x 4 rest patterns x 2 event x 2 seeds), crashes 0
+builds with >=1 long run: NSW 1152/1152, NRC 768/768
+
+== Q3 per goal x class: sessions | (Zone 2) | pace printed | Z2+pace | "max HR" | dose.tgt | dose.cap | dose.k | _runClass | _longRunTier | oracle(own-row recovery) eq/N | faster-than-own n, mean s, max s
+NRC run_10k | NRC long run :: 1536 | 0 | 1536 | 0 | 0 | 1536 | 1344 | {"dist":1536} | {"Long":1536} | {"C":448,"B":608,"A":288,"null":192} | 1344/1344 | 0 slower; faster 0, -, 0
+NRC run_5k | NRC long run :: 1536 | 0 | 1536 | 0 | 0 | 1536 | 1344 | {"dist":768,"time":768} | {"Long":1536} | {"C":1216,"B":128,"null":192} | 1344/1344 | 0 slower; faster 0, -, 0
+NRC run_half | NRC long run :: 2400 | 0 | 2400 | 0 | 0 | 2400 | 2304 | {"dist":2304,"time":96} | {"Long":2400} | {"C":256,"B":720,"A":1328,"null":96} | 2304/2304 | 0 slower; faster 0, -, 0
+NRC run_marathon | NRC long run :: 3072 | 0 | 3072 | 0 | 0 | 3072 | 2976 | {"dist":2688,"time":384} | {"Long":3072} | {"B":528,"A":2448,"null":96} | 2976/2976 | 0 slower; faster 0, -, 0
+NSW pace 1.5mi 10:30 | NSW lsd_easy :: 1404 | 1404 | 1404 | 1404 | 1404 | 1404 | 0 | {"dist":1404} | {"Long":1404} | {"null":1404} | 156/1404 | 828 slower; faster 420, 7.1, 18
+NSW pace 1.5mi 10:30 | NSW lsd_long :: 1872 | 1872 | 1872 | 1872 | 1872 | 1872 | 0 | {"dist":1872} | {"Long":1872} | {"C":672,"B":984,"A":216} | 208/1872 | 1104 slower; faster 560, 7.1, 18
+NSW pace 1.5mi 12:00 | NSW lsd_easy :: 1344 | 1344 | 1344 | 1344 | 1344 | 1344 | 0 | {"dist":1344} | {"Long":1344} | {"null":1344} | 120/1344 | 840 slower; faster 384, 7.3, 18
+NSW pace 1.5mi 12:00 | NSW lsd_long :: 1792 | 1792 | 1792 | 1792 | 1792 | 1792 | 0 | {"dist":1792} | {"Long":1792} | {"C":664,"B":928,"A":200} | 160/1792 | 1120 slower; faster 512, 7.3, 18
+NSW pace 1mi 8:00 | NSW lsd_easy :: 1152 | 1152 | 1152 | 1152 | 1152 | 1152 | 0 | {"dist":1152} | {"Long":1152} | {"null":1152} | 384/1152 | 0 slower; faster 768, 12.9, 28
+NSW pace 1mi 8:00 | NSW lsd_long :: 1536 | 1536 | 1536 | 1536 | 1536 | 1536 | 0 | {"dist":1536} | {"Long":1536} | {"C":512,"B":824,"A":200} | 512/1536 | 0 slower; faster 1024, 12.9, 28
+NSW run_15_under10 | NSW lsd_easy :: 1584 | 1584 | 1584 | 1584 | 1584 | 1584 | 0 | {"dist":1584} | {"Long":1584} | {"null":1584} | 168/1584 | 840 slower; faster 576, 7.3, 18
+NSW run_15_under10 | NSW lsd_long :: 2112 | 2112 | 2112 | 2112 | 2112 | 2112 | 0 | {"dist":2112} | {"Long":2112} | {"C":768,"B":1128,"A":216} | 224/2112 | 1120 slower; faster 768, 7.3, 18
+NSW run_base | NSW lsd_easy :: 2208 | 0 | 2208 | 0 | 0 | 2208 | 2208 | {"time":2208} | {"Easy":2208} | {"null":2208} | 2208/2208 | 0 slower; faster 0, -, 0
+NSW run_base | NSW lsd_long :: 1152 | 0 | 1152 | 0 | 0 | 1152 | 1152 | {"time":1152} | {"Long":1152} | {"C":432,"B":640,"A":80} | 1152/1152 | 0 slower; faster 0, -, 0
+NSW run_mile_time | NSW lsd_easy :: 1584 | 1584 | 1584 | 1584 | 1584 | 1584 | 0 | {"dist":1584} | {"Long":1584} | {"null":1584} | 168/1584 | 840 slower; faster 576, 7.3, 18
+NSW run_mile_time | NSW lsd_long :: 2112 | 2112 | 2112 | 2112 | 2112 | 2112 | 0 | {"dist":2112} | {"Long":2112} | {"C":768,"B":1128,"A":216} | 224/2112 | 1120 slower; faster 768, 7.3, 18
+TOTAL NSW LSD/easy/long sessions 19852: pace printed 19852, pace+(Zone 2) 16492
+TOTAL NRC long-run sessions 8544: pace printed 8544, pace+(Zone 2) 0
+
+== Q1 rendered examples (intermediate, mile 9:00), buildCardioHTML / _doseStripHTML / buildHeroPreview
+-- NRC run_10k | NRC long run W1 sat subtype=Long Run
+   card :  | Run — Long Run | 5K Run: 3.1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (11:35/mi) across the run. Comfortable the whole way. Average no faster than 11:03/mi. | LONG RUN: Easy start, controlled build. This is your most important session of the week. Bring fuel/water for anything over ~75 minutes. | 
+   strip: Run · Planned 3.1 mi @ 11:35/mi
+   hero : "Run · Long Run5K Run: 3.1 mile run, run …Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":3.1,"tgt":695,"cap":663}
+-- NRC run_5k | NRC long run W1 sat subtype=Long Run
+   card :  | Run — Long Run | One Mile Run: 1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (11:35/mi) across the run. Comfortable the whole way. Average no faster than 11:03/mi. | LONG RUN: Easy start, controlled build. This is your most important session of the week. Bring fuel/water for anything over ~75 minutes. | 
+   strip: Run · Planned 1 mi @ 11:35/mi
+   hero : "Run · Long RunOne Mile Run: 1 mile run, …Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":1,"tgt":695,"cap":663}
+-- NRC run_half | NRC long run W1 sat subtype=Long Run
+   card :  | Run — Long Run | 5K Run: 3.1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (11:35/mi) across the run. Comfortable the whole way. Average no faster than 11:03/mi. | LONG RUN: Easy start, controlled build. This is your most important session of the week. Bring fuel/water for anything over ~75 minutes. | 
+   strip: Run · Planned 3.1 mi @ 11:35/mi
+   hero : "Run · Long Run5K Run: 3.1 mile run, run …Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":3.1,"tgt":695,"cap":663}
+-- NRC run_marathon | NRC long run W1 sat subtype=Long Run
+   card :  | Run — Long Run | 5 Mile Run: 5 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (11:35/mi) across the run. Comfortable the whole way. Average no faster than 11:03/mi. | LONG RUN: Easy start, controlled build. This is your most important session of the week. Bring fuel/water for anything over ~75 minutes. | 
+   strip: Run · Planned 5 mi @ 11:35/mi
+   hero : "Run · Long Run5 Mile Run: 5 mile run, ru…Decline pushups2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":5,"tgt":695,"cap":663}
+-- NSW pace 1.5mi 10:30 | NSW lsd_easy W1 fri subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 2.1 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. | LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here. | 
+   strip: Run — LSD · Planned 2.1 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)2.1 mi at Recovery Pace: 1…Dumbbell bench press3×12 — RPE 6–7, leave 3+ in reserveKettlebell single-arm press2×10–15 each @ RPE 7"
+   dose : {"k":"dist","mi":2.1,"tgt":712,"key":"easy"}
+-- NSW pace 1.5mi 10:30 | NSW lsd_long W1 sat subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 3 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. | LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs. | 
+   strip: Run — LSD · Planned 3 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)3 mi at Recovery Pace: 11:…Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":3,"tgt":712,"key":"long"}
+-- NSW pace 1.5mi 12:00 | NSW lsd_easy W1 fri subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 2.1 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. | LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here. | 
+   strip: Run — LSD · Planned 2.1 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)2.1 mi at Recovery Pace: 1…Dumbbell bench press3×12 — RPE 6–7, leave 3+ in reserveKettlebell single-arm press2×10–15 each @ RPE 7"
+   dose : {"k":"dist","mi":2.1,"tgt":712,"key":"easy"}
+-- NSW pace 1.5mi 12:00 | NSW lsd_long W1 sat subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 3 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. | LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs. | 
+   strip: Run — LSD · Planned 3 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)3 mi at Recovery Pace: 11:…Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":3,"tgt":712,"key":"long"}
+-- NSW pace 1mi 8:00 | NSW lsd_easy W1 fri subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 2.1 mi at Recovery Pace: 11:35/mi (Zone 2). / 60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. | LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here. | 
+   strip: Run — LSD · Planned 2.1 mi @ 11:35/mi
+   hero : "Run · Long Slow Distance (LSD)2.1 mi at Recovery Pace: 1…Dumbbell bench press3×12 — RPE 6–7, leave 3+ in reserveKettlebell single-arm press2×10–15 each @ RPE 7"
+   dose : {"k":"dist","mi":2.1,"tgt":695,"key":"easy"}
+-- NSW pace 1mi 8:00 | NSW lsd_long W1 sat subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 3 mi at Recovery Pace: 11:35/mi (Zone 2). / 60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. | LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs. | 
+   strip: Run — LSD · Planned 3 mi @ 11:35/mi
+   hero : "Run · Long Slow Distance (LSD)3 mi at Recovery Pace: 11:…Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":3,"tgt":695,"key":"long"}
+-- NSW run_15_under10 | NSW lsd_easy W1 fri subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 2.1 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. | LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here. | 
+   strip: Run — LSD · Planned 2.1 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)2.1 mi at Recovery Pace: 1…Dumbbell bench press3×12 — RPE 6–7, leave 3+ in reserveKettlebell single-arm press2×10–15 each @ RPE 7"
+   dose : {"k":"dist","mi":2.1,"tgt":712,"key":"easy"}
+-- NSW run_15_under10 | NSW lsd_long W1 sat subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 3 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. | LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs. | 
+   strip: Run — LSD · Planned 3 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)3 mi at Recovery Pace: 11:…Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":3,"tgt":712,"key":"long"}
+-- NSW run_base | NSW lsd_easy W1 mon subtype=Easy Run
+   card :  | Run — Easy Run | 25 min easy and conversational (RPE 3-4 out of 10). Around 11:35/mi is right for you. Do not run faster than 11:03/mi. Distance is not the goal; time on feet is. Log the distance you covered. | EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working. | 
+   strip: Run — EASY · Planned 25 min @ 11:35/mi
+   hero : "Run · Easy Run25 min easy and conversati…Close-grip bench press3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min restDumbbell Arnold press2×6–10 @ RPE 7"
+   dose : {"k":"time","mins":25,"tgt":695,"cap":663,"key":"easy"}
+-- NSW run_base | NSW lsd_long W1 sat subtype=Easy Run — Long
+   card :  | Run — Easy Run — Long | 35 min easy and conversational (RPE 3-4 out of 10). Around 11:35/mi is right for you. Do not run faster than 11:03/mi. This is the longest run of your week. Time on feet is the goal. Log the distance you covered. | EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working. | 
+   strip: Run — EASY · Planned 35 min @ 11:35/mi
+   hero : "Run · Easy Run — Long35 min easy and conversati…Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"time","mins":35,"tgt":695,"cap":663,"key":"long"}
+-- NSW run_mile_time | NSW lsd_easy W1 fri subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 2.1 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. | LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here. | 
+   strip: Run — LSD · Planned 2.1 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)2.1 mi at Recovery Pace: 1…Dumbbell bench press3×12 — RPE 6–7, leave 3+ in reserveKettlebell single-arm press2×10–15 each @ RPE 7"
+   dose : {"k":"dist","mi":2.1,"tgt":712,"key":"easy"}
+-- NSW run_mile_time | NSW lsd_long W1 sat subtype=Long Slow Distance (LSD)
+   card :  | Run — Long Slow Distance (LSD) | 3 mi at Recovery Pace: 11:52/mi (Zone 2). / 60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. | LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs. | 
+   strip: Run — LSD · Planned 3 mi @ 11:52/mi
+   hero : "Run · Long Slow Distance (LSD)3 mi at Recovery Pace: 11:…Kettlebell swing4×10 — fast and crisp, 60s restLandmine reverse lunge2 sets — RPE 7 (leave 3 or more in reserve)"
+   dose : {"k":"dist","mi":3,"tgt":712,"key":"long"}
+
+== HALF_MANNY (harness fixture, comment says "Mario's live program")
+self-stable true digest 2d35e8f743680cfa weeks 14
+long runs 14, with pace 14, with zone 2 0
+  W1 sat Long Run :: 5K Run: 3.1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the w
+  W2 sat Long Run :: 4 Mile Run: 4 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the
+  W3 sat Long Run :: 5 Mile Run: 5 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the
+  W4 sat Long Run :: 10K Run: 6.2 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the 
+  W5 sat Long Run :: 10K Run: 6.2 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the 
+  W6 sat Long Run :: 8 Mile Run: 8 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the
+  W7 sat Long Run :: 15K Run: 9.5 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the 
+  W8 sat Long Run :: 10 Mile Run: 10 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable t
+  W9 sat Long Run :: 10 Mile Run: 10 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable t
+  W10 sat Long Run — Dress Rehearsal :: 13.1K Dress Rehearsal: 8 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comf
+  W11 sat Long Run — Peak :: 20K Run: 12.5 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the
+  W12 sat Long Run — Cutback :: One Hour Run: 60-minute run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortabl
+  W13 sat Long Run — Taper :: 7 Mile Run: 7 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the
+  W14 sun Long Run — RACE DAY :: 13.1 miles. Half Marathon race day. Target pace 12:10/mi. Trust your training, start controlled, finish strong.
+
+== static scans (comments stripped; line = index.html line)
+"(Zone 2)" with pace token — 2 code lines: 3990:buildRunSession, 4029:buildRunSession
+"Zone 2" anywhere in code — 16 code lines: 3990:buildRunSession, 4029:buildRunSession, 4652:_longMinsFor, 4653:_longMinsFor, 4664:_longMinsFor, 4665:_longMinsFor, 4667:_longMinsFor, 4669:_longMinsFor, 4671:_longMinsFor, 4672:_longMinsFor, 4850:lsdYards, 4851:lsdYards, 4859:lsdYards, 9631:_cardioInterference, 11352:buildProgram, 11406:buildProgram
+max HR / heart rate token in code — 10 code lines: 3990:buildRunSession, 4029:buildRunSession, 4081:buildRunSession, 4081:buildRunSession, 4167:buildRunSession, 4183:buildRunSession, 4190:buildRunSession, 4197:buildRunSession, 4672:_longMinsFor, 4683:_longMinsFor
+cfg/wizard HR input field — 0 code lines: 
+reads dose.tgt — 9 code lines: 11085:_longRunTier, 13498:doseDerived, 13503:doseDerived, 13508:doseDerived, 13514:doseDerived, 13525:_doseStripHTML, 13542:updateDoseDerived, 16473:_recoveryPaceEntry, 17184:easyVsPrescribed
+reads dose.cap / steadyCapSec — 10 code lines: 3982:buildRunSession, 4012:buildRunSession, 4443:buildNRCSession, 4447:buildNRCSession, 4506:buildNRCSession, 4507:buildNRCSession, 4510:buildNRCSession, 4511:buildNRCSession, 4998:steadyCapSec, 17187:easyVsPrescribed
+reads chartRow/_row .recovery — 18 code lines: 3975:buildRunSession, 3983:buildRunSession, 3986:buildRunSession, 3988:buildRunSession, 3992:buildRunSession, 3975:buildRunSession, 4017:buildRunSession, 3986:buildRunSession, 4027:buildRunSession, 3992:buildRunSession, 4072:buildRunSession, 4077:buildRunSession, 4397:buildNRCSession, 4447:buildNRCSession, 4491:buildNRCSession, 4507:buildNRCSession, 4511:buildNRCSession, 4998:steadyCapSec
+parses a pace out of detail text — 3 code lines: 11112:d189DefaultAnchorNote, 11776:sessionTimeEst, 13475:doseFromCardio
+_runClass callers — 4 code lines: 16659:_runClass, 16711:runsByClass, 16733:easyEffortWeekly, 17181:easyVsPrescribed
+_longRunTier callers — 4 code lines: 10535:recoveryDeload, 10636:capSessionBudget, 11077:_longRunTier, 11122:d18LongRunDayPass
+buildCardioHTML callers — 3 code lines: 13082:buildCardioHTML, 14202:openDetail, 14203:openDetail
+runSessionCode callers — 3 code lines: 11835:runSessionCode, 11866:dayCode, 13519:_doseStripHTML
+journal-ish render functions touching cardio.detail — 3 code lines: 1235:getDayHistFor, 1310:getDayHist, 1311:saveDayHist
+
+== Q6 tests/ (gates, sabotage, harness; measure/ and edits/ excluded) files mentioning each token
+Zone 2 — 0 files: 
+Recovery Pace — 4 files: gates/g203_ceiling_and_anchor.js, gates/g226_d188_beginnermile.js, sabotage/v203.json, sabotage/v207_d106a.json
+steadyCapSec|dose.cap — 10 files: gates/g192_floorpress_shoulder_gear.js, gates/g203_ceiling_and_anchor.js, gates/g204_clock_limb.js, gates/g205_d129_tiebreak.js, gates/g223_d184_testlen.js, harness.js, sabotage/v192_floorpress_shoulder_gear.json, sabotage/v203.json, sabotage/v223_d184.json, sabotage/v229_d193.json
+dose.tgt — 15 files: gates/g191_pacedelta.js, gates/g193_d50_trunkfloor.js, gates/g202_int_doctrine.js, gates/g202_pace_anchor.js, gates/g204_clock_limb.js, gates/g209_d140_tier.js, gates/g211_d153_d155.js, gates/g212_d110a_swim.js, gates/g216_d156_longday.js, gates/g219_samecard_draws.js, gates/g225_d186_clockend.js, gates/g226_d188_beginnermile.js, gates/g227_d190_prefpath.js, sabotage/v191.json, sabotage/v204.json
+Long Slow Distance|LSD — 24 files: gates/g202_int_doctrine.js, gates/g202_pace_anchor.js, gates/g202_pace_copy.js, gates/g205_d125_ceiling.js, gates/g205_d125_spaced.js, gates/g205_d130_typed.js, gates/g205_d132_walkweek.js, gates/g205_pace_eve.js, gates/g207_gk_trial_present.js, gates/g207_test_week.js, gates/g208_d103a_chip.js, gates/g208_d103a_key.js, gates/g208_d103a_readers.js, gates/g208_d104a_runbase.js, gates/g213_d113a.js, gates/g214_d158_eve.js, gates/g216_d156_longday.js, gates/g233_d207_bikewheel.js, gates/g235_d215_hmszero.js, sabotage/v205.json, sabotage/v206_d109.json, sabotage/v207_d106a.json, sabotage/v208_shakeout.json, sabotage/v214_d158.json
+max HR — 6 files: gates/g202_int_doctrine.js, gates/g202_pace_anchor.js, gates/g202_pace_copy.js, gates/g206_d109_copy.js, sabotage/v202.json, sabotage/v206_d109.json
+PACE_CHART|recovery col — 5 files: gates/g203_ceiling_and_anchor.js, gates/g204_clock_limb.js, harness.js, sabotage/v202.json, sabotage/v203.json
+
+== Q5 doctrine (file:line [page] first 110 chars)
+nikerunclub10k.txt — 4 hits
+  nikerunclub10k.txt:76 [p5] LONG RUNS
+  nikerunclub10k.txt:236 [p11] Over the course of the run you will average your Recovery Run pace. This
+  nikerunclub10k.txt:239 [p11] natural way. Your Long and Recovery Runs should be run as Progression Runs.
+  nikerunclub10k.txt:290 [p13] RECOVERY PACE (4-5 OUT OF 10 EFFORT)
+nikerunclub5k.txt — 4 hits
+  nikerunclub5k.txt:76 [p5] LONG RUNS
+  nikerunclub5k.txt:236 [p11] Over the course of the run you will average your Recovery Run pace. This
+  nikerunclub5k.txt:239 [p11] natural way. Your Long and Recovery Runs should be run as Progression Runs.
+  nikerunclub5k.txt:290 [p13] RECOVERY PACE (4-5 OUT OF 10 EFFORT)
+nikerunclubhalfmarathon.txt — 4 hits
+  nikerunclubhalfmarathon.txt:78 [p5] LONG RUNS
+  nikerunclubhalfmarathon.txt:244 [p11] Over the course of the run you will average your Recovery Run pace. This
+  nikerunclubhalfmarathon.txt:247 [p11] natural way. Your Long and Recovery Runs should be run as Progression Runs.
+  nikerunclubhalfmarathon.txt:298 [p13] RECOVERY PACE (4-5 OUT OF 10 EFFORT)
+nikerunclubmarathon.txt — 6 hits
+  nikerunclubmarathon.txt:33 [p3] There will be an option to do every speed run, recovery run and most long runs
+  nikerunclubmarathon.txt:48 [p4] your Speed and Long Runs. Try to avoid doing Speed Runs and Long Runs
+  nikerunclubmarathon.txt:79 [p5] LONG RUNS
+  nikerunclubmarathon.txt:240 [p11] Over the course of the run you will average your Recovery Run pace. This
+  nikerunclubmarathon.txt:243 [p11] natural way. Your Long and Recovery Runs should be run as Progression Runs.
+  nikerunclubmarathon.txt:294 [p13] RECOVERY PACE (4-5 OUT OF 10 EFFORT)
+nsw_ptg_sealswcc_11pg.txt — 2 hits
+  nsw_ptg_sealswcc_11pg.txt:12 [p2] Physical Training Guide Page 2www.sealswcc.comPhysical Training Guide Page 3www.sealswcc.comThe Naval Special 
+  nsw_ptg_sealswcc_11pg.txt:24 [p8] Physical Training Guide Page 8www.sealswcc.comPhysical Training Guide Page 9www.sealswcc.comWarm-up & Cool-Dow
+physicaltrainingguide2020.txt — 5 hits
+  physicaltrainingguide2020.txt:220 [p11] The intensity of Long Slow Distance (LSD) work is low to moderate, so your pace should feel
+  physicaltrainingguide2020.txt:222 [p11] intense sessions. To determine the appropriate intensity, use the Talk Test. You should be able
+  physicaltrainingguide2020.txt:226 [p11] For LSD workouts, focus more on duration than intensity. Forty minutes of continual running or
+  physicaltrainingguide2020.txt:297 [p15] desired intensity of 90-95% of maximal pace.
+  physicaltrainingguide2020.txt:327 [p20] 1. Do 2 Long Slow Distance (LSD) workouts for both running and swimming
+ptg2020_tables_p13_14_16_17.txt — 0 hits
+
+DONE
+Nike lines with >=4 m:ss values nikerunclub10k.txt: 17 on pages 8,9
+Nike lines with >=4 m:ss values nikerunclub5k.txt: 17 on pages 8,9
+Nike lines with >=4 m:ss values nikerunclubhalfmarathon.txt: 17 on pages 8,9
+Nike lines with >=4 m:ss values nikerunclubmarathon.txt: 17 on pages 8,9

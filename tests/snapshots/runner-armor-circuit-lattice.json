@@ -1,0 +1,34 @@
+{
+  "floorB": {
+    "fires": {
+      "commercial": 0,
+      "crossfit": 0,
+      "home_full": 84,
+      "home_basic": 0,
+      "bodyweight": 0
+    },
+    "configsPerTier": {
+      "commercial": 126,
+      "crossfit": 126,
+      "home_full": 126,
+      "home_basic": 126,
+      "bodyweight": 126
+    }
+  },
+  "shard": {
+    "legDays": 2072,
+    "runnerLegDays": 1544,
+    "nonRunnerLegDays": 528,
+    "kneeProtectLegDays": 95,
+    "runnerDaysWithTheFourthItem": 1008,
+    "fourthItemByFamily": {
+      "race": 496,
+      "test": 512
+    },
+    "itemsRemovedBySection": {
+      "core block": 33,
+      "carry finisher": 13
+    },
+    "calfDays": 1290
+  }
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bragging Rights Mockup</title>
+<!--
+  P-BRAG mockup, recovered from the 2026-10-09 chat "Progress page entertainment features"
+  (old Desktop session c6d5b21f). Not built and not ruled: IRON_ASYLUM_HANDOFF_1_1.md §12
+  carries the open calls. The body below is the chat's widget verbatim; this head only supplies
+  the theme variables the chat's viewer provided. Sample numbers, not anyone's program.
+-->
+<style>
+:root{--surface-1:#FFFFFF;--surface-2:#F4F1E8;--border:#D9D3C4;--border-strong:#B8B09C;
+  --text-primary:#1B1A17;--text-secondary:#55514A;--text-muted:#8A847A;--bg:#ECE8DC}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--surface-1:#26241F;--surface-2:#1B1A17;
+  --border:#3A372F;--border-strong:#5A554A;--text-primary:#F4F1E8;--text-secondary:#C9C3B5;--text-muted:#9A9488;--bg:#121110}}
+:root[data-theme="dark"]{--surface-1:#26241F;--surface-2:#1B1A17;--border:#3A372F;--border-strong:#5A554A;
+  --text-primary:#F4F1E8;--text-secondary:#C9C3B5;--text-muted:#9A9488;--bg:#121110}
+body{margin:0;padding:24px 16px;background:var(--bg);color:var(--text-primary);
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+button{font:inherit;background:var(--surface-1);color:var(--text-primary);border:0.5px solid var(--border-strong);border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+<h2 class="sr-only">Clickable mockup of a Bragging rights section for the Iron Asylum Progress page, with eight stat cards that cycle through funny comparisons when tapped.</h2>
+<style>
+.ph{max-width:380px;margin:0 auto;background:var(--surface-2);border:0.5px solid var(--border);border-radius:28px;padding:18px 14px 20px}
+.bg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cd{background:var(--surface-1);border-radius:12px;padding:12px;cursor:pointer;user-select:none;transition:transform .12s;min-height:132px;display:flex;flex-direction:column}
+.cd:active{transform:scale(.97)}
+.cd.w{grid-column:span 2;min-height:96px}
+.lb{font-size:11px;color:var(--text-secondary);letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}
+.nm{font-size:22px;font-weight:500;color:#993C1D;margin:4px 0 6px}
+.ln{font-size:13px;line-height:1.45;color:var(--text-primary);flex:1}
+.dt{display:flex;gap:4px;margin-top:8px}
+.dt i{width:5px;height:5px;border-radius:50%;background:var(--border-strong);display:block}
+.dt i.on{background:#D85A30}
+@media (prefers-color-scheme:dark){.nm{color:#F0997B}}
+</style>
+<div class="ph">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:18px;font-weight:500">Progress</div>
+    <div style="font-size:11px;padding:4px 10px;border-radius:999px;background:#FAECE7;color:#712B13">Half marathon</div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin:4px 2px 8px">
+    <div style="font-size:15px;font-weight:500">Bragging rights</div>
+    <button id="sh" style="font-size:12px;padding:4px 10px"><i class="ti ti-dice-5" aria-hidden="true" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Shuffle</button>
+  </div>
+  <div class="bg" id="grid"></div>
+  <div style="font-size:11px;color:var(--text-muted);text-align:center;margin:10px 0 14px">Sample numbers. Tap any card.</div>
+  <div style="border-top:0.5px solid var(--border);padding-top:12px;opacity:1">
+    <div style="font-size:13px;color:var(--text-muted)">Will I be ready</div>
+    <div style="height:46px;border-radius:8px;background:var(--surface-1);margin-top:6px"></div>
+    <div style="font-size:13px;color:var(--text-muted);margin-top:10px">Weekly volume</div>
+    <div style="height:46px;border-radius:8px;background:var(--surface-1);margin-top:6px"></div>
+  </div>
+</div>
+<script>
+const C=[
+{k:'Weight moved',n:'48,210 lb',w:0,l:['That is 48 grand pianos.','That is 10 pickup trucks.','That is 3.7 African elephants.','That is 2.5 T. rexes.','A blue whale is 300,000 lb. You are 16% of the way.']},
+{k:'Miles run',n:'84.6 mi',w:0,l:['That is 3.2 marathons.','That is 14 laps of Central Park.','That is 50 Golden Gate Bridges.','Frodo walked 1,779 miles to Mordor. You are 4.8% of the way. Second breakfast earned.']},
+{k:'Time on your feet',n:'14 h 20 m',w:0,l:['The extended Lord of the Rings trilogy. Back to back. Then you kept going.','Titanic, four times. The ship still sinks.','Every episode of Friends would take 87 hours. Keep going.']},
+{k:'Animal race',n:'7.7 mph',w:0,l:['A chicken runs 9 mph. Chicken wins. For now.','A garden snail runs 0.03 mph. Comfortable win.','A T. rex ran about 12 mph. Keep moving.','Beat the chicken: run a 6:40 mile.']},
+{k:'Words in your notes',n:'1,248',w:1,l:['The Hobbit is 95,356 words. You are 1.3% of the way there.','Your word of the program: legs. It came up 11 times.','Most honest note: “never again.” Week 4, Thursday.']},
+{k:'Your calendar',n:'Tuesday',w:0,l:['Favorite day. 9 for 9.','Nemesis day: Friday. 3 for 8. Friday knows what it did.','Earliest session: 5:12 am. The sun was not up yet.','Longest streak: 14 sessions in a row.']},
+{k:'Hardest session',n:'RPE 10',w:0,l:['Week 4, Thursday. You wrote “never again.” You came back Saturday.','Your average effort is 6.4. Hard days hard. Easy days easy.','Easiest session: RPE 3. Week 2 shakeout. That is the point.']},
+{k:'Plot twists',n:'7',w:1,l:['3 swaps. Run to bike, every time. The bike says thanks.','4 rest day jogs. Rest days are training too.','0 skipped long runs. That is the whole program.']}
+];
+const st=C.map(()=>0),g=document.getElementById('grid');
+function dots(c,i){return c.l.map((_,j)=>'<i class="'+(j===i?'on':'')+'"></i>').join('')}
+function draw(){g.innerHTML=C.map((c,x)=>'<div class="cd'+(c.w?' w':'')+'" data-x="'+x+'"><div class="lb"><span>'+c.k+'</span><i class="ti ti-refresh" aria-hidden="true" style="font-size:12px;color:var(--text-muted)"></i></div><div class="nm">'+c.n+'</div><div class="ln">'+c.l[st[x]]+'</div><div class="dt">'+dots(c,st[x])+'</div></div>').join('');
+g.querySelectorAll('.cd').forEach(e=>e.onclick=()=>{const x=+e.dataset.x;st[x]=(st[x]+1)%C[x].l.length;draw()})}
+document.getElementById('sh').onclick=()=>{C.forEach((c,x)=>{st[x]=Math.floor(Math.random()*c.l.length)});draw()};
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+# npm run dev (scripts/dev.ts) lays this over docker-compose.yml: the same container, port and devices volume, run from
+# the dev image (Dockerfile.dev) instead of the production one. The container watches this checkout and rebuilds what
+# is saved by itself (scripts/dev-watch.ts), so nothing on the Mac has to run, and restart: unless-stopped (from
+# docker-compose.yml) brings it back whenever Docker starts. npm run dev:down stops it; npm run docker:up puts back the
+# plain production image.
+#
+# What it may touch: every source folder and the repo root (for the app's icon, and the app's source files
+# frontends/app/src/legacy/src/ with frontends/app/scripts/build-index.mjs, which builds them) are mounted read-only;
+# backend/dist/, backend/app-web/ and frontends/dist/, the three build folders, are the only ones it writes. Its
+# node_modules are the image's own (Linux), and the Angular cache lives in a volume of its own. The image is built from
+# the repo root and lays the checkout out as the repo does: /srv/backend and /srv/frontends.
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile.dev
+    image: ${COMPOSE_PROJECT_NAME}-api-dev
+    # tini as PID 1: passes docker stop on to the watcher and reaps what the builds leave behind.
+    init: true
+    environment:
+      IA_DEV: "1"
+      IA_BACKEND_NAME: ${IA_BACKEND_NAME:-docker dev on this Mac (npm run dev)}
+      # Where the app's source files and its icon are: the repo root, mounted read-only below.
+      APP_SOURCE_DIR: /repo
+      # The log carries rebuilds, tests, restarts and reloads; LOG_REQUESTS=1 npm run dev adds a line per request.
+      LOG_REQUESTS: ${LOG_REQUESTS:-0}
+      # Saves arrive as file events through the mounts. IA_DEV_POLL_MS=500 npm run dev polls instead, should they stop.
+      IA_DEV_POLL_MS: ${IA_DEV_POLL_MS:-}
+      # The Mac's time zone (npm run dev passes it), so the log's times read as the Mac's clock.
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ..:/repo:ro
+      - ../frontends/website:/srv/frontends/website:ro
+      - ../frontends/admin:/srv/frontends/admin:ro
+      - ../frontends/common:/srv/frontends/common:ro
+      - ./server:/srv/backend/server:ro
+      - ./client:/srv/backend/client:ro
+      - ./scripts:/srv/backend/scripts:ro
+      - ./test:/srv/backend/test:ro
+      - ./dist:/srv/backend/dist
+      - ./app-web:/srv/backend/app-web
+      - ../frontends/dist:/srv/frontends/dist
+      - angular-cache:/srv/frontends/.angular
+
+volumes:
+  angular-cache:

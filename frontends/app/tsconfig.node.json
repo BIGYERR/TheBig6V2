@@ -1,0 +1,26 @@
+/* The Node side of the app folder: the unit and integration tests (test/). The e2e lives in tests/e2e/.
+ * Node runs these .ts files directly by stripping the types, so nothing is emitted. tsc only type-checks
+ * (npm run typecheck), and erasableSyntaxOnly keeps out the TypeScript that stripping cannot run (enums,
+ * namespaces, parameter properties). The Angular app keeps its own tsconfig.app.json. */
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
+  },
+  "include": ["test/**/*.ts"]
+}

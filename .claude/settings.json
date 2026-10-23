@@ -15,6 +15,33 @@
       "Bash(git diff *)",
       "Bash(git status *)",
       "Bash(git log *)"
+    ],
+    "ask": [
+      "Agent",
+      "Task"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-hook.mjs\"", "async": true, "timeout": 10 }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-hook.mjs\"", "async": true, "timeout": 10 }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-hook.mjs\"", "async": true, "timeout": 10 }] }
+    ],
+    "PreCompact": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-hook.mjs\"", "async": true, "timeout": 10 }] }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Agent|Task",
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-hook.mjs\"", "async": true, "timeout": 10 }]
+      }
+    ],
+    "SubagentStop": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-hook.mjs\"", "async": true, "timeout": 10 }] }
     ]
   }
 }

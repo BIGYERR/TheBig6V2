@@ -1,0 +1,14 @@
+{
+  "name": "@ia/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Iron Asylum's shared TypeScript: the domain types, the release version and its label, semver. Framework-free (no DOM, no Angular, no Node API). The release version lives in src/version.ts, never in this file. The engine (src/engine, @ia/core/engine) moves here from the app in phase D.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/engine/index.ts",
+    "./engine/*": "./src/engine/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false
+}

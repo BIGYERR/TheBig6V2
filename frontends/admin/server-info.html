@@ -1,0 +1,27 @@
+@if (state.stats()?.server; as s) {
+  <div class="split">
+    <section class="block" aria-labelledby="srv-where">
+      <div class="block-head"><h2 id="srv-where">Where it runs</h2></div>
+      <dl class="facts">
+        <dt>Kind</dt><dd><span class="kind-dot" [attr.data-kind]="s.kind"></span>{{ s.kind }}, {{ kinds[s.kind] || 'set by IA_BACKEND_KIND' }}</dd>
+        <dt>Name</dt><dd>{{ s.name }}</dd>
+        <dt>Backend build</dt><dd>v{{ s.version }}@if (s.commit) { · {{ s.commit }} }@if (s.release) { · release {{ s.release }} }</dd>
+        <dt>Node</dt><dd>{{ s.node }}</dd>
+        <dt>Up for</dt><dd>{{ span(s.uptimeS) }}</dd>
+        <dt>App at /app/</dt><dd>@if (s.appVersion) { <a href="/app/">{{ version(s.appVersion, s.appSemver) }}</a> } @else { not bundled (npm run app:bundle) }</dd>
+      </dl>
+    </section>
+    <section class="block" aria-labelledby="srv-settings">
+      <div class="block-head"><h2 id="srv-settings">Settings</h2></div>
+      <dl class="facts">
+        <dt>Devices</dt><dd>{{ s.persistent ? 'kept in a file across restarts' : 'in memory, reset on restart' }}, up to {{ s.maxDevices }}</dd>
+        <dt>Heartbeat</dt><dd>every {{ s.beatMs / 1000 }} s while the app is on screen</dd>
+        <dt>Connected means</dt><dd>a beat within the last {{ s.connectedWindowMs / 1000 }} s</dd>
+        <dt>Staff session</dt><dd>{{ s.sessionMinutes / 60 }} h, then sign in again</dd>
+        <dt>Allowed origins</dt><dd>@for (o of s.corsOrigins; track o) { <code>{{ o }}</code> }</dd>
+      </dl>
+    </section>
+  </div>
+} @else {
+  <p class="empty">Loading…</p>
+}

@@ -1,0 +1,13 @@
+{
+  "name": "iron-asylum-heroku",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Heroku's manifest. It sits at the repo root because Heroku deploys the branch main from GitHub as it is (and backend/scripts/heroku.sh deploy puts it at the root of the tree it pushes). npm run build builds the website and the admin (frontends/), then the backend, whose build also builds the app's page from frontends/app/src/legacy/src into backend/app-web/. npm start runs the one server: the website at /, the admin at /admin/, the app at /app/ and the API. GitHub Pages serves this folder too, so nothing here is secret.",
+  "engines": {
+    "node": "26.x"
+  },
+  "scripts": {
+    "build": "npm ci --prefix frontends --include=dev --no-audit --no-fund && npm run build --prefix frontends && rm -rf frontends/node_modules frontends/.angular && npm ci --prefix backend --include=dev --no-audit --no-fund && npm run build --prefix backend && npm prune --prefix backend --omit=dev --no-audit --no-fund",
+    "start": "cd backend && node --enable-source-maps dist/server/server.js"
+  }
+}

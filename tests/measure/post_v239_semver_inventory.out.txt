@@ -1,0 +1,139 @@
+
+== 1. index.html runtime: every line naming ia-version / IA_VERSION (comments kept)
+  index.html:8  <meta name="ia-version" content="239"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+  index.html:18072  +'build: v'+IA_VERSION+'\n'
+  index.html:18105  const _bv=document.getElementById('bugVersion'); if(_bv) _bv.textContent='BUILD v'+IA_VERSION;
+  index.html:18460  Single source of truth: <meta name="ia-version">. The running app knows its
+  index.html:18464  const IA_VERSION = (document.querySelector('meta[name="ia-version"]')||{}).content || '0';
+  index.html:18488  const m = txt.match(/name=["']ia-version["']\s+content=["']([^"']+)["']/i);
+  index.html:18491  if(remote && remote !== IA_VERSION) iaShowUpdateBanner();
+  total lines 7
+  other version-shaped tokens (ia_ver|appVersion|APP_VER|buildVersion|version: NNN): 0 lines []
+
+== 2. live tooling under tests/ (not gates): version-reading lines, comments stripped
+  tests/harness.js             124 code lines (117 of them era-table rows)
+      tests/harness.js:44  'IA_VERSION','buildProgram','refreshProgram','raceAlignment','calcProgramLength',
+      tests/harness.js:96  metaVersion.content = opts.version;
+      tests/harness.js:103  querySelector: sel => (/meta\[name="ia-version"\]/.test(sel) ? metaVersion : mkEl('div')),
+      tests/harness.js:138  const version = (html.match(/<meta name="ia-version" content="(\d+)"/)||[])[1];
+      tests/harness.js:139  if(!version) throw new Error('harness: no ia-version meta in '+abs);
+      tests/harness.js:147  IA.version = version;
+      tests/harness.js:449  console.log('ia-version', IA.version, '| buildProgram', typeof IA.buildProgram);
+  tests/gate.sh                  5 code lines (0 of them era-table rows)
+      tests/gate.sh:21  if ! printf '%s' "$JOBS" | grep -qE '^[0-9]+$' || [ "$JOBS" -lt 1 ]; then
+      tests/gate.sh:26  META="$(grep -oE '<meta name="ia-version" content="[0-9]+"' "$CAND" | grep -oE '[0-9]+' | tail -1)"
+      tests/gate.sh:28  echo "   meta=$META filename=${FNV:-index}"
+      tests/gate.sh:29  if [ -n "$FNV" ] && [ "$FNV" != "$META" ]; then echo "FAIL: ia-version ($META) != filename (V$FNV)"; exit 1; fi
+      tests/gate.sh:48  echo "== 2b. version scope (no gate row is scoped to one exact ia-version)"
+  tests/status.js                0 code lines (0 of them era-table rows)
+  tests/chain.js                 4 code lines (0 of them era-table rows)
+      tests/chain.js:50  const maps = fs.readdirSync(MD).map(f => [f, /^v(\d+)_gate_reach\.json$/.exec(f)]).filter(x => x[1])
+      tests/chain.js:53  const mapFile = path.join(MD, maps[0][0]), mapVer = +maps[0][1][1];
+      tests/chain.js:154  console.log('map: ' + rel(mapFile) + '  built on V' + mapVer + ' (version from the file name; the map records none)  ' +
+      tests/chain.js:175  const META_RE = /^\s*<meta name="ia-version" content="(\d+)">/;
+  tests/era_bump.py             12 code lines (0 of them era-table rows)
+      tests/era_bump.py:200  ANY_ROW = re.compile(r'(?<![\w$])([A-Za-z_$][\w$]*)\[(\d{3})\]\s*=(?![=>])')
+      tests/era_bump.py:217  ERA_ADDED = re.compile(r'^(\s*)([A-Za-z_$][\w$]*)\[(\d+)\] = \2\[(\d+)\];   // ' + re.escape(MARK) +
+      tests/era_bump.py:218  r'(\d+): ruled UNMOVED, reference to \[(\d+)\]; \S.*$')
+      tests/era_bump.py:221  def parse_version(s, what):
+      tests/era_bump.py:222  if not re.fullmatch(r'\d{3}', s or ''):
+      tests/era_bump.py:223  die('REFUSED: %s must be a three-digit ia-version, got %r' % (what, s))
+      tests/era_bump.py:402  m = re.match(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@', ln)
+      tests/era_bump.py:468  ap.add_argument('version', nargs='?', help='the new ia-version N (rows [N] = [N-1])')
+      tests/era_bump.py:475  modes = [x for x in (a.version, a.check, a.era_only_diff) if x is not None]
+      tests/era_bump.py:479  if a.version is not None:
+      tests/era_bump.py:482  return bump(parse_version(a.version, '<N>'), a.ruling, a.moved, a.dry_run)
+      tests/era_bump.py:486  return check(parse_version(a.check, '--check'))
+  tests/sabotage.py              0 code lines (0 of them era-table rows)
+  tests/fuzz.sh                  1 code lines (0 of them era-table rows)
+      tests/fuzz.sh:37  if ! printf '%s' "$vl" | grep -qE '^[0-9]+$' || [ "$vl" -lt 1 ]; then
+  tests/version_scope.js         7 code lines (0 of them era-table rows)
+      tests/version_scope.js:114  const objs = new Set(['IA', 'IB']), vers = new Set(['VER', 'CAND_VER', 'BASE_VER', 'IA_VERSION']), eras = new Set();
+      tests/version_scope.js:123  if ((mm = new RegExp('^(' + ID + ')\\s*\\.\\s*(version|IA_VERSION)$').exec(s))) return objs.has(mm[1]);
+      tests/version_scope.js:126  if (/^\d{3}$/.test(s) || /^(['"])\d{3}\1$/.test(s)) return true;
+      tests/version_scope.js:132  for (const a of asg) if (/^\s*\(?\s*\d{3}\s*\)?\s*$/.test(a.rhs)) eras.add(a.name);
+      tests/version_scope.js:134  for (const a of asg) if (!vers.has(a.name) && (fromVer(a.rhs) || (/ia-version/.test(a.rhsNc) && /\.\s*(match|exec)\s*\(/.test(a.rhsNc)))) { vers.add(a
+      tests/version_scope.js:144  const mm = new RegExp('^(' + ID + ')\\s*\\.\\s*(version|IA_VERSION)$').exec(stripWrap(verSide)); if (!mm || !baseObjs.has(mm[1])) return false;
+      tests/version_scope.js:202  const m = /^(\S+\.js)\s+(\d+)$/.exec(l);
+  tests/rows.js                  2 code lines (0 of them era-table rows)
+      tests/rows.js:92  const VERSION_CAUSE = /\bV\d+\b|\b\d{3}\b|\bia-version\b|\beras?\b/i;   // a V-number, a 3-digit build number, ia-version, era
+      tests/rows.js:219  if(kind === 'allow' && VERSION_CAUSE.test(why)){ red.push('FAIL ' + at + ' — the cause names a version (a V-number, a 3-digit build number, ia-version
+  tests/tooling_selftest.sh     40 code lines (0 of them era-table rows)
+      tests/tooling_selftest.sh:50  CUR="$(grep -oE '<meta name="ia-version" content="[0-9]+"' "$R/index.html" | grep -oE '[0-9]+' | tail -1 || true)"
+      tests/tooling_selftest.sh:51  if [ -z "$CUR" ]; then echo "setup: index.html carries no ia-version meta (crash)"; exit 1; fi
+      tests/tooling_selftest.sh:52  NEXT=$((CUR + 1))
+      tests/tooling_selftest.sh:54  echo "   repo $R, today's ia-version $CUR (era rows bump to $NEXT), run dir $W"
+      tests/tooling_selftest.sh:136  c = list(re.finditer(r'^const ([A-Z_][A-Z0-9_]*)\s*=\s*(\d+)\s*;', s, re.M))
+      tests/tooling_selftest.sh:197  [ "$(grep -cE '^[a-z]_[a-z]+\.js [0-9]+(\.[0-9]+)?$' "$1" || true)" = 5 ]
+      tests/tooling_selftest.sh:204  printf "const IA = { version: '%s' }, VER = +IA.version;\nif (VER === %s) console.log('planted exact-version row');\nconsole.log('PASS 2 FAIL 0');\n" 
+      tests/tooling_selftest.sh:215  row "G7 step 5 runs after the reds (blast-radius diff written)" 'hasX "$O" "== 5. blast-radius diff vs base.html" && has "$O" "^   [0-9]+ hunks, \+[0-
+      tests/tooling_selftest.sh:259  [ "$(grade_order "$1")" = "$EIGHT" ] && [ "$(grep -cE '^   [a-z]_[a-z]+\.js: PASS 1 FAIL 0  [0-9]+(\.[0-9]+)? s$' "$1" || true)" = 8 ] \
+      tests/tooling_selftest.sh:266  row "G18 GATE_TIMES_OUT carries the pool column over: d_heavy.js <seconds> pool=3, the 7 light toys two columns each" '[ "$(grep -cE "^d_heavy\.js [0-
+      tests/tooling_selftest.sh:287  row "G21 grading unchanged at GATE_JOBS=1: 3 graded in glob order, ALL GATES PASS, exit 0; GATE_TIMES_OUT keeps b_heavy.js pool=2" 'rc_is "$O" 0 && ha
+      tests/tooling_selftest.sh:327  row "G27 ROW_MANIFEST_OUT written: the three typed rows, a run line naming the candidate, ia-version $CUR and the date, equal to rows.js manifest of t
+      tests/tooling_selftest.sh:356  HDR="const IA = { version: '$CUR' }, VER = +IA.version;"
+      tests/tooling_selftest.sh:357  printf '%s\nif (VER >= %s) console.log("a minimum, not a hit");\n' "$HDR" "$CUR" > "$VT/gates/clean.js"
+  tests/lattice193.js            0 code lines (0 of them era-table rows)
+PROBE js: {"plus":null,"Number":null,"parseInt":0,"ge220":false,"eq239":false,"ne239":true,"lt220":false,"rawGe220":false,"metaD":null,"appRegex":"0.239.1","bannerOld239":true}
+PROBE harness.load(0.239.1): THROWS harness: no ia-version meta in /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0980a538-a5ec-49d9-928a-eb1f93189ad1/scratchpad/measure/cand_semver.html
+REFUSED: --check must be a three-digit ia-version, got '0.239.1'
+PROBE era_bump --check rc=2
+== 0. version / filename invariant
+PROBE gate.sh step0 rc=1
+== EMPIRICAL R0 (239, harness as shipped) vs R2s (0.239.1, harness meta regex widened), 102 gates (g230 excluded)
+   2 CRASH
+  20 GREEN_SAME
+  73 RED
+   7 SILENT_FEWER
+GREEN_SAME g000_boot R0[PASS 9 FAIL 0] R2s[PASS 9 FAIL 0] skiplines=0
+GREEN_SAME g191_pacedelta R0[PASS 26 FAIL 0] R2s[PASS 26 FAIL 0] skiplines=0
+GREEN_SAME g192_floorpress_shoulder_gear R0[PASS 29 FAIL 0] R2s[PASS 29 FAIL 0] skiplines=0
+GREEN_SAME g192_labelsync R0[PASS 19 FAIL 0] R2s[PASS 19 FAIL 0] skiplines=0
+GREEN_SAME g192_shoulder_side R0[PASS 16 FAIL 0] R2s[PASS 16 FAIL 0] skiplines=0
+GREEN_SAME g193_budget_floor R0[PASS 36 FAIL 0] R2s[PASS 36 FAIL 0] skiplines=0
+GREEN_SAME g193_d50_trunkfloor R0[PASS 17 FAIL 0] R2s[PASS 17 FAIL 0] skiplines=0
+GREEN_SAME g193_gear_gates R0[PASS 168 FAIL 0] R2s[PASS 168 FAIL 0] skiplines=0
+GREEN_SAME g193_rotation_reach R0[PASS 24 FAIL 0] R2s[PASS 24 FAIL 0] skiplines=0
+GREEN_SAME g193_trunk_protect R0[PASS 38 FAIL 0] R2s[PASS 38 FAIL 0] skiplines=0
+GREEN_SAME g194_implement_and_range R0[PASS 21 FAIL 0] R2s[PASS 21 FAIL 0] skiplines=0
+GREEN_SAME g195_wildcard R0[PASS 110 FAIL 0] R2s[PASS 110 FAIL 0] skiplines=0
+GREEN_SAME g196_ledger R0[PASS 55 FAIL 0] R2s[PASS 55 FAIL 0] skiplines=0
+GREEN_SAME g197c_d84_cmp R0[PASS 35 FAIL 0] R2s[PASS 35 FAIL 0] skiplines=0
+GREEN_SAME g197d_d84_base R0[PASS 6 FAIL 0] R2s[PASS 6 FAIL 0] skiplines=0
+GREEN_SAME g205_bike_unmoved R0[PASS 15 FAIL 0] R2s[PASS 15 FAIL 0] skiplines=0
+GREEN_SAME g207_test_calendar R0[PASS 19 FAIL 0] R2s[PASS 19 FAIL 0] skiplines=0
+GREEN_SAME g217_d160_dedupe_view R0[PASS 13 FAIL 0] R2s[PASS 13 FAIL 0] skiplines=1
+GREEN_SAME g219_d167_pairs R0[PASS 8 FAIL 0] R2s[PASS 8 FAIL 0] skiplines=1
+GREEN_SAME g224_d185_wctoday R0[PASS 29 FAIL 0] R2s[PASS 29 FAIL 0] skiplines=0
+SILENT_FEWER g205_d130_typed R0[PASS 24 FAIL 0] R2s[PASS 0 FAIL 0] skiplines=1
+SILENT_FEWER g206_d109_copy R0[PASS 13 FAIL 0] R2s[PASS 0 FAIL 0] skiplines=14
+SILENT_FEWER g209_d140_tier R0[PASS 15 FAIL 0] R2s[PASS 0 FAIL 0] skiplines=14
+SILENT_FEWER g210_equipment_denials R0[PASS 128 FAIL 0] R2s[PASS 0 FAIL 0] skiplines=24
+SILENT_FEWER g211_d153_d155 R0[PASS 48 FAIL 0] R2s[PASS 0 FAIL 0] skiplines=8
+SILENT_FEWER g212_d110a_swim R0[PASS 44 FAIL 0] R2s[PASS 0 FAIL 0] skiplines=39
+SILENT_FEWER g213_d113a R0[PASS 26 FAIL 0] R2s[PASS 0 FAIL 0] skiplines=14
+g205_d130_typed rc=0 first: SKIP g205_d130_typed: ia-version NaN predates D130 (needs >= 205)
+g206_d109_copy rc=0 first: SCOPED OUT D109-S-run ia-version NaN predates D109 (V206), NOT APPLICABLE: buildRunSession (389 lines, 155 lit
+g209_d140_tier rc=0 first: NOT APPLICABLE: ia-version NaN predates D140 (V209).
+g210_equipment_denials rc=0 first: NOT APPLICABLE: ia-version NaN predates D70c (V210).
+g211_d153_d155 rc=0 first: NOT APPLICABLE: ia-version NaN predates D153/D155 (V211).
+g212_d110a_swim rc=0 first: NOT APPLICABLE: ia-version NaN predates D110a (V212).
+g213_d113a rc=0 first: NOT APPLICABLE: ia-version NaN predates D113a/D146 (V213).
+CRASH g203_ceiling_and_anchor R0[PASS 151 FAIL 0] R2s[] skiplines=
+CRASH g205_d129_tiebreak R0[PASS 21 FAIL 0] R2s[] skiplines=0
+== STATIC gate (form,use) line counts, grep -E over tests/gates/*.js, // lines dropped
+NUM_PLUS lines=66 files=55
+NUMBER lines=4 files=4
+PARSEINT lines=1 files=1
+RAWASSIGN lines=5 files=5
+META_D lines=10 files=10
+VER_ORD lines=326 files=78
+VER_EQ lines=55 files=26
+IAV_ORD lines=14 files=6
+LOOKUP lines=38 files=33
+RANGE lines=29 files=14
+ARITH lines=0 files=0
+ERA_CONST lines=82 files=67
+DISPLAY lines=268 files=84
+     103
+      92

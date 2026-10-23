@@ -1,0 +1,78 @@
+{
+  "name": "iron-asylum",
+  "version": "0.0.0",
+  "scripts": {
+    "emulator-ios": "node ../../tools/run.mjs build-ios-emulator -- node scripts/ios.mjs emulator",
+    "device-ios": "node ../../tools/run.mjs build-ios-device -- node scripts/ios.mjs device",
+    "build-ios": "node ../../tools/run.mjs build-ios-simulator -- node scripts/ios.mjs build",
+    "version-ios": "node scripts/ios.mjs version",
+    "pwa-pages": "node ../../tools/run.mjs build-pwa-pages -- node scripts/pwa-pages.mjs",
+    "pwa-pages:check": "node scripts/pwa-pages.mjs --check",
+    "pwa-local": "node ../../tools/run.mjs server-pwa-local -- node scripts/pwa-local.mjs",
+    "xcode-ios": "node scripts/ios.mjs open",
+    "prestart": "npm run sync",
+    "start": "node ../../tools/run.mjs server-app-dev -- ng serve",
+    "prebuild": "npm run sync",
+    "build": "ng build",
+    "sync": "node scripts/sync-legacy.mjs",
+    "sync:check": "node scripts/sync-legacy.mjs --check",
+    "build:index": "node ../../tools/run.mjs build-index -- sh -c 'node scripts/module-blocks.mjs && node scripts/build-index.mjs'",
+    "build:index:check": "node scripts/build-index.mjs --check",
+    "modules": "node scripts/module-blocks.mjs",
+    "modules:check": "node scripts/module-blocks.mjs --check",
+    "test": "npm run test:unit; u=$?; npm run test:integration; i=$?; [ $u -eq 0 ] && [ $i -eq 0 ]",
+    "pretest": "npm run typecheck",
+    "test:unit": "node ../../tools/run.mjs unit -- node --test --test-reporter=spec 'test/unit/**/*.test.ts'",
+    "test:integration": "node ../../tools/run.mjs integration -- node --test --test-reporter=spec 'test/integration/**/*.test.ts'",
+    "typecheck": "node ../../tools/run.mjs typecheck -- sh -c 'tsc -p tsconfig.node.json && tsc -p tsconfig.legacy.json'",
+    "logs": "node ../../tools/logs.mjs",
+    "ng": "ng",
+    "lint": "node ../../tools/run.mjs lint -- ng lint",
+    "prelint": "npm run sync",
+    "lint:legacy": "npm run sync && eslint -c eslint.legacy.config.mjs --format ./scripts/eslint-summary.mjs public/legacy/app.js"
+  },
+  "private": true,
+  "packageManager": "npm@11.19.0",
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.2",
+    "@angular/cli": "^22.2.2",
+    "@angular/compiler-cli": "^22.2.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.5",
+    "angular-eslint": "22.5.0",
+    "cordova": "^13.0.0",
+    "cordova-ios": "^8.1.1",
+    "eslint": "^10.9.1",
+    "globals": "^17.13.0",
+    "ia-island": "file:plugins-src/ia-island",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "8.69.0"
+  },
+  "description": "Iron Asylum as an Angular app, packaged for iOS with Cordova. Generated from the repo root index.html.",
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "@parcel/watcher": false,
+    "fsevents": false,
+    "lmdb": false,
+    "msgpackr-extract": false
+  },
+  "cordova": {
+    "platforms": [
+      "ios"
+    ],
+    "plugins": {
+      "ia-island": {}
+    }
+  }
+}

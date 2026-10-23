@@ -1,0 +1,65 @@
+@if (state.versions(); as v) {
+  <section class="cards" aria-label="Versions summary">
+    <div class="card">
+      <span class="k">Newest version</span>
+      <span class="v">{{ v.latest || '–' }}</span>
+      <small class="card-note">{{ v.latestSemver && v.latestSemver !== v.latest ? v.latestSemver + ' · ' : '' }}{{ sources[v.latestFrom] || 'no version known yet' }}</small>
+    </div>
+    <div class="card">
+      <span class="k">On an old build</span>
+      <span class="v" [class.warn]="v.outdated > 0">{{ v.outdated }}</span>
+      @if (v.outdated) {
+        <a class="card-note" href="#/devices?old=1">List those devices</a>
+      } @else {
+        <small class="card-note">devices</small>
+      }
+    </div>
+    <div class="card">
+      <span class="k">Versions in use</span>
+      <span class="v">{{ v.rows.length }}</span>
+    </div>
+  </section>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Version as sent</th>
+          <th>Reads as</th>
+          <th>Status</th>
+          <th class="num">Devices</th>
+          <th class="num">Connected now</th>
+          <th>Last seen</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of v.rows; track r.version) {
+          <tr [class.old]="r.outdated">
+            <td>{{ r.version || 'unknown' }}</td>
+            <td class="uid">{{ r.semver || '–' }}</td>
+            <td>
+              @if (r.outdated) {
+                <span class="badge old">old</span>
+              } @else if (r.semver && r.semver === v.latestSemver) {
+                <span class="badge new">newest</span>
+              } @else {
+                <span class="badge">not comparable</span>
+              }
+            </td>
+            <td class="num">{{ r.devices }}</td>
+            <td class="num">{{ r.connected }}</td>
+            <td [title]="when(r.lastSeen)">{{ ago(r.lastSeen) }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="empty">No device has checked in yet.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="block-note">
+    The app sends its version with every heartbeat. A bare build number such as 239 reads as 0.239.0, the same rule
+    the repo's version tooling uses, so old and new numbering compare correctly.
+  </p>
+} @else {
+  <p class="empty">Loading…</p>
+}

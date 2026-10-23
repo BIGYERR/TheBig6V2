@@ -1,0 +1,67 @@
+# The e2e stack. npm run e2e (e2e/launch.ts) drives it and names the project per checkout, so two checkouts (or two
+# sessions) can run the suite at once without sharing containers, images or a host port.
+#   web      nginx: the Angular app at /, the single-file page (built from the same sources) at /reference/
+#   backend  the backend (backend/Dockerfile): the website at /, the admin at /admin/, the app at /app/, on port 3000
+#   runner   the Puppeteer suite
+# backend and runner share web's network stack, so the runner reaches both on 127.0.0.1, a secure localhost origin.
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: tests/e2e/Dockerfile
+      target: web
+    ports:
+      # 0 lets Docker pick a free host port; E2E_PORT pins one. The runner never uses it (see network_mode below).
+      - "127.0.0.1:${E2E_PORT:-0}:80"
+      # The backend listens in this same network stack, so its port is published here (E2E_KEEP=1 prints it).
+      - "127.0.0.1:${E2E_BACKEND_PORT:-0}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 1s
+      timeout: 2s
+      retries: 30
+
+  backend:
+    # backend/Dockerfile copies app-web/, the app it serves at /app/; launch.ts first builds it there from the app's source files.
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
+    network_mode: service:web
+    depends_on:
+      web:
+        condition: service_started
+    # The project's own local development login (config.ts falls back to the same outside production); the runner signs
+    # in with it. Devices are kept in memory, so every run starts with none.
+    environment:
+      ADMIN_USER: ${E2E_ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${E2E_ADMIN_PASSWORD:-asylum}
+      IA_BACKEND_NAME: e2e
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 1s
+      timeout: 2s
+      retries: 60
+
+  runner:
+    build:
+      context: ../..
+      dockerfile: tests/e2e/Dockerfile
+      target: runner
+    # Shares web's network stack, so the app is at http://127.0.0.1: a secure localhost origin, like a dev server.
+    network_mode: service:web
+    depends_on:
+      web:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    init: true
+    shm_size: 1gb
+    # The report is written inside the container and copied out by launch.ts (docker cp), never bind-mounted: the
+    # repo sits in an iCloud-synced folder, and nothing in the suite needs the host's file system while it runs.
+    environment:
+      E2E_REPORT_DIR: /report
+      E2E_PARITY_MAX: ${E2E_PARITY_MAX:-0}
+      E2E_ONLY: ${E2E_ONLY:-}
+      E2E_BACKEND_URL: http://127.0.0.1:3000
+      E2E_ADMIN_USER: ${E2E_ADMIN_USER:-admin}
+      E2E_ADMIN_PASSWORD: ${E2E_ADMIN_PASSWORD:-asylum}

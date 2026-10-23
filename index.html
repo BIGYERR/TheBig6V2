@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="239"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="0.242.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -233,6 +233,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .ov-effect-sub{font-size:12px;color:var(--muted);line-height:1.5;}
 .ov-apply{width:100%;background:var(--accent);color:var(--on-ink,#F4F1E8);text-align:center;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:15px;border-radius:4px;border:none;cursor:pointer;}
 .ov-apply:active{transform:scale(.98);}
+/* v0.240.0 (D228): the rest sheet's Clear, under Log it. */
+.ov-clear{width:100%;margin-top:10px;background:transparent;color:var(--text);text-align:center;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:13px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;}
+.ov-clear:active{transform:scale(.98);}
 .wk-chip-ov{display:inline-block;font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.06em;color:var(--lift);border:1px solid rgba(188,106,67,0.45);border-radius:2px;padding:1px 4px;margin-top:3px;}
 .days-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px;flex:1;background:var(--bg) !important;}
 .day-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color 0.15s;box-shadow:0 1px 2px rgba(40,34,22,0.06);}
@@ -366,6 +369,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .export-btn{margin-top:8px;width:100%;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:10px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;}
 .status-row{display:flex;gap:8px;margin-top:8px;}
 .log-nudge{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:rgba(24,23,18,0.12);border:1px solid rgba(24,23,18,0.5);border-radius:4px;padding:11px 14px;margin:10px 0 2px;font-size:13px;color:var(--text);line-height:1.4;}
+.also-block{background:rgba(24,23,18,0.06);border:1px solid var(--border2);border-radius:4px;padding:11px 14px;margin:10px 0 2px;}
+.also-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.12em;color:var(--muted);}
+.also-line{font-size:13px;color:var(--run);margin-top:6px;font-weight:500;}
+.also-btn{margin-top:10px;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 14px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;}
 .log-nudge-btn{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 14px;border-radius:4px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer;white-space:nowrap;transition:transform .08s;}
 .log-nudge-btn:active{transform:scale(0.97);}
 /* V181 (D1/D2): two-state day status. One primary (Done), one small exception (Skip); both toggle. */
@@ -882,10 +889,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .screen.active{animation:scrIn .30s cubic-bezier(.32,.72,0,1);}
 @keyframes scrIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 /* detail + random overlays present as slide-up sheets */
-.overlay,.rand-overlay{display:block !important;transform:translateY(100%);visibility:hidden;will-change:transform;
+.overlay,.rand-overlay{display:block !important;transform:translateY(100%);visibility:hidden;will-change:transform;pointer-events:none;
   transition:transform .36s cubic-bezier(.32,.72,0,1), visibility 0s linear .36s;}
-.overlay.open,.rand-overlay.open{transform:translateY(0);visibility:visible;
+.overlay.open,.rand-overlay.open{transform:translateY(0);visibility:visible;pointer-events:auto;
   transition:transform .40s cubic-bezier(.32,.72,0,1), visibility 0s linear 0s;}
+/* v0.240.0 (D230): a sheet takes touches only while it is open. pointer-events is not in the transition list, so a
+   closing sheet stops taking them the moment open is removed, through its slide-out and after. */
 /* celebration popup: scale-in with a touch of bounce */
 @keyframes popIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:none;}}
 .pop-overlay.show{animation:fadeBg .22s ease;}
@@ -1211,16 +1220,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 </div>
 
-<script>
-
+<script>// ── Icons: the Asylum icon set as inline SVG, and the emoji each stands in for. ──
 /* THE ASYLUM icon system — Lucide 2px (DS) + custom fitness marks. */
 const ASY_ICON_PATHS={"trash":"<path d=\"M3 6h18\"/><path d=\"M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2\"/><path d=\"M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6\"/><path d=\"M10 11v6M14 11v6\"/>","medal":"<path d=\"M7.5 3h9l-3 6h-3z\"/><path d=\"M12 9v2\"/><circle cx=\"12\" cy=\"16\" r=\"5\"/><path d=\"M12 14v4M10 16h4\"/>","growth":"<path d=\"M4.5 16a4.5 4.5 0 0 1 4.5 4.5\"/><path d=\"M4.5 11.75a8.75 8.75 0 0 1 8.75 8.75\"/><path d=\"M4.5 7.5a13 13 0 0 1 13 13\"/><path d=\"M13 11 19.5 4.5\"/><path d=\"M14.8 4.5h4.7v4.7\"/>","barbell":"<line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><rect x=\"5.5\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><rect x=\"15.9\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><line x1=\"2.5\" y1=\"9.5\" x2=\"2.5\" y2=\"14.5\"/><line x1=\"21.5\" y1=\"9.5\" x2=\"21.5\" y2=\"14.5\"/>","lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>","brain":"<path d=\"M12 5a3 3 0 0 0-5.5 1.7A3 3 0 0 0 5 12a3 3 0 0 0 1.7 5.3A3 3 0 0 0 12 19\"/><path d=\"M12 5a3 3 0 0 1 5.5 1.7A3 3 0 0 1 19 12a3 3 0 0 1-1.7 5.3A3 3 0 0 1 12 19\"/><path d=\"M12 5v14\"/>","scale":"<line x1=\"12\" y1=\"4\" x2=\"12\" y2=\"20\"/><line x1=\"7\" y1=\"20\" x2=\"17\" y2=\"20\"/><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><path d=\"M4 7 1.6 12.6a2.4 2.4 0 0 0 4.8 0z\"/><path d=\"M20 7l-2.4 5.6a2.4 2.4 0 0 0 4.8 0z\"/>","warning":"<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13.5\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","siren":"<path d=\"M8 13a4 4 0 0 1 8 0v1.5H8z\"/><rect x=\"6\" y=\"14.5\" width=\"12\" height=\"5\" rx=\"1\"/><line x1=\"12\" y1=\"14.5\" x2=\"12\" y2=\"19.5\"/><line x1=\"12\" y1=\"6\" x2=\"12\" y2=\"3\"/><line x1=\"18\" y1=\"8.3\" x2=\"20.2\" y2=\"6.1\"/><line x1=\"6\" y1=\"8.3\" x2=\"3.8\" y2=\"6.1\"/><line x1=\"20\" y1=\"13\" x2=\"22.5\" y2=\"13\"/><line x1=\"4\" y1=\"13\" x2=\"1.5\" y2=\"13\"/>","kettlebell":"<path d=\"M7.7 11.3C6.2 8.4 7.6 4.8 12 4.8s5.8 3.6 4.3 6.5\"/><path d=\"M10 10c-.9-1.6-.2-3.3 2-3.3s2.9 1.7 2 3.3\"/><path d=\"M7.7 11.3a5.4 5.4 0 1 0 8.6 0\"/>","flagFinish":"<line x1=\"5\" y1=\"21\" x2=\"5\" y2=\"3\"/><path d=\"M5 4h14v9H5z\"/><line x1=\"5\" y1=\"8.5\" x2=\"19\" y2=\"8.5\"/><line x1=\"9.66\" y1=\"4\" x2=\"9.66\" y2=\"13\"/><line x1=\"14.33\" y1=\"4\" x2=\"14.33\" y2=\"13\"/>","lock":"<rect x=\"4\" y=\"10.5\" width=\"16\" height=\"10.5\" rx=\"2\"/><path d=\"M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5\"/>","notebook":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\"/><line x1=\"12\" y1=\"8\" x2=\"16\" y2=\"8\"/><line x1=\"12\" y1=\"12\" x2=\"16\" y2=\"12\"/><line x1=\"12\" y1=\"16\" x2=\"16\" y2=\"16\"/>","calculator":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><rect x=\"8\" y=\"6\" width=\"8\" height=\"3\" rx=\"0.5\"/><line x1=\"8\" y1=\"13\" x2=\"8.01\" y2=\"13\"/><line x1=\"12\" y1=\"13\" x2=\"12.01\" y2=\"13\"/><line x1=\"16\" y1=\"13\" x2=\"16.01\" y2=\"13\"/><line x1=\"8\" y1=\"17\" x2=\"8.01\" y2=\"17\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/><line x1=\"16\" y1=\"17\" x2=\"16.01\" y2=\"17\"/>","home":"<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>","dumbbell":"<path d=\"M6.5 6.5v11\"/><path d=\"M3.5 8.5v7\"/><path d=\"M17.5 6.5v11\"/><path d=\"M20.5 8.5v7\"/><line x1=\"6.5\" y1=\"12\" x2=\"17.5\" y2=\"12\"/>","chart":"<line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"10\"/><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"16\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","play":"<polygon points=\"6 3 20 12 6 21 6 3\"/>","pause":"<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","plus":"<line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","minus":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","chevronRight":"<polyline points=\"9 18 15 12 9 6\"/>","chevronLeft":"<polyline points=\"15 18 9 12 15 6\"/>","chevronDown":"<polyline points=\"6 9 12 15 18 9\"/>","clock":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","flame":"<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>","trophy":"<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>","bell":"<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9\"/><path d=\"M13.73 21a2 2 0 0 1-3.46 0\"/>","arrowRight":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/><polyline points=\"12 5 19 12 12 19\"/>","more":"<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>","target":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/>","zap":"<polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/>","calendar":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>","history":"<path d=\"M3 3v5h5\"/><path d=\"M3.05 13A9 9 0 1 0 6 5.3L3 8\"/><polyline points=\"12 7 12 12 15 15\"/>","sliders":"<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"1\" y1=\"14\" x2=\"7\" y2=\"14\"/><line x1=\"9\" y1=\"8\" x2=\"15\" y2=\"8\"/><line x1=\"17\" y1=\"16\" x2=\"23\" y2=\"16\"/>","skip":"<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" y1=\"5\" x2=\"19\" y2=\"19\"/>","run":"<circle cx=\"15\" cy=\"5\" r=\"2\"/><path d=\"M14 7l-3 6\"/><path d=\"M14 9l4 1\"/><path d=\"M14 9l-4-1\"/><path d=\"M11 13l3 4-1 4\"/><path d=\"M11 13l-3 3 1 4\"/>","bike":"<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"15\" cy=\"5\" r=\"1\"/><path d=\"M12 17.5V14l-3-3 4-3 2 3h2\"/>","swim":"<circle cx=\"8\" cy=\"9\" r=\"2\"/><path d=\"M10 10l4-2 3 2\"/><path d=\"M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/><path d=\"M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/>","shield":"<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"/>","sprout":"<path d=\"M7 20h10\"/><path d=\"M10 20c5.5-2.5.8-6.4 3-10\"/><path d=\"M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z\"/><path d=\"M14.1 6c-.9 1-1.3 2.5-1.1 4 1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z\"/>","flag":"<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\"/><line x1=\"4\" y1=\"22\" x2=\"4\" y2=\"15\"/>","dice":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M16 8h.01\"/><path d=\"M8 8h.01\"/><path d=\"M8 16h.01\"/><path d=\"M16 16h.01\"/><path d=\"M12 12h.01\"/>","backpack":"<path d=\"M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z\"/><path d=\"M8 10V6a4 4 0 0 1 8 0v4\"/><path d=\"M8 18h8\"/><path d=\"M8 14h8\"/>","pencil":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","copy":"<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>","bandage":"<rect x=\"1.8\" y=\"7.6\" width=\"20.4\" height=\"8.8\" rx=\"4.4\" transform=\"rotate(-45 12 12)\"/><line x1=\"8.6\" y1=\"8.6\" x2=\"15.4\" y2=\"15.4\"/><line x1=\"15.4\" y1=\"8.6\" x2=\"8.6\" y2=\"15.4\"/>","swap":"<line x1=\"3\" y1=\"8.5\" x2=\"17\" y2=\"8.5\"/><polyline points=\"14 5.5 17 8.5 14 11.5\"/><line x1=\"21\" y1=\"15.5\" x2=\"7\" y2=\"15.5\"/><polyline points=\"10 12.5 7 15.5 10 18.5\"/>"};
 const ASY_EMOJI={"🏅":"medal","🏆":"trophy","💪":"growth","🏋":"barbell","🦾":"dumbbell","⚡":"zap","🔥":"flame","⚖":"scale","🛡":"shield","🌱":"sprout","🧠":"brain","💡":"lightbulb","🏠":"home","🎒":"backpack","🤸":"kettlebell","👤":"user","🎯":"target","🏁":"flagFinish","🔒":"lock","⚠":"warning","🚨":"siren","✅":"check","📓":"notebook","🧮":"calculator","🏃":"run","🚴":"bike","🏊":"swim","📅":"calendar","📈":"chart","📊":"chart","🎲":"dice","⏱":"clock"};
+function asyIcon(key,size){size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
+
+
 // Exercise names reach markup from the library, from swaps, and now from the add picker.
 // Escaped on the way in so a name containing a quote or angle bracket can never break the
 // attribute it sits in.
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function asyIcon(key,size){size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
 
 // STORAGE
 function getPrograms(){try{return JSON.parse(localStorage.getItem('ia_programs')||'[]');}catch{return[];}}
@@ -1378,24 +1388,76 @@ function snapshotDay(week,dayKey){
   }catch(e){ console.error('day snapshot failed',week,dayKey,e); }
 }
 // ── REST-DAY SHEET ───────────────────────────────────────────────────────────
-const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
+// v0.240.0 (D228 item 2): no defaults. The face starts empty (the wheels' zero faces, no chip) and is seeded only from
+// the athlete's own record (_restSeed): a prefill is a placeholder, never a stored value (Mario).
+const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:'',dist:'',rpe:null,armed:false};
 function openRestSheet(w,dayKey,view){
   if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
-  if(!restDayEligible(w,dayKey)){showToast('That rest day has not come around yet');return;}
-  _restDraft.w=w; _restDraft.day=dayKey; _restDraft.view=view||'menu'; _restDraft.pick=null;
-  const types=(activeProg.cfg&&activeProg.cfg.cardioTypes)||[];
-  _restDraft.type=types[0]||'run'; _restDraft.mins=30; _restDraft.dist=''; _restDraft.rpe=5;
+  // v0.240.0 (D231 item 1): the sheet opens on every jog-eligible day; the menu and the move only where a move may land.
+  if(!restJogEligible(w,dayKey)){showToast('That rest day has not come around yet');return;}
+  const canMove=restDayEligible(w,dayKey);
+  _restDraft.w=w; _restDraft.day=dayKey; _restDraft.view=canMove?(view||'menu'):'cardio'; _restDraft.pick=null; _restDraft.armed=false;
+  // v0.240.0 (D228 item 1): the selected type is the first one holding a record, else the program's first sport.
+  const types=(activeProg.cfg&&activeProg.cfg.cardioTypes)||[], held=_restHeld(w,dayKey);
+  _restDraft.type=Object.keys(held).find(t=>_restIsRec(held[t]))||types[0]||'run';
+  _restSeed();
   renderRestSheet();
   const o=document.getElementById('restOverlay'); o.classList.add('open'); o.scrollTop=0;
 }
 function closeRestSheet(){document.getElementById('restOverlay').classList.remove('open');}
-function _rdSet(k,v){_restDraft[k]=v;renderRestSheet();}
+function _rdSet(k,v){ if(k==='type'){ _rdType(v); return; } _restDraft[k]=v;renderRestSheet();}
+// v0.240.0 (D228 item 1): a modality chip re-seeds the face from that type's record, never from a roll that was not logged.
+function _rdType(t){ _restDraft.type=t; _restDraft.armed=false; _restSeed(); renderRestSheet(); }
+// A chip tap takes any wheel still settling first; tapping the selected chip deselects it (D228 item 4).
+function _rdRpe(v){
+  const body=document.getElementById('restBody'); if(body) iaWheelFlush(body);
+  _restDraft.rpe=(_restDraft.rpe!=null&&+_restDraft.rpe===v)?null:v; renderRestSheet();
+}
+// The day's restLog through the getLogs lens, or {}.
+function _restHeld(w,dk){ const e=getLogs()[completedKey(w,dk)]; return (e&&e.restLog&&typeof e.restLog==='object')?e.restLog:{}; }
+// A record is a type holding a time or a distance.
+function _restIsRec(r){ return !!(r&&typeof r==='object'&&(+r.mins>0||+r.dist>0)); }
+// The selected type's record, or null.
+function _restRec(){ const r=_restHeld(_restDraft.w,_restDraft.day)[_restDraft.type]; return _restIsRec(r)?r:null; }
+// The face from the record: the record is shown, not a prefill (D228 item 1).
+function _restSeed(){
+  const r=_restRec();
+  _restDraft.mins=(r&&+r.mins>0)?String(r.mins):'';
+  _restDraft.dist=(r&&_restDraft.type!=='walk'&&+r.dist>0)?String(r.dist):'';
+  _restDraft.rpe=(r&&r.rpe!=null&&r.rpe!==''&&isFinite(+r.rpe))?+r.rpe:null;
+}
+function _restNum(v){ const n=parseFloat(String(v==null?'':v)); return n>0?n:0; }
+// D228 item 3: the face equals the record, every number compared as a number.
+function _restSame(r){
+  const rp=(v)=>(v==null||v===''||!isFinite(+v))?null:+v;
+  return _restNum(_restDraft.mins)===_restNum(r.mins)
+    && (_restDraft.type==='walk'||_restNum(_restDraft.dist)===_restNum(r.dist))
+    && rp(_restDraft.rpe)===rp(r.rpe);
+}
+// The button is a regime, as on the card: Logged ✓ while the face is the record, Log it once anything differs.
+function _restRegime(){
+  const b=document.getElementById('restLogBtn'); if(!b) return;
+  const r=_restRec(); b.textContent=(r&&_restSame(r))?'Logged \u2713':'Log it';
+}
+// A wheel commit writes its hidden node and fires input; the face follows it, and the button with it.
+function _restInput(ev){
+  const id=ev&&ev.target&&ev.target.id;
+  if(id==='rest_mins') _restDraft.mins=ev.target.value;
+  else if(id==='rest_dist') _restDraft.dist=ev.target.value;
+  else return;
+  _restRegime();
+}
 function renderRestSheet(){
   const body=document.getElementById('restBody'); if(!body) return;
   const w=_restDraft.w, dk=_restDraft.day;
   const dayName=DAY_FULL[dk]||dk;
   if(_restDraft.view==='move')      body.innerHTML=_renderRestMove(w,dk,dayName);
-  else if(_restDraft.view==='cardio') body.innerHTML=_renderRestCardio(w,dk,dayName);
+  else if(_restDraft.view==='cardio'){
+    body.innerHTML=_renderRestCardio(w,dk,dayName);
+    // D229 item 2: the sheet's own wheels, initialised after every render; the face follows their commits.
+    iaWheelInit(body);
+    if(!body._rdIn){ body._rdIn=true; body.addEventListener('input',_restInput); }
+  }
   else body.innerHTML=
      '<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 REST DAY</div>'
     +'<div class="ov-title">Not resting?</div>'
@@ -1408,6 +1470,12 @@ function _renderRestMove(w,dk,dayName){
   const head='<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 TRAINING ANYWAY</div>'
     +'<div class="ov-title">Move a session here</div>'
     +'<div class="ov-intro">Nothing gets added. Whatever you pick moves to '+dayName+', and its old day becomes your rest.</div>';
+  // v0.240.0 (D232): a jog already on the day is said before the list, each line the sentence without "logged".
+  const jog=restLogLines(_restHeld(w,dk));
+  const already=jog.length
+    ? '<div class="ov-effect"><div class="ov-effect-ttl">Already logged here</div><div class="ov-effect-sub">'
+      +jog.map((l)=>l.replace(' logged','')+'<br>').join('')+'Move a session in and '+dayName+' is a double day. Your call.</div></div>'
+    : '';
   if(!cands.length) return head
     +'<div class="ov-effect"><div class="ov-effect-ttl">Nothing left to move</div><div class="ov-effect-sub">Every session this week is logged or done. Take the rest, or log some cardio instead.</div></div>'
     +'<button class="ov-apply" onclick="_rdSet(\'view\',\'cardio\')">Log cardio instead</button>';
@@ -1426,34 +1494,46 @@ function _renderRestMove(w,dk,dayName){
         +'<div class="ov-effect-sub">You have '+reg+' work on '+names+' too. Stack it here and something gives. Your call.</div></div>';
     }
   }
-  return head+'<div class="ov-eq-lbl">NOT LOGGED THIS WEEK</div>'+rows+warn
+  return head+already+'<div class="ov-eq-lbl">NOT LOGGED THIS WEEK</div>'+rows+warn
     +(_restDraft.pick?'<button class="ov-apply" onclick="applyRestMove()">Move it here</button>':'');
 }
 function _renderRestCardio(w,dk,dayName){
   const types=((activeProg.cfg&&activeProg.cfg.cardioTypes)||[]).slice();
   if(!types.includes('walk')) types.push('walk');   // walk is what most rest-day movement is
+  const held=_restHeld(w,dk), t=_restDraft.type, rec=_restRec();
+  // A type holding a record always has its chip, ahead of walk.
+  Object.keys(held).forEach(x=>{ if(_restIsRec(held[x])&&!types.includes(x)) types.splice(types.length-1,0,x); });
   const LBL={run:'Run',bike:'Bike',swim:'Swim',row:'Row',walk:'Walk'};
-  const chips=types.map(t=>'<div class="rd-chip'+(_restDraft.type===t?' sel':'')+'" onclick="_rdSet(\'type\',\''+t+'\')">'+(LBL[t]||t)+'</div>').join('');
+  // v0.240.0 (D228 item 1): a chip whose type holds a record prints a check.
+  const chips=types.map((x)=>'<div class="rd-chip'+(t===x?' sel':'')+'" onclick="_rdType(\''+x+'\')">'+(LBL[x]||x)+(_restIsRec(held[x])?' \u2713':'')+'</div>').join('');
   // RPE, not a separate easy/hard vocabulary — the whole app prescribes in RPE, so the
   // log should speak it too. Word anchors because RPE on a run is less instinctive.
   const RPE=[[5,'Easy','Conversational, full sentences'],[7,'Steady','Working, sentences getting short'],[9,'Hard','That\u2019s a training day, not a rest day']];
-  const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe===v?' sel':'')+'" onclick="_rdSet(\'rpe\','+v+')"><b>RPE '+v+(v===9?'+':'')+'</b> \u00b7 '+n+'<span>'+d+'</span></div>').join('');
-  const distLbl=_restDraft.type==='swim'?'Distance (yards)':'Distance (miles)';
-  const showDist=_restDraft.type!=='walk';
+  const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe!=null&&+_restDraft.rpe===v?' sel':'')+'" onclick="_rdRpe('+v+')"><b>RPE '+v+(v===9?'+':'')+'</b> \u00b7 '+n+'<span>'+d+'</span></div>').join('');
+  // v0.240.0 (D229 item 2): controls by type, on the sheet's own hidden ids. Run and bike: the time wheel and the miles
+  // wheel. Row: the time wheel and a meters box. Swim: the time wheel and the card's yards box. Walk: the time wheel.
+  const lbl=(x)=>'<div class="ov-eq-lbl" style="margin-top:14px">'+x+'</div>';
+  let ctl=lbl('TIME')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('hms','rest_mins',_restDraft.mins)+'</div>';
+  if(t==='run'||t==='bike') ctl+=lbl('DISTANCE')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('dist','rest_dist',_restDraft.dist)+'</div>';
+  else if(t==='row'||t==='swim') ctl+=lbl(t==='row'?'DISTANCE (METERS)':'DISTANCE (YARDS)')
+    +'<div class="rd-row"><input class="rd-input" type="number" inputmode="numeric" min="0"'+(t==='swim'?' step="25"':'')+' id="rest_dist" value="'+esc(_restDraft.dist)+'" placeholder="'+(t==='row'?'meters':'yards')+'"></div>';
   const note=_restDraft.rpe>=9
     ? '<div class="ov-effect" style="border-color:var(--accent)"><div class="ov-effect-ttl" style="color:var(--accent)">Noted</div><div class="ov-effect-sub">Hard effort is not a rest day, it is a training day. Logging it as it happened. Keep an eye on how tomorrow feels.</div></div>'
     : '';
+  const word=REST_WORD[t]||t;
   return '<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 LOG CARDIO</div>'
-    +'<div class="ov-title">What did you do?</div>'
-    +'<div class="ov-intro">Easy work on a rest day is recovery, not extra load. This will not touch your program.</div>'
+    +(rec
+      ? '<div class="ov-title">Your '+word+' on '+dayName+'</div>'
+        +'<div class="ov-intro">This is what you logged. Roll it to fix it, or clear it if it did not happen.</div>'
+      : '<div class="ov-title">What did you do?</div>'
+        +'<div class="ov-intro">Easy work on a rest day is recovery, not extra load. This will not touch your program.</div>')
     +'<div class="ov-eq-lbl">MODALITY</div><div class="rd-row">'+chips+'</div>'
-    +'<div class="ov-eq-lbl" style="margin-top:14px">TIME</div>'
-    +'<div class="rd-row"><input class="rd-input" type="number" inputmode="numeric" min="1" max="600" value="'+_restDraft.mins+'" onchange="_restDraft.mins=+this.value||0" placeholder="minutes"><span class="rd-unit">min</span></div>'
-    +(showDist?'<div class="ov-eq-lbl" style="margin-top:14px">'+distLbl+' <span style="text-transform:none;letter-spacing:0;opacity:.75">optional</span></div>'
-      +'<div class="rd-row"><input class="rd-input" type="number" inputmode="decimal" step="0.1" min="0" value="'+_restDraft.dist+'" onchange="_restDraft.dist=this.value" placeholder="'+(_restDraft.type==='swim'?'yards':'miles')+'"></div>':'')
+    +ctl
     +'<div class="ov-eq-lbl" style="margin-top:14px">HOW HARD</div>'+rpeRows
     +note
-    +'<button class="ov-apply" onclick="applyRestCardio()">Log it</button>';
+    +'<button class="ov-apply" id="restLogBtn" onclick="applyRestCardio()">'+(rec&&_restSame(rec)?'Logged \u2713':'Log it')+'</button>'
+    // D228 item 6: Clear, two taps, only where the selected type holds a record.
+    +(rec?'<button class="ov-clear" id="restClearBtn" onclick="clearRestCardio()">'+(_restDraft.armed?'Tap again to clear':'Clear this '+word)+'</button>':'');
 }
 function applyRestMove(){
   const {w,day,pick}=_restDraft;
@@ -1468,29 +1548,51 @@ function applyRestMove(){
   showToast('Moved. '+(DAY_FULL[pick]||pick)+' is your rest now \u2713');
 }
 function applyRestCardio(){
-  const {w,day,type,mins,dist,rpe}=_restDraft;
-  const m=+mins||0;
-  if(m<=0){showToast('How long did you go?');return;}
+  // v0.240.0 (D228 item 4): a wheel still settling writes its face first, as Done does (D179).
+  const body=document.getElementById('restBody'); if(body) iaWheelFlush(body);
+  const {w,day,type}=_restDraft, rec=_restRec();
+  // D228 item 3: Logged ✓ with the face unchanged closes the sheet and writes nothing.
+  if(rec&&_restSame(rec)){ closeRestSheet(); return; }
+  const m=_restNum(_restDraft.mins), d=type==='walk'?0:_restNum(_restDraft.dist);
+  // D228 item 5: nothing is ever written for an empty face; a record rolled to zero is removed only by Clear.
+  if(m<=0&&d<=0){ showToast(rec?'To remove it, use Clear.':(type==='walk'?'Nothing to log yet. Add a time.':'Nothing to log yet. Add a time or a distance.')); return; }
+  // V238 (D223): the jog is its own record on the day, restLog[type] = {mins?, dist?, rpe?}, numbers, writing no
+  // key a session reads. v0.240.0 (D228 item 4, D226 amended; D229): Log writes the face over the type's record:
+  // the time when above zero, the distance when above zero (never on walk), the RPE when a chip is selected; another
+  // type keeps its own key. week and ts are stamped the way writeSetDraft stamps them.
   const logs=getLogs(); const k=completedKey(w,day);
-  const e=Object.assign({},logs[k]||{});
-  // V238 (D223 items 1-2, Amendment 1 A6, D226): the jog is its own record on the day,
-  // restLog[type] = {mins, dist?, rpe}, numbers. It writes no top-level key a session reads:
-  // rest_cardio, rest_type, rest_mins, rpe and the run_dist/bike_mins/swim_yards sum are retired,
-  // so a session moved onto the day opens empty and its rebuild carries the jog. dist is stored
-  // only when the box took one (parseFloat > 0), never on walk. "Log more" never overwrites: the
-  // same type adds mins and dist and keeps the higher RPE; another type gets its own key. week
-  // and ts are stamped the way writeSetDraft stamps them.
-  const rl=Object.assign({},e.restLog||{}), was=rl[type]||{}, o={};
-  const fin=v=>(v!=null&&v!==''&&isFinite(+v))?+v:null;
-  const d=parseFloat(dist), dd=(type!=='walk'&&d>0)?d:0, wd=(+was.dist>0)?+was.dist:0;
-  o.mins=((+was.mins>0)?+was.mins:0)+m;
-  if(type!=='walk'&&wd+dd>0) o.dist=wd+dd;
-  const r0=fin(was.rpe), r1=fin(rpe);
-  if(r0!=null||r1!=null) o.rpe=Math.max(r0==null?-Infinity:r0, r1==null?-Infinity:r1);
+  const e=Object.assign({},logs[k]||{}), rl=Object.assign({},e.restLog||{}), o={};
+  if(m>0) o.mins=m;
+  if(d>0) o.dist=d;
+  if(_restDraft.rpe!=null&&_restDraft.rpe!==''&&isFinite(+_restDraft.rpe)) o.rpe=+_restDraft.rpe;
   rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now();
   logs[k]=e; saveLogs(logs);
-  closeRestSheet(); renderWeekView();
-  showToast(m+' min logged \u2713');
+  closeRestSheet(); renderWeekView(); _restDetailRefresh(w,day);
+  showToast(restLogHead(type,o)+' logged \u2713');
+}
+// v0.240.0 (D228 item 6): Clear, two taps. The first arms it and writes nothing. The second removes the type's
+// record; restLog goes when it empties; the day key goes when nothing but week and ts is left (an emptied record
+// would still freeze the day and turn Progress); anything else on the entry is left byte for byte.
+function clearRestCardio(){
+  if(!_restDraft.armed){ _restDraft.armed=true; const b=document.getElementById('restClearBtn'); if(b) b.textContent='Tap again to clear'; return; }
+  _restDraft.armed=false;
+  const {w,day,type}=_restDraft;
+  const logs=getLogs(), k=completedKey(w,day), e=logs[k];
+  if(e&&e.restLog&&e.restLog[type]){
+    const n=Object.assign({},e), rl=Object.assign({},e.restLog);
+    delete rl[type];
+    if(Object.keys(rl).length) n.restLog=rl; else delete n.restLog;
+    if(Object.keys(n).every(x=>x==='week'||x==='ts')) delete logs[k]; else logs[k]=n;
+    saveLogs(logs);
+  }
+  closeRestSheet(); renderWeekView(); _restDetailRefresh(w,day);
+  const word=REST_WORD[type]||type;
+  showToast(word.charAt(0).toUpperCase()+word.slice(1)+' cleared');
+}
+// D231 item 4: a Log or a Clear opened from a double day's session card re-renders the card, so its block is current.
+function _restDetailRefresh(w,day){
+  const o=document.getElementById('detailOverlay');
+  if(o&&o.classList.contains('open')&&w===currentWeek&&day===currentDayKey&&activeProg.weeks[w]&&activeProg.weeks[w][day]) openDetail(day,activeProg.weeks[w][day]);
 }
 // ── REST-DAY SESSIONS — storage, move engine, and guards ─────────────────────
 // Two things an athlete can do on a rest day, and they behave differently on purpose.
@@ -1559,6 +1661,21 @@ function restMoveCollisions(w,destDay,srcDay){
 // Future rest days are excluded on purpose: logging cardio you have not done yet is a
 // prescription, not a log, and moving a session onto next Wednesday is just rescheduling
 // the program, which is a different feature.
+// v0.240.0 (D231 item 1): jog-eligible: inside the program, the date has come, and the day is a rest day or already
+// holds a jog (a double day). restDayEligible below stays the move's test (a rest day, not moved away).
+function restJogEligible(w,dayKey){
+  if(!activeProg||!activeProg.startDate) return false;
+  if(dayBeforeStart(activeProg,w,dayKey)) return false;
+  const day=activeProg.weeks&&activeProg.weeks[w]&&activeProg.weeks[w][dayKey];
+  if(!day) return false;
+  if(!day.rest&&!Object.keys(_restHeld(w,dayKey)).length) return false;
+  const order=['mon','tue','wed','thu','fri','sat','sun'];
+  const idx=order.indexOf(dayKey); if(idx<0) return false;
+  const mon=getWeekMonday(activeProg.startDate);
+  const d=new Date(mon); d.setDate(mon.getDate()+(w-1)*7+idx); d.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  return d<=today;
+}
 function restDayEligible(w,dayKey){
   if(!activeProg||!activeProg.startDate) return false;
   if(dayBeforeStart(activeProg,w,dayKey)) return false;       // V174 (D24)
@@ -1595,13 +1712,28 @@ function restMoveCandidates(w){
   return out;
 }
 let activeProgId=null,currentWeek=1,currentDayKey=null,activeProg=null,calcLift='Deadlift',editProgId=null,progressViewId=null,confirmProgId=null,confirmTier=0;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setActiveProgId(v){ activeProgId=v; }
+function _setCurrentWeek(v){ currentWeek=v; }
+function _setCurrentDayKey(v){ currentDayKey=v; }
+function _setActiveProg(v){ activeProg=v; }
+function _setCalcLift(v){ calcLift=v; }
+function _setEditProgId(v){ editProgId=v; }
+function _setProgressViewId(v){ progressViewId=v; }
+function _setConfirmProgId(v){ confirmProgId=v; }
+function _setConfirmTier(v){ confirmTier=v; }
 // V168 D8 — render-scoped, NOT persisted. The D7 sentence fires on the first stale
 // pill of a rendered day card; every stale pill below it goes dashed and silent.
 // Reset in openDetail, which is also the re-render path for swap/skip/add, so an
 // in-session edit re-arms it exactly once rather than losing it.
 let _staleWarnShown=false,_staleWarnSrc='';
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setStaleWarnShown(v){ _staleWarnShown=v; }
+function _setStaleWarnSrc(v){ _staleWarnSrc=v; }
 let openProgIds=new Set();
 let currentRandIdx=-1;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setCurrentRandIdx(v){ currentRandIdx=v; }
 
 let _curScreen='screenHome';
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);updateTabBar(id);_curScreen=id;updateRestFloat();}
@@ -1623,10 +1755,14 @@ function tabGo(target){
 }
 function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
+
+/** Where a movement is done (V164): a superset never pairs two fixed stations of different classes. */
+/** One logged set of a movement in ia_exw_ (the loads a movement has been worked at, by week). */
+/** One movement's thread in ia_exw_, under its store key (exStoreKey). */
 // EXERCISE LIBRARY
 const EXLIB={
   chest_compound:['Barbell bench press','Incline barbell press','Close-grip bench press','Dumbbell bench press'],
-  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press'],
+  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press','Single-arm dumbbell bench press'],
   chest_acc_joint:['Dumbbell incline press','Dumbbell bench press','Machine chest press','Cable crossover','Pec deck','Dumbbell decline press','Dumbbell floor press'],
   back_compound:['Deadlift','Trap bar deadlift','Sumo deadlift','Barbell Romanian deadlift'],
   back_row:['Barbell row','Pendlay row','Kettlebell single-arm row','Dumbbell row'],
@@ -1636,7 +1772,7 @@ const EXLIB={
   // shoulder and finishes forward at chest height, driven by hip rotation. It lives in
   // the shoulder pool because the pattern is a press, not a core drill; _pattern reads
   // it as 'hpress' for exactly that reason.
-  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Landmine rotational press'],
+  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Landmine rotational press','Seated dumbbell shoulder press'],
   shoulder_iso:['Dumbbell lateral raise','Cable lateral raise','Dumbbell front raise','Dumbbell rear delt fly','Face pull'],
   // BODYWEIGHT DELT ISOLATION (V127). Every entry in shoulder_iso above is a dumbbell or a
   // cable, so once _gearOK gained its dumbbell clause the pool emptied on the bodyweight
@@ -1649,8 +1785,8 @@ const EXLIB={
   // Two heads, two movements. Gastroc loads knee-straight, soleus loads knee-bent, so a
   // pool of standing-only variants trains half the calf. The machine seated raise is
   // cable-tier only, which left every other tier gastroc-only until the DB seated entry.
-  calves:['Dumbbell standing calf raise','Dumbbell seated calf raise','Machine seated calf raise'],
-  squat:['Back squat','Front squat','Paused back squat','Barbell box squat'],
+  calves:['Dumbbell standing calf raise','Dumbbell seated calf raise','Machine seated calf raise','Dumbbell split-stance calf raise'],
+  squat:['Back squat','Front squat','Paused back squat','Barbell box squat','Barbell pin squat'], // D241: pin squat, a dead-stop concentric from the safeties (positional: REP_AFFINITY 6)
   squat_joint:['Leg press','Dumbbell goblet squat','Hack squat (machine)','Barbell box squat'],
   // V178 (D1): landmine reverse lunge — the loaded unilateral knee-dominant lunge with a
   // fixed bar path (name says landmine → RACK class, barbell-gated by the pool's own
@@ -1661,7 +1797,10 @@ const EXLIB={
   // the anterior counterweight makes the pattern self-coaching and leaves a bail path.
   // The name deliberately avoids the word 'lateral' — _isCompound's exclusion regex
   // vetoes any name containing it, which would strip this of compound status.
-  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge'],
+  // D241 (P-BENCH): the deficit reverse lunge (more range), the goblet side lunge to a knee drive (frontal plane into a
+  // single-leg finish; no 'lateral', which _isCompound vetoes), the barbell reverse lunge (a step back is the bail) and
+  // KB step-downs (the eccentric single-leg quad drill).
+  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge','Deficit reverse lunge (KB)','Goblet side lunge to knee drive','Barbell reverse lunge','Step-downs (KB)'],
   // V178 (D1): standing cable hamstring curl — knee flexion in a running-relevant standing
   // posture. Lives in leg_accessory (which is _gear'd, so the cable gate applies) NOT in
   // hinge (which is not). _pattern reads 'hamstring curl' → leg_iso, added the same session.
@@ -1696,15 +1835,22 @@ const EXLIB={
   // classify null in _pattern — prehab, cap-exempt — and carry fixed details in
   // buildHipSection. 'Standing clamshell' from the same source IS 'Standing band hip
   // abduction' and was folded as a no-op.
-  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion"],
-  hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
+  // D239 (P-BENCH): the Copenhagen plank (the bench had no adductor work), the side plank
+  // with the top leg raised (glute med) and the glute bridge hold; three mobility pieces, the
+  // Cossack shift (V192 kept it out of the lunge pool as mobility), the half-kneeling hip
+  // flexor stretch and pigeon lift-offs. All prehab: _pattern null, doses fixed.
+  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion","Copenhagen plank (bent knee)","Side plank (top leg raised)","Glute bridge hold","Copenhagen plank (long lever)","Kettlebell hip flexor raise"], // D241: the Copenhagen's long-lever rung (advanced, EX_MIN_EXP) and loaded hip flexion past 90°
+  hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch","Cossack squat shift","Half-kneeling hip flexor stretch","Pigeon lift-offs"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
   // V178 (D3): FOOT & ANKLE prehab pool. The calves pool loads gastroc/soleus in plantar
   // flexion only; nothing in the file trained the tibialis, dorsiflexion, the bent-knee
   // soleus in isolation, or ankle range. For a runner the soleus is what fails at mile
   // ten. Rides the same rail as hip stability (leg day, hip:true flag → cap-exempt,
   // prehab-protected under injury sweeps), runner-only, every week INCLUDING race week.
-  foot_ankle:['Tibialis raise (wall lean)','Banded dorsiflexion','Single-leg bent-knee soleus raise','Standing ankle CARs'],
-  foot_ankle_bw:['Tibialis raise (wall lean)','Single-leg bent-knee soleus raise','Standing ankle CARs'],
+  // D239 (P-BENCH): single-leg balance (the bench had none), its loaded rung, the loaded
+  // tib raise, the split-squat calf isometric, dorsiflexion range, foot intrinsics and calf
+  // endurance in gait. The two KB names are loaded-tier only.
+  foot_ankle:['Tibialis raise (wall lean)','Banded dorsiflexion','Single-leg bent-knee soleus raise','Standing ankle CARs','Single-leg balance hold (eyes closed)','Single-leg KB pass-around','Kettlebell tibialis raise (seated)','Split-squat heel-raise hold','Knee-to-wall ankle rocks','Towel scrunches','Tiptoe walks'],
+  foot_ankle_bw:['Tibialis raise (wall lean)','Single-leg bent-knee soleus raise','Standing ankle CARs','Single-leg balance hold (eyes closed)','Split-squat heel-raise hold','Knee-to-wall ankle rocks','Towel scrunches','Tiptoe walks'],
   // Cuff / scapular rehab. Pain-free-range external rotation, low-load horizontal
   // abduction and scapular control — the drills that actually rehabilitate a protect-
   // tier shoulder, as opposed to simply avoiding it. Deliberately contains no pressing,
@@ -1744,7 +1890,7 @@ function _carryRx(dist,name,qual){
 // that knows a press is one-handed. Barbell overhead press, Dumbbell Arnold press,
 // Dumbbell lateral raise and Barbell push press are two-hand or two-side movements
 // and must NOT print 'each'.
-const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1};
+const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1,'Single-arm dumbbell bench press':1};
 function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
 // ── REP-AFFINITY (V160, D2-b) ────────────────────────────────────────────────────────
 // A movement declares the MAX reps a wave-driven prescription may ask of it.
@@ -1754,12 +1900,12 @@ function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]
 // not quads — wrong limiter — so it must never ride the endurance/hypertrophy/
 // fatloss/balanced waves. SIDECAR MAP on purpose: EXLIB stays flat strings and
 // every existing consumer is byte-identical. Untagged = unconstrained.
-const REP_AFFINITY={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6}};
+const REP_AFFINITY={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6},'Barbell pin squat':{maxReps:6}};
 // ── MIN EXPERIENCE (V178, D4) ─────────────────────────────────────────────────────
 // Same sidecar shape as REP_AFFINITY. A movement declares the LEAST experience tier
 // that may be handed it. Untagged = any. Applied at pool construction (buildEx) so
 // every consumer of the pool inherits it; the power pools already do this by cost.
-const EX_MIN_EXP={'Zercher single-leg deadlift':'advanced'};
+const EX_MIN_EXP={'Zercher single-leg deadlift':'advanced','Copenhagen plank (long lever)':'advanced'};
 const _EXP_RANK={beginner:0,intermediate:1,advanced:2};
 function _expOK(name,experience){const m=EX_MIN_EXP[name];if(!m)return true;return (_EXP_RANK[experience||'intermediate']??1)>=(_EXP_RANK[m]??0);}// V161: box squat is a dead-stop power variant — honest pause dies past ~6 reps (Mario's ruling D1-b)
 // ── STATION CLASS (V164, D1/D6) ──────────────────────────────────────────────
@@ -1931,11 +2077,208 @@ function _swapUniverseAdd(arr){
 }
 function _swapUniverseList(){return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
 function pick(arr,n,seed){_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+// Lifting focus maps to internal goal for wave/exercise selection
+const LIFTING_FOCUS_TO_GOAL = {
+  strength: 'strength',
+  hypertrophy: 'hypertrophy',
+  fatloss: 'fatloss',
+  balanced: 'balanced',
+  support_strength: 'athletic',
+  support_athletic: 'athletic',
+  support_prevention: 'endurance',
+};
+// Experience-based 1RM defaults — conservative estimates
+const DEFAULT_1RM = {
+  beginner:    {bench:65,  squat:75,  deadlift:95},   // conservative untrained estimates (single source of truth)
+  intermediate:{bench:135, squat:155, deadlift:185},  // been at it a while, consistent
+  advanced:    {bench:225, squat:275, deadlift:315},  // solid lifter, knows the movements
+};
+// ── Exercise kinds: timed, rep-only or loaded, what a set logs, and how a weight rounds. ──
+// Equipment token map — single source of truth for how a movement name signals added
+// load. Each family lists every surface form, INCLUDING the parenthetical suffix
+// convention "Movement (ABBR)". Add a new abbreviation once here (e.g. a '(sb' for a
+// safety bar) and every detector below inherits it automatically — no more patching
+// isKBExercise / isDBExercise / isTrackableWeight one at a time.
+const EQUIP_TOKENS = {
+  barbell:    ['barbell','(bb'],
+  dumbbell:   ['dumbbell','db ','db-','(db'],
+  kettlebell: ['kettlebell','kb ','kb-','(kb'],
+  cable:      ['cable','(cable'],
+  machine:    ['machine'],
+  trapbar:    ['trap bar','(trap'],
+  // 'slam' added V122: 'Ball slams' IS med-ball work but named neither 'med ball' nor
+  // 'wall ball', so no equipment token matched and the movement was invisible to the gear
+  // gates while still being handed a weight field by movKeywords.
+  medball:    ['med ball','medicine ball','wall ball','slam'],
+  goblet:     ['goblet'],
+  loaded:     ['weighted','loaded']
+};
+// True if the name carries any external-load token at all.
+function anyEquip(name){
+  const n = (name||'').toLowerCase();
+  for(const fam in EQUIP_TOKENS){ if(EQUIP_TOKENS[fam].some(t => n.includes(t))) return true; }
+  return false;
+}
+function isTimeExercise(name) {
+  if(!name) return false;
+  const n = name.toLowerCase();
+  const timeKeywords = ['plank','hold','wall sit','dead hang','hollow hold',
+    'static hold','isometric hold','bird dog hold','dead bug hold'];
+  return timeKeywords.some(kw => n.includes(kw));
+}
+// Movements whose NAME matches a rep keyword — so `isRepExercise` vetoes the weight
+// field — but which are conventionally performed WITH external load when the name
+// carries no bodyweight qualifier.
+//
+// Root cause, and this is the third instance of the same failure (V101, V103, now):
+// **the name alone cannot say whether a movement is loaded**, because the engine draws
+// the SAME string into a barbell pool and a bodyweight pool. `EXLIB.lunge` holds
+// 'Dumbbell Bulgarian split squat' next to 'Reverse lunge (KB)'; the `_bw()` bodyweight branch
+// holds 'Bulgarian split squat (foot on chair)'. Only the parenthetical distinguishes
+// them, and `isRepExercise` matches the shared substring 'split squat' in both.
+//
+// The convention the library already follows: the BODYWEIGHT variant is explicitly
+// qualified — "(foot on chair)", "(chair)", "(shoulders on bed)", "Assisted ",
+// "Bodyweight ", "Banded " — and the loaded variant is bare. So a bare name in this
+// list gets its load field back; a qualified one keeps the veto.
+//
+// Adding a name here is a COACHING call, not a parser tweak: it asserts the movement is
+// normally performed under external load at any tier that owns equipment. The real fix
+// is to carry loaded-ness down from the POOL rather than re-derive it from the string —
+// see §12. Until then this list is the seam, and it must stay short.
+// V113: 'bulgarian split squat' removed. The bare name is gone from the library — the
+// loaded variant is 'Dumbbell Bulgarian split squat', which anyEquip catches directly.
+// One less name asserted by hand. The seam shrinks as the library gets honest.
+const REP_BUT_LOADED = ['single-leg hip thrust','bench dips'];
+const BW_QUALIFIER = ['(chair','foot on chair','shoulders on bed','assisted ','(assisted','bodyweight','(partner','(anchored','banded ','band ','(bw'];
+function isLoadedRepMovement(name){
+  const n=(name||'').toLowerCase();
+  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
+  return REP_BUT_LOADED.some(k => n.includes(k));
+}
+// swap-prefs asks with the detail too, which this test does not read.
+function isTrackableWeight(name) {
+  if(!name) return false;
+  const n = name.toLowerCase();
+  // Band-only movements — no weight to track
+  if(n.includes('band') && !n.includes('barbell') && !n.includes('db') && !n.includes('kb')) return false;
+  // Explicit external load in the name wins — a loaded variant of a movement that also
+  // reads as a bodyweight/rep exercise (Barbell hip thrust, Dumbbell Bulgarian split squat,
+  // Weighted dips) must still get a weight field. This override beats the bodyweight and
+  // rep vetoes below. Timed holds stay on the SEC field. Tokens come from EQUIP_TOKENS.
+  if(anyEquip(n) && !isTimeExercise(n)) return true;
+  // STACK-LOADED, BUT THE NAME SAYS NOTHING. Cable and selectorised-machine movements the
+  // gym floor calls by their apparatus, not their implement: the athlete picks a pin, so
+  // these are among the MOST loadable movements in the building, yet every keyword list
+  // below misses them — 'face pull' has no equipment token and 'pull' is not a movKeyword,
+  // 'extension' is not a movKeyword at all, and 'pec deck' names neither. They therefore
+  // got no weight field, and as of V121 the unloadable sweep would ALSO have stripped their
+  // rep target, which is exactly backwards.
+  // Deliberately a short explicit list rather than adding a broad /extension/ token: that
+  // token would also flip 'Eccentric wrist extension', which is rehab work that stays
+  // unloaded, and 'Bodyweight back extension', which already names itself. Harvested from
+  // the file — 259 names classified, these four are the whole disagreement.
+  if(_STACK_LOADED.test(n)) return true;
+  // Same class of override, for loaded movements whose name carries no equipment token
+  // at all (bare 'Dumbbell Bulgarian split squat' from the barbell lunge pool). Must sit ABOVE
+  // the isRepExercise veto below — that veto is what removed the field.
+  if(isLoadedRepMovement(n) && !isTimeExercise(n)) return true;
+  // An explicit bodyweight qualifier beats every movement keyword below. Without this,
+  // movKeywords' 'raise' hands a LOAD field to 'Calf raise (bodyweight)', 'squat' hands one
+  // to 'Bodyweight squats', and 'deadlift' to 'Single-leg Romanian deadlift (bodyweight)'.
+  // Sits BELOW the anyEquip check on purpose: 'Single-leg glute bridge (weighted)' and
+  // 'Dumbbell Bulgarian split squat' name their load and keep the field.
+  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
+  // Pure bodyweight / plyometric / cardio
+  const bwKeywords = ['jump squat','box jump','broad jump','burpee','mountain climber',
+    'sprint','run','jog','skipping','jumping jack','high knee',
+    'push-up','pushup','pull-up','pullup','chin-up','chinup',
+    'clamshell','side step','it band','90/90','pigeon','world greatest',
+    'lunge walk','bear crawl','inchworm','hip circle','terminal knee',
+    'inverted row','bound','skater jump','tuck jump',
+    'hanging knee raise','hanging leg raise',
+    'pallof','anti-rotation','bird dog','dead bug','plank'
+  ];
+  if(bwKeywords.some(kw => n.includes(kw))) return false;
+  // PHANTOM LOAD FIELDS (V122). Four movements matched a movKeyword by substring and were
+  // handed a weight field they can never use: 'McGill curl-up' (matched 'curl'),
+  // 'Garhammer raises' and 'Prone Y raise' (matched 'raise'), 'TRX row (if available)'
+  // (matched 'row'). None carries a qualifier BW_QUALIFIER could catch. The pool was
+  // internally inconsistent about it too: 'Prone Y-T-W raises' was already correctly
+  // vetoed by 'y-t-w' while its sibling 'Prone Y raise' was not.
+  // Matched on the whole name, not a substring, so a future 'Dumbbell Y raise' would
+  // still keep its field.
+  const _PHANTOM_LOAD=['mcgill curl-up','garhammer raises','prone y raise','trx row (if available)'];
+  if(_PHANTOM_LOAD.indexOf(n.trim())>=0) return false;
+  // Time-based holds tracked separately
+  if(isTimeExercise(n)) return false;
+  // Rep-based bodyweight tracked separately
+  if(isRepExercise(n)) return false;
+  // Equipment / weighted keywords — order matters, check equipment first
+  const equipKeywords = ['barbell','dumbbell','db ','db-','kettlebell','kb ','kb-',
+    'trap bar','cable','machine','weighted','med ball','medicine ball','wall ball'];
+  const movKeywords = ['press','row','curl','raise','deadlift','squat','bench',
+    'fly','flye','pulldown','upright','lateral','front raise','arnold','goblet',
+    'swing','snatch','clean','rdl','hip thrust','glute bridge','step-up',
+    'good morning','lunge','slam','carry','farmer','suitcase','thruster'];
+  return equipKeywords.some(kw => n.includes(kw)) || movKeywords.some(kw => n.includes(kw));
+}
+function isRepExercise(name) {
+  if(!name) return false;
+  const n = name.toLowerCase();
+  // Was only pullups/pushups/dips, so most no-load work (inverted rows, split squats,
+  // glute bridges, Nordics) fell through to the WEIGHT field or showed no log field at
+  // all — i.e. it could not be logged. Anything performed against bodyweight alone is
+  // logged in REPS, which is also what makes open-ended "sets to RPE" prescriptions work.
+  const repKeywords = ['pull-up','pullup','chin-up','chinup','push-up','pushup','dip','ring dip','muscle-up',
+    'inverted row','split squat','pistol squat','shrimp squat','glute bridge','hip thrust',
+    'nordic','back extension','snow angel','y-t-w','superman','step-up','lunge',
+    'sit-up','situp','leg raise','knee raise','v-up','hollow rock','squat (slow'];
+  return repKeywords.some(kw => n.includes(kw));
+}
+function roundWeight(lbs, unit) {
+  if(unit === 'kg') {
+    const kg = lbs * 0.453592;
+    return Math.round(kg / 2.5) * 2.5;
+  }
+  return Math.round(lbs / 5) * 5;
+}
+// ── Calendar: the day orders, local dates and week Mondays the engine and the screens share. ──
+const ALL_DAYS_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
+const _ISO_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
+function _isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function getWeekMonday(dateStr){
+  // Get the Monday of the week containing the given date string
+  const parts=dateStr.split('-');
+  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  d.setHours(0,0,0,0);
+  // getDay(): 0=Sun,1=Mon,...,6=Sat
+  // Days since Monday: Sun=6, Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5
+  const dayOfWeek=d.getDay();
+  const daysSinceMonday=dayOfWeek===0?6:dayOfWeek-1;
+  d.setDate(d.getDate()-daysSinceMonday);
+  return d;
+}
+function _parseLocalDate(s){
+  const p=String(s||'').split('-');
+  if(p.length!==3) return null;
+  const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  if(isNaN(d.getTime())) return null;
+  d.setHours(0,0,0,0); return d;
+}
+// ── Clock format: m:ss for paces and times, and the mile anchor as it prints. ──
+// D126 (V204): _clkMS is the SINGLE OWNER of the seconds limb. It rounds the WHOLE value before
+// splitting, so a ':60' limb is structurally impossible rather than corrected after the fact
+// (the technique _fmtHMS already uses). Suffixes belong to the caller: '/mi', '/100', or bare.
+function _clkMS(sec){
+  const t = Math.round(sec);
+  return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
+}
+function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
 
 // WIZARD
 
 // ── SHARED DAY CONSTANTS ──
-const ALL_DAYS_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
 const DAY_FULL={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 const DAY_SHORT={sun:'SU',mon:'MO',tue:'TU',wed:'WE',thu:'TH',fri:'FR',sat:'SA'};
 
@@ -1949,6 +2292,9 @@ const MIN_TRAIN_DAYS = {
 let wizardStep = 0;
 let lastRandIdx = -1;
 let currentRandDayKey = null;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setLastRandIdx(v){ lastRandIdx=v; }
+function _setCurrentRandDayKey(v){ currentRandDayKey=v; }
 
 // ── NEW WIZARD STRUCTURE ──
 // Steps: primary → profile → equipment → cardio_goal → lifting_focus → days → lifts → name
@@ -1967,8 +2313,6 @@ const WIZARD_STEPS = ['primary','profile','equipment','cardio_goal','lifting_foc
 //   • holdsTest=true (D184 c) when that short week holds the test of a dated test goal: the
 //     test date (from _rsRace) falls from the entered day through that Sunday. That week is
 //     not empty, so it does not snap: the start stays the entered day and week 1 is the test week.
-const _ISO_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
-function _isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _isoToday(){ const t=new Date(); t.setHours(0,0,0,0); return _isoOf(t); }
 // D184 (c): the test date the resolver is given, or null. Only a dated test goal has one (the
 // run_pace_goal family, PACE_GOALS); race goals, run_base, undated goals and non run programs get
@@ -2231,16 +2575,6 @@ const LIFTING_OPTIONS = {
   ],
 };
 
-// Lifting focus maps to internal goal for wave/exercise selection
-const LIFTING_FOCUS_TO_GOAL = {
-  strength: 'strength',
-  hypertrophy: 'hypertrophy',
-  fatloss: 'fatloss',
-  balanced: 'balanced',
-  support_strength: 'athletic',
-  support_athletic: 'athletic',
-  support_prevention: 'endurance',
-};
 
 function startWizard() {
   wizardStep = 0;
@@ -2258,12 +2592,6 @@ function startWizard() {
 
 
 
-// Experience-based 1RM defaults — conservative estimates
-const DEFAULT_1RM = {
-  beginner:    {bench:65,  squat:75,  deadlift:95},   // conservative untrained estimates (single source of truth)
-  intermediate:{bench:135, squat:155, deadlift:185},  // been at it a while, consistent
-  advanced:    {bench:225, squat:275, deadlift:315},  // solid lifter, knows the movements
-};
 function get1RMDefault(lift){
   return DEFAULT_1RM[WD.experience||'intermediate'][lift]||0;
 }
@@ -2293,13 +2621,6 @@ function wizardNext() {
   }
 }
 
-// D126 (V204): _clkMS is the SINGLE OWNER of the seconds limb. It rounds the WHOLE value before
-// splitting, so a ':60' limb is structurally impossible rather than corrected after the fact
-// (the technique _fmtHMS already uses). Suffixes belong to the caller: '/mi', '/100', or bare.
-function _clkMS(sec){
-  const t = Math.round(sec);
-  return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
-}
 function formatPacePerMile(totalSecs, distMiles) {
   if(!totalSecs || !distMiles || distMiles <= 0) return '';
   const paceSecPerMile = totalSecs / distMiles;
@@ -2317,7 +2638,7 @@ function runCalc(){
   res.innerHTML='<b style="color:var(--accent)">Estimated '+calcLift+' 1RM: '+est+' '+unit+'</b> <span style="color:var(--muted)">— for your reference; the app coaches by RPE.</span>';
 }
 function setCalcLift(l){
-  calcLift=l;
+  _setCalcLift(l);
   ['Deadlift','Squat','Bench'].forEach(n=>{
     const b=document.getElementById('calcLift_'+n);
     if(b){const on=(n===l);b.style.background=on?'var(--accent)':'transparent';b.style.color=on?'var(--on-ink)':'var(--muted)';}
@@ -3102,6 +3423,15 @@ function renderWizardStep() {
   }
 }
 
+/** The cardio goals as the engine passes them: buildProgram adds the athlete's experience and age bracket. */
+/** A pace goal's target (paceGoalTarget): the distance in miles, the total seconds, the pace per mile. */
+/** A CHI dose: how many continuous reps, how many minutes each, and the coach's note a session may add. */
+/** A pace goal's weekly paces (seconds per mile), and what the progression found on the way. */
+/** A cardio session as a builder returns it: the scheduler adds legLoad, and the goal id is the cfg's own string. */
+/** Where a week sits in the taper: its step (1 on, 0 outside it) of how many taper weeks. */
+/** The compressed 3-day quality phase: INT ramps over intSpan weeks, CHI runs from chiFrom to chiTo. */
+/** A run goal's weekly distances by session family, and the pace goal's paces. */
+
 
 // CARDIO PROGRESSIONS
 
@@ -3860,6 +4190,10 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
   return {easy:easyArr, interval:intervalArr, tempo:tempoArr, long:longArr, paceProgression};
 }
 
+// buildRunSession hands buildRunProgressionForLength the pace goal's inputs as statics on the function (_initialPace and
+// the rest), set just before the call and read inside it.
+// The schedule builder hands the run session its later inputs as trailing arguments, read inside as arguments[9] to [19]:
+// target distance and seconds, age bracket, mile best, volume freeze, quality phase, taper, pace shift, strides, benchmark, minutes.
 function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experience, forceType, eventTargeted, sessionOverride) {
   const tw = totalWeeks || 6;
   // V126: the legacy ids are aliased upstream, so this is now simply "is it the pace goal".
@@ -4250,6 +4584,13 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   return {type:'run', subtype, detail, note, week, goalId, dose:_dose||undefined};
 }
 
+/** A swim time goal's weekly paces (seconds per 100), and what the progression found on the way. */
+
+/** Days and whole weeks from today to a race (raceCountdown). */
+/** An NRC race goal laid back from its race date (raceAlignment). */
+/** The race week's pin (raceWeekPin), carried on the cfg for one build (cfg._racePin, deleted before the cfg is stored). */
+/** One week of a Nike Run Club plan, as transcribed: the long run, the speed sessions, the recovery runs (minutes, or a distance). */
+
 // ════════════════════════════════════════════════════════════════════
 // NRC ENGINE — 5K (8 wk) + 10K (8 wk) + Half Marathon (14 wk) + Marathon (18 wk)
 // TABLE-DRIVEN: transcribed directly from the Nike Run Club PDFs so the
@@ -4287,7 +4628,7 @@ function raceCountdown(raceIso, todayIso){
   const race = _parseLocalDate(raceIso); if(!race) return null;
   const today = todayIso ? _parseLocalDate(todayIso) : new Date(); if(!today) return null;
   today.setHours(0,0,0,0);
-  const days = Math.round((race - today)/86400000);
+  const days = Math.round((race.getTime() - today.getTime())/86400000);
   return {days, weeks: Math.floor(days/7)};
 }
 // D182 (V223): raceCountdownWords(cd) → {card, copy} for a raceCountdown result, null on null.
@@ -4314,10 +4655,10 @@ function raceAlignment(goalId, raceIso, eventOn, todayIso){
   const today = todayIso ? _parseLocalDate(todayIso) : new Date(); today.setHours(0,0,0,0);
   const todayMon = getWeekMonday(_isoOf(today));
   const weeksOut = raceCountdown(raceIso, todayIso).weeks;   // D182: one day-count in the file
-  const openWeek = Math.max(1, Math.min(tw, Math.round((todayMon - start)/86400000/7) + 1));
-  const futureWeeks = Math.max(0, Math.round((start - todayMon)/86400000/7));
+  const openWeek = Math.max(1, Math.min(tw, Math.round((todayMon.getTime() - start.getTime())/86400000/7) + 1));
+  const futureWeeks = Math.max(0, Math.round((start.getTime() - todayMon.getTime())/86400000/7));
   const floor = NRC_PLAN_FLOOR[goalId];
-  return {tw, raceIso, raceDay:_ISO_ORDER[Math.round((race - raceMon)/86400000)], raceMon:_isoOf(raceMon),
+  return {tw, raceIso, raceDay:_ISO_ORDER[Math.round((race.getTime() - raceMon.getTime())/86400000)], raceMon:_isoOf(raceMon),
           start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
           behindWeeks: futureWeeks ? 0 : openWeek - 1};
 }
@@ -4329,7 +4670,7 @@ function raceAlignment(goalId, raceIso, eventOn, todayIso){
 function testWeekIndex(startIso, raceIso){
   const s = _parseLocalDate(startIso), t = _parseLocalDate(raceIso);
   if(!s || !t || t < s) return null;
-  const days = Math.round((getWeekMonday(_isoOf(t)) - getWeekMonday(_isoOf(s))) / 86400000);
+  const days = Math.round((getWeekMonday(_isoOf(t)).getTime() - getWeekMonday(_isoOf(s)).getTime()) / 86400000);
   return Math.floor(days / 7) + 1;   // week 1 is the week holding the start
 }
 // The race-week pin: race day is the entered date's weekday; every train day AFTER it in
@@ -4584,6 +4925,7 @@ function getNRCSessionTypes(nRunDays, goalId) {
   }
 }
 
+// The schedule builder hands the bike session its ordinal among the week's bike days as a trailing argument, arguments[8].
 function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assignedType, recoveryMode, taper) {
   const tw = totalWeeks || 6;
   // ── V140 (Tier-3 Q7 signed): THE FTP CARD DELIVERS FTP WORK ────────────────
@@ -4993,6 +5335,17 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   if(segments) detail = segments.map(sg => sg.label + ': ' + sg.text).join('\n');
   return {type:'swim', subtype, detail, note, week, goalId, segments: segments || undefined};
 }
+
+/** One row of the pace chart: seconds per mile for each pace, total seconds for the *best columns. */
+/** A column of the pace chart. */
+/** How many days a week each sport gets. */
+/** The taper a program runs: its length in weeks, and each week's place in it. */
+/** Each week's cardio, by week number, then by training day. */
+/** The cfg as one build carries it: the race week's pin rides along (cfg._racePin), deleted before the cfg is stored. */
+/** What the week view says about the run's pace anchor (runAnchorInfo): the mile pace, where it came from, and the chart row. */
+/** A run-base athlete's frequency ramp: which of the chosen days run each week, and for how many minutes. */
+/** The base-cardio plan: the days chosen for cardio and the sport on each. */
+/** A spaced pick of run days (_nrcSpacedRunDays): the chosen indexes, each day's session type, and the ranking it won on. */
 
 
 // Speed-responsive goals depend on interval sessions to deliver their pace work.
@@ -6308,7 +6661,7 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
   // are attempted before run so the run's long day keeps its late-week placement whenever
   // moving another sport is enough — the long run being last is a real convention, and
   // this pass should spend the cheapest move that fixes the week.
-  const sports = Object.keys(sportDayIndices).sort((a,b)=>(a==='run')-(b==='run'));
+  const sports = Object.keys(sportDayIndices).sort((a,b)=>Number(a==='run')-Number(b==='run'));
   let guard = 0;
   for(const sp of sports){
     if(sp === _skipSport) continue;   // V213 (D146): chooser-planned run week, left as planned
@@ -6335,22 +6688,60 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
   }
   return 1;
 }
+// ── V172 (D7): THE RUN ANCHOR, STATED ────────────────────────────────────────
+// Every run pace the engines print comes from ONE chart row, and that row is picked by a
+// mile anchor the athlete was never shown — the V156 seed writes it into the wizard as if
+// typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
+// their own anchor logic and the assertion suite checks the two agree.
+const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
+function runAnchorInfo(cfg){
+  const c = cfg || {};
+  if(!(c.cardioTypes||[]).includes('run')) return null;
+  const g = c.cardioGoals && c.cardioGoals.run;
+  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
+  const exp = c.experience || 'intermediate';
+  const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
+  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
+  // Same rule as both engines: a falsy entry falls to the default (D188: every level).
+  const rawSec = entered ? entered : expDef;
+  const row = paceChartLookup('mile', rawSec);
+  // The chart CLAMPS: anything at or under its fastest row trains at that row, anything at
+  // or over its slowest trains there. row.mile is the anchor the engines actually use, so
+  // that is the number stated; when it differs from the entry, the sentence says so.
+  const anchorSec = row.mile;
+  const clamped = (!!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
+  const src = g.mileBestSrc || null;
+  const kind = !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
+  const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
+  // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
+  // the measure of progress is the projection card walking toward it.
+  const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
+}
 
-function buildHipSection(seed,bodyweight){
+/** The four core pillars' drills: anti-extension in a static and a loaded tier, the other three in one list each. */
+
+function buildHipSection(seed,bodyweight,keep){
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
   // 1 mobility piece, so a leg day can never come up all-stretches with zero abductor work.
   // Bodyweight tier ("Room only") swaps banded drills for equipment-free glute-med equivalents.
-  const stabPool=bodyweight
-    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction']
-    : EXLIB.hip_stability;
+  // D239 Amendment 1: keep is the injury plan's drop list, applied before the draw (all names when healthy).
+  const _keep=(n) => !keep||keep(n);
+  const stabPool=(bodyweight
+    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction','Copenhagen plank (bent knee)','Side plank (top leg raised)','Glute bridge hold','Copenhagen plank (long lever)']
+    : EXLIB.hip_stability).filter(_keep);
   const stab=pick(stabPool,2,seed);
-  const mob=pick(EXLIB.hip_mobility,1,seed+7);
+  const mob=pick(EXLIB.hip_mobility.filter(_keep),1,seed+7);
   const selected=[...stab,...mob];
   const details={
     "Clamshells w/ band":"2×15 each","Banded side steps":"2×20 each","Banded monster walks":"2×15 each","Standing band hip abduction":"2×15 each",
     "Hip airplane (light KB)":"2×6 each, slow","Seated banded hip flexion":"2×15 each","Weighted 90/90 hip switch":"2×6 each",
     "Side-lying leg raises":"2×15 each","Clamshells (bodyweight)":"2×20 each","Fire hydrants":"2×15 each","Standing hip abduction":"2×20 each",
-    "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side"
+    "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side",
+    "Copenhagen plank (bent knee)":"2×20 sec each","Side plank (top leg raised)":"2×20 sec each","Glute bridge hold":"2×30 sec",
+    "Cossack squat shift":"2×6 each side, slow","Half-kneeling hip flexor stretch":"2×45 sec each","Pigeon lift-offs":"2×8 each",
+    "Copenhagen plank (long lever)":"2×20 sec each","Kettlebell hip flexor raise":"2×10 each"
   };
   return {label:'Hip stability',hip:true,items:selected.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }
@@ -6359,11 +6750,14 @@ function buildHipSection(seed,bodyweight){
 // Two drills a day, fixed prescription, seeded off the hip section's seed so the two
 // prehab blocks never share a draw. Carries hip:true on purpose: every cap exemption,
 // injury-sweep protection and render rule keyed on that flag applies unchanged.
-function buildFootAnkleSection(seed,bodyweight,raceWeek){
+function buildFootAnkleSection(seed,bodyweight,raceWeek,keep){
   const details={
     'Tibialis raise (wall lean)':'2×20','Banded dorsiflexion':'2×15 each',
     'Single-leg bent-knee soleus raise':'2×12 each, slow','Standing ankle CARs':'2×5 each direction',
-    'Toe yoga (splay + big-toe lifts)':'2×10 each foot'
+    'Toe yoga (splay + big-toe lifts)':'2×10 each foot',
+    'Single-leg balance hold (eyes closed)':'2×30 sec each','Single-leg KB pass-around':'2×5 each direction, each leg',
+    'Kettlebell tibialis raise (seated)':'2×15','Split-squat heel-raise hold':'2×30 sec each','Knee-to-wall ankle rocks':'2×10 each',
+    'Towel scrunches':'2×20 each foot','Tiptoe walks':'2×30 yards'
   };
   // V180 (D8, Mario's concur): race week is dynamic mobility only. A random draw could hand
   // the athlete single-leg soleus raises on T-5 — loaded work, and the wrong side of the
@@ -6372,7 +6766,7 @@ function buildFootAnkleSection(seed,bodyweight,raceWeek){
     const rw=['Standing ankle CARs','Toe yoga (splay + big-toe lifts)'];
     return {label:'Foot & ankle — mobility only',hip:true,items:rw.map(n=>({name:n,detail:details[n]}))};
   }
-  const pool=bodyweight?EXLIB.foot_ankle_bw:EXLIB.foot_ankle;
+  const pool=(bodyweight?EXLIB.foot_ankle_bw:EXLIB.foot_ankle).filter(n=>!keep||keep(n));   // D239 Amendment 1
   const sel=pick(pool,2,seed+13);
   return {label:'Foot & ankle',hip:true,items:sel.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }
@@ -6446,12 +6840,14 @@ const CORE_PILLARS = {
       {name:'Bird dogs', detail:'3×20 alternating'},             // NSW + McGill Big 3
       {name:'McGill curl-up', detail:'3×6 each, 8 sec holds'},  // McGill Big 3
       {name:'Superman', detail:'3×12'},                         // NSW
-      {name:'RKC plank', detail:'3×20 sec max tension'}
+      {name:'RKC plank', detail:'3×20 sec max tension'},
+      {name:'Wall-press dead bug', detail:'3×8 each, slow'}            // D241 (P-BENCH): hands press a wall overhead
     ],
     loaded: [
       {name:'Ab wheel rollouts', detail:'3×8–10'},
       {name:'Weighted dead bugs', detail:'3×8 each'},
-      {name:'Barbell rollouts', detail:'3×8'}
+      {name:'Barbell rollouts', detail:'3×8'},
+      {name:'Hollow hold dumbbell press', detail:'3×30 sec'}           // D241 (P-BENCH): a hollow hold with a press riding on it
     ]
   },
   anti_rotation: { // Lateral stability — low fatigue, safe before anything
@@ -6484,7 +6880,10 @@ const CORE_PILLARS = {
       {name:'Hanging knee raises', detail:'3×12'},              // NSW
       {name:'Hanging leg raises', detail:'3×10'},
       {name:'Garhammer raises', detail:'3×12'},
-      {name:'Toes-to-bar', detail:'3×8'}
+      {name:'Toes-to-bar', detail:'3×8'},
+      {name:'Overhead sit-up', detail:'3×8'},                           // D241 (P-BENCH): NSW trains the sit-up for the PST
+      {name:'V-ups', detail:'3×8'},                                     // D241: the sit-up's harder rung
+      {name:'Farmer march', detail:'3×20 marches'}                      // D241: loaded hip flexion and bracing in place; the pillar's one member with no bar
     ]
   },
   rotational_power: { // Thoracic mobility / rotation — moderate, non-compressive
@@ -6502,7 +6901,8 @@ const CORE_PILLARS = {
       // rotational exposure. Each addition is DERIVED from a member already here, not invented.
       {name:'Standing torso rotations (slow)', detail:'3×10 each'},  // V178 _BW_SUBS target for Landmine rotations, promoted from substitution target to member; dose from the member it stands in for
       {name:'Side plank thread-the-needle', detail:'3×10 each'},     // NSW p.7 item 7 asks static AND dynamic trunk work; dynamic rotational form of Side plank, already prescribed from the NSW trunk table
-      {name:'Band woodchopper (door anchor)', detail:'3×12 each'}    // band form of Cable woodchoppers; dose copied from that member exactly
+      {name:'Band woodchopper (door anchor)', detail:'3×12 each'},   // band form of Cable woodchoppers; dose copied from that member exactly
+      {name:'Russian twist (heels down)', detail:'3×8 each'}            // D241 (P-BENCH): Mario's add, bodyweight only, heels down
     ]
   }
 };
@@ -6576,7 +6976,6 @@ const _BW_SUBS={
   'Ball slams OR Kettlebell swings':'Burpees',
   'Ball slams':'Burpees',
   'Kettlebell swing':'Jump squats',
-  'Kettlebell swing':'Jump squats',
   'Clamshells w/ band':'Clamshells (bodyweight)',
   'Banded side steps':'Side-lying leg raises',
   'Terminal knee extension (band)':'Wall sit',
@@ -6632,9 +7031,10 @@ const _STACK_LOADED=/^(face pull|pec deck|leg extension|rope tricep extension)\b
 // prescribes, and the guide's own volume-DOWN-as-intensity-climbs progression falls out
 // of the arithmetic instead of needing a second rule.
 const _POWER_COST = [
+  [/seated box jump/i,                                                    1.0], // D241: a seated takeoff onto the box, no countermovement and no landing from height
   [/depth jump|depth fall|box jump|in-?depth/i,                         2.0], // shock: landing from height. V178: 'depth fall' — same drop, same landing
   [/single-?leg landing|\bsl landing\b/i,                                1.5], // V178 (D2): a bilateral takeoff that LANDS on one leg is priced by the landing
-  [/single-?leg hop|single-?arm k[bB] snatch|bounding|split-?squat jump/i, 1.5], // unilateral landing
+  [/single-?leg hop|single-?arm k[bB] snatch|bounding|split[- ]?squat jump/i, 1.5], // unilateral landing
   [/broad jump|jump squat|tuck jump|skater bound|lateral bound|trap bar jump|\bjump\b|pogo/i, 1.0], // double-leg. V178: pogo hops priced here — unpriced they were the swing latch all over again (cost 0 = 'not power work')
   [/ball slam|wall ball|plyo push|clap push|kettlebell swing/i,         0.5], // no landing, low CNS: med-ball work + hip ballistics
   // V143: loaded weightlifting derivatives moved 0.5 → 1.0. At 0.5 they shared a tier with
@@ -6812,7 +7212,7 @@ function _powerAllowed(name, experience, injury, ageBracket){
   const ageCap = _POWER_AGE_MAX_COST[ageBracket||'18-35'] || 2.0;
   return c <= Math.min(expCap, ageCap);
 }
-const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation/i;
+const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation|ankle rock|towel scrunch|tiptoe walk|cossack|pigeon|hip flexor raise/i;   // D239: the slice 1 prehab doses are fixed
 function _bwSetsFromDetail(detail, wk, exp, prev){
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;
@@ -6986,6 +7386,17 @@ function bodyweightSweep(weeks, _bwExp, _bwPrev){
   }));
   return weeks;
 }
+function _setLeadingSets(d,n){
+  var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
+  if(m) return n+s.slice(m[1].length);
+  m=s.match(/^(\d+)\s*sets?\b/i);
+  if(m) return n+s.slice(m[1].length);
+  return s;
+}
+
+/** The NRC week's run shape (_nrcRunShape): the long run, its eve and the day after, and the speed and easy days. */
+/** Two adjacent days: week and day of the first, week and day of the second, and the pair's index in the program. */
+/** A day as the core injector reads and writes it: its sections, its tags and its cardio. */
 
 // Build a core finisher block applying the PRIORITY + PLACEMENT rules.
 //  week           — weekly pillar/exercise rotation
@@ -7090,7 +7501,12 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
     const key = ['dynamic_bracing','anti_extension_loaded','rotational_power'][((R-1)%3+3)%3];
     if(key==='anti_extension_loaded'){
       pillar='anti_extension';
-      items=[rot(P.anti_extension.loaded, R), rot(P.anti_extension.static, R)];
+      // D241 (F1, F2): this branch fires only when R ≡ 2 (mod 3), so rot(arr, R) is index 0 forever; it rotates on the
+      // pillar's own firing count, like rotational power, and the loaded list goes through the gear lens (no loaded
+      // member is legal on bodyweight, which draws two static members instead).
+      const T3L = Math.floor((R-1)/3);
+      const _ld = equip===undefined ? P.anti_extension.loaded : (equip==='bodyweight' ? [] : P.anti_extension.loaded.filter(it=>_auxGearOK(it.name, equip)));
+      items = _ld.length ? [rotOn(T3L,_ld,0), rotOn(T3L,P.anti_extension.static,0)] : [rotOn(T3L,P.anti_extension.static,0), rotOn(T3L,P.anti_extension.static,1)];
     } else {
       pillar=key;
       // V193 (D46): key cycles three ways on ((R-1)%3), so rotational_power (the index-2 slot)
@@ -7101,7 +7517,7 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
       // Same rotation + dedup shape dynamic_bracing already uses, one line below.
       const T3 = Math.floor((R-1)/3);
       items = (key==='dynamic_bracing')
-        ? [rot(_pi('dynamic_bracing'), R), rot(_pi('dynamic_bracing'), R+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)
+        ? [rotOn(T3,_pi('dynamic_bracing'),T3), rotOn(T3,_pi('dynamic_bracing'),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)   // D241: R steps by 3 here, so six members locked on two
         : [rotOn(T3,_pi(key),T3), rotOn(T3,_pi(key),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
     }
   }
@@ -7118,6 +7534,7 @@ function roleIsLegHeavy(role){ return LEG_HEAVY_ROLES.has(role); }
 function _coreTomorrowHot(weekObj, dayRoles, orderedTrain, idx){
   const next = orderedTrain[(idx+1) % orderedTrain.length];
   const nc = weekObj[next] && weekObj[next].cardio;
+  // @ts-expect-error a read nothing writes: no session carries assignedType, so this test is always false (handoff §12, for a ruling)
   const hotCardio = !!(nc && (nc.legLoad || CORE_SPEED_TYPES.has(nc.assignedType)));
   const hotLift = roleIsLegHeavy(dayRoles[next]); // heavy squat / deadlift days
   return hotCardio || hotLift;
@@ -7132,6 +7549,7 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
   const ordered = ALL_DAYS_ORDER.filter(d => trainDays.includes(d) && dayRoles[d] && dayRoles[d]!=='active' && !_hasTrunk(d));
   if(!ordered.length) return;
   const dist=(a,b)=>{const r=Math.abs(ALL_DAYS_ORDER.indexOf(a)-ALL_DAYS_ORDER.indexOf(b));return Math.min(r,7-r);};
+  // @ts-expect-error a read nothing writes: no session carries assignedType, so this test is always false (handoff §12, for a ruling)
   const isHardRun=d=>{const c=weekObj[d]&&weekObj[d].cardio;return !!(c&&CORE_SPEED_TYPES.has(c.assignedType));};
   const LIGHT=new Set(['push','push_light','full']); // prefer upper/light days; keep trunk off heavy legs/pull when possible
   const chosen=[];
@@ -7650,18 +8068,23 @@ function doGenerate(){
     // First program (list empty) arms the rest-timer discovery intro. Gating on list-empty —
     // NOT a localStorage flag — means it re-fires after a delete-all, so it's actually testable
     // and can't get permanently stuck the way ia_rt_seen / ia_rt_intro2 did.
-    _rtIntroPending=(programs.length===0);
+    _setRtIntroPending(programs.length===0);
     programs.push(prog);savePrograms(programs);
     // V221 D178: the wizard commits through the loader; the program is stored on the line
     // above, so the loader reads it. The wizard still lands on week 1: calcCurrentWeek() is
     // later than 1 for a back-dated start (race-aligned NRC), and the landing does not move.
     loadActiveProgram(prog.id);
-    currentWeek=1;
+    _setCurrentWeek(1);
     // Update generate screen to show actual week count
     document.getElementById('generateSub').textContent='Your '+prog.totalWeeks+'-week program is ready!';
     setTimeout(()=>{showScreen('screenWeek');renderWeekView();renderProgList();},600);
   },2400);
 }
+
+/** Engine A's timeline: the program's id and length, its days, its goals, the waves and the deload and taper resolvers. */
+/** Engine B's cardio: the schedule, the hip prehab flag and the taper. */
+/** Each training day's lifting role ('push', 'pull', 'legs', 'push_light', 'full', 'active'), by day key. */
+/** The calendar plan: the roles, and the note the leg and region deconfliction leaves (or null). */
 
 // ============================================================================
 // PROGRAM GENERATION PIPELINE  (decoupled A -> B -> C -> D)
@@ -7989,6 +8412,8 @@ function planCalendar(cfg, A, B){
   return { dayRoles, legRecoveryNote: recoveryNote };
 }
 
+/** What an injury does to a build (injuryPlan): the patterns dropped and capped, the names dropped and swapped, the flags. */
+
 // ── INJURY OVERLAY — COACHING PLAN (region × tier → engine effects) ─────────
 // cfg.injury = { region, tier }. Two tiers, matching how injuries actually behave:
 //   workaround — mild, warms up okay: keep the pattern, regress the variant, cap
@@ -8040,7 +8465,8 @@ function injuryPlan(cfg){
       // Loaded knee flexion under high eccentric tension flares an angry knee even
       // though the pattern reads hamstring — Nordic/GHR sit out in protect. Knee-cap
       // isometrics (wall sit, Spanish squat, TKE) are quad loading and sit out too.
-      P.dropNames=/nordic|glute-ham|\bghr\b|wall sit|spanish squat|terminal knee|knee extension|pistol/i;
+      // D239: so does the split-squat heel-raise hold, and the Cossack shift's deep knee bend.
+      P.dropNames=/nordic|glute-ham|\bghr\b|wall sit|spanish squat|terminal knee|knee extension|pistol|cossack|heel-raise hold/i;
       P.cardioMode='noimpact';
     } else {
       P.cap=new Set(['squat','lunge','leg_iso']);
@@ -8062,11 +8488,13 @@ function injuryPlan(cfg){
     if(T==='protect'){
       P.drop=new Set(['hinge','lunge','hip_ext']);
       P.cap=new Set(['squat']);
-      P.dropNames=/swing|pull-through|pull through/i;
+      // D239: the prehab block's adductor plank, end-range Cossack and bridge hold sit out with hip extension.
+      P.dropNames=/swing|pull-through|pull through|copenhagen|cossack|glute bridge hold|hip flexor raise/i;
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','lunge','hip_ext','squat']);
-      P.dropNames=/swing/i;
+      // D239: the adductor is the likeliest injured tissue in a hip plan, so the Copenhagen sits out here too.
+      P.dropNames=/swing|copenhagen/i;
       P.cardioMode='easy';
     }
   } else if(R==='lowback'){
@@ -8084,13 +8512,13 @@ function injuryPlan(cfg){
       // athlete rotates from the hip rather than the lumbar spine. Matches
       // 'landmine rotational', which does not touch 'Landmine rotations' (no 'al')
       // or 'Landmine reverse lunge'.
-      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through|landmine rotational/i;
+      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through|landmine rotational|barbell reverse lunge/i;   // D241: a back-racked lunge sits out (the flexion drills swap, below)
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','squat','row','hip_ext']);
       // V192 (D42): same reason as the protect tier above. 'hpress' is uncapped here
       // too, so the only lever that reaches this movement is the name.
-      P.dropNames=/good morning|swing|pendlay|landmine rotational/i;
+      P.dropNames=/good morning|swing|pendlay|landmine rotational|barbell reverse lunge/i;
       P.cardioMode='easy';
     }
   } else if(R==='shoulder'){
@@ -8103,7 +8531,7 @@ function injuryPlan(cfg){
       // Ab wheel and hanging work are named too — _pattern() returns null for core,
       // so P.drop can never reach them, and both load an irritated shoulder hard.
       P.drop=new Set(['hpress','vpress','tri_iso']);
-      P.dropNames=/\bdips\b|bench dips|lateral raise|front raise|ab wheel|hanging|l-sit|dragon flag/i;
+      P.dropNames=/\bdips\b|bench dips|lateral raise|front raise|ab wheel|hanging|l-sit|dragon flag|hollow hold dumbbell press|wall-press dead bug/i;   // D241
       P.cardioMode='swimout';
     } else {
       P.cap=new Set(['hpress','vpress','delt_iso']);
@@ -8112,7 +8540,7 @@ function injuryPlan(cfg){
       // Lateral raise out, front raise stays. The previous list had this backwards:
       // loaded abduction is the impingement arc, while a front raise in the scapular
       // plane is generally tolerated. Face pulls and rear delt work stay either way.
-      P.dropNames=/overhead|arnold|push press|military|pike pushup|pike pushups|handstand|wall walk|\bdips\b|bench dips|lateral raise/i;
+      P.dropNames=/overhead|arnold|push press|military|pike pushup|pike pushups|handstand|wall walk|\bdips\b|bench dips|lateral raise|shoulder press|plyo push|hollow hold dumbbell press/i;   // D241
       // V192 (D43): the workaround tier's job is to substitute, not just subtract.
       // The floor stops the elbow at torso depth — the impingement-adjacent range
       // the dropNames above already avoid. Runs after dropNames, so nothing here
@@ -8125,14 +8553,14 @@ function injuryPlan(cfg){
     if(T==='protect'){
       P.drop=new Set(['tri_iso','bi_iso','hpress','vpress']);
       P.cap=new Set(['row','vpull']);
-      P.dropNames=/\bdips\b|bench dips|skullcrush/i;
+      P.dropNames=/\bdips\b|bench dips|skullcrush|hollow hold dumbbell press|wall-press dead bug/i;   // D241
     } else {
       // V185 (D2-c): vpull added. D2 moved pulldowns off 'row', which would have handed a
       // cranky elbow an UNCAPPED lat pulldown. Chinups were already uncapped here, so this
       // is an existing gap the reclassification exposed rather than one it created: loaded
       // elbow flexion is loaded elbow flexion whichever direction you pull.
       P.cap=new Set(['hpress','tri_iso','bi_iso','row','vpull']);
-      P.dropNames=/\bdips\b|bench dips/i;
+      P.dropNames=/\bdips\b|bench dips|plyo push|hollow hold dumbbell press/i;   // D241
       P.swapNames={'Dumbbell skullcrushers':'Cable pushdown','Barbell curl':'Dumbbell hammer curl','Preacher curl':'Cable curl'};
     }
   }
@@ -8180,7 +8608,8 @@ function _capRpeClamp(d){
 function applyInjuryFilter(sections,cfg){
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
-  const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};
+  // D241 A2: the new flexion and twist drills swap to spine-safe ones the way the hanging raises do, so a lowback core block keeps its count.
+  const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs','Overhead sit-up':'Dead bugs','V-ups':'Bird dogs','Russian twist (heels down)':'Standing torso rotations (slow)'};
   const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck/i;
   const out=[];
   sections.forEach(s=>{
@@ -8198,7 +8627,7 @@ function applyInjuryFilter(sections,cfg){
       if(pat&&P.drop.has(pat)) return;
       if(P.dropNames&&P.dropNames.test(name)) return;
       if(P.noJumps&&JUMPS.test(name)) return;
-      if(P.noCarry&&/carry/i.test(name)) return;
+      if(P.noCarry&&/carry|farmer march/i.test(name)) return;   // D241: a farmer march is a carry in place
       if(P.spineSafeCore&&Object.prototype.hasOwnProperty.call(SPINE_SWAP,name)){
         const sw=SPINE_SWAP[name];
         if(!sw) return;
@@ -8247,6 +8676,13 @@ function injuryDayTitle(role,cfg){
   return null;
 }
 
+/** One week of a lifting wave: sets, reps (a count, or a range like '8–12'), the load as a share of the 1RM, and the taper or deload it carries. */
+/** What Engine C reads of Engine A's timeline (engineA_timeline). */
+/** What Engine C reads of Engine B's cardio (engineB_cardio). */
+/** What a day's sections are built with: the full-body variant, the hard day after, the carry, the day's cardio. */
+/** Engine C: a day's sections by role and week, and the gear lens its pools read. */
+/** One week's movements, drawn per rotation block (getEx). */
+
 // ── ENGINE C — KINEMATIC POOL FILTER (exercise selection + RPE prescription) ─
 // Pure-RPE coaching (scheme()/rpeFromWave()) over Engine-A's wave resolver and
 // equipment-filtered EXLIB pools. Needs includeHip from B for the hip module on
@@ -8266,6 +8702,10 @@ function engineC_kinematics(cfg, A, B){
   // Injury overlay plan (null when healthy). Read by scheme() for the RPE 7 clamp on
   // capped patterns and by the pool-override block below for protect-tier substitutions.
   const _inj = injuryPlan(cfg);
+  // D239 Amendment 1: the plan's drop list comes out of the prehab pools before the draw, so an injured athlete's hip
+  // and foot & ankle blocks keep their full count instead of losing a drawn drill to applyInjuryFilter afterwards.
+  // D241: and the experience floor (EX_MIN_EXP), so the long-lever Copenhagen reaches only an advanced athlete.
+  const _prehabKeep = (n) => !(_inj && _inj.dropNames && _inj.dropNames.test(n)) && _expOK(n, cfg.experience);
   // V153 (F2): set by buildSections from opts.hotNext at entry, read by scheme(). A
   // closure variable rather than a scheme() parameter because scheme has ~30 call sites
   // and _inj/strengthSupport already travel this exact road. Days build serially, so a
@@ -8531,7 +8971,7 @@ function engineC_kinematics(cfg, A, B){
   const olderHyp=(goal==='hypertrophy')&&(cfg.ageBracket==='55+'||cfg.ageBracket==='36-54');
   let chestCompoundPool=hasBarbell?_gear(olderHyp?['Dumbbell bench press','Dumbbell incline press','Machine chest press','Close-grip bench press']:EXLIB.chest_compound):_bw(['Incline pushups (hands on bed)','Pushups (slow 3s eccentric)','Decline pushups (feet elevated)','Diamond pushups','Archer pushups'],['Dumbbell bench press','Dumbbell incline press','Dumbbell decline press','Pushup variation (weighted)']);
   let backCompoundPool=hasBarbell?EXLIB.back_compound:_bw(['Inverted row (knees bent, under a table)','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell single-leg deadlift','Dumbbell Romanian deadlift']);
-  let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)']);
+  let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)','Heel-elevated goblet squat']);
   // V210 (2b): advanced 55+ older hypertrophy on crossfit or home_full draws goblet OR front
   // squat, once, for the whole program (hypertrophy is locked; the lock outranks alternation).
   // Under any shoulder or elbow plan the front rack is withheld on every tier: it loads wrist
@@ -8544,7 +8984,11 @@ function engineC_kinematics(cfg, A, B){
   // V192 (D41): the frontal-plane lunge reaches the no-barbell tier through the LOADED
   // list only. The bodyweight list beside it is a rung ladder (easy->hard, windowed by
   // _bwRung); a goblet needs a bell, and inserting it there would also shift the window.
-  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat','Dumbbell goblet side lunge']);
+  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat','Dumbbell goblet side lunge','Deficit reverse lunge (KB)','Goblet side lunge to knee drive','Step-downs (KB)']);
+  // D241: a plan's drop list leaves the lunge pool before the draw (filtered here, before _preInj, so the injury guard
+  // does not read it as a redirect). Today it takes one name: the back-racked barbell reverse lunge under either lowback
+  // plan, which already keeps every barbell squat away; the slot draws a held lunge instead of printing short.
+  { const _ip=injuryPlan(cfg), _dn=_ip&&_ip.dropNames; if(_dn) lungePool=lungePool.filter(n=>!_dn.test(n)); }
   let hingePool=hasBarbell?EXLIB.hinge.filter(n=>_expOK(n,cfg.experience)):_bw(['Bodyweight back extension','Single-leg glute bridge','Single-leg Romanian deadlift (bodyweight)','Nordic hamstring curl (anchored)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell Romanian deadlift','Double Kettlebell deadlift']);
   // Loaded posterior-chain / hip-extension pool. Complements the hinge (RDL is hamstring/
   // erector-biased; these are glute- and eccentric-hamstring-biased). GHR/Nordic are the
@@ -8576,7 +9020,7 @@ function engineC_kinematics(cfg, A, B){
   // through on every tier including bodyweight. Gated here the way lungePool is
   // gated one screen above. The no-barbell branch is EXLIB.shoulder minus the
   // landmine, member for member, so no other tier's shoulder content moves.
-  const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press']);
+  const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Seated dumbbell shoulder press']);
   // V193 (same-card, slice 5): the chest-accessory pool was an inline literal at its ONE
   // draw site, so buildSections had no legal way to re-walk it when the name it was handed
   // turned out to be the name the day's Main lift already held. It is a named pool now, on
@@ -8597,8 +9041,10 @@ function engineC_kinematics(cfg, A, B){
   // shares the same internal 'athletic' goal but keeps the standard calisthenic day.)
   const athleticSupport=cfg.liftingFocus==='support_athletic';
   const powerPool=hasBarbell
-    ?['Broad jumps','Box jumps','Jump squats','Kettlebell swing','Power clean (light & explosive)','Trap bar jump','Pogo hops','Rotational jump to single-leg landing','Depth fall to single-leg bounds']
-    :_bwFlat(['Jump squats','Broad jumps','Tuck jumps','Skater bounds','Split-squat jumps','Lateral bounds','Pogo hops','Rotational jump to single-leg landing'],['Broad jumps','Jump squats','Tuck jumps','Lateral bounds','Kettlebell swing','Single-arm KB snatch','Pogo hops']);
+    ?['Broad jumps','Box jumps','Jump squats','Kettlebell swing','Power clean (light & explosive)','Trap bar jump','Pogo hops','Rotational jump to single-leg landing','Depth fall to single-leg bounds','Split-squat jumps','Bulgarian split squat jumps','Plyo pushups','Single-leg box jumps','Seated box jumps']
+    :_bwFlat(['Jump squats','Broad jumps','Tuck jumps','Skater bounds','Split-squat jumps','Lateral bounds','Pogo hops','Rotational jump to single-leg landing','Bulgarian split squat jumps','Plyo pushups'],['Broad jumps','Jump squats','Tuck jumps','Lateral bounds','Kettlebell swing','Single-arm KB snatch','Pogo hops','Split-squat jumps','Bulgarian split squat jumps','Plyo pushups']);
+  // D241 (P-BENCH): split-squat jumps reach the loaded tiers; the Bulgarian split squat jumps, plyo pushups and the single-leg
+  // and seated box jumps join, each priced by _POWER_COST (1.5, 0.5, 2.0, 1.0), so _powerAllowed gates them by cost.
   // V178 (D2/D4): three additions. Pogo hops (1.0, stiffness/elastic), rotational jump to
   // single-leg landing (1.5, priced by the landing), depth fall to single-leg bounds (2.0
   // shock — advanced AND 18–35 only, by the existing min(exp,age) cap; no new gate). The
@@ -9053,7 +9499,7 @@ function engineC_kinematics(cfg, A, B){
       // 2×20 tibialis raises; what the block buys in weeks 13–14 is tissue readiness in the
       // structures that fail late in a half. Hip stability stays dropped: banded abduction
       // carries real glute-med fatigue and dropping it here was a deliberate call.
-      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace));
+      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace,_prehabKeep));
       return s;
     }
     if(role==='push'||role==='push_light'){
@@ -9093,7 +9539,7 @@ function engineC_kinematics(cfg, A, B){
         // the floor case at 3 — Bird dogs, Side plank, Plank shoulder taps, the three members
         // _AUX_GEAR (search '_AUX_GEAR=') leaves untagged. Re-derive, do not trust this line.
         const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));
-        const _ae=CORE_PILLARS.anti_extension.static;
+        const _ae=CORE_PILLARS.anti_extension.static.filter(it=>_prehabKeep(it.name));   // D241: the plan's drops leave before the draw (the overhead wall press on a protect shoulder or elbow)
         // V193 (slice 4): 'Bird dogs' is a member of BOTH pillars — D49 added it to
         // anti-rotation and anti_extension.static has always held it — and these two sections
         // draw from two independent rotations, so the same movement could land on both and
@@ -9161,7 +9607,7 @@ function engineC_kinematics(cfg, A, B){
         const lightPress=pick(lightPressPool.length?lightPressPool:[_lpFallback],1,blockSeed(w)+40)[0];
         const lightTri=pick(_bw(['Bench dips (chair)','Close-grip pushups','Diamond pushups'],_gear(EXLIB.triceps)),1,blockSeed(w)+41)[0];
         s.push({label:'Main — '+lightPress,items:[{name:lightPress,detail:vsets(3)+'×12 — RPE 6–7, leave 3+ in reserve'+restNote},{name:ex.shoulder[1],detail:vsets(3)+'×12'+(_isOneArmPress(ex.shoulder[1])?' each':'')}]});
-        s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'},{name:lightTri,detail:vsets(3)+'×15'}]});
+        s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'+(_isOneArmPress(ex.chestAcc[1])?' each':'')},{name:lightTri,detail:vsets(3)+'×15'}]});
         if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)
           s.push({label:'Light finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[2],detail:vsets(3)+'×15'},{name:ex.cond[3],detail:vsets(3)+'×12'}]});
         else {
@@ -9227,7 +9673,7 @@ function engineC_kinematics(cfg, A, B){
         // 2) Secondary varied compound (3 sets)
         s.push({label:'Secondary compound — '+secondary,items:[{name:secondary,detail:hsets+'×'+repA}]});
         // 3) Hypertrophy/pump accessories (chest angle + 2 delts)
-        s.push({label:'Chest volume',items:[{name:chest2[0],detail:hsets+'×'+repB}]});
+        s.push({label:'Chest volume',items:[{name:chest2[0],detail:hsets+'×'+repB+(_isOneArmPress(chest2[0])?' each':'')}]});   // D241: a one-arm press prints its side
         s.push({label:'Delts',superset:true,rounds:hsets,items:[{name:delts[0],detail:hsets+'×'+repB},{name:delts[1],detail:hsets+'×'+repB}]});
         // 4) Direct isolation slot (triceps)
         s.push({label:'Triceps',superset:true,rounds:hsets,items:[{name:tris[0],detail:hsets+'×'+repA},{name:tris[1],detail:hsets+'×'+repB}]});
@@ -9272,12 +9718,12 @@ function engineC_kinematics(cfg, A, B){
         const _accA=_accFresh([ex.chestAcc[0],ex.chestAcc[1]]);
         if(_accA){
           const _sp=_ssPair(_accA,ex.shoulder[1],[],shoulderAccPool.filter(n=>n!==ex.shoulder[0]));
-          s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
+          s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'+(_isOneArmPress(_sp.a)?' each':'')},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
         }
       }
       if(!isBeginner){
         const _ckA=_accFresh([ex.chestAcc[1],ex.chestAcc[0]]);
-        if(_ckA) s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:_ckA,detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
+        if(_ckA) s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:_ckA,detail:vsets(3)+'×12'+(_isOneArmPress(_ckA)?' each':'')},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
       }
       }
     } else if(role==='pull'){
@@ -9441,10 +9887,10 @@ function engineC_kinematics(cfg, A, B){
         s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});
         s.push({label:'Leg isolation',superset:_laItems.length>1,rounds:hsets,items:_laItems});
       }
-      if(includeHip)s.push(buildHipSection(seed+w,isBW));
+      if(includeHip)s.push(buildHipSection(seed+w,isBW,_prehabKeep));
       // V178 (D3): foot & ankle rides with hip stability for runners. An ankle-region injury
       // plan owns that joint through the rehab section, so the prehab block steps aside.
-      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW));
+      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,false,_prehabKeep));
       // Loaded carry surfaces beyond the full day: a grip/posterior/core finisher on legs day,
       // a fresh pick so it doesn't echo the full day's carry. Gated on session length to respect
       // shorter workouts.
@@ -9613,6 +10059,11 @@ function engineC_kinematics(cfg, A, B){
   return { buildSections, gearOK:_gearOK };
 }
 
+
+/** A day's training region, as the regional caps count it; core and grip are tagged and never capped. */
+/** A fatiguing movement pattern (_pattern); holds, carries, core, ballistic and conditioning work have none. */
+/** The swap sheet's like-for-like family for an accessory with no pattern (V162). */
+/** A rep window [lo, hi]; [0, 0] is unloadable (reps emerge from the effort prescribed). */
 // ── REGIONAL FATIGUE CAP ────────────────────────────────────────────────────
 // Within-day guard against same-region volume stacking. deconflictSameRegion
 // spaces press/leg days ACROSS the week; this caps the load WITHIN a single day.
@@ -9767,7 +10218,7 @@ function _pattern(name){
   // Without this classification the movement is _pattern-null: invisible to all three
   // region caps, and KEPT by applyInjuryFilter even at shoulder/protect.
   if(/^landmine rotational press$/.test(N)) return 'hpress';
-  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up/.test(N)) return null; // core, exempt
+  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up|sit-up|v-up|russian twist|farmer march/.test(N)) return null; // core, exempt (D241 names the four new drills) // core, exempt
   // REHAB DRILLS ARE NOT REGIONAL VOLUME. Wrist/forearm and scapular work is low-load
   // corrective loading; scoring it against a ceiling misreads the day. Without this the
   // generic catch-alls below swallowed them and the injury filter then DROPPED them from
@@ -9779,7 +10230,10 @@ function _pattern(name){
   // V178: hip/foot prehab and the renegade row are exempt. 'Renegade rows' would otherwise
   // score as a row; 'Standing ankle CARs' / 'soleus raise' would otherwise be invisible
   // by accident rather than by rule. Named here so the exemption is deliberate.
-  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90/.test(N)) return null;
+  // D239 (P-BENCH): the slice 1 prehab names. Three of them would otherwise be read as training
+  // patterns: 'Split-squat heel-raise hold' and 'Cossack squat shift' by the /squat/ catch-all,
+  // 'Glute bridge hold' by the hip_ext rule. The two new planks already left at the core line.
+  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90|balance hold|pass-around|heel-raise hold|ankle rock|towel scrunch|tiptoe walk|glute bridge hold|cossack|hip flexor stretch|pigeon|hip flexor raise/.test(N)) return null;
   // Wall slides are scap/rear-delt work, not a press. Classified on introduction (V127) so
   // the movement is never invisible to capRegionalFatigue or deconflictAdjacentDupes — the
   // mistake Ball slams is still living with. Must precede the wall-walk rule: both contain
@@ -9850,7 +10304,7 @@ function _pattern(name){
   if(/curl/.test(N)) return 'bi_iso';
   if(/back squat|front squat|box squat|hack squat|leg press|goblet squat/.test(N)) return 'squat';
   if(/deadlift|romanian|good morning|swing|hinge/.test(N)) return 'hinge';
-  if(/lunge|split squat|step-up|step up/.test(N)) return 'lunge';
+  if(/lunge|split squat|step-up|step up|step-down/.test(N)) return 'lunge';   // D241: 'Step-downs (KB)' is a lunge
   if(/leg extension|leg curl|leg iso/.test(N)) return 'leg_iso';
   if(/calf|calves/.test(N)) return 'calf_iso';
   if(/squat/.test(N)) return 'squat';
@@ -9879,12 +10333,15 @@ const _AUX_FAMILY={
   'Cable woodchoppers':'core','Landmine rotations':'core','Medicine ball rotary toss':'core',
   'Standing torso rotations (slow)':'core','Side plank thread-the-needle':'core',
   'Band woodchopper (door anchor)':'core',
+  // D241 (P-BENCH): the new core and power names get their swap families.
+  'Wall-press dead bug':'core','Hollow hold dumbbell press':'core','Overhead sit-up':'core','V-ups':'core','Farmer march':'core','Russian twist (heels down)':'core',
   'Farmer carry':'carry','Suitcase carry':'carry','Overhead carry':'carry',
   'Trap bar farmer carry':'carry',
   'Ball slams':'power','Broad jumps':'power','Dumbbell snatch':'power','Kettlebell clean':'power',
   'Lateral bounds':'power','Power clean (light & explosive)':'power',
   'Single-arm KB snatch':'power','Skater bounds':'power','Trap bar jump':'power','Tuck jumps':'power',
   'Wall ball shots':'power',
+  'Plyo pushups':'power','Bulgarian split squat jumps':'power','Single-leg box jumps':'power','Seated box jumps':'power',
   'Burpees':'cond','High knees':'cond','Mountain climbers':'cond',
   'Wall sit':'hold','Single-leg wall sit':'hold','Spanish squat hold (KB)':'hold',
   'Cable crossover':'chest_iso','Pec deck':'chest_iso'
@@ -9905,7 +10362,7 @@ const _AUX_FAMILY_LABEL={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLIST
 // bodyweight athlete. Band, not cable, is the right tag: the band is the looser implement
 // and the movement genuinely runs off one, so the tier set is the /\bband\b/ clause's
 // (everything that owns bands: not bodyweight, not minimal).
-const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
+const _AUX_GEAR={'Farmer march':'loaded','Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
 function _auxGearOK(name,equip){
   const _g=_AUX_GEAR[String(name||'').trim()];
   if(_g==='loaded') return equip!=='bodyweight';
@@ -9918,25 +10375,6 @@ function _auxGearOK(name,equip){
   if(/kettlebell|\(kb|\bkb\b|dumbbell|\(db\b/.test(N)) return equip!=='bodyweight';
   if(/\bband\b/.test(N)) return equip!=='bodyweight'&&equip!=='minimal';   // V193 (D46): wizard equipment copy gives bands to home_full, home_basic and crossfit
   return true;
-}
-// Candidates for a null-pattern swap: same family, not already on the card, gear-legal,
-// injury-legal through the REAL filter (no second copy of the drop rules), and — for the
-// power family — through _powerAllowed, so age/experience power doctrine cannot be
-// bypassed through the side door of a swap.
-function auxSwapCandidates(outName,day,prog){
-  const fam=_auxFamily(outName); if(!fam) return [];
-  const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unchanged: injury only)
-  const onCard=Object.create(null);
-  ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
-  const _ssP=_ssPartnerOf(day,outName);   // V164 D5: same partner filter as swapCandidates
-  return Object.keys(_AUX_FAMILY).filter(function(n){
-    if(n===outName||_AUX_FAMILY[n]!==fam) return false;
-    if(onCard[n.toLowerCase()]) return false;
-    if(!_auxGearOK(n,cfg.equipment||'home_full')) return false;
-    if(fam==='power'&&typeof _powerAllowed==='function'&&!_powerAllowed(n,cfg.experience,cfg.injury,cfg.ageBracket)) return false;
-    if(_ssP&&!_ssLegal(n,_ssP)) return false;         // V164 D5
-    return _swapInjuryOK(n,cfg);
-  }).sort();
 }
 // ── MOVEMENT REP FLOOR ───────────────────────────────────────────────────────
 // The wave descends reps (4x6 -> 4x3) on one premise: fewer reps at a higher RPE means
@@ -10020,6 +10458,86 @@ function _repFloor(name){
   for(let i=0;i<_REP_FLOOR.length;i++){ if(_REP_FLOOR[i][0].test(N)) return _REP_FLOOR[i][1]; }
   return null;
 }
+// ── Swap preferences: a swap the athlete made, carried into every build (applySwapPrefs) with its detail and injury check. ──
+// Survives the athlete's injury plan? Wrapped as a throwaway section so the real
+// filter does the judging — no second copy of the drop rules.
+function _swapInjuryOK(name,cfg){
+  if(!cfg||!cfg.injury) return true;
+  try{
+    const out=applyInjuryFilter([{label:'x',items:[{name:name,detail:'3×5'}]}],cfg);
+    return !!(out&&out[0]&&out[0].items&&out[0].items.length&&out[0].items[0].name===name);
+  }catch(e){ return true; }
+}
+// Name-level substitution over a day's sections. Returns true when anything changed.
+// Section labels embed the exercise name ("Main — Deadlift"), so they move too, the
+// same way bodyweightSweep handles it.
+// A swap or an add can land on a movement that has no load to move. Between two loaded
+// movements the prescription carries verbatim and stays honest, because pure RPE
+// self-corrects — "4×5 @ RPE 8" means something on any bar. It does not survive the jump
+// to bodyweight: "3×10–12 at RPE 7" on a pushup is a guess at the athlete's capacity, not
+// an instruction, and the sheet's own promise ("whatever you pick keeps 3×10–12 at RPE 7")
+// is then false for anyone who can do thirty of them.
+//
+// No new dialect for this. The three pieces already exist and are already tested:
+// _repFloor knows which movements are unloadable, _BW_KEEP_FIXED protects the ones that
+// legitimately carry a number anyway (timed holds, plyos, carries, core bracing), and
+// _bwSetsFromDetail writes the copy the bodyweight tier has shipped since V94. This is
+// the same conversion bodyweightSweep runs, reached from the swap sheet instead of from
+// the config. (V119. §12 records the general case: 58.7% of unloadable-movement
+// prescriptions still arrive from generation with a fixed rep target on every other tier.)
+function _swapDetailFor(name,detail,out){
+  if(!name||!detail) return detail;
+  const fl=(typeof _repFloor==='function')?_repFloor(name):null;
+  // V221 D177 (R1, R2). A swapped Main is prescribed the way the engine would have
+  // prescribed the candidate in that slot: scheme()'s floor branch, on the wave Main
+  // grammar and nothing else. The detail must start `S×R — RPE ` with R a number or a
+  // lo–hi range, and the low end is compared exactly as scheme() compares it. Under the
+  // window's low end the rep token becomes the window; sets, RPE, note, ramp-up and rest
+  // carry byte for byte. At or above it the donor carries verbatim. The null row never
+  // gets here with a window, so barbell compounds carry verbatim too.
+  // This sits BEFORE the _BW_KEEP_FIXED test on purpose: that regex holds `rotational`,
+  // which would shut out Landmine rotational press, a loaded lift the unilateral row windows.
+  // `out` is optional. A caller that passes one learns the window fired (the swap toast).
+  if(fl&&fl[1]!==0){
+    const m=/^(\d+×)(\d+(?:–\d+)?)( — RPE )/.exec(detail);
+    if(m){
+      const lo=parseInt(m[2],10);
+      if(!(lo>=fl[0])){
+        if(out) out.win=[fl[0],fl[1]];
+        return m[1]+fl[0]+'–'+fl[1]+detail.slice(m[1].length+m[2].length);
+      }
+    }
+    return detail;
+  }
+  if(!(fl&&fl[1]===0)) return detail;                 // movement can express a rep target
+  if(_BW_KEEP_FIXED.test(name)) return detail;        // holds, plyos, carries, core
+  // TWO SYSTEMS HAVE TO AGREE. _repFloor's unloadable clause is a broad regex
+  // (/\bdips\b|pushup/), so it also catches five movements the LOG side is about to hand
+  // a weight field to: Bench dips, Weighted dips, Glute-ham raise, Pushup variation
+  // (weighted), Single-leg glute bridge (weighted). If the app will show you somewhere to
+  // write a number, a rep target is a real instruction and must not be taken away.
+  // Harvested from the file, not hand-listed — five of 217 names disagree.
+  try{ if(typeof isTrackableWeight==='function' && isTrackableWeight(name,detail)) return detail; }catch(e){}
+  if(!/^\s*\d+\s*[×x]\s*\d/.test(detail)) return detail;  // already open-ended
+  return _bwSetsFromDetail(detail);
+}
+function applySwapPrefs(sections,map){
+  if(!Array.isArray(sections)||!map) return false;
+  let hit=false;
+  sections.forEach(sec=>{
+    if(!sec||!Array.isArray(sec.items)) return;
+    sec.items.forEach(it=>{
+      if(!it||!it.name) return;
+      const to=map[it.name];
+      if(!to||to===it.name) return;
+      const was=it.name;
+      it.name=to; hit=true;
+      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));
+      if(sec.label&&sec.label.indexOf(was)>=0) sec.label=sec.label.split(was).join(to);
+    });
+  });
+  return hit;
+}
 // Which region a pattern belongs to (for ceiling bookkeeping + interference).
 // ── EXERCISE SWAP ────────────────────────────────────────────────────────────
 // Session-scoped substitution. The athlete trades one lift for another on the day
@@ -10058,15 +10576,6 @@ function _dayPlanCfg(prog,day){
   const ov=dayOverlayInfo(day);
   if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
   return Object.assign({},base,{injury:ov.patch.injury});
-}
-// Survives the athlete's injury plan? Wrapped as a throwaway section so the real
-// filter does the judging — no second copy of the drop rules.
-function _swapInjuryOK(name,cfg){
-  if(!cfg||!cfg.injury) return true;
-  try{
-    const out=applyInjuryFilter([{label:'x',items:[{name:name,detail:'3×5'}]}],cfg);
-    return !!(out&&out[0]&&out[0].items&&out[0].items.length&&out[0].items[0].name===name);
-  }catch(e){ return true; }
 }
 // Candidates for the ADD picker (V109). Same legality machinery as swapCandidates —
 // same universe harvest (travel-spliced, equipment-legal), same injury filter, same
@@ -10202,76 +10711,6 @@ function swapLoadNote(outName,candName){
   const d=_compoundTier(outName)-_compoundTier(candName);
   if(d<2) return '';
   return 'Much lighter than '+outName.toLowerCase()+'. Volume holds, top-end strength does not.';
-}
-// Name-level substitution over a day's sections. Returns true when anything changed.
-// Section labels embed the exercise name ("Main — Deadlift"), so they move too, the
-// same way bodyweightSweep handles it.
-// A swap or an add can land on a movement that has no load to move. Between two loaded
-// movements the prescription carries verbatim and stays honest, because pure RPE
-// self-corrects — "4×5 @ RPE 8" means something on any bar. It does not survive the jump
-// to bodyweight: "3×10–12 at RPE 7" on a pushup is a guess at the athlete's capacity, not
-// an instruction, and the sheet's own promise ("whatever you pick keeps 3×10–12 at RPE 7")
-// is then false for anyone who can do thirty of them.
-//
-// No new dialect for this. The three pieces already exist and are already tested:
-// _repFloor knows which movements are unloadable, _BW_KEEP_FIXED protects the ones that
-// legitimately carry a number anyway (timed holds, plyos, carries, core bracing), and
-// _bwSetsFromDetail writes the copy the bodyweight tier has shipped since V94. This is
-// the same conversion bodyweightSweep runs, reached from the swap sheet instead of from
-// the config. (V119. §12 records the general case: 58.7% of unloadable-movement
-// prescriptions still arrive from generation with a fixed rep target on every other tier.)
-function _swapDetailFor(name,detail,out){
-  if(!name||!detail) return detail;
-  const fl=(typeof _repFloor==='function')?_repFloor(name):null;
-  // V221 D177 (R1, R2). A swapped Main is prescribed the way the engine would have
-  // prescribed the candidate in that slot: scheme()'s floor branch, on the wave Main
-  // grammar and nothing else. The detail must start `S×R — RPE ` with R a number or a
-  // lo–hi range, and the low end is compared exactly as scheme() compares it. Under the
-  // window's low end the rep token becomes the window; sets, RPE, note, ramp-up and rest
-  // carry byte for byte. At or above it the donor carries verbatim. The null row never
-  // gets here with a window, so barbell compounds carry verbatim too.
-  // This sits BEFORE the _BW_KEEP_FIXED test on purpose: that regex holds `rotational`,
-  // which would shut out Landmine rotational press, a loaded lift the unilateral row windows.
-  // `out` is optional. A caller that passes one learns the window fired (the swap toast).
-  if(fl&&fl[1]!==0){
-    const m=/^(\d+×)(\d+(?:–\d+)?)( — RPE )/.exec(detail);
-    if(m){
-      const lo=parseInt(m[2],10);
-      if(!(lo>=fl[0])){
-        if(out) out.win=[fl[0],fl[1]];
-        return m[1]+fl[0]+'–'+fl[1]+detail.slice(m[1].length+m[2].length);
-      }
-    }
-    return detail;
-  }
-  if(!(fl&&fl[1]===0)) return detail;                 // movement can express a rep target
-  if(_BW_KEEP_FIXED.test(name)) return detail;        // holds, plyos, carries, core
-  // TWO SYSTEMS HAVE TO AGREE. _repFloor's unloadable clause is a broad regex
-  // (/\bdips\b|pushup/), so it also catches five movements the LOG side is about to hand
-  // a weight field to: Bench dips, Weighted dips, Glute-ham raise, Pushup variation
-  // (weighted), Single-leg glute bridge (weighted). If the app will show you somewhere to
-  // write a number, a rep target is a real instruction and must not be taken away.
-  // Harvested from the file, not hand-listed — five of 217 names disagree.
-  try{ if(typeof isTrackableWeight==='function' && isTrackableWeight(name,detail)) return detail; }catch(e){}
-  if(!/^\s*\d+\s*[×x]\s*\d/.test(detail)) return detail;  // already open-ended
-  return _bwSetsFromDetail(detail);
-}
-function applySwapPrefs(sections,map){
-  if(!Array.isArray(sections)||!map) return false;
-  let hit=false;
-  sections.forEach(sec=>{
-    if(!sec||!Array.isArray(sec.items)) return;
-    sec.items.forEach(it=>{
-      if(!it||!it.name) return;
-      const to=map[it.name];
-      if(!to||to===it.name) return;
-      const was=it.name;
-      it.name=to; hit=true;
-      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));
-      if(sec.label&&sec.label.indexOf(was)>=0) sec.label=sec.label.split(was).join(to);
-    });
-  });
-  return hit;
 }
 // ── SESSION SWAP STORE ───────────────────────────────────────────────────────
 // Keyed w<N>_<day> exactly like ia_logs_ and ia_comp_, so the freeze's "touched"
@@ -10449,6 +10888,26 @@ function markSwapOffered(pid,from){
   const c=getSwapCounts(pid);
   if(c[from]){c[from].offered=true;saveSwapCounts(pid,c);}
 }
+// Candidates for a null-pattern swap: same family, not already on the card, gear-legal,
+// injury-legal through the REAL filter (no second copy of the drop rules), and — for the
+// power family — through _powerAllowed, so age/experience power doctrine cannot be
+// bypassed through the side door of a swap.
+function auxSwapCandidates(outName,day,prog){
+  const fam=_auxFamily(outName); if(!fam) return [];
+  const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unchanged: injury only)
+  const onCard=Object.create(null);
+  ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
+  const _ssP=_ssPartnerOf(day,outName);   // V164 D5: same partner filter as swapCandidates
+  return Object.keys(_AUX_FAMILY).filter(function(n){
+    if(n===outName||_AUX_FAMILY[n]!==fam) return false;
+    if(onCard[n.toLowerCase()]) return false;
+    if(!_auxGearOK(n,cfg.equipment||'home_full')) return false;
+    if(fam==='power'&&typeof _powerAllowed==='function'&&!_powerAllowed(n,cfg.experience,cfg.injury,cfg.ageBracket)) return false;
+    if(_ssP&&!_ssLegal(n,_ssP)) return false;         // V164 D5
+    return _swapInjuryOK(n,cfg);
+  }).sort();
+}
+/** The parts of a session the passes read: its sport, its name and text, its dose, whether it is a Nike plan session. */
 const _PATTERN_REGION = {
   hpress:'push', vpress:'push', delt_iso:'push', tri_iso:'push',
   row:'pull', vpull:'pull', bi_iso:'pull',
@@ -10637,8 +11096,9 @@ function capSessionBudget(sections, cardio){
   // Test-only bypass, per-pass since V123. See recoveryDeload for why.
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__BUDGET_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
-  const _isStretch=n=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(n||'');
-  const _isHalf=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n||'');
+  // D239: the hip block's mobility piece stays free; the Cossack shift and pigeon lift-offs are mobility pieces.
+  const _isStretch=n=>/stretch|mobility|90\/90|foam|worlds greatest|cossack|pigeon/i.test(n||'');
+  const _isHalf=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises|sit-up|v-up|russian twist|farmer march|torso rotation/i.test(n||'');
   const _prehabHalf=new Set([].concat(EXLIB.hip_stability,EXLIB.knee_stability,EXLIB.foot_ankle,EXLIB.foot_ankle_bw)); const _cost=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return (_isHalf(it.name)||_prehabHalf.has(it.name))?s*0.5:s; };
   const _total=list=>list.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+_cost(it),0),0);
   const cap=Math.max(12, SESSION_SET_BUDGET - Math.round(_cardioInterference(cardio)*2));
@@ -11386,6 +11846,7 @@ const RAND_POOLS={
     {title:'Core Hypertrophy',sections:[{label:'Core as a muscle — train it heavy',items:[{name:'Ab wheel rollouts',detail:'4×12'},{name:'Hanging knee raises',detail:'4×15'},{name:'L-sit hold',detail:'4×20 sec'},{name:'Dead bugs',detail:'3×12 each'},{name:'Plank hold',detail:'3×45 sec'}]}]},
   ],
   fatloss:[
+    {title:'Lap and Station',cardio:{type:'run',detail:'One lap (400 m) before each station. Eight laps, steady.'},sections:[{label:'Run a lap, then the station. One round.',items:[{name:'Jump squats',detail:'20 reps'},{name:'Pushups',detail:'20 reps'},{name:'Mountain climbers',detail:'20 each leg'},{name:'Walking lunge',detail:'10 each leg'},{name:'Burpees',detail:'10 reps'},{name:'Sit-ups',detail:'20 reps'},{name:'Spiderman pushups',detail:'5 each side'},{name:'Side lunge (bodyweight)',detail:'10 each side, moving'}]}]},
     {title:'Cardio Shred',sections:[{label:'Superset A — 4 rounds',superset:true,items:[{name:'Ball slams',detail:'12 reps'},{name:'Burpees',detail:'8 reps'}]},{label:'Superset B — 3 rounds',superset:true,items:[{name:'Jump squats',detail:'15 reps'},{name:'Mountain climbers',detail:'20 reps'}]},{label:'Core',items:[{name:'Ab wheel rollouts',detail:'3×10'},{name:'Dead bugs',detail:'3×12 each'}]}]},
     {title:'The Hurricane',sections:[{label:'Round 1 — 3 sets',superset:true,items:[{name:'Ball slams',detail:'15 reps'},{name:'Burpees',detail:'10 reps'},{name:'Mountain climbers',detail:'20 reps'}]},{label:'Round 2 — 3 sets',superset:true,items:[{name:'Kettlebell swing',detail:'20 reps'},{name:'Broad jumps',detail:'8 reps'},{name:'Plank hold',detail:'30 sec'}]}]},
     {title:'AMRAP 20 Min',sections:[{label:'As many rounds as possible',superset:true,rounds:null,items:[{name:'Kettlebell swing',detail:'15 reps'},{name:'Pushups',detail:'10 reps'},{name:'Chinups',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'}]}]},
@@ -11416,6 +11877,7 @@ const RAND_POOLS={
     {title:'Navy Grinder',sections:[{label:'5 rounds, 90s rest',superset:true,items:[{name:'Chinups',detail:'10 reps'},{name:'Pushups',detail:'20 reps'},{name:'Ab wheel rollouts',detail:'10 reps'},{name:'Ball slams',detail:'10 reps'},{name:'Kettlebell swing',detail:'20 reps'}]}]},
   ],
   athletic:[
+    {title:'Lap and Station',cardio:{type:'run',detail:'One lap (400 m) before each station. Eight laps, steady.'},sections:[{label:'Run a lap, then the station. One round.',items:[{name:'Jump squats',detail:'20 reps'},{name:'Pushups',detail:'20 reps'},{name:'Mountain climbers',detail:'20 each leg'},{name:'Walking lunge',detail:'10 each leg'},{name:'Burpees',detail:'10 reps'},{name:'Sit-ups',detail:'20 reps'},{name:'Spiderman pushups',detail:'5 each side'},{name:'Side lunge (bodyweight)',detail:'10 each side, moving'}]}]},
     {title:'Explosive Power',sections:[{label:'Power — 5 rounds',superset:true,items:[{name:'Broad jumps',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'},{name:'Kettlebell swing',detail:'10 reps'}]},{label:'Strength',items:[{name:'Deadlift',detail:'4×3 @ RPE 9'},{name:'Barbell bench press',detail:'4×3 @ RPE 9'}]}]},
     {title:'Full Body Athletic',sections:[{label:'Power circuit — 4 rounds',superset:true,items:[{name:'Kettlebell swing',detail:'15 reps'},{name:'Ball slams',detail:'10 reps'},{name:'Broad jumps',detail:'8 reps'}]},{label:'Strength',items:[{name:'Barbell bench press',detail:'3×5 heavy'},{name:'Deadlift',detail:'3×3 heavy'}]}]},
     {title:'Sprint + Lift',cardio:{type:'run',detail:'6×100m strides — walk back recovery'},sections:[{label:'Strength',items:[{name:'Back squat',detail:'4×5 @ RPE 9'},{name:'Barbell bench press',detail:'4×5 @ RPE 9'}]},{label:'Explosive',superset:true,items:[{name:'Broad jumps',detail:'4×6'},{name:'Ball slams',detail:'4×10'}]}]},
@@ -11511,13 +11973,13 @@ function reroll(){
   const pool=getActivePool();
   let idx;
   do{idx=Math.floor(Math.random()*pool.length);}while(idx===lastRandIdx&&pool.length>1);
-  lastRandIdx=idx;currentRandIdx=idx;
+  _setLastRandIdx(idx);_setCurrentRandIdx(idx);
   const w=pool[idx];
   const done=getWildcardDone();
   const alreadyDone=done.some(d=>d.title===w.title);
   const now=new Date();
   const dowToKey={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
-  currentRandDayKey=dowToKey[now.getDay()]||'mon';
+  _setCurrentRandDayKey(dowToKey[now.getDay()]||'mon');
   const goal=activeProg?.goal||'balanced';
   const colors={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
   const color=colors[goal];
@@ -11674,18 +12136,6 @@ function _partialWeek1(prog){
   if(!prog||!prog.startDate) return false;
   const sd=_parseLocalDate(prog.startDate); if(!sd) return false;
   return getWeekMonday(prog.startDate).getTime() !== sd.getTime();
-}
-function getWeekMonday(dateStr){
-  // Get the Monday of the week containing the given date string
-  const parts=dateStr.split('-');
-  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
-  d.setHours(0,0,0,0);
-  // getDay(): 0=Sun,1=Mon,...,6=Sat
-  // Days since Monday: Sun=6, Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5
-  const dayOfWeek=d.getDay();
-  const daysSinceMonday=dayOfWeek===0?6:dayOfWeek-1;
-  d.setDate(d.getDate()-daysSinceMonday);
-  return d;
 }
 function calcCurrentWeek(){
   if(!activeProg?.startDate) return 1;
@@ -11865,8 +12315,9 @@ function openDayKey(d){
   if(!day) return;
   if(dayBeforeStart(activeProg,currentWeek,d)){ showToast('Before your start date'); return; }   // V174 (D24)
   // Rest days used to dead-end here. Today's and past rest days now open the rest sheet
-  // so an unplanned session or a bonus run has somewhere to go; future ones stay inert.
-  if(day.rest){ if(restDayEligible(currentWeek,d)) openRestSheet(currentWeek,d); return; }
+  // so an unplanned session or a bonus run has somewhere to go. v0.240.0 (D231 item 2): a future
+  // one asks the sheet too, which answers with its toast instead of silence.
+  if(day.rest){ openRestSheet(currentWeek,d); return; }
   openDetail(d,day);
 }
 // ── Day codes for the week strip (cardio modality above, focus below). ──
@@ -12007,10 +12458,24 @@ function _wkScoot(el,to,cur){
 // e.g. "37 min run logged · RPE 7". The sport words are the hero's map; a missing RPE prints the
 // hero's dash. The journal prints the same strings, so the two never word a jog differently. A type
 // with no mins (a legacy lensed run that kept only its distance) has no line: the lens invents nothing.
+// v0.240.0 (D229): the sport words and distance units a rest-day record speaks in. Walk carries no distance (A6).
+const REST_WORD={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
+const REST_UNIT={run:'mi',bike:'mi',swim:'yd',row:'m'};
+// A record's distance in its sport's unit, or 0 (walk and unknown types never carry one).
+function restDist(t,r){ return (REST_UNIT[t]&&r&&+r.dist>0)?Math.round(+r.dist*100)/100:0; }
+// The head of a record's sentence: the time when it holds one (whole minutes; the stored seconds stay), else the distance.
+function restLogHead(t,r){
+  const m=(r&&+r.mins>0)?Math.round(+r.mins):0, d=restDist(t,r);
+  return m>0?m+' min '+(REST_WORD[t]||t):d+' '+REST_UNIT[t]+' '+(REST_WORD[t]||t);
+}
+// v0.240.0 (D229 item 4): one line per type that holds a time or a distance, in key order: the head, logged, the
+// distance after the time when it holds both, the RPE last. A line without a distance is byte-identical to V238's.
 function restLogLines(rl){
   if(!rl||typeof rl!=='object') return [];
-  const W={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
-  return Object.keys(rl).filter(t=>rl[t]&&+rl[t].mins>0).map(t=>rl[t].mins+' min '+(W[t]||t)+' logged · RPE '+(rl[t].rpe||'—'));
+  return Object.keys(rl).filter(t=>rl[t]&&(+rl[t].mins>0||restDist(t,rl[t])>0)).map(t=>{
+    const r=rl[t], d=restDist(t,r);
+    return restLogHead(t,r)+' logged'+(+r.mins>0&&d>0?' · '+d+' '+REST_UNIT[t]:'')+' · RPE '+(r.rpe||'—');
+  });
 }
 function renderWeekView(){
   if(!activeProg) return;
@@ -12129,7 +12594,7 @@ function renderWeekView(){
       if(_hit) _ovMark=' \u2726';
     }
     b.textContent='Wk '+w+(w===actualWeek?' \u25cf':'')+_ovMark;
-    b.onclick=(wk=>()=>{currentWeek=wk;renderWeekView();})(w);wscroll.appendChild(b);
+    b.onclick=(wk=>()=>{_setCurrentWeek(wk);renderWeekView();})(w);wscroll.appendChild(b);
     if(w===currentWeek) _actBtn=b;
   }
   // Anchor on currentWeek, not actualWeek: the strip is a control for the week you are
@@ -12222,8 +12687,8 @@ function renderWeekView(){
   const _heroMovedFrom=(heroKey&&wkData[heroKey]&&wkData[heroKey].movedFrom)?(DAY_FULL[wkData[heroKey].movedFrom]||wkData[heroKey].movedFrom):null;
   const _heroCardio=(heroKey&&wkData[heroKey]&&wkData[heroKey].rest)?((getLogs()||{})[completedKey(currentWeek,heroKey)]||null):null;
   // V238 (D224 rest hero, H1 as restated in Amendment 1 A2): the entry comes through the getLogs lens,
-  // so a V237 rest entry reads as restLog too. One line per restLog type that holds mins, in key
-  // order, same sentence and class as before; Log more below stays keyed on a line being there.
+  // so a V237 rest entry reads as restLog too. One line per restLog type that holds a time or (v0.240.0,
+  // D229) a distance, in key order; Edit cardio below is keyed on a line being there (v0.240.0, D228 item 8).
   const _rcLine=(_heroCardio&&_heroCardio.restLog)
     ? restLogLines(_heroCardio.restLog).map(s=>'<div class="wk-rest-logged">'+s+'</div>').join('')
     : '';
@@ -12235,8 +12700,9 @@ function renderWeekView(){
       +'<div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>'
       +_rcLine
       +'<div class="wk-rest-acts">'
-        +'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'move\')">Training anyway?</button>'
-        +'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'cardio\')">'+(_rcLine?'Log more':'Log cardio')+'</button>'
+        // v0.240.0 (D231 item 3): a day whose session moved away takes a jog and never a move.
+        +(heroKey&&wkData[heroKey].moved?'':'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'move\')">Training anyway?</button>')
+        +'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'cardio\')">'+(_rcLine?'Edit cardio':'Log cardio')+'</button>'
       +'</div>'
       +'</div></div>'
       +'<div class="wk-tip"><div class="wk-tip-lbl">'+tip.label+'</div>'
@@ -12336,13 +12802,6 @@ function _stripLeadingSets(d){
     .replace(/^(\d+)\s*sets?\s+of\s+/i,'')
     .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
     .replace(/^(\d+)\s*sets?\b\s*/i,'');
-}
-function _setLeadingSets(d,n){
-  var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
-  if(m) return n+s.slice(m[1].length);
-  m=s.match(/^(\d+)\s*sets?\b/i);
-  if(m) return n+s.slice(m[1].length);
-  return s;
 }
 function buildSectionsHTML(sections,baseIdx){
   const all=sections||[];
@@ -13064,7 +13523,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
         _stale=isStaleTs(effEntry&&effEntry.ts);
         const _src=(crossSrc&&crossSrc.progName)||'';
         const _speak=_stale&&!_staleWarnShown;
-        if(_speak){ _staleWarnShown=true; _staleWarnSrc=_src; }
+        if(_speak){ _setStaleWarnShown(true); _setStaleWarnSrc(_src); }
         // Sub-label is age-only. It regains the source program name ONLY when this
         // pill's source differs from the one the sentence named — otherwise the
         // sentence would be speaking for a number it did not come from.
@@ -13175,151 +13634,10 @@ function isWeightedExercise(name) {
   const n = name.toLowerCase();
   return false; // handled by isTimeExercise and weight detection below
 }
-// Equipment token map — single source of truth for how a movement name signals added
-// load. Each family lists every surface form, INCLUDING the parenthetical suffix
-// convention "Movement (ABBR)". Add a new abbreviation once here (e.g. a '(sb' for a
-// safety bar) and every detector below inherits it automatically — no more patching
-// isKBExercise / isDBExercise / isTrackableWeight one at a time.
-const EQUIP_TOKENS = {
-  barbell:    ['barbell','(bb'],
-  dumbbell:   ['dumbbell','db ','db-','(db'],
-  kettlebell: ['kettlebell','kb ','kb-','(kb'],
-  cable:      ['cable','(cable'],
-  machine:    ['machine'],
-  trapbar:    ['trap bar','(trap'],
-  // 'slam' added V122: 'Ball slams' IS med-ball work but named neither 'med ball' nor
-  // 'wall ball', so no equipment token matched and the movement was invisible to the gear
-  // gates while still being handed a weight field by movKeywords.
-  medball:    ['med ball','medicine ball','wall ball','slam'],
-  goblet:     ['goblet'],
-  loaded:     ['weighted','loaded']
-};
 // True if the name carries a token from the given family (e.g. hasEquip(n,'kettlebell')).
 function hasEquip(name, fam){
   const n = (name||'').toLowerCase();
   return (EQUIP_TOKENS[fam]||[]).some(t => n.includes(t));
-}
-// True if the name carries any external-load token at all.
-function anyEquip(name){
-  const n = (name||'').toLowerCase();
-  for(const fam in EQUIP_TOKENS){ if(EQUIP_TOKENS[fam].some(t => n.includes(t))) return true; }
-  return false;
-}
-function isTimeExercise(name) {
-  if(!name) return false;
-  const n = name.toLowerCase();
-  const timeKeywords = ['plank','hold','wall sit','dead hang','hollow hold',
-    'static hold','isometric hold','bird dog hold','dead bug hold'];
-  return timeKeywords.some(kw => n.includes(kw));
-}
-// Movements whose NAME matches a rep keyword — so `isRepExercise` vetoes the weight
-// field — but which are conventionally performed WITH external load when the name
-// carries no bodyweight qualifier.
-//
-// Root cause, and this is the third instance of the same failure (V101, V103, now):
-// **the name alone cannot say whether a movement is loaded**, because the engine draws
-// the SAME string into a barbell pool and a bodyweight pool. `EXLIB.lunge` holds
-// 'Dumbbell Bulgarian split squat' next to 'Reverse lunge (KB)'; the `_bw()` bodyweight branch
-// holds 'Bulgarian split squat (foot on chair)'. Only the parenthetical distinguishes
-// them, and `isRepExercise` matches the shared substring 'split squat' in both.
-//
-// The convention the library already follows: the BODYWEIGHT variant is explicitly
-// qualified — "(foot on chair)", "(chair)", "(shoulders on bed)", "Assisted ",
-// "Bodyweight ", "Banded " — and the loaded variant is bare. So a bare name in this
-// list gets its load field back; a qualified one keeps the veto.
-//
-// Adding a name here is a COACHING call, not a parser tweak: it asserts the movement is
-// normally performed under external load at any tier that owns equipment. The real fix
-// is to carry loaded-ness down from the POOL rather than re-derive it from the string —
-// see §12. Until then this list is the seam, and it must stay short.
-// V113: 'bulgarian split squat' removed. The bare name is gone from the library — the
-// loaded variant is 'Dumbbell Bulgarian split squat', which anyEquip catches directly.
-// One less name asserted by hand. The seam shrinks as the library gets honest.
-const REP_BUT_LOADED = ['single-leg hip thrust','bench dips'];
-const BW_QUALIFIER = ['(chair','foot on chair','shoulders on bed','assisted ','(assisted','bodyweight','(partner','(anchored','banded ','band ','(bw'];
-function isLoadedRepMovement(name){
-  const n=(name||'').toLowerCase();
-  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
-  return REP_BUT_LOADED.some(k => n.includes(k));
-}
-function isTrackableWeight(name) {
-  if(!name) return false;
-  const n = name.toLowerCase();
-  // Band-only movements — no weight to track
-  if(n.includes('band') && !n.includes('barbell') && !n.includes('db') && !n.includes('kb')) return false;
-  // Explicit external load in the name wins — a loaded variant of a movement that also
-  // reads as a bodyweight/rep exercise (Barbell hip thrust, Dumbbell Bulgarian split squat,
-  // Weighted dips) must still get a weight field. This override beats the bodyweight and
-  // rep vetoes below. Timed holds stay on the SEC field. Tokens come from EQUIP_TOKENS.
-  if(anyEquip(n) && !isTimeExercise(n)) return true;
-  // STACK-LOADED, BUT THE NAME SAYS NOTHING. Cable and selectorised-machine movements the
-  // gym floor calls by their apparatus, not their implement: the athlete picks a pin, so
-  // these are among the MOST loadable movements in the building, yet every keyword list
-  // below misses them — 'face pull' has no equipment token and 'pull' is not a movKeyword,
-  // 'extension' is not a movKeyword at all, and 'pec deck' names neither. They therefore
-  // got no weight field, and as of V121 the unloadable sweep would ALSO have stripped their
-  // rep target, which is exactly backwards.
-  // Deliberately a short explicit list rather than adding a broad /extension/ token: that
-  // token would also flip 'Eccentric wrist extension', which is rehab work that stays
-  // unloaded, and 'Bodyweight back extension', which already names itself. Harvested from
-  // the file — 259 names classified, these four are the whole disagreement.
-  if(_STACK_LOADED.test(n)) return true;
-  // Same class of override, for loaded movements whose name carries no equipment token
-  // at all (bare 'Dumbbell Bulgarian split squat' from the barbell lunge pool). Must sit ABOVE
-  // the isRepExercise veto below — that veto is what removed the field.
-  if(isLoadedRepMovement(n) && !isTimeExercise(n)) return true;
-  // An explicit bodyweight qualifier beats every movement keyword below. Without this,
-  // movKeywords' 'raise' hands a LOAD field to 'Calf raise (bodyweight)', 'squat' hands one
-  // to 'Bodyweight squats', and 'deadlift' to 'Single-leg Romanian deadlift (bodyweight)'.
-  // Sits BELOW the anyEquip check on purpose: 'Single-leg glute bridge (weighted)' and
-  // 'Dumbbell Bulgarian split squat' name their load and keep the field.
-  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
-  // Pure bodyweight / plyometric / cardio
-  const bwKeywords = ['jump squat','box jump','broad jump','burpee','mountain climber',
-    'sprint','run','jog','skipping','jumping jack','high knee',
-    'push-up','pushup','pull-up','pullup','chin-up','chinup',
-    'clamshell','side step','it band','90/90','pigeon','world greatest',
-    'lunge walk','bear crawl','inchworm','hip circle','terminal knee',
-    'inverted row','bound','skater jump','tuck jump',
-    'hanging knee raise','hanging leg raise',
-    'pallof','anti-rotation','bird dog','dead bug','plank'
-  ];
-  if(bwKeywords.some(kw => n.includes(kw))) return false;
-  // PHANTOM LOAD FIELDS (V122). Four movements matched a movKeyword by substring and were
-  // handed a weight field they can never use: 'McGill curl-up' (matched 'curl'),
-  // 'Garhammer raises' and 'Prone Y raise' (matched 'raise'), 'TRX row (if available)'
-  // (matched 'row'). None carries a qualifier BW_QUALIFIER could catch. The pool was
-  // internally inconsistent about it too: 'Prone Y-T-W raises' was already correctly
-  // vetoed by 'y-t-w' while its sibling 'Prone Y raise' was not.
-  // Matched on the whole name, not a substring, so a future 'Dumbbell Y raise' would
-  // still keep its field.
-  const _PHANTOM_LOAD=['mcgill curl-up','garhammer raises','prone y raise','trx row (if available)'];
-  if(_PHANTOM_LOAD.indexOf(n.trim())>=0) return false;
-  // Time-based holds tracked separately
-  if(isTimeExercise(n)) return false;
-  // Rep-based bodyweight tracked separately
-  if(isRepExercise(n)) return false;
-  // Equipment / weighted keywords — order matters, check equipment first
-  const equipKeywords = ['barbell','dumbbell','db ','db-','kettlebell','kb ','kb-',
-    'trap bar','cable','machine','weighted','med ball','medicine ball','wall ball'];
-  const movKeywords = ['press','row','curl','raise','deadlift','squat','bench',
-    'fly','flye','pulldown','upright','lateral','front raise','arnold','goblet',
-    'swing','snatch','clean','rdl','hip thrust','glute bridge','step-up',
-    'good morning','lunge','slam','carry','farmer','suitcase','thruster'];
-  return equipKeywords.some(kw => n.includes(kw)) || movKeywords.some(kw => n.includes(kw));
-}
-function isRepExercise(name) {
-  if(!name) return false;
-  const n = name.toLowerCase();
-  // Was only pullups/pushups/dips, so most no-load work (inverted rows, split squats,
-  // glute bridges, Nordics) fell through to the WEIGHT field or showed no log field at
-  // all — i.e. it could not be logged. Anything performed against bodyweight alone is
-  // logged in REPS, which is also what makes open-ended "sets to RPE" prescriptions work.
-  const repKeywords = ['pull-up','pullup','chin-up','chinup','push-up','pushup','dip','ring dip','muscle-up',
-    'inverted row','split squat','pistol squat','shrimp squat','glute bridge','hip thrust',
-    'nordic','back extension','snow angel','y-t-w','superman','step-up','lunge',
-    'sit-up','situp','leg raise','knee raise','v-up','hollow rock','squat (slow'];
-  return repKeywords.some(kw => n.includes(kw));
 }
 function isKBExercise(name) {
   if(!name) return false;
@@ -13471,13 +13789,6 @@ function variantLoadFactor(exName){
   if(n.includes('close-grip')||n.includes('box squat')||n.includes('tempo')) return 0.90;
   return 1;
 }
-function roundWeight(lbs, unit) {
-  if(unit === 'kg') {
-    const kg = lbs * 0.453592;
-    return Math.round(kg / 2.5) * 2.5;
-  }
-  return Math.round(lbs / 5) * 5;
-}
 
 const RPE_LABELS = {1:'Very Easy',2:'Easy',3:'Moderate',4:'Somewhat Hard',5:'Hard',6:'Hard+',7:'Very Hard',8:'Very Hard+',9:'Max Effort',10:'All Out'};
 function updateRPEDisplay(val) {
@@ -13518,6 +13829,10 @@ function cardioSwapNoteText(active, planned, e){
 let _curLogDose=null;      // dose for the sport currently being logged (null when swapped)
 let _curLogDoseFull=null;  // dose of the PLANNED sport, so swapping back restores the form
 let _curLogSub='';         // planned subtype, for the strip label
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setCurLogDose(v){ _curLogDose=v; }
+function _setCurLogDoseFull(v){ _curLogDoseFull=v; }
+function _setCurLogSub(v){ _curLogSub=v; }
 function _fmtPaceMi(sec){ if(!isFinite(sec)||sec<=0) return null; return _clkMS(sec); }   // D126 (V204)
 function _parseClock(t){ // "2:04" or bare seconds -> seconds
   if(!t) return null; t=String(t).trim();
@@ -13945,7 +14260,7 @@ function buildLogHTML(dayKey, dayCardio){
   // V148: resolve the dose once per render. Swapped sessions get null on purpose —
   // there is no prescription in the new sport, so the generic form is the honest one.
   const _dose=hasCardio?doseFromCardio(dayCardio):null;
-  _curLogDoseFull=_dose; _curLogSub=(dayCardio&&dayCardio.subtype)||''; _curLogDose=swapped?null:_dose;
+  _setCurLogDoseFull(_dose); _setCurLogSub((dayCardio&&dayCardio.subtype)||''); _setCurLogDose(swapped?null:_dose);
 
   // RPE slider value
   const rpeVal=e.rpe||'';
@@ -14014,6 +14329,8 @@ function sessionLogProgress(day){
 // ── Floating count-up rest stopwatch (PiP-style edge tab). Persists app-wide; runs through screen-lock. ──
 let _ruId=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;
 let _rtSide='right',_rtExpanded=false,_rtIntroTO=null,_rtInited=false,_rtDragging=false,_rtIntroPending=false;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setRtIntroPending(v){ _rtIntroPending=v; }
 // V239 (D233, R1 as amended): inside the native app (window.iaIsland present) the rest clock is the wall clock
 // and the island mirrors every seam; on the PWA it stays performance.now() and the island is never called.
 function _ruClock(){return window.iaIsland?Date.now():performance.now();}
@@ -14098,6 +14415,8 @@ function _rtWireDrag(handle,isTab){
     var anchor=document.getElementById('rtAnchor'),frame=document.getElementById('restFloat');
     var dx=e.clientX-sx,dy=e.clientY-sy;
     if(Math.abs(dx)>5||Math.abs(dy)>5)moved=true;
+    // v0.239.1 (D235.1): below the 5 px threshold nothing is written, so a jittery tap leaves the timer docked.
+    if(!moved)return;
     var fb=frame.getBoundingClientRect();
     var maxT=window.innerHeight-anchor.offsetHeight-8;
     anchor.style.top=Math.max(8,Math.min(maxT,sTop+dy))+'px';
@@ -14105,18 +14424,30 @@ function _rtWireDrag(handle,isTab){
     var x=Math.max(0,Math.min(fb.width-w,e.clientX-fb.left-w/2));
     anchor.style.left=x+'px';anchor.style.right='auto';
   });
-  handle.addEventListener('pointerup',function(e){
-    if(!dragging)return;dragging=false;_rtDragging=false;
+  // v0.239.1 (D235.2): one end-of-drag path for pointerup and pointercancel. It ends the drag, restores the
+  // snap transition and, when the drag moved, docks the timer to the nearer edge. It returns moved.
+  function snap(){
+    dragging=false;_rtDragging=false;
     var anchor=document.getElementById('rtAnchor'),frame=document.getElementById('restFloat');
     anchor.style.transition='left .18s cubic-bezier(.34,1.3,.5,1),right .18s cubic-bezier(.34,1.3,.5,1)';
     if(moved){
       var center=anchor.offsetLeft+anchor.offsetWidth/2,fb=frame.getBoundingClientRect();
       _rtSide=(center<fb.width/2)?'left':'right';
       anchor.style.left='';_rtApplySide();
-    }else if(isTab){_rtDismissIntro();rtExpand();}
+    }
+    return moved;
+  }
+  handle.addEventListener('pointerup',function(e){
+    if(!dragging)return;
+    if(snap())return;
+    if(isTab){_rtDismissIntro();rtExpand();}
     else if(_rtIntroTO){rtCollapse();}
   });
-  handle.addEventListener('pointercancel',function(){dragging=false;_rtDragging=false;});
+  // A cancel ends the drag through snap() and never runs a tap action; outside a drag it only clears the flags.
+  handle.addEventListener('pointercancel',function(){
+    if(dragging){snap();}
+    else{_rtDragging=false;}
+  });
 }
 function _rtInit(){
   if(_rtInited)return;
@@ -14223,8 +14554,18 @@ function rangeTopNudgeHTML(day){
   return '<div class="prog-nudge"><b>Time to add weight.</b> Last session you hit the top of the range on every set of '
     +shown+extra+'. Go up in weight today and start back at the bottom of the range.</div>';
 }
+// v0.240.0 (D231 item 4): a session card on a day that also holds a jog says so above the work, one sentence per type
+// as the hero and the journal print it, and edits it in the rest sheet, which opens over the card on its cardio view.
+function restAlsoHTML(w,dayKey){
+  const e=getLogs()[completedKey(w,dayKey)];
+  const lines=restLogLines(e&&e.restLog);
+  if(!lines.length) return '';
+  return '<div class="also-block"><div class="also-lbl">ALSO ON '+String((DAY_FULL)[dayKey]||dayKey).toUpperCase()+'</div>'
+    +lines.map((l)=>'<div class="also-line">'+l+'</div>').join('')
+    +'<button class="also-btn" onclick="openRestSheet('+w+',\''+dayKey+'\',\'cardio\')">Edit cardio</button></div>';
+}
 function openDetail(dayKey,day){
-  _staleWarnShown=false; _staleWarnSrc='';
+  _setStaleWarnShown(false); _setStaleWarnSrc('');
   window._unitLabel=(activeProg&&activeProg.cfg&&activeProg.cfg.unit==='kg')?'kg':'lbs';
   // V152 — A RE-RENDER MUST NOT MOVE THE READER.
   // openDetail is not only an open. It is also the re-render for every in-session edit:
@@ -14240,7 +14581,7 @@ function openDetail(dayKey,day){
   const _dOv=document.getElementById('detailOverlay');
   const _dFresh=!(_dOv&&_dOv.classList.contains('open')&&currentDayKey===dayKey);
   const _dKeep=_dFresh?0:_dOv.scrollTop;
-  currentDayKey=dayKey;
+  _setCurrentDayKey(dayKey);
   const comp=getCompleted()[completedKey(currentWeek,dayKey)];
   const over=document.getElementById('detailDayName');if(over)over.textContent='Week '+currentWeek+' \u00b7 '+DAY_FULL[dayKey];
   const ttl=document.getElementById('detailDayTitle');if(ttl)ttl.textContent=(comp&&comp.title)||day.title||'Training';
@@ -14272,6 +14613,7 @@ function openDetail(dayKey,day){
   if(day.note) html+='<div class="note-block">'+day.note+'</div>';
   const _rtNudge=rangeTopNudgeHTML(day); if(_rtNudge) html=_rtNudge+html;
   const _wcTag=wildcardTagHTML(currentWeek,dayKey); if(_wcTag) html=_wcTag+html;   // V195 (D64)
+  const _also=restAlsoHTML(currentWeek,dayKey); if(_also) html=_also+html;   // v0.240.0 (D231 item 4)
   html+=buildLogHTML(dayKey, day.cardio);
   const curStatus=comp?(comp.status||'complete'):null;
   const escTitle=(day.title||'').replace(/'/g,"\\'");
@@ -14738,7 +15080,7 @@ function acceptSwapNudge(){
     markSwapOffered(activeProgId,from);
     // Preference lives in cfg, so the rebuild below — and every rebuild after it —
     // reproduces the substitution without any patch store to re-apply.
-    activeProg=refreshProgram(p);
+    _setActiveProg(refreshProgram(p));
   }
   const o=document.getElementById('swapNudgeOverlay');if(o)o.classList.remove('show');
   _nudgeCtx=null;
@@ -14969,7 +15311,7 @@ function setCardioSwap(sport){
   const fields=document.getElementById('cardioFields');
   // V148: swapping back to the planned sport restores the dose form; any other sport
   // has no prescription here, so it gets the generic fields (null dose).
-  _curLogDose=(sport===planned)?_curLogDoseFull:null;
+  _setCurLogDose((sport===planned)?_curLogDoseFull:null);
   if(fields) fields.innerHTML=cardioFieldHTML(sport, e, _curLogDose, _curLogSub);
   wrap.querySelectorAll('#cardioPicker button[data-sport]').forEach(function(b){
     const on=b.dataset.sport===sport;
@@ -15010,8 +15352,8 @@ function setProgRace(dateStr){
   activeProg.startDate=_al.start;   // blockOpen stays — the weeks behind you don't move
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
-  activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
-  currentWeek=calcCurrentWeek();
+  _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
+  _setCurrentWeek(calcCurrentWeek());
   showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
   renderWeekView();
 }
@@ -15044,8 +15386,8 @@ function setProgStart(dateStr){
   if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
-  if(_tp) activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
-  currentWeek=calcCurrentWeek();
+  if(_tp) _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
+  _setCurrentWeek(calcCurrentWeek());
   // D184 (c) Q4: the holdsTest arm is first (a holdsTest return is also partial). Both surfaces read
   // the same resolver return; the toast never went through startResolveCopy. No dashes in the arms.
   showToast(_r.holdsTest ? 'That week holds your test. Nothing left to train before it ✓'
@@ -15064,38 +15406,6 @@ const _DAYF={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sa
 // Single source of truth for a program's recalled onboarding selection.
 // Lifts are experience-derived (DEFAULT_1RM) when not manually stored, so the panel
 // shows the numbers the engine actually anchors to rather than a misleading zero.
-// ── V172 (D7): THE RUN ANCHOR, STATED ────────────────────────────────────────
-// Every run pace the engines print comes from ONE chart row, and that row is picked by a
-// mile anchor the athlete was never shown — the V156 seed writes it into the wizard as if
-// typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
-// their own anchor logic and the assertion suite checks the two agree.
-const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
-function runAnchorInfo(cfg){
-  const c = cfg || {};
-  if(!(c.cardioTypes||[]).includes('run')) return null;
-  const g = c.cardioGoals && c.cardioGoals.run;
-  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
-  const exp = c.experience || 'intermediate';
-  const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
-  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
-  // Same rule as both engines: a falsy entry falls to the default (D188: every level).
-  const rawSec = entered ? entered : expDef;
-  const row = paceChartLookup('mile', rawSec);
-  // The chart CLAMPS: anything at or under its fastest row trains at that row, anything at
-  // or over its slowest trains there. row.mile is the anchor the engines actually use, so
-  // that is the number stated; when it differs from the entry, the sentence says so.
-  const anchorSec = row.mile;
-  const clamped = (!!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
-  const src = g.mileBestSrc || null;
-  const kind = !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
-  const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
-  // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
-  // the measure of progress is the projection card walking toward it.
-  const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
-    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
-  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
-}
-function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
 function runAnchorChips(a){
   const r = a.row;
   const list = a.goalId==='run_base' ? [['Mile',r.mile]] : [['Mile',r.mile],['5K',r.fiveK],['10K',r.tenK],['Tempo',r.tempo]];
@@ -15345,8 +15655,8 @@ function commitGoalChange(){
   programs[pi].cfg={...programs[pi].cfg,cardioGoals:{...(programs[pi].cfg.cardioGoals||{}),[sport]:next}};
   savePrograms(programs);
   if(activeProgId===_goalDraft.progId){
-    activeProg=refreshProgram(programs[pi]);
-    currentWeek=calcCurrentWeek();
+    _setActiveProg(refreshProgram(programs[pi]));
+    _setCurrentWeek(calcCurrentWeek());
     try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeGoalSheet();
@@ -15425,8 +15735,8 @@ function commitMileChange(){
   p.cfg={...p.cfg,cardioGoals:{...(p.cfg.cardioGoals||{}),run:next}};
   savePrograms(programs);
   if(activeProgId===_mileDraft.progId){
-    activeProg=refreshProgram(programs[pi]);
-    currentWeek=calcCurrentWeek();
+    _setActiveProg(refreshProgram(programs[pi]));
+    _setCurrentWeek(calcCurrentWeek());
     try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeMileSheet();
@@ -15542,13 +15852,6 @@ function renderProgList(){
 // further notice" cases. Dates are the SOURCE OF TRUTH, weeks are derived — once
 // Suspend lands and pauses the clock, program weeks shift, so anchoring an overlay
 // to a week number would be circular.
-function _parseLocalDate(s){
-  const p=String(s||'').split('-');
-  if(p.length!==3) return null;
-  const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
-  if(isNaN(d.getTime())) return null;
-  d.setHours(0,0,0,0); return d;
-}
 // Program week containing a calendar date (1-based, matching the weeks object).
 function weekOfDate(prog, dateStr){
   if(!prog || !prog.startDate) return null;
@@ -15806,7 +16109,7 @@ function removeOverlay(id){
   activeProg.overlays=activeProg.overlays.filter(o=>o&&o.id!==id);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   renderWeekView();
   showToast('Change removed \u2713');
 }
@@ -15992,7 +16295,7 @@ function applyInjuryDraft(){
   activeProg.overlays.push(ov);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   closeOverlaySheet();
   renderWeekView();
   showToast(T==='protect'?'Protected. Train around it \u2713':'Working around it \u2713');
@@ -16024,7 +16327,7 @@ function imBackFromInjury(id){
   }
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   renderWeekView();
   const lbl=(INJURY_REGIONS[region]||{}).label||'injury';
   if(!_hadRunSuppression){
@@ -16106,7 +16409,7 @@ function applyOverlayDraft(){
   activeProg.overlays.push(ov);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   closeOverlaySheet();
   renderWeekView();
   showToast('Change applied \u2713');
@@ -16388,11 +16691,12 @@ function refreshProgram(prog){
 // no day). It is checked before the lookup, so the archived and unknown refusals cannot fire
 // on it. beforeRefresh, when given, runs once the globals name the new id and before
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
-function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');activeProgId=null;activeProg=null;currentDayKey=null;currentWeek=1;return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);activeProgId=id;if(beforeRefresh)beforeRefresh();activeProg=refreshProgram(stored);currentWeek=calcCurrentWeek();currentDayKey=null;return true;}
+function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
-function setActive(id){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
-function startRename(id){editProgId=id;renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
-function cancelRename(){editProgId=null;renderProgList();}
+// v0.240.1 (D238): a switch marks the new program's past unmarked days as asked (markPastAsked).
+function setActive(id){if(!loadActiveProgram(id))return;markPastAsked();renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
+function startRename(id){_setEditProgId(id);renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
+function cancelRename(){_setEditProgId(null);renderProgList();}
 function commitRename(id){
   const inp=document.getElementById('renameInput_'+id);
   const programs=getPrograms();const p=programs.find(x=>x.id===id);
@@ -16404,7 +16708,7 @@ function commitRename(id){
       showToast('Renamed ✓');
     }
   }
-  editProgId=null;renderProgList();
+  _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
 function purgeProgData(id){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
@@ -16419,7 +16723,8 @@ function _handoffActiveFrom(id,programs){
     // V221 D178: both arms switch through the loader. Next program: the loader sets
     // currentWeek=calcCurrentWeek() and currentDayKey=null, the values this arm set. None left:
     // the loader's null clear removes ia_active and nulls activeProgId and activeProg.
-    if(nx)loadActiveProgram(nx.id);
+    // v0.240.1 (D238): handing active on is a switch, so the next program's past unmarked days are marked as asked.
+    if(nx){ if(loadActiveProgram(nx.id)) markPastAsked(); }
     else loadActiveProgram(null);
   }
 }
@@ -16427,8 +16732,8 @@ function archiveProg(id){
   const programs=getPrograms();const p=programs.find(x=>x.id===id);if(!p)return;
   p.archived=true;p.archivedAt=Date.now();savePrograms(programs);
   _handoffActiveFrom(id,programs);
-  confirmProgId=null;confirmTier=0;
-  if(progressViewId===id)progressViewId=null;
+  _setConfirmProgId(null);_setConfirmTier(0);
+  if(progressViewId===id)_setProgressViewId(null);
   renderProgList();showToast('Program archived');
 }
 function unarchiveProg(id){
@@ -16436,9 +16741,9 @@ function unarchiveProg(id){
   delete p.archived;delete p.archivedAt;savePrograms(programs);
   renderProgList();showToast('Program restored');
 }
-function askArchive(id){confirmProgId=id;confirmTier=1;renderProgList();}
-function askPurge(id){confirmProgId=id;confirmTier=2;renderProgList();}
-function cancelConfirm(){confirmProgId=null;confirmTier=0;renderProgList();}
+function askArchive(id){_setConfirmProgId(id);_setConfirmTier(1);renderProgList();}
+function askPurge(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgList();}
+function cancelConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgList();}
 // fromProgress is optional: the Programs-list call site passes nothing, so its
 // behaviour is byte-identical to V168.
 function deleteProg(id,fromProgress){
@@ -16448,8 +16753,8 @@ function deleteProg(id,fromProgress){
   programs=programs.filter(p=>p.id!==id);savePrograms(programs);
   _handoffActiveFrom(id,programs);
   purgeProgData(id);
-  confirmProgId=null;confirmTier=0;
-  if(progressViewId===id)progressViewId=null;
+  _setConfirmProgId(null);_setConfirmTier(0);
+  if(progressViewId===id)_setProgressViewId(null);
   if(fromProgress)renderProgressScreen();else renderProgList();
   showToast('Program deleted');
 }
@@ -16457,8 +16762,8 @@ function deleteProg(id,fromProgress){
 
 // ── PROGRESS SCREEN ──
 function showProgressScreen() {
-  confirmProgId=null;confirmTier=0;   // V169: never open Progress with a confirm armed
-  progressViewId = null;   // V156: always open on the active program
+  _setConfirmProgId(null);_setConfirmTier(0);   // V169: never open Progress with a confirm armed
+  _setProgressViewId(null);   // V156: always open on the active program
   renderProgressScreen();
   showScreen('screenProgress');
 }
@@ -16663,9 +16968,9 @@ function _restoreBarHTML(p){
     <button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" onclick="askPurgeFromProgress('${p.id}')">${asyIcon('trash',16)}</button>
   </div>`;
 }
-function askPurgeFromProgress(id){confirmProgId=id;confirmTier=2;renderProgressScreen();}
-function cancelProgressConfirm(){confirmProgId=null;confirmTier=0;renderProgressScreen();}
-function setProgressView(id){progressViewId=id;renderProgressScreen();}
+function askPurgeFromProgress(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgressScreen();}
+function cancelProgressConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgressScreen();}
+function setProgressView(id){_setProgressViewId(id);renderProgressScreen();}
 // ══ V165 — PROGRESS SCREEN REBUILD (D1/D2/D3/D5/D7/D8/D9/D10-A/D6) ══════════
 // Six modules replace the V164 run/lift chart stack. Swim and bike dot charts are
 // untouched: D7 named a run-and-lift set, and deleting a sport's only chart would
@@ -17661,7 +17966,7 @@ function renderProgressScreen() {
   // charts render; null means the active program. Every store read below goes through
   // the *For(_vid) accessors so a viewed program can NEVER leak the active one's data.
   let _vprog = progressViewId ? _allProgs.find(p=>p.id===progressViewId) : null;
-  if(!_vprog){ progressViewId=null; _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
+  if(!_vprog){ _setProgressViewId(null); _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
   if(!_vprog) return;
   const _vid = _vprog.id;
   const _chips = _progChipsHTML(_allProgs, _vid);
@@ -18069,7 +18374,7 @@ async function submitBug(){
   try{
     const ap=activeProg;
     ctx='\n\n— context —\n'
-      +'build: v'+IA_VERSION+'\n'
+      +'build: '+iaVersionLabel(IA_VERSION)+'\n'
       +'time: '+new Date().toISOString()+'\n'
       +'ua: '+navigator.userAgent+'\n'
       +'viewport: '+window.innerWidth+'x'+window.innerHeight+'\n'
@@ -18102,7 +18407,7 @@ function init(){
   // later throw in init can skip it; the stopwatch holds its initials here, so this is end() in the native app
   // and a no-op on the PWA (no window.iaIsland).
   _ruIsland();
-  const _bv=document.getElementById('bugVersion'); if(_bv) _bv.textContent='BUILD v'+IA_VERSION;
+  const _bv=document.getElementById('bugVersion'); if(_bv) _bv.textContent='BUILD '+iaVersionLabel(IA_VERSION);
   renderProgList();
   const aid=getActiveProgId();const programs=getPrograms();
   // V221 D178: boot switches through the loader, so a fallback pick is written back to ia_active.
@@ -18401,9 +18706,18 @@ function fireCompletionPopup(week,dayKey){
   if(streakMilestone(streak)){ fireStreakPopup(streak); return; }
   fireWorkoutPopup(week,dayKey);
 }
-// Day-after reminder: most recent strictly-past pending non-rest day not yet reminded.
+// Day-after reminder: most recent strictly-past pending non-rest day not yet reminded, since the last marked day.
 function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
 function markReminded(week,d){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
+// v0.240.1 (D238, P-REMINDSWITCH): nothing records when a program became active, so a program switched to would ask
+// about every day spent on another one. The switch marks each past unmarked training day as asked. The record is not
+// written: the days stay unmarked, and the streak reads them as transparent. Today and later are asked as before.
+function markPastAsked(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const m=remindedSet(); let n=0;
+  scheduledDays(today).forEach(x=>{ if(x.date<today&&!statusOf(x.week,x.d)&&!m[completedKey(x.week,x.d)]){ m[completedKey(x.week,x.d)]=true; n++; } });
+  if(n) try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{}
+}
 function _todayStamp(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
 function maybeShowReminder(){
   if(!activeProg?.startDate) return;
@@ -18414,7 +18728,9 @@ function maybeShowReminder(){
   const rem=remindedSet(); let target=null;
   for(let i=days.length-1;i>=0;i--){
     const x=days[i];
-    if(statusOf(x.week,x.d)) continue;            // already resolved
+    // v0.241.1 (D240, P-REMINDGAP): a marked day ends the walk. The days before it are behind the athlete and never
+    // asked about: never chase missed work. Before, the walk skipped it and asked about an old gap one day at a time.
+    if(statusOf(x.week,x.d)) break;               // already resolved
     if(rem[completedKey(x.week,x.d)]) continue;    // already reminded
     target=x; break;
   }
@@ -18462,6 +18778,13 @@ function resolveReminder(week,dayKey,title,status){
    and reads the same meta from the fresh bytes. No service worker involved.
 ═══════════════════════════════════════════ */
 const IA_VERSION = (document.querySelector('meta[name="ia-version"]')||{}).content || '0';
+// v0.239.1 (D236.1): the version as people read it, 'v' plus MAJOR.MINOR.PATCH. One leading v or V is dropped
+// first, so the label never reads vv. A pre-semver integer N reads 0.N.0 (239 prints v0.239.0); anything else
+// prints as given after one v, so the label never throws. IA_VERSION stays the raw meta for the update check.
+function iaVersionLabel(ver){
+  var s=String(ver),t=/^[vV]/.test(s)?s.slice(1):s;
+  return /^(0|[1-9][0-9]*)$/.test(t)?'v0.'+t+'.0':'v'+t;
+}
 let _iaUpdateDismissed = false;   // session-only; re-arms on next full load
 let _iaUpdateShown = false;
 

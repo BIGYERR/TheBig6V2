@@ -1,0 +1,224 @@
+m5 rerun 2026-10-13 on index.html ia-version 0.239.44 (rest sheet re-check before v0.240.0): rest-sheet rows byte-identical to the V238 run; only page line numbers and the Random Workout draw differ
+
+==== A1 overlays (static, from the file text)
+  detailOverlay class="overlay" :1058
+  swapOverlay class="overlay" :1084
+  addOverlay class="overlay" :1095
+  swapNudgeOverlay class="pop-overlay" :1106
+  rpeInfoOverlay class="rpe-overlay" :1114
+  randOverlay class="rand-overlay" :1132
+  restOverlay class="rand-overlay" :1141
+  changeOverlay class="rand-overlay" :1148
+  goalOverlay class="rand-overlay" :1155
+  mileOverlay class="rand-overlay" :1165
+  mileLockOverlay class="rand-overlay" :1183
+  popOverlay class="pop-overlay" :18658
+  popModal class="pop-modal" :18659
+  :283 .overlay { display:none;position:fixed;inset:0;background:var(--bg) !important;z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch; }
+  :284 .overlay.open { display:block; }
+  :455 .pop-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px; }
+  :456 .pop-overlay.show { display:flex; }
+  :457 .pop-modal { position:relative;width:100%;max-width:360px;background:#181712;border:1px solid rgba(244,241,232,0.14);border-radius:4px;padding:32px 26px 24px;text-align:center;overflow:hidden;animation:popIn .42s cubic-bezier(.16,1.3,.4,1);box … }
+  :458 .pop-modal.shake { animation:popIn .42s cubic-bezier(.16,1.3,.4,1), popShake .5s .42s ease-in-out; }
+  :461 .pop-modal::before { content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:220px;height:160px;background:radial-gradient(ellipse,var(--pop-glow,rgba(207,78,26,0.30)),transparent 70%);pointer-events:none; }
+  :490 .rand-overlay { display:none;position:fixed;inset:0;background:var(--bg) !important;z-index:300;overflow-y:auto; }
+  :491 .rand-overlay.open { display:block; }
+  :505 .toast { position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--run);color:#0a0a0a;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;padding:10px 20px;border-radius:4px;z-index:99 … }
+  :506 .toast.show { opacity:1; }
+  :885 .overlay,.rand-overlay { display:block !important;transform:translateY(100%);visibility:hidden;will-change:transform; transition:transform .36s cubic-bezier(.32,.72,0,1), visibility 0s linear .36s; }
+  :887 .overlay.open,.rand-overlay.open { transform:translateY(0);visibility:visible; transition:transform .40s cubic-bezier(.32,.72,0,1), visibility 0s linear 0s; }
+  :891 .pop-overlay.show { animation:fadeBg .22s ease; }
+  :892 .pop-overlay.show>* { animation:popIn .28s cubic-bezier(.34,1.56,.64,1); }
+  :899 .overlay,.rand-overlay,.overlay.open,.rand-overlay.open { transition:none; }
+  :921 .rpe-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:2500;padding:22px; }
+  :922 .rpe-overlay.show { display:flex; }
+  closing .overlay/.rand-overlay: transform .36s, visibility hidden delayed .36s => hit-testable window 360 ms
+  pointer-events rules on any overlay selector: .pop-modal::before | .toast ; whole-file "pointer-events" count 8
+  reduced-motion rule present: true
+
+==== A2 handlers rendered inside each sheet (driven)
+  W2 grid {"sun":{"rest":true,"title":"Rest","secs":0},"mon":{"rest":false,"title":"Strength Support","cardio":"run","sub":"Speed Run — Intervals","secs":4},"tue":{"rest":false,"title":"Leg Strength + Mobility","cardio":null,"sub":null,"secs":6},"wed":{"rest":true,"title":"Rest","secs":0},"thu":{"rest":false,"title":"Posterior Chain","cardio":"run","sub":"Speed Run — Intervals","secs":3},"fri":{"rest":false,"title":"Recovery Lift","cardio":"run","sub":"Recovery Run","secs":3},"sat":{"rest":false,"title":"Full Body Support","cardio":"run","sub":"Long Run","secs":1}}
+  lift day mon | run day mon
+  detailOverlay (mon): {"openSwapSheet":6,"toggleSets":6,"stepSet":30,"setDelta":15,"onSetWeight":15,"cascadeSetWeights":6,"saveExWeight":6,"skipExercise":5,"skipSuperset":1,"showRpeInfo":1,"updateRPEDisplay":1,"toggleCardioPicker":1,"setCardioSwap":3,"logCardio":1,"handleDayStatus":2}
+  detailOverlay (mon): {"openSwapSheet":6,"toggleSets":6,"stepSet":30,"setDelta":15,"onSetWeight":15,"cascadeSetWeights":6,"saveExWeight":6,"skipExercise":5,"skipSuperset":1,"showRpeInfo":1,"updateRPEDisplay":1,"toggleCardioPicker":1,"setCardioSwap":3,"logCardio":1,"handleDayStatus":2}
+  swapOverlay: {"applySwapChoice":13}
+  addOverlay: {"applyAddChoice":16}
+  randOverlay: {"skipSuperset":1,"openSwapSheet":4,"toggleSets":4,"stepSet":8,"setDelta":4,"onSetWeight":2,"cascadeSetWeights":2,"saveExWeight":4,"skipExercise":3,"completeWildcard":1,"setRandFilter":2}
+  restOverlay menu: {"_rdSet":2}
+  restOverlay move: {"_rdSet":5,"applyRestMove":1}
+  restOverlay cardio: {"_rdSet":5,"_restDraft.mins":1,"_restDraft.dist":1,"applyRestCardio":1}
+  changeOverlay travel: {"_ovSet":5,"applyOverlayDraft":1}
+  changeOverlay injury: {"_ovSet":10,"applyInjuryDraft":1}
+  goalOverlay: {"selectGoalOpt":5}
+  mileOverlay (static html): {}
+  mileOverlay (static html): {"closeMileSheet":2,"commitMileChange":1}
+  swapNudgeOverlay: {}
+  swapNudgeOverlay (static): {"acceptSwapNudge":1,"dismissSwapNudge":1}
+
+==== A2 second call of every state-writing / closing handler (driven, same draft, no reopen between calls)
+  rest: Log it (applyRestCardio)
+     onclick "applyRestCardio()" | closes sheet: true | call1 wrote ["ia_logs_p_mario"] | call2 wrote ["ia_logs_p_mario"] | toasts ["30 min logged ✓"] then ["30 min logged ✓"]
+     => sum
+       w2_wed after 1 {"run":{"mins":30,"dist":3.1,"rpe":5}} after 2 {"run":{"mins":60,"dist":6.2,"rpe":5}}
+  rest: Move it here (applyRestMove)
+     onclick "applyRestMove()" | closes sheet: true | call1 wrote ["ia_programs","ia_moves_p_mario"] | call2 wrote [] | toasts ["Moved. Monday is your rest now ✓"] then ["Moved. Monday is your rest now ✓"]
+     => idempotent
+  rest: Log cardio instead / menu rows (_rdSet)
+     onclick "_rdSet('view','cardio')" | closes sheet: false | call1 wrote [] | call2 wrote [] | toasts [] then []
+     => writes nothing
+  detail: Done (handleDayStatus complete)
+     onclick "handleDayStatus('mon','Strength Support','complete')" | closes sheet: true | call1 wrote ["ia_hist_p_mario","ia_logs_p_mario","ia_comp_p_mario"] | call2 wrote ["ia_comp_p_mario"] | toasts ["Done ✓"] then ["Unmarked"] | pops ["workout"]
+     => toggle (2nd call deletes the completion; logs/hist kept)
+  detail: Skip (handleDayStatus skipped)
+     onclick "handleDayStatus('mon','Strength Support','skipped')" | closes sheet: true | call1 wrote ["ia_hist_p_mario","ia_logs_p_mario","ia_comp_p_mario"] | call2 wrote ["ia_comp_p_mario"] | toasts ["Skipped ✕ The week moves on"] then ["Unmarked"]
+     => toggle (2nd call deletes the completion; logs/hist kept)
+  detail: Mark Done nudge (handleDayStatus complete, logged-unmarked day)
+     onclick "handleDayStatus('mon','Strength Support','complete')" | closes sheet: true | call1 wrote ["ia_logs_p_mario","ia_hist_p_mario","ia_comp_p_mario"] | call2 wrote ["ia_comp_p_mario"] | toasts ["Done ✓"] then ["Unmarked"] | pops ["workout"]
+     => toggle (2nd call deletes the completion; logs/hist kept)
+  swap: candidate row (applySwapChoice)
+     onclick "applySwapChoice('Barbell bench press')" | closes sheet: true | call1 wrote ["ia_swaps_p_mario","ia_swapct_p_mario"] | call2 wrote [] | toasts ["Barbell bench press in, close-grip bench press out. Same job, same numbers."] then [] | mem ["\"Close-grip bench press\"","\"Barbell bench press\"","\"Barbell bench press\""]
+     => idempotent
+  add: candidate row (applyAddChoice)
+     onclick "applyAddChoice('Dumbbell front raise')" | closes sheet: true | call1 wrote ["ia_edits_p_mario"] | call2 wrote [] | toasts ["Dumbbell front raise added at 3×10 — RPE 7."] then ["Dumbbell front raise added at 3×10 — RPE 7."] | mem ["0","1","1"]
+     => idempotent
+       ia_edits_ after 1 105 bytes, after 2 105 bytes; "{\"w2_mon\":{\"add\":[{\"name\":\"Dumbbell front raise\",\"detail\":\"3×10 — RPE 7\",\"ts\":1791475200000}],\"skip\":[]}}"
+  rand: Complete — Mark Done (completeWildcard)
+     onclick "completeWildcard('Core + Carry Day')" | closes sheet: true | call1 wrote ["ia_wild_p_mario"] | call2 wrote [] | toasts ["Core + Carry Day logged ✓"] then ["Core + Carry Day logged ✓"]
+     => idempotent
+  rand: Reset (resetWildcardCounter, two-tap confirm by design; one wildcard done)
+     onclick "resetWildcardCounter()" | closes sheet: n/a | call1 wrote [] | call2 wrote ["ia_wild_p_mario"] | toasts [] then ["Wildcard counter reset ✓"]
+     => two-tap confirm: call 1 arms, call 2 wipes ia_wild_ ([{"title":"X","ts":1,"week":2,"dayKey":"thu"}] -> [])
+  change: Apply change travel (applyOverlayDraft)
+     onclick "applyOverlayDraft()" | closes sheet: true | call1 wrote ["ia_programs"] | call2 wrote ["ia_programs"] | toasts ["Change applied ✓"] then ["Change applied ✓"] | mem ["0","1","2"]
+     => duplicate record (overlays 0 -> 1 -> 2)
+  change: Apply change injury (applyInjuryDraft)
+     onclick "applyInjuryDraft()" | closes sheet: true | call1 wrote ["ia_programs"] | call2 wrote ["ia_programs"] | toasts ["Working around it ✓"] then ["Working around it ✓"] | mem ["0","1","2"]
+     => duplicate record (overlays 0 -> 1 -> 2)
+  goal: Make the switch (commitGoalChange)
+     onclick "commitGoalChange()" | closes sheet: true | call1 wrote ["ia_programs"] | call2 wrote [] | toasts ["Goal switched. Program rebuilt from this week."] then ["Goal switched. Program rebuilt from this week."] | mem ["\"run_half\"","\"run_5k\"","\"run_5k\""]
+     => idempotent
+  mile: Update my mile (commitMileChange)
+     onclick "commitMileChange()" | closes sheet: true | call1 wrote ["ia_programs"] | call2 wrote ["ia_programs"] | toasts ["Mile updated. Every run still ahead of you now reads from your new row."] then ["Mile updated. Every run still ahead of you now reads from your new row."]
+     => rewrite (same mile; mileBestSrc.from overwritten with the value call 1 wrote)
+       mileBestSrc after 1 {"kind":"edited","at":"2026-10-08","wk":2,"from":{"mins":"10","secs":"30","kind":"entered"}} | after 2 {"kind":"edited","at":"2026-10-08","wk":2,"from":{"mins":"9","secs":"45","kind":"edited"}}
+  nudge (pop-overlay): Make the change (acceptSwapNudge)
+     onclick "acceptSwapNudge()" | closes sheet: true | call1 wrote ["ia_programs"] | call2 wrote [] | toasts ["Done. Front Squat is your squat from here."] then []
+     => idempotent
+  nudge (pop-overlay): Leave the plan alone (dismissSwapNudge)
+     onclick "dismissSwapNudge()" | closes sheet: true | call1 wrote [] | call2 wrote [] | toasts [] then []
+     => writes nothing
+  TALLY over 16 driven handlers: {"sum":1,"idempotent":6,"writes nothing":2,"toggle (2nd call deletes the completion; logs/hist kept)":3,"two-tap confirm: call 1 arms, call 2 wipes ia_wild_ ([{\"title\":\"X\",\"ts\":1,\"week\":2,\"dayKey\":\"thu\"}] -> [])":1,"duplicate record (overlays 0 -> 1 -> 2)":2,"rewrite (same mile; mileBestSrc.from overwritten with the value call 1 wrote)":1}
+
+==== A3 status foot after the undo tap (driven): the re-rendered foot puts a button back under the finger
+  foot before: {"handleDayStatus":2} | foot on a Done day: "Done ✓ tap to undo Skip"
+
+==== B1 rest sheet cardio view per type (driven; cardioTypes set to all four so every chip renders)
+  run: chips Run*,Bike,Swim,Row,Walk | labels ["MODALITY","TIME","Distance (miles)","HOW HARD"] units ["min"]
+     inputs {ph minutes min 1 max 600 step - mode numeric value "30" onchange _restDraft.mins=+this.value||0} {ph miles min 0 max - step 0.1 mode decimal value "" onchange _restDraft.dist=this.value}
+     typed 25 + 3.1 -> stored restLog {"run":{"mins":25,"dist":3.1,"rpe":5}} toast ["25 min logged ✓"]
+  bike: chips Run,Bike*,Swim,Row,Walk | labels ["MODALITY","TIME","Distance (miles)","HOW HARD"] units ["min"]
+     inputs {ph minutes min 1 max 600 step - mode numeric value "30" onchange _restDraft.mins=+this.value||0} {ph miles min 0 max - step 0.1 mode decimal value "" onchange _restDraft.dist=this.value}
+     typed 25 + 3.1 -> stored restLog {"bike":{"mins":25,"dist":3.1,"rpe":5}} toast ["25 min logged ✓"]
+  swim: chips Run,Bike,Swim*,Row,Walk | labels ["MODALITY","TIME","Distance (yards)","HOW HARD"] units ["min"]
+     inputs {ph minutes min 1 max 600 step - mode numeric value "30" onchange _restDraft.mins=+this.value||0} {ph yards min 0 max - step 0.1 mode decimal value "" onchange _restDraft.dist=this.value}
+     typed 25 + 3.1 -> stored restLog {"swim":{"mins":25,"dist":3.1,"rpe":5}} toast ["25 min logged ✓"]
+  row: chips Run,Bike,Swim,Row*,Walk | labels ["MODALITY","TIME","Distance (miles)","HOW HARD"] units ["min"]
+     inputs {ph minutes min 1 max 600 step - mode numeric value "30" onchange _restDraft.mins=+this.value||0} {ph miles min 0 max - step 0.1 mode decimal value "" onchange _restDraft.dist=this.value}
+     typed 25 + 3.1 -> stored restLog {"row":{"mins":25,"dist":3.1,"rpe":5}} toast ["25 min logged ✓"]
+  walk: chips Run,Bike,Swim,Row,Walk* | labels ["MODALITY","TIME","HOW HARD"] units ["min"]
+     inputs {ph minutes min 1 max 600 step - mode numeric value "30" onchange _restDraft.mins=+this.value||0}
+     typed 25 + 3.1 -> stored restLog {"walk":{"mins":25,"rpe":5}} toast ["25 min logged ✓"]
+
+==== B2 RPE chips vs RPE_LABELS (driven)
+  chip RPE 5 "Easy" (Conversational, full sentences) [default selected] | RPE_LABELS[5] = "Hard" | agree false
+  chip RPE 7 "Steady" (Working, sentences getting short) | RPE_LABELS[7] = "Very Hard" | agree false
+  chip RPE 9+ "Hard" (That’s a training day, not a rest day) | RPE_LABELS[9] = "Max Effort" | agree false
+  RPE_LABELS all: {"1":"Very Easy","2":"Easy","3":"Moderate","4":"Somewhat Hard","5":"Hard","6":"Hard+","7":"Very Hard","8":"Very Hard+","9":"Max Effort","10":"All Out"} | rpeInfoOverlay bands (static): 1–3 Easy — can hold a full conversation 4–6 Moderate — short sentences only 7–8 Hard — a few words at a time 9–10 Max — can't talk, all-out
+
+==== B3 wheels (driven where pure)
+  run day mon (Speed Run — Intervals, dose.k undefined) wheels: ["dist->log_run_dist","pace->log_run_pace"]
+  run day thu (Speed Run — Intervals, dose.k undefined) wheels: ["dist->log_run_dist","pace->log_run_pace"]
+  run day fri (Recovery Run, dose.k time) wheels: ["hms->log_run_mins data-plan=\"35\"","dist->log_run_dist"]
+  run day sat (Long Run, dose.k dist) wheels: ["dist->log_run_dist data-plan=\"4\"","hms->log_run_mins"]
+  after closeDetail: detailOverlay open false | detailBody still holds hidden inputs: id="log_run_dist",id="log_run_mins"
+  iaWheelHTML pure call: hms 25 -> hidden value 25 | dist 3.1 parse ["3","1","0"] | hms 800 parse (ceiling) ["9","59","59"] | dist 120 parse ["99","0","0"]
+  DOM order: detailOverlay :1058 before restOverlay :1141 (getElementById returns the first id in document order)
+  swim card field (cardioFieldHTML swim): <label><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto"><circle cx="8" cy="9" r="2"/><path d="M10 
+  bike card field: hms->log_bike_mins
+
+==== B4 sum past max="600" (driven) and what each reader prints
+  400 + 400 -> {"run":{"mins":800,"dist":6,"rpe":5}} toasts ["400 min logged ✓","400 min logged ✓"]
+  one typed 900 (the onchange "_restDraft.mins=+this.value||0" does not clamp; max is an attribute, not a check) -> {"run":{"mins":900,"rpe":5}} toast ["900 min logged ✓"]
+  in-file readers that compare a rest mins to 600 (comments stripped): 1
+  readers with run mins 800 + bike mins 800: {"MILES":"6","wedCell":"WED — 7 REST","hero":null,"progEmpty":false,"progMi":["6.0","6.0"],"progSessions":null,"journalWed":" Wed 800 min run logged · RPE 5 800 min ride logged · RPE 5 1RM Estimator Option","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":6}","ladder":"{\"2\":6}","moveCands":"mon,tue,thu,fri,sat","restLines":"[\"800 min run logged · RPE 5\",\"800 min ride logged · RPE 5\"]"}
+
+==== B5 "Training anyway?" sheet (driven)
+  with a 30 min jog logged on WED, text: "WEDNESDAY · TRAINING ANYWAY Move a session here Nothing gets added. Whatever you pick moves to Wednesday, and its old day becomes your rest. NOT LOGGED THIS WEEK Strength Support Monday · not logged Leg Strength + Mobility Tuesday · not logged Posterior Chain Thursday · not logged Recovery Lift Friday · not logged Full Body Support Saturday · not logged"
+  mentions the jog (min|logged|jog|mi): false
+  after a pick: "D THIS WEEK Strength Support Monday · not logged ✓ Leg Strength + Mobility Tuesday · not logged Posterior Chain Thursday · not logged Recovery Lift Friday · not logged Full Body Support Saturday · not logged Move it here"
+  menu text: "WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you got in. Train a session here Move one of this week’s untrained days onto today. Log cardio Ran, rode, swam, walked. Record it and move on."
+  menu with a jog logged identical to menu without: true
+  cardio view with a jog logged: inputs ["value=\"30\" onchange","placeholder=\"minutes\"","value=\"\" onchange","placeholder=\"miles\""] | shows the log: false
+
+==== B6 restDayEligible / openDayKey across a hand calendar (driven; expected from date arithmetic)
+  Thu 10-08 (today W2 THU, a training day) | W1 WED 2026-09-30 [past week] -> sheet OPENS | toast [] | expected open
+  Thu 10-08 (today W2 THU, a training day) | W1 SUN 2026-10-04 [past week] -> sheet OPENS | toast [] | expected open
+  Thu 10-08 (today W2 THU, a training day) | W2 WED 2026-10-07 [past, this week] -> sheet OPENS | toast [] | expected open
+  Thu 10-08 (today W2 THU, a training day) | W2 SUN 2026-10-11 [future, this week] -> sheet no | toast [] | expected closed
+  Thu 10-08 (today W2 THU, a training day) | W3 WED 2026-10-14 [future week] -> sheet no | toast [] | expected closed
+  Thu 10-08 (today W2 THU, a training day) | W3 SUN 2026-10-18 [future week] -> sheet no | toast [] | expected closed
+  Wed 10-07 (today W2 WED, a rest day) | W1 WED 2026-09-30 [past week] -> sheet OPENS | toast [] | expected open
+  Wed 10-07 (today W2 WED, a rest day) | W1 SUN 2026-10-04 [past week] -> sheet OPENS | toast [] | expected open
+  Wed 10-07 (today W2 WED, a rest day) | W2 WED 2026-10-07 [today] -> sheet OPENS | toast [] | expected open
+  Wed 10-07 (today W2 WED, a rest day) | W2 SUN 2026-10-11 [future, this week] -> sheet no | toast [] | expected closed
+  Wed 10-07 (today W2 WED, a rest day) | W3 WED 2026-10-14 [future week] -> sheet no | toast [] | expected closed
+  Wed 10-07 (today W2 WED, a rest day) | W3 SUN 2026-10-18 [future week] -> sheet no | toast [] | expected closed
+  agree 12/12
+  start Thu 10-01, W1 WED 09-30 (before start) -> open false toasts ["Before your start date"]
+  after moving THU onto WED: thu = {"rest":true,"moved":true} | hero rest buttons [["openRestSheet(2,'thu','move')","Training anyway?"],["openRestSheet(2,'thu','cardio')","Log cardio"]]
+    hero "Training anyway?" -> sheet no toast ["That rest day has not come around yet"]
+    hero "Log cardio" -> sheet no toast ["That rest day has not come around yet"]
+    strip THU -> sheet false toast []
+  static: "has not come around yet" sites 1; openRestSheet callers (non-def) 4
+
+==== C1 W2 WED entry shapes through every reader (driven, clock Thu 10-08; hero rows from clock Wed 10-07)
+  clock Thu | S0 no key
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":null,"progEmpty":"empty (hasAnyData false)","progMi":[],"progSessions":null,"journalWed":"(no Wed row)","journalEmpty":"no journal heading","seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","frozenW2Wed":false,"sheetCardio":"blank (value 30)"}
+  clock Thu | S1 logged jog {restLog:{run:{mins:30,dist:3.1,rpe:5}}}
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":null,"progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 30 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":3.1}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[\"30 min run logged · RPE 5\"]","frozenW2Wed":true,"sheetCardio":"blank (value 30)"}
+  clock Thu | S2 {restLog:{}, week, ts}
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":null,"progEmpty":"empty (no section rendered)","progMi":[],"progSessions":null,"journalWed":"(no Wed row)","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","frozenW2Wed":true,"sheetCardio":"blank (value 30)"}
+  clock Thu | S3 {week, ts}
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":null,"progEmpty":"empty (no section rendered)","progMi":[],"progSessions":null,"journalWed":"(no Wed row)","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","frozenW2Wed":true,"sheetCardio":"blank (value 30)"}
+  clock Wed (WED is today) | S0 no key
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. Training anyway? Log cardio","progEmpty":"empty (hasAnyData false)","progMi":[],"progSessions":null,"journalWed":"(no Wed row)","journalEmpty":"no journal heading","seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","frozenW2Wed":false,"sheetCardio":"blank (value 30)"}
+  clock Wed (WED is today) | S1 logged jog {restLog:{run:{mins:30,dist:3.1,rpe:5}}}
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. 30 min run logged · RPE 5 Training anyway? Log more","progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 30 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[\"30 min run logged · RPE 5\"]","frozenW2Wed":true,"sheetCardio":"blank (value 30)"}
+  clock Wed (WED is today) | S2 {restLog:{}, week, ts}
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. Training anyway? Log cardio","progEmpty":"empty (no section rendered)","progMi":[],"progSessions":null,"journalWed":"(no Wed row)","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","frozenW2Wed":true,"sheetCardio":"blank (value 30)"}
+  clock Wed (WED is today) | S3 {week, ts}
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. Training anyway? Log cardio","progEmpty":"empty (no section rendered)","progMi":[],"progSessions":null,"journalWed":"(no Wed row)","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","frozenW2Wed":true,"sheetCardio":"blank (value 30)"}
+  static: getLogs/getLogsFor/raw ia_logs_ readers listed in the record; presence reads: Progress hasAnyData = Object.keys(logs).length>0; refreshProgram _touched merges raw ia_logs_ keys
+
+==== C2 partial jog records through the SPREAD readers (driven)
+  clock Thu | T1 {dist:3.1, rpe:7} no mins
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":null,"progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 1RM Estimator Optional — estimate a one-rep max from any recent set, just f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":3.1}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","relogDefaults":"{\"mins\":30,\"dist\":3.1,\"rpe\":7}"}
+  clock Thu | T2 {mins:25} no rpe
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":null,"progEmpty":false,"progMi":[],"progSessions":null,"journalWed":" Wed 25 min run logged · RPE — 1RM Estimator Optional — estimate a one-rep max f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[\"25 min run logged · RPE —\"]","relogDefaults":"{\"mins\":55,\"rpe\":5}"}
+  clock Thu | T3 {mins:0, dist:3.1, rpe:7}
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":null,"progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 1RM Estimator Optional — estimate a one-rep max from any recent set, just f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":3.1}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","relogDefaults":"{\"mins\":30,\"dist\":3.1,\"rpe\":7}"}
+  clock Thu | T4 {mins:25, dist:3.1, rpe:7} control
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":null,"progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 25 min run logged · RPE 7 1RM Estimator Optional — estimate a one-rep max f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":3.1}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[\"25 min run logged · RPE 7\"]","relogDefaults":"{\"mins\":55,\"dist\":3.1,\"rpe\":7}"}
+  clock Wed | T1 {dist:3.1, rpe:7} no mins
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. Training anyway? Log cardio","progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 1RM Estimator Optional — estimate a one-rep max from any recent set, just f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","relogDefaults":"{\"mins\":30,\"dist\":3.1,\"rpe\":7}"}
+  clock Wed | T2 {mins:25} no rpe
+     {"MILES":"0","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. 25 min run logged · RPE — Training anyway? Log more","progEmpty":false,"progMi":[],"progSessions":null,"journalWed":" Wed 25 min run logged · RPE — 1RM Estimator Optional — estimate a one-rep max f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{}","moveCands":"mon,tue,thu,fri,sat","restLines":"[\"25 min run logged · RPE —\"]","relogDefaults":"{\"mins\":55,\"rpe\":5}"}
+  clock Wed | T3 {mins:0, dist:3.1, rpe:7}
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. Training anyway? Log cardio","progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 1RM Estimator Optional — estimate a one-rep max from any recent set, just f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[]","relogDefaults":"{\"mins\":30,\"dist\":3.1,\"rpe\":7}"}
+  clock Wed | T4 {mins:25, dist:3.1, rpe:7} control
+     {"MILES":"3.1","wedCell":"WED — 7 REST","hero":"Today · Wednesday REST DAY Recovery is where the work sets in. Move easy, refuel, sleep. 25 min run logged · RPE 7 Training anyway? Log more","progEmpty":false,"progMi":["3.1","3.1"],"progSessions":null,"journalWed":" Wed 25 min run logged · RPE 7 1RM Estimator Optional — estimate a one-rep max f","journalEmpty":null,"seedMax0":"null","seedMax":"planted 6 recovery runs of 2 mi -> {\"n\":6,\"maxDist\":2}","ladder":"{\"2\":3.1}","moveCands":"mon,tue,thu,fri,sat","restLines":"[\"25 min run logged · RPE 7\"]","relogDefaults":"{\"mins\":55,\"dist\":3.1,\"rpe\":7}"}
+
+==== A2b detail-sheet writers that do NOT close the sheet: NOT DRIVEN
+  toggleSets and stepSet each hit the 3 s vm timeout in this DOM stub (both calls), and skipSuperset ran the process out of heap (two attempts); the stub cannot run them, so A2b is code-read only and these rows are a failed measurement, not a clean result.
+
+DONE

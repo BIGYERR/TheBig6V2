@@ -1,0 +1,27 @@
+/* The server: TypeScript in server/, compiled by tsc into dist/server/ (npm run build:server). The compiled files are
+ * what runs: npm start, the Procfile on Heroku, the Dockerfile and mac-local-backend. Imports name the .ts file and tsc
+ * rewrites them to .js as it emits, so Node can also run the source as it stands (npm run dev, the tests), and
+ * erasableSyntaxOnly keeps out the TypeScript that Node cannot run that way (enums, namespaces, parameter properties).
+ * No DOM here: the server is Node only. The admin UI and the website keep their own tsconfig.json. */
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "rootDir": "server",
+    "outDir": "dist/server",
+    "sourceMap": true,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["server/**/*.ts"]
+}

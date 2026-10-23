@@ -9,7 +9,7 @@ const KW = /\b(RED|REFUSED|REFUSES|crash(ed|es)?|no summary|FAIL [1-9]\d*|went r
 const lines = H.split('\n');
 let out = [];
 lines.forEach((ln, i) => {
-  const m = ln.match(/^- \*\*(V\d{3}|Post-V\d{3}|tooling|tests)/);
+  const m = ln.match(/^- \*\*(V\d{3}|v\d+\.\d+\.\d+|Post-[vV]\d+(?:\.\d+\.\d+)?|tooling|tests)/);
   const tag = m ? m[1] : null;
   const sents = ln.split(/(?<=[.;])\s+/);
   const hits = sents.filter(s => KW.test(s));
@@ -27,7 +27,7 @@ console.log('handoff hit lines', out.length, 'of', lines.length, '; gate commits
   const o2 = [];
   for (let i = 11; i < 116; i++) {
     const ln = lines[i]; if (!/^- \*\*(Prior|Most recent|Post)/.test(ln)) continue;
-    const ver = (ln.match(/\((V\d{3})\)|(Post-V\d{3})/) || [])[0] || '?';
+    const ver = (ln.match(/\((V\d{3}|v\d+\.\d+\.\d+)\)|(Post-[vV]\d+(?:\.\d+\.\d+)?)/) || [])[0] || '?';
     const s = ln.split(/(?<=[.;])\s+(?=[A-Z*(`])/).filter(x => KW2.test(x));
     o2.push(`### L${i + 1} ${ver}\n` + s.map(x => '  - ' + x.slice(0, 900)).join('\n'));
   }

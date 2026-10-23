@@ -1,0 +1,6 @@
+node_modules/
+dist/
+app-web/
+data/
+.env
+*.tmp

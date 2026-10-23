@@ -1,0 +1,22 @@
+# Context is the repo root; send only what the e2e images build from.
+*
+!apple-touch-icon.png
+!frontends/app/package.json
+!frontends/app/package-lock.json
+!frontends/app/angular.json
+!frontends/app/tsconfig.json
+!frontends/app/tsconfig.app.json
+!frontends/app/tsconfig.legacy.json
+!frontends/app/src/
+!frontends/app/scripts/
+!core/package.json
+!core/tsconfig.json
+!core/tsconfig.base.json
+!core/src/
+!tests/package.json
+!tests/package-lock.json
+!tests/e2e/
+# Generated inputs are rebuilt inside the image from the app's source files
+frontends/app/src/legacy/generated/
+# The suite's own output never goes back into an image
+tests/e2e/report/

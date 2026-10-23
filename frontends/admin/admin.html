@@ -1,0 +1,75 @@
+@switch (state.auth()) {
+  @case ('checking') {
+    <p class="boot" aria-live="polite">Loading…</p>
+  }
+  @case ('signed-in') {
+    <div class="shell">
+      <header class="bar">
+        <a class="brand" href="#/overview" aria-label="Admin overview">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="brand-word">THE <b>ASYLUM</b></span>
+          <span class="brand-tag">Admin vision</span>
+        </a>
+        @if (state.stats()?.server; as s) {
+          <span class="kind" [attr.data-kind]="s.kind" [title]="'This admin is served by the ' + s.kind + ' backend ' + s.name">
+            <i aria-hidden="true"></i>{{ s.kind }} <small>{{ s.name }}</small>
+          </span>
+        }
+        <span class="bar-gap"></span>
+        <span class="who"><ia-icon name="user" [size]="16" />{{ state.user() }}</span>
+        <button type="button" class="logout" (click)="state.logout()"><ia-icon name="logOut" [size]="16" />Log out</button>
+      </header>
+
+      <nav class="side" aria-label="Admin sections">
+        @for (s of sections; track s.id) {
+          <a class="side-link" [href]="'#/' + s.id" [attr.aria-current]="section() === s.id ? 'page' : null">
+            <ia-icon [name]="s.icon" [size]="18" /><span>{{ s.label }}</span>
+            @if (s.id === 'versions' && (state.stats()?.outdated ?? 0) > 0) {
+              <b class="side-count" [title]="state.stats()?.outdated + ' devices on an old build'">{{ state.stats()?.outdated }}</b>
+            }
+          </a>
+        }
+        <a class="side-link side-site" href="/"><ia-icon name="external" [size]="18" /><span>Website</span></a>
+      </nav>
+
+      <main class="panel">
+        <div class="panel-in">
+          <div class="sec-head">
+            <h1>{{ current().label }}</h1>
+            <p>{{ current().blurb }}</p>
+          </div>
+          @if (state.error()) {
+            <p class="error" role="alert">{{ state.error() }}</p>
+          }
+          @switch (section()) {
+            @case ('devices') {
+              <ia-devices />
+            }
+            @case ('versions') {
+              <ia-versions />
+            }
+            @case ('server') {
+              <ia-server-info />
+            }
+            @default {
+              <ia-overview />
+            }
+          }
+        </div>
+      </main>
+
+      <footer class="foot">
+        @if (state.stats()?.server; as s) {
+          <span>
+            Backend v{{ s.version }}@if (s.commit) { · {{ s.commit.slice(0, 7) }} } · {{ s.kind }} · up {{ span(s.uptimeS) }}
+            @if (!s.persistent) { · <em title="Set DATA_FILE or add a database to keep them">devices reset on restart</em> }
+          </span>
+        }
+        <span>© {{ year }} Iron Asylum · staff only</span>
+      </footer>
+    </div>
+  }
+  @default {
+    <ia-login />
+  }
+}

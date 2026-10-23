@@ -1,1 +1,75 @@
 # TheBig6V2
+
+Iron Asylum: a hybrid strength and cardio program builder for iPhone.
+
+| Folder | What it is | How it ships |
+|---|---|---|
+| `index.html` | the app: one page, built from `frontends/app/src/legacy/src/` into `dist-github-pages/` (with its icon), served at https://bigyerr.github.io/TheBig6V2/; the root `index.html` is its committed copy until the Pages source switches to GitHub Actions | GitHub Pages, on every merge into `main` (the pipeline's Pages job, once the source is switched; the branch `main` until then) |
+| `frontends/app/` | the same app as an Angular project, built four ways: `emulator-ios` and `device-ios` (Cordova), `pwa-pages` (a web build for `/TheBig6V2/pwa/`), and `pwa-local` (the same web build, served from this Mac) | built on demand; see `frontends/app/README.md` |
+| `frontends/` | the website and the admin dashboard (an Angular workspace), and `common/`, what the frontends share; the app above is `frontends/app/` | served by the backend; see `frontends/README.md` |
+| `backend/` | the Node backend: one server for the website (`/`), the app (`/app/`), the admin dashboard (`/admin/`) and the device heartbeat API | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
+| `tests/` | the test suite, by feature: unit, integration and sweeps in TypeScript on Vitest, with golden program output in `tests/snapshots/` | `node tools/check.mjs` locally (60 s), the full suite in CI |
+| `docs/` | reference for agents and Mario: the design system (`docs/design/`) | not shipped; it rides along on Pages with the rest of the repo, and the app never reads it |
+| `tools/` | the run log: every test, build, deploy, server and Claude session recorded in `temp/` | see `tools/README.md` |
+| `temp/` | the run log's output (gitignored, kept out of iCloud) | written by every run |
+
+## Running the app, in short
+
+**The fastest way to see a change across the whole stack is `cd backend && npm run dev`.** It serves the website, the
+app, the admin and the backend from the docker backend on http://localhost:3000, rebuilds whatever you save in about a
+second, runs only the tests that finish within 3 seconds, and reloads every open page. The paths below are for
+devices, deploys and full builds, and work as before.
+
+| Flow | Command | Where it runs |
+|---|---|---|
+| full stack dev mode: website, app, admin, backend | `cd backend && npm run dev` | http://localhost:3000/ (website), `/app/`, `/admin/` (admin / asylum), rebuilt and reloaded on every save |
+| live app | a pull request from `dev` into `main`, after the pipeline (`CLAUDE.md`, session rhythm) | https://bigyerr.github.io/TheBig6V2/, once Pages has deployed that commit (`node tools/deploy-check.mjs`) |
+| web app on this Mac, and on the iPhone over Wi-Fi | `cd frontends/app && npm run pwa-local` | http://localhost:4400/ on the Mac and `http://<Mac name>.local:4400/` on the iPhone. Nothing is committed or pushed |
+| Angular dev server | `cd frontends/app && npm start` | http://localhost:4200, this Mac only |
+| iOS Simulator | `cd frontends/app && npm run emulator-ios` | the native app in the simulator |
+| iPhone, native | `cd frontends/app && npm run device-ios` | the native app on the plugged-in iPhone |
+| web build on Pages | `cd frontends/app && npm run pwa-pages`, then commit `pwa/` and push | https://bigyerr.github.io/TheBig6V2/pwa/ |
+
+`pwa-local` serves the app only while it runs and the phone is on the same Wi-Fi. Add it to the home screen from the
+`.local` address, not the IP: each address keeps its own data, and the IP can change. Its data is separate from the
+live app's and the native app's. The details are in `frontends/app/README.md`.
+
+## Branches, checks and deploys
+
+- **Work on `dev`.** Commit and push there freely. Every commit runs the 60-second check on what it touches
+  (`tools/check.mjs --staged`, from `.githooks/pre-commit`; turn the hook on once per clone with
+  `git config core.hooksPath .githooks`). `node tools/check.mjs` runs all of it by hand, in about 25 seconds. Every push
+  to `dev` also runs the full suite in GitHub Actions (below); nothing waits for it, and its results are there to review.
+- **Release by pull request from `dev` into `main`, opened by hand** after reviewing the push's results in Actions. No
+  agent opens one. `main` is protected: it changes only through that pull request, and
+  only when every check in `.github/workflows/pipeline.yml` passes: the unit and integration tests (`tests/unit`,
+  `tests/integration`) and the sweeps (`tests/sweeps`), the app
+  and backend tests and lint, and the Docker e2e. That takes about 15 minutes
+  in GitHub Actions; nothing waits for it locally. Merging is the deploy: Pages serves `main`, the pipeline then proves
+  the live site serves it, and `backend/scripts/heroku.sh deploy` ships `origin/main`'s `backend/`.
+
+## What happened, and when
+
+Every test, e2e, build, deploy, local server and Claude session records itself in `temp/` (`tools/README.md`):
+one history, `temp/events.log`, with a line for each start, finish, failure and deploy step, and one folder per run
+under `temp/runs/` with its full output, its summary and anything it made (the e2e report and collage, docker and
+xcodebuild logs). `node tools/logs.mjs` shows the latest history, `node tools/logs.mjs runs` the latest runs, and
+`node tools/logs.mjs show e2e` the newest e2e run. Proving a Pages deploy is `node tools/deploy-check.mjs`.
+
+One level up, `~/Library/Logs/IronAsylum/orchestration.log` (also `temp/orchestration.log`, or
+`node tools/logs.mjs orch`) has one line for everything started on this Mac, from any checkout: each run, each
+Claude session, each prompt and each agent, saying who started it and the folder to open.
+
+## Backend on Heroku, in short
+
+The backend deploys separately from the app. Pages serves the repo root; Heroku gets only `backend/`.
+
+1. One time: `brew tap heroku/brew && brew install heroku`, `heroku login`, then
+   `bash backend/scripts/heroku.sh setup <app-name>` (creates the app, sets the admin login and config vars, adds
+   the `heroku-backend` remote).
+2. Each deploy: commit `backend/`, then `bash backend/scripts/heroku.sh deploy`. It pushes `backend/` alone and
+   does not return until the live `/healthz` reports the pushed commit.
+3. Admin vision is at `https://<your-app-url>/admin/`.
+
+Local runs (`npm start`, `npm run docker:up`), the API, config vars, and what Heroku does and does not keep are
+in `backend/README.md`.

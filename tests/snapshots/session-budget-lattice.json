@@ -1,0 +1,247 @@
+{
+  "census": {
+    "wide": {
+      "dayBuilds": 28224,
+      "longRunDays": 2808,
+      "longRunTiers": {
+        "A": 1944,
+        "B": 648,
+        "C": 216
+      },
+      "longRunCoreSections": 270,
+      "byInjury": {
+        "healthy": {
+          "coreSec": 1296,
+          "thinCore": 643,
+          "coreOffLongRun": 1296
+        },
+        "shoulder/protect": {
+          "coreSec": 774,
+          "thinCore": 570,
+          "coreOffLongRun": 648
+        },
+        "lowback/protect": {
+          "coreSec": 1248,
+          "thinCore": 676,
+          "coreOffLongRun": 1248
+        },
+        "elbow/protect": {
+          "coreSec": 744,
+          "thinCore": 514,
+          "coreOffLongRun": 600
+        }
+      },
+      "tiers": {
+        "bodyweight": {
+          "sections": 10245,
+          "items": 17905,
+          "coreSections": 692,
+          "thinCore": 315,
+          "prehab": 4014,
+          "prehabInHipSections": 3072,
+          "prehabOutsideD85Names": 336
+        },
+        "minimal": {
+          "sections": 10425,
+          "items": 18359,
+          "coreSections": 692,
+          "thinCore": 387,
+          "prehab": 4040,
+          "prehabInHipSections": 3072,
+          "prehabOutsideD85Names": 356
+        },
+        "home_basic": {
+          "sections": 10383,
+          "items": 18234,
+          "coreSections": 668,
+          "thinCore": 374,
+          "prehab": 3993,
+          "prehabInHipSections": 3072,
+          "prehabOutsideD85Names": 336
+        },
+        "home_full": {
+          "sections": 10445,
+          "items": 18289,
+          "coreSections": 672,
+          "thinCore": 431,
+          "prehab": 3976,
+          "prehabInHipSections": 3072,
+          "prehabOutsideD85Names": 319
+        },
+        "commercial": {
+          "sections": 10372,
+          "items": 18213,
+          "coreSections": 672,
+          "thinCore": 453,
+          "prehab": 3970,
+          "prehabInHipSections": 3072,
+          "prehabOutsideD85Names": 313
+        },
+        "crossfit": {
+          "sections": 10356,
+          "items": 18036,
+          "coreSections": 666,
+          "thinCore": 443,
+          "prehab": 3928,
+          "prehabInHipSections": 3072,
+          "prehabOutsideD85Names": 271
+        }
+      },
+      "budgetDeletes": {
+        "perTier": {
+          "bodyweight": {
+            "opt": 54,
+            "non": 749,
+            "nonEx": 533,
+            "ruled": 216
+          },
+          "minimal": {
+            "opt": 100,
+            "non": 707,
+            "nonEx": 491,
+            "ruled": 216
+          },
+          "home_basic": {
+            "opt": 96,
+            "non": 732,
+            "nonEx": 516,
+            "ruled": 216
+          },
+          "home_full": {
+            "opt": 96,
+            "non": 771,
+            "nonEx": 555,
+            "ruled": 216
+          },
+          "commercial": {
+            "opt": 102,
+            "non": 774,
+            "nonEx": 558,
+            "ruled": 216
+          },
+          "crossfit": {
+            "opt": 102,
+            "non": 750,
+            "nonEx": 534,
+            "ruled": 216
+          }
+        },
+        "perClass": {
+          "Arms finisher": 18,
+          "Biceps": 267,
+          "Calves": 1221,
+          "Delts": 112,
+          "Delts finisher": 36,
+          "Leg isolation": 1296,
+          "Triceps": 647,
+          "Trunk — anti-extension": 886
+        }
+      }
+    },
+    "narrow": {
+      "tiers": {
+        "bodyweight": {
+          "sections": 960,
+          "items": 1864,
+          "coreSections": 90,
+          "thinCore": 0,
+          "prehab": 425,
+          "prehabInHipSections": 320,
+          "prehabOutsideD85Names": 0
+        },
+        "minimal": {
+          "sections": 1025,
+          "items": 2011,
+          "coreSections": 90,
+          "thinCore": 10,
+          "prehab": 471,
+          "prehabInHipSections": 320,
+          "prehabOutsideD85Names": 46
+        },
+        "home_basic": {
+          "sections": 1025,
+          "items": 2019,
+          "coreSections": 90,
+          "thinCore": 5,
+          "prehab": 471,
+          "prehabInHipSections": 320,
+          "prehabOutsideD85Names": 46
+        },
+        "home_full": {
+          "sections": 1029,
+          "items": 2002,
+          "coreSections": 90,
+          "thinCore": 26,
+          "prehab": 457,
+          "prehabInHipSections": 320,
+          "prehabOutsideD85Names": 32
+        },
+        "commercial": {
+          "sections": 1029,
+          "items": 2000,
+          "coreSections": 90,
+          "thinCore": 28,
+          "prehab": 457,
+          "prehabInHipSections": 320,
+          "prehabOutsideD85Names": 32
+        },
+        "crossfit": {
+          "sections": 1029,
+          "items": 1993,
+          "coreSections": 90,
+          "thinCore": 30,
+          "prehab": 457,
+          "prehabInHipSections": 320,
+          "prehabOutsideD85Names": 32
+        }
+      },
+      "budgetDeletes": {
+        "bodyweight": {
+          "opt": 0,
+          "non": 0,
+          "nonEx": 0,
+          "ruled": 0
+        },
+        "minimal": {
+          "opt": 0,
+          "non": 0,
+          "nonEx": 0,
+          "ruled": 0
+        },
+        "home_basic": {
+          "opt": 0,
+          "non": 0,
+          "nonEx": 0,
+          "ruled": 0
+        },
+        "home_full": {
+          "opt": 0,
+          "non": 0,
+          "nonEx": 0,
+          "ruled": 0
+        },
+        "commercial": {
+          "opt": 0,
+          "non": 0,
+          "nonEx": 0,
+          "ruled": 0
+        },
+        "crossfit": {
+          "opt": 0,
+          "non": 0,
+          "nonEx": 0,
+          "ruled": 0
+        }
+      }
+    }
+  },
+  "costLens": {
+    "configs": 650,
+    "dayCells": 37240,
+    "budgetOffDiffers": 3718,
+    "changedByLens": 1947,
+    "itemsAdded": 2603,
+    "itemsRemoved": 0,
+    "detailChanges": 1
+  }
+}

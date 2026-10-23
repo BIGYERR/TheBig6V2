@@ -1,0 +1,125 @@
+</style>
+</head>
+<body>
+
+<!-- UPDATE-AVAILABLE BANNER (populated/toggled by update-check JS) -->
+<div class="ia-update-banner" id="iaUpdateBanner" onclick="iaDoUpdate()">
+  <span class="ia-update-label">Update available — tap to refresh</span>
+  <span class="ia-update-dismiss" onclick="event.stopPropagation();iaDismissUpdate()">✕</span>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1: PROGRAM LIST (HOME)
+══════════════════════════════════════════ -->
+<div class="screen active" id="screenHome">
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div>
+        <div class="app-title">THE <span>ASYLUM</span></div>
+        <div class="app-subtitle" id="homeSubtitle">Your Programs</div>
+      </div>
+    </div>
+  </div>
+  <div class="prog-list" id="progList"></div>
+  <button class="new-prog-btn" onclick="startWizard()">+ Build New Program</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2: WIZARD
+══════════════════════════════════════════ -->
+<div class="screen" id="screenWizard">
+  <div class="wizard-bar">
+    <button class="wizard-back" onclick="wizardBack()">← Back</button>
+    <div class="wizard-progress"><div class="wizard-progress-fill" id="wizardFill"></div></div>
+    <div class="wizard-step-label" id="wizardStepLabel">1 / 6</div>
+  </div>
+  <div class="wizard-body" id="wizardBody"></div>
+  <button class="wizard-next" id="wizardNext" onclick="wizardNext()">Continue →</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 3: GENERATING
+══════════════════════════════════════════ -->
+<div class="screen" id="screenGenerate">
+  <div class="generate-screen">
+    <svg role="status" aria-label="Loading" width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="var(--text)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 18px">
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 11; 0 0" keyTimes="0;0.5;1" dur="1.5s" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" repeatCount="indefinite"/>
+        <line x1="17" y1="8" x2="47" y2="8"/>
+        <line x1="18" y1="3.5" x2="18" y2="12.5"/>
+        <line x1="46" y1="3.5" x2="46" y2="12.5"/>
+        <line x1="21.5" y1="5" x2="21.5" y2="11"/>
+        <line x1="42.5" y1="5" x2="42.5" y2="11"/>
+        <path d="M32 19 L23 8"/>
+        <path d="M32 19 L41 8"/>
+        <circle cx="32" cy="14.5" r="3.4"/>
+        <line x1="32" y1="18" x2="32" y2="36"/>
+      </g>
+      <path d="M32 36 L26 46 L24 56">
+        <animate attributeName="d" dur="1.5s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" values="M32 36 L26 46 L24 56; M32 47 L20 49 L24 57; M32 36 L26 46 L24 56" repeatCount="indefinite"/>
+      </path>
+      <path d="M32 36 L38 46 L40 56">
+        <animate attributeName="d" dur="1.5s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" values="M32 36 L38 46 L40 56; M32 47 L44 49 L40 57; M32 36 L38 46 L40 56" repeatCount="indefinite"/>
+      </path>
+      <g stroke="none" fill="var(--signal,#CF4E1A)">
+        <circle cx="40" cy="24" r="1.3">
+          <animate attributeName="cy" dur="1.5s" keyTimes="0;0.5;0.78;1" values="24;24;31;31" repeatCount="indefinite"/>
+          <animate attributeName="cx" dur="1.5s" keyTimes="0;0.5;0.78;1" values="40;40;44;44" repeatCount="indefinite"/>
+          <animate attributeName="opacity" dur="1.5s" keyTimes="0;0.5;0.6;0.78;1" values="0;0;1;0;0" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="24" cy="24" r="1.1">
+          <animate attributeName="cy" dur="1.5s" keyTimes="0;0.55;0.85;1" values="24;24;30;30" repeatCount="indefinite"/>
+          <animate attributeName="cx" dur="1.5s" keyTimes="0;0.55;0.85;1" values="24;24;20;20" repeatCount="indefinite"/>
+          <animate attributeName="opacity" dur="1.5s" keyTimes="0;0.55;0.65;0.85;1" values="0;0;1;0;0" repeatCount="indefinite"/>
+        </circle>
+      </g>
+    </svg>
+    <div class="generate-title">Building Your Program</div>
+    <div class="generate-sub" id="generateSub">Calculating progressions...</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 4: WEEK VIEW
+══════════════════════════════════════════ -->
+<div class="screen" id="screenWeek">
+  <div class="wk-topbar">
+    <div class="wk-overline" id="weekOverline">THE ASYLUM</div>
+    <div class="wk-headrow">
+      <div class="wk-bignum" id="weekBigNum">WEEK 1</div>
+      <button class="hurt-btn" id="hurtBtn" onclick="openInjurySheet()" aria-label="Report or manage an injury">
+        <span class="hurt-ico" id="hurtIco"></span>
+        <span class="hurt-lbl" id="hurtLbl">HURT?</span>
+      </button>
+    </div>
+  </div>
+  <div class="week-scroll" id="weekScroll"></div>
+  <div class="wk-subrow">
+    <label class="wk-startdate" aria-label="Program start date">
+      <svg class="wk-cal-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="wk-startdate-stack">
+        <span class="wk-startdate-lbl">Program Start</span>
+        <span id="startDateDisplay" class="wk-startdate-txt is-unset">Set date</span>
+      </span>
+      <input type="date" id="startDateInput" class="wk-startdate-native" onchange="setProgStart(this.value)">
+    </label>
+    <label class="wk-startdate" id="raceDateWrap" aria-label="Race date" style="display:none">
+      <svg class="wk-cal-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 1-1h13l-3 4 3 4H5"/></svg>
+      <span class="wk-startdate-stack">
+        <span class="wk-startdate-lbl">Race Day</span>
+        <span id="raceDateDisplay" class="wk-startdate-txt">\u2014</span>
+      </span>
+      <input type="date" id="raceDateInput" class="wk-startdate-native" onchange="setProgRace(this.value)">
+    </label>
+    <div class="phase-pill" id="phasePill"></div>
+  </div>
+  <div class="days-list" id="daysList"></div>
+  <div class="settings-bar">
+    <div class="wk-actions-row">
+      <button class="random-btn" onclick="openRandom()" id="randBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M16 8h.01"/><path d="M8 8h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/><path d="M12 12h.01"/></svg><span>Random Workout</span><span class="rand-counter" id="randCounter"></span></button>
+      <button class="change-btn" onclick="openOverlaySheet()" id="changeBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto"><path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/><path d="M8 18h8"/><path d="M8 14h8"/></svg><span>Traveling?</span></button>
+    </div>
+    <div class="change-active-wrap" id="changeActiveWrap"></div>
+  </div>
+</div>
+
