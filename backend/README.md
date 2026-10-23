@@ -279,20 +279,24 @@ beats, and latency.
 
 ## Deploying to Heroku
 
-Heroku receives the repo's layout (below) with `heroku/`'s files at its root. It runs the `web` process from that
-`Procfile`: `cd backend && node --enable-source-maps dist/server/server.js`, listening on the `PORT` Heroku assigns.
-The Node buildpack runs the root `npm run build` (`heroku/package.json`): it installs and builds the frontends
-workspace (the website and the admin), drops its `node_modules`, then installs this folder, compiles the server
-through tsc and prunes the dev dependencies, so the running slug holds Express, the compiled server and the two
-built pages, nothing of TypeScript's or Angular's toolchain.
+**Heroku deploys the branch `main` by itself** (automatic deploys from GitHub, Mario, Post-v0.242.0). `main` changes
+only through a pull request from `dev` whose checks passed, so what Heroku builds has passed the pipeline. Heroku
+needs `package.json` and the `Procfile` at the root of what it receives, so they sit at the repo root (GitHub Pages
+serves them too; nothing in them is secret). It runs the `web` process from that `Procfile`:
+`cd backend && node --enable-source-maps dist/server/server.js`, listening on the `PORT` Heroku assigns. The Node
+buildpack runs the root `npm run build`: it installs and builds the frontends workspace (the website and the admin),
+drops its `node_modules`, then installs this folder and runs its build, which builds the app's page from
+`frontends/app/src/legacy/src` into `app-web/` (`scripts/app-bundle.ts`) and compiles the server through tsc, and
+prunes the dev dependencies. So the one dyno serves the website at `/`, the admin at `/admin/`, the app at `/app/`
+and the API, and the running slug holds nothing of TypeScript's or Angular's toolchain.
 
-**Why deploys go through `scripts/heroku.sh`.** The repo root is the GitHub Pages site. Heroku needs
-`package.json` and the `Procfile` at the root of what it receives, so a plain `git push heroku main` would hand it
-the wrong folder. `heroku.sh deploy` makes a commit (with `git commit-tree`; `git subtree` is not needed and is not
-installed on this Mac) whose tree keeps the repo's layout, so the server finds the website and the admin where it
-does in a checkout: `backend/` (with the app as `backend/app-web/`), `frontends/` without the app, and `heroku/`'s
-`package.json`, lock file and `Procfile` at the root. It goes on top of what Heroku already has and is pushed. Every
-deploy is a fast-forward; nothing is force-pushed.
+**The manual path is `scripts/heroku.sh deploy`,** for when the automatic deploy does not fire or another ref has
+to go out (`HEROKU_DEPLOY_REF=<ref>`). It makes a commit (with `git commit-tree`; `git subtree` is not needed and is
+not installed on this Mac) whose tree keeps the repo's layout, so the server finds the website and the admin where it
+does in a checkout: `backend/` (with the app as `backend/app-web/`), `frontends/` without the app, and the root's
+`package.json`, lock file and `Procfile`. It goes on top of what Heroku's git already has and is pushed. Every deploy
+is a fast-forward; nothing is force-pushed. `heroku.sh verify` with no commit checks that `/healthz` reports
+`origin/main`, which is what the automatic deploy ships.
 
 ### One-time setup
 

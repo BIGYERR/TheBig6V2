@@ -45,7 +45,7 @@ describe('app-bundle', () => {
 });
 
 describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) && 'not in a git checkout' }, () => {
-  test("keeps the repo's layout: backend/ with the app in app-web/, frontends/ without the app, heroku/'s manifest at the root", () => {
+  test("keeps the repo's layout: backend/ with the app in app-web/, frontends/ without the app, the root's manifest at the root", () => {
     // Without the variables git exports to hooks: with GIT_DIR set, git takes BACKEND for the top of the checkout
     // (heroku.sh unsets them for the same reason).
     const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('GIT_')));
@@ -74,7 +74,7 @@ describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) 
     ];
     assert.deepEqual([...files].sort(), expected.sort());
     for (const f of ['package.json', 'package-lock.json', 'Procfile']) {
-      assert.equal(git('rev-parse', `${tree}:${f}`), git('rev-parse', `${ref}:backend/heroku/${f}`), `${f} is heroku/'s`);
+      assert.equal(git('rev-parse', `${tree}:${f}`), git('rev-parse', `${ref}:${f}`), `${f} is the root's`);
     }
     // The page is the build of the ref's source files. While the repo still carries its committed copy at the root (until
     // the Pages source switch, handoff §12) that copy is the oracle, since the 60-second check holds the two equal; after,
@@ -98,13 +98,14 @@ describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) 
   });
 });
 
-// Heroku gets the TypeScript and compiles it itself: its Node buildpack runs the root `npm run build`
-// (backend/heroku/package.json, at the root of the deploy tree), which builds the frontends, then this folder, with the
-// dev dependencies installed; then the Procfile starts what tsc wrote. The Dockerfile does the same in its build
-// stages. So the build must compile the server, and every start command must name the file tsc emits for
-// server/server.ts.
+// Heroku gets the TypeScript and compiles it itself: its Node buildpack runs the root `npm run build` (the repo root's
+// package.json, which Heroku's GitHub deploy of main finds there, and heroku.sh deploy puts at the root of its tree),
+// which builds the frontends, then this folder (the app's page, then the server), with the dev dependencies installed;
+// then the root's Procfile starts what tsc wrote. The Dockerfile does the same in its build stages. So the build must
+// compile the server, and every start command must name the file tsc emits for server/server.ts.
 describe('compiled server', () => {
   const read = (file: string) => readFileSync(join(BACKEND, file), 'utf8');
+  const readRoot = (file: string) => readFileSync(join(BACKEND, '..', file), 'utf8');
   const tsconfig = JSON.parse(read('tsconfig.server.json').replace(/\/\*[\s\S]*?\*\//g, ''));
   const entry = join(tsconfig.compilerOptions.outDir, 'server.js');
 
@@ -119,10 +120,11 @@ describe('compiled server', () => {
     assert.match(pkg.scripts['build:server'], /tsc -p tsconfig\.server\.json$/);
     assert.equal(pkg.main, entry);
     assert.ok(pkg.scripts.start.endsWith(` ${entry}`), pkg.scripts.start);
-    const heroku = JSON.parse(read('heroku/package.json'));
+    assert.match(pkg.scripts.build, /^node scripts\/app-bundle\.ts && /, "the backend's build builds the app's page first");
+    const heroku = JSON.parse(readRoot('package.json'));
     assert.match(heroku.scripts.build, /npm run build --prefix frontends && .*npm run build --prefix backend/, 'Heroku builds the frontends, then the server');
     assert.equal(heroku.scripts.start, `cd backend && node --enable-source-maps ${entry}`);
-    assert.equal(read('heroku/Procfile'), `web: cd backend && node --enable-source-maps ${entry}\n`);
+    assert.equal(readRoot('Procfile'), `web: cd backend && node --enable-source-maps ${entry}\n`);
     assert.equal(heroku.engines.node, pkg.engines.node, 'Heroku picks the Node line from the root manifest');
     const docker = read('Dockerfile');
     assert.ok(docker.includes('RUN npm run build:server'), 'the image compiles the server');

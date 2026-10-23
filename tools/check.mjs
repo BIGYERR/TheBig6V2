@@ -12,7 +12,8 @@
 //            as a version, its inline script compiles, and it boots in the harness and builds HALF_MANNY, self-stable.
 //   frontends frontends/ (the website, the admin, common/): type check, lint.
 //   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint.
-//   backend  backend/: type checks, tests, lint.
+//   backend  backend/, and the root's package.json, lock file and Procfile (Heroku's build, which its tests read):
+//            type checks, tests, lint.
 //
 //   node tools/check.mjs              every lane
 //   node tools/check.mjs --staged     only the lanes the staged files touch (what the pre-commit hook runs)
@@ -61,7 +62,7 @@ const want = {
   build: touches(/^(index\.html|frontends\/app\/src\/legacy\/src\/|core\/src\/engine\/|frontends\/app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
   app: touches(/^(frontends\/app\/|core\/src\/engine\/|tools\/|index\.html)/),
   frontends: touches(/^frontends\/(?!app\/)/),
-  backend: touches(/^backend\//),
+  backend: touches(/^(backend\/|package\.json$|package-lock\.json$|Procfile$)/),
 };
 
 if (LIST) {

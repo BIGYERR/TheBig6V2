@@ -111,9 +111,12 @@ session's files written into `tests/measure/` mid-proof.
 - **Branches.** Work lands on the local `dev` branch in the main checkout: commit there as often as needed. Only that
   branch, from that checkout, is ever pushed to `origin/dev`. Every push to `dev` runs the full suite in
   CI and nothing waits for it; Mario reviews the results and, to release, opens the pull request into `main` himself.
-  `main` is what Pages serves and what Heroku deploys (`backend/scripts/heroku.sh deploy` ships `origin/main`'s
-  `backend/`), and branch protection lets it change only through a pull request from `dev` whose pipeline checks all
-  passed. A branch off `dev` is rare and merges back into local `dev`, never into `main`.
+  `main` is what Pages serves and what Heroku deploys: Heroku's automatic deploy from GitHub builds every push to
+  `main` with the repo root's `package.json` and `Procfile` (the website, the admin, the app at `/app/` and the
+  backend, one dyno; Mario, Post-v0.242.0), and `backend/scripts/heroku.sh deploy` is the manual path. Branch
+  protection lets `main` change only through a pull request from `dev` whose pipeline checks all passed; its required
+  checks are the pipeline's PR job names, kept in GitHub's settings, not in the repo, so a renamed job is renamed there
+  too. A branch off `dev` is rare and merges back into local `dev`, never into `main`.
 - **A worktree never pushes (Mario, Post-V239).** A session in a git worktree (`.claude/worktrees/*`) commits on its own
   branch and never runs `git push`, not to `dev` and not to any other branch. When its work is done it rebases that
   branch onto the current local `dev`, fast-forwards local `dev` to it (`git -C <main checkout> merge --ff-only
@@ -152,8 +155,8 @@ session's files written into `tests/measure/` mid-proof.
   in `tests/unit/e2e-*.test.ts` and `tests/integration/e2e-browser.test.ts`.
 - **TypeScript and Vitest** (architecture phase A). Every test is strict TypeScript run by Vitest (`import { describe,
   test } from 'vitest'`, `node:assert/strict` inside). `tests/` is its own package: `tests/package.json` and its
-  lockfile are committed, `tests/node_modules` is not. There is still no `package.json` or `tsconfig.json` at the repo
-  root, which Pages serves; the shared strict base is `core/tsconfig.base.json`.
+  lockfile are committed, `tests/node_modules` is not. The repo root, which Pages serves, holds no `tsconfig.json`; its
+  one `package.json` is Heroku's build manifest (Pipeline), so the shared strict base is `core/tsconfig.base.json`.
 - **Run.** `cd tests && npx vitest run unit integration` (a few seconds; `npx vitest run` adds the sweeps; `npm ci`
   there first on a fresh clone, which the 60-second check does by itself), and the type check `cd tests && npm run
   typecheck` (strict `tsc` over `core/`, then `tests/`). `IA_APP=<file>` runs the same tests against another body of

@@ -2,19 +2,22 @@
 # Heroku helper for the backend. Run from anywhere in the repo:
 #   bash backend/scripts/heroku.sh setup <app-name>   create or adopt the app, set config vars, add the git remote
 #   bash backend/scripts/heroku.sh deploy             push origin/main's backend/ to Heroku, then prove it is live
-#   bash backend/scripts/heroku.sh verify             prove the live dyno runs the last deployed commit
+#   bash backend/scripts/heroku.sh verify [commit]    prove the live dyno runs commit (default origin/main)
 #   bash backend/scripts/heroku.sh status             dynos, release, /healthz
 #   bash backend/scripts/heroku.sh logs               tail the logs
 #   bash backend/scripts/heroku.sh open               open /admin/ in the browser
 #   bash backend/scripts/heroku.sh tree [ref]         print the tree deploy would push for ref (default HEAD)
 #
-# Why the deploy is not a plain `git push heroku main`: the repo root is the GitHub Pages site, and Heroku wants
-# package.json and the Procfile at the root of what it receives. So deploy makes a commit (git commit-tree, no git
-# subtree needed) on top of what Heroku already has, and pushes that. Its tree keeps the repo's layout, so the server
-# finds the website and the admin where it does in a checkout: backend/, frontends/ without the app (the website, the
-# admin, common/ and their workspace files), and at the root heroku/'s package.json, lock file and Procfile, which build
-# the frontends and the server and start the server. The app the backend serves at /app/ is added as
-# backend/app-web/: the page built from the same commit's source files (what Pages deploys from it) and its icon.
+# Heroku deploys the branch main by itself (automatic deploys from GitHub, Mario, Post-v0.242.0; main changes only
+# through a pull request whose checks passed):
+# the repo root's package.json, lock file and Procfile build the frontends and the server, the server's build builds the
+# app's page from its source files, and the Procfile starts the server. deploy here is the manual path, for when that
+# does not fire or a ref other than main has to go out. It pushes a smaller tree than the whole repo: deploy makes a
+# commit (git commit-tree, no git subtree needed) on top of what Heroku's git already has, and pushes that. Its tree
+# keeps the repo's layout, so the server finds the website and the admin where it does in a checkout: backend/,
+# frontends/ without the app (the website, the admin, common/ and their workspace files), and the root's package.json,
+# lock file and Procfile. The app the backend serves at /app/ is added as backend/app-web/: the page built from the same
+# commit's source files (what Pages deploys from it) and its icon.
 set -euo pipefail
 
 # Always the checkout this script sits in. Git exports GIT_DIR and friends to hooks; with GIT_DIR set, git takes the
@@ -117,8 +120,8 @@ app_page_blob() {
 
 # The tree deploy pushes for a ref: backend/ with app-web/ holding the page built from that ref and its
 # apple-touch-icon.png (what the server serves at /app/, the same files Pages deploys; locally scripts/app-bundle.ts
-# fills app-web/ from the working copy instead), frontends/ without the app, and backend/heroku/'s package.json,
-# package-lock.json and Procfile at the root.
+# fills app-web/ from the working copy instead), frontends/ without the app, and the ref's root package.json,
+# package-lock.json and Procfile.
 deploy_tree() {
   local ref="$1" app_tree backend_tree frontends_tree file blob page icon
   page="$(app_page_blob "$ref")" || exit 1
@@ -132,7 +135,7 @@ deploy_tree() {
   frontends_tree="$({ git ls-tree --full-tree "$ref:frontends" || die "no frontends/ at $ref"; } | { grep -v "	app$" || true; } | git mktree)"
   {
     for file in package.json package-lock.json Procfile; do
-      blob="$(git rev-parse --verify --quiet "$ref:$PREFIX/heroku/$file")" || die "no $PREFIX/heroku/$file at $ref"
+      blob="$(git rev-parse --verify --quiet "$ref:$file")" || die "no $file at the root of $ref"
       printf '100644 blob %s\t%s\n' "$blob" "$file"
     done
     printf '040000 tree %s\t%s\n' "$backend_tree" "$PREFIX"
@@ -169,15 +172,16 @@ cmd_deploy() {
   cmd_verify "$commit"
 }
 
-# A push is not a deploy. Poll /healthz, cache-busted, until it reports the commit that was pushed.
+# A push is not a deploy. Poll /healthz, cache-busted, until it reports the commit that was pushed. With no commit
+# given, that is origin/main, which Heroku deploys from GitHub; a manual deploy passes the commit it made.
 cmd_verify() {
   need_cli
   local app want url got=""
   app="$(app_name)"
   want="${1:-}"
   if [ -z "$want" ]; then
-    git fetch --quiet "$REMOTE" main || die "cannot read $REMOTE main"
-    want="$(git rev-parse FETCH_HEAD)"
+    git fetch --quiet origin main || die "cannot read origin/main"
+    want="$(git rev-parse origin/main)"
   fi
   url="$(web_url "$app")"
   for _ in $(seq 1 40); do
