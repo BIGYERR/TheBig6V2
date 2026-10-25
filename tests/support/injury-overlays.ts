@@ -313,6 +313,9 @@ function injuryPoolAssignments(src: string): PoolAssignment[] | null {
     const t = raw.trim();
     const mr = t.match(/_R==='([a-z]+)'/);
     if (mr) region = mr[1]!;
+    // D245 (v0.245.0): the ankle arm opens on _ankleLike(_inj), the ankle or a protected calf, whose plan is the
+    // ankle's line for line; its pools are read as the ankle's.
+    else if (/_ankleLike\(_inj\)/.test(t)) region = 'ankle';
     const mt = t.match(/_T==='([a-z]+)'/);
     if (mt) tier = mt[1]!;
     else if (/^\}\s*else\s*\{/.test(t) && region) tier = tier === 'protect' ? 'workaround' : 'protect';

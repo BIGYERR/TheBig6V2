@@ -38,8 +38,14 @@ const INJURY_REGIONS: Record<string, { label: string }>={
   lowback:{label:'Lower Back'},
   hip:{label:'Hip / Glute'},
   knee:{label:'Knee'},
-  ankle:{label:'Ankle / Foot / Shin'}
+  ankle:{label:'Ankle / Foot / Shin'},
+  calf:{label:'Calf'}   // v0.245.0 (D245)
 };
+// v0.245.0 (D245): a protected calf is a protected ankle to every reader of the ankle plan: the leg-day pools, the foot
+// & ankle block standing aside, the day's title. Takes a plan or the cfg's injury; both carry region and tier.
+function _ankleLike(x: { region?: string | null; tier?: string | null } | null | undefined): boolean{
+  return !!x && (x.region === 'ankle' || (x.region === 'calf' && x.tier === 'protect'));
+}
 function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
   const inj=cfg&&cfg.injury;
   if(!inj||!inj.region||!INJURY_REGIONS[inj.region]) return null;
@@ -88,6 +94,23 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
     } else {
       P.drop=new Set(['calf_iso']);
       P.cap=new Set(['squat','lunge']);
+      P.cardioMode='reduce';
+    }
+  } else if(R==='calf'){
+    // v0.245.0 (D245, Mario): a fried or strained calf. Working around it, every calf raise and every jump sits out and
+    // every run goes easy and shorter (the reduce sweep, strides with them). calf_iso is every loaded raise's pattern; the
+    // soleus raise, the heel-raise hold and tiptoe walks load the calf too but are prehab-exempt from the pattern, so
+    // they go by name, before the foot & ankle draw. The tibialis raises and the dorsiflexion and ankle drills stay.
+    // Protected, it is the ankle plan, line for line, and _ankleLike carries it to the ankle plan's other readers.
+    P.noJumps=true;
+    if(T==='protect'){
+      P.drop=new Set(['calf_iso','lunge']);
+      P.cap=new Set(['squat']);
+      P.dropNames=/pistol|single-leg squat|skater|bounds|high knees/i;
+      P.cardioMode='noimpact';
+    } else {
+      P.drop=new Set(['calf_iso']);
+      P.dropNames=/soleus raise|heel-raise hold|tiptoe walk/i;
       P.cardioMode='reduce';
     }
   } else if(R==='hip'){
@@ -272,7 +295,7 @@ function injuryDayTitle(role: string,cfg: Cfg | null | undefined): string | null
   const P=injuryPlan(cfg);
   if(!P||P.tier!=='protect') return null;
   if(role==='legs'){
-    if(P.region==='knee'||P.region==='ankle') return 'Posterior Chain';
+    if(P.region==='knee'||_ankleLike(P)) return 'Posterior Chain';   // v0.245.0 (D245): a protected calf too
     if(P.region==='hip') return 'Legs (hip-safe)';
     if(P.region==='lowback') return 'Legs (spine-safe)';
   }
@@ -283,4 +306,6 @@ function injuryDayTitle(role: string,cfg: Cfg | null | undefined): string | null
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { INJURY_REGIONS, TEST_RX_TEXT, _injViewName, _stripCapCue, applyInjuryFilter, injuryDayTitle, injuryPlan };
+export {
+  INJURY_REGIONS, TEST_RX_TEXT, _ankleLike, _injViewName, _stripCapCue, applyInjuryFilter, injuryDayTitle, injuryPlan,
+};

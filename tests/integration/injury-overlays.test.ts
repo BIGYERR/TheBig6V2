@@ -571,3 +571,54 @@ test('the add path refuses a cued detail and R7\'s held-test prose, and a loaded
     assert.deepEqual([clean(b.n), b.d], [p.to, p.d0], 'after a boot');
   }
 });
+
+// ── D245: the calf region ────────────────────────────────────────────────────────────────────────────────────────────
+// Oracles, typed by hand from the ruling: the calf-loading names (every calf_iso raise by pattern, and by name the soleus
+// raise, the heel-raise hold and tiptoe walks), the jump names, the two drills the athlete keeps, the protected run, and
+// "protected, it is the ankle plan" as the ankle program itself. The reported half: intermediate, Home Full, Strength
+// Support, rest Sunday and Wednesday, seed 1013.
+const CALF_CFG = (tier: 'workaround' | 'protect', region = 'calf') => ({
+  name: 'CALF', primaryPath: 'event', cardioTypes: ['run'], eventTargeted: true, raceDate: '2027-01-31',
+  cardioGoals: { run: { id: 'run_half', label: 'Half Marathon', mileBestMins: '9', mileBestSecs: '00', baselineDist: '5', baseline: '5mi' } },
+  liftingFocus: 'support_strength', experience: 'intermediate', ageBracket: '18-35', equipment: 'home_full', unit: 'lbs',
+  restDays: ['sun', 'wed'], days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], bench: 135, squat: 155, deadlift: 185, seed: 1013,
+  injury: { region, tier },
+});
+const CALF_LOAD = /soleus raise|heel-raise hold|tiptoe walk/i;
+const JUMP_NAMES = /jump|burpee|broad|bound|box jump|high knees|tuck/i;
+const allItems = (p: any) => Object.keys(p.weeks).flatMap((w) => Object.keys(p.weeks[w]).flatMap((d) =>
+  ((p.weeks[w][d] && p.weeks[w][d].sections) || []).flatMap((s: Section) => (s.items || []).map((i: Item) => ({ w, d, s: clean(s.label || ''), n: clean(i.name) })))));
+
+test('Calf is on the HURT? sheet, after the ankle, and its plan is none of the others (D245)', () => {
+  const regions = IA.eval('INJURY_REGIONS');
+  assert.deepEqual(Object.keys(regions), ['shoulder', 'elbow', 'lowback', 'hip', 'knee', 'ankle', 'calf']);
+  assert.equal(regions.calf.label, 'Calf');
+  const w = IA.eval('injuryPlan')(CALF_CFG('workaround')), p = IA.eval('injuryPlan')(CALF_CFG('protect'));
+  assert.deepEqual([w.region, w.tier, [...w.drop], [...w.cap], w.noJumps, w.cardioMode], ['calf', 'workaround', ['calf_iso'], [], true, 'reduce']);
+  assert.deepEqual([p.region, p.tier, [...p.drop].sort(), [...p.cap], p.noJumps, p.cardioMode], ['calf', 'protect', ['calf_iso', 'lunge'], ['squat'], true, 'noimpact']);
+});
+
+test('working around a calf: no calf raise and no jump anywhere in the block, every run easy and shorter, and the tibialis raises and dorsiflexion stay (D245)', () => {
+  const p: any = IA.buildProgram(CALF_CFG('workaround') as any);
+  const pat = IA.eval('_pattern');
+  const items = allItems(p);
+  assert.deepEqual(items.filter((x) => pat(x.n) === 'calf_iso' || CALF_LOAD.test(x.n)).map((x) => x.w + ' ' + x.d + ' ' + x.n), []);
+  assert.deepEqual(items.filter((x) => JUMP_NAMES.test(x.n)).map((x) => x.w + ' ' + x.d + ' ' + x.n), []);
+  const runs = Object.keys(p.weeks).flatMap((w) => Object.values(p.weeks[w]).flatMap((day: any) => ([] as any[]).concat((day && day.cardio) || []).filter((c) => c && c.type === 'run')));
+  assert.ok(runs.length >= 50, 'runs ' + runs.length);
+  assert.deepEqual([...new Set(runs.map((c) => c.subtype))], ['Easy Run (protected)']);
+  assert.ok(runs.every((c) => c.legLoad === false));
+  // Week 9 keeps its days (one speed day, D243 and D244) and every run on them is the protected easy run.
+  const wk9 = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((d) => {
+    const day = p.weeks['9'][d]; if (!day || day.rest) return d + ':x';
+    const r = ([] as any[]).concat(day.cardio || []).find((c) => c && c.type === 'run'); return d + ':' + (r ? r.subtype : '-');
+  }).join(' | ');
+  assert.equal(wk9, 'mon:Easy Run (protected) | tue:Easy Run (protected) | wed:x | thu:- | fri:Easy Run (protected) | sat:Easy Run (protected) | sun:x');
+  const kept = items.filter((x) => /^Foot & ankle/.test(x.s)).map((x) => x.n);
+  assert.ok(kept.some((n) => /tibialis raise/i.test(n)) && kept.some((n) => /dorsiflexion|ankle rocks/i.test(n)), kept.join(', '));
+});
+
+test('a protected calf builds the protected ankle program, day for day (D245)', () => {
+  const a = IA.buildProgram(CALF_CFG('protect') as any), b = IA.buildProgram(CALF_CFG('protect', 'ankle') as any);
+  assert.equal(JSON.stringify(a.weeks), JSON.stringify(b.weeks));
+});

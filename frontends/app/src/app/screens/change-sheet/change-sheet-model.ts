@@ -104,6 +104,10 @@ export const INJ_EFFECT: Readonly<Record<string, { workaround: string; protect: 
     workaround: 'Calf work is out and single leg work moves to variants that keep the foot planted. Runs get shorter and stay easy.',
     protect: 'Nothing stands on that ankle under load. Leg day leans hip and hamstring. Runs become rides or swims, same slots, same clock.',
   },
+  calf: {
+    workaround: 'Calf raises and jumps are out. Tibialis raises and ankle mobility stay. Runs get shorter and stay easy.',
+    protect: 'Nothing stands on that calf under load. Leg day leans hip and hamstring. Runs become rides or swims, same slots, same clock.',
+  },
   hip: {
     workaround: 'Hinges and lunges back off to RPE 7, swings are out, extra hip mobility comes in. Runs go easy.',
     protect: 'Hinges, lunges, and hip thrusts sit out. Leg day leans quads plus mobility work. Runs move to the pool first, the bike second.',

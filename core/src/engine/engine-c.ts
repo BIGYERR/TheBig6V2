@@ -7,7 +7,7 @@ import {
   CORE_PILLARS, _gearLens, _tierHasBarbell, buildFootAnkleSection, buildHipSection, buildRehabSection,
 } from './prehab.ts';
 import { _powerAllowed, _powerPrescribe } from './power-accessory.ts';
-import { TEST_RX_TEXT, _injViewName, injuryPlan } from './injury.ts';
+import { TEST_RX_TEXT, _ankleLike, _injViewName, injuryPlan } from './injury.ts';
 import { _auxFamily, _auxGearOK, _cardioInterference, _isUnilateralRow, _pattern, _repFloor } from './region-caps.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 import type { Cfg, Goal, Section } from '../domain/index.ts';
@@ -449,7 +449,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
         squatPool = (hasCables?['Leg press','Barbell box squat','Dumbbell goblet squat']:hasBarbell?['Barbell box squat','Dumbbell goblet squat']:['Squat (slow 3s tempo)','Split squat']);
         lungePool = hasBarbell?['Step-ups (KB)','Reverse lunge (KB)']:['Step-ups (chair)','Reverse lunge'];
       }
-    } else if(_R==='ankle'){
+    } else if(_ankleLike(_inj)){   // v0.245.0 (D245): a protected calf takes the ankle's protect pools
       if(_T==='protect'){
         squatPool = hasCables?['Leg press','Dumbbell goblet squat']:hasBarbell?_gear(['Barbell hip thrust','45° back extension']):[_bwHTak,'Single-leg glute bridge'];
         lungePool = ['Single-leg hip thrust','Single-leg glute bridge'];
@@ -842,7 +842,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
       // 2×20 tibialis raises; what the block buys in weeks 13–14 is tissue readiness in the
       // structures that fail late in a half. Hip stability stays dropped: banded abduction
       // carries real glute-med fatigue and dropping it here was a deliberate call.
-      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace,_prehabKeep));
+      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!_ankleLike(cfg.injury))s.push(buildFootAnkleSection(seed+w,isBW,isRace,_prehabKeep));   // v0.245.0 (D245): a protected calf steps it aside too
       return s;
     }
     if(role==='push'||role==='push_light'){
@@ -1233,7 +1233,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
       if(includeHip)s.push(buildHipSection(seed+w,isBW,_prehabKeep));
       // V178 (D3): foot & ankle rides with hip stability for runners. An ankle-region injury
       // plan owns that joint through the rehab section, so the prehab block steps aside.
-      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,false,_prehabKeep));
+      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!_ankleLike(cfg.injury))s.push(buildFootAnkleSection(seed+w,isBW,false,_prehabKeep));   // v0.245.0 (D245)
       // Loaded carry surfaces beyond the full day: a grip/posterior/core finisher on legs day,
       // a fresh pick so it doesn't echo the full day's carry. Gated on session length to respect
       // shorter workouts.

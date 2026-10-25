@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.244.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.245.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -8457,8 +8457,14 @@ const INJURY_REGIONS={
   lowback:{label:'Lower Back'},
   hip:{label:'Hip / Glute'},
   knee:{label:'Knee'},
-  ankle:{label:'Ankle / Foot / Shin'}
+  ankle:{label:'Ankle / Foot / Shin'},
+  calf:{label:'Calf'}   // v0.245.0 (D245)
 };
+// v0.245.0 (D245): a protected calf is a protected ankle to every reader of the ankle plan: the leg-day pools, the foot
+// & ankle block standing aside, the day's title. Takes a plan or the cfg's injury; both carry region and tier.
+function _ankleLike(x){
+  return !!x && (x.region === 'ankle' || (x.region === 'calf' && x.tier === 'protect'));
+}
 function injuryPlan(cfg){
   const inj=cfg&&cfg.injury;
   if(!inj||!inj.region||!INJURY_REGIONS[inj.region]) return null;
@@ -8507,6 +8513,23 @@ function injuryPlan(cfg){
     } else {
       P.drop=new Set(['calf_iso']);
       P.cap=new Set(['squat','lunge']);
+      P.cardioMode='reduce';
+    }
+  } else if(R==='calf'){
+    // v0.245.0 (D245, Mario): a fried or strained calf. Working around it, every calf raise and every jump sits out and
+    // every run goes easy and shorter (the reduce sweep, strides with them). calf_iso is every loaded raise's pattern; the
+    // soleus raise, the heel-raise hold and tiptoe walks load the calf too but are prehab-exempt from the pattern, so
+    // they go by name, before the foot & ankle draw. The tibialis raises and the dorsiflexion and ankle drills stay.
+    // Protected, it is the ankle plan, line for line, and _ankleLike carries it to the ankle plan's other readers.
+    P.noJumps=true;
+    if(T==='protect'){
+      P.drop=new Set(['calf_iso','lunge']);
+      P.cap=new Set(['squat']);
+      P.dropNames=/pistol|single-leg squat|skater|bounds|high knees/i;
+      P.cardioMode='noimpact';
+    } else {
+      P.drop=new Set(['calf_iso']);
+      P.dropNames=/soleus raise|heel-raise hold|tiptoe walk/i;
       P.cardioMode='reduce';
     }
   } else if(R==='hip'){
@@ -8691,7 +8714,7 @@ function injuryDayTitle(role,cfg){
   const P=injuryPlan(cfg);
   if(!P||P.tier!=='protect') return null;
   if(role==='legs'){
-    if(P.region==='knee'||P.region==='ankle') return 'Posterior Chain';
+    if(P.region==='knee'||_ankleLike(P)) return 'Posterior Chain';   // v0.245.0 (D245): a protected calf too
     if(P.region==='hip') return 'Legs (hip-safe)';
     if(P.region==='lowback') return 'Legs (spine-safe)';
   }
@@ -9131,7 +9154,7 @@ function engineC_kinematics(cfg, A, B){
         squatPool = (hasCables?['Leg press','Barbell box squat','Dumbbell goblet squat']:hasBarbell?['Barbell box squat','Dumbbell goblet squat']:['Squat (slow 3s tempo)','Split squat']);
         lungePool = hasBarbell?['Step-ups (KB)','Reverse lunge (KB)']:['Step-ups (chair)','Reverse lunge'];
       }
-    } else if(_R==='ankle'){
+    } else if(_ankleLike(_inj)){   // v0.245.0 (D245): a protected calf takes the ankle's protect pools
       if(_T==='protect'){
         squatPool = hasCables?['Leg press','Dumbbell goblet squat']:hasBarbell?_gear(['Barbell hip thrust','45° back extension']):[_bwHTak,'Single-leg glute bridge'];
         lungePool = ['Single-leg hip thrust','Single-leg glute bridge'];
@@ -9524,7 +9547,7 @@ function engineC_kinematics(cfg, A, B){
       // 2×20 tibialis raises; what the block buys in weeks 13–14 is tissue readiness in the
       // structures that fail late in a half. Hip stability stays dropped: banded abduction
       // carries real glute-med fatigue and dropping it here was a deliberate call.
-      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace,_prehabKeep));
+      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!_ankleLike(cfg.injury))s.push(buildFootAnkleSection(seed+w,isBW,isRace,_prehabKeep));   // v0.245.0 (D245): a protected calf steps it aside too
       return s;
     }
     if(role==='push'||role==='push_light'){
@@ -9915,7 +9938,7 @@ function engineC_kinematics(cfg, A, B){
       if(includeHip)s.push(buildHipSection(seed+w,isBW,_prehabKeep));
       // V178 (D3): foot & ankle rides with hip stability for runners. An ankle-region injury
       // plan owns that joint through the rehab section, so the prehab block steps aside.
-      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,false,_prehabKeep));
+      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!_ankleLike(cfg.injury))s.push(buildFootAnkleSection(seed+w,isBW,false,_prehabKeep));   // v0.245.0 (D245)
       // Loaded carry surfaces beyond the full day: a grip/posterior/core finisher on legs day,
       // a fresh pick so it doesn't echo the full day's carry. Gated on session length to respect
       // shorter workouts.
@@ -16211,6 +16234,9 @@ const _INJ_EFFECT={
         protect:'Leg day becomes a posterior chain day. Hip thrusts, glute work, hamstrings. No squatting, no lunging, no jumping. Runs become easy rides or swims so your engine keeps building.'},
   ankle:{workaround:'Calf work is out and single leg work moves to variants that keep the foot planted. Runs get shorter and stay easy.',
         protect:'Nothing stands on that ankle under load. Leg day leans hip and hamstring. Runs become rides or swims, same slots, same clock.'},
+  // v0.245.0 (D245)
+  calf:{workaround:'Calf raises and jumps are out. Tibialis raises and ankle mobility stay. Runs get shorter and stay easy.',
+        protect:'Nothing stands on that calf under load. Leg day leans hip and hamstring. Runs become rides or swims, same slots, same clock.'},
   hip:{workaround:'Hinges and lunges back off to RPE 7, swings are out, extra hip mobility comes in. Runs go easy.',
         protect:'Hinges, lunges, and hip thrusts sit out. Leg day leans quads plus mobility work. Runs move to the pool first, the bike second.'},
   lowback:{workaround:'Deadlifts become hip thrusts, rows go single arm and supported, carries are out, core goes spine safe. Cardio stays easy.',

@@ -46,7 +46,7 @@ export type InjuryTier = (typeof INJURY_TIERS)[number];
 
 /** cfg.injury: a region and how it behaves. Overlays add one of the two flags. */
 export interface Injury {
-  /** 'knee', 'shoulder', 'lowback', 'elbow', 'hip', 'ankle' and the rest of the injury plan's regions. */
+  /** 'knee', 'shoulder', 'lowback', 'elbow', 'hip', 'ankle', 'calf' (v0.245.0) and the rest of the injury plan's regions. */
   region: string;
   tier: InjuryTier;
   /** Optional: only the bridge overlay sets it. */
