@@ -69,3 +69,38 @@ D4, V186 F4 on NRC) are recorded in the handoff and `tests/measure/v205_rulings/
   half that had a second speed slot below advanced or a one-speed layout; the one the predicate missed is a knee
   protect 10K beginner, whose runs are all time-matched walks: the walks' minutes moved with the slot underneath, and no
   lift day changed.
+
+## D244: rest into the long run, ranked third on the NRC arm (v0.244.0)
+
+- **Date:** ruled 2026-10-24. **Ruled by:** Mario (the key below, confirmed: "Yes, Monday"). **Bump:** MINOR (Mario).
+  **Shipped:** v0.244.0.
+- **The brief (Mario):** in `_nrcSpacedRunDays` the `qualRest` term (V205 D129 addendum, rank 8: the distance back from
+  the long run to the week's last quality session) was gated to the pace family. Ungate it for NRC goals and move it
+  above speeds-after-rest and the recovery run padding the long; keep the collision terms and the long-run pin first.
+  He expected the reported calendar to land its quality session on Tuesday.
+- **The finding (measure, before the ruling):** on the reported calendar (rest Sunday and Wednesday) the new key keeps
+  the one speed day on Monday: Monday sits five days back from the Saturday long run and Tuesday four, and Monday also
+  follows the rest day. Mario took Monday. With two speed days nothing moves there either: the furthest the later one
+  can sit without a collision is Thursday.
+- **What changes:** the NRC arm's rank key is `[-untol, -tol, longLast, qualRest, speedsAfterRest, recBeforeLong,
+  canonical, identity, spread, qualFirst]`. The key is split by arm: the pace family keeps its D129 order byte for byte.
+  All four NRC goals take it, the marathon included.
+- **What deliberately does not change:** the long-run pins, the collision terms, the NRC easy-run predicate
+  (`recBeforeLong` still reads the shipped lens; V205 D129 left it unruled on NRC), the types dealt (D243), any session
+  text, and the pace family.
+- **What it moves (`tests/measure/nrc-layout_rest-calendars.js`, v0.243.0 against v0.244.0, report saved beside it):**
+  18 of 384 rest-day calendar rows on run_half (every calendar, three experiences, Strength Support everywhere and
+  Athletic Support at six and seven days): 4 of 21 five-day calendars for beginner and for intermediate, 2 of 7 six-day
+  ones for each at both foci, and 2 of 21 five-day ones for advanced. HALF_MANNY and the 864-cell lattice do not move
+  (Mario's rest days already have the furthest-back day). In `program-output.json` one program moves, the marathon
+  (Athletic Support, 36 to 45, rest Monday and Thursday): its speed day goes from Friday, two days before the Sunday long
+  run, to Tuesday, five days before; its pull day follows it (D36). On 685 sampled configs only 10K and half programs
+  moved (48), no pace, base, 5K or marathon one in the sample.
+- **Expected values (typed by hand: the long run pinned to the last training day, no quality day beside it, the
+  furthest back wins):** rest Wednesday only, intermediate, five runs: week 9 is Monday recovery, Tuesday `Speed Run —
+  Tempo`, Thursday and Friday recovery, Saturday lift only, Sunday long (before: the speed day on Thursday). Advanced,
+  rest Thursday and Friday: every layout pays one hard pair, and the speed days move from Tuesday and Saturday (the long
+  run's eve) to Monday Intervals and Wednesday Tempo, four days back.
+- **Proof:** the two D244 calendar tests, the split key in the source and the oracle's NRC objective (now ranking
+  `qualRest` third) in `tests/integration/run-week-layout.test.ts` fail on v0.243.0, six tests in all; the identity
+  census (445/357/228/129 → 373/262/184/78) and the excluded-week census (112 → 116 of 116) moved with the key.

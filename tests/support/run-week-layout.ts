@@ -252,8 +252,10 @@ export function topBy<T extends object>(list: T[], key: string): T[] {
 /**
  * Every layout of `types` on `cap` of the training days `train`, scored. pace: the pace family's objective; otherwise
  * NRC's, with both long run pins. Each candidate carries:
- *   rank   the full objective, ten terms (ranks 6 to 9 are 0 off the pace family);
- *   ruled  its first six terms, [-untol, -tol, longLast, speedsAfterRest, recBeforeLong, canonical];
+ *   rank   the full objective, ten terms (identity, spread and the earliest quality day are 0 off the pace family);
+ *   ruled  its ruled head: on the pace family [-untol, -tol, longLast, speedsAfterRest, recBeforeLong, canonical]; on
+ *          NRC (D244) [-untol, -tol, longLast, qualRest, speedsAfterRest, recBeforeLong, canonical], the rest into the
+ *          long run, the distance back from the long run to the last quality day, ranked third;
  *   shipped  ruled with recBeforeLong read through the Sunday first list (NRC's predicate, and the pace family's before D129);
  *   coll, untol, tol, lf (longest run-free stretch), qr (rank 8), hard (the non-easy days and their types).
  */
@@ -280,15 +282,16 @@ export function layouts(train: Day[], cap: number, types: string[], T: Tokens, p
       const s1 = days.find(d => typeOf[d] === T.s1), s2 = days.find(d => typeOf[d] === T.s2);
       const can = (s1 && s2 && pos(s1) < pos(s2)) ? 1 : 0;
       const lf = longestFree(days);
-      const qr = (pace && longDay && quality.length) ? Math.min(...quality.map(d => (pos(longDay) - pos(d) + 7) % 7)) : 0;
+      const qrAll = (longDay && quality.length) ? Math.min(...quality.map(d => (pos(longDay) - pos(d) + 7) % 7)) : 0;
+      const qr = pace ? qrAll : 0;
       const qf = (pace && quality.length) ? -pos(quality[0] as Day) : 0;
       const ident = pace && idxs.join(',') === ek ? 1 : 0;
       const rbl = pace ? rblEve : rblShipped;
-      const ruled = [-a.untol, -a.tol, ll, sar, rbl, can];
+      const ruled = pace ? [-a.untol, -a.tol, ll, sar, rbl, can] : [-a.untol, -a.tol, ll, qrAll, sar, rbl, can];
       out.push({
         idxs, days, typeOf, coll: a.coll, untol: a.untol, tol: a.tol, longLast: ll, lf, qr, ident,
         ruled, shipped: [-a.untol, -a.tol, ll, sar, rblShipped, can],
-        rank: ruled.concat([ident, pace ? -lf : 0, qr, qf]),
+        rank: pace ? ruled.concat([ident, -lf, qr, qf]) : ruled.concat([0, 0, 0]),
         hard: days.filter(d => typeOf[d] !== T.rec).map(d => d + ':' + typeOf[d]).join(' '),
       });
     });

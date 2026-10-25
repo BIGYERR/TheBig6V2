@@ -115,7 +115,7 @@ test('NRC keeps both long run pins: on every NRC layout the long run is the last
   assert.ok(escapes > 0, 'the pace family moves its long run off the last training day somewhere');
 });
 
-test('every NRC layout is a maximum of its five ruled terms, with the shipped easy run predicate, and carries untol equal to coll', () => {
+test('every NRC layout is a maximum of its ruled terms (rest into the long run third, D244), with the shipped easy run predicate, and carries untol equal to coll', () => {
   const C = R.chooser();
   const bad = [], split = [];
   for (const r of NRC_ROWS) {
@@ -131,7 +131,9 @@ test('every NRC layout is a maximum of its five ruled terms, with the shipped ea
   assert.deepEqual(split, []);
 });
 
-test('identity is pace family only: NRC declines the even spread subset on 129 of the 357 five-term ties it is offered', () => {
+test('identity is pace family only: NRC declines the even spread subset on 78 of the 262 ruled-term ties it is offered', () => {
+  // D244 (v0.244.0) ranks rest into the long run third on NRC, so fewer layouts tie at the top of the ruled terms:
+  // 445 rows with a tie across day sets, 357 offered, 228 taken and 129 declined before it.
   const C = R.chooser();
   let tieMulti = 0, offered = 0, takes = 0, declines = 0;
   for (const r of NRC_ROWS) {
@@ -145,7 +147,7 @@ test('identity is pace family only: NRC declines the even spread subset on 129 o
     offered++;
     if (C.choose(r.train, r.cap, r.g, false, 'advanced').idxs.join(',') === ev) takes++; else declines++;
   }
-  assert.deepEqual({ tieMulti, offered, takes, declines }, { tieMulti: 445, offered: 357, takes: 228, declines: 129 });
+  assert.deepEqual({ tieMulti, offered, takes, declines }, { tieMulti: 373, offered: 262, takes: 184, declines: 78 });
 });
 
 // ── D243: one speed day below advanced, and the Tempo when the week has one ────────────────────────────────────────────
@@ -173,7 +175,7 @@ const speedTypes = (p: R.AppProgram, w: number) => WEEK_ORDER.map(d => {
 }).filter(Boolean);
 const HALF_ONE_SPEED = ['Intervals', 'Intervals', 'Hills', 'Tempo', 'Tempo', 'Intervals', 'Intervals', 'Intervals', 'Tempo', 'Intervals', 'Intervals', 'Tempo', 'Intervals', 'Intervals'];
 
-test('every one-speed NRC layout (beginner, intermediate) deals no second speed slot, is a maximum of its five ruled terms and keeps the long run on the last training day (D243)', () => {
+test('every one-speed NRC layout (beginner, intermediate) deals no second speed slot, is a maximum of its ruled terms (the D244 key) and keeps the long run on the last training day (D243)', () => {
   const C = R.chooser();
   const bad: string[] = [], unpinned: string[] = [], second: string[] = [];
   let rows = 0;
@@ -232,6 +234,22 @@ test('a three-run half carries one speed slot for every experience, so its speed
 test('an advanced athlete on the reported calendar keeps both speed days: week 9 is MON Intervals and THU Tempo (unchanged: guards the advanced row)', () => {
   const p = R.build(HALF_CFG({ experience: 'advanced', restDays: ['sun', 'wed'] }));
   assert.equal(runWeek(p, 9), 'mon:Speed Run — Intervals | tue:- | wed:x | thu:Speed Run — Tempo | fri:Recovery Run | sat:Long Run | sun:x');
+});
+
+// ── D244: rest into the long run, ranked third on NRC ──────────────────────────────────────────────────────────────────
+// Oracles, typed by hand: the long run is pinned to the last training day (Sunday on these calendars); a quality day may
+// not sit beside it (Monday is beside Sunday, round the week); among the rest the one furthest back from the long run
+// wins, counted backwards: Tuesday 5 days, Wednesday 4, Thursday 3.
+test('rest Wednesday only, five runs: the one speed day moves from Thursday to Tuesday, five days before the Sunday long run (D244)', () => {
+  const p = R.build(HALF_CFG({ experience: 'intermediate', restDays: ['wed'] }));
+  assert.equal(runWeek(p, 9), 'mon:Recovery Run | tue:Speed Run — Tempo | wed:x | thu:Recovery Run | fri:Recovery Run | sat:- | sun:Long Run');
+});
+
+test('an advanced athlete resting Thursday and Friday: the speed days move off the long run\'s eve to Monday and Wednesday, four days back (D244)', () => {
+  // Every layout pays one hard pair here (Monday and Saturday both touch Sunday, Tuesday and Wednesday touch each other),
+  // so rank 3 decides: Monday and Wednesday leave four days into the long run, Tuesday and Saturday left one.
+  const p = R.build(HALF_CFG({ experience: 'advanced', restDays: ['thu', 'fri'] }));
+  assert.equal(runWeek(p, 9), 'mon:Speed Run — Intervals | tue:Recovery Run | wed:Speed Run — Tempo | thu:x | fri:x | sat:- | sun:Long Run');
 });
 
 test('identity: where the even spread subset ties at the top of the ruled terms, the pace family keeps it (37 rows)', () => {
@@ -405,11 +423,12 @@ test('at three runs a mid-week long run ships only where every long-last layout 
 
 // ── the source ───────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('the source: the pace ceiling drops to three only on an untolerated pick, and the rank key is the ruled order, split on the pace family only', () => {
+test('the source: the pace ceiling drops to three only on an untolerated pick, and the rank key is the ruled order on each arm: rest into the long run third on NRC (D244), the D129 order on the pace family', () => {
   const src = R.code();
   assert.equal(R.occurrences(src, 'if(_paceCapped && capDays > 3 && (!_pick || _pick.untol > 0)){'), 1);
   assert.equal(R.occurrences(src, '_pick.coll > 0'), 0, 'the total-collision key is gone from the ceiling');
-  assert.equal(R.occurrences(src, 'const _rank = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];'), 1);
+  assert.equal(R.occurrences(src, 'const _rank = paceFam\n          ? c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst]\n          : c => [-c.untol, -c.tol, c.longLast, c.qualRest, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualFirst];'), 1);
+  assert.equal(R.occurrences(src, 'const qualRest = _qualRest;'), 1, 'rest into the long run is scored on both arms');
   assert.equal(R.occurrences(src, 'const untol = paceFam ? _untol : coll;'), 1);
   assert.equal(R.occurrences(src, 'const tol   = paceFam ? _tol   : 0;'), 1);
   assert.equal(R.occurrences(src, "const identity = (paceFam && idxs.join(',') === _evenKey) ? 1 : 0;"), 1);

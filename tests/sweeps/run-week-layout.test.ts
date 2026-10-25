@@ -266,5 +266,6 @@ test('the exclusion key: every excluded mode is reached in both populations, the
     assert.ok(E[row].routed > 0, row + ' routed twins');
     assert.ok(E[row].moved > 0, row + ': the chooser would move an excluded week, so the pinned layouts can fail');
   }
-  assert.deepEqual({ pace: [E.pace.moved, E.pace.routable], nrc: [E.nrc.moved, E.nrc.routable] }, { pace: [36, 44], nrc: [112, 116] });
+  // nrc moved 112 of 116 until D244 (v0.244.0): rest into the long run, ranked third, re-lays four more of them.
+  assert.deepEqual({ pace: [E.pace.moved, E.pace.routable], nrc: [E.nrc.moved, E.nrc.routable] }, { pace: [36, 44], nrc: [116, 116] });
 });

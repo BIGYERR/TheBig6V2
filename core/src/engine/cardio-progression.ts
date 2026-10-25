@@ -919,9 +919,10 @@ function buildCardioProgression(cardioTypes: CardioType[] | null | undefined, ca
           });
           if(_nearest < 7) _qualRest = _nearest;
         }
-        // paceFam-gated like ranks 6 and 7: NRC's subset and permutation pins already fix
-        // its layout, and a new preference there is unruled.
-        const qualRest = paceFam ? _qualRest : 0;
+        // paceFam-gated like ranks 6 and 7 until v0.244.0. D244 (Mario) rules it on the NRC arm
+        // too, and higher: the long run is the race rehearsal, so the week's last quality session
+        // sits as far before it as the collision terms allow (rank 3 on NRC, below the long-run pin).
+        const qualRest = _qualRest;
         // V205 (D129 addendum), rank 9 — EARLIEST FIRST QUALITY DAY. Below rank 8, and
         // already implied by canonical; written out so it is a rank rather than an
         // accident of enumeration. days ascends in week order, so the first quality
@@ -940,7 +941,12 @@ function buildCardioProgression(cardioTypes: CardioType[] | null | undefined, ca
         // V205 (D130 amended): rank 1 is -untol, rank 1b is -tol. Ranks 2..9 are
         // unchanged and keep their shipped order. -c.coll is GONE from the key: a
         // total that mixes a tolerated pair with an untolerated one cannot rank them.
-        const _rank: (c: NrcPick) => number[] = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];
+        // v0.244.0 (D244, Mario): THE KEY IS SPLIT BY ARM. On NRC, rest into the long run is rank 3,
+        // under the collisions and the long-run pin and above speeds after a rest day and the
+        // recovery run padding the long. The pace family keeps its ruled order (D129) byte for byte.
+        const _rank: (c: NrcPick) => number[] = paceFam
+          ? c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst]
+          : c => [-c.untol, -c.tol, c.longLast, c.qualRest, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualFirst];
         if(!best) best = cand;
         else {
           const ka = _rank(cand), kb = _rank(best);
