@@ -3,7 +3,7 @@
     "fires": {
       "commercial": 0,
       "crossfit": 0,
-      "home_full": 84,
+      "home_full": 88,
       "home_basic": 0,
       "bodyweight": 0
     },
@@ -20,14 +20,14 @@
     "runnerLegDays": 1544,
     "nonRunnerLegDays": 528,
     "kneeProtectLegDays": 95,
-    "runnerDaysWithTheFourthItem": 1008,
+    "runnerDaysWithTheFourthItem": 1164,
     "fourthItemByFamily": {
-      "race": 496,
+      "race": 652,
       "test": 512
     },
     "itemsRemovedBySection": {
-      "core block": 33,
-      "carry finisher": 13
+      "core block": 23,
+      "carry finisher": 7
     },
     "calfDays": 1290
   }

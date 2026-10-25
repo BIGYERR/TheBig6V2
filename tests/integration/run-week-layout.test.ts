@@ -34,18 +34,20 @@ const SNAPSHOT = path.join(__dirname, '..', 'snapshots', 'run-week-layout.json')
 test('the run day chooser and its session tables lift out of the app and run alone', () => {
   const C = R.chooser();
   for (const f of ['choose', 'sessionTypes', 'nrcTypes', 'isSpeedGoal'] as const) assert.equal(typeof C[f], 'function', f);
-  const p = C.choose(['mon', 'tue', 'thu', 'fri', 'sat'], 4, 'run_pace_goal', true);
+  const p = C.choose(['mon', 'tue', 'thu', 'fri', 'sat'], 4, 'run_pace_goal', true, undefined);
   assert.ok(p && Array.isArray(p.idxs) && p.idxs.length === 4, 'a four-run pick');
 });
 
-test('the NSW run table is Table 7 as the pace family deals it, and the NRC table is one speed day for the marathon, two for every other plan', () => {
+test('the NSW run table is Table 7 as the pace family deals it, and the NRC table is one speed day for the marathon, two for an advanced athlete on every other plan and one for everyone else (D243)', () => {
   const C = R.chooser();
   // the pace flag on (D113a): two runs easy and long; three INT, CHI and long; four add the easy run
   for (const n of [2, 3, 4]) assert.deepEqual(C.sessionTypes(n, true, false, false, true), R.NSW_RUN_TYPES[n], 'pace, ' + n + ' runs');
   // the pace flag off (an excluded injury mode, and the row D129 was ruled on): three runs keep easy, INT and long
   assert.deepEqual(C.sessionTypes(3, true, false, false, false), R.NSW_FALLBACK3);
   assert.deepEqual(C.sessionTypes(4, true, false, false, false), R.NSW_RUN_TYPES[4]);
-  for (const g of R.NRC_PLANS) for (let n = 1; n <= 7; n++) assert.deepEqual(C.nrcTypes(n, g), R.nrcTypesHand(n, g), g + ' ' + n + ' runs');
+  for (const exp of ['beginner', 'intermediate', 'advanced', undefined]) for (const g of R.NRC_PLANS) for (let n = 1; n <= 7; n++) {
+    assert.deepEqual(C.nrcTypes(n, g, exp), R.nrcTypesHand(n, g, exp), g + ' ' + n + ' runs, ' + exp);
+  }
 });
 
 /** The routed pace rows: rest-day calendars with zero to five rest days, at a ceiling of two, three or four runs. */
@@ -59,7 +61,7 @@ test('every routed pace layout is a maximum of the full ruled objective, over ev
   const bad = [];
   for (const r of PACE_ALL) {
     const all = layouts(r.train, r.cap, R.paceTypes(r.train, r.cap), TP, true);
-    const pick = C.choose(r.train, r.cap, 'run_pace_goal', true);
+    const pick = C.choose(r.train, r.cap, 'run_pace_goal', true, undefined);
     const got = findPick(all, r.train, pick)!;
     const best = topBy(all, 'rank')[0];
     if (!got || cmp(got.rank, best.rank) !== 0) bad.push(r.key + ' cap ' + r.cap + ': ' + pickLayout(r.train, pick) + ' rank ' + (got ? got.rank : 'off the space') + ' best ' + best.rank);
@@ -72,7 +74,7 @@ test('the day after the long run is never credited as padding it: no pick keeps 
   const C = R.chooser();
   const bad = [];
   for (const r of PACE_ROWS) {
-    const pick = C.choose(r.train, r.cap, 'run_pace_goal', true);
+    const pick = C.choose(r.train, r.cap, 'run_pace_goal', true, undefined);
     const days = pick.idxs.map(i => r.train[i]);
     const L = days.find(d => pick.typeOf[d] === 'lsd_long');
     if (!L) continue;
@@ -95,9 +97,9 @@ test('NRC keeps both long run pins: on every NRC layout the long run is the last
   let rows = 0;
   const unpinned = [];
   for (const g of R.NRC_PLANS) for (const c of R.calendars([0, 1, 2, 3])) for (let cap = 2; cap < Math.min(c.train.length, 6); cap++) {
-    if (R.nrcTypesHand(cap, g).length !== cap) continue;
+    if (R.nrcTypesHand(cap, g, 'advanced').length !== cap) continue;
     rows++;
-    const p = C.choose(c.train, cap, g, false);
+    const p = C.choose(c.train, cap, g, false, 'advanced');
     const L = (Object.keys(p.typeOf) as R.Day[]).find(d => p.typeOf[d] === 'nrc_long');
     if (L && L !== c.train[c.train.length - 1]) unpinned.push(g + ' ' + c.key + ' cap ' + cap);
   }
@@ -106,7 +108,7 @@ test('NRC keeps both long run pins: on every NRC layout the long run is the last
   let escapes = 0;
   for (const c of R.calendars([0, 1, 2, 3])) {
     if (c.train.length <= 4) continue;
-    const p = C.choose(c.train, 4, 'run_pace_goal', true);
+    const p = C.choose(c.train, 4, 'run_pace_goal', true, undefined);
     const L = (Object.keys(p.typeOf) as R.Day[]).find(d => p.typeOf[d] === 'lsd_long');
     if (L && L !== c.train[c.train.length - 1]) escapes++;
   }
@@ -117,9 +119,9 @@ test('every NRC layout is a maximum of its five ruled terms, with the shipped ea
   const C = R.chooser();
   const bad = [], split = [];
   for (const r of NRC_ROWS) {
-    const all = layouts(r.train, r.cap, R.nrcTypesHand(r.cap, r.g), TN, false);
+    const all = layouts(r.train, r.cap, R.nrcTypesHand(r.cap, r.g, 'advanced'), TN, false);
     if (!all.length) continue;
-    const pick = C.choose(r.train, r.cap, r.g, false);
+    const pick = C.choose(r.train, r.cap, r.g, false, 'advanced');
     const got = findPick(all, r.train, pick)!;
     if (!got || cmp(got.ruled, topBy(all, 'ruled')[0].ruled) !== 0) bad.push(r.g + ' ' + r.key + ' cap ' + r.cap);
     if (pick.untol !== pick.coll || pick.tol !== 0) split.push(r.g + ' ' + r.key + ' cap ' + r.cap + ' coll ' + pick.coll + ' untol ' + pick.untol);
@@ -133,7 +135,7 @@ test('identity is pace family only: NRC declines the even spread subset on 129 o
   const C = R.chooser();
   let tieMulti = 0, offered = 0, takes = 0, declines = 0;
   for (const r of NRC_ROWS) {
-    const all = layouts(r.train, r.cap, R.nrcTypesHand(r.cap, r.g), TN, false);
+    const all = layouts(r.train, r.cap, R.nrcTypesHand(r.cap, r.g, 'advanced'), TN, false);
     if (!all.length) continue;
     const subs = new Set(topBy(all, 'ruled').map(c => c.idxs.join(',')));
     if (subs.size < 2) continue;
@@ -141,9 +143,95 @@ test('identity is pace family only: NRC declines the even spread subset on 129 o
     const ev = R.evenIdx(r.train.length, r.cap).join(',');
     if (!subs.has(ev)) continue;
     offered++;
-    if (C.choose(r.train, r.cap, r.g, false).idxs.join(',') === ev) takes++; else declines++;
+    if (C.choose(r.train, r.cap, r.g, false, 'advanced').idxs.join(',') === ev) takes++; else declines++;
   }
   assert.deepEqual({ tieMulti, offered, takes, declines }, { tieMulti: 445, offered: 357, takes: 228, declines: 129 });
+});
+
+// ── D243: one speed day below advanced, and the Tempo when the week has one ────────────────────────────────────────────
+// Oracles, typed by hand: the type table from the ruling (nrcTypesHand), and Nike's half table, slot by slot: the first
+// slot is Intervals in every week but week 3 (Hills); the Tempos are weeks 4, 5, 9 and 12, all in the second slot.
+const HALF_GOAL = { id: 'run_half', label: 'Half Marathon', mileBestMins: '9', mileBestSecs: '00', baselineDist: '5', baseline: '5mi' };
+const HALF_CFG = (o: { experience: string; restDays: string[]; liftingFocus?: string }): R.RunCfg => ({
+  name: 'REPORTED', primaryPath: 'event', cardioTypes: ['run'], cardioGoals: { run: HALF_GOAL }, eventTargeted: true,
+  raceDate: '2027-01-31', liftingFocus: o.liftingFocus || 'support_strength', experience: o.experience, ageBracket: '18-35',
+  equipment: 'home_full', unit: 'lbs', restDays: o.restDays, days: DAYS.slice(), bench: 135, squat: 155, deadlift: 185,
+  seed: 1013,
+});
+const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+/** One week as Day:card, the run's printed name or '-' for a lift-only day, 'x' for rest. */
+const runWeek = (p: R.AppProgram, w: number) => WEEK_ORDER.map(d => {
+  const day = p.weeks[String(w)][d];
+  if (!day || day.rest) return d + ':x';
+  const run = ([] as any[]).concat(day.cardio || []).find(c => c && c.type === 'run');
+  return d + ':' + (run ? run.subtype : '-');
+}).join(' | ');
+const speedTypes = (p: R.AppProgram, w: number) => WEEK_ORDER.map(d => {
+  const day = p.weeks[String(w)][d];
+  const run = day && ([] as any[]).concat(day.cardio || []).find(c => c && c.type === 'run');
+  return run && /^Speed Run — /.test(run.subtype) ? run.subtype.replace('Speed Run — ', '') : null;
+}).filter(Boolean);
+const HALF_ONE_SPEED = ['Intervals', 'Intervals', 'Hills', 'Tempo', 'Tempo', 'Intervals', 'Intervals', 'Intervals', 'Tempo', 'Intervals', 'Intervals', 'Tempo', 'Intervals', 'Intervals'];
+
+test('every one-speed NRC layout (beginner, intermediate) deals no second speed slot, is a maximum of its five ruled terms and keeps the long run on the last training day (D243)', () => {
+  const C = R.chooser();
+  const bad: string[] = [], unpinned: string[] = [], second: string[] = [];
+  let rows = 0;
+  for (const exp of ['beginner', 'intermediate']) for (const r of NRC_ROWS) {
+    const all = layouts(r.train, r.cap, R.nrcTypesHand(r.cap, r.g, exp), TN, false);
+    if (!all.length) continue;
+    rows++;
+    const pick = C.choose(r.train, r.cap, r.g, false, exp);
+    const tag = exp + ' ' + r.g + ' ' + r.key + ' cap ' + r.cap;
+    if (Object.values(pick.typeOf).includes('nrc_speed2')) second.push(tag);
+    const got = findPick(all, r.train, pick);
+    if (!got || cmp(got.ruled, topBy(all, 'ruled')[0]!.ruled) !== 0) bad.push(tag);
+    const L = (Object.keys(pick.typeOf) as R.Day[]).find(d => pick.typeOf[d] === 'nrc_long');
+    if (L !== r.train[r.train.length - 1]) unpinned.push(tag);
+  }
+  assert.ok(rows >= NRC_ROWS.length, 'both experiences ran: ' + rows);
+  assert.deepEqual(second, []);
+  assert.deepEqual(bad, []);
+  assert.deepEqual(unpinned, []);
+});
+
+test("the reported half (intermediate, Home Full, Strength Support, rest Sunday and Wednesday): week 9 is MON Tempo, TUE recovery, THU lift only, FRI recovery, SAT long, one speed day (D243)", () => {
+  const c = HALF_CFG({ experience: 'intermediate', restDays: ['sun', 'wed'] });
+  const p = R.build(c);
+  assert.equal(progDigest(p), progDigest(R.build(c)), 'self-stable');
+  assert.equal(Object.keys(p.weeks).length, 14);
+  assert.equal(runWeek(p, 9), 'mon:Speed Run — Tempo | tue:Recovery Run | wed:x | thu:- | fri:Recovery Run | sat:Long Run | sun:x');
+  assert.deepEqual(speedTypes(p, 9), ['Tempo']);
+});
+
+test('one speed day a week all block, and it prints the Tempo in weeks 4, 5, 9 and 12, Intervals or Hills (week 3) in the others; a beginner reads the same (D243)', () => {
+  for (const experience of ['intermediate', 'beginner']) {
+    const p = R.build(HALF_CFG({ experience, restDays: ['sun', 'wed'] }));
+    const got = Array.from({ length: 14 }, (_, i) => speedTypes(p, i + 1));
+    assert.deepEqual(got, HALF_ONE_SPEED.map(t => [t]), experience);
+  }
+});
+
+test('at five runs (Strength Support, rest Wednesday only) an intermediate still gets one speed day a week (D243)', () => {
+  const p = R.build(HALF_CFG({ experience: 'intermediate', restDays: ['wed'] }));
+  for (let w = 1; w <= 14; w++) {
+    const runs = runWeek(p, w).split(' | ').filter(x => !/:(x|-)$/.test(x)).length;
+    assert.equal(runs, 5, 'week ' + w + ' runs');
+    assert.equal(speedTypes(p, w).length, 1, 'week ' + w + ' speed days');
+  }
+});
+
+test('a three-run half carries one speed slot for every experience, so its speed day prints the Tempo in weeks 4, 5, 9 and 12 too (D243)', () => {
+  for (const experience of ['intermediate', 'advanced']) {
+    const p = R.build(HALF_CFG({ experience, restDays: ['sun', 'tue', 'wed', 'fri'] }));
+    const got = Array.from({ length: 14 }, (_, i) => speedTypes(p, i + 1));
+    assert.deepEqual(got, HALF_ONE_SPEED.map(t => [t]), experience);
+  }
+});
+
+test('an advanced athlete on the reported calendar keeps both speed days: week 9 is MON Intervals and THU Tempo (unchanged: guards the advanced row)', () => {
+  const p = R.build(HALF_CFG({ experience: 'advanced', restDays: ['sun', 'wed'] }));
+  assert.equal(runWeek(p, 9), 'mon:Speed Run — Intervals | tue:- | wed:x | thu:Speed Run — Tempo | fri:Recovery Run | sat:Long Run | sun:x');
 });
 
 test('identity: where the even spread subset ties at the top of the ruled terms, the pace family keeps it (37 rows)', () => {
@@ -155,7 +243,7 @@ test('identity: where the even spread subset ties at the top of the ruled terms,
     const ev = R.evenIdx(r.train.length, r.cap).join(',');
     if (!tied.some(c => c.idxs.join(',') === ev)) continue;
     n++;
-    const pick = C.choose(r.train, r.cap, 'run_pace_goal', true);
+    const pick = C.choose(r.train, r.cap, 'run_pace_goal', true, undefined);
     if (pick.idxs.join(',') !== ev) moved.push(r.key + ' cap ' + r.cap);
   }
   assert.equal(n, 37);
@@ -171,7 +259,7 @@ test('spread: among ties without the even spread subset, the pace family takes t
     const tied = topBy(all, 'ruled');
     if (tied.some(c => c.idxs.join(',') === R.evenIdx(r.train.length, r.cap).join(','))) continue;
     n++;
-    const got = findPick(all, r.train, C.choose(r.train, r.cap, 'run_pace_goal', true))!;
+    const got = findPick(all, r.train, C.choose(r.train, r.cap, 'run_pace_goal', true, undefined))!;
     if (!got || got.lf !== Math.min(...tied.map(c => c.lf))) loose.push(r.key + ' cap ' + r.cap);
   }
   assert.equal(n, 56);
@@ -180,7 +268,7 @@ test('spread: among ties without the even spread subset, the pace family takes t
 
 test("Mario's calendar (rest Sunday and Wednesday) at four runs: MON INT, THU CHI, FRI easy, SAT long, clean, ranked 0,1,2,1,1, longest gap 2", () => {
   const train = DAYS.filter(d => !R.MARIO_REST.includes(d));
-  const pick = R.chooser().choose(train, 4, 'run_pace_goal', true);
+  const pick = R.chooser().choose(train, 4, 'run_pace_goal', true, undefined);
   assert.equal(pickLayout(train, pick), 'mon:int thu:chi fri:lsd_easy sat:lsd_long');
   const got = findPick(layouts(train, 4, R.NSW_RUN_TYPES[4], TP, true), train, pick)!;
   assert.deepEqual({ untol: got.untol, tol: got.tol }, { untol: 0, tol: 0 });
@@ -192,7 +280,7 @@ test("Mario's calendar (rest Sunday and Wednesday) at four runs: MON INT, THU CH
 
 test('rest Friday at four runs: MON INT, WED CHI, THU easy, SAT long, with three days from the last quality day into the long run', () => {
   const train = DAYS.filter(d => d !== 'fri');
-  const pick = R.chooser().choose(train, 4, 'run_pace_goal', true);
+  const pick = R.chooser().choose(train, 4, 'run_pace_goal', true, undefined);
   assert.equal(pickLayout(train, pick), 'mon:int wed:chi thu:lsd_easy sat:lsd_long');
   assert.equal(findPick(layouts(train, 4, R.NSW_RUN_TYPES[4], TP, true), train, pick)!.qr, 3);
 });
@@ -279,7 +367,7 @@ test('at four runs on all 64 calendars: no untolerated pair; the 14 pay exactly 
   const notBest: string[] = [], untol: string[] = [], tolOn: string[] = [], cleanOff: string[] = [], unsplitOff: string[] = [], offLast: Record<string, string> = {};
   for (const c of CAL64) {
     const all = layouts(c.train, 4, R.NSW_RUN_TYPES[4], TP, true).map(x => Object.assign(x, { unsplit: unsplit(x) }));
-    const pick = C.choose(c.train, 4, 'run_pace_goal', true);
+    const pick = C.choose(c.train, 4, 'run_pace_goal', true, undefined);
     const built = pickLayout(c.train, pick);
     const got = findPick(all, c.train, pick)!;
     if (built !== layoutOf(topBy(all, 'rank')[0])) notBest.push(c.key);
@@ -303,7 +391,7 @@ test('at three runs a mid-week long run ships only where every long-last layout 
   let mid = 0;
   const tied = [];
   for (const c of CAL64) {
-    const p = C.choose(c.train, 3, 'run_pace_goal', true);
+    const p = C.choose(c.train, 3, 'run_pace_goal', true, undefined);
     const days = p.idxs.map(i => c.train[i]);
     if (days.find(d => p.typeOf[d] === 'lsd_long') === days[days.length - 1]) continue;
     mid++;
@@ -653,7 +741,7 @@ test('under the excluded modes a multi-sport week keeps its unrouted day layout 
       const p = R.build(t.cfg), train = R.cardioTrainDays(t.cfg), days = R.weekRunDays(p, 1, train);
       if (days.length < R.ROUTE_FROM[row]) continue;
       routed++;
-      const pick = C.choose(train, days.length, t.cfg.cardioGoals.run.id, row === 'pace');
+      const pick = C.choose(train, days.length, t.cfg.cardioGoals.run.id, row === 'pace', t.cfg.experience);
       assert.deepEqual(days, pick.idxs.map(i => train[i]), row + ' twin ' + t.key);
     }
     assert.ok(cells.length >= 10 && routed >= 2, row + ': ' + cells.length + ' cells, ' + routed + ' routed twins');

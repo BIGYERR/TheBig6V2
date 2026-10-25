@@ -24,9 +24,10 @@ test('the knee protect lattice is 630 configs, 126 per tier, 90 of them preventi
   assert.equal(FB.prevN, 90);
 });
 
-test('floor (b) fires on home_full 84 of 126 and on no other tier', () => {
-  // D195-A-e: e-home_full, e-others
-  assert.equal(FB.fire.home_full, 84);
+test('floor (b) fires on home_full 88 of 126 and on no other tier', () => {
+  // D195-A-e: e-home_full, e-others. 84 until D243 (v0.243.0): one speed day re-lays the shard's beginner and
+  // intermediate race weeks, and four more home_full leg days reach the floor.
+  assert.equal(FB.fire.home_full, 88);
   for (const t of RA.FB_TIERS.filter((x) => x !== 'home_full')) assert.equal(FB.fire[t], 0, t);
 });
 

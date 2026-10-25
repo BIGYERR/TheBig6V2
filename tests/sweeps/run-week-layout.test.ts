@@ -234,14 +234,14 @@ function excluded(): Record<string, ExclRow> {
       const days = R.weekRunDays(p, 1, train);
       if (days.length < R.ROUTE_FROM[row]) continue;
       routable++;
-      const pick = C.choose(train, days.length, cell.cfg.cardioGoals.run.id, row === 'pace');
+      const pick = C.choose(train, days.length, cell.cfg.cardioGoals.run.id, row === 'pace', cell.cfg.experience);
       if (pick.idxs.map(i => train[i]).join() !== days.join()) moved++;
     }
     for (const t of pop.twins) {
       const p = R.build(t.cfg), train = R.cardioTrainDays(t.cfg), days = R.weekRunDays(p, 1, train);
       if (days.length < R.ROUTE_FROM[row]) continue;
       routed++;
-      const pick = C.choose(train, days.length, t.cfg.cardioGoals.run.id, row === 'pace');
+      const pick = C.choose(train, days.length, t.cfg.cardioGoals.run.id, row === 'pace', t.cfg.experience);
       if (pick.idxs.map(i => train[i]).join() !== days.join()) twinOff.push(t.key);
     }
     EXCL[row] = { cells: pop.cells.length, twins: pop.twins.length, layouts, reach, moved, routable, routed, twinOff };

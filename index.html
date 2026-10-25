@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.242.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.243.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -4862,7 +4862,11 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
     }
 
   } else if(_type === 'nrc_speed1' || _type === 'nrc_speed2') {
-    const slot = _type === 'nrc_speed1' ? 0 : 1;
+    // v0.243.0 (D243, Mario): a layout with one speed slot prints the week's Tempo when Nike's week has one, else the
+    // first session. Nike's half puts every Tempo in the second slot, so a one-speed week read by slot alone never
+    // ran one. The marathon (one Nike session a week) and every two-speed layout read by slot, as before.
+    const _tempo = (_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon) ? wk.speed.findIndex(x => x.type === 'Tempo') : -1;
+    const slot = _type === 'nrc_speed1' ? (_tempo > 0 ? _tempo : 0) : 1;
     const sp = wk.speed[Math.min(slot, wk.speed.length - 1)];
     subtype = 'Speed Run — ' + sp.type;
     detail = fillPaces((sp.detailIfHalfSlow && chartRow.half >= chartRow.marathon) ? sp.detailIfHalfSlow : sp.detail);   // V176 (D31)
@@ -4915,8 +4919,13 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
 
 // NRC session type assignment. Marathon: 1 speed + 3 recovery + 1 long.
 // Half: 2 speed + 2 recovery + 1 long. Degrades gracefully on fewer days.
-function getNRCSessionTypes(nRunDays, goalId) {
+// v0.243.0 (D243, Mario): the second speed slot is an advanced athlete's. On the 5K, 10K and half plans a beginner or
+// intermediate gets one speed day at four and five runs and the slot becomes a recovery run, so the week stops
+// stacking two quality sessions on a lifting week. No experience reads as intermediate, as buildNRCSession does.
+// The marathon rows already carry one.
+function getNRCSessionTypes(nRunDays, goalId, experience) {
   const isMarathon = goalId === 'run_marathon';
+  const _twoSpeed = experience === 'advanced';
   if(isMarathon) {
     if(nRunDays >= 5) return ['nrc_recovery','nrc_speed1','nrc_recovery','nrc_recovery','nrc_long'];
     if(nRunDays === 4) return ['nrc_recovery','nrc_speed1','nrc_recovery','nrc_long'];
@@ -4924,8 +4933,8 @@ function getNRCSessionTypes(nRunDays, goalId) {
     if(nRunDays === 2) return ['nrc_recovery','nrc_long'];
     return ['nrc_long'];
   } else {
-    if(nRunDays >= 5) return ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_recovery','nrc_long'];
-    if(nRunDays === 4) return ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_long'];
+    if(nRunDays >= 5) return _twoSpeed ? ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_recovery','nrc_long'] : ['nrc_speed1','nrc_recovery','nrc_recovery','nrc_recovery','nrc_long'];
+    if(nRunDays === 4) return _twoSpeed ? ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_long'] : ['nrc_speed1','nrc_recovery','nrc_recovery','nrc_long'];
     if(nRunDays === 3) return ['nrc_speed1','nrc_recovery','nrc_long'];
     if(nRunDays === 2) return ['nrc_recovery','nrc_long'];
     return ['nrc_long'];
@@ -5959,7 +5968,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // set with nothing to choose.
     const _paceCapped = PACE_GOALS.has(_soloRunGoal) && capDays<=nCardio && capDays>=2;
     if(_nrcCapped || _paceCapped){
-      let _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped, undefined, _d113Excl);
+      let _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped, undefined, _d113Excl, cfg.experience);
       // V205 (D125 amended, RE-KEYED BY D130): THE CONDITIONAL CEILING, DECIDED HERE.
       // Four runs ship only where the chooser hands back a layout with zero UNTOLERATED
       // hard-day adjacencies. Where it cannot, the week drops to three runs and is re-laid
@@ -5977,7 +5986,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       // nothing and any future calendar shape that cannot reach untol==0.
       if(_paceCapped && capDays > 3 && (!_pick || _pick.untol > 0)){
         capDays = 3;
-        _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped, undefined, _d113Excl);
+        _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped, undefined, _d113Excl, cfg.experience);
       }
       if(_pick){
         _pick.idxs.forEach(i=>chosen.add(i));
@@ -6031,7 +6040,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // slice 2c, coach: those modes rewrite every run, so there is nothing left to space).
     { const _msG = cardioTypes.includes('run') && cardioGoals.run && cardioGoals.run.id; const _msPace = PACE_GOALS.has(_msG);
       const _k = dayToSport.filter(s => s === 'run').length;
-      if(((_msPace && !_d113Excl && _k >= 3) || (NRC_GOALS.has(_msG) && !_d113Excl && _k >= 2)) && !isBaseCardio){ const _pk = _nrcSpacedRunDays(cardioTrainDays, _k, _msG, _msPace);
+      if(((_msPace && !_d113Excl && _k >= 3) || (NRC_GOALS.has(_msG) && !_d113Excl && _k >= 2)) && !isBaseCardio){ const _pk = _nrcSpacedRunDays(cardioTrainDays, _k, _msG, _msPace, undefined, undefined, cfg.experience);
         if(_pk){ const _oth = dayToSport.filter(s => s !== 'run'); const _ix = new Set(_pk.idxs); let _o = 0;
           for(let i = 0; i < dayToSport.length; i++) dayToSport[i] = _ix.has(i) ? 'run' : _oth[_o++]; _nrcPlan = _pk.typeOf; _msFlag = true; _d113Fb = !!_pk._fbFired; } } }
   }
@@ -6084,9 +6093,11 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // ever passed by the chooser's own fallback below. `_excl` is the exclusion key read once
   // in buildCardioProgression (`_d113Excl`); under it the pace arm reads the V212 row, not
   // the D113 row.
-  function _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam, _fb, _excl){
+  // v0.243.0 (D243): `_exp` is the athlete's experience, which picks the NRC row (one speed slot or two). A parameter,
+  // never a closure, for the same reason.
+  function _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam, _fb, _excl, _exp){
     const types = paceFam ? (_fb ? ['lsd_easy','int','lsd_long'] : getSessionTypes(capDays, isSpeedGoal(goalId), false, false, !_excl))
-                          : getNRCSessionTypes(capDays, goalId);
+                          : getNRCSessionTypes(capDays, goalId, _exp);
     // The objective is written once, in tokens. The NSW table's quality pair is INT then
     // CHI, which is the same sequence NRC prints as speed1 then speed2.
     const T = paceFam
@@ -6274,7 +6285,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // no such layout. There the week keeps the V212 shape, easy / INT / long, and the one
     // quality slot crosses INT to CHI at the V115 crossover. The flag rides on the RETURNED
     // object, never on a closure, so a gate that lifts this function into a bare VM runs it.
-    if(paceFam && capDays === 3 && !_fb && best && best.untol > 0){ const _alt = _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam, true, _excl); if(_alt){ _alt._fbFired = true; return _alt; } }
+    if(paceFam && capDays === 3 && !_fb && best && best.untol > 0){ const _alt = _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam, true, _excl, _exp); if(_alt){ _alt._fbFired = true; return _alt; } }
     return best; // {idxs:[...], typeOf:{dayKey:type}, ...} — never null for capDays≥1
   }
 
@@ -6285,8 +6296,9 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     const goalId = cardioGoals[type] && cardioGoals[type].id;
     const isNRC = type === 'run' && NRC_GOALS.has(goalId);
     if(isNRC) {
-      // NRC engine: marathon = 1 speed + 3 recovery + 1 long; 5K/10K/half = 2 speed + 2 recovery + 1 long
-      const nrcTypes = getNRCSessionTypes(sportDays.length, goalId);
+      // NRC engine: marathon = 1 speed + 3 recovery + 1 long; 5K/10K/half = 2 speed + 2 recovery + 1 long for an
+      // advanced athlete, 1 speed + 3 recovery + 1 long for everyone else (v0.243.0, D243)
+      const nrcTypes = getNRCSessionTypes(sportDays.length, goalId, cfg.experience);
       // Track which recovery-run slot each day is, so each pulls a distinct duration
       let recCounter = 0, recAllCounter = 0, hasSpeed2 = false;
       sportDays.forEach((globalDayIdx, sportIdx) => {

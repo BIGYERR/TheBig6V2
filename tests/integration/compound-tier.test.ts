@@ -180,6 +180,7 @@ test('regional fatigue, the adjacent-day dedupe, the swap candidates and the add
   assert.equal(IA.eval('_pattern')('Pallof press') == null, true);
   assert.deepEqual(L.r1, [0, 1796]);
   assert.deepEqual(L.r2, [0, 49]);
-  assert.deepEqual(L.r3, [0, 213]);
+  // D243 (v0.243.0) moved HALF_MANNY's days, so its Pallof day offers two more swap checks (213 before); none decides.
+  assert.deepEqual(L.r3, [0, 215]);
   assert.deepEqual(L.r4, [0, 35]);
 });

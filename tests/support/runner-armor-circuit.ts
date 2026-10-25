@@ -104,7 +104,7 @@ const LEGS_DAYS = [
 ];
 
 // ── the two typed cells (coach's INJ lattice constructor, cards printed by coach) ──────────────────────────────
-const CELL_F1 = { tag: 'shoulder/protect | commercial | beginner | s1234 | sun,wed | race (run_half)', w: 2, d: 'tue',
+const CELL_F1 = { tag: 'shoulder/protect | commercial | beginner | s1234 | sun,wed | race (run_half)', w: 2, d: 'thu',
   cfg: { name: 'M', primaryPath: 'event', cardioTypes: ['run'], cardioGoals: { run: { id: 'run_half', label: 'run_half', mileBestMins: '8', mileBestSecs: '0', baselineDist: '3', baseline: '3mi' } }, eventTargeted: false, liftingFocus: 'support_prevention', experience: 'beginner', ageBracket: '18-35', equipment: 'commercial', unit: 'lbs', restDays: ['sun', 'wed'], days: DAYS.slice(), bench: 135, squat: 155, deadlift: 185, seed: 1234, injury: { region: 'shoulder', tier: 'protect' } } };
 const CELL_FH = { tag: 'shoulder/protect | test (run_base) | commercial | intermediate | s87747 | sat,sun', w: 3, d: 'mon',
   cfg: { name: 'M', primaryPath: 'event', cardioTypes: ['run'], cardioGoals: { run: { id: 'run_base', label: 'run_base', mileBestMins: '8', mileBestSecs: '0', baselineDist: '3', baseline: '3mi' } }, eventTargeted: false, liftingFocus: 'support_prevention', experience: 'intermediate', ageBracket: '18-35', equipment: 'commercial', unit: 'lbs', restDays: ['sat', 'sun'], days: DAYS.slice(), bench: 135, squat: 155, deadlift: 185, seed: 87747, injury: { region: 'shoulder', tier: 'protect' } } };
@@ -116,9 +116,11 @@ const CARD_F1 = [
   // D239 (v0.241.0) moved the cell's two prehab blocks, nothing else.
   'Hip stability :: Glute bridge hold 2×30 sec | Kettlebell hip flexor raise 2×10 each | IT band stretch 2×30 sec each',
   'Foot & ankle :: Knee-to-wall ankle rocks 2×10 each | Towel scrunches 2×20 each foot',
-  'Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each',
+  // D243 (v0.243.0) gave the beginner one speed day: the leg day moved from Tuesday to Thursday and its core block to
+  // Monday's pull day, so the carry finisher the core had crowded out fits here now. Nothing else on the card moved.
+  'Loaded carry finisher :: Farmer carry 3×40 yards, heavy',
 ];
-/** The same cell without D195 (parts A and B): the circuit's three, and no carry (coach's print of V230). */
+/** The same cell without D195 (parts A and B): the circuit's three (coach's print of V230; since D243 the carry closes it). */
 const CARD_F1_THREE = CARD_F1.slice(0, 1)
   .concat(['Leg circuit — runner armor (SS 2) :: Deficit reverse lunge (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8'], CARD_F1.slice(2));
 const CARD_FH = [
