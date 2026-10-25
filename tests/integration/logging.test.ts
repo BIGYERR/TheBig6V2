@@ -1159,13 +1159,14 @@ test('the sport chip does not park a draft, and parks and returns a logged run',
 });
 
 test('a lifting day has no Log button and its RPE saves on the move', () => {
-  fresh(); C.open(1, 'tue');
+  // HALF_MANNY's lift-only day: Thursday since D243 (v0.243.0), Tuesday before.
+  fresh(); C.open(1, 'thu');
   const body = C.els.detailBody.innerHTML;
   assert.ok(body.length > 0);
   assert.doesNotMatch(body, /id="cardioLogBtn"/);
   assert.doesNotMatch(body, /id="cardioSwapWrap"/);
   C.rpe('7');
-  assert.equal((C.entry(1, 'tue') || {}).rpe, '7');
+  assert.equal((C.entry(1, 'thu') || {}).rpe, '7');
 });
 
 test('the Log button copy is exact in the source, with a real check mark, no dash and no brand', () => {
@@ -1358,9 +1359,9 @@ function heroOf(w: number, d: string) {
   return { lines, btn: b ? b[1] : null, rest: h.includes('REST DAY') };
 }
 
-test('the hosts are as typed: HALF_MANNY W1 has a rest Wednesday, a lifting Tuesday and the three run doses; the multi-sport cells exist', () => {
+test('the hosts are as typed: HALF_MANNY W1 has a rest Wednesday, a lifting Thursday (D243) and the three run doses; the multi-sport cells exist', () => {
   const W = HALF.weeks[1];
-  assert.ok(W.wed.rest && !cardioOf(W.tue) && !W.tue.rest);
+  assert.ok(W.wed.rest && !cardioOf(W.thu) && !W.thu.rest);
   assert.match(subOf(HALF, 1, 'mon'), /Speed Run/);
   assert.ok(!cardioOf(W.mon).dose);
   assert.match(subOf(HALF, 1, 'fri'), /Recovery Run/);

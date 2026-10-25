@@ -4,7 +4,7 @@
 // ones that name what they were given, so every expected string is typed here from the legacy code.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { changeSheetView, injuryView, type OverlayDraft, type SheetDeps, travelView } from '../../src/app/screens/change-sheet/change-sheet-model.ts';
+import { changeSheetView, INJ_EFFECT, injuryView, type OverlayDraft, type SheetDeps, travelView } from '../../src/app/screens/change-sheet/change-sheet-model.ts';
 
 const REGIONS = { shoulder: { label: 'Shoulder' }, lowback: { label: 'Lower Back' }, knee: { label: 'Knee' } };
 const deps = (inProgram = true): SheetDeps => ({
@@ -82,5 +82,15 @@ describe('the injury and travel sheet', () => {
   it('sends a neck or anything unlisted to a professional, with Got it and nothing to apply', () => {
     const v = injuryView({ ...HURT, injRegion: 'other' }, REGIONS, deps());
     assert.deepEqual([v.regions.at(-1)!.sel, v.tiers, v.dates, v.action, v.effect!.title], [true, null, null, 'close', 'That one’s above my pay grade']);
+  });
+  it('offers the calf with its own effect copy on both tiers, written in the coach\'s voice (D245)', () => {
+    const regions = { ...REGIONS, calf: { label: 'Calf' } };
+    const w = injuryView({ ...HURT, injRegion: 'calf', injTier: '' }, regions, deps());
+    const p = injuryView({ ...HURT, injRegion: 'calf', injTier: 'protect' }, regions, deps());
+    assert.equal(w.effect!.title, 'Working around it · Calf');
+    assert.equal(p.effect!.title, 'Protected · Calf');
+    assert.equal(INJ_EFFECT['calf']!.workaround, 'Calf raises and jumps are out. Tibialis raises and ankle mobility stay. Runs get shorter and stay easy.');
+    assert.equal(INJ_EFFECT['calf']!.protect, 'Nothing stands on that calf under load. Leg day leans hip and hamstring. Runs become rides or swims, same slots, same clock.');
+    for (const t of [INJ_EFFECT['calf']!.workaround, INJ_EFFECT['calf']!.protect]) assert.doesNotMatch(t, /\S[-\u2013\u2014]\S|\s[-\u2013\u2014]\s/, 'no mid-sentence dash');
   });
 });

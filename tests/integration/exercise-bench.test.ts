@@ -103,7 +103,8 @@ test('a bike program prints the hip names and none of the foot drills (foot & an
 
 test('THE HALF MANNY: the taper week draws from the new pool, and race week keeps its fixed mobility pair', () => {
   const p = IA.buildProgram(fixtures.HALF_MANNY);
-  const block = (w: number, re: RegExp) => ((p.weeks as any)[w].tue.sections || []).find((s: any) => re.test(s.label || ''));
+  // His leg day carries the foot & ankle block: Thursday since D243 (v0.243.0), Tuesday before.
+  const block = (w: number, re: RegExp) => ((p.weeks as any)[w].thu.sections || []).find((s: any) => re.test(s.label || ''));
   const w13 = block(13, /^Foot & ankle$/);
   assert.deepEqual(Array.from(w13.items, (i: any) => clean(i.name) + ' ' + i.detail), ['Split-squat heel-raise hold 2×30 sec each', 'Kettlebell tibialis raise (seated) 2×15']);
   let raceWeek: any = null;

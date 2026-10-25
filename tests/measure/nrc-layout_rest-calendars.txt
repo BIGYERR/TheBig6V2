@@ -1,0 +1,80 @@
+before 0.243.0 after 0.244.0
+advanced     support_athletic train 6  calendars  7  moved 0
+advanced     support_athletic train 7  calendars  1  moved 0
+advanced     support_strength train 2  calendars 21  moved 0
+advanced     support_strength train 3  calendars 35  moved 0
+advanced     support_strength train 4  calendars 35  moved 0
+advanced     support_strength train 5  calendars 21  moved 2
+advanced     support_strength train 6  calendars  7  moved 0
+advanced     support_strength train 7  calendars  1  moved 0
+beginner     support_athletic train 6  calendars  7  moved 2
+beginner     support_athletic train 7  calendars  1  moved 0
+beginner     support_strength train 2  calendars 21  moved 0
+beginner     support_strength train 3  calendars 35  moved 0
+beginner     support_strength train 4  calendars 35  moved 0
+beginner     support_strength train 5  calendars 21  moved 4
+beginner     support_strength train 6  calendars  7  moved 2
+beginner     support_strength train 7  calendars  1  moved 0
+intermediate support_athletic train 6  calendars  7  moved 2
+intermediate support_athletic train 7  calendars  1  moved 0
+intermediate support_strength train 2  calendars 21  moved 0
+intermediate support_strength train 3  calendars 35  moved 0
+intermediate support_strength train 4  calendars 35  moved 0
+intermediate support_strength train 5  calendars 21  moved 4
+intermediate support_strength train 6  calendars  7  moved 2
+intermediate support_strength train 7  calendars  1  moved 0
+total: 18 of 384 rows moved
+wed              beginner     support_strength
+  before Mo:E Tu:E We:x Th:Q Fr:E Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:E Sa:- Su:L
+wed              intermediate support_strength
+  before Mo:E Tu:E We:x Th:Q Fr:E Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:E Sa:- Su:L
+wed              beginner     support_athletic
+  before Mo:E Tu:E We:x Th:Q Fr:E Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:E Sa:- Su:L
+wed              intermediate support_athletic
+  before Mo:E Tu:E We:x Th:Q Fr:E Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:E Sa:- Su:L
+thu              beginner     support_strength
+  before Mo:E Tu:E We:E Th:x Fr:Q Sa:- Su:L
+  after  Mo:E Tu:Q We:E Th:x Fr:E Sa:- Su:L
+thu              intermediate support_strength
+  before Mo:E Tu:E We:E Th:x Fr:Q Sa:- Su:L
+  after  Mo:E Tu:Q We:E Th:x Fr:E Sa:- Su:L
+thu              beginner     support_athletic
+  before Mo:E Tu:E We:E Th:x Fr:Q Sa:- Su:L
+  after  Mo:E Tu:Q We:E Th:x Fr:E Sa:- Su:L
+thu              intermediate support_athletic
+  before Mo:E Tu:E We:E Th:x Fr:Q Sa:- Su:L
+  after  Mo:E Tu:Q We:E Th:x Fr:E Sa:- Su:L
+wed+thu          beginner     support_strength
+  before Mo:E Tu:E We:x Th:x Fr:Q Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:x Fr:E Sa:- Su:L
+wed+thu          intermediate support_strength
+  before Mo:E Tu:E We:x Th:x Fr:Q Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:x Fr:E Sa:- Su:L
+tue+fri          advanced     support_strength
+  before Mo:L Tu:x We:Q Th:- Fr:x Sa:Q Su:E
+  after  Mo:Q Tu:x We:Q Th:E Fr:x Sa:- Su:L
+wed+fri          beginner     support_strength
+  before Mo:E Tu:E We:x Th:Q Fr:x Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:x Sa:- Su:L
+wed+fri          intermediate support_strength
+  before Mo:E Tu:E We:x Th:Q Fr:x Sa:- Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:x Sa:- Su:L
+thu+fri          advanced     support_strength
+  before Mo:E Tu:Q We:- Th:x Fr:x Sa:Q Su:L
+  after  Mo:Q Tu:E We:Q Th:x Fr:x Sa:- Su:L
+wed+sat          beginner     support_strength
+  before Mo:E Tu:E We:x Th:Q Fr:- Sa:x Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:- Sa:x Su:L
+wed+sat          intermediate support_strength
+  before Mo:E Tu:E We:x Th:Q Fr:- Sa:x Su:L
+  after  Mo:E Tu:Q We:x Th:E Fr:- Sa:x Su:L
+thu+sat          beginner     support_strength
+  before Mo:E Tu:E We:- Th:x Fr:Q Sa:x Su:L
+  after  Mo:E Tu:Q We:E Th:x Fr:- Sa:x Su:L
+thu+sat          intermediate support_strength
+  before Mo:E Tu:E We:- Th:x Fr:Q Sa:x Su:L
+  after  Mo:E Tu:Q We:E Th:x Fr:- Sa:x Su:L

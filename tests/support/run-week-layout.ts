@@ -80,9 +80,10 @@ export interface Layout {
 }
 /** The app's chooser and session tables, lifted out and run alone. */
 export interface Chooser {
-  choose(train: Day[], cap: number, goal: string, pace: boolean): Pick;
+  /** `exp` is the athlete's experience: on NRC it picks one speed slot or two (D243). */
+  choose(train: Day[], cap: number, goal: string, pace: boolean, exp: string | null | undefined): Pick;
   sessionTypes(...args: unknown[]): string[];
-  nrcTypes(cap: number, goal: string): string[];
+  nrcTypes(cap: number, goal: string, exp: string | null | undefined): string[];
   isSpeedGoal(goal: string): boolean;
 }
 
@@ -163,7 +164,7 @@ export function liftFunction(src: string, name: string): string {
 let CHOOSER: Chooser | null = null;
 /**
  * The app's run day chooser and the tables it deals from, compiled together in a fresh context with the week order
- * typed: choose(trainDays, capDays, goalId, paceFam) is _nrcSpacedRunDays; sessionTypes is getSessionTypes;
+ * typed: choose(trainDays, capDays, goalId, paceFam, experience) is _nrcSpacedRunDays; sessionTypes is getSessionTypes;
  * nrcTypes is getNRCSessionTypes; isSpeedGoal is the app's. Results are plain data (copied out of the context).
  */
 export function chooser(): Chooser {
@@ -175,9 +176,9 @@ export function chooser(): Chooser {
   vm.runInContext(parts.join('\n') + '\nglobalThis.__out = { c: _nrcSpacedRunDays, gs: getSessionTypes, gn: getNRCSessionTypes, sp: isSpeedGoal };', ctx);
   const o = ctx['__out'];
   CHOOSER = {
-    choose: (train, cap, goal, pace) => { const r = o.c(train.slice(), cap, goal, pace); return r ? clone(r) : r; },
+    choose: (train, cap, goal, pace, exp) => { const r = o.c(train.slice(), cap, goal, pace, undefined, undefined, exp); return r ? clone(r) : r; },
     sessionTypes: (...a) => clone(o.gs(...a)),
-    nrcTypes: (cap, goal) => clone(o.gn(cap, goal)),
+    nrcTypes: (cap, goal, exp) => clone(o.gn(cap, goal, exp)),
     isSpeedGoal: g => o.sp(g),
   };
   return CHOOSER;
@@ -192,15 +193,19 @@ export const NSW_RUN_TYPES: Record<number, string[]> = { 2: ['lsd_easy', 'lsd_lo
 export const NSW_FALLBACK3 = ['lsd_easy', 'int', 'lsd_long'];
 /** The three-run row D129 was ruled on (the fallback row, and the row an excluded injury mode keeps). */
 export const D129_TYPES: Record<number, string[]> = { 3: NSW_FALLBACK3, 4: NSW_RUN_TYPES[4] as string[] };
-/** The NRC type table by run count: the marathon carries one speed day, every other plan two. */
-export function nrcTypesHand(n: number, goal: string): string[] {
+/**
+ * The NRC type table by run count: the marathon carries one speed day; every other plan two for an advanced athlete
+ * and one for everyone else, the second slot a recovery run (D243). No experience reads as intermediate.
+ */
+export function nrcTypesHand(n: number, goal: string, exp: string | null | undefined): string[] {
   if (goal === 'run_marathon') {
     if (n >= 5) return ['nrc_recovery', 'nrc_speed1', 'nrc_recovery', 'nrc_recovery', 'nrc_long'];
     const M: Record<number, string[]> = { 4: ['nrc_recovery', 'nrc_speed1', 'nrc_recovery', 'nrc_long'], 3: ['nrc_speed1', 'nrc_recovery', 'nrc_long'], 2: ['nrc_recovery', 'nrc_long'], 1: ['nrc_long'] };
     return M[n] as string[];
   }
-  if (n >= 5) return ['nrc_speed1', 'nrc_recovery', 'nrc_speed2', 'nrc_recovery', 'nrc_long'];
-  const O: Record<number, string[]> = { 4: ['nrc_speed1', 'nrc_recovery', 'nrc_speed2', 'nrc_long'], 3: ['nrc_speed1', 'nrc_recovery', 'nrc_long'], 2: ['nrc_recovery', 'nrc_long'], 1: ['nrc_long'] };
+  const two = exp === 'advanced';
+  if (n >= 5) return two ? ['nrc_speed1', 'nrc_recovery', 'nrc_speed2', 'nrc_recovery', 'nrc_long'] : ['nrc_speed1', 'nrc_recovery', 'nrc_recovery', 'nrc_recovery', 'nrc_long'];
+  const O: Record<number, string[]> = { 4: two ? ['nrc_speed1', 'nrc_recovery', 'nrc_speed2', 'nrc_long'] : ['nrc_speed1', 'nrc_recovery', 'nrc_recovery', 'nrc_long'], 3: ['nrc_speed1', 'nrc_recovery', 'nrc_long'], 2: ['nrc_recovery', 'nrc_long'], 1: ['nrc_long'] };
   return O[n] as string[];
 }
 export const NRC_PLANS = ['run_5k', 'run_10k', 'run_half', 'run_marathon'];
@@ -247,8 +252,10 @@ export function topBy<T extends object>(list: T[], key: string): T[] {
 /**
  * Every layout of `types` on `cap` of the training days `train`, scored. pace: the pace family's objective; otherwise
  * NRC's, with both long run pins. Each candidate carries:
- *   rank   the full objective, ten terms (ranks 6 to 9 are 0 off the pace family);
- *   ruled  its first six terms, [-untol, -tol, longLast, speedsAfterRest, recBeforeLong, canonical];
+ *   rank   the full objective, ten terms (identity, spread and the earliest quality day are 0 off the pace family);
+ *   ruled  its ruled head: on the pace family [-untol, -tol, longLast, speedsAfterRest, recBeforeLong, canonical]; on
+ *          NRC (D244) [-untol, -tol, longLast, qualRest, speedsAfterRest, recBeforeLong, canonical], the rest into the
+ *          long run, the distance back from the long run to the last quality day, ranked third;
  *   shipped  ruled with recBeforeLong read through the Sunday first list (NRC's predicate, and the pace family's before D129);
  *   coll, untol, tol, lf (longest run-free stretch), qr (rank 8), hard (the non-easy days and their types).
  */
@@ -275,15 +282,16 @@ export function layouts(train: Day[], cap: number, types: string[], T: Tokens, p
       const s1 = days.find(d => typeOf[d] === T.s1), s2 = days.find(d => typeOf[d] === T.s2);
       const can = (s1 && s2 && pos(s1) < pos(s2)) ? 1 : 0;
       const lf = longestFree(days);
-      const qr = (pace && longDay && quality.length) ? Math.min(...quality.map(d => (pos(longDay) - pos(d) + 7) % 7)) : 0;
+      const qrAll = (longDay && quality.length) ? Math.min(...quality.map(d => (pos(longDay) - pos(d) + 7) % 7)) : 0;
+      const qr = pace ? qrAll : 0;
       const qf = (pace && quality.length) ? -pos(quality[0] as Day) : 0;
       const ident = pace && idxs.join(',') === ek ? 1 : 0;
       const rbl = pace ? rblEve : rblShipped;
-      const ruled = [-a.untol, -a.tol, ll, sar, rbl, can];
+      const ruled = pace ? [-a.untol, -a.tol, ll, sar, rbl, can] : [-a.untol, -a.tol, ll, qrAll, sar, rbl, can];
       out.push({
         idxs, days, typeOf, coll: a.coll, untol: a.untol, tol: a.tol, longLast: ll, lf, qr, ident,
         ruled, shipped: [-a.untol, -a.tol, ll, sar, rblShipped, can],
-        rank: ruled.concat([ident, pace ? -lf : 0, qr, qf]),
+        rank: pace ? ruled.concat([ident, -lf, qr, qf]) : ruled.concat([0, 0, 0]),
         hard: days.filter(d => typeOf[d] !== T.rec).map(d => d + ':' + typeOf[d]).join(' '),
       });
     });

@@ -45,8 +45,9 @@ test('the hand rows match PACE_CHART, and the ceiling is the midpoint of tempo a
   assert.ok(ROWS.every((r) => r.cap > r.tempo && r.cap < r.recovery), 'it sits between tempo and recovery');
 });
 
-function nrcRuns(goal: string, row: Row, raceDate?: string | null) {
+function nrcRuns(goal: string, row: Row, raceDate?: string | null, experience?: 'advanced') {
   const cfg = clone(fixtures.HALF_MANNY);
+  if (experience) cfg.experience = experience;
   const [mm, ss] = row.mile.split(':');
   cfg.cardioGoals.run = { id: goal, label: goal, mileBestMins: mm, mileBestSecs: ss };
   if (raceDate) cfg.raceDate = raceDate;
@@ -62,13 +63,15 @@ const SWEEP = [
   { label: 'run_half at 10:30, race on the calendar', goal: 'run_half', row: ROWS[1], race: '2026-12-06' },
   { label: 'run_10k at 8:00, race on the calendar', goal: 'run_10k', row: ROWS[0], race: '2026-12-06' },
   { label: 'run_10k at 10:30, no race (time trial)', goal: 'run_10k', row: ROWS[1], race: null },
+  // D243 (v0.243.0): a Fartlek sits only in Nike's second speed slot, which only an advanced athlete keeps.
+  { label: 'run_half at 8:00, advanced (two speed days), race on the calendar', goal: 'run_half', row: ROWS[0], race: '2026-12-06', experience: 'advanced' as const },
 ];
 const seen = { speed: new Set(), raceDay: 0, timeTrial: 0, rec: 0, long: 0, speedRuns: 0 };
 const CEILING = /faster than (\d+:[0-5]\d\/mi)\./;
 
 for (const S of SWEEP) {
   test(`${S.label}: recovery and long runs print ${S.row.capStr} and carry dose.cap ${S.row.cap}; speed, race day and the time trial carry none`, () => {
-    const all = nrcRuns(S.goal, S.row, S.race);
+    const all = nrcRuns(S.goal, S.row, S.race, 'experience' in S ? S.experience : undefined);
     const rec = all.filter((c) => c.subtype === 'Recovery Run');
     const longs = all.filter((c) => /^Long Run/.test(c.subtype));
     const speed = all.filter((c) => /^Speed Run/.test(c.subtype));

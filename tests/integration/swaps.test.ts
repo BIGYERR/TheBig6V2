@@ -453,14 +453,15 @@ test('every chain off a natively cued item boots as the live day', () => {
   assert.deepEqual(CUED_REACH.filter(r => !(r.eq && r.liveSig === r.bootSig)).map(tagOf), []);
 });
 
-test("HALF_MANNY W3 Thursday trap bar deadlift to RDL to deadlift to RDL: the chip says Deadlift and one undo walks back one step", () => {
-  // undokey PIN (the D192 ruling's own chain)
+test("HALF_MANNY W3 Monday trap bar deadlift to RDL to deadlift to RDL: the chip says Deadlift and one undo walks back one step", () => {
+  // undokey PIN (the D192 ruling's own chain). D243 (v0.243.0) moved his pull day, and this main with it, from
+  // Thursday to Monday, his one speed day.
   const A = X.page(); X.setup(A, 'manny', X.CFGS.manny); X.boot(A);
   const hits: { si: number; ii: number }[] = [];
-  (X.dayOf(A, 3, 'thu').sections || []).forEach((s: any, si: number) => (s.items || []).forEach((it: any, ii: number) => { if (it && it.name === 'Trap bar deadlift' && clean(s.label).startsWith('Main')) hits.push({ si, ii }); }));
+  (X.dayOf(A, 3, 'mon').sections || []).forEach((s: any, si: number) => (s.items || []).forEach((it: any, ii: number) => { if (it && it.name === 'Trap bar deadlift' && clean(s.label).startsWith('Main')) hits.push({ si, ii }); }));
   assert.equal(hits.length, 1);
   const { si, ii } = hits[0], seq = ['Trap bar deadlift', 'Barbell Romanian deadlift', 'Deadlift', 'Barbell Romanian deadlift'];
-  const c = { id: 'pin', ck: 'manny', cls: 'hop3', w: 3, d: 'thu', hops: seq.slice(1).map((to, k) => ({ si, ii, from: seq[k], to })) };
+  const c = { id: 'pin', ck: 'manny', cls: 'hop3', w: 3, d: 'mon', hops: seq.slice(1).map((to, k) => ({ si, ii, from: seq[k], to })) };
   const r = X.runChains([c], 'u', true).get('pin') as X.ChainRun;
   assert.equal(r.unreach, 0);
   assert.equal(r.chip, 'Deadlift');

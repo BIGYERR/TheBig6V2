@@ -20,6 +20,7 @@ import assert from 'node:assert/strict';
 import type { Cfg } from '@ia/core';
 import * as X from '../support/test-week.ts';
 import * as R from '../support/race-date.ts';
+import { loadApp, pinClock } from '../support/app.ts';
 // ── the block open (D180), the clock on Thu 2026-09-24 12:00 ─────────────────────────────────────────────────────
 const FIX_START = '2026-08-31', FIX_WEEKS = 14;
 const AFTER = { W1pre: 'mon tue wed thu fri sat sun', W1done: '0 /0 DONE', toast: 'Before your start date', W4pre: 'mon tue wed', W4taps: 4, W4done: '0 /3 DONE', sched: 1, streak: 0 };
@@ -222,3 +223,40 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
     });
   });
 }
+
+// ── the name step's start date (D242), the clock on Sat 2026-10-24 12:00 ─────────────────────────────────────────────
+// Oracle, typed by hand: the half plan is 14 weeks, so a race on Sun 2027-01-31 (race week's Monday 2027-01-25) starts
+// 13 weeks earlier, on Mon 2026-10-26. The wizard's default start is today, Sat 2026-10-24.
+describe('the wizard name step prints one start date (D242)', () => {
+  const HALF = {
+    name: 'X', primaryPath: 'event', cardioTypes: ['run'], eventTargeted: true,
+    cardioGoals: { run: { id: 'run_half', label: 'Half Marathon', mileBestMins: '9', mileBestSecs: '00', baselineDist: '5', baseline: '5mi' } },
+    liftingFocus: 'support_strength', experience: 'intermediate', ageBracket: '18-35', equipment: 'home_full',
+    restDays: ['sun', 'wed'], startDate: '2026-10-24',
+  };
+  const nameStep = (wd: Record<string, unknown>) => {
+    const IA = loadApp({ dom: true });
+    pinClock(IA, '2026-10-24T12:00:00');
+    IA.eval('Object.assign(WD,' + JSON.stringify(wd) + ");wizardStep=WIZARD_STEPS.indexOf('name');renderWizardStep();");
+    const html = String(IA.els['wizardBody'].innerHTML);
+    return {
+      derived: (html.match(/<div class="input-field derived"><span>([^<]*)<\/span>/) || [])[1] ?? null,
+      input: (html.match(/id="wizStartDate" value="([^"]*)"/) || [])[1] ?? null,
+      row: (html.match(/<span id="sumStartDate">([^<]*)<\/span>/) || [])[1] ?? null,
+    };
+  };
+
+  test('with a race date the summary row prints the Monday the race sets, the date the field shows, not today', () => {
+    const r = nameStep({ ...HALF, raceDate: '2027-01-31' });
+    assert.equal(r.derived, 'Mon, Oct 26, 2026');
+    assert.equal(r.row, 'Mon, Oct 26, 2026, set by race date');   // D246 (v0.245.1): a comma, not a dash
+  });
+
+  test('with no race date the row reads the entered start, a short first week from a Saturday, joined with a comma (D242 resolver arm, D246)', () => {
+    const r = nameStep({ ...HALF, raceDate: null });
+    assert.equal(r.derived, null);
+    assert.equal(r.input, '2026-10-24');
+    assert.equal(r.row, 'Sat, Oct 24, 2026, short first week');
+    assert.doesNotMatch(r.row ?? '', /[\u2013\u2014]/, 'no dash in the row (the copy rule)');
+  });
+});

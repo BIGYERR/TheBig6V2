@@ -192,7 +192,7 @@ test('the lite lattice on the overlay path: W5 sheets offer nothing the plan rej
       for (const r of o3[d].rows) { const x = K[r.k]; x.n3++; if (o3[d].stamp) x.st3++; x.rej3 += judge(r.L, cfg).length; }
     }
   }
-  const WANT: Record<string, number> = { pat: 4613, aux: 1829, add: 1440 };   // pat 4608, aux 1814 until D241 widened the pools and families
+  const WANT: Record<string, number> = { pat: 4626, aux: 1875, add: 1440 };   // pat 4608, aux 1814 until D241 widened the pools and families; pat 4613, aux 1829 until D243 re-laid the lite lattice's one-speed race weeks
   for (const k of Object.keys(WANT)) {
     const x = K[k];
     assert.deepEqual([x.n5, x.st5, x.rej, x.rows, x.eqFix], [WANT[k], WANT[k], 0, 0, WANT[k]], `${k}: rows, stamped, rejected names, rows with one, == fixture`);

@@ -14,7 +14,7 @@
 // tests/sweeps/runner-armor-circuit.test.js runs the floor (b) lattice (630 configs) and the prevention shard (272) whole.
 //
 // Oracles are typed by hand (tests/support/runner-armor-circuit.js): the ruling's strings and digests, HALF_MANNY's
-// universe and Tuesday circuits, the hand lists and their verdicts, the hand days and their trim walks, the cell cards.
+// universe and leg day circuits (Tuesday until D243, Thursday since), the hand lists and their verdicts, the hand days and their trim walks, the cell cards.
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { fixtures } from '../support/app.ts';
@@ -26,24 +26,25 @@ const { clone, clean, DAYS } = SB;
 const C = SB.twice(null, fixtures.HALF_MANNY), N = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY);
 const p = C.prog, q = N.prog;
 
-test("HALF_MANNY's W1 to W12 Tuesday circuit carries Single-leg hip thrust 2×6–10 each @ RPE 7 after its three", () => {
-  // D195-A-a: a-tue (the fourth item and items 1 to 3)
+test("HALF_MANNY's W1 to W12 leg day circuit (Thursday since D243) carries Single-leg hip thrust 2×6–10 each @ RPE 7 after its three", () => {
+  // D195-A-a: a-tue (the fourth item and items 1 to 3). D243 (v0.243.0) moved his leg day from Tuesday to Thursday,
+  // the card the same in all 14 weeks.
   assert.ok(C.self && N.self);
   for (let w = 1; w <= 12; w++) {
-    const it = RA.circuitItems(p.weeks[w].tue)!;
+    const it = RA.circuitItems(p.weeks[w].thu)!;
     assert.equal(it.length, 4, 'W' + w);
     assert.deepEqual(it[3], RA.FOURTH, 'W' + w);
     assert.deepEqual(it.slice(0, 3), RA.TUE[w], 'W' + w);
   }
 });
 
-test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 Tuesday less item 4, and every other day whole', () => {
-  // D195-A-a: a-tue (the day otherwise unchanged), a-other (W13, W14 and every non-Tuesday)
+test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 leg day (Thursday) less item 4, and every other day whole', () => {
+  // D195-A-a: a-tue (the day otherwise unchanged), a-other (W13, W14 and every other day)
   assert.equal(SB.weekKeys(p).length, 14);
   let other = 0;
   for (let w = 1; w <= 14; w++) for (const d of DAYS) {
     const a = clone(p.weeks[w][d]);
-    if (d === 'tue' && w <= 12) {
+    if (d === 'thu' && w <= 12) {
       const si = a.sections.findIndex((s: AppDay) => RA.CIRCUIT_RE.test(clean(s.label)));
       a.sections[si].items.splice(3, 1);
     } else other++;
@@ -52,10 +53,10 @@ test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to
   assert.equal(other, 86);
 });
 
-test('the Tuesday calf and carry strings read YYY-YYY-YYY--- over the 14 weeks', () => {
+test('the leg day\'s calf and carry strings (Thursday since D243) read YYY-YYY-YYY--- over the 14 weeks', () => {
   // D195-A-a: a-calf, a-carry
   let calf = '', carry = '';
-  for (let w = 1; w <= 14; w++) { calf += RA.hasSec(p.weeks[w].tue, /^Calf — achilles/) ? 'Y' : '-'; carry += RA.hasSec(p.weeks[w].tue, /carry/i) ? 'Y' : '-'; }
+  for (let w = 1; w <= 14; w++) { calf += RA.hasSec(p.weeks[w].thu, /^Calf — achilles/) ? 'Y' : '-'; carry += RA.hasSec(p.weeks[w].thu, /carry/i) ? 'Y' : '-'; }
   assert.equal(calf, RA.CALF_STR);
   assert.equal(carry, RA.CARRY_STR);
 });
@@ -69,13 +70,14 @@ test("HALF_MANNY's swap universe is the 107 names, with the fourth item and with
   }
 });
 
-test('part A without part B is 93fd2d1d3a43f192, part B without part A is c17e854e54e86f57 (the ruling printed both, moved by D239 and D241)', () => {
+test('part A without part B is b8a8aabf561bfc44, part B without part A is 895bb404a809927b (the ruling printed both, moved by D239, D241 and D243)', () => {
   // D195-A-a: a-cfA, a-cfB. D239 (v0.241.0) moved both (were f5ed630033ebe3db, 0ac7da6b1691a8e1), D241 (v0.242.0) again
-  // (were 3e88e365246858f3, b1b15c80f1a703f1): their draws reach his Tuesdays and his core days.
+  // (were 3e88e365246858f3, b1b15c80f1a703f1): their draws reach his Tuesdays and his core days. D243 (v0.243.0) again
+  // (were 93fd2d1d3a43f192, c17e854e54e86f57): one speed day moves his leg day to Thursday.
   const A = SB.twice(SB.noCostLens(), fixtures.HALF_MANNY);
   assert.ok(A.self);
-  assert.equal(A.dig, '93fd2d1d3a43f192');
-  assert.equal(N.dig, 'c17e854e54e86f57');
+  assert.equal(A.dig, 'b8a8aabf561bfc44');
+  assert.equal(N.dig, '895bb404a809927b');
   assert.equal(Array.from(A.prog._swapUniverse || []).length, 107);
 });
 
@@ -155,13 +157,13 @@ for (const c of RA.LEGS_DAYS) {
   });
 }
 
-test('the two typed cells print the cards coach printed: a four-item circuit with the calf and no carry; Wall sit second of three', () => {
+test('the two typed cells print the cards coach printed: a four-item circuit with the calf, and since D243 the carry finisher; Wall sit second of three', () => {
   // D195-A-d: d-cellA, d-cellB
   const a = SB.twice(null, RA.CELL_F1.cfg).prog.weeks[RA.CELL_F1.w][RA.CELL_F1.d];
   const b = SB.twice(null, RA.CELL_FH.cfg).prog.weeks[RA.CELL_FH.w][RA.CELL_FH.d];
   assert.deepEqual(SB.cardLines(a), RA.CARD_F1);
   assert.equal(RA.circuitItems(a)!.length, 4);
-  assert.ok(RA.hasSec(a, /^Calf — achilles/) && !RA.hasSec(a, /carry/i));
+  assert.ok(RA.hasSec(a, /^Calf — achilles/) && RA.hasSec(a, /carry/i));
   assert.deepEqual(SB.cardLines(b), RA.CARD_FH);
   assert.deepEqual(RA.circuitItems(b)!.map((x) => x.join(' '))[1], 'Wall sit 2×25 sec');
   assert.equal(RA.circuitItems(b)!.length, 3);

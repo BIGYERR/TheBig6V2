@@ -287,7 +287,11 @@ function buildNRCSession(goalId: string, week: number, totalWeeks: number, sessi
     }
 
   } else if(_type === 'nrc_speed1' || _type === 'nrc_speed2') {
-    const slot = _type === 'nrc_speed1' ? 0 : 1;
+    // v0.243.0 (D243, Mario): a layout with one speed slot prints the week's Tempo when Nike's week has one, else the
+    // first session. Nike's half puts every Tempo in the second slot, so a one-speed week read by slot alone never
+    // ran one. The marathon (one Nike session a week) and every two-speed layout read by slot, as before.
+    const _tempo = (_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon) ? wk.speed.findIndex(x => x.type === 'Tempo') : -1;
+    const slot = _type === 'nrc_speed1' ? (_tempo > 0 ? _tempo : 0) : 1;
     const sp = wk.speed[Math.min(slot, wk.speed.length - 1)];
     subtype = 'Speed Run — ' + sp.type;
     detail = fillPaces((sp.detailIfHalfSlow && chartRow.half >= chartRow.marathon) ? sp.detailIfHalfSlow : sp.detail);   // V176 (D31)
@@ -340,8 +344,13 @@ function buildNRCSession(goalId: string, week: number, totalWeeks: number, sessi
 
 // NRC session type assignment. Marathon: 1 speed + 3 recovery + 1 long.
 // Half: 2 speed + 2 recovery + 1 long. Degrades gracefully on fewer days.
-function getNRCSessionTypes(nRunDays: number, goalId: unknown): string[] {
+// v0.243.0 (D243, Mario): the second speed slot is an advanced athlete's. On the 5K, 10K and half plans a beginner or
+// intermediate gets one speed day at four and five runs and the slot becomes a recovery run, so the week stops
+// stacking two quality sessions on a lifting week. No experience reads as intermediate, as buildNRCSession does.
+// The marathon rows already carry one.
+function getNRCSessionTypes(nRunDays: number, goalId: unknown, experience?: Experience | null): string[] {
   const isMarathon = goalId === 'run_marathon';
+  const _twoSpeed = experience === 'advanced';
   if(isMarathon) {
     if(nRunDays >= 5) return ['nrc_recovery','nrc_speed1','nrc_recovery','nrc_recovery','nrc_long'];
     if(nRunDays === 4) return ['nrc_recovery','nrc_speed1','nrc_recovery','nrc_long'];
@@ -349,8 +358,8 @@ function getNRCSessionTypes(nRunDays: number, goalId: unknown): string[] {
     if(nRunDays === 2) return ['nrc_recovery','nrc_long'];
     return ['nrc_long'];
   } else {
-    if(nRunDays >= 5) return ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_recovery','nrc_long'];
-    if(nRunDays === 4) return ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_long'];
+    if(nRunDays >= 5) return _twoSpeed ? ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_recovery','nrc_long'] : ['nrc_speed1','nrc_recovery','nrc_recovery','nrc_recovery','nrc_long'];
+    if(nRunDays === 4) return _twoSpeed ? ['nrc_speed1','nrc_recovery','nrc_speed2','nrc_long'] : ['nrc_speed1','nrc_recovery','nrc_recovery','nrc_long'];
     if(nRunDays === 3) return ['nrc_speed1','nrc_recovery','nrc_long'];
     if(nRunDays === 2) return ['nrc_recovery','nrc_long'];
     return ['nrc_long'];
