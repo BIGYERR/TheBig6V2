@@ -121,6 +121,13 @@ function startSummaryVal(r: any){
   if(r && r.aligned) return _fmtStartDay(r.start, true) + ' \u2014 set by race date';
   return _fmtStartDay(r.start, true) + (r.partial ? ' \u2014 short first week' : '');
 }
+// v0.242.1 (D242): the summary row reads the start the field above it shows. With a race date the field prints
+// raceAlignment's start, the one _applyWizardStart builds from; the row read the resolver's (today) and called a
+// Monday start a short first week. Both name steps, legacy and Angular, call this.
+function wizardStartSummary(sr: any){
+  const _al = wizardAlignment();
+  return startSummaryVal(_al ? {start:_al.start, aligned:true} : sr);
+}
 // V188 (D14a): wizard-side alignment (reads WD; the pure helper does the dates).
 function wizardAlignment(){
   if(!WD || !WD.cardioTypes || !WD.cardioTypes.includes('run') || !WD.cardioGoals || !WD.cardioGoals.run) return null;
@@ -1172,7 +1179,7 @@ function renderWizardStep() {
         ['Lifting', liftLabel],
         ['Cardio', cardioSummary],
         ['Program length', programWeeks + (programWeeks === 1 ? ' week' : ' weeks')],
-        ['Start date', '<span id="sumStartDate">'+startSummaryVal(_sr)+'</span>'],
+        ['Start date', '<span id="sumStartDate">'+wizardStartSummary(_sr)+'</span>'],
         ['Training days', trainDays.map(d=>DAY_SHORT[d]).join(' · ')],
         ['Rest days', WD.restDays.length?WD.restDays.map(d=>DAY_SHORT[d]).join(' · '):'None'],
         ['Experience', WD.experience],

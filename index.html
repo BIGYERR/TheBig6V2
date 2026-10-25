@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.242.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.242.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2375,6 +2375,13 @@ function startSummaryVal(r){
   if(r && r.aligned) return _fmtStartDay(r.start, true) + ' \u2014 set by race date';
   return _fmtStartDay(r.start, true) + (r.partial ? ' \u2014 short first week' : '');
 }
+// v0.242.1 (D242): the summary row reads the start the field above it shows. With a race date the field prints
+// raceAlignment's start, the one _applyWizardStart builds from; the row read the resolver's (today) and called a
+// Monday start a short first week. Both name steps, legacy and Angular, call this.
+function wizardStartSummary(sr){
+  const _al = wizardAlignment();
+  return startSummaryVal(_al ? {start:_al.start, aligned:true} : sr);
+}
 // V188 (D14a): wizard-side alignment (reads WD; the pure helper does the dates).
 function wizardAlignment(){
   if(!WD || !WD.cardioTypes || !WD.cardioTypes.includes('run') || !WD.cardioGoals || !WD.cardioGoals.run) return null;
@@ -3412,7 +3419,7 @@ function renderWizardStep() {
         ['Lifting', liftLabel],
         ['Cardio', cardioSummary],
         ['Program length', programWeeks + (programWeeks === 1 ? ' week' : ' weeks')],
-        ['Start date', '<span id="sumStartDate">'+startSummaryVal(_sr)+'</span>'],
+        ['Start date', '<span id="sumStartDate">'+wizardStartSummary(_sr)+'</span>'],
         ['Training days', trainDays.map(d=>DAY_SHORT[d]).join(' · ')],
         ['Rest days', WD.restDays.length?WD.restDays.map(d=>DAY_SHORT[d]).join(' · '):'None'],
         ['Experience', WD.experience],

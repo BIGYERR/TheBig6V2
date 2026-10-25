@@ -568,7 +568,7 @@ export class Wizard {
     } else if (draft.primaryPath === 'event') {
       raceRow = 'No date set — no taper';
     }
-    this.nameInput = { weeks, cardio, raceRow, startSummary: b.call('startSummaryVal', sr), aligned: null, resolveCopy: '' };
+    this.nameInput = { weeks, cardio, raceRow, startSummary: b.call('wizardStartSummary', sr), aligned: null, resolveCopy: '' };
     this.rows.set(nameSummary(draft, this.nameInput));
     this.resolveCopy.set(al ? '' : b.call('startResolveCopy', sr));
     return {
