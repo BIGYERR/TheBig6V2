@@ -56,7 +56,9 @@ jobs:
     name: unit and integration tests
     if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 25, not 15 (Mario, Post-v0.245.0): the suite runs about 8 minutes, and a slow runner took every file 1.7 to 2.2
+    # times longer and cut a run with no failing test at 15 (run 40200902811, attempt 1).
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
