@@ -29,3 +29,14 @@ and the Angular `frontends/app/src/app/screens/wizard/wizard.ts`. Tests: `tests/
   week`.
 - **Flagged, not ruled (copy, Mario's call):** both arms of the row join with an em-dash, which the copy rule keeps out
   of what the athlete reads. Recommendation: a comma, `Mon, Oct 26, 2026, set by race date`.
+  Ruled as D246 (below).
+
+## D246: the summary row joins with a comma (v0.245.1)
+
+- **Date:** found by D242 on 2026-10-24, ruled 2026-10-25. **Ruled by:** Mario ("yes" to the recommendation). **Bump:**
+  PATCH (Mario). **Shipped:** v0.245.1.
+- **The finding:** both arms of `startSummaryVal` joined the date and its note with an em-dash, which the copy rule
+  keeps out of what the athlete reads.
+- **What changes:** a comma: `Mon, Oct 26, 2026, set by race date` and `Sat, Oct 24, 2026, short first week`. The
+  plain start (no note) is unchanged.
+- **What deliberately does not change:** which start the row prints (D242), every other wizard line, and the program.

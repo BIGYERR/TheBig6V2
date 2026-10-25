@@ -249,13 +249,14 @@ describe('the wizard name step prints one start date (D242)', () => {
   test('with a race date the summary row prints the Monday the race sets, the date the field shows, not today', () => {
     const r = nameStep({ ...HALF, raceDate: '2027-01-31' });
     assert.equal(r.derived, 'Mon, Oct 26, 2026');
-    assert.equal(r.row, 'Mon, Oct 26, 2026 \u2014 set by race date');
+    assert.equal(r.row, 'Mon, Oct 26, 2026, set by race date');   // D246 (v0.245.1): a comma, not a dash
   });
 
-  test('with no race date the row still reads the entered start, a short first week from a Saturday (unchanged: guards the resolver arm)', () => {
+  test('with no race date the row reads the entered start, a short first week from a Saturday, joined with a comma (D242 resolver arm, D246)', () => {
     const r = nameStep({ ...HALF, raceDate: null });
     assert.equal(r.derived, null);
     assert.equal(r.input, '2026-10-24');
-    assert.equal(r.row, 'Sat, Oct 24, 2026 \u2014 short first week');
+    assert.equal(r.row, 'Sat, Oct 24, 2026, short first week');
+    assert.doesNotMatch(r.row ?? '', /[\u2013\u2014]/, 'no dash in the row (the copy rule)');
   });
 });

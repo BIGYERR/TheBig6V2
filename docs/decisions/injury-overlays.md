@@ -12,7 +12,7 @@ D193, D194, D197) are recorded in the handoff and `docs/test-migration/13-injury
 ## D245: a calf region on the HURT? sheet (v0.245.0)
 
 - **Date:** ruled 2026-10-24. **Ruled by:** Mario (the brief); the name-level drops and the effect copy are the main
-  session's, flagged for his review. **Bump:** MINOR (Mario). **Shipped:** v0.245.0.
+  session's, and Mario concurred with the copy on 2026-10-25 ("concur"). **Bump:** MINOR (Mario). **Shipped:** v0.245.0.
 - **The report (Mario):** the athlete on the reported half has fried calves, and the sheet offers no calf.
 - **What changes:**
   1. `calf` joins `INJURY_REGIONS` after the ankle, labelled `Calf` (the check-in line reads "how the calf feels").
@@ -41,7 +41,22 @@ D193, D194, D197) are recorded in the handoff and `docs/test-migration/13-injury
   there: the plan is null and the program is healthy) and pass; the app's change-sheet test holds the copy and the
   sheet's titles. The pool-chain oracle in `tests/support/injury-overlays.ts` reads `_ankleLike(_inj)` as the ankle's
   arm, since a protected calf runs the ankle's filter.
-- **Flagged, not ruled:** the jump filter (`JUMPS` in `applyInjuryFilter`: jump, burpee, broad, bound, box jump, high
+- **Flagged, then ruled as D247 (below):** the jump filter (`JUMPS` in `applyInjuryFilter`: jump, burpee, broad, bound, box jump, high
   knees, tuck) does not match `Pogo hops`, which the athletic power pool holds, so every no-jumps plan (knee, ankle,
   calf) could print it. None did on 96 sampled builds (three regions, both tiers, four tiers of gear, four seeds,
   Athletic Support). Recommendation: add `pogo` to `JUMPS`, a PATCH.
+
+## D247: the jump filter catches pogo hops (v0.245.1)
+
+- **Date:** found by D245 on 2026-10-24, ruled 2026-10-25. **Ruled by:** Mario ("yes" to the recommendation). **Bump:**
+  PATCH (Mario). **Shipped:** v0.245.1.
+- **The finding:** `JUMPS` in `applyInjuryFilter` (jump, burpee, broad, bound, box jump, high knees, tuck) does not match
+  `Pogo hops`, which the athletic power pool holds, so a plan that sets `noJumps` (knee, ankle and calf, both tiers)
+  would let it through.
+- **What changes:** `pogo` joins `JUMPS`.
+- **What it moves (source-surgery copy of v0.245.0, before the build):** nothing. 0 of 1,728 programs (the 864-cell
+  injury lattice, and 864 knee, ankle and calf builds over the half, the pace goal and the base, both tiers, four foci,
+  six tiers of gear and two seeds); none of them printed a pogo hop under a no-jumps plan before the fix. The fix is
+  the filter's own claim made true: "kills jump/plyo conditioning".
+- **Expected values (typed by hand):** a section holding `Pogo hops` and `Dumbbell row`, filtered under a calf,
+  ankle or knee plan on either tier, keeps `Dumbbell row` alone; uninjured it keeps both.

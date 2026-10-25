@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.245.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.245.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2371,9 +2371,10 @@ function startResolveCopy(r){
   return 'Week 1 runs <b>'+_fmtSpan(r.start, sunOf(r.start))+'</b>.';
 }
 // Summary-row value: the resolved start, flagged when the first week is short.
+// v0.245.1 (D246): the note joins with a comma, not a dash (the copy rule).
 function startSummaryVal(r){
-  if(r && r.aligned) return _fmtStartDay(r.start, true) + ' \u2014 set by race date';
-  return _fmtStartDay(r.start, true) + (r.partial ? ' \u2014 short first week' : '');
+  if(r && r.aligned) return _fmtStartDay(r.start, true) + ', set by race date';
+  return _fmtStartDay(r.start, true) + (r.partial ? ', short first week' : '');
 }
 // v0.242.1 (D242): the summary row reads the start the field above it shows. With a race date the field prints
 // raceAlignment's start, the one _applyWizardStart builds from; the row read the resolver's (today) and called a
@@ -8658,7 +8659,7 @@ function applyInjuryFilter(sections,cfg){
   if(!P||!Array.isArray(sections)) return sections;
   // D241 A2: the new flexion and twist drills swap to spine-safe ones the way the hanging raises do, so a lowback core block keeps its count.
   const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs','Overhead sit-up':'Dead bugs','V-ups':'Bird dogs','Russian twist (heels down)':'Standing torso rotations (slow)'};
-  const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck/i;
+  const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck|pogo/i;   // v0.245.1 (D247): pogo hops are a jump too
   const out=[];
   sections.forEach(s=>{
     if(!s||!Array.isArray(s.items)){out.push(s);return;}

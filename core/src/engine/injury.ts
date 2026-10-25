@@ -239,7 +239,7 @@ function applyInjuryFilter(sections: Section[],cfg: Cfg | null | undefined): Sec
   if(!P||!Array.isArray(sections)) return sections;
   // D241 A2: the new flexion and twist drills swap to spine-safe ones the way the hanging raises do, so a lowback core block keeps its count.
   const SPINE_SWAP: Record<string, string | null>={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs','Overhead sit-up':'Dead bugs','V-ups':'Bird dogs','Russian twist (heels down)':'Standing torso rotations (slow)'};
-  const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck/i;
+  const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck|pogo/i;   // v0.245.1 (D247): pogo hops are a jump too
   const out: Section[]=[];
   sections.forEach(s=>{
     if(!s||!Array.isArray(s.items)){out.push(s);return;}

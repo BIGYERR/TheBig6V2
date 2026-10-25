@@ -117,9 +117,10 @@ function startResolveCopy(r: any){
   return 'Week 1 runs <b>'+_fmtSpan(r.start, sunOf(r.start))+'</b>.';
 }
 // Summary-row value: the resolved start, flagged when the first week is short.
+// v0.245.1 (D246): the note joins with a comma, not a dash (the copy rule).
 function startSummaryVal(r: any){
-  if(r && r.aligned) return _fmtStartDay(r.start, true) + ' \u2014 set by race date';
-  return _fmtStartDay(r.start, true) + (r.partial ? ' \u2014 short first week' : '');
+  if(r && r.aligned) return _fmtStartDay(r.start, true) + ', set by race date';
+  return _fmtStartDay(r.start, true) + (r.partial ? ', short first week' : '');
 }
 // v0.242.1 (D242): the summary row reads the start the field above it shows. With a race date the field prints
 // raceAlignment's start, the one _applyWizardStart builds from; the row read the resolver's (today) and called a

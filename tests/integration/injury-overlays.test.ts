@@ -622,3 +622,15 @@ test('a protected calf builds the protected ankle program, day for day (D245)', 
   const a = IA.buildProgram(CALF_CFG('protect') as any), b = IA.buildProgram(CALF_CFG('protect', 'ankle') as any);
   assert.equal(JSON.stringify(a.weeks), JSON.stringify(b.weeks));
 });
+
+// ── D247: the jump filter catches pogo hops ──────────────────────────────────────────────────────────────────────────
+test('every no-jumps plan (knee, ankle and calf, both tiers) filters out Pogo hops and keeps the row beside it; uninjured keeps both (D247)', () => {
+  const filter = IA.eval('applyInjuryFilter');
+  const day = () => [{ label: 'Power', items: [{ name: 'Pogo hops', detail: '3×10' }, { name: 'Dumbbell row', detail: '3×8' }] }];
+  // Copied into this realm: the filter's arrays are the app VM's, and strict deep-equal compares prototypes.
+  const names = (injury: unknown) => Array.from(filter(day(), { ...CALF_CFG('workaround'), injury }) as Section[], (s) => Array.from(s.items || [], (i: Item) => String(i.name))).flat();
+  for (const region of ['knee', 'ankle', 'calf']) for (const tier of ['workaround', 'protect']) {
+    assert.deepEqual(names({ region, tier }), ['Dumbbell row'], region + '/' + tier);
+  }
+  assert.deepEqual(names(null), ['Pogo hops', 'Dumbbell row']);
+});
