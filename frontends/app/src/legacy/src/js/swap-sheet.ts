@@ -9,6 +9,7 @@ import {
   getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
 } from './swaps-edits.ts';
 import { _PATTERN_REGION, _compoundTier } from '../../../../../../core/src/engine/budget-engine-d.ts';
+import { _wildDraw, renderRand } from './random-wildcard.ts';
 import { parseRx } from './week-view-sections.ts';
 import { openDetail } from './day-detail.ts';
 import { showSwapNudge } from './day-status.ts';
@@ -16,7 +17,9 @@ import { showSwapNudge } from './day-status.ts';
 // ── SWAP SHEET ───────────────────────────────────────────────────────────────
 let _swapCtx: any=null;
 // What did this lift replace on today's card? Drives the "SWAPPED IN" chip.
-function swapOriginOf(name: any){
+function swapOriginOf(name: any,src?: any){
+  // v0.246.0 D250 (P-WILDEDIT): a Wildcard card's origin is the Wildcard's own swap list, never a program day's.
+  if(src==='wild') return ((((_wildDraw&&_wildDraw.swaps)||[]).filter(function(e: any){return e&&e.to===name;}).pop())||{}).from||null;
   if(!activeProgId||!currentDayKey) return null;
   const list=(getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[];
   // V228 D192 P-UNDOKEY: the most recent record whose `to` is the card's name, so the chip names the lift that just left.
@@ -50,12 +53,13 @@ function _swapRow(name: any,caution: any,outName: any){
     +(note?'<span class="swap-cand-note">'+note+'</span>':'')
     +'</button>';
 }
-function openSwapSheet(secIdx: any,itemIdx: any){
-  const day=activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
+function openSwapSheet(secIdx: any,itemIdx: any,src?: any){
+  const day=_editDay(src);   // v0.246.0 D250: the Wildcard's working day for a Wildcard card
   const sec=day&&day.sections&&day.sections[secIdx];
   const item=sec&&sec.items&&sec.items[itemIdx];
   if(!item||!item.name){showToast('Nothing to swap here');return;}
   _swapCtx={secIdx:secIdx,itemIdx:itemIdx,name:item.name,detail:item.detail||''};
+  if(src==='wild') _swapCtx.src='wild';
   const c=swapCandidates(item.name,day,currentWeek,activeProg);
   // V162 (ruling D3): a null-pattern movement swaps within its aux family — same
   // sidecar legality (gear, injury, power doctrine) the engine itself answers to.
@@ -116,7 +120,8 @@ function openSwapSheet(secIdx: any,itemIdx: any){
 function closeSwapSheet(){const o=document.getElementById('swapOverlay');if(o)o.classList.remove('open');_swapCtx=null;}
 function applySwapChoice(to: any){
   if(!_swapCtx||!activeProg||!activeProgId){closeSwapSheet();return;}
-  const day=activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
+  const _wild=_swapCtx.src==='wild';
+  const day=_editDay(_swapCtx.src);
   const sec=day&&day.sections&&day.sections[_swapCtx.secIdx];
   const item=sec&&sec.items&&sec.items[_swapCtx.itemIdx];
   if(!item){closeSwapSheet();return;}
@@ -160,11 +165,14 @@ function applySwapChoice(to: any){
     }catch(e){}
   }
   if(sec.label&&sec.label.indexOf(from)>=0) sec.label=sec.label.split(from).join(to);
-  recordSwap(activeProgId,currentWeek,currentDayKey,from,to,_undoRx);
-  const nudge=bumpSwapCount(activeProgId,from,to);
+  // v0.246.0 D250 (P-WILDEDIT): a Wildcard swap lives on the Wildcard's working day. No record, no swap count, no
+  // nudge, no snapshot: no program day hears of it.
+  if(_wild) _wildDraw.swaps.push({from:from,to:to,rx:_undoRx});
+  else recordSwap(activeProgId,currentWeek,currentDayKey,from,to,_undoRx);
+  const nudge=_wild?false:bumpSwapCount(activeProgId,from,to);
   closeSwapSheet();
-  resnapshotDayEdit(currentWeek,currentDayKey);
-  openDetail(currentDayKey,day);
+  if(_wild) renderRand();
+  else{ resnapshotDayEdit(currentWeek,currentDayKey); openDetail(currentDayKey,day); }
   // "Same numbers" is a promise the app has to keep. When the reps came off because the
   // movement cannot express them, say so instead.
   // V221 D177 (R5): the third branch fires only when the window branch moved the reps.
@@ -190,37 +198,41 @@ function applySwapChoice(to: any){
 // freeze restores from it, so an edit that is not folded into the snapshot silently vanishes
 // on the next boot.
 function _liveDay(){return activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];}
-function _afterEdit(day: any,msg: any){
+// v0.246.0 D250 (P-WILDEDIT): the day an edit addresses. 'wild' is the Wildcard's working day (random-wildcard.ts),
+// which an edit redraws and never stores; anything else is the session sheet's day.
+function _editDay(src?: any){return src==='wild'?_wildDraw:_liveDay();}
+function _afterEdit(day: any,msg: any,src?: any){
+  if(src==='wild'){ renderRand(); if(msg) showToast(msg); return; }
   resnapshotDayEdit(currentWeek,currentDayKey);
   openDetail(currentDayKey,day);
   if(msg) showToast(msg);
 }
-function skipExercise(name: any){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function skipExercise(name: any,src?: any){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   let hit=null;
   (day.sections||[]).forEach(function(s: any){(s.items||[]).forEach(function(it: any){if(it&&it.name===name){it._skipped=true;hit=it;}});});
   if(!hit) return;
-  recordSkip(activeProgId,currentWeek,currentDayKey,name);
-  _afterEdit(day,name+' is off today. Tap to put it back.');
+  if(src!=='wild') recordSkip(activeProgId,currentWeek,currentDayKey,name);
+  _afterEdit(day,name+' is off today. Tap to put it back.',src);
 }
-function unskipExercise(name: any){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function unskipExercise(name: any,src?: any){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   (day.sections||[]).forEach(function(s: any){(s.items||[]).forEach(function(it: any){if(it&&it.name===name)it._skipped=undefined;});});
-  clearSkip(activeProgId,currentWeek,currentDayKey,name);
-  _afterEdit(day,name+' is back on the card.');
+  if(src!=='wild') clearSkip(activeProgId,currentWeek,currentDayKey,name);
+  _afterEdit(day,name+' is back on the card.',src);
 }
-function skipSuperset(secIdx: any){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function skipSuperset(secIdx: any,src?: any){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   const sec=(day.sections||[])[secIdx]; if(!sec) return;
   sec._skipped=true;
-  recordSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
-  _afterEdit(day,'Round is off today. Tap to put it back.');
+  if(src!=='wild') recordSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
+  _afterEdit(day,'Round is off today. Tap to put it back.',src);
 }
-function unskipSuperset(secIdx: any){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function unskipSuperset(secIdx: any,src?: any){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   const sec=(day.sections||[])[secIdx]; if(sec) sec._skipped=undefined;
-  clearSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
-  _afterEdit(day,'Round is back on the card.');
+  if(src!=='wild') clearSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
+  _afterEdit(day,'Round is back on the card.',src);
 }
 function removeAddedExercise(name: any){
   const day=_liveDay(); if(!day||!activeProgId) return;
@@ -299,11 +311,12 @@ function applyAddChoice(name: any){
   closeAddSheet();
   _afterEdit(day,name+' added at '+detail+'.');
 }
-function undoSwap(from: any){
+function undoSwap(from: any,src?: any){
   if(!activeProg||!activeProgId) return;
-  const day=activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
+  const _wild=src==='wild';
+  const day=_editDay(src);
   if(!day) return;
-  const list=(getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[];
+  const list=_wild?(day.swaps||[]):((getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[]);
   // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const hit=list.filter(e=>e&&e.from===from)[0];
   if(!hit) return;
@@ -325,11 +338,11 @@ function undoSwap(from: any){
       if(it){it.detail=p.d;if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;_put.push(it);}
     });
   }
-  clearSwap(activeProgId,currentWeek,currentDayKey,from);
-  resnapshotDayEdit(currentWeek,currentDayKey);
-  openDetail(currentDayKey,day);
+  // v0.246.0 D250: on the Wildcard the record leaves its own list, as clearSwap drops it from the store.
+  if(_wild){ day.swaps=(day.swaps||[]).filter(function(e: any){return e&&e.from!==from;}); renderRand(); }
+  else{ clearSwap(activeProgId,currentWeek,currentDayKey,from); resnapshotDayEdit(currentWeek,currentDayKey); openDetail(currentDayKey,day); }
   showToast(from+' is back on the card.');
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { swapOriginOf };
+export { _editDay, swapOriginOf };

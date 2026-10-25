@@ -12,8 +12,10 @@ export interface BridgeLike {
  * The legacy reads the sections and their cards make, through the bridge: the logged loads, the prescription parser and
  * the set summaries, the active day's controls, and the render-time state (the rx cache, the once-per-sheet stale
  * warning). Shared by the session sheet and Random Workout, the two places the legacy buildSectionsHTML drew.
+ * v0.246.0 D250 (P-WILDEDIT): `src` 'wild' reads Random Workout's cards off the Wildcard's own working day (the legacy
+ * `_wildDraw`) and its own swaps, as the legacy buildExItem does for a Wildcard card; unset, the session sheet's day.
  */
-export function sectionReads(b: BridgeLike): SectionReads {
+export function sectionReads(b: BridgeLike, src?: 'wild'): SectionReads {
   const store = b.call<Record<string, { entries?: ExEntry[] } | undefined>>('getExWeights');
   const prog = b.global<{ weeks?: Record<string, Record<string, { sections?: unknown[] } | undefined> | undefined> } | null>('activeProg');
   const week = b.global<number>('currentWeek');
@@ -31,9 +33,11 @@ export function sectionReads(b: BridgeLike): SectionReads {
     isRep: (n) => b.call<boolean>('isRepExercise', n),
     isTrackable: (n) => b.call<boolean>('isTrackableWeight', n),
     hasProgram: !!prog,
-    daySection: (i) => (prog && prog.weeks && prog.weeks[week] && prog.weeks[week]![dayKey] && (prog.weeks[week]![dayKey]!.sections || [])[i]) || null,
+    daySection: src === 'wild'
+      ? (i) => ((b.global<{ sections?: unknown[] } | null>('_wildDraw')?.sections) || [])[i] || null
+      : (i) => (prog && prog.weeks && prog.weeks[week] && prog.weeks[week]![dayKey] && (prog.weeks[week]![dayKey]!.sections || [])[i]) || null,
     controlFlags: (sec, i, it) => b.call('exControlFlags', sec, i, it),
-    swapOrigin: (n) => b.call<string | null>('swapOriginOf', n),
+    swapOrigin: src === 'wild' ? (n) => b.call<string | null>('swapOriginOf', n, 'wild') : (n) => b.call<string | null>('swapOriginOf', n),
     parseRx: (d, n) => b.call<Rx | null>('parseRx', d, n),
     rxSuffix: (rx) => b.call<string>('rxSuffix', rx),
     cacheRx: (k, rx) => {

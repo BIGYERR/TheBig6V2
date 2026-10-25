@@ -60,7 +60,7 @@ export class SwapSheet {
   protected readonly view = signal<SwapSheetView | null>(null);
 
   constructor() {
-    this.bridge.provide('openSwapSheet', (secIdx: number, itemIdx: number) => this.open(secIdx, itemIdx));
+    this.bridge.provide('openSwapSheet', (secIdx: number, itemIdx: number, src?: 'wild') => this.open(secIdx, itemIdx, src));
     this.bridge.provide('closeSwapSheet', () => this.close());
   }
 
@@ -77,18 +77,19 @@ export class SwapSheet {
     this.bridge.set('_swapCtx', null);
   }
 
-  private open(secIdx: number, itemIdx: number): void {
+  private open(secIdx: number, itemIdx: number, src?: 'wild'): void {
     const prog = this.bridge.global('activeProg');
     const week = this.bridge.global('currentWeek');
     const dayKey = this.bridge.global('currentDayKey');
-    const day = prog && prog.weeks && prog.weeks[week] && prog.weeks[week][dayKey];
+    // v0.246.0 D250 (P-WILDEDIT): a Wildcard card is looked up on the Wildcard's own working day, as the legacy _editDay does.
+    const day = src === 'wild' ? this.bridge.global('_wildDraw') : prog && prog.weeks && prog.weeks[week] && prog.weeks[week][dayKey];
     const sec = day && day.sections && day.sections[secIdx];
     const item = sec && sec.items && (sec.items[itemIdx] as { name: string; detail?: string } | undefined);
     if (!item || !item.name) {
       this.bridge.call('showToast', 'Nothing to swap here');
       return;
     }
-    this.bridge.set('_swapCtx', { secIdx, itemIdx, name: item.name, detail: item.detail || '' });
+    this.bridge.set('_swapCtx', src === 'wild' ? { secIdx, itemIdx, name: item.name, detail: item.detail || '', src } : { secIdx, itemIdx, name: item.name, detail: item.detail || '' });
     const c = this.bridge.call('swapCandidates', item.name, day, week, prog);
     const fam = !c.pattern ? this.bridge.call('_auxFamily', item.name) : null;
     if (fam) {

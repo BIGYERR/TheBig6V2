@@ -739,9 +739,11 @@ function _stripLeadingSets(d: any){
     .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
     .replace(/^(\d+)\s*sets?\b\s*/i,'');
 }
-function buildSectionsHTML(sections: any,baseIdx?: any){
+// v0.246.0 D250 (P-WILDEDIT): `src` 'wild' draws a Wildcard's sections, whose controls address the Wildcard (buildExItem).
+function buildSectionsHTML(sections: any,baseIdx?: any,src?: any){
   const all=sections||[];
   const _base=baseIdx||0;
+  const _srcArg=(src==='wild')?",'wild'":'';
   // Only the MAIN lift (and the taper Primer) keeps a section label — every other block renders
   // as plain exercise rows. The conditioning round-protocol survives because it's drawn by the
   // superset-header inside the block, not by this outer label.
@@ -753,25 +755,25 @@ function buildSectionsHTML(sections: any,baseIdx?: any){
     if((sec.superset||sec.type==='superset')&&sec._skipped){
       return `<div class="section"><div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span>`
         +`<span class="ex-skipped-name">${esc(sec.label||'Conditioning round')} \u2014 ${(sec.items||[]).length} movements</span>`
-        +`<button class="ex-skipped-undo" onclick="unskipSuperset(${_secIdx})">Put it back</button></div></div>`;
+        +`<button class="ex-skipped-undo" onclick="unskipSuperset(${_secIdx}${_srcArg})">Put it back</button></div></div>`;
     }
     let h=`<div class="section">`+(showLabel?`<div class="section-label">${sec.label||''}</div>`:'');
     if(sec._added){
       // The athlete's own additions render in their own block, in signal orange, so they
       // never masquerade as something the engine programmed.
       h+=`<div class="section-label" style="color:var(--signal)">${sec.label||'Added by you'}</div><div class="section-block">`;
-      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     } else if(sec.hip){
       // Broken out of the old bundled "Hip Abductor Circuit" box — each stability drill now
       // stands as its own logged card. The section still carries hip:true, so capRegionalFatigue
       // keeps shielding this prehab from deload/high-fatigue trimming.
       h+=`<div class="section-label" style="color:var(--hip)">${sec.label||'Hip stability'}</div><div class="section-block">`;
-      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     } else if(sec.core){
       h+=`<div class="core-block"><div class="core-header">${sec.coreHeader||'Core'}</div>`;
-      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     } else if((sec.superset||sec.type==='superset')&&(sec.items||[]).length>1){
       // V175 (D28): a section that holds ONE item is not a superset whatever its flag
@@ -794,8 +796,8 @@ function buildSectionsHTML(sections: any,baseIdx?: any){
           :(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
         h+=`<div class="section-label" style="color:var(--muted)">${esc(sec.label||'Round')} \u2014 reduced to straight sets</div><div class="section-block">`;
         sec.items.forEach((i2: any,_ii: any)=>{
-          if(i2._skipped){h+=buildExItem(i2,_secIdx,_ii);return;}
-          h+=buildExItem({...i2,detail:_mapped},_secIdx,_ii);
+          if(i2._skipped){h+=buildExItem(i2,_secIdx,_ii,undefined,src);return;}
+          h+=buildExItem({...i2,detail:_mapped},_secIdx,_ii,undefined,src);
         });
         h+=`</div></div>`;
         return h;
@@ -806,14 +808,14 @@ function buildSectionsHTML(sections: any,baseIdx?: any){
       const hdrTxt=(labelHasRounds||rounds==null)?(sec.label||'')
         :`${rounds} Rounds — no rest between exercises · ${rounds<=2?90:60}s rest between rounds`;
       h+=`<div class="superset-wrap"><div class="superset-header"><span class="sshdr-txt">${hdrTxt}</span>`
-        +`<button class="ss-minus" onclick="skipSuperset(${_secIdx})" aria-label="Skip this round">`+asyIcon('minus',15)+`</button></div>`;
+        +`<button class="ss-minus" onclick="skipSuperset(${_secIdx}${_srcArg})" aria-label="Skip this round">`+asyIcon('minus',15)+`</button></div>`;
       // The block owns the set dimension, so the rows inside state reps and effort only.
       // Data is untouched — this is the rendered string.
-      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii,rounds);});
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii,rounds,src);});
       h+=`</div>`;
     } else {
       h+=`<div class="section-block">`;
-      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     }
     h+=`</div>`;

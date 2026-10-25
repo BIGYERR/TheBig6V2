@@ -197,17 +197,30 @@ function buildRandFilterBar(){
 
 function setRandFilter(f: any){randFilter=f;buildRandFilterBar();reroll();}
 
+// v0.246.0 D250 (P-WILDEDIT): the Wildcard's own working day. Each draw is copied here and its cards are drawn from
+// the copy, so a swap or a minus on one changes the copy only: never a program day, never RAND_POOLS. A reroll, a
+// filter change or closing the Wildcard starts clean.
+let _wildDraw: any=null;
+function _setWildDraw(w: any){
+  _wildDraw=w?{w:w,sections:JSON.parse(JSON.stringify(w.sections||[])),swaps:[]}:null;
+}
 function reroll(){
   const pool=getActivePool();
   let idx;
   do{idx=Math.floor(Math.random()*pool.length);}while(idx===lastRandIdx&&pool.length>1);
   _setLastRandIdx(idx);_setCurrentRandIdx(idx);
-  const w=pool[idx];
-  const done=getWildcardDone();
-  const alreadyDone=done.some(d=>d.title===w.title);
+  _setWildDraw(pool[idx]);
   const now=new Date();
   const dowToKey: Record<string, string>={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
   _setCurrentRandDayKey(dowToKey[now.getDay()]||'mon');
+  renderRand();
+}
+// The Wildcard's sheet, drawn from the working day: on every draw, and again after each edit on it.
+function renderRand(){
+  if(!_wildDraw) return;
+  const w=_wildDraw.w;
+  const done=getWildcardDone();
+  const alreadyDone=done.some(d=>d.title===w.title);
   const goal=activeProg?.goal||'balanced';
   const colors: Record<string, string>={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
   const color=colors[goal];
@@ -221,7 +234,7 @@ function reroll(){
     const labelCls=ctype.includes('swim')?'cardio-label-swim':ctype.includes('run')?'cardio-label-run':ctype.includes('bike')?'cardio-label-bike':'cardio-label-general';
     html+=`<div class="${blockCls}"><div class="cardio-type-label ${labelCls}">${w.cardio.type}</div><div class="cardio-detail">${w.cardio.detail}</div></div>`;
   }
-  html+=buildSectionsHTML(w.sections);
+  html+=buildSectionsHTML(_wildDraw.sections,0,'wild');
   if(w.note) html+=`<div class="note-block">${w.note}</div>`;
   if(alreadyDone) html+=`<div class="wildcard-done-block">✓ You've done this one before</div>`;
   else html+=`<button class="wildcard-complete-btn" onclick="completeWildcard('${(w.title||'').replace(/'/g,"\\'")}')">${asyIcon('✅',14)} Complete — Mark Done</button>`;
@@ -306,7 +319,7 @@ function completeWildcard(title: any){
   if(activeProg) renderWeekView();
   setTimeout(()=>fireWildcardPopup(isTraining),380);
 }
-function closeRandom(){document.getElementById('randOverlay')!.classList.remove('open');}
+function closeRandom(){document.getElementById('randOverlay')!.classList.remove('open');_setWildDraw(null);}
 
 let resetPending=false;
 function resetWildcardCounter(){
@@ -329,4 +342,4 @@ function updateRandCounter(){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { RAND_POOLS, updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML };
+export { RAND_POOLS, _wildDraw, renderRand, updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML };

@@ -138,7 +138,8 @@
    anything else placed in that header later. */
 .swap-tag{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.06em;background:rgba(244,241,232,0.10);border:1px solid rgba(244,241,232,0.22);border-radius:2px;padding:3px 7px;color:rgba(244,241,232,0.78);}
 .swap-body{padding:14px 20px 40px;overflow-x:hidden;}
-#swapOverlay{overflow-x:hidden;}
+/* v0.246.0 D250 (P-WILDEDIT): the swap sheet opens over the Wildcard (.rand-overlay, 300) as well as over the session sheet. */
+#swapOverlay{overflow-x:hidden;z-index:310;}
 #swapOverlay .detail-header{overflow-x:hidden;}
 #swapOverlay .dh-title{overflow-wrap:anywhere;}
 .swap-sec-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;color:var(--muted);padding:0 2px 3px;}
