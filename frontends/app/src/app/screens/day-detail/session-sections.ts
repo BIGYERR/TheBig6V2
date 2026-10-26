@@ -23,7 +23,7 @@ import type { SectionView } from './session-sections-model';
   @for (list of [sections()]; track list) {
   @for (sec of list; track $index) {
     @if (sec.kind === 'skippedRound') {
-      <div class="section"><div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span><span class="ex-skipped-name">{{ sec.text }}</span><button class="ex-skipped-undo" (click)="call('unskipSuperset', sec.secIdx)">Put it back</button></div></div>
+      <div class="section"><div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span><span class="ex-skipped-name">{{ sec.text }}</span><button class="ex-skipped-undo" (click)="call('unskipSuperset', sec.secIdx, src())">Put it back</button></div></div>
     } @else {
       <div class="section">
         @if (sec.label !== null) {<div class="section-label" [innerHTML]="html(sec.label)"></div>}
@@ -35,7 +35,7 @@ import type { SectionView } from './session-sections-model';
         } @else if (sec.body.kind === 'core') {
           <div class="core-block"><div class="core-header" [innerHTML]="html(sec.body.header)"></div><ng-container [ngTemplateOutlet]="cards" [ngTemplateOutletContext]="{ $implicit: sec.body.items }" /></div>
         } @else {
-          <div class="superset-wrap"><div class="superset-header"><span class="sshdr-txt" [innerHTML]="html(sec.body.header)"></span><button class="ss-minus" (click)="call('skipSuperset', sec.body.secIdx)" aria-label="Skip this round" [innerHTML]="icon('minus', 15)"></button></div><ng-container [ngTemplateOutlet]="cards" [ngTemplateOutletContext]="{ $implicit: sec.body.items }" /></div>
+          <div class="superset-wrap"><div class="superset-header"><span class="sshdr-txt" [innerHTML]="html(sec.body.header)"></span><button class="ss-minus" (click)="call('skipSuperset', sec.body.secIdx, src())" aria-label="Skip this round" [innerHTML]="icon('minus', 15)"></button></div><ng-container [ngTemplateOutlet]="cards" [ngTemplateOutletContext]="{ $implicit: sec.body.items }" /></div>
         }
       </div>
     }
@@ -44,18 +44,18 @@ import type { SectionView } from './session-sections-model';
   <ng-template #cards let-items>
     @for (x of items; track $index) {
       @if (x.kind === 'skipped') {
-        <div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span><span class="ex-skipped-name">{{ x.name }}</span><button class="ex-skipped-undo" (click)="call('unskipExercise', x.name)">Put it back</button></div>
+        <div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span><span class="ex-skipped-name">{{ x.name }}</span><button class="ex-skipped-undo" (click)="call('unskipExercise', x.name, src())">Put it back</button></div>
       } @else {
         <div [attr.class]="'exercise-item' + (x.logged ? ' logged' : '')" [id]="'excard_' + x.exKey">
           <div class="ex-namerow">
             <span class="ex-name" [innerHTML]="html(x.name)"></span>
-            @if (x.swap; as sw) {<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" (click)="call('openSwapSheet', sw.secIdx, sw.itemIdx)" [innerHTML]="icon('swap', 16)"></button>}
-            @if (x.skip) {<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" (click)="call('skipExercise', x.name)" [innerHTML]="icon('minus', 16)"></button>}
+            @if (x.swap; as sw) {<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" (click)="call('openSwapSheet', sw.secIdx, sw.itemIdx, src())" [innerHTML]="icon('swap', 16)"></button>}
+            @if (x.skip) {<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" (click)="call('skipExercise', x.name, src())" [innerHTML]="icon('minus', 16)"></button>}
             <span class="ex-badge" [id]="'exbadge_' + x.exKey">@if (x.logged) {✓}</span>
           </div>
           @if (x.detail) {<div class="ex-detail" [innerHTML]="html(x.detail)"></div>}
           @if (x.added) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">YOU ADDED THIS</span>{{ ' · not in the plan' }}<button type="button" class="ex-swapundo" (click)="call('removeAddedExercise', x.name)">remove</button></div>}
-          @if (x.swappedFrom; as from) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span>{{ ' for ' + from }}<button type="button" class="ex-swapundo" (click)="call('undoSwap', from)">put it back</button></div>}
+          @if (x.swappedFrom; as from) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span>{{ ' for ' + from }}<button type="button" class="ex-swapundo" (click)="call('undoSwap', from, src())">put it back</button></div>}
           @if (x.log; as lg) {
             <div class="ex-log" [id]="'exlog_' + x.exKey">
               @if (lg.sets; as st) {
@@ -111,6 +111,8 @@ export class SessionSections {
   private readonly bridge = inject(LegacyBridge);
   private readonly sanitizer = inject(DomSanitizer);
   readonly sections = input.required<SectionView[]>();
+  /** v0.246.0 D250 (P-WILDEDIT): 'wild' on Random Workout, whose swap, skip and undo address the Wildcard's own day. */
+  readonly src = input<'wild' | undefined>(undefined);
   private readonly safe = new Map<string, SafeHtml>();
 
   /** Markup from the program or a legacy helper, made ready for the page once per string. */

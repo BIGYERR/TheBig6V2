@@ -11,7 +11,7 @@ import { _auxFamily, _pattern } from '../../../../../../core/src/engine/region-c
 import { _stripLeadingSets, parseRx, rxSuffix } from './week-view-sections.ts';
 import { entryDay, getExWeights, isKBExercise } from './log-entries.ts';
 import { saveExWeight } from './day-detail.ts';
-import { swapOriginOf } from './swap-sheet.ts';
+import { _editDay, swapOriginOf } from './swap-sheet.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // Human recency for the reuse pill — never program-week numbers.
 // V168 D6 — its own constant. SEED_WINDOW_DAYS happens to share the number today;
@@ -365,10 +365,10 @@ function refreshSetSummary(exKey: any){
 // ── EX CONTROL FLAGS (V162, rulings D0/R2/D3/D5) ─────────────────────────────
 // Single source for which controls an exercise row carries — consumed by the render
 // AND the gate harness, so drift between them is a contradiction, not a latent bug.
-//   canSkip: everything EXCEPT (a) the top lift — item 0 of a /^main/i section, the
-//            one slot whose absence makes the day a lie (D0/R1: swap is its exit) —
-//            and (b) note-items, the icon-prefixed coaching copy (D5). Primer lost
-//            protection by ruling; superset members carry their own minus now.
+//   canSkip: everything EXCEPT note-items, the icon-prefixed coaching copy (D5).
+//            v0.246.0 D248 (P-MAINSKIP, amends D0): the top lift — item 0 of a /^main/i
+//            section — takes the minus too. Swap was its only exit, and 44 lattice mains
+//            had nothing to swap to. Superset members carry their own minus (R2).
 //   canSwap: real lift patterns, PLUS the V162 aux families. Notes never.
 function exControlFlags(sec: any,itemIdx: any,it: any){
   const name=(it&&it.name)||'';
@@ -376,10 +376,12 @@ function exControlFlags(sec: any,itemIdx: any,it: any){
   const inSS=!!(sec&&(sec.superset||sec.type==='superset'));
   const isMainSlot=!inSS&&itemIdx===0&&/^main/i.test((sec&&sec.label)||'');
   const canSwap=!isNote&&(!!_pattern(name)||!!_auxFamily(name));
-  const canSkip=!isNote&&!isMainSlot;
+  const canSkip=!isNote;
   return {isNote:isNote,inSS:inSS,isMainSlot:isMainSlot,canSwap:canSwap,canSkip:canSkip};
 }
-function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any){
+// v0.246.0 D250 (P-WILDEDIT): `src` is 'wild' for a Wildcard card, whose controls address the Wildcard's own day
+// (_editDay), never a program day. Unset, the card is the session sheet's, and draws exactly as before.
+function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any,src?: any){
   // V190 (D39): inside a block that draws a round count, the row states reps and effort
   // only — the count is on the header. `_dispDetail` is the RENDERED string; i.detail is
   // left alone so parseRx and every one of its five callers see what they always saw.
@@ -388,10 +390,11 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any){
   // A skipped item renders as a struck-through stub instead of a card. It is NOT removed
   // from the day: keeping it visible is what distinguishes "the engine never programmed
   // this" from "I bailed on this", and the stub carries the only way to put it back.
+  const _srcArg=(src==='wild')?",'wild'":'';
   if(i._skipped){
     return '<div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span>'
       +'<span class="ex-skipped-name">'+esc(i.name||'')+'</span>'
-      +'<button class="ex-skipped-undo" onclick="unskipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">Put it back</button></div>';
+      +'<button class="ex-skipped-undo" onclick="unskipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\''+_srcArg+')">Put it back</button></div>';
   }
   const stored=getExWeights();
   const entries=(stored[exKey]&&stored[exKey].entries)||[];
@@ -444,21 +447,22 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any){
   // Primer lost protection; superset members carry their own minus (drop-and-continue,
   // see the superset render branch); aux families swap via their sidecar universe (D3);
   // note-items get neither control (D5).
-  const _sec=(activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey]&&(activeProg.weeks[currentWeek][currentDayKey].sections||[])[secIdx])||null;
+  const _eday=_editDay(src);
+  const _sec=(_eday&&(_eday.sections||[])[secIdx])||null;
   const _cf=exControlFlags(_sec,itemIdx,i);
   const _canSwap=secIdx!=null&&itemIdx!=null&&!!activeProg&&_cf.canSwap;
-  const _swappedFrom=_canSwap?swapOriginOf(i.name||''):null;
+  const _swappedFrom=_canSwap?swapOriginOf(i.name||'',src):null;
   const _canSkip=secIdx!=null&&!!activeProg&&_cf.canSkip&&!i._addedByUser;
   let html='<div class="exercise-item'+(loggedThisDay?' logged':'')+'" id="excard_'+exKey+'">'
     +'<div class="ex-namerow"><span class="ex-name">'+(i.name||'')+'</span>'
-    +(_canSwap?'<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" onclick="openSwapSheet('+secIdx+','+itemIdx+')">'+asyIcon('swap',16)+'</button>':'')
-    +(_canSkip?'<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" onclick="skipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">'+asyIcon('minus',16)+'</button>':'')
+    +(_canSwap?'<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" onclick="openSwapSheet('+secIdx+','+itemIdx+_srcArg+')">'+asyIcon('swap',16)+'</button>':'')
+    +(_canSkip?'<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" onclick="skipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\''+_srcArg+')">'+asyIcon('minus',16)+'</button>':'')
     +'<span class="ex-badge" id="exbadge_'+exKey+'">'+(loggedThisDay?'\u2713':'')+'</span></div>'
     +(_dispDetail?'<div class="ex-detail">'+_dispDetail+'</div>':'')
     +(i._addedByUser?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">YOU ADDED THIS</span> \u00b7 not in the plan'
       +'<button type="button" class="ex-swapundo" onclick="removeAddedExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">remove</button></div>':'')
     +(_swappedFrom?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span> for '+_swappedFrom
-      +'<button type="button" class="ex-swapundo" onclick="undoSwap(\''+_swappedFrom.replace(/'/g,"\\'")+'\')">put it back</button></div>':'');
+      +'<button type="button" class="ex-swapundo" onclick="undoSwap(\''+_swappedFrom.replace(/'/g,"\\'")+'\''+_srcArg+')">put it back</button></div>':'');
   const rx=parseRx(i.detail||'',i.name||'');
   const loaded=isKB||isWeight;
   if(rx||loaded){

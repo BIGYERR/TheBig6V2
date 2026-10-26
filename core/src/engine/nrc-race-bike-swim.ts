@@ -198,6 +198,26 @@ const NRC_10K_TABLE: NrcWeek[] = [
   {long:{val:6.2,unit:'mi',label:'THE RACE',race:true}, speed:[{type:'Tempo',detail:'15:00 progression tempo — Recovery Pace down to Best\n5:00 warm up\nRun the next 15:00 as one continuous progression:\n5:00 at Recovery Pace ({recovery})\n4:00 at 10K Pace ({tenK})\n3:00 at 5K Pace ({fiveK})\n2:00 at Mile Pace ({mile})\n1:00 at Best Pace'}], recovery:[{mi:3.1,label:'5K'},25,{mi:1,label:'1 Mile'}]},
 ];
 
+// v0.248.0 (D252): a speed session's work in minutes, read from Nike's own text, never the table's type or name: the
+// time its headline states ("N:NN of work", then "N:NN fartlek", then "N:NN tempo" or "progression tempo", so "5K reps
+// around a 10:00 tempo — 22:00 of work" reads 22); a hill session's uphill efforts summed over its rounds; a distance
+// tempo ("8K tempo") at the athlete's chart tempo pace (seconds per mile). The tables stay as Nike wrote them.
+function _nrcWorkMin(sp: { detail: string }, tempoSecPerMi: number): number{
+  const lines = String(sp.detail).split('\n'), head = lines[0] || '';
+  const mmss = (m: RegExpMatchArray) => +m[1]! + +m[2]! / 60;
+  const stated = head.match(/(\d+):(\d\d) of work/) || head.match(/(\d+):(\d\d) fartlek/) || head.match(/(\d+):(\d\d) (?:progression )?tempo/);
+  if(stated) return mmss(stated);
+  const km = head.match(/(\d+(?:\.\d+)?)K tempo/);
+  if(km) return (+km[1]! / 1.609344) * tempoSecPerMi / 60;
+  let rounds = 1, total = 0;
+  lines.slice(1).forEach(raw => {
+    const line = raw.replace(/\u00a0/g, ' ');
+    const r = line.match(/^(\d+) rounds of/); if(r){ rounds = +r[1]!; return; }
+    const e = line.match(/^\s*(\d+):(\d\d) uphill at/); if(e) total += mmss(e) * rounds;
+  });
+  return total;
+}
+
 function buildNRCSession(goalId: string, week: number, totalWeeks: number, sessionType: string, experience: Experience | null | undefined, mileBestSecs: number | null | undefined, recIdx?: number | null, recSlots?: number | null, hasSpeed2?: boolean, recIdxAll?: number | null, eventOn?: boolean | null): CardioSession {
   const isMarathon = goalId === 'run_marathon';
   // V186: four tables, one engine. The 5K/10K plans share the half's 2-speed layout.
@@ -287,11 +307,19 @@ function buildNRCSession(goalId: string, week: number, totalWeeks: number, sessi
     }
 
   } else if(_type === 'nrc_speed1' || _type === 'nrc_speed2') {
-    // v0.243.0 (D243, Mario): a layout with one speed slot prints the week's Tempo when Nike's week has one, else the
-    // first session. Nike's half puts every Tempo in the second slot, so a one-speed week read by slot alone never
-    // ran one. The marathon (one Nike session a week) and every two-speed layout read by slot, as before.
-    const _tempo = (_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon) ? wk.speed.findIndex(x => x.type === 'Tempo') : -1;
-    const slot = _type === 'nrc_speed1' ? (_tempo > 0 ? _tempo : 0) : 1;
+    // v0.248.0 (D252, Mario with coach): a layout with one speed slot (D243) prints the LONGER of Nike's sessions, by
+    // _nrcWorkMin. One speed day has to carry the week's main stimulus, and for a 5K, 10K or half that is time at
+    // quality pace, whatever Nike typed or named it. A tie goes to the Tempo-typed session, else Nike's first. This
+    // replaces D243's Tempo-type read and D251's tempo-name read. The marathon (one Nike session a week) and every
+    // two-speed layout read by slot, as before.
+    let slot = _type === 'nrc_speed1' ? 0 : 1;
+    if(_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon && wk.speed.length > 1){
+      const _w = wk.speed.map(x => _nrcWorkMin(x, chartRow.tempo));
+      const _best = Math.max(..._w);
+      const _tied = _w.map((v, i) => i).filter(i => Math.abs(_w[i]! - _best) < 1e-9);
+      const _tempoTie = _tied.find(i => wk.speed[i]!.type === 'Tempo');
+      slot = _tempoTie !== undefined ? _tempoTie : _tied[0]!;
+    }
     const sp = wk.speed[Math.min(slot, wk.speed.length - 1)];
     subtype = 'Speed Run — ' + sp.type;
     detail = fillPaces((sp.detailIfHalfSlow && chartRow.half >= chartRow.marathon) ? sp.detailIfHalfSlow : sp.detail);   // V176 (D31)

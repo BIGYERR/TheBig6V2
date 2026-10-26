@@ -36,7 +36,7 @@ import {
       @if (v.cardio; as c) {
         <div [class]="c.blockCls"><div [class]="'cardio-type-label ' + c.labelCls">{{ c.type }}</div><div class="cardio-detail">{{ c.detail }}</div></div>
       }
-      <ia-session-sections [sections]="sections()" />
+      <ia-session-sections [sections]="sections()" src="wild" />
       @if (v.note) {
         <div class="note-block">{{ v.note }}</div>
       }
@@ -63,6 +63,7 @@ export class RandomWorkout {
   constructor() {
     this.bridge.provide('openRandom', () => this.open());
     this.bridge.provide('updateRandCounter', () => this.updateCounter());
+    this.bridge.provide('renderRand', () => this.drawSections());
   }
 
   protected close(): void {
@@ -116,11 +117,22 @@ export class RandomWorkout {
     this.bridge.call('_setLastRandIdx', idx);
     this.bridge.call('_setCurrentRandIdx', idx);
     const w = pool[idx]!;
+    this.bridge.call('_setWildDraw', w);
     const done = this.bridge.call('getWildcardDone');
     this.bridge.call('_setCurrentRandDayKey', dayKeyOf(new Date()));
     this.view.set(randView(w, done, this.goal()));
-    this.sections.set(sectionsView(w.sections as ExSection[] | undefined, undefined, sectionReads(this.bridge as unknown as BridgeLike)));
+    this.drawSections();
     this.completeLabel.set(this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', '✅', 14) + ' Complete — Mark Done'));
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * v0.246.0 D250 (P-WILDEDIT): the cards, from the Wildcard's own working day (the legacy `_wildDraw`), on every draw
+   * and again after a swap or a minus on one (the legacy renderRand, taken over here).
+   */
+  private drawSections(): void {
+    const draw = this.bridge.global('_wildDraw') as { sections?: ExSection[] } | null;
+    this.sections.set(sectionsView(draw ? draw.sections : [], undefined, sectionReads(this.bridge as unknown as BridgeLike, 'wild')));
     this.cdr.detectChanges();
   }
 

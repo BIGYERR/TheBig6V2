@@ -1,0 +1,43 @@
+=== v0.245.1 (before) ===
+PART A — the census. Programs 865 (HALF_MANNY + lattice FULL 864), training days 60550
+  exercise cards (notes excluded) 307788: skippable 271512, locked 36276
+  main slots 36276 (one per lift day: 59900 days with sections)
+    skippable 0 of 36276
+    no swap button 0 of 36276, swap sheet empty 44 of 36276 {"Chinups":16,"Assisted pullups":20,"Neutral-grip chinups":8}
+  days with a cardio card 48440: cardio only 650, cardio plus lifting 47790 (no control on any cardio card: 48440 of 48440)
+  cardio cards by type:subtype {"run:Easy Run (protected)":13104,"run:Recovery Run":12736,"run:Incline Walk":12096,"run:Speed Run — Intervals":3897,"run:Long Run":2925,"run:Speed Run — Tempo":1300,"run:Speed Run — Hills":433,"run:Long Run — Dress Rehearsal":325,"run:Long Run — Peak":325,"run:Long Run — Cutback":325,"run:Long Run — Taper":325,"run:Long Run — RACE DAY":325,"run:Speed Run — Fartlek":324}
+
+PART B — the Wildcard. Workouts 143 (every title in RAND_POOLS), HALF_MANNY week 1, session sheet last on each weekday
+  week 1: mon 3 sections, tue 4 sections, wed rest, thu 6 sections, fri 3 sections, sat 2 sections, sun rest
+  swap taps 4389 (143 workouts x 7 weekdays, every card with a swap button)
+    sheet names the tapped card 37, sheet names another exercise 1875, toast "Nothing to swap here" 2477
+      mon: "Max Effort Bench" tap on Barbell bench press opens the sheet for Barbell Romanian deadlift
+      mon: "Max Effort Bench" tap on Dumbbell incline press opens the sheet for Barbell row
+      mon: "Max Effort Bench" tap on Barbell row opens the sheet for Weighted chinups
+      mon: "Max Effort Bench" tap on Ab wheel rollouts opens the sheet for Dumbbell row
+      mon: "Max Effort Bench" tap on Plank hold opens the sheet for Ball slams
+      mon: "Max Effort Squat" tap on Back squat opens the sheet for Barbell Romanian deadlift
+  the swap sheet (#swapOverlay) z-index 200, the Wildcard (.rand-overlay) z-index 300: the sheet opens under the Wildcard
+  minus taps 3908: strike a same-named card off the program day 211, do nothing 3697
+      mon: "Max Effort Bench" minus on Barbell row strikes Barbell row off the program day
+      mon: "Deadlift PR Day" minus on Barbell row strikes Barbell row off the program day
+      mon: "Speed Bench" minus on Barbell row strikes Barbell row off the program day
+      mon: "Heavy Upper" minus on Weighted chinups strikes Weighted chinups off the program day
+      mon: "Heavy Upper" minus on Barbell row strikes Barbell row off the program day
+      mon: "Posterior Chain" minus on Barbell Romanian deadlift strikes Barbell Romanian deadlift off the program day
+
+=== v0.246.0 build (after) ===
+PART A — the census. Programs 865 (HALF_MANNY + lattice FULL 864), training days 60550
+  exercise cards (notes excluded) 307788: skippable 307788, locked 0
+  main slots 36276 (one per lift day: 59900 days with sections)
+    skippable 36276 of 36276
+    no swap button 0 of 36276, swap sheet empty 44 of 36276 {"Chinups":16,"Assisted pullups":20,"Neutral-grip chinups":8}
+  days with a cardio card 48440: cardio only 650, cardio plus lifting 47790 (no control on any cardio card: 48440 of 48440)
+  cardio cards by type:subtype {"run:Easy Run (protected)":13104,"run:Recovery Run":12736,"run:Incline Walk":12096,"run:Speed Run — Intervals":3897,"run:Long Run":2925,"run:Speed Run — Tempo":1300,"run:Speed Run — Hills":433,"run:Long Run — Dress Rehearsal":325,"run:Long Run — Peak":325,"run:Long Run — Cutback":325,"run:Long Run — Taper":325,"run:Long Run — RACE DAY":325,"run:Speed Run — Fartlek":324}
+
+PART B — the Wildcard. Workouts 143 (every title in RAND_POOLS), HALF_MANNY week 1, session sheet last on each weekday
+  week 1: mon 3 sections, tue 4 sections, wed rest, thu 6 sections, fri 3 sections, sat 2 sections, sun rest
+  swap taps 4389 (143 workouts x 7 weekdays, every card with a swap button)
+    sheet names the tapped card 4389, sheet names another exercise 0, toast "Nothing to swap here" 0
+  the swap sheet (#swapOverlay) z-index 310, the Wildcard (.rand-overlay) z-index 300: the sheet opens above the Wildcard
+  minus taps 4480: strike a same-named card off the program day 0, do nothing 4480

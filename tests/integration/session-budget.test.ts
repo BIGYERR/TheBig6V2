@@ -256,8 +256,8 @@ test("the cost lens alone is PRT TING whole, and moves no byte of HALF_MANNY", (
   assert.equal(SB.twice(SB.noHipExtA(), SB.PRT).dig, '997add753ad41179');
   const B = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY), V = SB.twice(SB.noD195(), fixtures.HALF_MANNY);
   assert.ok(B.self && V.self);
-  assert.equal(B.dig, '895bb404a809927b');   // 0ac7da6b1691a8e1 until D239, b1b15c80f1a703f1 until D241, c17e854e54e86f57 until D243
-  assert.equal(V.dig, '895bb404a809927b');
+  assert.equal(B.dig, '7ed355470630a9c5');   // 0ac7da6b1691a8e1 until D239, b1b15c80f1a703f1 until D241, c17e854e54e86f57 until D243, 895bb404a809927b until D251, df75a47fc8917305 until D252
+  assert.equal(V.dig, '7ed355470630a9c5');
   assert.equal(SB.dayJ(B.prog.weeks), SB.dayJ(V.prog.weeks));
   assert.equal(SB.weekKeys(V.prog).length * 7, 98);
 });

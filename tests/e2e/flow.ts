@@ -565,6 +565,21 @@ const STRENGTH: readonly Step[] = [
       await t.expectText('#randFilterBar .rand-filter-btn.active', 'My Goal');
       await t.expectText('#randBody .rand-badge', 'Wildcard');
     },
+    async after(t, page) {
+      // v0.246.0 D250 (P-WILDEDIT): swap on a Wildcard card opens the sheet for that card, over the Wildcard (a tap on a
+      // sheet left under it would land on the Wildcard), a pick changes the Wildcard's card, and its chip puts it back.
+      const name = await page.evaluate(() => document.querySelector('#randBody .ex-swapbtn')?.closest('.ex-namerow')?.querySelector('.ex-name')?.textContent ?? '');
+      if (!name) throw new Error('the Wildcard drew no card to swap');
+      await t.tap('#randBody .ex-swapbtn');
+      await t.overlayOpen('swapOverlay');
+      await t.expectText('#swapOutName', name);
+      await t.tap('#swapBody .swap-cand');
+      if ((await t.openOverlays()).includes('swapOverlay')) throw new Error('the swap sheet stayed open after a pick');
+      await t.expectText('#randBody .ex-swapchip', 'SWAPPED IN for ' + name);
+      await t.tap('#randBody .ex-swapundo');
+      if (await t.count('#randBody .ex-swapchip')) throw new Error('the Wildcard card stayed swapped after put it back');
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+    },
   },
   {
     id: 'random-see-all',

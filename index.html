@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.245.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.248.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -422,7 +422,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
    anything else placed in that header later. */
 .swap-tag{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.06em;background:rgba(244,241,232,0.10);border:1px solid rgba(244,241,232,0.22);border-radius:2px;padding:3px 7px;color:rgba(244,241,232,0.78);}
 .swap-body{padding:14px 20px 40px;overflow-x:hidden;}
-#swapOverlay{overflow-x:hidden;}
+/* v0.246.0 D250 (P-WILDEDIT): the swap sheet opens over the Wildcard (.rand-overlay, 300) as well as over the session sheet. */
+#swapOverlay{overflow-x:hidden;z-index:310;}
 #swapOverlay .detail-header{overflow-x:hidden;}
 #swapOverlay .dh-title{overflow-wrap:anywhere;}
 .swap-sec-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;color:var(--muted);padding:0 2px 3px;}
@@ -4774,6 +4775,26 @@ const NRC_10K_TABLE = [
   {long:{val:6.2,unit:'mi',label:'THE RACE',race:true}, speed:[{type:'Tempo',detail:'15:00 progression tempo — Recovery Pace down to Best\n5:00 warm up\nRun the next 15:00 as one continuous progression:\n5:00 at Recovery Pace ({recovery})\n4:00 at 10K Pace ({tenK})\n3:00 at 5K Pace ({fiveK})\n2:00 at Mile Pace ({mile})\n1:00 at Best Pace'}], recovery:[{mi:3.1,label:'5K'},25,{mi:1,label:'1 Mile'}]},
 ];
 
+// v0.248.0 (D252): a speed session's work in minutes, read from Nike's own text, never the table's type or name: the
+// time its headline states ("N:NN of work", then "N:NN fartlek", then "N:NN tempo" or "progression tempo", so "5K reps
+// around a 10:00 tempo — 22:00 of work" reads 22); a hill session's uphill efforts summed over its rounds; a distance
+// tempo ("8K tempo") at the athlete's chart tempo pace (seconds per mile). The tables stay as Nike wrote them.
+function _nrcWorkMin(sp, tempoSecPerMi){
+  const lines = String(sp.detail).split('\n'), head = lines[0] || '';
+  const mmss = (m) => +m[1] + +m[2] / 60;
+  const stated = head.match(/(\d+):(\d\d) of work/) || head.match(/(\d+):(\d\d) fartlek/) || head.match(/(\d+):(\d\d) (?:progression )?tempo/);
+  if(stated) return mmss(stated);
+  const km = head.match(/(\d+(?:\.\d+)?)K tempo/);
+  if(km) return (+km[1] / 1.609344) * tempoSecPerMi / 60;
+  let rounds = 1, total = 0;
+  lines.slice(1).forEach(raw => {
+    const line = raw.replace(/\u00a0/g, ' ');
+    const r = line.match(/^(\d+) rounds of/); if(r){ rounds = +r[1]; return; }
+    const e = line.match(/^\s*(\d+):(\d\d) uphill at/); if(e) total += mmss(e) * rounds;
+  });
+  return total;
+}
+
 function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mileBestSecs, recIdx, recSlots, hasSpeed2, recIdxAll, eventOn) {
   const isMarathon = goalId === 'run_marathon';
   // V186: four tables, one engine. The 5K/10K plans share the half's 2-speed layout.
@@ -4863,11 +4884,19 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
     }
 
   } else if(_type === 'nrc_speed1' || _type === 'nrc_speed2') {
-    // v0.243.0 (D243, Mario): a layout with one speed slot prints the week's Tempo when Nike's week has one, else the
-    // first session. Nike's half puts every Tempo in the second slot, so a one-speed week read by slot alone never
-    // ran one. The marathon (one Nike session a week) and every two-speed layout read by slot, as before.
-    const _tempo = (_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon) ? wk.speed.findIndex(x => x.type === 'Tempo') : -1;
-    const slot = _type === 'nrc_speed1' ? (_tempo > 0 ? _tempo : 0) : 1;
+    // v0.248.0 (D252, Mario with coach): a layout with one speed slot (D243) prints the LONGER of Nike's sessions, by
+    // _nrcWorkMin. One speed day has to carry the week's main stimulus, and for a 5K, 10K or half that is time at
+    // quality pace, whatever Nike typed or named it. A tie goes to the Tempo-typed session, else Nike's first. This
+    // replaces D243's Tempo-type read and D251's tempo-name read. The marathon (one Nike session a week) and every
+    // two-speed layout read by slot, as before.
+    let slot = _type === 'nrc_speed1' ? 0 : 1;
+    if(_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon && wk.speed.length > 1){
+      const _w = wk.speed.map(x => _nrcWorkMin(x, chartRow.tempo));
+      const _best = Math.max(..._w);
+      const _tied = _w.map((v, i) => i).filter(i => Math.abs(_w[i] - _best) < 1e-9);
+      const _tempoTie = _tied.find(i => wk.speed[i].type === 'Tempo');
+      slot = _tempoTie !== undefined ? _tempoTie : _tied[0];
+    }
     const sp = wk.speed[Math.min(slot, wk.speed.length - 1)];
     subtype = 'Speed Run — ' + sp.type;
     detail = fillPaces((sp.detailIfHalfSlow && chartRow.half >= chartRow.marathon) ? sp.detailIfHalfSlow : sp.detail);   // V176 (D31)
@@ -12018,17 +12047,30 @@ function buildRandFilterBar(){
 
 function setRandFilter(f){randFilter=f;buildRandFilterBar();reroll();}
 
+// v0.246.0 D250 (P-WILDEDIT): the Wildcard's own working day. Each draw is copied here and its cards are drawn from
+// the copy, so a swap or a minus on one changes the copy only: never a program day, never RAND_POOLS. A reroll, a
+// filter change or closing the Wildcard starts clean.
+let _wildDraw=null;
+function _setWildDraw(w){
+  _wildDraw=w?{w:w,sections:JSON.parse(JSON.stringify(w.sections||[])),swaps:[]}:null;
+}
 function reroll(){
   const pool=getActivePool();
   let idx;
   do{idx=Math.floor(Math.random()*pool.length);}while(idx===lastRandIdx&&pool.length>1);
   _setLastRandIdx(idx);_setCurrentRandIdx(idx);
-  const w=pool[idx];
-  const done=getWildcardDone();
-  const alreadyDone=done.some(d=>d.title===w.title);
+  _setWildDraw(pool[idx]);
   const now=new Date();
   const dowToKey={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
   _setCurrentRandDayKey(dowToKey[now.getDay()]||'mon');
+  renderRand();
+}
+// The Wildcard's sheet, drawn from the working day: on every draw, and again after each edit on it.
+function renderRand(){
+  if(!_wildDraw) return;
+  const w=_wildDraw.w;
+  const done=getWildcardDone();
+  const alreadyDone=done.some(d=>d.title===w.title);
   const goal=activeProg?.goal||'balanced';
   const colors={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
   const color=colors[goal];
@@ -12042,7 +12084,7 @@ function reroll(){
     const labelCls=ctype.includes('swim')?'cardio-label-swim':ctype.includes('run')?'cardio-label-run':ctype.includes('bike')?'cardio-label-bike':'cardio-label-general';
     html+=`<div class="${blockCls}"><div class="cardio-type-label ${labelCls}">${w.cardio.type}</div><div class="cardio-detail">${w.cardio.detail}</div></div>`;
   }
-  html+=buildSectionsHTML(w.sections);
+  html+=buildSectionsHTML(_wildDraw.sections,0,'wild');
   if(w.note) html+=`<div class="note-block">${w.note}</div>`;
   if(alreadyDone) html+=`<div class="wildcard-done-block">✓ You've done this one before</div>`;
   else html+=`<button class="wildcard-complete-btn" onclick="completeWildcard('${(w.title||'').replace(/'/g,"\\'")}')">${asyIcon('✅',14)} Complete — Mark Done</button>`;
@@ -12127,7 +12169,7 @@ function completeWildcard(title){
   if(activeProg) renderWeekView();
   setTimeout(()=>fireWildcardPopup(isTraining),380);
 }
-function closeRandom(){document.getElementById('randOverlay').classList.remove('open');}
+function closeRandom(){document.getElementById('randOverlay').classList.remove('open');_setWildDraw(null);}
 
 let resetPending=false;
 function resetWildcardCounter(){
@@ -12852,9 +12894,11 @@ function _stripLeadingSets(d){
     .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
     .replace(/^(\d+)\s*sets?\b\s*/i,'');
 }
-function buildSectionsHTML(sections,baseIdx){
+// v0.246.0 D250 (P-WILDEDIT): `src` 'wild' draws a Wildcard's sections, whose controls address the Wildcard (buildExItem).
+function buildSectionsHTML(sections,baseIdx,src){
   const all=sections||[];
   const _base=baseIdx||0;
+  const _srcArg=(src==='wild')?",'wild'":'';
   // Only the MAIN lift (and the taper Primer) keeps a section label — every other block renders
   // as plain exercise rows. The conditioning round-protocol survives because it's drawn by the
   // superset-header inside the block, not by this outer label.
@@ -12866,25 +12910,25 @@ function buildSectionsHTML(sections,baseIdx){
     if((sec.superset||sec.type==='superset')&&sec._skipped){
       return `<div class="section"><div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span>`
         +`<span class="ex-skipped-name">${esc(sec.label||'Conditioning round')} \u2014 ${(sec.items||[]).length} movements</span>`
-        +`<button class="ex-skipped-undo" onclick="unskipSuperset(${_secIdx})">Put it back</button></div></div>`;
+        +`<button class="ex-skipped-undo" onclick="unskipSuperset(${_secIdx}${_srcArg})">Put it back</button></div></div>`;
     }
     let h=`<div class="section">`+(showLabel?`<div class="section-label">${sec.label||''}</div>`:'');
     if(sec._added){
       // The athlete's own additions render in their own block, in signal orange, so they
       // never masquerade as something the engine programmed.
       h+=`<div class="section-label" style="color:var(--signal)">${sec.label||'Added by you'}</div><div class="section-block">`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     } else if(sec.hip){
       // Broken out of the old bundled "Hip Abductor Circuit" box — each stability drill now
       // stands as its own logged card. The section still carries hip:true, so capRegionalFatigue
       // keeps shielding this prehab from deload/high-fatigue trimming.
       h+=`<div class="section-label" style="color:var(--hip)">${sec.label||'Hip stability'}</div><div class="section-block">`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     } else if(sec.core){
       h+=`<div class="core-block"><div class="core-header">${sec.coreHeader||'Core'}</div>`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     } else if((sec.superset||sec.type==='superset')&&(sec.items||[]).length>1){
       // V175 (D28): a section that holds ONE item is not a superset whatever its flag
@@ -12907,8 +12951,8 @@ function buildSectionsHTML(sections,baseIdx){
           :(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
         h+=`<div class="section-label" style="color:var(--muted)">${esc(sec.label||'Round')} \u2014 reduced to straight sets</div><div class="section-block">`;
         sec.items.forEach((i2,_ii)=>{
-          if(i2._skipped){h+=buildExItem(i2,_secIdx,_ii);return;}
-          h+=buildExItem({...i2,detail:_mapped},_secIdx,_ii);
+          if(i2._skipped){h+=buildExItem(i2,_secIdx,_ii,undefined,src);return;}
+          h+=buildExItem({...i2,detail:_mapped},_secIdx,_ii,undefined,src);
         });
         h+=`</div></div>`;
         return h;
@@ -12919,14 +12963,14 @@ function buildSectionsHTML(sections,baseIdx){
       const hdrTxt=(labelHasRounds||rounds==null)?(sec.label||'')
         :`${rounds} Rounds — no rest between exercises · ${rounds<=2?90:60}s rest between rounds`;
       h+=`<div class="superset-wrap"><div class="superset-header"><span class="sshdr-txt">${hdrTxt}</span>`
-        +`<button class="ss-minus" onclick="skipSuperset(${_secIdx})" aria-label="Skip this round">`+asyIcon('minus',15)+`</button></div>`;
+        +`<button class="ss-minus" onclick="skipSuperset(${_secIdx}${_srcArg})" aria-label="Skip this round">`+asyIcon('minus',15)+`</button></div>`;
       // The block owns the set dimension, so the rows inside state reps and effort only.
       // Data is untouched — this is the rendered string.
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,rounds);});
+      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,rounds,src);});
       h+=`</div>`;
     } else {
       h+=`<div class="section-block">`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,undefined,src);});
       h+=`</div>`;
     }
     h+=`</div>`;
@@ -13373,10 +13417,10 @@ function refreshSetSummary(exKey){
 // ── EX CONTROL FLAGS (V162, rulings D0/R2/D3/D5) ─────────────────────────────
 // Single source for which controls an exercise row carries — consumed by the render
 // AND the gate harness, so drift between them is a contradiction, not a latent bug.
-//   canSkip: everything EXCEPT (a) the top lift — item 0 of a /^main/i section, the
-//            one slot whose absence makes the day a lie (D0/R1: swap is its exit) —
-//            and (b) note-items, the icon-prefixed coaching copy (D5). Primer lost
-//            protection by ruling; superset members carry their own minus now.
+//   canSkip: everything EXCEPT note-items, the icon-prefixed coaching copy (D5).
+//            v0.246.0 D248 (P-MAINSKIP, amends D0): the top lift — item 0 of a /^main/i
+//            section — takes the minus too. Swap was its only exit, and 44 lattice mains
+//            had nothing to swap to. Superset members carry their own minus (R2).
 //   canSwap: real lift patterns, PLUS the V162 aux families. Notes never.
 function exControlFlags(sec,itemIdx,it){
   const name=(it&&it.name)||'';
@@ -13384,10 +13428,12 @@ function exControlFlags(sec,itemIdx,it){
   const inSS=!!(sec&&(sec.superset||sec.type==='superset'));
   const isMainSlot=!inSS&&itemIdx===0&&/^main/i.test((sec&&sec.label)||'');
   const canSwap=!isNote&&(!!_pattern(name)||!!_auxFamily(name));
-  const canSkip=!isNote&&!isMainSlot;
+  const canSkip=!isNote;
   return {isNote:isNote,inSS:inSS,isMainSlot:isMainSlot,canSwap:canSwap,canSkip:canSkip};
 }
-function buildExItem(i,secIdx,itemIdx,_ssRounds){
+// v0.246.0 D250 (P-WILDEDIT): `src` is 'wild' for a Wildcard card, whose controls address the Wildcard's own day
+// (_editDay), never a program day. Unset, the card is the session sheet's, and draws exactly as before.
+function buildExItem(i,secIdx,itemIdx,_ssRounds,src){
   // V190 (D39): inside a block that draws a round count, the row states reps and effort
   // only — the count is on the header. `_dispDetail` is the RENDERED string; i.detail is
   // left alone so parseRx and every one of its five callers see what they always saw.
@@ -13396,10 +13442,11 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
   // A skipped item renders as a struck-through stub instead of a card. It is NOT removed
   // from the day: keeping it visible is what distinguishes "the engine never programmed
   // this" from "I bailed on this", and the stub carries the only way to put it back.
+  const _srcArg=(src==='wild')?",'wild'":'';
   if(i._skipped){
     return '<div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span>'
       +'<span class="ex-skipped-name">'+esc(i.name||'')+'</span>'
-      +'<button class="ex-skipped-undo" onclick="unskipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">Put it back</button></div>';
+      +'<button class="ex-skipped-undo" onclick="unskipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\''+_srcArg+')">Put it back</button></div>';
   }
   const stored=getExWeights();
   const entries=(stored[exKey]&&stored[exKey].entries)||[];
@@ -13450,21 +13497,22 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
   // Primer lost protection; superset members carry their own minus (drop-and-continue,
   // see the superset render branch); aux families swap via their sidecar universe (D3);
   // note-items get neither control (D5).
-  const _sec=(activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey]&&(activeProg.weeks[currentWeek][currentDayKey].sections||[])[secIdx])||null;
+  const _eday=_editDay(src);
+  const _sec=(_eday&&(_eday.sections||[])[secIdx])||null;
   const _cf=exControlFlags(_sec,itemIdx,i);
   const _canSwap=secIdx!=null&&itemIdx!=null&&!!activeProg&&_cf.canSwap;
-  const _swappedFrom=_canSwap?swapOriginOf(i.name||''):null;
+  const _swappedFrom=_canSwap?swapOriginOf(i.name||'',src):null;
   const _canSkip=secIdx!=null&&!!activeProg&&_cf.canSkip&&!i._addedByUser;
   let html='<div class="exercise-item'+(loggedThisDay?' logged':'')+'" id="excard_'+exKey+'">'
     +'<div class="ex-namerow"><span class="ex-name">'+(i.name||'')+'</span>'
-    +(_canSwap?'<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" onclick="openSwapSheet('+secIdx+','+itemIdx+')">'+asyIcon('swap',16)+'</button>':'')
-    +(_canSkip?'<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" onclick="skipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">'+asyIcon('minus',16)+'</button>':'')
+    +(_canSwap?'<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" onclick="openSwapSheet('+secIdx+','+itemIdx+_srcArg+')">'+asyIcon('swap',16)+'</button>':'')
+    +(_canSkip?'<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" onclick="skipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\''+_srcArg+')">'+asyIcon('minus',16)+'</button>':'')
     +'<span class="ex-badge" id="exbadge_'+exKey+'">'+(loggedThisDay?'\u2713':'')+'</span></div>'
     +(_dispDetail?'<div class="ex-detail">'+_dispDetail+'</div>':'')
     +(i._addedByUser?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">YOU ADDED THIS</span> \u00b7 not in the plan'
       +'<button type="button" class="ex-swapundo" onclick="removeAddedExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">remove</button></div>':'')
     +(_swappedFrom?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span> for '+_swappedFrom
-      +'<button type="button" class="ex-swapundo" onclick="undoSwap(\''+_swappedFrom.replace(/'/g,"\\'")+'\')">put it back</button></div>':'');
+      +'<button type="button" class="ex-swapundo" onclick="undoSwap(\''+_swappedFrom.replace(/'/g,"\\'")+'\''+_srcArg+')">put it back</button></div>':'');
   const rx=parseRx(i.detail||'',i.name||'');
   const loaded=isKB||isWeight;
   if(rx||loaded){
@@ -14793,7 +14841,9 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
 // ── SWAP SHEET ───────────────────────────────────────────────────────────────
 let _swapCtx=null;
 // What did this lift replace on today's card? Drives the "SWAPPED IN" chip.
-function swapOriginOf(name){
+function swapOriginOf(name,src){
+  // v0.246.0 D250 (P-WILDEDIT): a Wildcard card's origin is the Wildcard's own swap list, never a program day's.
+  if(src==='wild') return ((((_wildDraw&&_wildDraw.swaps)||[]).filter(function(e){return e&&e.to===name;}).pop())||{}).from||null;
   if(!activeProgId||!currentDayKey) return null;
   const list=(getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[];
   // V228 D192 P-UNDOKEY: the most recent record whose `to` is the card's name, so the chip names the lift that just left.
@@ -14826,12 +14876,13 @@ function _swapRow(name,caution,outName){
     +(note?'<span class="swap-cand-note">'+note+'</span>':'')
     +'</button>';
 }
-function openSwapSheet(secIdx,itemIdx){
-  const day=activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
+function openSwapSheet(secIdx,itemIdx,src){
+  const day=_editDay(src);   // v0.246.0 D250: the Wildcard's working day for a Wildcard card
   const sec=day&&day.sections&&day.sections[secIdx];
   const item=sec&&sec.items&&sec.items[itemIdx];
   if(!item||!item.name){showToast('Nothing to swap here');return;}
   _swapCtx={secIdx:secIdx,itemIdx:itemIdx,name:item.name,detail:item.detail||''};
+  if(src==='wild') _swapCtx.src='wild';
   const c=swapCandidates(item.name,day,currentWeek,activeProg);
   // V162 (ruling D3): a null-pattern movement swaps within its aux family — same
   // sidecar legality (gear, injury, power doctrine) the engine itself answers to.
@@ -14890,7 +14941,8 @@ function openSwapSheet(secIdx,itemIdx){
 function closeSwapSheet(){const o=document.getElementById('swapOverlay');if(o)o.classList.remove('open');_swapCtx=null;}
 function applySwapChoice(to){
   if(!_swapCtx||!activeProg||!activeProgId){closeSwapSheet();return;}
-  const day=activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
+  const _wild=_swapCtx.src==='wild';
+  const day=_editDay(_swapCtx.src);
   const sec=day&&day.sections&&day.sections[_swapCtx.secIdx];
   const item=sec&&sec.items&&sec.items[_swapCtx.itemIdx];
   if(!item){closeSwapSheet();return;}
@@ -14933,11 +14985,14 @@ function applySwapChoice(to){
     }catch(e){}
   }
   if(sec.label&&sec.label.indexOf(from)>=0) sec.label=sec.label.split(from).join(to);
-  recordSwap(activeProgId,currentWeek,currentDayKey,from,to,_undoRx);
-  const nudge=bumpSwapCount(activeProgId,from,to);
+  // v0.246.0 D250 (P-WILDEDIT): a Wildcard swap lives on the Wildcard's working day. No record, no swap count, no
+  // nudge, no snapshot: no program day hears of it.
+  if(_wild) _wildDraw.swaps.push({from:from,to:to,rx:_undoRx});
+  else recordSwap(activeProgId,currentWeek,currentDayKey,from,to,_undoRx);
+  const nudge=_wild?false:bumpSwapCount(activeProgId,from,to);
   closeSwapSheet();
-  resnapshotDayEdit(currentWeek,currentDayKey);
-  openDetail(currentDayKey,day);
+  if(_wild) renderRand();
+  else{ resnapshotDayEdit(currentWeek,currentDayKey); openDetail(currentDayKey,day); }
   // "Same numbers" is a promise the app has to keep. When the reps came off because the
   // movement cannot express them, say so instead.
   // V221 D177 (R5): the third branch fires only when the window branch moved the reps.
@@ -14963,37 +15018,41 @@ function applySwapChoice(to){
 // freeze restores from it, so an edit that is not folded into the snapshot silently vanishes
 // on the next boot.
 function _liveDay(){return activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];}
-function _afterEdit(day,msg){
+// v0.246.0 D250 (P-WILDEDIT): the day an edit addresses. 'wild' is the Wildcard's working day (random-wildcard.ts),
+// which an edit redraws and never stores; anything else is the session sheet's day.
+function _editDay(src){return src==='wild'?_wildDraw:_liveDay();}
+function _afterEdit(day,msg,src){
+  if(src==='wild'){ renderRand(); if(msg) showToast(msg); return; }
   resnapshotDayEdit(currentWeek,currentDayKey);
   openDetail(currentDayKey,day);
   if(msg) showToast(msg);
 }
-function skipExercise(name){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function skipExercise(name,src){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   let hit=null;
   (day.sections||[]).forEach(function(s){(s.items||[]).forEach(function(it){if(it&&it.name===name){it._skipped=true;hit=it;}});});
   if(!hit) return;
-  recordSkip(activeProgId,currentWeek,currentDayKey,name);
-  _afterEdit(day,name+' is off today. Tap to put it back.');
+  if(src!=='wild') recordSkip(activeProgId,currentWeek,currentDayKey,name);
+  _afterEdit(day,name+' is off today. Tap to put it back.',src);
 }
-function unskipExercise(name){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function unskipExercise(name,src){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   (day.sections||[]).forEach(function(s){(s.items||[]).forEach(function(it){if(it&&it.name===name)it._skipped=undefined;});});
-  clearSkip(activeProgId,currentWeek,currentDayKey,name);
-  _afterEdit(day,name+' is back on the card.');
+  if(src!=='wild') clearSkip(activeProgId,currentWeek,currentDayKey,name);
+  _afterEdit(day,name+' is back on the card.',src);
 }
-function skipSuperset(secIdx){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function skipSuperset(secIdx,src){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   const sec=(day.sections||[])[secIdx]; if(!sec) return;
   sec._skipped=true;
-  recordSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
-  _afterEdit(day,'Round is off today. Tap to put it back.');
+  if(src!=='wild') recordSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
+  _afterEdit(day,'Round is off today. Tap to put it back.',src);
 }
-function unskipSuperset(secIdx){
-  const day=_liveDay(); if(!day||!activeProgId) return;
+function unskipSuperset(secIdx,src){
+  const day=_editDay(src); if(!day||!activeProgId) return;
   const sec=(day.sections||[])[secIdx]; if(sec) sec._skipped=undefined;
-  clearSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
-  _afterEdit(day,'Round is back on the card.');
+  if(src!=='wild') clearSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
+  _afterEdit(day,'Round is back on the card.',src);
 }
 function removeAddedExercise(name){
   const day=_liveDay(); if(!day||!activeProgId) return;
@@ -15069,11 +15128,12 @@ function applyAddChoice(name){
   closeAddSheet();
   _afterEdit(day,name+' added at '+detail+'.');
 }
-function undoSwap(from){
+function undoSwap(from,src){
   if(!activeProg||!activeProgId) return;
-  const day=activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
+  const _wild=src==='wild';
+  const day=_editDay(src);
   if(!day) return;
-  const list=(getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[];
+  const list=_wild?(day.swaps||[]):((getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[]);
   const hit=list.filter(e=>e&&e.from===from)[0];
   if(!hit) return;
   const back={}; back[hit.to]=from;
@@ -15094,9 +15154,9 @@ function undoSwap(from){
       if(it){it.detail=p.d;if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;_put.push(it);}
     });
   }
-  clearSwap(activeProgId,currentWeek,currentDayKey,from);
-  resnapshotDayEdit(currentWeek,currentDayKey);
-  openDetail(currentDayKey,day);
+  // v0.246.0 D250: on the Wildcard the record leaves its own list, as clearSwap drops it from the store.
+  if(_wild){ day.swaps=(day.swaps||[]).filter(function(e){return e&&e.from!==from;}); renderRand(); }
+  else{ clearSwap(activeProgId,currentWeek,currentDayKey,from); resnapshotDayEdit(currentWeek,currentDayKey); openDetail(currentDayKey,day); }
   showToast(from+' is back on the card.');
 }
 // ── COACH NUDGE ──────────────────────────────────────────────────────────────
