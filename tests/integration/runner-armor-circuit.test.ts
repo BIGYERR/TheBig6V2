@@ -70,15 +70,16 @@ test("HALF_MANNY's swap universe is the 107 names, with the fourth item and with
   }
 });
 
-test('part A without part B is 3c253c3fd440dad5, part B without part A is df75a47fc8917305 (the ruling printed both, moved by D239, D241, D243 and D251)', () => {
+test('part A without part B is b443e538b40890bd, part B without part A is 7ed355470630a9c5 (the ruling printed both, moved by D239, D241, D243, D251 and D252)', () => {
   // D195-A-a: a-cfA, a-cfB. D239 (v0.241.0) moved both (were f5ed630033ebe3db, 0ac7da6b1691a8e1), D241 (v0.242.0) again
   // (were 3e88e365246858f3, b1b15c80f1a703f1): their draws reach his Tuesdays and his core days. D243 (v0.243.0) again
   // (were 93fd2d1d3a43f192, c17e854e54e86f57): one speed day moves his leg day to Thursday. D251 (v0.247.0) again
-  // (were b8a8aabf561bfc44, 895bb404a809927b): his week 10 speed day is Nike's tempo session.
+  // (were b8a8aabf561bfc44, 895bb404a809927b): his week 10 speed day is Nike's tempo session. D252 (v0.248.0) again
+  // (were 3c253c3fd440dad5, df75a47fc8917305): his speed day is the longer of Nike's two sessions.
   const A = SB.twice(SB.noCostLens(), fixtures.HALF_MANNY);
   assert.ok(A.self);
-  assert.equal(A.dig, '3c253c3fd440dad5');
-  assert.equal(N.dig, 'df75a47fc8917305');
+  assert.equal(A.dig, 'b443e538b40890bd');
+  assert.equal(N.dig, '7ed355470630a9c5');
   assert.equal(Array.from(A.prog._swapUniverse || []).length, 107);
 });
 

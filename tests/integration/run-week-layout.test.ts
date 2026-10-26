@@ -173,7 +173,9 @@ const speedTypes = (p: R.AppProgram, w: number) => WEEK_ORDER.map(d => {
   const run = day && ([] as any[]).concat(day.cardio || []).find(c => c && c.type === 'run');
   return run && /^Speed Run — /.test(run.subtype) ? run.subtype.replace('Speed Run — ', '') : null;
 }).filter(Boolean);
-const HALF_ONE_SPEED = ['Intervals', 'Intervals', 'Hills', 'Tempo', 'Tempo', 'Intervals', 'Intervals', 'Intervals', 'Tempo', 'Intervals', 'Intervals', 'Tempo', 'Intervals', 'Intervals'];
+// D252 (v0.248.0): the longer of Nike's two sessions, so week 1 is the fartlek, week 3 the 5K reps over the hills and
+// week 12 the 42:00 of intervals over the 15:00 tempo (before: Intervals, Intervals, Hills, ..., Tempo in week 12).
+const HALF_ONE_SPEED = ['Fartlek', 'Intervals', 'Intervals', 'Tempo', 'Tempo', 'Intervals', 'Intervals', 'Intervals', 'Tempo', 'Intervals', 'Intervals', 'Intervals', 'Intervals', 'Intervals'];
 
 test('every one-speed NRC layout (beginner, intermediate) deals no second speed slot, is a maximum of its ruled terms (the D244 key) and keeps the long run on the last training day (D243)', () => {
   const C = R.chooser();
@@ -206,7 +208,7 @@ test("the reported half (intermediate, Home Full, Strength Support, rest Sunday 
   assert.deepEqual(speedTypes(p, 9), ['Tempo']);
 });
 
-test('one speed day a week all block, and it prints the Tempo in weeks 4, 5, 9 and 12, Intervals or Hills (week 3) in the others; a beginner reads the same (D243)', () => {
+test('one speed day a week all block, the longer of Nike\'s two sessions: Fartlek in week 1, Tempo in weeks 4, 5 and 9, Intervals in the rest; a beginner reads the same (D243, D252)', () => {
   for (const experience of ['intermediate', 'beginner']) {
     const p = R.build(HALF_CFG({ experience, restDays: ['sun', 'wed'] }));
     const got = Array.from({ length: 14 }, (_, i) => speedTypes(p, i + 1));
@@ -223,7 +225,7 @@ test('at five runs (Strength Support, rest Wednesday only) an intermediate still
   }
 });
 
-test('a three-run half carries one speed slot for every experience, so its speed day prints the Tempo in weeks 4, 5, 9 and 12 too (D243)', () => {
+test('a three-run half carries one speed slot for every experience, so its speed day takes the longer session too (D243, D252)', () => {
   for (const experience of ['intermediate', 'advanced']) {
     const p = R.build(HALF_CFG({ experience, restDays: ['sun', 'tue', 'wed', 'fri'] }));
     const got = Array.from({ length: 14 }, (_, i) => speedTypes(p, i + 1));
@@ -246,7 +248,7 @@ const speedHeads = (p: R.AppProgram, w: number) => WEEK_ORDER.map(d => {
   return run && /^Speed Run — /.test(run.subtype) ? d + ': ' + run.subtype + ' | ' + String(run.detail).split('\n')[0] : null;
 }).filter(Boolean);
 
-test("the reported half's week 10 speed day is Nike's tempo session, 5K reps around a 10:00 tempo, not the 13:30 of intervals (D251)", () => {
+test("the reported half's week 10 speed day is Nike's tempo session, 5K reps around a 10:00 tempo, not the 13:30 of intervals (D251, by length since D252)", () => {
   const p = R.build(HALF_CFG({ experience: 'intermediate', restDays: ['sun', 'wed'] }));
   assert.deepEqual(speedHeads(p, 10), ['mon: Speed Run — Intervals | 5K reps around a 10:00 tempo — 22:00 of work']);
   assert.deepEqual(speedHeads(p, 9), ['mon: Speed Run — Tempo | 8K tempo, bookended by 2K easy']);
@@ -256,6 +258,48 @@ test("the reported half's week 10 speed day is Nike's tempo session, 5K reps aro
 test('an advanced athlete keeps both of week 10\'s sessions, each in its own slot (unchanged: guards the two-speed layout)', () => {
   const p = R.build(HALF_CFG({ experience: 'advanced', restDays: ['sun', 'wed'] }));
   assert.deepEqual(speedHeads(p, 10), ['mon: Speed Run — Intervals | 3 rounds of 5K → 10K → Mile — 13:30 of work', 'thu: Speed Run — Intervals | 5K reps around a 10:00 tempo — 22:00 of work']);
+});
+
+// ── D252: the one speed day prints the longer of Nike's two sessions ─────────────────────────────────────────────────
+// Oracles, typed from Nike's tables: each session's work as its title states it (hills counted from their efforts), and
+// the headline the one speed day prints in every week.
+const HALF_HEADS = ['21:00 fartlek — 1:00 hard, 2:00 easy', '5K reps with a Mile-pace kicker — 15:00 of work, 10 efforts',
+  '3 × 7:00 at 5K Pace — 21:00 of work', '25:00 tempo', '23:00 progression tempo — Marathon Pace to 10K Pace',
+  '20 × 0:30 at Mile Pace — 10:00 of work', 'Power pyramid — 22:00 of work, Mile to 10K and back', '10 × 2:00 at 5K Pace — 20:00 of work',
+  '8K tempo, bookended by 2K easy', '5K reps around a 10:00 tempo — 22:00 of work', '5 × 5:00 at 10K Pace — 25:00 of work',
+  '3 rounds of 10K → 5K → Mile — 42:00 of work', '3 rounds of a 5K rep and four Mile-pace bursts — 15:00 of work',
+  'Race-week sharpener — 11:00 of work around 5:00 at race pace'];
+const headsOf = (p: R.AppProgram) => Array.from({ length: Object.keys(p.weeks).length }, (_, i) => speedHeads(p, i + 1).map(x => String(x).split(' | ')[1]));
+
+test('the reported half prints the longer session every week: the fartlek in week 1, the 5K reps over the hills in week 3, the 42:00 of intervals over the 15:00 tempo in cutback week 12 (D252)', () => {
+  const p = R.build(HALF_CFG({ experience: 'intermediate', restDays: ['sun', 'wed'] }));
+  assert.deepEqual(headsOf(p), HALF_HEADS.map(h => [h]));
+});
+
+test('on the 5K the one speed day takes the longer session in weeks 1, 2, 3, 4 and 7, and on the 10K in week 1 (D252)', () => {
+  const goal = (id: string) => ({ id, label: id, mileBestMins: '8', mileBestSecs: '00', baselineDist: '3', baseline: '3mi' });
+  const k5 = headsOf(R.build({ ...HALF_CFG({ experience: 'intermediate', restDays: ['sun', 'wed'] }), cardioGoals: { run: goal('run_5k') }, raceDate: '2026-12-20' }));
+  assert.deepEqual([k5[0], k5[2], k5[6]], [['Mixed-pace ladder down to Best — 10:00 of work, 10 efforts'], ['15:00 fartlek — 1:00 hard, 1:00 easy'], ['10K bookends around 5K and Mile reps — 15:30 of work, 8 efforts']]);
+  const k10 = headsOf(R.build({ ...HALF_CFG({ experience: 'intermediate', restDays: ['sun', 'wed'] }), cardioGoals: { run: goal('run_10k') }, raceDate: '2026-12-20' }));
+  assert.deepEqual([k10[0], k10[3]], [['Mixed-pace ladder down to Best — 10:00 of work, 10 efforts'], ['25:00 tempo']]);
+});
+
+test('the work read: each session of the half\'s two-session weeks weighs what its title states, hills their efforts, and the 8K tempo beats 18:00 at any chart pace (D252)', () => {
+  const work = R.app().eval('_nrcWorkMin');
+  const table = R.app().eval('NRC_HALF_TABLE');
+  const HAND = [[8, 21], [9, 15], [5, 21], [18, 25], [11.25, 23], [10, 6.75], [14, 22], [20, 15], [18, null], [13.5, 22], [25, 21], [42, 15], [15, 9]];
+  HAND.forEach(([a, b], i) => {
+    const w = table[i].speed.map((x: { detail: string }) => work(x, 600));
+    assert.ok(Math.abs(w[0] - (a as number)) < 1e-9, 'week ' + (i + 1) + ' slot 1: ' + w[0]);
+    if (b !== null) assert.ok(Math.abs(w[1] - b) < 1e-9, 'week ' + (i + 1) + ' slot 2: ' + w[1]);
+  });
+  // 8 km is 4.97 miles: at a 6:00 or a 15:00 tempo mile it is 29.8 or 74.6 minutes, over the 18:00 beside it either way.
+  for (const sec of [360, 900]) assert.ok(work(table[8].speed[1], sec) > 18, 'the 8K tempo at ' + sec + ' s/mi');
+});
+
+test('an advanced athlete keeps both of week 12\'s sessions, the 42:00 of intervals and the 15:00 tempo (unchanged: guards the two-speed layout)', () => {
+  const p = R.build(HALF_CFG({ experience: 'advanced', restDays: ['sun', 'wed'] }));
+  assert.deepEqual(speedHeads(p, 12).map(x => String(x).split(' | ')[1]), ['3 rounds of 10K → 5K → Mile — 42:00 of work', '15:00 progression tempo — Recovery Pace down to Best']);
 });
 
 // ── D244: rest into the long run, ranked third on NRC ──────────────────────────────────────────────────────────────────

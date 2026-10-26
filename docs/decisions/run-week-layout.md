@@ -127,3 +127,45 @@ D4, V186 F4 on NRC) are recorded in the handoff and `tests/measure/v205_rulings/
 - **Expected values (typed from Nike's table):** the reported half (intermediate, rest Sunday and Wednesday) prints week
   10 Monday as `5K reps around a 10:00 tempo — 22:00 of work`, typed Intervals; every other week's speed day is unchanged;
   an advanced athlete keeps both sessions.
+
+## D252: the one speed day prints the longer of Nike's two sessions (v0.248.0; amends D243, retires D251's name read)
+
+- **Date:** ruled 2026-10-25. **Ruled by:** Mario ("it should be the longer of the two! ... a longer session better
+  represents what you need for a half marathon and marathon or even a 10k"), with a fresh coach's concurrence, which
+  Mario concurred with ("concur" on the rule, the bump and holding the pull request). **Bump:** MINOR (Mario).
+  **Shipped:** v0.248.0.
+- **Coach, in his own words:** "On one speed day a week, that day has to carry the week's main stimulus. For a half
+  marathoner or a 10K runner that is the session with the most time at quality pace. ... Week 12 is the one week where
+  longer and tempo disagree, and I still say longer. Nike cut that week's long run to sixty easy minutes and put the
+  biggest speed session of the plan beside it. That is the classic shape three weeks out: volume down, quality up, last
+  big workout, then two taper weeks. ... The cutback is the long run, not the speed day. Call: ship the longer session,
+  measured by Nike's stated work time, no exceptions, tempo wins only a tie."
+- **The finding (measured on v0.247.0):** Nike frames the two weekly speed runs as one menu and ranks neither. Across the
+  5K, 10K and half tables (27 two-session weeks) the Tempo-typed session is the longer one in 4 of the 5 weeks that have
+  one (the exception is half week 12: 42:00 of intervals against a 15:00 progression tempo), and D251's named-tempo week
+  (half 10) is the longer too. "Longer" keeps what D243 wanted and reads neither a type nor a name.
+- **What changes:** on a one-speed layout on the 5K, 10K and half (beginners and intermediates on every calendar, and
+  every athlete at three runs a week, where D243 already dealt one speed slot), the speed day prints the session with
+  the greater work. Work is read from Nike's own text at pick time: the time its headline
+  states (`N:NN of work`, then `N:NN fartlek`, then `N:NN tempo` or `progression tempo`); a hill session's uphill
+  efforts summed over its rounds; a distance tempo (`8K tempo`) at the athlete's chart tempo pace. A tie goes to the
+  Tempo-typed session, else Nike's first; no tie exists in the tables today. The D243 type read and the D251 name read
+  are deleted.
+- **One departure from coach's builder notes, the main session's:** coach proposed a typed `work` number on every table
+  row. The tables stay untouched (Mario's standing brief: never touch the NRC session content tables), so the same
+  numbers are read from the text, and a test holds them against hand-typed values.
+- **What deliberately does not change:** every session text, type label and table; the marathon; every advanced
+  (two-speed) layout; race week; the recovery durations; the hinge on the speed day (D36).
+- **Accepted cost:** no one-speed athlete on these plans runs a hill session (every hill session, 5:00 to 6:45 of
+  efforts, is shorter than the other session that week); the advanced athlete keeps them. Half week 12 goes from 25:00
+  of work the week before to 42:00, beside Nike's 60-minute cutback long run.
+- **What it moves:** half weeks 1, 2, 3, 7 and 12; 10K week 1; 5K weeks 1, 2, 3, 4 and 7 (11 of 27 weeks). HALF_MANNY
+  `59b6261ed32c79c6` → `b04eeaee9fe1ef46`, the digest coach printed from a source-surgery copy before the build; the
+  build equals it. Blast radius on 689 configs (every run goal in turn, three experiences, four foci and tiers, random
+  rest days, a quarter injured; v0.247.0 against v0.248.0): 80 moved, every one a 5K, 10K or half, every change in the
+  ruled weeks; the 3 advanced ones are three-run calendars; no pace, base or marathon program moved.
+- **Expected values (typed from Nike's table), the half's one speed day by week:** 21:00 fartlek; 15:00 of reps with a
+  Mile-pace kicker; 3 × 7:00 at 5K Pace (21:00); 25:00 tempo; 23:00 progression tempo; 20 × 0:30 at Mile Pace (10:00);
+  the 22:00 power pyramid; 10 × 2:00 at 5K Pace (20:00); the 8K tempo; 5K reps around a 10:00 tempo (22:00); 5 × 5:00
+  at 10K Pace (25:00); 3 rounds of 10K → 5K → Mile (42:00); 3 rounds of a 5K rep and four Mile-pace bursts (15:00); the
+  race-week sharpener.

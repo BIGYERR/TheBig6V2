@@ -348,9 +348,9 @@ export function mileCfg(goal: string, exp: string, seed: number, mileSec: number
   return c;
 }
 /** Week 1's run cards, Monday to Sunday. */
-export function w1Runs(p: any): { d: string; st: string; detail: string }[] {
+export function w1Runs(p: any, wk = 1): { d: string; st: string; detail: string }[] {
   const out: { d: string; st: string; detail: string }[] = [];
-  const w = (p && p.weeks && (p.weeks['1'] || p.weeks[1])) || {};
+  const w = (p && p.weeks && (p.weeks[String(wk)] || p.weeks[wk])) || {};
   for (const d of ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']) {
     const day = w[d];
     if (!day || day.rest) continue;
@@ -377,9 +377,12 @@ function beginnerMileLatticeCases(IA: App, progDigest: (p: any) => string, label
   const build = (cfg: Record<string, any>) => IA.buildProgram(clone(cfg));
   const out: LatticeTest[] = [];
   for (const goal of ['run_5k', 'run_half']) {
-    out.push([`${label}: a beginner's 13:00 mile on ${goal} prints every week 1 labelled pace off the 12:00 chart row, 5K and Recovery included`, () => {
+    // Weeks 1 and 2: since D252 (v0.248.0) the half's week 1 speed day is the 21:00 fartlek, which prints no pace, so
+    // the 5K Pace label it carried moved to week 2's 5K reps.
+    out.push([`${label}: a beginner's 13:00 mile on ${goal} prints every week 1 and 2 labelled pace off the 12:00 chart row, 5K and Recovery included`, () => {
       for (const s of seeds) {
-        const labs = ([] as [string, string][]).concat(...w1Runs(build(mileCfg(goal, 'beginner', s, 780))).filter((c) => /^Speed Run|^Recovery Run|^Long Run/.test(c.st)).map((c) => labeled(c.detail)));
+        const p = build(mileCfg(goal, 'beginner', s, 780));
+        const labs = ([] as [string, string][]).concat(...w1Runs(p).concat(w1Runs(p, 2)).filter((c) => /^Speed Run|^Recovery Run|^Long Run/.test(c.st)).map((c) => labeled(c.detail)));
         assert.deepEqual(labs.filter(([k, v]) => ROW_1200[k] !== v), [], `seed ${s}`);
         assert.ok(labs.some(([k]) => k === '5K') && labs.some(([k]) => k === 'Recovery'), `seed ${s}: 5K and Recovery are on the week`);
       }
