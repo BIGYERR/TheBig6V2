@@ -290,7 +290,11 @@ function buildNRCSession(goalId: string, week: number, totalWeeks: number, sessi
     // v0.243.0 (D243, Mario): a layout with one speed slot prints the week's Tempo when Nike's week has one, else the
     // first session. Nike's half puts every Tempo in the second slot, so a one-speed week read by slot alone never
     // ran one. The marathon (one Nike session a week) and every two-speed layout read by slot, as before.
-    const _tempo = (_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon) ? wk.speed.findIndex(x => x.type === 'Tempo') : -1;
+    let _tempo = (_type === 'nrc_speed1' && !hasSpeed2 && !isMarathon) ? wk.speed.findIndex(x => x.type === 'Tempo') : -1;
+    // v0.247.0 (D251, Mario): a session Nike names as a tempo is the week's tempo too, whatever its type. Half week 10's
+    // "5K reps around a 10:00 tempo" is typed Intervals, and the type-only read gave one-speed runners the shorter
+    // session. The headline (the detail's first line) is Nike's name for the session; a Tempo-typed session still wins.
+    if(_tempo < 0 && _type === 'nrc_speed1' && !hasSpeed2 && !isMarathon) _tempo = wk.speed.findIndex(x => /\btempo\b/i.test(String(x.detail).split('\n')[0]));
     const slot = _type === 'nrc_speed1' ? (_tempo > 0 ? _tempo : 0) : 1;
     const sp = wk.speed[Math.min(slot, wk.speed.length - 1)];
     subtype = 'Speed Run — ' + sp.type;

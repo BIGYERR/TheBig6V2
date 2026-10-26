@@ -236,6 +236,28 @@ test('an advanced athlete on the reported calendar keeps both speed days: week 9
   assert.equal(runWeek(p, 9), 'mon:Speed Run — Intervals | tue:- | wed:x | thu:Speed Run — Tempo | fri:Recovery Run | sat:Long Run | sun:x');
 });
 
+// ── D251: a session Nike names as a tempo is the week's tempo (amends D243) ───────────────────────────────────────────
+// Oracle, typed from Nike's half table: week 10's sessions are "3 rounds of 5K → 10K → Mile — 13:30 of work" and
+// "5K reps around a 10:00 tempo — 22:00 of work", both typed Intervals; weeks 9 and 11 lead with the 8K tempo and with
+// 5 × 5:00 at 10K Pace.
+const speedHeads = (p: R.AppProgram, w: number) => WEEK_ORDER.map(d => {
+  const day = p.weeks[String(w)][d];
+  const run = day && ([] as any[]).concat(day.cardio || []).find(c => c && c.type === 'run');
+  return run && /^Speed Run — /.test(run.subtype) ? d + ': ' + run.subtype + ' | ' + String(run.detail).split('\n')[0] : null;
+}).filter(Boolean);
+
+test("the reported half's week 10 speed day is Nike's tempo session, 5K reps around a 10:00 tempo, not the 13:30 of intervals (D251)", () => {
+  const p = R.build(HALF_CFG({ experience: 'intermediate', restDays: ['sun', 'wed'] }));
+  assert.deepEqual(speedHeads(p, 10), ['mon: Speed Run — Intervals | 5K reps around a 10:00 tempo — 22:00 of work']);
+  assert.deepEqual(speedHeads(p, 9), ['mon: Speed Run — Tempo | 8K tempo, bookended by 2K easy']);
+  assert.deepEqual(speedHeads(p, 11), ['mon: Speed Run — Intervals | 5 × 5:00 at 10K Pace — 25:00 of work']);
+});
+
+test('an advanced athlete keeps both of week 10\'s sessions, each in its own slot (unchanged: guards the two-speed layout)', () => {
+  const p = R.build(HALF_CFG({ experience: 'advanced', restDays: ['sun', 'wed'] }));
+  assert.deepEqual(speedHeads(p, 10), ['mon: Speed Run — Intervals | 3 rounds of 5K → 10K → Mile — 13:30 of work', 'thu: Speed Run — Intervals | 5K reps around a 10:00 tempo — 22:00 of work']);
+});
+
 // ── D244: rest into the long run, ranked third on NRC ──────────────────────────────────────────────────────────────────
 // Oracles, typed by hand: the long run is pinned to the last training day (Sunday on these calendars); a quality day may
 // not sit beside it (Monday is beside Sunday, round the week); among the rest the one furthest back from the long run

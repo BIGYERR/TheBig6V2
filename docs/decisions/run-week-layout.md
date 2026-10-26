@@ -104,3 +104,26 @@ D4, V186 F4 on NRC) are recorded in the handoff and `tests/measure/v205_rulings/
 - **Proof:** the two D244 calendar tests, the split key in the source and the oracle's NRC objective (now ranking
   `qualRest` third) in `tests/integration/run-week-layout.test.ts` fail on v0.243.0, six tests in all; the identity
   census (445/357/228/129 → 373/262/184/78) and the excluded-week census (112 → 116 of 116) moved with the key.
+
+## D251: a session Nike names as a tempo is the week's tempo (v0.247.0; amends D243)
+
+- **Date:** reported and ruled 2026-10-25. **Ruled by:** Mario ("yeah we gotta fix this! this is for users man").
+  **Bump:** MINOR (Mario; it changes what a program prescribes, and v0.246.0 was taken by another chat). **Shipped:**
+  v0.247.0.
+- **The report (Mario, Week 10 Monday on his phone):** the card printed Nike's "3 rounds of 5K → 10K → Mile, 13:30 of
+  work"; he expected the longer tempo session.
+- **The finding:** D243's pick reads the session's type only. Nike's half week 10 has two sessions typed Intervals, and
+  the second is "5K reps around a 10:00 tempo — 22:00 of work", a tempo block between two sets of 5K reps. It is the only
+  session in the 5K, 10K and half tables that names a tempo without the Tempo type in a week with no Tempo-typed session
+  (10K week 4 names one too, but that week has a Tempo-typed session, which still wins).
+- **What changes:** on a one-speed layout (D243's reach), when Nike's week has no Tempo-typed session, a session whose
+  headline (the detail's first line) names a tempo is the one that prints. The card keeps Nike's type and text
+  (`Speed Run — Intervals`).
+- **What deliberately does not change:** every week with a Tempo-typed session, every two-speed layout, the marathon,
+  every session text and table, and every week but half week 10.
+- **What it moves (source-surgery copy of v0.246.0, before the build):** HALF_MANNY `d39ecf0ed37a90e2` →
+  `59b6261ed32c79c6`, his week 10 Monday only (13:30 of intervals → the 22:00 tempo session); 216 of 864 lattice
+  programs, every one in week 10 alone.
+- **Expected values (typed from Nike's table):** the reported half (intermediate, rest Sunday and Wednesday) prints week
+  10 Monday as `5K reps around a 10:00 tempo — 22:00 of work`, typed Intervals; every other week's speed day is unchanged;
+  an advanced athlete keeps both sessions.
