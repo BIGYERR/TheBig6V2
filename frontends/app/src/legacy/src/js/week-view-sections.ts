@@ -792,7 +792,9 @@ function buildSectionsHTML(sections: any,baseIdx?: any,src?: any){
         const _sv=_live[0], _d=_sv.detail||'';
         // V190 (D39): with no honest round count there is nothing to multiply by, so the
         // survivor keeps its own prescription — which already carries its true set count.
-        const _mapped=(rounds==null||/^\d+\s*[x\xd7]/.test(_d))?_d
+        // v0.249.0 (D253): so does a line that opens "N sets" ("2 sets — RPE 7 …"). Prefixed,
+        // it read "2×2 sets" and parseRx logged it in seconds.
+        const _mapped=(rounds==null||/^\d+\s*(?:[x\xd7]|sets?\b)/.test(_d))?_d
           :(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
         h+=`<div class="section-label" style="color:var(--muted)">${esc(sec.label||'Round')} \u2014 reduced to straight sets</div><div class="section-block">`;
         sec.items.forEach((i2: any,_ii: any)=>{
@@ -910,7 +912,8 @@ function parseRx(detail: any,name: any){
   // by these two rules. The (?!of) guard is belt-and-braces against the rule above.
   const mOpen=d.match(/^(\d+)\s*sets?\b(?!\s*of\s*\d)/);
   if(mOpen) return {sets:Math.min(+mOpen[1],20), open:true, perSide:/each/.test(d)};
-  const m=d.match(/^(\d+)\s*[×x]\s*(\d+)(?:\s*[–-]\s*(\d+))?\s*(sec|s|yd)?/);
+  // v0.249.0 (D253): the unit is a whole word. Unbounded, the "s" of "sets" or "slow" read as seconds.
+  const m=d.match(/^(\d+)\s*[×x]\s*(\d+)(?:\s*[–-]\s*(\d+))?\s*(?:(sec|s|yd)\b)?/);
   if(!m) return _parseRxLoose(d,name);
   const sets=Math.min(+m[1],20), lo=+m[2], hi=m[3]?+m[3]:null, unitTok=m[4], perSide=/each/.test(d);
   const mid=hi?Math.round((lo+hi)/2):lo;

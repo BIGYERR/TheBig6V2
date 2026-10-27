@@ -19,6 +19,8 @@ const FOURTH: Pair = ['Single-leg hip thrust', '2×6–10 each @ RPE 7'];
 const CALF_STR = 'YYY-YYY-YYY---';
 const CARRY_STR = 'YYY-YYY-YYY---';
 const CIRCUIT_RE = /^Leg circuit — runner armor/;
+/** D254 (v0.249.0): the P-HIPEXT hip extension's own section, right after the circuit. */
+const GLUTE_RE = /^Glute — runner armor/;
 const UNIVERSE = [
   '45° back extension', 'Ab wheel rollouts', 'Back squat', 'Ball slams', 'Banded dorsiflexion', 'Banded monster walks', 'Banded side steps',
   'Barbell Romanian deadlift', 'Barbell bench press', 'Barbell good mornings', 'Barbell hip thrust', 'Barbell overhead press', 'Barbell push press',
@@ -62,12 +64,13 @@ const TUE: Record<number, Pair[]> = {
 };
 const hasSec = (day: AppDay, re: RegExp): boolean => liveSecs(day).some((s) => re.test(clean(s.label)));
 const circuit = (day: AppDay): AppDay | null => liveSecs(day).find((s) => CIRCUIT_RE.test(clean(s.label))) || null;
+const glute = (day: AppDay): AppDay | null => liveSecs(day).find((s) => GLUTE_RE.test(clean(s.label))) || null;
 const circuitItems = (day: AppDay): Pair[] | null => { const s = circuit(day); return s ? Array.from<AppDay, Pair>(s.items, (i) => [clean(i.name), clean(i.detail)]) : null; };
 
 // ── the hand legs days (D195-A6 with D195-B's pricing) ──────────────────────────────────────────────────────────
 // Pricing: a stretch costs 0; an _isHalf name (carry, wall sit, hold, plank, clamshell, side steps) or a member of the
 // hip stability, knee stability or foot and ankle pools costs half its sets; anything else its sets. Cap with no
-// cardio: 20. Trim score: (index 3 or later in a Leg circuit section ? 3 : section rank) x 10 + item rank (carry 2,
+// cardio: 20. Trim score: (the Glute — runner armor section, D254 ? 3 : section rank) x 10 + item rank (carry 2,
 // wall sit or hold 1), ties to the later position. Main and Hip stability are protected; the carry finisher ranks 3;
 // the optional core block ranks 3 while it holds two items and is protected at one (D48); the circuit, the calf and
 // Foot & ankle rank 1. The three days differ only in protected sets, so only the stopping point moves.
@@ -77,8 +80,8 @@ function legsDay(mainN: number, stepsN: number, clamN: number): { L: AppDay[]; h
     { label: 'Leg circuit — runner armor', superset: true, rounds: 2, items: [
       { name: 'Step-ups (KB)', detail: '2×8–12 each @ RPE 6–7' }, // 2; score 10
       { name: 'Wall sit', detail: '2×25 sec' }, // 1 (half); the hold, 11
-      { name: 'Kettlebell swing', detail: '2×8' }, // 2; hinge; 10
-      { name: 'Single-leg hip thrust', detail: '2×6–10 each @ RPE 6–7' }] }, // 2; hip_ext; index 3, 30
+      { name: 'Kettlebell swing', detail: '2×8' }] }, // 2; hinge; 10
+    { label: 'Glute — runner armor', items: [{ name: 'Single-leg hip thrust', detail: '2×6–10 each @ RPE 6–7' }] }, // 2; hip_ext; D254's section, 30
     { label: 'Calf — achilles armor', items: [{ name: 'Dumbbell standing calf raise', detail: '2×12–15 each, slow 3-sec lower' }] }, // 2; the calf, 10
     { label: 'Hip stability', items: [ // protected
       { name: 'Clamshells w/ band', detail: clamN + '×15 each' }, { name: 'Banded side steps', detail: stepsN + '×15–20 each @ RPE 6–7' },
@@ -92,13 +95,13 @@ function legsDay(mainN: number, stepsN: number, clamN: number): { L: AppDay[]; h
   // Main + circuit (2+1+2+2) + calf 2 + hip rail (clamN+stepsN) x 0.5 + foot and ankle (1+1) + carry 1.5 + core (1.5+1.5)
   return { L, hand: mainN + 7 + 2 + (clamN + stepsN) * 0.5 + 2 + 1.5 + 3 };
 }
-const CARRY = ['Loaded carry finisher', 'Farmer carry'], CORE2 = ['Core — Anti-Rotation', 'Plank shoulder taps'], THRUST = ['Leg circuit — runner armor', 'Single-leg hip thrust'];
+const CARRY = ['Loaded carry finisher', 'Farmer carry'], CORE2 = ['Core — Anti-Rotation', 'Plank shoulder taps'], THRUST = ['Glute — runner armor', 'Single-leg hip thrust'];
 const LEGS_DAYS = [
   // 20.5: the carry (32) leaves, 19, stop
   { total: 20.5, day: legsDay(3, 2, 2), gone: [CARRY] },
   // 22: the carry (20.5), then the core block's later item, which outranks the thrust's 30 by position (19), stop
   { total: 22, day: legsDay(4, 3, 2), gone: [CARRY, CORE2] },
-  // 23.5: the carry (22), the spare core item (20.5), then the circuit's index-3 item (two posterior items on the day, so
+  // 23.5: the carry (22), the spare core item (20.5), then the glute section's thrust (two posterior items on the day, so
   // the last-posterior floor does not hold it), 18.5, stop; the hold (11) and the calf (10) are never reached
   { total: 23.5, day: legsDay(5, 3, 3), gone: [CARRY, CORE2, THRUST] },
 ];
@@ -111,7 +114,9 @@ const CELL_FH = { tag: 'shoulder/protect | test (run_base) | commercial | interm
 const CARD_F1 = [
   'Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
   // D241 (v0.242.0) drew the deficit reverse lunge into the circuit and the KB hip flexor raise into the hip block.
-  'Leg circuit — runner armor (SS 2) :: Deficit reverse lunge (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7',
+  // D254 (v0.249.0): the hip thrust left the circuit for its own section, right after it.
+  'Leg circuit — runner armor (SS 2) :: Deficit reverse lunge (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8',
+  'Glute — runner armor :: Single-leg hip thrust 2×6–10 each @ RPE 6–7',
   'Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower',
   // D239 (v0.241.0) moved the cell's two prehab blocks, nothing else.
   'Hip stability :: Glute bridge hold 2×30 sec | Kettlebell hip flexor raise 2×10 each | IT band stretch 2×30 sec each',
@@ -121,8 +126,7 @@ const CARD_F1 = [
   'Loaded carry finisher :: Farmer carry 3×40 yards, heavy',
 ];
 /** The same cell without D195 (parts A and B): the circuit's three (coach's print of V230; since D243 the carry closes it). */
-const CARD_F1_THREE = CARD_F1.slice(0, 1)
-  .concat(['Leg circuit — runner armor (SS 2) :: Deficit reverse lunge (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8'], CARD_F1.slice(2));
+const CARD_F1_THREE = CARD_F1.filter((l) => !GLUTE_RE.test(l));
 const CARD_FH = [
   'Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
   'Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7',
@@ -238,9 +242,10 @@ function shardBuild(rows: ShardRow[]): ShardRec[] {
     if (x.ab && !rec.crash.length) {
       const wks = [...new Set(Object.keys(pn.weeks || {}).concat(Object.keys(pc.weeks || {})))].sort((a, b) => Number(a) - Number(b));
       for (const w of wks) for (const d of ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']) {
-        const N = ((pn.weeks || {})[w] || {})[d], C = ((pc.weeks || {})[w] || {})[d], cn = circuit(N), cc = circuit(C);
+        const N = ((pn.weeks || {})[w] || {})[d], C = ((pc.weeks || {})[w] || {})[d], cn = circuit(N), cc = circuit(C), gc = glute(C);
         if (!cn && !cc) continue;
-        rec.days.push({ tag: x.tag + ' W' + w + ' ' + d, Ni: circuitLines(cn), Ci: circuitLines(cc), labC: cc ? lab(cc) : '', rn: cn ? cn.rounds : null, rc: cc ? cc.rounds : null,
+        // D254: part A's item is the glute section after the circuit, read as the circuit's continuation.
+        rec.days.push({ tag: x.tag + ' W' + w + ' ' + d, Ni: circuitLines(cn), Ci: circuitLines(cc).concat(circuitLines(gc)), labC: gc ? lab(gc) : cc ? lab(cc) : '', rn: cn ? cn.rounds : null, rc: cc ? cc.rounds : null,
           calfN: hasSec(N, /^Calf — achilles/), calfC: hasSec(C, /^Calf — achilles/), iN: dayItems(N), iC: dayItems(C), same: SB.dayJ(N) === SB.dayJ(C) });
       }
     }
@@ -266,6 +271,6 @@ function analyse(z: LegDayRec) {
 export type AnalysedDay = LegDayRec & { r: ShardRec; a: ReturnType<typeof analyse> };
 
 export {
-  FOURTH, CALF_STR, CARRY_STR, CIRCUIT_RE, UNIVERSE, TUE, hasSec, circuit, circuitItems, LEGS_DAYS, CELL_F1, CELL_FH, CARD_F1, CARD_F1_THREE,
+  FOURTH, CALF_STR, CARRY_STR, CIRCUIT_RE, GLUTE_RE, UNIVERSE, TUE, hasSec, circuit, glute, circuitItems, LEGS_DAYS, CELL_F1, CELL_FH, CARD_F1, CARD_F1_THREE,
   CARD_FH, CARD_FH_THREE, cardLines, FB_TIERS, FB_FROM, floorBLattice, noFloorB, floorBFires, preventionShard, BED_THRUST, RUNNER, shardBuild, analyse,
 };

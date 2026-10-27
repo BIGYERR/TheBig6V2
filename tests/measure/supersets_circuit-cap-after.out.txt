@@ -1,0 +1,200 @@
+# before: v0.248.0 (ff0269f); after: the D254 build with Amendment 1, 2026-10-26
+HALF_MANNY digest before b04eeaee9fe1ef46 after e47eb1012ab04bff
+HALF_MANNY self-stable after: true
+
+HALF_MANNY W1 thu Leg Strength + Mobility
+  before:
+    [Main — Front squat] Front squat {3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell Bulgarian split squat {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Barbell Romanian deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell seated calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Seated banded hip flexion {2×15 each} ; Hip airplane (light KB) {2×6 each, slow} ; Hip 90/90 stretch {2×45 sec each}
+    [Foot & ankle] Single-leg bent-knee soleus raise {2×12 each, slow} ; Standing ankle CARs {2×5 each direction}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+  after:
+    [Main — Front squat] Front squat {3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell Bulgarian split squat {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Barbell Romanian deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell seated calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Seated banded hip flexion {2×15 each} ; Hip airplane (light KB) {2×6 each, slow} ; Hip 90/90 stretch {2×45 sec each}
+    [Foot & ankle] Single-leg bent-knee soleus raise {2×12 each, slow} ; Standing ankle CARs {2×5 each direction}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+
+HALF_MANNY W2 thu Leg Strength + Mobility
+  before:
+    [Main — Front squat] Front squat {3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell Bulgarian split squat {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Barbell Romanian deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell seated calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Standing band hip abduction {2×12–15 each @ RPE 7} ; Hip airplane (light KB) {2×6 each, slow} ; Hip 90/90 stretch {2×45 sec each}
+    [Foot & ankle] Single-leg bent-knee soleus raise {2×12 each, slow} ; Knee-to-wall ankle rocks {2×10 each}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+  after:
+    [Main — Front squat] Front squat {3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell Bulgarian split squat {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Barbell Romanian deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell seated calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Standing band hip abduction {2×12–15 each @ RPE 7} ; Hip airplane (light KB) {2×6 each, slow} ; Hip 90/90 stretch {2×45 sec each}
+    [Foot & ankle] Single-leg bent-knee soleus raise {2×12 each, slow} ; Knee-to-wall ankle rocks {2×10 each}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+
+HALF_MANNY W3 thu Leg Strength + Mobility
+  before:
+    [Main — Back squat] Back squat {3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell swing {2×8} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Banded monster walks {2×12–15 each @ RPE 7} ; Standing band hip abduction {2×12–15 each @ RPE 7} ; Hip 90/90 stretch {2×45 sec each}
+    [Foot & ankle] Single-leg balance hold (eyes closed) {2×30 sec each} ; Single-leg bent-knee soleus raise {2×12 each, slow}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+  after:
+    [Main — Back squat] Back squat {3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell swing {2×8}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Banded monster walks {2×12–15 each @ RPE 7} ; Standing band hip abduction {2×12–15 each @ RPE 7} ; Hip 90/90 stretch {2×45 sec each}
+    [Foot & ankle] Single-leg balance hold (eyes closed) {2×30 sec each} ; Single-leg bent-knee soleus raise {2×12 each, slow}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+
+HALF_MANNY W4 thu Leg Strength + Mobility
+  before:
+    [Main — Back squat] Back squat {3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell swing {2×8} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Hip stability] Banded side steps {2×15–20 each @ RPE 7} ; Banded monster walks {2×12–15 each @ RPE 7} ; Half-kneeling hip flexor stretch {2×45 sec each}
+    [Foot & ankle] Banded dorsiflexion {2×15 each} ; Towel scrunches {2×20 each foot}
+  after:
+    [Main — Back squat] Back squat {3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell swing {2×8}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Hip stability] Banded side steps {2×15–20 each @ RPE 7} ; Banded monster walks {2×12–15 each @ RPE 7} ; Half-kneeling hip flexor stretch {2×45 sec each}
+    [Foot & ankle] Banded dorsiflexion {2×15 each} ; Towel scrunches {2×20 each foot}
+
+HALF_MANNY W5 thu Leg Strength + Mobility
+  before:
+    [Main — Front squat] Front squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Kettlebell swing {2×8} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell split-stance calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Banded side steps {2×15–20 each @ RPE 7} ; Glute bridge hold {2×30 sec} ; Pigeon lift-offs {2×8 each}
+    [Foot & ankle] Standing ankle CARs {2×5 each direction} ; Banded dorsiflexion {2×15 each}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+  after:
+    [Main — Front squat] Front squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Kettlebell swing {2×8}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell split-stance calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Banded side steps {2×15–20 each @ RPE 7} ; Glute bridge hold {2×30 sec} ; Pigeon lift-offs {2×8 each}
+    [Foot & ankle] Standing ankle CARs {2×5 each direction} ; Banded dorsiflexion {2×15 each}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+
+HALF_MANNY W6 thu Leg Strength + Mobility
+  before:
+    [Main — Front squat] Front squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Kettlebell swing {2×8} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell split-stance calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Banded side steps {2×15–20 each @ RPE 7} ; Clamshells w/ band {2×15 each} ; Weighted 90/90 hip switch {2×6 each}
+    [Foot & ankle] Single-leg balance hold (eyes closed) {2×30 sec each} ; Single-leg KB pass-around {2×5 each direction, each leg}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+  after:
+    [Main — Front squat] Front squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Kettlebell swing {2×8}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell split-stance calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Banded side steps {2×15–20 each @ RPE 7} ; Clamshells w/ band {2×15 each} ; Weighted 90/90 hip switch {2×6 each}
+    [Foot & ankle] Single-leg balance hold (eyes closed) {2×30 sec each} ; Single-leg KB pass-around {2×5 each direction, each leg}
+    [Loaded carry finisher] Suitcase carry {3×40 yards each, heavy}
+
+HALF_MANNY W7 thu Leg Strength + Mobility
+  before:
+    [Main — Front squat] Front squat {3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell split-stance calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Kettlebell hip flexor raise {2×10 each} ; Worlds greatest stretch {5 each side}
+    [Foot & ankle] Single-leg balance hold (eyes closed) {2×30 sec each} ; Towel scrunches {2×20 each foot}
+    [Loaded carry finisher] Overhead carry {3×40 yards each, heavy}
+  after:
+    [Main — Front squat] Front squat {3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell split-stance calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Kettlebell hip flexor raise {2×10 each} ; Worlds greatest stretch {5 each side}
+    [Foot & ankle] Single-leg balance hold (eyes closed) {2×30 sec each} ; Towel scrunches {2×20 each foot}
+    [Loaded carry finisher] Overhead carry {3×40 yards each, heavy}
+
+HALF_MANNY W8 thu Leg Strength + Mobility
+  before:
+    [Main — Front squat] Front squat {3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Copenhagen plank (bent knee) {2×20 sec each} ; Worlds greatest stretch {5 each side}
+    [Foot & ankle] Standing ankle CARs {2×5 each direction} ; Knee-to-wall ankle rocks {2×10 each}
+  after:
+    [Main — Front squat] Front squat {3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Step-downs (KB) {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Copenhagen plank (bent knee) {2×20 sec each} ; Worlds greatest stretch {5 each side}
+    [Foot & ankle] Standing ankle CARs {2×5 each direction} ; Knee-to-wall ankle rocks {2×10 each}
+
+HALF_MANNY W9 thu Leg Strength + Mobility
+  before:
+    [Main — Back squat] Back squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Dumbbell split-stance deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Banded monster walks {2×12–15 each @ RPE 7} ; Cossack squat shift {2×6 each side, slow}
+    [Foot & ankle] Banded dorsiflexion {2×15 each} ; Split-squat heel-raise hold {2×30 sec each}
+    [Loaded carry finisher] Farmer carry {3×40 yards, heavy}
+  after:
+    [Main — Back squat] Back squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Dumbbell split-stance deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Banded monster walks {2×12–15 each @ RPE 7} ; Cossack squat shift {2×6 each side, slow}
+    [Foot & ankle] Banded dorsiflexion {2×15 each} ; Split-squat heel-raise hold {2×30 sec each}
+    [Loaded carry finisher] Farmer carry {3×40 yards, heavy}
+
+HALF_MANNY W10 thu Leg Strength + Mobility
+  before:
+    [Main — Back squat] Back squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Dumbbell split-stance deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Banded monster walks {2×12–15 each @ RPE 7} ; IT band stretch {2×30 sec each}
+    [Foot & ankle] Standing ankle CARs {2×5 each direction} ; Towel scrunches {2×20 each foot}
+    [Loaded carry finisher] Farmer carry {3×40 yards, heavy}
+  after:
+    [Main — Back squat] Back squat {3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Dumbbell goblet side lunge {2×8–12 each @ RPE 7} ; Spanish squat hold (KB) {2×25 sec} ; Dumbbell split-stance deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Clamshells w/ band {2×15 each} ; Banded monster walks {2×12–15 each @ RPE 7} ; IT band stretch {2×30 sec each}
+    [Foot & ankle] Standing ankle CARs {2×5 each direction} ; Towel scrunches {2×20 each foot}
+    [Loaded carry finisher] Farmer carry {3×40 yards, heavy}
+
+HALF_MANNY W11 thu Leg Strength + Mobility
+  before:
+    [Main — Back squat] Back squat {2×8 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Goblet side lunge to knee drive {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Seated banded hip flexion {2×15 each} ; Hip airplane (light KB) {2×6 each, slow} ; Weighted 90/90 hip switch {2×6 each}
+    [Foot & ankle] Knee-to-wall ankle rocks {2×10 each} ; Single-leg bent-knee soleus raise {2×12 each, slow}
+    [Loaded carry finisher] Overhead carry {3×40 yards each, heavy}
+  after:
+    [Main — Back squat] Back squat {2×8 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Goblet side lunge to knee drive {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Calf — achilles armor] Dumbbell standing calf raise {2×12–15 each, slow 3-sec lower}
+    [Hip stability] Seated banded hip flexion {2×15 each} ; Hip airplane (light KB) {2×6 each, slow} ; Weighted 90/90 hip switch {2×6 each}
+    [Foot & ankle] Knee-to-wall ankle rocks {2×10 each} ; Single-leg bent-knee soleus raise {2×12 each, slow}
+    [Loaded carry finisher] Overhead carry {3×40 yards each, heavy}
+
+HALF_MANNY W12 thu Leg Strength + Mobility
+  before:
+    [Main — Back squat] Back squat {2×9 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Goblet side lunge to knee drive {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7} ; Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Hip stability] Kettlebell hip flexor raise {2×10 each} ; Hip airplane (light KB) {2×6 each, slow} ; Cossack squat shift {2×6 each side, slow}
+    [Foot & ankle] Single-leg bent-knee soleus raise {2×12 each, slow} ; Split-squat heel-raise hold {2×30 sec each}
+  after:
+    [Main — Back squat] Back squat {2×9 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest}
+    [Leg circuit — runner armor] (round ×2) Goblet side lunge to knee drive {2×8–12 each @ RPE 7} ; Wall sit {2×25 sec} ; Kettlebell single-leg deadlift {2×6–10 @ RPE 7}
+    [Glute — runner armor] Single-leg hip thrust {2×6–10 each @ RPE 7}
+    [Hip stability] Kettlebell hip flexor raise {2×10 each} ; Hip airplane (light KB) {2×6 each, slow} ; Cossack squat shift {2×6 each side, slow}
+    [Foot & ankle] Single-leg bent-knee soleus raise {2×12 each, slow} ; Split-squat heel-raise hold {2×30 sec each}
+
+programs 865; training days 60550; days changed 3120: expected 3120, dropped 0 (main lift reads recovery: 0), other 0
+circuits of 4+ movements: before 3120, after 0
+hip thrust / glute bridge items on the lattice: before 12820, after 12820
+dropped, by the main lift's effort note: {}

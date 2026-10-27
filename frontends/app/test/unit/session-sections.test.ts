@@ -112,6 +112,15 @@ describe('the session sections', () => {
     assert.deepEqual([c.label.text, c.items[0]!.detail], ['Round — reduced to straight sets', ''], 'no count: the survivor keeps its own prescription');
   });
 
+  it('keeps a survivor line that opens "N sets" as it stands, as the page does (D253)', () => {
+    const [reduced] = sectionsView([
+      { label: 'Pull superset A', superset: true, rounds: 2, items: [{ name: 'Barbell row', detail: '2×6–10 @ RPE 7', _skipped: true }, { name: 'Chinups', detail: '2 sets — RPE 7 (leave 3 or more in reserve)' }] },
+    ], 0, reads());
+    const b = (reduced as { body: { label: { text: string }; items: ReturnType<typeof exItemView>[] } }).body;
+    assert.equal(b.label.text, 'Pull superset A — reduced to straight sets');
+    assert.deepEqual(b.items.map((x) => (x.kind === 'skipped' ? 'skipped ' + x.name : x.detail)), ['skipped Barbell row', '2 sets — RPE 7 (leave 3 or more in reserve)']);
+  });
+
   it('draws a card logged today: its rows from the log with their deltas, the load cells, the Top set labels, the swap and skip controls', () => {
     const store = { barbell_row: [{ week: 4, day: 'fri', weight: 135, setsDone: [7, 8, 9], setsW: [135, 145, 135], ts: NOW }] };
     const c = card(exItemView({ name: 'Barbell row', detail: '3×8' }, 1, 2, null, reads({ swapOrigin: () => 'Pendlay row' }, store)));
@@ -161,6 +170,8 @@ describe('the session sections', () => {
     assert.equal(third.log!.load!.reuse!.rec, 'last month · Other Block');
     const kb = card(exItemView({ name: 'Kettlebell swing', detail: '3×8' }, 1, 4, null, reads({ unit: 'kg' })));
     assert.equal(kb.log!.sets!.rows[0]!.weight!.unit, 'kg');
+    const kbLbs = card(exItemView({ name: 'Kettlebell single-arm row', detail: '3×8' }, 1, 5, null, reads({ unit: 'lbs' })));
+    assert.deepEqual([kbLbs.log!.sets!.rows[0]!.weight!.unit, kbLbs.log!.load!.unit], ['lbs', 'lbs'], 'a kettlebell in pounds says lbs, never lb (D257)');
   });
 
   it('strikes a skipped exercise through, and offers no controls without a program or for an exercise the athlete added', () => {

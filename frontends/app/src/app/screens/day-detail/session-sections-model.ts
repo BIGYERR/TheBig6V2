@@ -176,7 +176,7 @@ export function exItemView(i: ExItem, secIdx: number | null, itemIdx: number | n
   const loaded = isKB || isWeight;
   if (!rx && !loaded) return card;
   const dispLast: number | '' = effW !== '' && effW != null ? (kg ? Math.round(+effW * 0.453592 * 2) / 2 : +effW) : '';
-  const wunit = isKB ? (kg ? 'kg' : 'lb') : r.unit;
+  const wunit = r.unit; // v0.249.0 (D257): a kettlebell weighs in the program's unit, never "lb"
   let wkW: unknown[] = today && today.setsW && today.setsW.length ? today.setsW.map(r.toDispW) : [];
   let wkR: unknown[] = today && today.setsDone && today.setsDone.length ? today.setsDone.slice() : [];
   const draft = today ? null : r.readDraft(exKey);
@@ -262,7 +262,8 @@ export function sectionsView(sections: ExSection[] | null | undefined, baseIdx: 
       const live = (sec.items || []).filter((it) => it && !it._skipped);
       if (live.length === 1 && (sec.items || []).length > 1) {
         const d = live[0]!.detail || '';
-        const mapped = rounds == null || /^\d+\s*[x\xd7]/.test(d) ? d : d ? rounds + '\xd7' + d.replace(/^(\d+)\s*reps?\b/, '$1') : rounds + ' sets';
+        // v0.249.0 (D253): a line that opens "N sets" carries its own count, like one that opens "N×".
+        const mapped = rounds == null || /^\d+\s*(?:[x\xd7]|sets?\b)/.test(d) ? d : d ? rounds + '\xd7' + d.replace(/^(\d+)\s*reps?\b/, '$1') : rounds + ' sets';
         return {
           kind: 'section', label,
           body: {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.248.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.249.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1755,6 +1755,23 @@ function tabGo(target){
   if(target==='screenProgress'){showProgressScreen();return;}
 }
 function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// v0.249.1 (D256): iOS 26 leaves the layout viewport stale once the on-screen keyboard closes,
+// and fixed elements drift with the page when it scrolls up: the tab bar floated mid-screen on
+// Progress after a load was typed (WebKit bug 297779). A real scroll when the keyboard goes makes
+// WebKit recompute where fixed elements belong; it lands back where it started. The step back waits a
+// frame: two scrolls in one task net to nothing and the browser can drop them, so nothing would move.
+function installKeyboardResync(win){
+  const vv=win.visualViewport, doc=win.document;
+  const isField=(el)=>!!el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName||'');
+  const resync=()=>{ const x=win.scrollX||0, y=win.scrollY||0; win.scrollTo(x,y>0?y-1:y+1); win.requestAnimationFrame(()=>win.scrollTo(x,y)); };
+  if(vv){
+    let h=vv.height;
+    vv.addEventListener('resize',()=>{ if(vv.height>h+100) win.setTimeout(resync,60); h=vv.height; });   // grew back: the keyboard closed
+  }
+  doc.addEventListener('focusout',()=>{ win.setTimeout(()=>{ if(!isField(doc.activeElement)) resync(); },350); });
+}
+installKeyboardResync(window);
 
 
 /** Where a movement is done (V164): a superset never pairs two fixed stations of different classes. */
@@ -9880,7 +9897,12 @@ function engineC_kinematics(cfg, A, B){
         s.push({label:'Leg circuit — runner armor',superset:true,rounds:2,items:[
           {name:ex.lunge[0],detail:'2×10 each'},
           {name:ex.kneeStab,detail:'2×25 sec'},
-          {name:ex.hinge[0],detail:'2×8'}].concat((_isRunner&&ex.hipExt&&ex.hipExt!==ex.hinge[0])?[{name:ex.hipExt,detail:'2×8 each'}]:[])});
+          {name:ex.hinge[0],detail:'2×8'}]});
+        // v0.249.0 (D254, P-CIRCUIT3): a circuit holds three movements, so the P-HIPEXT hip
+        // extension follows the round as its own straight sets instead of riding in it as a
+        // fourth station. Same draw, same gate, same dose; the label carries no "hip", which
+        // the budget reads as prehab and protects.
+        if(_isRunner&&ex.hipExt&&ex.hipExt!==ex.hinge[0]) s.push({label:'Glute — runner armor',items:[{name:ex.hipExt,detail:'2×8 each'}]});
         // V154 (D4): the calf/achilles guarantee — the most-injured tissue in distance
         // runners had ZERO work anywhere in the prevention template. Run-goal builds only;
         // eccentric emphasis carried in the copy. Pool logic mirrors the hypertrophy calf
@@ -11075,7 +11097,7 @@ function recoveryDeload(sections, cardio){
   // regional cap's footprint. __CAP_OFF is kept as a master switch for all three.
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__DELOAD_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
-  const keep=[]; let accessoryKept=false;
+  const keep=[]; let accessoryKept=false, circuitKept=false;
   // D91: the surviving accessory block is chosen by PATTERN, not by push order. The
   // builder pushes 'Leg superset A' (lunge + knee hold, a unilateral SQUAT pattern) before
   // 'Leg superset B' (the day's hinge/hip_ext), so first-come cost every deload leg day its
@@ -11152,7 +11174,10 @@ function recoveryDeload(sections, cardio){
     if(s.hip||/hip|mobility|stretch/.test(L)){ keep.push(s); return; }            // prehab stays — injury-prevention backbone
     if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) return;       // fluff drops on a deload
     const hasLift=(s.items||[]).some(it=>it&&_pattern(it.name));
-    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }  // exactly ONE accessory block survives; D91 picks the posterior one when the card has one
+    // v0.249.0 (D254, Mario): the P-HIPEXT hip extension left the circuit for its own section and stays
+    // with it here, as it did inside the round; the cap changed the setup, not the dose.
+    if(/^glute — runner armor/.test(L)){ if(circuitKept) keep.push(s); return; }
+    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; circuitKept=/^leg circuit/.test(L); keep.push(s); return; }  // exactly ONE accessory block survives; D91 picks the posterior one when the card has one
     // additional accessory blocks and anything unclassified drop
   });
   return keep.length?keep:sections; // never empty a day — fallback guard for exotic builders (travel bodyweight tier)
@@ -11315,7 +11340,7 @@ function capSessionBudget(sections, cardio){
         if(_cost(it)<=0) return;
         if(_compoundTier(it.name)===3) return;            // barbell compounds are never budget fodder
         if(_postLeft<=1 && _isPost(it.name)) return;       // V198 (D85): the day's LAST hinge/hip_ext is not budget fodder
-        const score=(((ii>=3)&&/^leg circuit/i.test((s&&s.label)||''))?3:sr)*10+_itemRank(it.name);
+        const score=(/^glute — runner armor/i.test((s&&s.label)||'')?3:sr)*10+_itemRank(it.name);   // D254: the P-HIPEXT section goes first
         const pos=si*100+ii;
         if(!best || score>best.score || (score===best.score && pos>best.pos)) best={si,ii,score,pos};
       });
@@ -11358,7 +11383,8 @@ function capRegionalFatigue(sections, role, cardio, goal){
     const L=(label||'').toLowerCase();
     if(/^main|^primer|^power\b|^strength\b/.test(L)) return (itemIdx>0) ? 2 : 0;  // protect the main lift ONLY
     if(/secondary compound|conditioning|delts|chest volume|pull superset a|leg superset a/.test(L)) return 1;
-    if(/^leg circuit/.test(L)) return (itemIdx>=3) ? 3 : 2;
+    if(/^glute — runner armor/.test(L)) return 3;   // D254: the P-HIPEXT hip extension, out of the circuit, still goes first
+    if(/^leg circuit/.test(L)) return 2;
     if(/superset b|biceps|triceps|leg isolation|calves|accessory|pump|chest \+ knee/.test(L)) return 2;
     if(/finisher|optional|explosive/.test(L)) return 3;
     return 2;
@@ -11372,7 +11398,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
   const _legCut = Math.round(_interf * 3);
   const _uppCut = Math.round(_interf * 1.5);
   const _capFor = r => Math.max(6, _setCap(r) - (r==='legs' ? _legCut : _uppCut));
-  const _moveCapFor = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^leg circuit/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>=4)) ? 1 : 0);
+  const _moveCapFor = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^glute — runner armor/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>0)) ? 1 : 0);   // D254
 
   // 1) Score each REGION two ways in a single pass:
   //    • regionScore — PATTERN SATURATION. Distinct patterns are cheap; the 2nd+ movement
@@ -12947,7 +12973,9 @@ function buildSectionsHTML(sections,baseIdx,src){
         const _sv=_live[0], _d=_sv.detail||'';
         // V190 (D39): with no honest round count there is nothing to multiply by, so the
         // survivor keeps its own prescription — which already carries its true set count.
-        const _mapped=(rounds==null||/^\d+\s*[x\xd7]/.test(_d))?_d
+        // v0.249.0 (D253): so does a line that opens "N sets" ("2 sets — RPE 7 …"). Prefixed,
+        // it read "2×2 sets" and parseRx logged it in seconds.
+        const _mapped=(rounds==null||/^\d+\s*(?:[x\xd7]|sets?\b)/.test(_d))?_d
           :(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
         h+=`<div class="section-label" style="color:var(--muted)">${esc(sec.label||'Round')} \u2014 reduced to straight sets</div><div class="section-block">`;
         sec.items.forEach((i2,_ii)=>{
@@ -13065,7 +13093,8 @@ function parseRx(detail,name){
   // by these two rules. The (?!of) guard is belt-and-braces against the rule above.
   const mOpen=d.match(/^(\d+)\s*sets?\b(?!\s*of\s*\d)/);
   if(mOpen) return {sets:Math.min(+mOpen[1],20), open:true, perSide:/each/.test(d)};
-  const m=d.match(/^(\d+)\s*[×x]\s*(\d+)(?:\s*[–-]\s*(\d+))?\s*(sec|s|yd)?/);
+  // v0.249.0 (D253): the unit is a whole word. Unbounded, the "s" of "sets" or "slow" read as seconds.
+  const m=d.match(/^(\d+)\s*[×x]\s*(\d+)(?:\s*[–-]\s*(\d+))?\s*(?:(sec|s|yd)\b)?/);
   if(!m) return _parseRxLoose(d,name);
   const sets=Math.min(+m[1],20), lo=+m[2], hi=m[3]?+m[3]:null, unitTok=m[4], perSide=/each/.test(d);
   const mid=hi?Math.round((lo+hi)/2):lo;
@@ -13483,7 +13512,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds,src){
   const isRep=isRepExercise(i.name||'')&&isOpenEnded;
   const isWeight=!isKB&&isTrackableWeight(i.name||'');
   const showInput=isTime||isWeight||isRep||isKB;
-  const inputLabel=isTime?'sec':isRep?'reps':isKB?(unit==='kg'?'kg':'lb'):unit;
+  const inputLabel=isTime?'sec':isRep?'reps':unit;   // v0.249.0 (D257): a kettlebell weighs in the program's unit
   const inputStep=isTime?5:isRep?1:step;
   const lastDisplay=lastW?lastW+' '+inputLabel+' '+weekLabel:'';
   const safeN=(i.name||'').replace(/'/g,"\\'");
@@ -13518,7 +13547,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds,src){
   if(rx||loaded){
     html+='<div class="ex-log" id="exlog_'+exKey+'">';
     const dispLast=effW!==''&&effW!=null?(unit==='kg'?Math.round((+effW)*0.453592*2)/2:+effW):'';
-    const wunit=isKB?(unit==='kg'?'kg':'lb'):unit;
+    const wunit=unit;   // v0.249.0 (D257): a kettlebell in the program's unit too, never "lb"
     // Restore what was logged THIS week, in display units. Stored values are always lbs.
     let wkW=(thisDayEntry&&thisDayEntry.setsW&&thisDayEntry.setsW.length)?thisDayEntry.setsW.map(toDispW):[];
     let wkR=(thisDayEntry&&thisDayEntry.setsDone&&thisDayEntry.setsDone.length)?thisDayEntry.setsDone.slice():[];
@@ -14827,7 +14856,7 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
     // which then vanished entirely on the next render — the render path now restores it,
     // and the in-place path matches so the two can never disagree about the same state).
     wInput.value=String(dispW); wInput.placeholder=String(dispW);
-    const wunit=isKBExercise(exName)?(unit==='kg'?'kg':'lb'):unit;
+    const wunit=unit;   // v0.249.0 (D257): the kettlebell's reuse pill says the program's unit, as the card does
     const numEl=document.getElementById('exreusenum_'+exKey); if(numEl)numEl.textContent=dispW+' '+wunit;
     const recEl=document.getElementById('exrec_'+exKey); if(recEl)recEl.textContent='earlier today';
   }
@@ -17841,6 +17870,25 @@ function _setsOf(en){
   const m=String((en&&en.setsReps)||'').match(/(\d+)\s*$/);
   return m?[+m[1]]:[];
 }
+// v0.249.0 (D255, P-DEADLIFTLINE): the Posterior Chain main is drawn per block from these four
+// hinges (EXLIB.back_compound), and the ledger listed each as its own main lift. Display only: their
+// main-slot sessions are one Deadlift line, and a point that was not the conventional pull is tagged.
+const _HINGE_TAG={'Deadlift':'','Trap bar deadlift':'Trap bar','Sumo deadlift':'Sumo','Barbell Romanian deadlift':'RDL'};
+function _deadliftLine(mains){
+  const hinge=mains.filter(m=>m.mode==='load'&&Object.prototype.hasOwnProperty.call(_HINGE_TAG,m.name));
+  if(!hinge.length) return mains;
+  const tagOf=(m)=>_HINGE_TAG[m.name]||null;
+  let heavy=null, first=null;
+  hinge.forEach(m=>{
+    const t=tagOf(m);
+    if(!heavy||m.heavy.v>heavy.v||(m.heavy.v===heavy.v&&m.heavy.week<heavy.week)) heavy={...m.heavy, tag:t};
+    if(!first||m.first.week<first.week) first={...m.first, tag:t};
+  });
+  const series=([]).concat(...hinge.map(m=>m.series.map((p)=>({w:p.w, v:p.v, tag:tagOf(m)})))).sort((a,b)=>a.w-b.w);
+  const sum=(k)=>hinge.reduce((a,m)=>a+(m[k]||0),0);
+  return mains.filter(m=>hinge.indexOf(m)<0).concat([{name:'Deadlift', mode:'load', series, heavy, first,
+    plotted:sum('plotted'), accessoryDay:sum('accessoryDay'), noLoad:sum('noLoad'), entries:sum('entries')}]);
+}
 function ledgerModel(exw, hist){
   const mains=[], ladder=[], plain=[], unloaded=[];
   Object.values(exw||{}).forEach(ex=>{
@@ -17915,11 +17963,11 @@ function ledgerModel(exw, hist){
                Math.max.apply(null,all.map(e=>+e.weight||0).concat([wt]))]});
     }
   });
-  mains.sort((a,b)=>b.series.length-a.series.length);
+  const mainsOut=_deadliftLine(mains).sort((a,b)=>b.series.length-a.series.length);
   ladder.sort((a,b)=>(b.ready?1:0)-(a.ready?1:0) || b.sessions-a.sessions);
   plain.sort((a,b)=>b.sessions-a.sessions);
   unloaded.sort((a,b)=>b.sessions-a.sessions);
-  return {mains, ladder, plain, unloaded};
+  return {mains:mainsOut, ladder, plain, unloaded};
 }
 
 // ── main lift block: the top set, in whichever unit was written down ───────
@@ -17932,7 +17980,7 @@ function buildMainLiftBlock(m, unit){
   const disp=w=>isReps?w:((unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w));
   const u=isReps?'reps':((unit==='kg')?'kg':'lbs');
   const hv=m.heavy, fs=m.first;
-  const lblOf=p=>isReps?(p.v+' reps'):(disp(p.v)+(p.reps?'×'+p.reps:''));
+  const lblOf=p=>isReps?(p.v+' reps'):(disp(p.v)+(p.reps?'×'+p.reps:'')+(p.tag?' '+p.tag:''));   // D255: the variant, when not the deadlift
   const hLbl=lblOf(hv);
   const fLbl=lblOf(fs);
   let chart='';
@@ -17957,11 +18005,14 @@ function buildMainLiftBlock(m, unit){
       const top=(p.v===hv.v&&p.w===hv.week);
       s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.v).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
     });
+    // D255: each run of a variant is tagged once, over its first point.
+    // D255 Amendment 1: the first point's tag starts at the line, clear of the axis labels.
+    m.series.forEach((p,i)=>{ if(p.tag&&(i===0||m.series[i-1].tag!==p.tag)) s+=_axTx(padL+i*xs-(i?0:2), yof(p.v)-8, p.tag, 7, i?'middle':'start'); });
     const lblStep=Math.max(1,Math.ceil(m.series.length/6));
     m.series.forEach((p,i)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
     chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>';
   }
-  const gain=disp(hv.v)-disp(fs.v);
+  const gain=(fs.tag===hv.tag)?disp(hv.v)-disp(fs.v):0;   // D255: "up" compares one lift with itself
   // V196 D59 honesty rider: "Opened at" names the week of the FIRST PLOTTED session.
   // An athlete who trained from week 1 and first wrote a weight in week 6 must not be
   // told they opened in week 6 with no week on the number to say otherwise.

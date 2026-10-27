@@ -1,0 +1,14 @@
+# v0.248.0 (HEAD ff0269f), 2026-10-26: the before-picture
+pool: Deadlift, Trap bar deadlift, Sumo deadlift, Barbell Romanian deadlift
+HALF_MANNY by week: W1 Barbell Romanian deadlift | W2 Barbell Romanian deadlift | W3 Trap bar deadlift | W4 Trap bar deadlift | W5 Sumo deadlift | W6 Sumo deadlift | W7 Trap bar deadlift | W8 Trap bar deadlift | W9 Deadlift | W10 Deadlift | W11 Barbell Romanian deadlift | W12 Barbell Romanian deadlift
+programs 865; with a main hinge 325; hinge-main weeks 3900
+main hinge changes variant inside the program: 163/325
+opens on the RDL: 217/325; RDL is a main at some point: 271/325; conventional Deadlift never a main: 216/325
+weeks by variant: Barbell Romanian deadlift 1840 (47.2%), Trap bar deadlift 544 (13.9%), Sumo deadlift 1298 (33.3%), Deadlift 218 (5.6%)
+first block by variant: Barbell Romanian deadlift 217, Sumo deadlift 108
+top sequences:
+  108  RDL
+  55  RDL > Trap bar > Sumo > Trap bar > Deadlift > RDL
+  54  Sumo > Trap bar > RDL > Trap bar > Sumo > RDL
+  54  RDL > Sumo > Deadlift > Trap bar > Sumo
+  54  Sumo

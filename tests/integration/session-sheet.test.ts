@@ -341,6 +341,17 @@ describe('the sections and their exercise cards (buildSectionsHTML and buildExIt
       'came from Old &lt;b&gt;Block&lt;/b&gt;', 'ex-reuse-fill', 'value="45"', '<span class="ex-wunit">kg</span>', '<span class="ex-wunit">lbs</span>']);
   });
 
+  test('a kettlebell weighs in the program\'s unit: lbs or kg, never "lb", on both builders (D257)', () => {
+    const sec = [{ label: 'Accessories', items: [{ name: 'Kettlebell single-arm row', detail: '3×8–12 each @ RPE 8' }] }] as ExSection[];
+    for (const unit of ['lbs', 'kg']) {
+      IA.eval(`window._unitLabel='${unit}';`);
+      const want = W['buildSectionsHTML'](sec, 1) as string;
+      assert.ok(want.includes(`<span class="ex-wunit">${unit}</span>`), unit);
+      assert.ok(!/>lb</.test(want), 'no "lb" label in ' + unit);
+      assert.equal(sectionsMarkup(sectionsView(sec, 1, sectionReads(bridge))), want, 'the iOS app draws the same card');
+    }
+  });
+
   test('a day edited every way: a skipped exercise, a skipped round, a round down to one, added and hip and core blocks, a round with no count', () => {
     const [w, d] = days[3]!;
     const live = IA.eval('activeProg').weeks[w][d];

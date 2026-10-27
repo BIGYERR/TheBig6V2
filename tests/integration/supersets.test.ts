@@ -8,7 +8,7 @@
 // The lattice claims run on the 420-cell round-count lattice (tests/support/supersets.ts), every cell built once.
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
-import { loadApp } from '../support/app.ts';
+import { fixtures, loadApp } from '../support/app.ts';
 import * as S from '../support/supersets.ts';
 
 const IA = loadApp();
@@ -186,6 +186,52 @@ test('a bare count or range in a round block reads "N reps"; every other remaind
   const HAND = ['10 reps', '8–12 reps', '12 each side', '30 sec', 'RPE 8'];
   assert.deepEqual(sec.items.map((i) => S.wantMemberRow(i.detail)), HAND, 'the reference strip agrees with the hand table');
   assert.deepEqual(S.renderedDetails(render([sec])), HAND);
+});
+
+// ── a round down to one live member (D253) ───────────────────────────────────────────────────────────────────────
+const rx = (d: string): Record<string, unknown> => S.callApp(IA, 'parseRx', d, '');
+
+test("the reporter's Pull superset A, Barbell row skipped: Chinups keep their own line and log reps (D253)", () => {
+  const p = JSON.parse(JSON.stringify(IA.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))))) as { weeks: Record<string, Record<string, { sections: { label?: string; items: { name: string; detail: string; _skipped?: boolean }[] }[] }>> };
+  const sec = p.weeks['10']!['mon']!.sections.find((s) => s.label === 'Pull superset A')!;
+  const CHIN = '2 sets — RPE 7 (leave 3 or more in reserve)';
+  assert.deepEqual(sec.items.map((i) => [i.name, i.detail]), [['Barbell row', '2×6–10 @ RPE 7'], ['Chinups', CHIN]], "the reporter's screen");
+  sec.items[0]!._skipped = true;
+  const html = render([sec]);
+  assert.match(html, /Pull superset A — reduced to straight sets/);
+  assert.deepEqual(S.renderedDetails(html), [CHIN]);
+  const got = rx(CHIN);
+  assert.equal(got['open'], true);
+  assert.equal(got['sets'], 2);
+  assert.notEqual(got['kind'], 'sec');
+});
+
+test('a line that opens "N sets" is kept as it stands; a bare rep count still takes the round count (D253)', () => {
+  const one = (rounds: number, skipped: string, name: string, detail: string): unknown =>
+    ({ label: 'Strength', superset: true, rounds, items: [{ name: skipped, detail: '3×8–12 @ RPE 7', _skipped: true }, { name, detail }] });
+  const table: [unknown, string][] = [
+    [one(3, 'Feet-elevated inverted rows', 'Pushups (slow tempo)', '3 sets — RPE 7 (leave 3 or more in reserve)'), '3 sets — RPE 7 (leave 3 or more in reserve)'],
+    [one(4, 'Dumbbell row', 'Diamond pushups', '4 sets — RPE 8 (stop 2 reps short of failure)'), '4 sets — RPE 8 (stop 2 reps short of failure)'],
+    [one(3, 'Dumbbell row', 'Dumbbell bench press', '3 sets of 8 to 12 — RPE 8 (heaviest pair you can find)'), '3 sets of 8 to 12 — RPE 8 (heaviest pair you can find)'],
+    [one(2, 'Barbell row', 'Kettlebell swing', '10 reps'), '2×10'],
+    [one(2, 'Barbell row', 'Goblet squat', '2×6–10 @ RPE 7'), '2×6–10 @ RPE 7'],
+  ];
+  for (const [sec, want] of table) assert.deepEqual(S.renderedDetails(render([sec])), [want]);
+});
+
+test('the logger reads a unit only as a whole word: "sets" and "slow" are not seconds (D253)', () => {
+  const table: [string, Record<string, unknown>][] = [
+    ['2×2 sets — RPE 7 (leave 3 or more in reserve)', { sets: 2, kind: 'reps', target: 2 }],
+    ['4×12 slow', { sets: 4, kind: 'reps', target: 12 }],
+    ['3×15 slow', { sets: 3, kind: 'reps', target: 15 }],
+    ['3×25 sec', { sets: 3, kind: 'sec', target: 25 }],
+    ['3×30s each', { sets: 3, kind: 'sec', target: 30, perSide: true }],
+    ['4×20 yd', { sets: 4, kind: 'dist', target: 20 }],
+  ];
+  for (const [d, want] of table) {
+    const got = rx(d);
+    for (const [k, v] of Object.entries(want)) assert.equal(got[k], v, d + ': ' + k);
+  }
 });
 
 // ── generated programs, on the 420-cell lattice ───────────────────────────────────────────────────────────────────

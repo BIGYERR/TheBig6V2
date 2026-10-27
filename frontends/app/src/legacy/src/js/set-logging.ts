@@ -433,7 +433,7 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any,src?: any){
   const isRep=isRepExercise(i.name||'')&&isOpenEnded;
   const isWeight=!isKB&&isTrackableWeight(i.name||'');
   const showInput=isTime||isWeight||isRep||isKB;
-  const inputLabel=isTime?'sec':isRep?'reps':isKB?(unit==='kg'?'kg':'lb'):unit;
+  const inputLabel=isTime?'sec':isRep?'reps':unit;   // v0.249.0 (D257): a kettlebell weighs in the program's unit
   const inputStep=isTime?5:isRep?1:step;
   const lastDisplay=lastW?lastW+' '+inputLabel+' '+weekLabel:'';
   const safeN=(i.name||'').replace(/'/g,"\\'");
@@ -468,7 +468,7 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any,src?: any){
   if(rx||loaded){
     html+='<div class="ex-log" id="exlog_'+exKey+'">';
     const dispLast=effW!==''&&effW!=null?(unit==='kg'?Math.round((+effW)*0.453592*2)/2:+effW):'';
-    const wunit=isKB?(unit==='kg'?'kg':'lb'):unit;
+    const wunit=unit;   // v0.249.0 (D257): a kettlebell in the program's unit too, never "lb"
     // Restore what was logged THIS week, in display units. Stored values are always lbs.
     let wkW=(thisDayEntry&&thisDayEntry.setsW&&thisDayEntry.setsW.length)?thisDayEntry.setsW.map(toDispW):[];
     let wkR=(thisDayEntry&&thisDayEntry.setsDone&&thisDayEntry.setsDone.length)?thisDayEntry.setsDone.slice():[];

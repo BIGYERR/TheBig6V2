@@ -25,6 +25,19 @@ describe('the Lift Ledger', () => {
     assert.deepEqual([displayLoad(225, 'lbs'), displayLoad(225.4, 'lbs'), displayLoad(225, 'kg'), displayLoad(185, 'kg'), displayLoad(245, 'kg'), displayLoad(70, 'kg')], [225, 225, 102, 84, 111, 32]);
   });
 
+  it('tags the Deadlift line\'s variants once each and drops "up" across two lifts (D255)', () => {
+    const DL: LedgerModel['mains'][number] = {
+      name: 'Deadlift', mode: 'load', series: [{ w: 1, v: 95, tag: 'RDL' }, { w: 2, v: 95, tag: 'RDL' }, { w: 3, v: 155, tag: 'Trap bar' }, { w: 9, v: 185, tag: null }],
+      heavy: { v: 185, reps: 8, week: 9, tag: null }, first: { v: 95, reps: 8, week: 1, tag: 'RDL' }, accessoryDay: 0, noLoad: 0,
+    };
+    const b = mainBlock(DL, 'lbs');
+    assert.deepEqual([b.top, b.opened, b.afterOpened, b.gain], ['185×8', '95×8 RDL', ' in week 1 · heaviest in week 9', null]);
+    const tags = b.chart!.els.filter((e) => e.el === 'text' && /^(RDL|Trap bar|Sumo)$/.test(String(e.text))).map((e) => e.text);
+    assert.deepEqual(tags, ['RDL', 'Trap bar']);
+    const anchors = b.chart!.els.filter((e) => e.el === 'text' && /^(RDL|Trap bar)$/.test(String(e.text))).map((e) => e.a['text-anchor']);
+    assert.deepEqual(anchors, ['start', 'middle'], 'the first tag starts at the line, clear of the axis (D255 Amendment 1)');
+  });
+
   it('names the top set, the opening set and the gain, and draws the line from two sessions', () => {
     const b = mainBlock(SQUAT, 'lbs');
     assert.deepEqual([b.top, b.opened, b.afterOpened, b.gain, b.afterGain], ['245×5', '225×5', ' in week 1 · up ', '20 lbs', ' · heaviest in week 3']);

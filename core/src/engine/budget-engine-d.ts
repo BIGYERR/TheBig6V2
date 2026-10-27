@@ -124,7 +124,7 @@ function recoveryDeload(sections: Section[], cardio: SessionView | null | undefi
   // regional cap's footprint. __CAP_OFF is kept as a master switch for all three.
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__DELOAD_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
-  const keep: Section[]=[]; let accessoryKept=false;
+  const keep: Section[]=[]; let accessoryKept=false, circuitKept=false;
   // D91: the surviving accessory block is chosen by PATTERN, not by push order. The
   // builder pushes 'Leg superset A' (lunge + knee hold, a unilateral SQUAT pattern) before
   // 'Leg superset B' (the day's hinge/hip_ext), so first-come cost every deload leg day its
@@ -201,7 +201,10 @@ function recoveryDeload(sections: Section[], cardio: SessionView | null | undefi
     if(s.hip||/hip|mobility|stretch/.test(L)){ keep.push(s); return; }            // prehab stays — injury-prevention backbone
     if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) return;       // fluff drops on a deload
     const hasLift=(s.items||[]).some(it=>it&&_pattern(it.name));
-    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }  // exactly ONE accessory block survives; D91 picks the posterior one when the card has one
+    // v0.249.0 (D254, Mario): the P-HIPEXT hip extension left the circuit for its own section and stays
+    // with it here, as it did inside the round; the cap changed the setup, not the dose.
+    if(/^glute — runner armor/.test(L)){ if(circuitKept) keep.push(s); return; }
+    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; circuitKept=/^leg circuit/.test(L); keep.push(s); return; }  // exactly ONE accessory block survives; D91 picks the posterior one when the card has one
     // additional accessory blocks and anything unclassified drop
   });
   return keep.length?keep:sections; // never empty a day — fallback guard for exotic builders (travel bodyweight tier)
@@ -364,7 +367,7 @@ function capSessionBudget(sections: Section[], cardio: SessionView | null | unde
         if(_cost(it)<=0) return;
         if(_compoundTier(it.name)===3) return;            // barbell compounds are never budget fodder
         if(_postLeft<=1 && _isPost(it.name)) return;       // V198 (D85): the day's LAST hinge/hip_ext is not budget fodder
-        const score=(((ii>=3)&&/^leg circuit/i.test((s&&s.label)||''))?3:sr)*10+_itemRank(it.name);
+        const score=(/^glute — runner armor/i.test((s&&s.label)||'')?3:sr)*10+_itemRank(it.name);   // D254: the P-HIPEXT section goes first
         const pos=si*100+ii;
         if(!best || score>best.score || (score===best.score && pos>best.pos)) best={si,ii,score,pos};
       });
@@ -407,7 +410,8 @@ function capRegionalFatigue(sections: Section[], role: string, cardio: SessionVi
     const L=(label||'').toLowerCase();
     if(/^main|^primer|^power\b|^strength\b/.test(L)) return (itemIdx>0) ? 2 : 0;  // protect the main lift ONLY
     if(/secondary compound|conditioning|delts|chest volume|pull superset a|leg superset a/.test(L)) return 1;
-    if(/^leg circuit/.test(L)) return (itemIdx>=3) ? 3 : 2;
+    if(/^glute — runner armor/.test(L)) return 3;   // D254: the P-HIPEXT hip extension, out of the circuit, still goes first
+    if(/^leg circuit/.test(L)) return 2;
     if(/superset b|biceps|triceps|leg isolation|calves|accessory|pump|chest \+ knee/.test(L)) return 2;
     if(/finisher|optional|explosive/.test(L)) return 3;
     return 2;
@@ -421,7 +425,7 @@ function capRegionalFatigue(sections: Section[], role: string, cardio: SessionVi
   const _legCut = Math.round(_interf * 3);
   const _uppCut = Math.round(_interf * 1.5);
   const _capFor: (r: string) => number = r => Math.max(6, _setCap(r) - (r==='legs' ? _legCut : _uppCut));
-  const _moveCapFor: (r: string) => number = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^leg circuit/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>=4)) ? 1 : 0);
+  const _moveCapFor: (r: string) => number = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^glute — runner armor/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>0)) ? 1 : 0);   // D254
 
   // 1) Score each REGION two ways in a single pass:
   //    • regionScore — PATTERN SATURATION. Distinct patterns are cheap; the 2nd+ movement

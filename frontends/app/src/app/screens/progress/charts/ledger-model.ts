@@ -10,6 +10,8 @@ export interface LiftPoint {
   v: number;
   reps?: number | null;
   week: number;
+  /** The variant when the Deadlift line's point was not the conventional deadlift (D255). */
+  tag?: string | null;
 }
 
 /** The legacy ledgerModel's rows. */
@@ -17,7 +19,7 @@ export interface LedgerModel {
   mains: {
     name: string;
     mode: 'load' | 'reps';
-    series: { w: number; v: number }[];
+    series: { w: number; v: number; tag?: string | null }[];
     heavy: LiftPoint;
     first: LiftPoint;
     accessoryDay: number;
@@ -81,7 +83,7 @@ export function mainBlock(m: LedgerModel['mains'][number], unit: string): MainBl
   const disp = (w: number) => (isReps ? w : displayLoad(w, unit));
   const u = isReps ? 'reps' : unit === 'kg' ? 'kg' : 'lbs';
   const hv = m.heavy, fs = m.first;
-  const lblOf = (p: LiftPoint) => (isReps ? p.v + ' reps' : disp(p.v) + (p.reps ? '×' + p.reps : ''));
+  const lblOf = (p: LiftPoint) => (isReps ? p.v + ' reps' : disp(p.v) + (p.reps ? '×' + p.reps : '') + (p.tag ? ' ' + p.tag : ''));
   let chart: Picture | null = null;
   if (m.series.length >= 2) {
     const W = 320, H = 108, padL = 34, padR = 10, padT = 14, padB = 20;
@@ -108,13 +110,18 @@ export function mainBlock(m: LedgerModel['mains'][number], unit: string): MainBl
       const top = p.v === hv.v && p.w === hv.week;
       s.push(svgEl('circle', { cx: (padL + i * xs).toFixed(1), cy: yof(p.v).toFixed(1), r: top ? 4.5 : 3.2, fill: 'var(--lift)', opacity: top ? 1 : 0.72 }));
     });
+    // D255: each run of a variant is tagged once, over its first point.
+    m.series.forEach((p, i) => {
+      // D255 Amendment 1: the first point's tag starts at the line, clear of the axis labels.
+      if (p.tag && (i === 0 || m.series[i - 1]!.tag !== p.tag)) s.push(axTx(padL + i * xs - (i ? 0 : 2), yof(p.v) - 8, p.tag, 7, i ? 'middle' : 'start'));
+    });
     const lblStep = Math.max(1, Math.ceil(m.series.length / 6));
     m.series.forEach((p, i) => {
       if (i % lblStep === 0) s.push(axTx(padL + i * xs, H - 4, 'W' + p.w, 8, 'middle'));
     });
     chart = { viewBox: '0 0 ' + W + ' ' + H, style: 'width:100%;height:auto;overflow:visible', els: s };
   }
-  const gain = disp(hv.v) - disp(fs.v);
+  const gain = fs.tag === hv.tag ? disp(hv.v) - disp(fs.v) : 0; // D255: "up" compares one lift with itself
   const best = ' · ' + (isReps ? 'best' : 'heaviest') + ' in week ' + hv.week;
   return {
     name: m.name,

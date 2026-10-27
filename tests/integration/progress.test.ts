@@ -149,3 +149,50 @@ test('ledgerModel holds the range in one binding: declared null, set only by the
   assert.match(seg, /\blet rng=null;/);
   assert.match(seg, /if\(rng&&sets\.length\)/);
 });
+
+// ── the main hinge is one Deadlift line (D255) ───────────────────────────────────────────────────────────────────────
+// Hand-built logs: each session is item 0 of a "Main — <name>" section on its day, so the slot rule calls it main.
+const hingeLedger = (rows: [string, number, number, number][]): { mains: Record<string, any>[] } => {
+  const exw: Record<string, { name: string; entries: Record<string, unknown>[] }> = {};
+  const hist: Record<string, unknown> = {};
+  rows.forEach(([name, week, weight, reps], i) => {
+    (exw[name] ||= { name, entries: [] }).entries.push({ week, day: 'mon', ts: 100 * (i + 1), weight, setsDone: [reps, reps, reps], setsReps: '3×' + reps });
+    hist['w' + week + '_mon'] = { sections: [{ label: 'Main — ' + name, items: [{ name, detail: '3×' + reps }] }] };
+  });
+  return plain(ledgerModel(exw, hist));
+};
+
+test('the four main hinges are one Deadlift line; a non-hinge main keeps its own block (D255)', () => {
+  const r = hingeLedger([
+    ['Barbell Romanian deadlift', 1, 95, 8], ['Barbell Romanian deadlift', 2, 95, 8], ['Trap bar deadlift', 3, 155, 10], ['Deadlift', 9, 185, 8],
+  ]);
+  assert.deepEqual(r.mains.map((m) => m['name']), ['Deadlift']);
+  const m = r.mains[0]!;
+  assert.deepEqual(m['series'], [{ w: 1, v: 95, tag: 'RDL' }, { w: 2, v: 95, tag: 'RDL' }, { w: 3, v: 155, tag: 'Trap bar' }, { w: 9, v: 185, tag: null }]);
+  assert.deepEqual([m['heavy'], m['first']], [{ v: 185, reps: 8, week: 9, tag: null }, { v: 95, reps: 8, week: 1, tag: 'RDL' }]);
+  const squat = hingeLedger([['Back squat', 1, 135, 8], ['Back squat', 2, 145, 8], ['Sumo deadlift', 5, 165, 8]]);
+  assert.deepEqual(squat.mains.map((x) => x['name']).sort(), ['Back squat', 'Deadlift']);
+});
+
+test('the Deadlift block names each variant once and says "up" only when one lift is compared with itself (D255)', () => {
+  const mixed = hingeLedger([
+    ['Barbell Romanian deadlift', 1, 95, 8], ['Barbell Romanian deadlift', 2, 95, 8], ['Trap bar deadlift', 3, 155, 10], ['Deadlift', 9, 185, 8],
+  ]).mains[0];
+  const h = String(buildMainLiftBlock(mixed, 'lbs'));
+  const t = text(h);
+  assert.ok(t.startsWith('Deadlift 185×8 Opened at 95×8 RDL in week 1 · heaviest in week 9'), t.slice(0, 120));
+  assert.equal((h.match(/>RDL<\/text>/g) || []).length, 1, 'RDL is tagged once, over week 1');
+  assert.equal((h.match(/>Trap bar<\/text>/g) || []).length, 1, 'Trap bar is tagged once, over week 3');
+  assert.match(h, /text-anchor="start"[^>]*>RDL<\/text>/, 'the first tag starts at the line, clear of the axis (D255 Amendment 1)');
+  assert.match(h, /text-anchor="middle"[^>]*>Trap bar<\/text>/, 'a later tag is centred over its point');
+  const pulls = hingeLedger([['Deadlift', 9, 185, 8], ['Deadlift', 10, 195, 8]]).mains[0];
+  const p = String(buildMainLiftBlock(pulls, 'lbs'));
+  assert.ok(text(p).startsWith('Deadlift 195×8 Opened at 185×8 in week 9 · up 10 lbs · heaviest in week 10'), text(p).slice(0, 120));
+  assert.ok(!/>(RDL|Trap bar|Sumo)<\/text>/.test(p), 'no tag on a line of conventional pulls');
+});
+
+test('the Deadlift line tags exactly the hinges the engine draws its main from (D255)', () => {
+  const tags = IA.eval('JSON.stringify(Object.keys(_HINGE_TAG).sort())');
+  const pool = IA.eval('JSON.stringify(EXLIB.back_compound.slice().sort())');
+  assert.equal(tags, pool);
+});
