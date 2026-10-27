@@ -35,4 +35,5 @@ The bottom tab bar (`nav.tabbar`, `frontends/app/src/legacy/src/css/shell.css`),
   page scrolls, focus moving to another field does not; no visual viewport (an old browser) leaves the focus path alone.
 - **Tests:** `tests/unit/tab-bar.test.ts`, the function lifted out of the page with a hand-built window.
 - **Proof that only the phone can give:** Mario types a load, closes the keyboard, opens Progress and scrolls up; the
-  bar stays at the bottom.
+  bar stays at the bottom. **Confirmed 2026-10-27** on v0.249.1, installed by `npm run device-ios`: "Tested on the
+  phone: the tab bar stays at the bottom on Progress after typing." The app shell stays held, not needed.
