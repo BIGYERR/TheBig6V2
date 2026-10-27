@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.249.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.249.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1755,6 +1755,23 @@ function tabGo(target){
   if(target==='screenProgress'){showProgressScreen();return;}
 }
 function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// v0.249.1 (D256): iOS 26 leaves the layout viewport stale once the on-screen keyboard closes,
+// and fixed elements drift with the page when it scrolls up: the tab bar floated mid-screen on
+// Progress after a load was typed (WebKit bug 297779). A real scroll when the keyboard goes makes
+// WebKit recompute where fixed elements belong; it lands back where it started. The step back waits a
+// frame: two scrolls in one task net to nothing and the browser can drop them, so nothing would move.
+function installKeyboardResync(win){
+  const vv=win.visualViewport, doc=win.document;
+  const isField=(el)=>!!el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName||'');
+  const resync=()=>{ const x=win.scrollX||0, y=win.scrollY||0; win.scrollTo(x,y>0?y-1:y+1); win.requestAnimationFrame(()=>win.scrollTo(x,y)); };
+  if(vv){
+    let h=vv.height;
+    vv.addEventListener('resize',()=>{ if(vv.height>h+100) win.setTimeout(resync,60); h=vv.height; });   // grew back: the keyboard closed
+  }
+  doc.addEventListener('focusout',()=>{ win.setTimeout(()=>{ if(!isField(doc.activeElement)) resync(); },350); });
+}
+installKeyboardResync(window);
 
 
 /** Where a movement is done (V164): a superset never pairs two fixed stations of different classes. */
@@ -17989,7 +18006,8 @@ function buildMainLiftBlock(m, unit){
       s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.v).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
     });
     // D255: each run of a variant is tagged once, over its first point.
-    m.series.forEach((p,i)=>{ if(p.tag&&(i===0||m.series[i-1].tag!==p.tag)) s+=_axTx(padL+i*xs, yof(p.v)-8, p.tag, 7, 'middle'); });
+    // D255 Amendment 1: the first point's tag starts at the line, clear of the axis labels.
+    m.series.forEach((p,i)=>{ if(p.tag&&(i===0||m.series[i-1].tag!==p.tag)) s+=_axTx(padL+i*xs-(i?0:2), yof(p.v)-8, p.tag, 7, i?'middle':'start'); });
     const lblStep=Math.max(1,Math.ceil(m.series.length/6));
     m.series.forEach((p,i)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
     chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>';

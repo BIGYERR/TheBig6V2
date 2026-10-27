@@ -4,7 +4,7 @@
   version and ios-CFBundleVersion follow the root index.html's ia-version; scripts/ios.mjs keeps them in step,
   so a phone shows which build it carries. Both are the canonical M.m.p (ia-version 239 = 0.239.0, 0.239.1 = 0.239.1).
 -->
-<widget id="com.bigyerr.ironasylum" version="0.249.0" ios-CFBundleVersion="0.249.0"
+<widget id="com.bigyerr.ironasylum" version="0.249.1" ios-CFBundleVersion="0.249.1"
         xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>The Asylum</name>
   <description>Hybrid strength and running programs.</description>

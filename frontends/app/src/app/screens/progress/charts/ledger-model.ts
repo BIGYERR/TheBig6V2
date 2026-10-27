@@ -112,7 +112,8 @@ export function mainBlock(m: LedgerModel['mains'][number], unit: string): MainBl
     });
     // D255: each run of a variant is tagged once, over its first point.
     m.series.forEach((p, i) => {
-      if (p.tag && (i === 0 || m.series[i - 1]!.tag !== p.tag)) s.push(axTx(padL + i * xs, yof(p.v) - 8, p.tag, 7, 'middle'));
+      // D255 Amendment 1: the first point's tag starts at the line, clear of the axis labels.
+      if (p.tag && (i === 0 || m.series[i - 1]!.tag !== p.tag)) s.push(axTx(padL + i * xs - (i ? 0 : 2), yof(p.v) - 8, p.tag, 7, i ? 'middle' : 'start'));
     });
     const lblStep = Math.max(1, Math.ceil(m.series.length / 6));
     m.series.forEach((p, i) => {

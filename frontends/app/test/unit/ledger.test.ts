@@ -34,6 +34,8 @@ describe('the Lift Ledger', () => {
     assert.deepEqual([b.top, b.opened, b.afterOpened, b.gain], ['185×8', '95×8 RDL', ' in week 1 · heaviest in week 9', null]);
     const tags = b.chart!.els.filter((e) => e.el === 'text' && /^(RDL|Trap bar|Sumo)$/.test(String(e.text))).map((e) => e.text);
     assert.deepEqual(tags, ['RDL', 'Trap bar']);
+    const anchors = b.chart!.els.filter((e) => e.el === 'text' && /^(RDL|Trap bar)$/.test(String(e.text))).map((e) => e.a['text-anchor']);
+    assert.deepEqual(anchors, ['start', 'middle'], 'the first tag starts at the line, clear of the axis (D255 Amendment 1)');
   });
 
   it('names the top set, the opening set and the gain, and draws the line from two sessions', () => {

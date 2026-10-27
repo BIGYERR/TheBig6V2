@@ -232,7 +232,8 @@ function buildMainLiftBlock(m: any, unit: any){
       s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.v).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
     });
     // D255: each run of a variant is tagged once, over its first point.
-    m.series.forEach((p: any,i: any)=>{ if(p.tag&&(i===0||m.series[i-1].tag!==p.tag)) s+=_axTx(padL+i*xs, yof(p.v)-8, p.tag, 7, 'middle'); });
+    // D255 Amendment 1: the first point's tag starts at the line, clear of the axis labels.
+    m.series.forEach((p: any,i: any)=>{ if(p.tag&&(i===0||m.series[i-1].tag!==p.tag)) s+=_axTx(padL+i*xs-(i?0:2), yof(p.v)-8, p.tag, 7, i?'middle':'start'); });
     const lblStep=Math.max(1,Math.ceil(m.series.length/6));
     m.series.forEach((p: any,i: any)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
     chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>';

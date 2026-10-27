@@ -35,3 +35,16 @@ if ever, and the main line reads only main-slot sessions. Tests: `tests/integrat
   only Deadlift W9 185×8 and W10 195×8, the block reads "Opened at 185×8 in week 9 · up 10 lbs · heaviest in week 10".
 - **Tests:** in `tests/integration/progress-charts.test.ts`, the two histories above on the single-file page and
   through the iOS app's ledger model.
+
+## D255 Amendment 1: the first tag starts at the line, clear of the axis (v0.249.1)
+
+- **Date:** 2026-10-27. **Ruled by:** the main session (a layout defect), found when Mario asked to see the line ("can
+  you show me what that deadlift line on progress looks like?"). **Bump:** PATCH, v0.249.1 (Mario). **Shipped:** v0.249.1.
+- **The finding:** a tag over the line's first point was centred on it, at the plot's left edge, where the y-axis
+  labels end, so "RDL" ran into "125" in the screenshot sent to Mario.
+- **What changes:** the first point's tag starts at the point (anchored at its start, two points left of it); every
+  later tag stays centred over its point.
+- **Expected values:** on the D255 history the RDL tag is drawn with `text-anchor="start"` and the Trap bar tag with
+  `text-anchor="middle"`, on the page and in the iOS app.
+- **Tests:** `tests/integration/progress.test.ts`, `frontends/app/test/unit/ledger.test.ts`.
+

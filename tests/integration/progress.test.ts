@@ -183,6 +183,8 @@ test('the Deadlift block names each variant once and says "up" only when one lif
   assert.ok(t.startsWith('Deadlift 185×8 Opened at 95×8 RDL in week 1 · heaviest in week 9'), t.slice(0, 120));
   assert.equal((h.match(/>RDL<\/text>/g) || []).length, 1, 'RDL is tagged once, over week 1');
   assert.equal((h.match(/>Trap bar<\/text>/g) || []).length, 1, 'Trap bar is tagged once, over week 3');
+  assert.match(h, /text-anchor="start"[^>]*>RDL<\/text>/, 'the first tag starts at the line, clear of the axis (D255 Amendment 1)');
+  assert.match(h, /text-anchor="middle"[^>]*>Trap bar<\/text>/, 'a later tag is centred over its point');
   const pulls = hingeLedger([['Deadlift', 9, 185, 8], ['Deadlift', 10, 195, 8]]).mains[0];
   const p = String(buildMainLiftBlock(pulls, 'lbs'));
   assert.ok(text(p).startsWith('Deadlift 195×8 Opened at 185×8 in week 9 · up 10 lbs · heaviest in week 10'), text(p).slice(0, 120));

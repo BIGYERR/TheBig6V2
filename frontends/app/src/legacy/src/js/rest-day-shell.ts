@@ -385,6 +385,23 @@ function tabGo(target: any){
 }
 function showToast(msg: any){const t=document.getElementById('toast');t!.innerHTML=msg;t!.classList.add('show');setTimeout(()=>t!.classList.remove('show'),2200);}
 
+// v0.249.1 (D256): iOS 26 leaves the layout viewport stale once the on-screen keyboard closes,
+// and fixed elements drift with the page when it scrolls up: the tab bar floated mid-screen on
+// Progress after a load was typed (WebKit bug 297779). A real scroll when the keyboard goes makes
+// WebKit recompute where fixed elements belong; it lands back where it started. The step back waits a
+// frame: two scrolls in one task net to nothing and the browser can drop them, so nothing would move.
+function installKeyboardResync(win: any){
+  const vv=win.visualViewport, doc=win.document;
+  const isField=(el: any)=>!!el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName||'');
+  const resync=()=>{ const x=win.scrollX||0, y=win.scrollY||0; win.scrollTo(x,y>0?y-1:y+1); win.requestAnimationFrame(()=>win.scrollTo(x,y)); };
+  if(vv){
+    let h=vv.height;
+    vv.addEventListener('resize',()=>{ if(vv.height>h+100) win.setTimeout(resync,60); h=vv.height; });   // grew back: the keyboard closed
+  }
+  doc.addEventListener('focusout',()=>{ win.setTimeout(()=>{ if(!isField(doc.activeElement)) resync(); },350); });
+}
+installKeyboardResync(window);
+
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
   _curScreen, _setActiveProg, _setActiveProgId, _setCalcLift, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey,
