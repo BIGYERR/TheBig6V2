@@ -1145,7 +1145,12 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
         s.push({label:'Leg circuit — runner armor',superset:true,rounds:2,items:[
           {name:ex.lunge[0],detail:'2×10 each'},
           {name:ex.kneeStab,detail:'2×25 sec'},
-          {name:ex.hinge[0],detail:'2×8'}].concat((_isRunner&&ex.hipExt&&ex.hipExt!==ex.hinge[0])?[{name:ex.hipExt,detail:'2×8 each'}]:[])});
+          {name:ex.hinge[0],detail:'2×8'}]});
+        // v0.249.0 (D254, P-CIRCUIT3): a circuit holds three movements, so the P-HIPEXT hip
+        // extension follows the round as its own straight sets instead of riding in it as a
+        // fourth station. Same draw, same gate, same dose; the label carries no "hip", which
+        // the budget reads as prehab and protects.
+        if(_isRunner&&ex.hipExt&&ex.hipExt!==ex.hinge[0]) s.push({label:'Glute — runner armor',items:[{name:ex.hipExt,detail:'2×8 each'}]});
         // V154 (D4): the calf/achilles guarantee — the most-injured tissue in distance
         // runners had ZERO work anywhere in the prevention template. Run-goal builds only;
         // eccentric emphasis carried in the copy. Pool logic mirrors the hypertrophy calf

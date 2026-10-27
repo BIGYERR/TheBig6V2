@@ -9,7 +9,7 @@ import { DAY_FULL } from './wizard.ts';
 import { wildcardTagHTML } from './random-wildcard.ts';
 import { buildSectionsHTML, restLogLines } from './week-view-sections.ts';
 import { buildCardioHTML, refreshSetSummary, setWeightVals, toStoreW } from './set-logging.ts';
-import { getExWeights, isKBExercise, logExerciseWeight, updateDoseDerived } from './log-entries.ts';
+import { getExWeights, logExerciseWeight, updateDoseDerived } from './log-entries.ts';
 import { buildLogHTML, iaWheelInit, modTagsHTML, sessionLogProgress } from './wheel-log.ts';
 import { ruResetIfIdle } from './rest-timer.ts';
 import { cardioLive, persistLogFields, renderStatusFoot } from './day-status.ts';
@@ -286,7 +286,7 @@ function saveExWeight(exKey: any, exName: any, setsReps: any, quiet?: any) {
     // and the in-place path matches so the two can never disagree about the same state).
     // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     wInput.value=String(dispW); wInput.placeholder=String(dispW);
-    const wunit=isKBExercise(exName)?(unit==='kg'?'kg':'lb'):unit;
+    const wunit=unit;   // v0.249.0 (D257): the kettlebell's reuse pill says the program's unit, as the card does
     const numEl=document.getElementById('exreusenum_'+exKey); if(numEl)numEl.textContent=dispW+' '+wunit;
     const recEl=document.getElementById('exrec_'+exKey); if(recEl)recEl.textContent='earlier today';
   }

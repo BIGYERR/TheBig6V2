@@ -33,7 +33,7 @@
       },
       "tiers": {
         "bodyweight": {
-          "sections": 10299,
+          "sections": 10503,
           "items": 18004,
           "coreSections": 692,
           "thinCore": 341,
@@ -42,7 +42,7 @@
           "prehabOutsideD85Names": 336
         },
         "minimal": {
-          "sections": 10480,
+          "sections": 10696,
           "items": 18488,
           "coreSections": 692,
           "thinCore": 376,
@@ -51,7 +51,7 @@
           "prehabOutsideD85Names": 362
         },
         "home_basic": {
-          "sections": 10450,
+          "sections": 10666,
           "items": 18391,
           "coreSections": 668,
           "thinCore": 356,
@@ -60,7 +60,7 @@
           "prehabOutsideD85Names": 348
         },
         "home_full": {
-          "sections": 10510,
+          "sections": 10726,
           "items": 18474,
           "coreSections": 672,
           "thinCore": 397,
@@ -69,7 +69,7 @@
           "prehabOutsideD85Names": 337
         },
         "commercial": {
-          "sections": 10438,
+          "sections": 10654,
           "items": 18384,
           "coreSections": 672,
           "thinCore": 434,
@@ -78,7 +78,7 @@
           "prehabOutsideD85Names": 331
         },
         "crossfit": {
-          "sections": 10420,
+          "sections": 10636,
           "items": 18220,
           "coreSections": 666,
           "thinCore": 416,
@@ -141,7 +141,7 @@
     "narrow": {
       "tiers": {
         "bodyweight": {
-          "sections": 960,
+          "sections": 1008,
           "items": 1864,
           "coreSections": 90,
           "thinCore": 0,
@@ -150,7 +150,7 @@
           "prehabOutsideD85Names": 0
         },
         "minimal": {
-          "sections": 1025,
+          "sections": 1085,
           "items": 2021,
           "coreSections": 90,
           "thinCore": 0,
@@ -159,7 +159,7 @@
           "prehabOutsideD85Names": 46
         },
         "home_basic": {
-          "sections": 1025,
+          "sections": 1085,
           "items": 2028,
           "coreSections": 90,
           "thinCore": 0,
@@ -168,7 +168,7 @@
           "prehabOutsideD85Names": 46
         },
         "home_full": {
-          "sections": 1029,
+          "sections": 1089,
           "items": 2029,
           "coreSections": 90,
           "thinCore": 15,
@@ -177,7 +177,7 @@
           "prehabOutsideD85Names": 32
         },
         "commercial": {
-          "sections": 1029,
+          "sections": 1089,
           "items": 2022,
           "coreSections": 90,
           "thinCore": 21,
@@ -186,7 +186,7 @@
           "prehabOutsideD85Names": 32
         },
         "crossfit": {
-          "sections": 1029,
+          "sections": 1089,
           "items": 2017,
           "coreSections": 90,
           "thinCore": 19,

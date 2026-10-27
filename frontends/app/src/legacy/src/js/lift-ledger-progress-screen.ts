@@ -80,6 +80,25 @@ function _setsOf(en: any){
   const m=String((en&&en.setsReps)||'').match(/(\d+)\s*$/);
   return m?[+m[1]]:[];
 }
+// v0.249.0 (D255, P-DEADLIFTLINE): the Posterior Chain main is drawn per block from these four
+// hinges (EXLIB.back_compound), and the ledger listed each as its own main lift. Display only: their
+// main-slot sessions are one Deadlift line, and a point that was not the conventional pull is tagged.
+const _HINGE_TAG: Record<string, string>={'Deadlift':'','Trap bar deadlift':'Trap bar','Sumo deadlift':'Sumo','Barbell Romanian deadlift':'RDL'};
+function _deadliftLine(mains: any[]): any[]{
+  const hinge=mains.filter(m=>m.mode==='load'&&Object.prototype.hasOwnProperty.call(_HINGE_TAG,m.name));
+  if(!hinge.length) return mains;
+  const tagOf=(m: any)=>_HINGE_TAG[m.name]||null;
+  let heavy: any=null, first: any=null;
+  hinge.forEach(m=>{
+    const t=tagOf(m);
+    if(!heavy||m.heavy.v>heavy.v||(m.heavy.v===heavy.v&&m.heavy.week<heavy.week)) heavy={...m.heavy, tag:t};
+    if(!first||m.first.week<first.week) first={...m.first, tag:t};
+  });
+  const series=([] as any[]).concat(...hinge.map(m=>m.series.map((p: any)=>({w:p.w, v:p.v, tag:tagOf(m)})))).sort((a,b)=>a.w-b.w);
+  const sum=(k: string)=>hinge.reduce((a,m)=>a+(m[k]||0),0);
+  return mains.filter(m=>hinge.indexOf(m)<0).concat([{name:'Deadlift', mode:'load', series, heavy, first,
+    plotted:sum('plotted'), accessoryDay:sum('accessoryDay'), noLoad:sum('noLoad'), entries:sum('entries')}]);
+}
 function ledgerModel(exw: any, hist: any){
   const mains: any[]=[], ladder: any[]=[], plain: any[]=[], unloaded: any[]=[];
   Object.values(exw||{}).forEach(ex=>{
@@ -166,11 +185,11 @@ function ledgerModel(exw: any, hist: any){
                Math.max.apply(null,all.map(e=>+e.weight||0).concat([wt]))]});
     }
   });
-  mains.sort((a,b)=>b.series.length-a.series.length);
+  const mainsOut=_deadliftLine(mains).sort((a,b)=>b.series.length-a.series.length);
   ladder.sort((a,b)=>(b.ready?1:0)-(a.ready?1:0) || b.sessions-a.sessions);
   plain.sort((a,b)=>b.sessions-a.sessions);
   unloaded.sort((a,b)=>b.sessions-a.sessions);
-  return {mains, ladder, plain, unloaded};
+  return {mains:mainsOut, ladder, plain, unloaded};
 }
 
 // ── main lift block: the top set, in whichever unit was written down ───────
@@ -185,7 +204,7 @@ function buildMainLiftBlock(m: any, unit: any){
   const u=isReps?'reps':((unit==='kg')?'kg':'lbs');
   const hv=m.heavy, fs=m.first;
   // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
-  const lblOf=p=>isReps?(p.v+' reps'):(disp(p.v)+(p.reps?'×'+p.reps:''));
+  const lblOf=p=>isReps?(p.v+' reps'):(disp(p.v)+(p.reps?'×'+p.reps:'')+(p.tag?' '+p.tag:''));   // D255: the variant, when not the deadlift
   const hLbl=lblOf(hv);
   const fLbl=lblOf(fs);
   let chart='';
@@ -212,11 +231,13 @@ function buildMainLiftBlock(m: any, unit: any){
       const top=(p.v===hv.v&&p.w===hv.week);
       s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.v).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
     });
+    // D255: each run of a variant is tagged once, over its first point.
+    m.series.forEach((p: any,i: any)=>{ if(p.tag&&(i===0||m.series[i-1].tag!==p.tag)) s+=_axTx(padL+i*xs, yof(p.v)-8, p.tag, 7, 'middle'); });
     const lblStep=Math.max(1,Math.ceil(m.series.length/6));
     m.series.forEach((p: any,i: any)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
     chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>';
   }
-  const gain=disp(hv.v)-disp(fs.v);
+  const gain=(fs.tag===hv.tag)?disp(hv.v)-disp(fs.v):0;   // D255: "up" compares one lift with itself
   // V196 D59 honesty rider: "Opened at" names the week of the FIRST PLOTTED session.
   // An athlete who trained from week 1 and first wrote a weight in week 6 must not be
   // told they opened in week 6 with no week on the number to say otherwise.

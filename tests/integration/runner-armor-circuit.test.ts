@@ -9,6 +9,10 @@
 // this ruling only (2d35e8f743680cfa, held by tests/integration/program-output.test.js). Floor (b) of D149 fires on
 // home_full only. The record is in the handoff and tests/measure/v231_rulings/.
 //
+// D254 (P-CIRCUIT3, v0.249.0, docs/decisions/supersets.md) amends A2: a circuit holds three movements, so the fourth
+// item left the circuit for its own straight-set section right after it, 'Glute — runner armor', with A3c, A5 and A6
+// following it and the reduced weeks keeping it with the circuit (Amendment 1). Below, "the fourth item" is that section.
+//
 // The counterfactuals are the app with part A taken out, part B taken out, or both (tests/support/session-budget.js).
 // This file runs HALF_MANNY, the hand lists and days, the typed cells, and samples of the two lattices;
 // tests/sweeps/runner-armor-circuit.test.js runs the floor (b) lattice (630 configs) and the prevention shard (272) whole.
@@ -26,27 +30,30 @@ const { clone, clean, DAYS } = SB;
 const C = SB.twice(null, fixtures.HALF_MANNY), N = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY);
 const p = C.prog, q = N.prog;
 
-test("HALF_MANNY's W1 to W12 leg day circuit (Thursday since D243) carries Single-leg hip thrust 2×6–10 each @ RPE 7 after its three", () => {
+test("HALF_MANNY's W1 to W12 leg day (Thursday since D243): a three-item circuit, then Single-leg hip thrust 2×6–10 each @ RPE 7 on its own (D254)", () => {
   // D195-A-a: a-tue (the fourth item and items 1 to 3). D243 (v0.243.0) moved his leg day from Tuesday to Thursday,
-  // the card the same in all 14 weeks.
+  // the card the same in all 14 weeks. D254 (v0.249.0): the fourth item is the section right after the circuit, recovery
+  // weeks (W4, W8, W12) included.
   assert.ok(C.self && N.self);
   for (let w = 1; w <= 12; w++) {
-    const it = RA.circuitItems(p.weeks[w].thu)!;
-    assert.equal(it.length, 4, 'W' + w);
-    assert.deepEqual(it[3], RA.FOURTH, 'W' + w);
-    assert.deepEqual(it.slice(0, 3), RA.TUE[w], 'W' + w);
+    const day = JSON.parse(JSON.stringify(p.weeks[w].thu));
+    assert.deepEqual(RA.circuitItems(day), RA.TUE[w], 'W' + w);
+    const secs = day.sections.map((s: AppDay) => clean(s.label));
+    const ci = secs.findIndex((l: string) => RA.CIRCUIT_RE.test(l));
+    assert.equal(secs[ci + 1], 'Glute — runner armor', 'W' + w);
+    assert.deepEqual(day.sections[ci + 1].items.map((i: AppDay) => [clean(i.name), clean(i.detail)]), [RA.FOURTH], 'W' + w);
   }
 });
 
-test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 leg day (Thursday) less item 4, and every other day whole', () => {
+test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 leg day (Thursday) less the glute section, and every other day whole', () => {
   // D195-A-a: a-tue (the day otherwise unchanged), a-other (W13, W14 and every other day)
   assert.equal(SB.weekKeys(p).length, 14);
   let other = 0;
   for (let w = 1; w <= 14; w++) for (const d of DAYS) {
     const a = clone(p.weeks[w][d]);
     if (d === 'thu' && w <= 12) {
-      const si = a.sections.findIndex((s: AppDay) => RA.CIRCUIT_RE.test(clean(s.label)));
-      a.sections[si].items.splice(3, 1);
+      const si = a.sections.findIndex((s: AppDay) => RA.GLUTE_RE.test(clean(s.label)));
+      a.sections.splice(si, 1);
     } else other++;
     assert.equal(SB.dayJ(a), SB.dayJ(q.weeks[w][d]), 'W' + w + ' ' + d);
   }
@@ -70,27 +77,31 @@ test("HALF_MANNY's swap universe is the 107 names, with the fourth item and with
   }
 });
 
-test('part A without part B is b443e538b40890bd, part B without part A is 7ed355470630a9c5 (the ruling printed both, moved by D239, D241, D243, D251 and D252)', () => {
+test('part A without part B is 5151533e6e85fd11, part B without part A is 7ed355470630a9c5 (the ruling printed both, moved by D239, D241, D243, D251, D252 and D254)', () => {
   // D195-A-a: a-cfA, a-cfB. D239 (v0.241.0) moved both (were f5ed630033ebe3db, 0ac7da6b1691a8e1), D241 (v0.242.0) again
   // (were 3e88e365246858f3, b1b15c80f1a703f1): their draws reach his Tuesdays and his core days. D243 (v0.243.0) again
   // (were 93fd2d1d3a43f192, c17e854e54e86f57): one speed day moves his leg day to Thursday. D251 (v0.247.0) again
   // (were b8a8aabf561bfc44, 895bb404a809927b): his week 10 speed day is Nike's tempo session. D252 (v0.248.0) again
-  // (were 3c253c3fd440dad5, df75a47fc8917305): his speed day is the longer of Nike's two sessions.
+  // (were 3c253c3fd440dad5, df75a47fc8917305): his speed day is the longer of Nike's two sessions. D254 (v0.249.0) moved
+  // part A alone (was b443e538b40890bd): the fourth item left the circuit for its own section; part B alone has no
+  // fourth item, so it stands.
   const A = SB.twice(SB.noCostLens(), fixtures.HALF_MANNY);
   assert.ok(A.self);
-  assert.equal(A.dig, 'b443e538b40890bd');
+  assert.equal(A.dig, '5151533e6e85fd11');
   assert.equal(N.dig, '7ed355470630a9c5');
   assert.equal(Array.from(A.prog._swapUniverse || []).length, 107);
 });
 
 // ── the regional trim (A3c, A5) ──────────────────────────────────────────────────────────────────────────────────
-// List (i) is HALF_MANNY's W6 Tuesday: Main 3 sets, the four-item circuit at 2 each, the calf at 2. Five moves (squat,
-// lunge, hinge, hip_ext, calf; the hold has no pattern) against a legs move cap of 4 plus the circuit's one; 11 sets.
+// List (i) is HALF_MANNY's W6 Tuesday: Main 3 sets, the circuit at 2 each, the glute section (D254) at 2, the calf at 2.
+// Five moves (squat, lunge, hinge, hip_ext, calf; the hold has no pattern) against a legs move cap of 4 plus the glute
+// section's one; 11 sets.
 const L1 = [
   { label: 'Main — Front squat', items: [{ name: 'Front squat', detail: '3×8 — RPE 7' }] },
   { label: 'Leg circuit — runner armor', superset: true, rounds: 2, items: [
     { name: 'Dumbbell Bulgarian split squat', detail: '2×8–12 each @ RPE 7' }, { name: 'Spanish squat hold (KB)', detail: '2×25 sec' },
-    { name: 'Kettlebell swing', detail: '2×8' }, { name: 'Single-leg hip thrust', detail: '2×6–10 each @ RPE 7' }] },
+    { name: 'Kettlebell swing', detail: '2×8' }] },
+  { label: 'Glute — runner armor', items: [{ name: 'Single-leg hip thrust', detail: '2×6–10 each @ RPE 7' }] },
   { label: 'Calf — achilles armor', items: [{ name: 'Dumbbell seated calf raise', detail: '2×12–15 each, slow 3-sec lower' }] },
 ];
 // A hard run read by hand off _cardioInterference: run base 1.0 x 'speed run' intensity 1.4 + no distance = 1.4, so the
@@ -110,15 +121,15 @@ test('the regional trim reads a hard run at 1.4 interference', () => {
   assert.equal(IA.eval('_cardioInterference')(clone(HARD_RUN)), 1.4);
 });
 
-test('a four-item circuit and the calf pass the regional trim untouched with no cardio', () => {
+test('the circuit, the glute section and the calf pass the regional trim untouched with no cardio', () => {
   // D195-A-c: c-i
   assert.deepEqual(crf(L1, null), L1);
 });
 
-test('a three-item circuit with a leg isolation item (five moves, no four-item circuit) loses exactly one item', () => {
+test('a three-item circuit with a leg isolation item (five moves, no glute section) loses exactly one item', () => {
   // D195-A-c: c-ii
   const L2 = clone(L1);
-  L2[1].items.pop();
+  L2.splice(2, 1);
   L2.push({ label: 'Leg isolation', items: [{ name: 'Leg extension', detail: '2×12–15' }] });
   const out = crf(L2, null);
   let one = 0;
@@ -130,11 +141,11 @@ test('a three-item circuit with a leg isolation item (five moves, no four-item c
   assert.equal(one, 1);
 });
 
-test("on a hard run day the circuit's fourth item leaves, and the lunge, hold, hinge and calf stay", () => {
+test("on a hard run day the glute section's hip thrust leaves, and the lunge, hold, hinge and calf stay", () => {
   // D195-A-c: c-iii
   const want = clone(L1);
-  want[1].items.splice(3, 1);
-  assert.deepEqual(crf(L1, clone(HARD_RUN)), want);
+  want[2].items.splice(0, 1);
+  assert.deepEqual(live(crf(L1, clone(HARD_RUN))), live(want));
 });
 
 // ── the session budget (A6 with B's pricing) ─────────────────────────────────────────────────────────────────────
@@ -159,13 +170,13 @@ for (const c of RA.LEGS_DAYS) {
   });
 }
 
-test('the two typed cells print the cards coach printed: a four-item circuit with the calf, and since D243 the carry finisher; Wall sit second of three', () => {
+test('the two typed cells print the cards coach printed: the circuit, the glute section (D254) and the calf, and since D243 the carry finisher; Wall sit second of three', () => {
   // D195-A-d: d-cellA, d-cellB
   const a = SB.twice(null, RA.CELL_F1.cfg).prog.weeks[RA.CELL_F1.w][RA.CELL_F1.d];
   const b = SB.twice(null, RA.CELL_FH.cfg).prog.weeks[RA.CELL_FH.w][RA.CELL_FH.d];
   assert.deepEqual(SB.cardLines(a), RA.CARD_F1);
-  assert.equal(RA.circuitItems(a)!.length, 4);
-  assert.ok(RA.hasSec(a, /^Calf — achilles/) && RA.hasSec(a, /carry/i));
+  assert.equal(RA.circuitItems(a)!.length, 3);
+  assert.ok(RA.hasSec(a, RA.GLUTE_RE) && RA.hasSec(a, /^Calf — achilles/) && RA.hasSec(a, /carry/i));
   assert.deepEqual(SB.cardLines(b), RA.CARD_FH);
   assert.deepEqual(RA.circuitItems(b)!.map((x) => x.join(' '))[1], 'Wall sit 2×25 sec');
   assert.equal(RA.circuitItems(b)!.length, 3);
@@ -192,7 +203,7 @@ test('on a sample of the knee protect lattice floor (b) fires on home_full only,
 });
 
 // ── the prevention shard, on a sample (the 272 are in the sweep) ─────────────────────────────────────────────────
-test("on a sample of the prevention shard part A only appends one item to a runner's circuit, takes only from the carry or core block, and moves no universe", () => {
+test("on a sample of the prevention shard part A only adds one item after a runner's circuit, takes only from the carry or core block, and moves no universe", () => {
   // D195-A-b: b-notA, b-shard, b-fourth, b-add, b-rem, b-circ, b-calf, b-nonrun, b-knee; D195-A-f: f-shard, f-nonbw,
   // f-bwlb, f-other (every 12th program of the 272)
   const S = RA.shardBuild(RA.preventionShard().filter((_, i) => i % 12 === 0));

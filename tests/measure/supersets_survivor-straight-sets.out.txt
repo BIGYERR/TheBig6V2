@@ -1,0 +1,67 @@
+# v0.248.0 (HEAD ff0269f), 2026-10-26: the before-picture
+== Part A: a superset reduced to one live member
+programs 865; superset sections 42941 (42941 with a round count); members tried 93550; cards read 93550
+survivor's own detail opens "N sets": 30702 (round count equal to N: 30702, different: 0)
+drawn as "R×N sets ...": 30702
+logged in seconds though its own detail is not: 30702 (own detail already in seconds: 8221)
+-- distinct garbled cards (count, name | drawn detail):
+  1283  Diamond pushups | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  926  Single-leg glute bridge | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  783  Pushups (slow tempo) | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  748  Resistance band row | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  690  Dips | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  673  Decline pushups | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  550  Step-ups (chair) | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  544  L-sit chinups | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  542  Bodyweight back extension | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  512  Banded hip thrust | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  504  Diamond pushups | 3×3 sets — RPE 8 (stop 2 reps short of failure)
+  468  Diamond pushups | 4×4 sets — RPE 8 (stop 2 reps short of failure)
+  447  Neutral-grip chinups | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  443  Resistance band row | 4×4 sets — RPE 7 (leave 3 or more in reserve)
+  438  Decline pushups | 4×4 sets — RPE 7 (leave 3 or more in reserve)
+  432  Single-leg hip thrust (shoulders on bed) | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  429  Feet-elevated inverted rows | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  417  Bulgarian split squat (foot on chair) | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  412  Pike pushups | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  385  Chinups | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  384  Pushups (slow tempo) | 4×4 sets — RPE 7 (leave 3 or more in reserve)
+  382  Diamond pushups | 4×4 sets — RPE 7 (leave 3 or more in reserve)
+  354  Pike pushups (feet elevated) | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  342  Single-arm resistance band row | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+  336  Close-grip pushups | 2×2 sets — RPE 7 (leave 3 or more in reserve)
+   (209 distinct)
+-- distinct cards logged in seconds by mistake:
+  1283  Diamond pushups | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  926  Single-leg glute bridge | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  783  Pushups (slow tempo) | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  748  Resistance band row | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  690  Dips | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  673  Decline pushups | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  550  Step-ups (chair) | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  544  L-sit chinups | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  542  Bodyweight back extension | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  512  Banded hip thrust | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  504  Diamond pushups | 3 sets — RPE 8 (stop 2 reps short of failure)  =>  3×3 sets — RPE 8 (stop 2 reps short of failure)
+  468  Diamond pushups | 4 sets — RPE 8 (stop 2 reps short of failure)  =>  4×4 sets — RPE 8 (stop 2 reps short of failure)
+  447  Neutral-grip chinups | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  443  Resistance band row | 4 sets — RPE 7 (leave 3 or more in reserve)  =>  4×4 sets — RPE 7 (leave 3 or more in reserve)
+  438  Decline pushups | 4 sets — RPE 7 (leave 3 or more in reserve)  =>  4×4 sets — RPE 7 (leave 3 or more in reserve)
+  432  Single-leg hip thrust (shoulders on bed) | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  429  Feet-elevated inverted rows | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  417  Bulgarian split squat (foot on chair) | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  412  Pike pushups | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  385  Chinups | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  384  Pushups (slow tempo) | 4 sets — RPE 7 (leave 3 or more in reserve)  =>  4×4 sets — RPE 7 (leave 3 or more in reserve)
+  382  Diamond pushups | 4 sets — RPE 7 (leave 3 or more in reserve)  =>  4×4 sets — RPE 7 (leave 3 or more in reserve)
+  354  Pike pushups (feet elevated) | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  342  Single-arm resistance band row | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+  336  Close-grip pushups | 2 sets — RPE 7 (leave 3 or more in reserve)  =>  2×2 sets — RPE 7 (leave 3 or more in reserve)
+   (209 distinct)
+
+== Part B: details the strict grammar reads as a unit off a longer word
+lattice: 251 distinct details, 0 misread
+wildcard: 172 distinct details, 2 misread
+  4×12 slow  -> {"sets":4,"kind":"sec","unit":"sec","step":5,"target":12,"perSide":false}
+  3×15 slow  -> {"sets":3,"kind":"sec","unit":"sec","step":5,"target":15,"perSide":false}
+

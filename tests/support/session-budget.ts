@@ -117,9 +117,12 @@ export const BUDGET_OFF_SWITCH = "if(typeof globalThis!=='undefined' && (globalT
 // subset registering the whole pool (A1x), and the fourth item itself (A2r). reversed(HIPEXT_A) takes A back out.
 const RANK2 = "    if(/superset b|biceps|triceps|leg isolation|calves|accessory|pump|chest \\+ knee/.test(L)) return 2;\n";
 const CAPFOR = "  const _capFor = r => Math.max(6, _setCap(r) - (r==='legs' ? _legCut : _uppCut));\n";
+// D254 (v0.249.0) moved P-HIPEXT's hip extension out of the circuit into its own section; the after-texts below
+// are the D254 code, so reversing them still lands on the program before P-HIPEXT. The reduced-week lines D254 added
+// stay: without the section they never fire.
 export const HIPEXT_A: Rep[] = [
-  [RANK2, "    if(/^leg circuit/.test(L)) return (itemIdx>=3) ? 3 : 2;\n" + RANK2],
-  [CAPFOR, CAPFOR + "  const _moveCapFor = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^leg circuit/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>=4)) ? 1 : 0);\n"],
+  [RANK2, "    if(/^glute — runner armor/.test(L)) return 3;   // D254: the P-HIPEXT hip extension, out of the circuit, still goes first\n    if(/^leg circuit/.test(L)) return 2;\n" + RANK2],
+  [CAPFOR, CAPFOR + "  const _moveCapFor = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^glute — runner armor/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>0)) ? 1 : 0);   // D254\n"],
   ["      ((regionMoves[r]||0)-_moveCap(r))*4\n", "      ((regionMoves[r]||0)-_moveCapFor(r))*4\n"],
   ["      .filter(r=>(regionScore[r]||0)>_ceil(r) || (regionSets[r]||0)>_capFor(r) || (regionMoves[r]||0)>_moveCap(r))\n",
     "      .filter(r=>(regionScore[r]||0)>_ceil(r) || (regionSets[r]||0)>_capFor(r) || (regionMoves[r]||0)>_moveCapFor(r))\n"],
@@ -133,11 +136,16 @@ export const HIPEXT_A: Rep[] = [
   "        s.push({label:'Leg circuit — runner armor',superset:true,rounds:2,items:[\n"
     + "          {name:ex.lunge[0],detail:'2×10 each'},\n"
     + "          {name:ex.kneeStab,detail:'2×25 sec'},\n"
-    + "          {name:ex.hinge[0],detail:'2×8'}].concat((_isRunner&&ex.hipExt&&ex.hipExt!==ex.hinge[0])?[{name:ex.hipExt,detail:'2×8 each'}]:[])});\n"],
+    + "          {name:ex.hinge[0],detail:'2×8'}]});\n"
+    + "        // v0.249.0 (D254, P-CIRCUIT3): a circuit holds three movements, so the P-HIPEXT hip\n"
+    + "        // extension follows the round as its own straight sets instead of riding in it as a\n"
+    + "        // fourth station. Same draw, same gate, same dose; the label carries no \"hip\", which\n"
+    + "        // the budget reads as prehab and protects.\n"
+    + "        if(_isRunner&&ex.hipExt&&ex.hipExt!==ex.hinge[0]) s.push({label:'Glute — runner armor',items:[{name:ex.hipExt,detail:'2×8 each'}]});\n"],
   ["        if(_postLeft<=1 && _isPost(it.name)) return;       // V198 (D85): the day's LAST hinge/hip_ext is not budget fodder\n"
     + "        const score=sr*10+_itemRank(it.name);\n",
   "        if(_postLeft<=1 && _isPost(it.name)) return;       // V198 (D85): the day's LAST hinge/hip_ext is not budget fodder\n"
-    + "        const score=(((ii>=3)&&/^leg circuit/i.test((s&&s.label)||''))?3:sr)*10+_itemRank(it.name);\n"],
+    + "        const score=(/^glute — runner armor/i.test((s&&s.label)||'')?3:sr)*10+_itemRank(it.name);   // D254: the P-HIPEXT section goes first\n"],
 ];
 /** The app without D195-B's cost lens, without D195-A, and without both: the three counterfactuals the rulings printed. */
 export const noCostLens = (): string => variant('no-cost-lens', reversed([COST_LENS]));

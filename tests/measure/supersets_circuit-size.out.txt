@@ -1,0 +1,26 @@
+# v0.248.0 (HEAD ff0269f), 2026-10-26: the before-picture
+programs 865; training days 60550
+circuits by movement count: 2: 38393, 3: 1428, 4: 3120
+days with a circuit of 4+: 3120/60550; programs with one: 262/865
+4+ circuits by label:
+  3120  Leg circuit — runner armor
+movements in slot 4 and later:
+  1632  Single-leg hip thrust
+  780  Single-leg glute bridge (weighted)
+  360  Single-leg hip thrust (shoulders on bed)
+  300  Banded hip thrust
+  48  Single-leg glute bridge
+HALF_MANNY 4+ circuits:
+  W1 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Dumbbell Bulgarian split squat, Spanish squat hold (KB), Barbell Romanian deadlift, Single-leg hip thrust
+  W2 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Dumbbell Bulgarian split squat, Spanish squat hold (KB), Barbell Romanian deadlift, Single-leg hip thrust
+  W3 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Dumbbell goblet side lunge, Wall sit, Kettlebell swing, Single-leg hip thrust
+  W4 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Dumbbell goblet side lunge, Wall sit, Kettlebell swing, Single-leg hip thrust
+  W5 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Step-downs (KB), Spanish squat hold (KB), Kettlebell swing, Single-leg hip thrust
+  W6 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Step-downs (KB), Spanish squat hold (KB), Kettlebell swing, Single-leg hip thrust
+  W7 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Step-downs (KB), Wall sit, Kettlebell single-leg deadlift, Single-leg hip thrust
+  W8 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Step-downs (KB), Wall sit, Kettlebell single-leg deadlift, Single-leg hip thrust
+  W9 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Dumbbell goblet side lunge, Spanish squat hold (KB), Dumbbell split-stance deadlift, Single-leg hip thrust
+  W10 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Dumbbell goblet side lunge, Spanish squat hold (KB), Dumbbell split-stance deadlift, Single-leg hip thrust
+  W11 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Goblet side lunge to knee drive, Wall sit, Kettlebell single-leg deadlift, Single-leg hip thrust
+  W12 thu Leg Strength + Mobility :: Leg circuit — runner armor :: Goblet side lunge to knee drive, Wall sit, Kettlebell single-leg deadlift, Single-leg hip thrust
+
