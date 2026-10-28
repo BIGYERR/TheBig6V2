@@ -37,6 +37,7 @@ Procedure for every build:
    - `cd tests && IA_APP=<scratch>/base_v<previous>.html npx vitest run <each file you changed>`: every test written for a changed behaviour fails on the baseline (a guard for behaviour that must not change says so in its file);
    - if the ruling moves program output, `cd tests && UPDATE_SNAPSHOTS=1 npx vitest run integration/program-output.test.ts` and read `git diff tests/snapshots/`: HALF_MANNY's new digest must equal the one coach printed (standing ruling 5). Never regenerate a snapshot the ruling does not move.
    - the same ruling also moves the lattice: `cd tests && UPDATE_SNAPSHOTS=1 npx vitest run sweeps/program-output.test.ts` (a minute or two) regenerates `tests/snapshots/program-output-lattice.json`; name in the handoff which config tags moved.
+   - then every sweep (CLAUDE.md, Test layout, Post-v0.250.0): `cd tests && npx vitest run sweeps > <scratch>/sweeps.out 2>&1`, in the background. Every golden file it turns red is classified against the ruling, regenerated under it (`UPDATE_SNAPSHOTS=1` on that file) and named in the ruling's blast radius, in the release commit. v0.250.0 missed two sweep censuses D260 moved, and CI went red.
 6. Hand off to gatekeeper with: the ruling (its decision file entry), the baseline path, the test files and which behaviour each test holds, the previous-release run, and the classes of diff you EXPECT (so unclassified hunks stand out).
 
 **Seeing the edit (optional, never proof).** If the full stack dev mode is running (`curl -s localhost:3000/healthz`
