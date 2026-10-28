@@ -80,16 +80,20 @@ handoff §12.
 deploy proof, one session writes to this working tree. Any other session that needs to write (a measure, a queue review,
 a docs pass) works in its own git worktree or waits until the build commits. V238's final hash went red on another
 session's files written into `tests/measure/` mid-proof.
+**A D-code travels with its decision file (Mario, Post-v0.250.0).** The session that issues a D-code commits the handoff's
+registry line and the decision file it names together, at once, in a `docs:` commit, so no other session's commit carries
+the line alone. A session that finds another's uncommitted registry text in its own commit says so in its report.
+v0.250.0 carried the D258/D259 line to `dev` while `docs/decisions/speed-work.md` stayed untracked.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it, and print the deploy picture (step 7).
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `<feature>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience. The main session appends the ruling to its feature's decision file (Proof for new work).
 4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to the source files under `frontends/app/src/legacy/src/` (every text replaced occurs exactly once in the file it edits before it is replaced), `index.html` rebuilt from them (`npm run build:index`), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
 5. Gatekeeper proves it as **Pipeline** and **Proof for new work** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews. Green, or a NAMED failing test.
 6. `handoff-update` skill: the seven-element session entry, with the release line of each decision this version shipped filled in (`docs/decisions/<feature>.md`). Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
-   `git add -A`**, Mario, Post-V238), commit on `dev` (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check) and `git push origin dev`.
-   The push runs the full suite in CI; when it has finished, read it (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) and
-   report the result to Mario. **Mario opens every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one
-   (Mario, Post-V239).** When he has merged it, tag what merged: `git fetch origin && git tag v<version> origin/main && git push origin v<version>`.
+   `git add -A`**, Mario, Post-V238) and commit on `dev` (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check).
+   **Push only when Mario asks** (`git push origin dev`), and never wait on CI (Mario, Post-v0.250.0): the push runs the full suite there and Mario
+   reviews it himself; read a run (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) only when he asks. **Mario opens
+   every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one (Mario, Post-V239).** When he has merged it, tag what merged: `git fetch origin && git tag v<version> origin/main && git push origin v<version>`.
 7. **Report the deploy picture; a lagging deploy does not block** (Mario, Post-V239). A push or a merge is not a deploy:
    Pages can report `built` with no error while sitting several commits behind (it silently did not fire on V192 or
    V193). At session start and after every push or merge, read each of these from its own source, never inferring one
