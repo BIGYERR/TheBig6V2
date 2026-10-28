@@ -29,7 +29,7 @@ C. Coverage: list every behaviour the ruling changes against the test that holds
 D. Oracles and snapshots: no test asks the app for its own expected value. A changed `tests/snapshots/*.json` is red unless the ruling moves program output; when HALF_MANNY moves, its new digest equals the one coach printed before the build.
 E. Blast radius: `git diff` of `index.html` against the baseline, every hunk classified into a class builder declared; an unclassified hunk or an unruled removal is red.
 F. Lattice: when the ruling moves program output, `tests/snapshots/program-output-lattice.json` moves with it (`tests/sweeps/program-output.test.ts`, 864 configs on HALF_MANNY). Classify the moved digests by their config tags (injury, tier, focus, level, seed) against the ruling's blast radius; a digest that moves outside the ruled scope is red. When the ruling claims one engine only, the other engine's output is unchanged.
-G. CI: after the push to `dev`, read the run (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`). Every job green: the unit, integration and sweep tests, the app and backend, and the e2e.
+G. CI: when Mario asks (he reviews CI himself; Post-v0.250.0), read the run after the push to `dev` (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`). Every job green: the unit, integration and sweep tests, the app and backend, and the e2e.
 
 **`npm run dev` is not proof.** The full stack dev mode (`backend/scripts/dev.ts`) runs a 3 second subset of tests for a
 fast look; nothing it prints counts as a test or CI result, and you never cite it. Do not start it during a

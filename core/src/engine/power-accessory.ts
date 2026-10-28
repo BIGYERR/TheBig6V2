@@ -109,6 +109,8 @@ const _POWER_AGE_BUDGET_MOD: Record<string, number> = {'18-35':1, '36-54':0.92, 
 // a 3-rep lead movement gives 6 / 7 / 9 sets by experience, and a 2.0-cost box jump
 // gives 4 where a 1.0-cost jump squat gives 9. Ceiling raised to 10 because 10x3 is a
 // standard power protocol and 8 was cutting the advanced case short.
+// D260 (P-POWERSETS, Mario concurred 2026-10-27): 0.20 and 10 now hold for the 0.5 tier
+// only. Max-intent work takes _POWER_MAX_INTENT_SHARE and _POWER_MAX_INTENT_SETS below.
 function _powerDose(name: string, experience: string | null | undefined, repsPerSet: number | null | undefined, shareOfSession: number | null | undefined, ageBracket: string | null | undefined): number{
   const cost = _powerCost(name) || 1;
   // V144 (D4-i/iii): the budget owns EVERY dose input — experience AND age. vsets is out
@@ -180,10 +182,23 @@ function _powerReps(name: string, roleReps: number): number{
 // the tier picks it, the role breaks ties only above 0.5. 'max intent' stays reserved for
 // loaded triples per V144 Ruling 2; the 0.5 tier's V144 copy ('crisp and explosive')
 // described a triple and is retired along with the triple.
+// — MAX-INTENT WORK RUNS 3 TO 5 SETS (D260, P-POWERSETS, Mario concurred 2026-10-27) —
+// At 0.20 an intermediate's double-leg triple came out 7x3 and an advanced one 9x3: the
+// share split a whole plyometric session's contact band between two movements, and the
+// arithmetic picked the sets. NSCA's power rows write 3 to 5 sets. 12/110 puts the
+// reference athlete (intermediate, 18-35, a 1.0 triple) at 4, the middle of that band, and
+// 5 is its top; experience and age still scale inside it (V144 D4-i). The 0.5 tier is not
+// max-intent work and keeps V170 D3's density dose.
+const _POWER_MAX_INTENT_SHARE=12/110;
+const _POWER_MAX_INTENT_SETS=5;
 function _powerPrescribe(name: string, roleReps: number, experience: string | null | undefined, ageBracket: string | null | undefined): string{
   const reps=_powerReps(name, roleReps);
   const cue=(_powerCost(name)<=0.5) ? 'fast and crisp' : ((roleReps<=3) ? 'max intent' : 'explosive');
-  return _powerDose(name, experience, reps, 0.20, ageBracket)+'×'+reps+' — '+cue+', '+_powerRest(name);
+  const sets=(_powerCost(name)<=0.5) ? _powerDose(name, experience, reps, 0.20, ageBracket)
+    : Math.min(_POWER_MAX_INTENT_SETS, _powerDose(name, experience, reps, _POWER_MAX_INTENT_SHARE, ageBracket));
+  // D260: the athlete picks the load, and a trap bar jump's best power sits at a light one.
+  const load=/trap bar jump/i.test(name) ? 'light bar, ' : '';
+  return sets+'×'+reps+' — '+load+cue+', '+_powerRest(name);
 }
 // D8-REVISED (Claude's call, flagged for Mario's override — a CONSEQUENCE of D1, not a
 // ruling he made). The label used to promise 'full recovery'. Under D1 that is only true

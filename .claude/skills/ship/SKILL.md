@@ -13,7 +13,7 @@ B. Each new or changed test file against the previous release: `cd tests && IA_A
 C. Every behaviour the ruling changes is matched to a named test. A changed behaviour with no test is red.
 D. `git diff` on `index.html` and `tests/snapshots/`: every hunk classified against the ruling. A snapshot moves only when the ruling moves program output, and HALF_MANNY's new digest is the one coach printed.
 E. When the ruling moves program output, the lattice golden file (`tests/snapshots/program-output-lattice.json`) moved with it, and every moved digest's config tags fall inside the ruling's blast radius. If the ruling says "engine X only", the other engine's output is unchanged.
-F. CI on the push to `dev`: every job green (unit, integration and sweeps; app and backend; e2e), read with `gh run view` and `gh run download`, never rerun locally.
+F. CI on the push to `dev`, read only when Mario asks (he reviews it himself; Post-v0.250.0): every job green (unit, integration and sweeps; app and backend; e2e), read with `gh run view` and `gh run download`, never rerun locally. Unread, the verdict's CI line says `not read: <why>`.
 
 **Where each step runs is set by CLAUDE.md's Pipeline section.** Locally only what finishes inside 60 seconds, plus the previous-release runs of step B. Mario opens the pull request into `main` himself, by hand; no agent ever opens one.
 
@@ -25,5 +25,5 @@ BLAST    …   (hunks, classes, unclassified)
 LATTICE  …   (digests moved of 864, outside the ruled scope)
 VERDICT  GREEN | RED — <what>
 ```
-On GREEN the main session runs `handoff-update`, then stages the build's files by path (never `git add -A`: another session's untracked files stay out; Mario, Post-V238) and commits on the local `dev` branch in the main checkout (`git commit -m "v<version>: <title>"`), then pushes that branch only (`git push origin dev`; never from a worktree, never to `main`; CLAUDE.md Pipeline). The tag comes after Mario has merged his own pull request into `main` (`git fetch origin && git tag v<version> origin/main && git push origin v<version>`, CLAUDE.md Session rhythm step 6), then the deploy picture is printed (step 7).
+On GREEN the main session runs `handoff-update`, then stages the build's files by path (never `git add -A`: another session's untracked files stay out; Mario, Post-V238) and commits on the local `dev` branch in the main checkout (`git commit -m "v<version>: <title>"`), then pushes that branch only when Mario asks (`git push origin dev`; never from a worktree, never to `main`; CLAUDE.md Pipeline). The tag comes after Mario has merged his own pull request into `main` (`git fetch origin && git tag v<version> origin/main && git push origin v<version>`, CLAUDE.md Session rhythm step 6), then the deploy picture is printed (step 7).
 On RED the build goes back to builder with the named test. A test is not edited unless its oracle is shown wrong on a specific line.
