@@ -13,7 +13,7 @@ export interface TagChip {
 /** The legacy modTagsHTML: every tag but rest, in its palette color, or the fallback color for a tag with none. */
 export function modTags(tags: readonly string[] | undefined, pal: Record<string, readonly [string, string] | undefined>, meta: Record<string, { label?: string } | undefined>): TagChip[] {
   return (tags || []).filter((t) => t !== 'rest').map((t) => {
-    const p = pal[t] || ['#7d7668', 'rgba(125,118,104,0.12)'];
+    const p = pal[t] || ['var(--mark)', 'rgba(var(--mark-rgb),0.12)'];
     return { label: (meta[t] && meta[t]!.label) || t, color: p[0], bg: p[1] };
   });
 }

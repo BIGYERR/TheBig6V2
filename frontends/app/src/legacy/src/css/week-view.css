@@ -44,13 +44,13 @@
 .hurt-btn.is-injured{border-color:var(--red);color:var(--red);}
 /* ── INJURY WEEK WASH (option C) ── top rail + tinted hero + day-card rail. Scoped to
    .is-injury-week on the week screen so a healthy week is byte-identical to before. */
-.is-injury-week .wk-topbar{background:rgba(158,51,40,0.07);border-bottom-color:rgba(158,51,40,0.22);box-shadow:inset 0 3px 0 0 var(--red);}
-.is-injury-week .wk-subrow{background:rgba(158,51,40,0.07);border-bottom-color:rgba(158,51,40,0.22);}
+.is-injury-week .wk-topbar{background:rgba(var(--red-rgb),0.07);border-bottom-color:rgba(var(--red-rgb),0.22);box-shadow:inset 0 3px 0 0 var(--red);}
+.is-injury-week .wk-subrow{background:rgba(var(--red-rgb),0.07);border-bottom-color:rgba(var(--red-rgb),0.22);}
 .is-injury-week .day-card:not(.rest){border-left:3px solid var(--red);}
 .phase-pill:empty{display:none;}
 .random-bar{padding:12px 20px;border-bottom:1px solid var(--border);}
-.random-btn{width:100%;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:11px;border-radius:4px;border:1px solid rgba(188,106,67,0.40);background:rgba(188,106,67,0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
-.random-btn{flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:11px 12px;border-radius:4px;border:1px solid rgba(188,106,67,0.40);background:rgba(188,106,67,0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;gap:8px;}
+.random-btn{width:100%;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:11px;border-radius:4px;border:1px solid rgba(var(--lift-rgb),0.40);background:rgba(var(--lift-rgb),0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
+.random-btn{flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:11px 12px;border-radius:4px;border:1px solid rgba(var(--lift-rgb),0.40);background:rgba(var(--lift-rgb),0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;gap:8px;}
 .wk-actions-row{display:flex;gap:8px;align-items:stretch;}
 .change-btn{flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:11px 12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 .change-btn:active{transform:scale(.98);}
@@ -82,26 +82,26 @@
 .ov-effect{border-top:1px solid var(--border);padding-top:14px;margin-top:12px;margin-bottom:16px;}
 .ov-effect-ttl{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
 .ov-effect-sub{font-size:12px;color:var(--muted);line-height:1.5;}
-.ov-apply{width:100%;background:var(--accent);color:var(--on-ink,#F4F1E8);text-align:center;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:15px;border-radius:4px;border:none;cursor:pointer;}
+.ov-apply{width:100%;background:var(--accent);color:var(--on-ink);text-align:center;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:15px;border-radius:4px;border:none;cursor:pointer;}
 .ov-apply:active{transform:scale(.98);}
 /* v0.240.0 (D228): the rest sheet's Clear, under Log it. */
 .ov-clear{width:100%;margin-top:10px;background:transparent;color:var(--text);text-align:center;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:13px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;}
 .ov-clear:active{transform:scale(.98);}
-.wk-chip-ov{display:inline-block;font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.06em;color:var(--lift);border:1px solid rgba(188,106,67,0.45);border-radius:2px;padding:1px 4px;margin-top:3px;}
+.wk-chip-ov{display:inline-block;font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.06em;color:var(--lift);border:1px solid rgba(var(--lift-rgb),0.45);border-radius:2px;padding:1px 4px;margin-top:3px;}
 .days-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px;flex:1;background:var(--bg) !important;}
-.day-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color 0.15s;box-shadow:0 1px 2px rgba(40,34,22,0.06);}
+.day-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color 0.15s;box-shadow:0 1px 2px rgba(var(--shadow-rgb),0.06);}
 .day-card:active{background:var(--surface2);}
-.day-card.rest{opacity:1;cursor:default;background:var(--surface2) !important;border-color:rgba(24,23,18,0.06) !important;filter:grayscale(1);}
+.day-card.rest{opacity:1;cursor:default;background:var(--surface2) !important;border-color:rgba(var(--ink-rgb),0.06) !important;filter:grayscale(1);}
 .day-card.past{opacity:0.45;filter:grayscale(0.6);}
-.day-card.past .day-title{text-decoration:line-through;text-decoration-color:rgba(24,23,18,0.2);}
+.day-card.past .day-title{text-decoration:line-through;text-decoration-color:rgba(var(--ink-rgb),0.2);}
 .day-card.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
-.day-card.completed{border-color:rgba(94,140,84,0.6);}
-.day-card.completed .day-dot{background:rgba(94,140,84,0.18);color:var(--run);}
+.day-card.completed{border-color:rgba(var(--run-rgb),0.6);}
+.day-card.completed .day-dot{background:rgba(var(--run-rgb),0.18);color:var(--run);}
 .day-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.04em;}
 .dot-run{background:var(--run-dim);color:var(--run);}
 .dot-bike{background:var(--bike-dim);color:var(--bike);}
 .dot-lift{background:var(--lift-dim);color:var(--lift);}
-.dot-rest{background:rgba(24,23,18,0.06);color:rgba(24,23,18,0.25);}
+.dot-rest{background:rgba(var(--ink-rgb),0.06);color:rgba(var(--ink-rgb),0.25);}
 .day-info{flex:1;}
 .day-name{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;}
 .day-title{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--text);letter-spacing:0.02em;}

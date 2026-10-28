@@ -216,7 +216,7 @@ function buildKBChips(exKey: any, lastW: any, weekLabel: any, unit: any, exName:
   kbSizes.forEach(function(s) {
     const sel = +lastW === s;
     const bdr = sel ? 'var(--accent)' : 'var(--border2)';
-    const bg  = sel ? 'rgba(24,23,18,0.20)' : 'var(--surface2)';
+    const bg  = sel ? 'rgba(var(--ink-rgb),0.20)' : 'var(--surface2)';
     const clr = sel ? 'var(--accent)' : 'var(--muted)';
     html += `<button data-exkey="${exKey}" data-size="${s}" onclick="selectKBByKey(this.dataset.exkey,+this.dataset.size)" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:5px 9px;border-radius:4px;cursor:pointer;border:1px solid ${bdr};background:${bg};color:${clr}">${s}</button>`;
   });

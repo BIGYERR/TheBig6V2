@@ -62,7 +62,7 @@ describe('the Lift Ledger', () => {
     assert.deepEqual(t.els.filter((e) => e.el === 'rect'), [], 'the lowest set is the bottom of the range: nothing filled');
     assert.deepEqual(t.els.filter((e) => e.el === 'circle').map((e) => e.a['cx']), ['56.0', '50.5', '0.0']);
     const ends = t.els.filter((e) => e.el === 'text');
-    assert.deepEqual(ends.map((e) => [e.text, e.a['fill'], e.a['font-weight']]), [['10', 'rgba(24,23,18,0.3)', undefined], ['15', 'rgba(24,23,18,0.3)', undefined]]);
+    assert.deepEqual(ends.map((e) => [e.text, e.a['fill'], e.a['font-weight']]), [['10', 'rgba(var(--ink-rgb),0.3)', undefined], ['15', 'rgba(var(--ink-rgb),0.3)', undefined]]);
   });
 
   it('fills a ready accessory\'s track to the top in the signal colour', () => {

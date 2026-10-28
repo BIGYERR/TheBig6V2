@@ -328,7 +328,7 @@ export function easyBandsFallback(byClass: RunsByClass, d: RunChartDeps): CardSp
   const xof = (p: number) => padL + ((p - lo) / (hi - lo)) * plotW;
   const s: SvgEl[] = [];
   for (let pv = Math.ceil(lo / 60) * 60; pv <= hi; pv += 60) {
-    s.push(svgEl('line', { x1: xof(pv).toFixed(1), y1: padT - 6, x2: xof(pv).toFixed(1), y2: padT + 58, stroke: 'rgba(24,23,18,0.06)', 'stroke-width': '1' }));
+    s.push(svgEl('line', { x1: xof(pv).toFixed(1), y1: padT - 6, x2: xof(pv).toFixed(1), y2: padT + 58, stroke: 'rgba(var(--ink-rgb),0.06)', 'stroke-width': '1' }));
     s.push(axTx(xof(pv), padT + 74, d.pace(pv), 8, 'middle'));
   }
   s.push(axTx(padL, padT - 12, '← faster', 7, 'start'));
@@ -365,7 +365,7 @@ export function paceChart(title: string, weeks: number[], data: (number | null)[
   [lo, (lo + hi) / 2, hi].forEach((yv) => {
     const cy = Y(yv);
     s.push(gridLine(padL, cy.toFixed(1), W - padR));
-    s.push(svgEl('text', { x: padL - 4, y: (cy + 4).toFixed(1), fill: 'rgba(24,23,18,0.3)', 'font-size': '8', 'text-anchor': 'end', 'font-family': 'Helvetica Neue,Helvetica,Geist,sans-serif' }, d.pace(yv)));
+    s.push(svgEl('text', { x: padL - 4, y: (cy + 4).toFixed(1), fill: 'rgba(var(--ink-rgb),0.3)', 'font-size': '8', 'text-anchor': 'end', 'font-family': 'Helvetica Neue,Helvetica,Geist,sans-serif' }, d.pace(yv)));
   });
   if (tgt) {
     const ty = Y(tgt);
@@ -394,8 +394,8 @@ export function paceChart(title: string, weeks: number[], data: (number | null)[
   const xLabelStep = n <= 8 ? 1 : n <= 16 ? 2 : 4;
   weeks.forEach((w, i) => {
     if (i % xLabelStep !== 0) return;
-    s.push(svgEl('text', { x: (padL + i * xStep).toFixed(1), y: H - padB + 14, 'font-size': '8', fill: 'rgba(24,23,18,0.35)', 'text-anchor': 'middle', 'font-family': 'Helvetica Neue,Helvetica,Geist,sans-serif' }, 'W' + w));
+    s.push(svgEl('text', { x: (padL + i * xStep).toFixed(1), y: H - padB + 14, 'font-size': '8', fill: 'rgba(var(--ink-rgb),0.35)', 'text-anchor': 'middle', 'font-family': 'Helvetica Neue,Helvetica,Geist,sans-serif' }, 'W' + w));
   });
-  s.push(svgEl('text', { x: (padL + plotW / 2).toFixed(1), y: H - 4, 'font-size': '8', fill: 'rgba(24,23,18,0.45)', 'text-anchor': 'middle' }, 'higher = faster easy pace · dashed = plan target'));
+  s.push(svgEl('text', { x: (padL + plotW / 2).toFixed(1), y: H - 4, 'font-size': '8', fill: 'rgba(var(--ink-rgb),0.45)', 'text-anchor': 'middle' }, 'higher = faster easy pace · dashed = plan target'));
   return { title, color, titleGap: 10, head: null, svg: plain(W, H, s), body: null, foot: null };
 }

@@ -17,7 +17,7 @@ and the setting that picks it. Measure: `tests/measure/night-mode_colour-literal
   case: the session sheet's header keeps its dark band while its title takes the night ink, and the title vanishes.
   The same header uses `--on-ink` for two jobs, type on a filled accent button and type on a dark band, which a night
   palette has to split.
-- **Changes:**
+- **Changes** (item 1 amended: Amendment 1 moves the row to the Bugs page):
   1. **The setting.** The home screen (Your Programs) carries a "Look" row under Build New Program: Auto, Day, Night.
      Auto is the default and follows the phone (`prefers-color-scheme`); Day and Night override it. The choice is stored
      in `localStorage` key `ia_theme` as `day` or `night`; no key means Auto. The caption reads "Auto follows your phone."
@@ -64,4 +64,26 @@ and the setting that picks it. Measure: `tests/measure/night-mode_colour-literal
 - **Expected values:** the table above, typed from the preview Mario approved. On the night paper every type token
   reads at 4.5:1 or better (text 15.3, muted 6.3, signal 5.4, the six sport colours 5.4 to 8.4); `--dim` 4.6;
   `--mark` 4.1 (the day `--mark` is 4.0).
-- **Released:** pending.
+- **Released:** v0.251.0 (Minor, Mario 2026-10-28).
+
+## D261 Amendment 1: the Look row lives on the Bugs page; the build's own values
+
+- **Date:** 2026-10-28. **Ruled by:** Mario, mid-build, on the row as built on the home screen: "the setting looks
+  horrible just move those options to the bugs page please". No new D-code.
+- **Changes item 1:** the Look row (Auto, Day, Night, "Auto follows your phone.") moves off the home screen onto the Bugs
+  page, under the bug report and above the build label, as three full-width buttons. It goes in both builds: the
+  single-file page's `screenBugs` markup, and the native app's own Bugs screen (`frontends/app/src/app/screens/bug-report/bug-report.ts`,
+  which calls the same `setTheme` through the bridge). The build found the home screen row would never have reached the
+  phone: the native app draws its home screen from its own Angular component.
+- **Records the build's values the entry left to it** (form, the session's to decide): the tint tokens carry their
+  colour's channels in both palettes (`--ink-rgb` is the type's, so an ink tint turns bone at night); scrims
+  (`--scrim-rgb`) and shadows (`--shadow-rgb`) go to black at night; `--accent-dim` keeps its 0.06 alpha over the night
+  type; `--rest-ink` (`#2C2C2E`) and `--none-ink` (`#3A3A3C`), the week list's rest and unknown labels, take `--dim`'s
+  night value; the session wheel's `--wheel-hilite` and `--wheel-band` drop to 0.04 white and 0.06 bone. The colours
+  that stay written as they are, being the same in both looks, are item 4's three (black scrims, the Knicks colours,
+  the toggle knob) and five more: the near-black type on coloured fills (`#0a0a0a`), the danger button's line, the
+  cycling chart's orange (`#f0a050`), the type on today's signal cell (`_onGold`'s five), and the `theme-color` meta's
+  first value, which `applyTheme` rewrites from the resolved paper.
+- **Expected values:** `tests/integration/night-mode.test.ts` (the row on the Bugs page in both builds, none on the home
+  screen) and `tests/unit/night-mode.test.ts` (the tint channels and the same-in-both list).
+- **Released:** v0.251.0 (Minor, Mario 2026-10-28).

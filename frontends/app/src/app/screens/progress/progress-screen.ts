@@ -240,7 +240,7 @@ export class ProgressScreen {
             headStyle: 'display:flex;justify-content:space-between;align-items:center;margin-bottom:' + e.headMb + 'px',
             rpe: e.rpe ? { text: e.rpe.text, style: 'font-family:var(--font-display);font-size:12px;font-weight:700;color:' + e.rpe.color } : null,
             swap: e.swap
-              ? { html: this.html(e.swap.html), style: 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(24,23,18,0.06);border-radius:3px;padding:3px 7px;margin-bottom:' + e.swap.mb + 'px' }
+              ? { html: this.html(e.swap.html), style: 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(var(--ink-rgb),0.06);border-radius:3px;padding:3px 7px;margin-bottom:' + e.swap.mb + 'px' }
               : null,
             jog: e.jogLines.length ? { lines: e.jogLines.map((l) => this.html(l)), style: 'margin-bottom:' + e.jogMb + 'px' } : null,
             notes: e.notes ? this.html(e.notes) : null,

@@ -7,12 +7,12 @@ import { benchNotes, modTags, wildcardSub } from '../../src/app/screens/day-deta
 
 describe('the session sheet\'s marks', () => {
   it('colors each tag from its palette, names it from its label, leaves rest out, and falls back for a tag with no color', () => {
-    const pal = { run: ['#5e8c54', 'rgba(94,140,84,0.15)'] as const };
+    const pal = { run: ['var(--run)', 'rgba(var(--run-rgb),0.15)'] as const };
     const meta = { run: { label: 'Run' }, test: { label: 'Test Week' } };
     assert.deepEqual(modTags(['run', 'rest', 'test', 'odd'], pal, meta), [
-      { label: 'Run', color: '#5e8c54', bg: 'rgba(94,140,84,0.15)' },
-      { label: 'Test Week', color: '#7d7668', bg: 'rgba(125,118,104,0.12)' },
-      { label: 'odd', color: '#7d7668', bg: 'rgba(125,118,104,0.12)' },
+      { label: 'Run', color: 'var(--run)', bg: 'rgba(var(--run-rgb),0.15)' },
+      { label: 'Test Week', color: 'var(--mark)', bg: 'rgba(var(--mark-rgb),0.12)' },
+      { label: 'odd', color: 'var(--mark)', bg: 'rgba(var(--mark-rgb),0.12)' },
     ]);
     assert.deepEqual(modTags(undefined, pal, meta), []);
   });

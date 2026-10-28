@@ -296,13 +296,13 @@ type StepView =
             </div>
             <div style="font-size:12px;color:var(--muted);margin-top:6px">{{ 'Gold = training · Grey = rest · ' }}<b style="color:var(--text)">{{ v.days.count }}</b>{{ ' selected' }}</div>
             @if (v.days.floor; as f) {
-              <div style="margin-top:10px;background:rgba(24,23,18,0.12);border:1px solid rgba(24,23,18,0.35);border-radius:4px;padding:12px 14px">
+              <div style="margin-top:10px;background:rgba(var(--ink-rgb),0.12);border:1px solid rgba(var(--ink-rgb),0.35);border-radius:4px;padding:12px 14px">
                 <div style="font-size:13px;color:var(--accent);font-weight:700;line-height:1.5;margin-bottom:4px" [innerHTML]="lockTitle()"></div>
                 <div style="font-size:12px;color:var(--text);line-height:1.5">@if (f.reason) {{{ 'Your ' }}<b>{{ f.reason }}</b>{{ ' goal needs at least ' }}<b>{{ f.min + ' training days a week' }}</b>{{ ' to build the volume safely and avoid injury. To add more rest, ease your goal or pick a shorter distance.' }}} @else {Three days a week is the floor, cardio or no cardio. Two gives you the same session twice with nowhere to put the hard work. Three is where real training days start.}</div>
               </div>
             }
             @if (v.days.advisories.length) {
-              <div style="margin-top:10px;background:rgba(24,23,18,0.10);border:1px solid rgba(24,23,18,0.28);border-radius:4px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">@for (a of v.days.advisories; track $index) {<div style="font-size:12px;color:var(--accent);line-height:1.5" [innerHTML]="html(a)"></div>}</div>
+              <div style="margin-top:10px;background:rgba(var(--ink-rgb),0.10);border:1px solid rgba(var(--ink-rgb),0.28);border-radius:4px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">@for (a of v.days.advisories; track $index) {<div style="font-size:12px;color:var(--accent);line-height:1.5" [innerHTML]="html(a)"></div>}</div>
             }
           }
         }

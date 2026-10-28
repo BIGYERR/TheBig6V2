@@ -28,6 +28,15 @@
     <button id="bugSubmit" onclick="submitBug()" style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:14px;border-radius:4px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer">Send Bug Report</button>
     <div id="bugStatus" style="font-size:13px;color:var(--muted);min-height:20px;line-height:1.5"></div>
     <div style="font-size:11px;color:var(--muted);line-height:1.5;opacity:0.8">Your device and app context is attached automatically to help track it down.</div>
+    <div class="look-row" role="group" aria-label="Look">
+      <div class="look-lbl">Look</div>
+      <div class="look-seg">
+        <button class="look-opt" data-look="auto" onclick="setTheme('auto')">Auto</button>
+        <button class="look-opt" data-look="day" onclick="setTheme('day')">Day</button>
+        <button class="look-opt" data-look="night" onclick="setTheme('night')">Night</button>
+      </div>
+      <div class="look-note">Auto follows your phone.</div>
+    </div>
     <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0.08em;text-align:center;padding-top:4px"></div>
   </div>
 </div>

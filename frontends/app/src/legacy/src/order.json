@@ -11,6 +11,7 @@
   "css/motion.css",
   "html/screens.html",
   "html/overlays.html",
+  "js/theme.ts",
   "engine/icons.ts",
   "js/storage.ts",
   "js/rest-day-shell.ts",

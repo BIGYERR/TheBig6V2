@@ -152,7 +152,7 @@ export function ladderTrack(r: LedgerModel['ladder'][number]): Picture {
     s.push(svgEl('circle', { cx: (x - (n - 1) * 5.5).toFixed(1), cy: '12', r: '3.6', fill: col, opacity: '0.92' }));
   });
   s.push(axTx(0, 25, r.lo, 8, 'start'));
-  s.push(axTx(track, 25, r.hi, 8, 'end', r.ready ? 'var(--signal)' : 'rgba(24,23,18,0.3)', r.ready ? '700' : ''));
+  s.push(axTx(track, 25, r.hi, 8, 'end', r.ready ? 'var(--signal)' : 'rgba(var(--ink-rgb),0.3)', r.ready ? '700' : ''));
   return { viewBox: '-8 0 ' + (track + 16) + ' ' + H, style: 'width:' + track + 'px;height:' + H + 'px;overflow:visible', els: s };
 }
 

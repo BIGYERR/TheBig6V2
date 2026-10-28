@@ -221,7 +221,7 @@ function buildMainLiftBlock(m: any, unit: any){
     let s='', step=(hi-lo)>90?25:10;
     for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step){
       const cy=yof(v);
-      s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+      s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>';
       s+=_axTx(padL-5, cy+3, disp(v));
     }
     let d='';
@@ -273,7 +273,7 @@ function _ladderTrack(r: any){
     s+='<circle cx="'+(x-off).toFixed(1)+'" cy="12" r="3.6" fill="'+col+'" opacity="0.92"/>';
   });
   s+=_axTx(0, 25, r.lo, 8, 'start');
-  s+=_axTx(track, 25, r.hi, 8, 'end', r.ready?'var(--signal)':'rgba(24,23,18,0.3)', r.ready?'700':'');
+  s+=_axTx(track, 25, r.hi, 8, 'end', r.ready?'var(--signal)':'rgba(var(--ink-rgb),0.3)', r.ready?'700':'');
   return '<svg viewBox="-8 0 '+(track+16)+' '+H+'" style="width:'+track+'px;height:'+H+'px;overflow:visible">'+s+'</svg>';
 }
 function _ladderRow(r: any, unit: any){
@@ -518,7 +518,7 @@ function renderProgressScreen() {
   // ── Swimming yardage chart ──
   if(cardioTypes.includes('swim') || loggedAny('swim')) {
     const swimData = weeks.map(w => weeklyData[w].swim || null);
-    html += buildDotChart(asyIcon('🏊',15)+' Weekly Swimming Volume', weeks, swimData, '#3f6e96', 'yards', 'yd');
+    html += buildDotChart(asyIcon('🏊',15)+' Weekly Swimming Volume', weeks, swimData, 'var(--bike)', 'yards', 'yd');
   }
 
   // ── Bike minutes chart ──
@@ -531,7 +531,7 @@ function renderProgressScreen() {
   if(hasAnyData) {
     const rpeData = weeks.map(w => weeklyData[w].rpe || null);
     if(rpeData.some(v => v !== null)) {
-      html += buildDotChart(asyIcon('💡',15)+' Average Session RPE', weeks, rpeData, '#7e5e96', 'RPE', '', 10);
+      html += buildDotChart(asyIcon('💡',15)+' Average Session RPE', weeks, rpeData, 'var(--hip)', 'RPE', '', 10);
     }
   }
 
@@ -592,7 +592,7 @@ function renderProgressScreen() {
             <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text)">${dayName}</div>
             ${entry.rpe ? `<div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:${rpeColor}">RPE ${entry.rpe} — ${RPE_LABELS[+entry.rpe]||''}</div>` : ''}
           </div>
-          ${isSwap ? `<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(24,23,18,0.06);border-radius:3px;padding:3px 7px;margin-bottom:${(entry.notes||jogLines.length)?6:0}px">${asyIcon('history',12)} Swapped ${swapWord(entry.swapFrom)} → ${swapWord(entry.swapTo)}</div>` : ''}
+          ${isSwap ? `<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(var(--ink-rgb),0.06);border-radius:3px;padding:3px 7px;margin-bottom:${(entry.notes||jogLines.length)?6:0}px">${asyIcon('history',12)} Swapped ${swapWord(entry.swapFrom)} → ${swapWord(entry.swapTo)}</div>` : ''}
           ${jogLines.length ? `<div style="margin-bottom:${entry.notes?6:0}px">${jogLines.map(s => `<div style="font-size:12px;font-weight:500;color:var(--run);line-height:1.5">${s}</div>`).join('')}</div>` : ''}
           ${entry.notes ? `<div style="font-size:12px;color:var(--muted);line-height:1.5;font-style:italic">"${entry.notes}"</div>` : ''}
         </div>`;
@@ -691,8 +691,8 @@ function buildDotChart(title: any, weeks: any, data: any, color: any, label: any
       <!-- Grid lines -->
       ${yLabels.map(yv => {
         const cy = padT + plotH - ((yv - min)/(max-min))*plotH;
-        return `<line x1="${padL}" y1="${cy}" x2="${W-padR}" y2="${cy}" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>
-        <text x="${padL-4}" y="${cy+4}" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="end" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">${yv}</text>`;
+        return `<line x1="${padL}" y1="${cy}" x2="${W-padR}" y2="${cy}" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>
+        <text x="${padL-4}" y="${cy+4}" fill="rgba(var(--ink-rgb),0.3)" font-size="8" text-anchor="end" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">${yv}</text>`;
       }).join('')}
       <!-- Dotted connecting lines -->
       <path d="${pathD}" stroke="${color}" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.6"/>
@@ -702,7 +702,7 @@ function buildDotChart(title: any, weeks: any, data: any, color: any, label: any
         <circle cx="${pt.x}" cy="${pt.y}" r="7" fill="${color}" opacity="0.15"/>
       `).join('')}
       <!-- X axis week labels -->
-      ${weeks.map((w: any,i: any) => i%xLabelStep===0 ? `<text x="${padL+i*xStep}" y="${H-4}" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W${w}</text>` : '').join('')}
+      ${weeks.map((w: any,i: any) => i%xLabelStep===0 ? `<text x="${padL+i*xStep}" y="${H-4}" fill="rgba(var(--ink-rgb),0.3)" font-size="8" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W${w}</text>` : '').join('')}
     </svg>
     <div style="font-size:11px;color:var(--muted);margin-top:4px">
       Total logged: <b style="color:${color}">${validData.reduce((a: any,b: any)=>a+b,0).toFixed(1)} ${unit}</b>
@@ -730,8 +730,8 @@ function buildMultiDotChart(title: any, weeks: any, series: any) {
   // Grid
   svgContent += yLabels.map(yv => {
     const cy = padT + plotH - ((yv-min)/(max-min))*plotH;
-    return `<line x1="${padL}" y1="${cy}" x2="${W-padR}" y2="${cy}" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>
-    <text x="${padL-4}" y="${cy+4}" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="end" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">${yv}</text>`;
+    return `<line x1="${padL}" y1="${cy}" x2="${W-padR}" y2="${cy}" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>
+    <text x="${padL-4}" y="${cy+4}" fill="rgba(var(--ink-rgb),0.3)" font-size="8" text-anchor="end" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">${yv}</text>`;
   }).join('');
 
   // Each series
@@ -757,7 +757,7 @@ function buildMultiDotChart(title: any, weeks: any, series: any) {
 
   // X axis
   svgContent += weeks.map((w: any,i: any) => i%xLabelStep===0
-    ? `<text x="${padL+i*xStep}" y="${H-padB+14}" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W${w}</text>`
+    ? `<text x="${padL+i*xStep}" y="${H-padB+14}" fill="rgba(var(--ink-rgb),0.3)" font-size="8" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W${w}</text>`
     : '').join('');
 
   // Legend
