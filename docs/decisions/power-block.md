@@ -87,6 +87,13 @@ the handoff (V129 the power class, V130 the dose from the budget, V143, V144 D4,
   programs: `marathon, crossfit, athletic support, 36-45` and `run base and bike base, crossfit, balanced`). Three
   PRT TING pins in `tests/integration/session-budget.test.ts` move too, because PRT TING carries a power block; they
   are re-pinned in the release commit with this ruling named. No existing test pins the current set counts.
+  **Missed at ship (found 2026-10-28, when Mario asked for the CI runs on c077c61, df76378 and pull request 6):** two
+  more sweep golden files move with D260, and v0.250.0 left them unregenerated, so CI's unit and integration job was
+  red. `tests/snapshots/leg-accessory-trim-order.json`: days over the session cap 6,368 → 6,320 and over-cap days the
+  push order leaves untouched 3,887 → 3,839, the same 48 days back under the cap on fewer power sets; the push order's
+  own counts do not move. `tests/snapshots/session-budget-lattice.json`: days the budget changes 3,614 → 3,540; the
+  census by tier and class does not move. Both sweeps pass on v0.249.1 and fail on v0.250.0, and the only engine
+  change between them is D260. Regenerated under this ruling in the Post-v0.250.0 sweep snapshot pass (tests only).
 - **Tests (each behaviour, its hand value):**
   - an intermediate, 18 to 35, Trap bar jump lead prints `4×3 — light bar, max intent, ~2 min rest`;
   - the lead slot's sets for a cost 1.0 triple follow the table above, all nine cells;
