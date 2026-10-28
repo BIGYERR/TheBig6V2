@@ -1,0 +1,86 @@
+page 0.249.1
+run cardio keys: type=816 subtype=816 detail=816 note=816 week=816 goalId=816 isNRC=576 dose=816 legLoad=816
+
+NRC Long Run  n=144  goals=5k,10k,half,marathon  dose: dist(emitted) 123, time(emitted) 21
+   [Long Run] One Mile Run: 1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (10:30/mi) across the run. Comfortable the whole way. Average no faster than 9:58/mi.
+   [Long Run — Peak] 4 Mile Run: 4 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (10:30/mi) across the run. Comfortable the whole way. Average no faster than 9:58/mi.
+   [Long Run — Taper] 5K Run: 3.1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (10:30/mi) across the run. Comfortable the whole way. Average no faster than 9:58/mi.
+
+NRC Recovery Run  n=261  goals=5k,10k,half,marathon  dose: time(emitted) 227, dist(emitted) 34
+   [Recovery Run] 5 min recovery run at Recovery Pace (10:30/mi). 4–5/10 effort, easy enough to talk, laugh, or argue freely. Start a touch slower than that, finish a touch faster. Do not run faster than 9:58/mi.
+
+NRC Speed Run  n=171  goals=5k,10k,half,marathon  dose: none 171
+   [Speed Run — Intervals] Mixed-pace ladder down to Best — 10:00 of work, 10 efforts 5:00 warm up 1:00 at 5K Pace (8:40/mi) 2:00 at 10K Pace (9:00/mi) 1:00 at 5K Pace (8:40/mi) 2 × 0:45 at Mile Pace (8:00/mi) 2:00 at 10K Pace (9:00/mi) 1:00 at 5K Pace (8:40/mi) 0:45 at Mile Pace (8:00/
+   [Speed Run — Fartlek] 15:00 fartlek — 1:00 hard, 1:00 easy 5:00 warm up 15:00 fartlek: alternate 1:00 hard running and 1:00 easy running for 15:00
+   [Speed Run — Tempo] Out strong, back fast — 23:00 tempo 5:00 warm up 23:00 tempo at Tempo Pace (9:25/mi): first 12:00 out — strong and controlled last 11:00 back — progressively faster Goal: cover the same distance out and back
+
+NSW Benchmark Run  n=6  goals=base  dose: time(emitted) 6
+   [Benchmark Run] 20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered.
+   [Benchmark Run — Retest] 20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. This is the SAME run you did in week 1. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered.
+
+NSW Easy Run  n=57  goals=base  dose: time(emitted) 57
+   [Easy Run] 20 min easy and conversational (RPE 3-4 out of 10). Around 13:45/mi is right for you. Do not run faster than 13:10/mi. Distance is not the goal; time on feet is. Log the distance you covered.
+   [Easy Run — Long] 30 min easy and conversational (RPE 3-4 out of 10). Around 13:45/mi is right for you. Do not run faster than 13:10/mi. This is the longest run of your week. Time on feet is the goal. Log the distance you covered.
+
+NSW Easy Run + Strides  n=24  goals=base  dose: time(emitted) 24
+   [Easy Run + Strides] 30 min easy and conversational (RPE 3-4 out of 10). Around 13:45/mi is right for you. Do not run faster than 13:10/mi. Distance is not the goal; time on feet is. Log the distance you covered. Finish with 4 x 20 sec strides. Fast but relaxed, about 90% speed, w
+
+NSW Long Interval  n=33  goals=pace_goal  dose: time(emitted) 33
+   [Long Interval (LI)] 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation.
+
+NSW Long Slow Distance  n=66  goals=pace_goal  dose: dist(emitted) 66
+   [Long Slow Distance (LSD)] 1.5 mi at Recovery Pace: 10:59/mi (Zone 2). 60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower.
+
+NSW Short Interval  n=33  goals=pace_goal  dose: reps_dist(emitted) 33
+   [Short Interval (SI)] 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy.
+
+NSW Steady Aerobic Run  n=21  goals=base  dose: time(emitted) 21
+   [Steady Aerobic Run] 15 min steady at 13:10/mi (RPE 6 out of 10). Comfortably hard. You can speak a short sentence between breaths. This is aerobic threshold work, not a sprint.
+
+NRC run sessions 576, generic form 171; NSW run sessions 240, generic form 0
+
+== Part 2: NRC speed sessions, distinct 39 printed 171
+numbered pace zones per session -> 0: 24/171  1: 65/171  2: 25/171  3: 57/171
+zones with an effort of 1:00+    -> 0: 27/171  1: 73/171  2: 27/171  3: 44/171
+efforts per session            -> 01: 33/171  03: 12/171  04: 6/171  05: 27/171  07: 21/171  08: 15/171  09: 10/171  10: 19/171  11: 1/171  12: 6/171  14: 2/171  15: 6/171  20: 3/171  hill 10: 5/171  hill 9: 5/171
+main zone (most work minutes)   -> 10K Effort: 10/171  10K Pace: 31/171  5K Pace: 52/171  Half Marathon Pace: 3/171  Marathon Pace: 3/171  Mile Pace: 9/171  Recovery Pace: 16/171  Tempo Pace: 33/171  hard (no number): 14/171
+sessions naming each zone      -> 5K Pace 98, Mile Pace 73, 10K Pace 66, Tempo Pace 40, Half Marathon Pace 6, Marathon Pace 3
+   12  Speed Run — Tempo        zones[Tempo Pace] efforts 1  main Tempo Pace  | 25:00 tempo
+   10  Speed Run — Tempo        zones[10K Pace, 5K Pace, Mile Pace] efforts 5  main Recovery Pace  | 15:00 progression tempo — Recovery Pace down to Best
+    9  Speed Run — Intervals    zones[5K Pace, 10K Pace, Mile Pace] efforts 10  main 10K Pace  | Mixed-pace ladder down to Best — 10:00 of work, 10 efforts
+    9  Speed Run — Tempo        zones[Tempo Pace] efforts 1  main Tempo Pace  | Out strong, back fast — 23:00 tempo
+    9  Speed Run — Intervals    zones[5K Pace] efforts 3  main 5K Pace  | 3 × 7:00 at 5K Pace — 21:00 of work
+    7  Speed Run — Intervals    zones[5K Pace, Tempo Pace] efforts 7  main 5K Pace  | 5K reps around a 10:00 tempo — 22:00 of work
+    6  Speed Run — Intervals    zones[5K Pace] efforts 8  main 5K Pace  | 8 × 1:00 at 5K Pace — 8:00 of work
+    6  Speed Run — Intervals    zones[5K Pace] efforts 10  main 5K Pace  | 10 × 2:00 at 5K Pace — 20:00 of work
+    6  Speed Run — Tempo        zones[Tempo Pace] efforts 1  main Tempo Pace  | 20:00 tempo
+    6  Speed Run — Fartlek      zones[] efforts 7  main hard (no number)  | 21:00 fartlek — 1:00 hard, 2:00 easy
+    6  Speed Run — Intervals    zones[Mile Pace, 5K Pace, 10K Pace] efforts 5  main 5K Pace  | Power pyramid — 22:00 of work, Mile to 10K and back
+    6  Speed Run — Tempo        zones[Tempo Pace] efforts 1  main Tempo Pace  | 8K tempo, bookended by 2K easy
+    6  Speed Run — Intervals    zones[10K Pace] efforts 5  main 10K Pace  | 5 × 5:00 at 10K Pace — 25:00 of work
+    6  Speed Run — Intervals    zones[10K Pace, 5K Pace, Mile Pace] efforts 9  main 10K Pace  | 3 rounds of 10K → 5K → Mile — 42:00 of work
+    6  Speed Run — Intervals    zones[5K Pace, Mile Pace] efforts 15  main 5K Pace  | 3 rounds of a 5K rep and four Mile-pace bursts — 15:00 of work
+    5  Speed Run — Hills        zones[] efforts 10 (hill)  main 10K Effort  | Hill workout — 5 rounds of 10K effort into Best effort
+    5  Speed Run — Intervals    zones[Mile Pace, 5K Pace, 10K Pace] efforts 4  main Recovery Pace  | Mile to 10K, then 7:00 easy — 9:00 of work
+    5  Speed Run — Hills        zones[] efforts 9 (hill)  main 10K Effort  | Hill workout — 3 rounds of 10K, 5K and Mile efforts
+    4  Speed Run — Fartlek      zones[] efforts 8  main hard (no number)  | 15:00 fartlek — 1:00 hard, 1:00 easy
+    4  Speed Run — Intervals    zones[5K Pace, Mile Pace] efforts 12  main 5K Pace  | 3 rounds of 5K, Mile and two Best bursts — 10:30 of work
+    4  Speed Run — Intervals    zones[10K Pace, Mile Pace, 5K Pace] efforts 8  main 10K Pace  | 10K bookends around 5K and Mile reps — 15:30 of work, 8 efforts
+    4  Speed Run — Fartlek      zones[] efforts 7  main hard (no number)  | 21:00 fartlek — 2:00 hard, 1:00 easy
+    3  Speed Run — Intervals    zones[Mile Pace, 10K Pace] efforts 9  main Mile Pace  | Faster Fun — descending Mile reps with 10K floats, 8:00 of work, 9 efforts
+    3  Speed Run — Intervals    zones[10K Pace, 5K Pace, Mile Pace] efforts 7  main 10K Pace  | Slow Down to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work,
+    3  Speed Run — Intervals    zones[5K Pace, Mile Pace] efforts 10  main 5K Pace  | 5K reps with a Mile-pace kicker — 15:00 of work, 10 efforts
+    3  Speed Run — Tempo        zones[Marathon Pace, Half Marathon Pace, 10K Pace] efforts 3  main Marathon Pace  | 23:00 progression tempo — Marathon Pace to 10K Pace
+    3  Speed Run — Intervals    zones[Mile Pace] efforts 20  main Mile Pace  | 20 × 0:30 at Mile Pace — 10:00 of work
+    3  Speed Run — Intervals    zones[5K Pace, 10K Pace, Half Marathon Pace] efforts 5  main Half Marathon Pace  | Race-week sharpener — 11:00 of work around 5:00 at race pace
+    2  Speed Run — Fartlek      zones[10K Pace, 5K Pace, Mile Pace] efforts 14  main 10K Pace  | How Fartlek Can You Go — 9:15 of work, 14 efforts, recovery equals the effort
+    1  Speed Run — Intervals    zones[Mile Pace, 5K Pace, 10K Pace] efforts 7  main Mile Pace  | On the Move — Mile bursts between 5K and 10K reps, 6:00 of work, 7 efforts
+    1  Speed Run — Intervals    zones[Mile Pace, 5K Pace, 10K Pace] efforts 11  main 5K Pace  | Rhythm and Roll — 5K bursts around a 3:00 10K rep, 8:00 of work, 11 efforts
+    1  Speed Run — Intervals    zones[5K Pace] efforts 5  main 5K Pace  | In the Zone — 5 × 4:00 at 5K Pace, 20:00 of work
+    1  Speed Run — Intervals    zones[Mile Pace] efforts 10  main Mile Pace  | Go Fast — Mile reps growing 0:30 → 1:30, each chased by 0:15 at Best, 6:15 of wo
+    1  Speed Run — Intervals    zones[Mile Pace, 5K Pace, 10K Pace] efforts 5  main 5K Pace  | Mixed-pace ladder — 9:00 of work, 5 efforts
+    1  Speed Run — Intervals    zones[Mile Pace, 5K Pace] efforts 12  main 5K Pace  | Descending ladder of Mile and 5K reps — 18:00 of work, 12 efforts
+    1  Speed Run — Intervals    zones[5K Pace, Mile Pace] efforts 12  main Mile Pace  | 3 rounds of a 5K rep and three Mile-pace bursts — 11:15 of work
+    1  Speed Run — Intervals    zones[10K Pace, 5K Pace, Mile Pace] efforts 4  main Recovery Pace  | Four blocks, each shifting straight into Mile Pace — 14:00 of work
+    1  Speed Run — Intervals    zones[10K Pace, 5K Pace, Mile Pace] efforts 8  main 10K Pace  | Pyramid from 10K to Best and back — 18:00 of work, 8 efforts
+    1  Speed Run — Intervals    zones[5K Pace, 10K Pace, Mile Pace] efforts 9  main 5K Pace  | 3 rounds of 5K → 10K → Mile — 13:30 of work
