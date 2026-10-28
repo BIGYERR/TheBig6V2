@@ -232,7 +232,7 @@ test('the cost lens prices the prehab rails at half, so PRT TING keeps what the 
   // D195-B-a: a-digest, a-tue, a-mon
   const C = SB.twice(null, SB.PRT);
   assert.ok(C.self, 'PRT TING equals itself');
-  assert.equal(C.dig, '997add753ad41179');   // 1119727db3f37832 until D239, f61dab1548de2a20 until D241
+  assert.equal(C.dig, '17bf44d989d51990');   // 1119727db3f37832 until D239, f61dab1548de2a20 until D241, 997add753ad41179 until D260 (power sets only)
   assert.deepEqual(SB.cardLines(C.prog.weeks[9].tue), TUE_9);
   assert.deepEqual(SB.cardLines(C.prog.weeks[9].mon), MON_9);
 });
@@ -241,7 +241,7 @@ test('without the cost lens PRT TING is the program the ruling measured before i
   // D195-B-a: a-cells, and the before half of a-v230/a-before on the app without the lens
   const N = SB.twice(SB.noCostLens(), SB.PRT), C = SB.twice(null, SB.PRT);
   assert.ok(N.self);
-  assert.equal(N.dig, '81742326331d5c5b');   // 3a053a2ac8cb2b44 until D239, c6f054bee6f8b22b until D241
+  assert.equal(N.dig, '8a8bdbe91d29ee5f');   // 3a053a2ac8cb2b44 until D239, c6f054bee6f8b22b until D241, 81742326331d5c5b until D260 (power sets only)
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].tue), TUE_9_WITHOUT);
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].mon), MON_9_WITHOUT);
   const differ: string[] = [];
@@ -253,7 +253,7 @@ test('without the cost lens PRT TING is the program the ruling measured before i
 
 test("the cost lens alone is PRT TING whole, and moves no byte of HALF_MANNY", () => {
   // D195-B-a: a-cfB; D195-B-c: c-cfB, c-bytes (B alone = the app without D195-A; neither = without A and B)
-  assert.equal(SB.twice(SB.noHipExtA(), SB.PRT).dig, '997add753ad41179');
+  assert.equal(SB.twice(SB.noHipExtA(), SB.PRT).dig, '17bf44d989d51990');   // 997add753ad41179 until D260 (power sets only)
   const B = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY), V = SB.twice(SB.noD195(), fixtures.HALF_MANNY);
   assert.ok(B.self && V.self);
   assert.equal(B.dig, '7ed355470630a9c5');   // 0ac7da6b1691a8e1 until D239, b1b15c80f1a703f1 until D241, c17e854e54e86f57 until D243, 895bb404a809927b until D251, df75a47fc8917305 until D252

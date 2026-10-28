@@ -1,0 +1,73 @@
+app index.html ia-version 0.249.1 | builds 1188 (lattice 864 + nsw 324)
+HALF_MANNY digest e47eb1012ab04bff (self-stable true) | days with a power block 1
+power items 1785 | power blocks 1146 | programs with any power block: lattice 54 of 864, nsw 180 of 324
+
+--- sets per item (every week, deload weeks included): key -> {sets: count}
+slot 1 cost 0.5 10 reps | advanced     18-35 -> {"3":33,"5":96}
+slot 1 cost 0.5 10 reps | advanced     36-54 -> {"3":3,"5":6}
+slot 1 cost 0.5 10 reps | advanced     55+   -> {"2":4,"4":6}
+slot 1 cost 0.5 10 reps | beginner     18-35 -> {"2":38,"4":132}
+slot 1 cost 0.5 10 reps | beginner     36-54 -> {"2":12,"3":38}
+slot 1 cost 0.5 10 reps | beginner     55+   -> {"2":12,"3":38}
+slot 1 cost 0.5 10 reps | intermediate 18-35 -> {"2":36,"4":115}
+slot 1 cost 0.5 10 reps | intermediate 36-54 -> {"2":9,"4":21}
+slot 1 cost 0.5 10 reps | intermediate 55+   -> {"2":12,"4":22}
+slot 1 cost 0.5 rpe reps | advanced     18-35 -> {"3":6,"4":18}
+slot 1 cost 0.5 rpe reps | advanced     55+   -> {"4":3}
+slot 1 cost 0.5 rpe reps | beginner     18-35 -> {"2":8,"4":31}
+slot 1 cost 0.5 rpe reps | beginner     36-54 -> {"2":2,"3":12}
+slot 1 cost 0.5 rpe reps | beginner     55+   -> {"2":2,"3":12}
+slot 1 cost 0.5 rpe reps | intermediate 18-35 -> {"2":6,"4":18}
+slot 1 cost 0.5 rpe reps | intermediate 55+   -> {"2":2,"4":9}
+slot 1 cost 1.0 3 reps | advanced     18-35 -> {"5":3,"9":12}
+slot 1 cost 1.0 3 reps | advanced     36-54 -> {"5":9,"8":3}
+slot 1 cost 1.0 3 reps | advanced     55+   -> {"4":8,"7":3}
+slot 1 cost 1.0 3 reps | beginner     18-35 -> {"4":14,"6":47}
+slot 1 cost 1.0 3 reps | beginner     36-54 -> {"4":22,"6":46}
+slot 1 cost 1.0 3 reps | beginner     55+   -> {"3":22,"5":46}
+slot 1 cost 1.0 3 reps | intermediate 18-35 -> {"4":15,"7":19}
+slot 1 cost 1.0 3 reps | intermediate 36-54 -> {"4":24,"7":18}
+slot 1 cost 1.0 3 reps | intermediate 55+   -> {"4":22,"6":17}
+slot 1 cost 1.5 3 reps | advanced     18-35 -> {"4":3}
+slot 1 cost 1.5 3 reps | advanced     36-54 -> {"5":3}
+slot 1 cost 1.5 3 reps | intermediate 18-35 -> {"3":3,"5":10}
+slot 1 cost 1.5 3 reps | intermediate 36-54 -> {"2":3,"4":9}
+slot 1 cost 2.0 3 reps | advanced     18-35 -> {"2":3}
+slot 2 cost 0.5 10 reps | advanced     18-35 -> {"3":9,"5":20}
+slot 2 cost 0.5 10 reps | advanced     55+   -> {"4":1}
+slot 2 cost 0.5 10 reps | beginner     18-35 -> {"2":6,"4":23}
+slot 2 cost 0.5 10 reps | beginner     36-54 -> {"3":4}
+slot 2 cost 0.5 10 reps | beginner     55+   -> {"3":4}
+slot 2 cost 0.5 10 reps | intermediate 18-35 -> {"2":6,"4":18}
+slot 2 cost 0.5 10 reps | intermediate 55+   -> {"4":3}
+slot 2 cost 0.5 rpe reps | advanced     18-35 -> {"3":3,"4":9}
+slot 2 cost 0.5 rpe reps | beginner     18-35 -> {"2":3,"4":9}
+slot 2 cost 0.5 rpe reps | intermediate 18-35 -> {"2":3,"4":9}
+slot 2 cost 1.0 5 reps | advanced     18-35 -> {"3":4,"5":6}
+slot 2 cost 1.0 5 reps | advanced     36-54 -> {"3":6,"5":6}
+slot 2 cost 1.0 5 reps | advanced     55+   -> {"2":9,"4":8}
+slot 2 cost 1.0 5 reps | beginner     18-35 -> {"2":18,"4":70}
+slot 2 cost 1.0 5 reps | beginner     36-54 -> {"2":27,"3":68}
+slot 2 cost 1.0 5 reps | beginner     55+   -> {"2":27,"3":68}
+slot 2 cost 1.0 5 reps | intermediate 18-35 -> {"2":15,"4":26}
+slot 2 cost 1.0 5 reps | intermediate 36-54 -> {"2":21,"4":24}
+slot 2 cost 1.0 5 reps | intermediate 55+   -> {"2":27,"4":33}
+slot 2 cost 1.5 5 reps | advanced     18-35 -> {"2":2}
+slot 2 cost 1.5 5 reps | advanced     36-54 -> {"2":3,"3":3}
+slot 2 cost 1.5 5 reps | intermediate 18-35 -> {"2":3,"3":13}
+slot 2 cost 1.5 5 reps | intermediate 36-54 -> {"2":6,"3":12}
+slot 2 cost 2.0 5 reps | advanced     18-35 -> {"3":4}
+
+items over 5 sets: 165 of 1785 (9.2%)
+items over 5 sets, cost > 0.5 only: 165 of 893
+
+--- block total sets: {"2":105,"3":81,"4":292,"5":98,"6":166,"7":25,"8":174,"9":65,"10":91,"11":34,"12":4,"13":3,"14":8}
+--- block total reps (jumps and throws): median 35, max 100
+--- block rest minutes (sets x rest): {"2":105,"3":81,"4":267,"5":72,"6":37,"8":68,"9":53,"10":63,"11":6,"12":149,"14":3,"16":64,"18":56,"20":73,"22":34,"23":2,"24":4,"26":3,"28":6}
+--- both slots the same family: 190 of 639 two-item blocks
+    by pair: {"two-leg vertical jump + two-leg vertical jump":158,"hip ballistic + hip ballistic":32}
+
+--- the screenshot shape (intermediate, Trap bar jump lead):
+  Trap bar jump 7×3 — max intent, ~2 min rest | Pogo hops 4×5 — explosive, ~2 min rest
+  Trap bar jump 4×3 — max intent, ~2 min rest | Pogo hops 2×5 — explosive, ~2 min rest
+  Trap bar jump 6×3 — max intent, ~2 min rest | Pogo hops 4×5 — explosive, ~2 min rest
