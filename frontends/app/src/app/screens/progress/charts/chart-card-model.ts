@@ -41,7 +41,7 @@ export function axTx(x: number, y: number, s: string | number, size?: number, an
   const a: Record<string, string> = {
     x: (+x).toFixed(1),
     y: (+y).toFixed(1),
-    fill: fill || 'rgba(24,23,18,0.3)',
+    fill: fill || 'rgba(var(--ink-rgb),0.3)',
     'font-size': String(size || 8),
     'text-anchor': anchor || 'end',
     'font-family': 'Helvetica Neue,Helvetica,Geist,sans-serif',
@@ -52,7 +52,7 @@ export function axTx(x: number, y: number, s: string | number, size?: number, an
 
 /** A gridline across the plot, as every legacy chart drew it. */
 export function gridLine(x1: number, y: string, x2: number): SvgEl {
-  return { el: 'line', a: { x1: String(x1), y1: y, x2: String(x2), y2: y, stroke: 'rgba(24,23,18,0.06)', 'stroke-width': '1' } };
+  return { el: 'line', a: { x1: String(x1), y1: y, x2: String(x2), y2: y, stroke: 'rgba(var(--ink-rgb),0.06)', 'stroke-width': '1' } };
 }
 
 /** An element with its attributes as given. */

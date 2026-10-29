@@ -274,20 +274,20 @@ function runSessionCode(sub: any, key: any, type: any){
   return 'RUN';
 }
 function dayCode(day: any){
-  if(!day||day.rest) return {top:'',topColor:'#5f5f62',bot:'REST',botColor:'#5f5f62'};
+  if(!day||day.rest) return {top:'',topColor:'var(--dim)',bot:'REST',botColor:'var(--dim)'};
   var liftSections=(day.sections||[]).some(function(s: any){return !s.core&&!s.hip&&(s.items||[]).length;});
   var c=day.cardio, ctype=(c&&c.type||'').toLowerCase();
   var top=ctype==='run'?'RUN':ctype==='bike'?'BIKE':ctype==='swim'?'SWIM':'';
-  var topColor=ctype==='run'?'#5e8c54':(ctype==='bike'||ctype==='swim')?'#3f6e96':'#5f5f62';
+  var topColor=ctype==='run'?'var(--run)':(ctype==='bike'||ctype==='swim')?'var(--bike)':'var(--dim)';
   var bot, botColor;
-  if(liftSections){ bot=liftFocusCode(day.title); botColor='#bc6a43'; }
+  if(liftSections){ bot=liftFocusCode(day.title); botColor='var(--lift)'; }
   else if(c){ bot=runSessionCode(c.subtype||'', c.dose&&c.dose.key, c.type); botColor=topColor; }
-  else { bot=liftFocusCode(day.title); botColor='#bc6a43'; }
+  else { bot=liftFocusCode(day.title); botColor='var(--lift)'; }
   return {top:top,topColor:topColor,bot:bot,botColor:botColor};
 }
 function _onGold(hex: any){
   // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ '#
-  return {'#5e8c54':'#1c5f2c','#3f6e96':'#0a3a66','#bc6a43':'#7a3410','#5f5f62':'#3a2c08','#a6822f':'#7a4d00'}[hex]||'#3a2c08';
+  return {'var(--run)':'#1c5f2c','var(--bike)':'#0a3a66','var(--lift)':'#7a3410','var(--dim)':'#3a2c08','var(--core)':'#7a4d00'}[hex]||'#3a2c08';
 }
 // ── V146: week-strip positioning ──────────────────────────────────────────────
 // The strip used to sit at scrollLeft 0 forever, so from week 6 on the week you were
@@ -559,9 +559,9 @@ function renderWeekView(){
   const list=document.getElementById('daysList');list!.innerHTML='';
   if(!wkData){return;}
 
-  const MOD: Record<string, any>={lift:['#bc6a43','rgba(188,106,67,0.15)'],run:['#5e8c54','rgba(94,140,84,0.15)'],bike:['#3f6e96','rgba(63,110,150,0.15)'],swim:['#3f6e96','rgba(63,110,150,0.15)'],hip:['#7e5e96','rgba(126,94,150,0.15)'],core:['#a6822f','rgba(166,130,47,0.15)'],rest:['#2c2c2e','rgba(24,23,18,0.05)']};
+  const MOD: Record<string, any>={lift:['var(--lift)','rgba(var(--lift-rgb),0.15)'],run:['var(--run)','rgba(var(--run-rgb),0.15)'],bike:['var(--bike)','rgba(var(--bike-rgb),0.15)'],swim:['var(--swim)','rgba(var(--swim-rgb),0.15)'],hip:['var(--hip)','rgba(var(--hip-rgb),0.15)'],core:['var(--core)','rgba(var(--core-rgb),0.15)'],rest:['var(--rest-ink)','rgba(var(--ink-rgb),0.05)']};
   // @ts-expect-error TS7006 Parameter 'k' implicitly has an 'any' type.
-  const modColor=k=>(MOD[k]?MOD[k][0]:'#3a3a3c');
+  const modColor=k=>(MOD[k]?MOD[k][0]:'var(--none-ink)');
   // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   const dayDateOf=d=>{ if(!weekMon) return null; const dd=new Date(weekMon); dd.setDate(weekMon.getDate()+(currentWeek-1)*7+dayOffset[d]); dd.setHours(0,0,0,0); return dd; };
   // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
@@ -585,8 +585,8 @@ function renderWeekView(){
     const dimCls=(!isToday&&(isPast||!day||day.rest))?' dim':'';
     const code=dayCode(day);
     const dim=dimCls!=='';
-    const topC=isToday?_onGold(code.topColor):(dim?'#5f5f62':code.topColor);
-    const botC=isToday?_onGold(code.botColor):(dim?'#5f5f62':code.botColor);
+    const topC=isToday?_onGold(code.topColor):(dim?'var(--dim)':code.topColor);
+    const botC=isToday?_onGold(code.botColor):(dim?'var(--dim)':code.botColor);
     // V174 (D24): a before-start cell shows its date, no codes, no tap.
     strip+=isPre
       ? '<div class="wk-day pre" aria-label="Before your start date">'
@@ -647,7 +647,7 @@ function renderWeekView(){
     const over=(heroMode==='today'?'Today \u00b7 ':'Week '+currentWeek+' \u00b7 ')+DAY_FULL[heroKey]+(_heroMovedFrom?' \u00b7 moved from '+_heroMovedFrom:'');
     // @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
     const tags=(day.tags||[]).filter(t=>t!=='rest').map(t=>{
-      const col=MOD[t]?MOD[t][0]:'#181712';const dim=MOD[t]?MOD[t][1]:'rgba(24,23,18,0.15)';
+      const col=MOD[t]?MOD[t][0]:'var(--text)';const dim=MOD[t]?MOD[t][1]:'rgba(var(--ink-rgb),0.15)';
       return '<span class="wk-tag" style="color:'+col+';background:'+dim+'">'+((tagMeta[t]&&tagMeta[t].label)||t)+'</span>';
     }).join('');
     const summ=heroSummary(day);

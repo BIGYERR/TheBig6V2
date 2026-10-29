@@ -1,0 +1,50 @@
+units: previous 12445, this 12480; only in previous 5, only in this 40
+
+only in previous:
+  - css @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap'); :root{ color-scheme: light; --bg:rgb(244,241,232);--surface:rgb(251,250,245);--surface2:
+  - css @media (prefers-color-scheme: dark) { html{background:rgb(244,241,232) !important;
+  - css html,body{background:rgb(244,241,232) !important;color:rgb(24,23,18) !important;
+  - css .screen{background:rgb(244,241,232) !important;
+  - txt <meta name="ia-version" content="0.250.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+
+only in this:
+  + css @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap'); :root{ color-scheme: light; --bg:rgb(244,241,232);--surface:rgb(251,250,245);--surface2:
+  + css @media (prefers-color-scheme: dark) { :root:not([data-theme="day"]){ color-scheme: dark; --bg:rgb(18,17,13);--surface:rgb(27,26,21);--surface2:rgb(36,34,28);--surface3:rgb(46,43,35); --border:rgb(56,52,43);--border2:
+  + css :root[data-theme="night"]{ color-scheme: dark; --bg:rgb(18,17,13);--surface:rgb(27,26,21);--surface2:rgb(36,34,28);--surface3:rgb(46,43,35); --border:rgb(56,52,43);--border2:rgb(81,75,62); --text:rgb(236,231,218);--m
+  + css .look-row{display:flex;flex-direction:column;gap:8px;border-top:1px solid rgb(213,206,189);padding-top:16px;margin-top:6px;
+  + css .look-lbl{font-family:'Helvetica Now Text','Helvetica Neue',Helvetica,'Geist',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgb(107,101,87);
+  + css .look-seg{display:flex;gap:8px;
+  + css .look-opt{flex:1;background:transparent;border:1px solid rgb(188,178,155);border-radius:4px;color:rgb(107,101,87);font-family:'Helvetica Now Text','Helvetica Neue',Helvetica,'Geist',Arial,sans-serif;font-size:13px;fo
+  + css :root:not([data-theme]) .look-opt[data-look="auto"],:root[data-theme="day"] .look-opt[data-look="day"],:root[data-theme="night"] .look-opt[data-look="night"]{background:rgb(24,23,18);border-color:rgb(24,23,18);color:
+  + css .look-note{font-size:12px;color:rgb(107,101,87);line-height:1.5;
+  + txt <meta name="ia-version" content="0.251.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+  + txt </div>
+  + txt </div>
+  + txt const THEME_KEY='ia_theme';
+  + txt function getTheme(){
+  + txt try{const v=localStorage.getItem(THEME_KEY);return v==='day'||v==='night'?v:'auto';}catch{return 'auto';}
+  + txt }
+  + txt }
+  + txt }
+  + txt function applyTheme(){
+  + txt const t=getTheme();const root=document.documentElement;
+  + txt if(t==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
+  + txt const meta=document.querySelector('meta[name="theme-color"]');
+  + txt let paper='';
+  + txt try{paper=getComputedStyle(root).getPropertyValue('--bg').trim();}catch{paper='';}
+  + txt if(meta&&paper) meta.setAttribute('content',paper);
+  + txt function setTheme(t){
+  + txt try{if(t==='day'||t==='night') localStorage.setItem(THEME_KEY,t); else localStorage.removeItem(THEME_KEY);}catch{}
+  + txt applyTheme();
+  + txt applyTheme();
+  + txt try{
+  + txt const mq=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');
+  + txt if(mq&&mq.addEventListener) mq.addEventListener('change',applyTheme);
+  + txt }catch{}
+  + txt <div class="look-row" role="group" aria-label="Look">
+  + txt <div class="look-lbl">Look</div>
+  + txt <div class="look-seg">
+  + txt <button class="look-opt" data-look="auto" onclick="setTheme('auto')">Auto</button>
+  + txt <button class="look-opt" data-look="day" onclick="setTheme('day')">Day</button>
+  + txt <button class="look-opt" data-look="night" onclick="setTheme('night')">Night</button>
+  + txt <div class="look-note">Auto follows your phone.</div>

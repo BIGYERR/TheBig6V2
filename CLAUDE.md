@@ -183,6 +183,12 @@ v0.250.0 carried the D258/D259 line to `dev` while `docs/decisions/speed-work.md
   Vitest's snapshots, so `vitest -u` changes nothing here. The diff is the review, and it ships in
   the release commit. When HALF_MANNY moves, the regenerated digest equals the one coach printed before the build
   (standing ruling 5). A snapshot is never regenerated to turn a red test green without a ruling.
+  **Every sweep before the release commit (Mario, Post-v0.250.0).** When a ruling moves program output, run the whole
+  `tests/sweeps` folder locally on the candidate, in the background (`cd tests && npx vitest run sweeps > <scratch>/sweeps.out
+  2>&1`), before the release commit. Sweeps keep their own golden counts that ride on what a program prescribes, and the
+  60-second check never runs them. Every golden file it turns red is classified against the ruling, regenerated under it
+  and named in its blast radius, in the same commit. v0.250.0 regenerated the two program output files, and CI then
+  failed on two sweep censuses D260 also moved.
 
 ## Proof for new work (Mario, Post-v0.239.1)
 - **CI is the gate.** The unit and integration tests and the type check run in the 60-second check and in CI on every

@@ -528,6 +528,33 @@ test('the Done Before badge reads the title whatever the record shape, and an em
   assert.ok(h.includes('wildcard-complete-btn') && !h.includes('Done Before'), h.slice(0, 200));
 });
 
+// ── the badge's tint (D262, docs/decisions/wildcard.md) ──────────────────────────────────────────────────────────────
+// The badge sits on its program goal's colour as a tint, 0.133 (the 22 alpha, 34/255, it was written with). Before, it
+// wrote `var(--lift)22`, which no browser reads as a colour, so the badge had no fill. The native app's copy of the
+// rule is frontends/app/test/unit/random-workout.test.ts.
+function badgeFor(goal: string): string {
+  const F = B.at(WEEK[0]);
+  const prog = F.mkProg(['sun'], 'Recovery Lift');
+  prog.goal = goal;
+  B.install(prog, null, 3);
+  ev("randFilter='mine'; reroll();");
+  const badge = B.randBodyHTML().match(/<div class="rand-badge"[^>]*>/);
+  assert.ok(badge, 'a badge for ' + goal);
+  return badge[0];
+}
+
+test("the Wildcard badge sits on a tint of its goal's colour", () => {
+  assert.equal(badgeFor('strength'), '<div class="rand-badge" style="background:rgba(var(--lift-rgb),0.133);color:var(--lift)">');
+  assert.equal(badgeFor('balanced'), '<div class="rand-badge" style="background:rgba(var(--accent-rgb),0.133);color:var(--accent)">');
+  assert.equal(badgeFor('endurance'), '<div class="rand-badge" style="background:rgba(var(--run-rgb),0.133);color:var(--run)">');
+  assert.equal(badgeFor('hypertrophy'), '<div class="rand-badge" style="background:rgba(var(--hip-rgb),0.133);color:var(--hip)">');
+  assert.equal(badgeFor('athletic'), '<div class="rand-badge" style="background:rgba(var(--bike-rgb),0.133);color:var(--bike)">');
+});
+
+test('a Wildcard badge for a goal with no colour carries no style', () => {
+  assert.equal(badgeFor('mystery'), '<div class="rand-badge" style="">');
+});
+
 // ── the day a date resolves to, across daylight saving changes (New York) ────────────────────────────────────────────
 const NY = dstLatticeIn('America/New_York');
 const nyRows = (ids: string[]) => ids.filter((id) => !(NY.rows[id] && NY.rows[id].ok)).map((id) => id + ': ' + (NY.rows[id] ? NY.rows[id].detail : 'no result'));

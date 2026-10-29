@@ -288,7 +288,7 @@ function setCardioSwap(sport: any){
     // @ts-expect-error TS2339 Property 'style' does not exist on type 'Element'.
     b.style.border='1px solid '+(on?'var(--accent)':'var(--border2)');
     // @ts-expect-error TS2339 Property 'style' does not exist on type 'Element'.
-    b.style.background=on?'rgba(24,23,18,0.12)':'var(--surface2)';
+    b.style.background=on?'rgba(var(--ink-rgb),0.12)':'var(--surface2)';
     // @ts-expect-error TS2339 Property 'style' does not exist on type 'Element'.
     b.style.color=on?'var(--accent)':'var(--muted)';
   });

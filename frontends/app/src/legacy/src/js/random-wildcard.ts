@@ -222,10 +222,12 @@ function renderRand(){
   const done=getWildcardDone();
   const alreadyDone=done.some(d=>d.title===w.title);
   const goal=activeProg?.goal||'balanced';
-  const colors: Record<string, string>={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
-  const color=colors[goal];
+  const tones: Record<string, string>={strength:'lift',hypertrophy:'hip',fatloss:'run',athletic:'bike',balanced:'accent',endurance:'run',support_strength:'lift',support_athletic:'bike',support_prevention:'hip'};
+  const tone=tones[goal];
+  // D262: the badge sits on its goal colour's tint (0.133, the 22 alpha it was written with); a goal with no colour gets none
+  const badgeStyle=tone?'background:rgba(var(--'+tone+'-rgb),0.133);color:var(--'+tone+')':'';
   let html=`<div style="text-align:center;padding:4px 0 16px">
-    <div class="rand-badge" style="background:${color}22;color:${color}">${alreadyDone?'Done Before ✓':'Wildcard'}</div>
+    <div class="rand-badge" style="${badgeStyle}">${alreadyDone?'Done Before ✓':'Wildcard'}</div>
     <div class="rand-title">${w.title}</div>
   </div>`;
   if(w.cardio){

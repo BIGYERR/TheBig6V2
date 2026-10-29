@@ -19,7 +19,7 @@ function _iaCard(title: any, color: any, inner: any, footer?: any){
     + '</div>';
 }
 function _axTx(x: any,y: any,s: any,size?: any,anchor?: any,fill?: any,weight?: any){
-  return '<text x="'+(+x).toFixed(1)+'" y="'+(+y).toFixed(1)+'" fill="'+(fill||'rgba(24,23,18,0.3)')
+  return '<text x="'+(+x).toFixed(1)+'" y="'+(+y).toFixed(1)+'" fill="'+(fill||'rgba(var(--ink-rgb),0.3)')
     +'" font-size="'+(size||8)+'" text-anchor="'+(anchor||'end')+'" font-family="Helvetica Neue,Helvetica,Geist,sans-serif"'
     +(weight?' font-weight="'+weight+'"':'')+'>'+s+'</text>';
 }
@@ -37,7 +37,7 @@ function buildLadderChart(wk: any, totalWeeks: any, raceMi: any, cut: any, skip1
   const step=mx>20?10:5;
   for(let yv=0; yv<=mx; yv+=step){
     const cy=padT+plotH-(yv/mx)*plotH;
-    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>';
     s+=_axTx(padL-5, cy+3, yv);
   }
   if(raceMi>0&&raceMi<=mx){
@@ -86,7 +86,7 @@ function buildClassBandsChart(byClass: any){
   const first=Math.ceil(lo/tickStep)*tickStep;
   for(let pv=first; pv<=hi; pv+=tickStep){
     const cy=yof(pv);
-    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>';
     s+=_axTx(padL-5, cy+3, _fmtPaceShort(pv));
   }
   active.forEach((c,ci)=>{
@@ -132,7 +132,7 @@ function buildEasyEffortChart(ee: any, totalWeeks: any){
   const first=Math.ceil(lo/tickStep)*tickStep;
   for(let pv=first; pv<=hi; pv+=tickStep){
     const cy=yof(pv);
-    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>';
     s+=_axTx(padL-5, cy+3, _fmtPaceShort(pv));
   }
   s+=_axTx(padL, padT-6, '↑ faster', 7, 'start');
@@ -191,7 +191,7 @@ function buildProjectionCard(ee: any, totalWeeks: any, intakeMileSec: any){
   let s='';
   for(let tv=Math.ceil(lo/600)*600; tv<=hi; tv+=600){
     const cy=yof(tv);
-    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>';
     s+=_axTx(padL-5, cy+3, Math.floor(tv/3600)+':'+String(Math.floor((tv%3600)/60)).padStart(2,'0'));
   }
   if(claimed){
@@ -244,7 +244,7 @@ function buildDriftChart(pv: any, totalWeeks: any, cut: any, skip1: any){
   for(let yv=Math.ceil(lo/step)*step; yv<=hi; yv+=step){
     if(Math.abs(yv)<1e-9) continue;
     const cy=yof(yv);
-    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>';
     s+=_axTx(padL-5, cy+3, (yv>0?'+':'')+yv);
   }
   const zy=yof(0);
@@ -473,7 +473,7 @@ function buildEasyBandsFallback(byClass: any){
   const xof=p=>padL+((p-lo)/(hi-lo))*plotW;
   let s='';
   for(let pv=Math.ceil(lo/60)*60; pv<=hi; pv+=60){
-    s+='<line x1="'+xof(pv).toFixed(1)+'" y1="'+(padT-6)+'" x2="'+xof(pv).toFixed(1)+'" y2="'+(padT+58)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    s+='<line x1="'+xof(pv).toFixed(1)+'" y1="'+(padT-6)+'" x2="'+xof(pv).toFixed(1)+'" y2="'+(padT+58)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>';
     s+=_axTx(xof(pv), padT+74, _fmtPaceShort(pv), 8, 'middle');
   }
   s+=_axTx(padL, padT-12, '\u2190 faster', 7, 'start');

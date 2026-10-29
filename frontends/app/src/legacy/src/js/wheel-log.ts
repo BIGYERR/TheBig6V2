@@ -319,7 +319,7 @@ function cardioFieldHTML(sport: any, e: any, dose: any, sub: any){
 function cardioSwapChip(sport: any, active: any, planned: any){
   const on=sport===active;
   const tag=sport===planned?' · planned':'';
-  return `<button type="button" data-sport="${sport}" onclick="setCardioSwap('${sport}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid ${on?'var(--accent)':'var(--border2)'};background:${on?'rgba(24,23,18,0.12)':'var(--surface2)'};color:${on?'var(--accent)':'var(--muted)'};font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em">${asyIcon(sport,15)}<span>${CARDIO_WORD[sport]}${tag}</span></button>`;
+  return `<button type="button" data-sport="${sport}" onclick="setCardioSwap('${sport}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid ${on?'var(--accent)':'var(--border2)'};background:${on?'rgba(var(--ink-rgb),0.12)':'var(--surface2)'};color:${on?'var(--accent)':'var(--muted)'};font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em">${asyIcon(sport,15)}<span>${CARDIO_WORD[sport]}${tag}</span></button>`;
 }
 
 function buildLogHTML(dayKey: any, dayCardio: any){
@@ -376,13 +376,13 @@ function buildExportHTML(){
 }
 
 // ── Session-sheet helpers (V18.3) ──
-const MOD_PAL: Record<string, [string, string]>={test:['#CF4E1A','rgba(207,78,26,0.15)'],peak:['#CF4E1A','rgba(207,78,26,0.15)'],lift:['#bc6a43','rgba(188,106,67,0.15)'],run:['#5e8c54','rgba(94,140,84,0.15)'],bike:['#3f6e96','rgba(63,110,150,0.15)'],swim:['#3f6e96','rgba(63,110,150,0.15)'],hip:['#7e5e96','rgba(126,94,150,0.15)'],core:['#a6822f','rgba(166,130,47,0.15)']};
+const MOD_PAL: Record<string, [string, string]>={test:['var(--signal)','rgba(var(--signal-rgb),0.15)'],peak:['var(--signal)','rgba(var(--signal-rgb),0.15)'],lift:['var(--lift)','rgba(var(--lift-rgb),0.15)'],run:['var(--run)','rgba(var(--run-rgb),0.15)'],bike:['var(--bike)','rgba(var(--bike-rgb),0.15)'],swim:['var(--swim)','rgba(var(--swim-rgb),0.15)'],hip:['var(--hip)','rgba(var(--hip-rgb),0.15)'],core:['var(--core)','rgba(var(--core-rgb),0.15)']};
 // Fallback for a tag with no palette entry. The old value was near-black text on a
 // translucent-black chip — 1.01:1 on the dark day header, i.e. invisible. Any tag added
 // to the engine without a MOD_PAL entry hit this. On-ink instead: 7.6:1 on the dark
 // header and still legible on the bone week list.
 // @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
-function modTagsHTML(tags: any){return (tags||[]).filter(t=>t!=='rest').map(function(t: any){var p=MOD_PAL[t]||['#7d7668','rgba(125,118,104,0.12)'];return '<span class="wk-tag" style="color:'+p[0]+';background:'+p[1]+'">'+((tagMeta[t]&&tagMeta[t].label)||t)+'</span>';}).join('');}
+function modTagsHTML(tags: any){return (tags||[]).filter(t=>t!=='rest').map(function(t: any){var p=MOD_PAL[t]||['var(--mark)','rgba(var(--mark-rgb),0.12)'];return '<span class="wk-tag" style="color:'+p[0]+';background:'+p[1]+'">'+((tagMeta[t]&&tagMeta[t].label)||t)+'</span>';}).join('');}
 function sessionLogProgress(day: any){
   const stored=getExWeights();var total=0,done=0;
   (day.sections||[]).forEach(function(sec: any){

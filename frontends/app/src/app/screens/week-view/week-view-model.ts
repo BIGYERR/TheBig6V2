@@ -126,9 +126,9 @@ export interface WeekView {
 const ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const DAY_OFFSET: Record<string, number> = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
 const MOD: Record<string, [string, string]> = {
-  lift: ['#bc6a43', 'rgba(188,106,67,0.15)'], run: ['#5e8c54', 'rgba(94,140,84,0.15)'], bike: ['#3f6e96', 'rgba(63,110,150,0.15)'],
-  swim: ['#3f6e96', 'rgba(63,110,150,0.15)'], hip: ['#7e5e96', 'rgba(126,94,150,0.15)'], core: ['#a6822f', 'rgba(166,130,47,0.15)'],
-  rest: ['#2c2c2e', 'rgba(24,23,18,0.05)'],
+  lift: ['var(--lift)', 'rgba(var(--lift-rgb),0.15)'], run: ['var(--run)', 'rgba(var(--run-rgb),0.15)'], bike: ['var(--bike)', 'rgba(var(--bike-rgb),0.15)'],
+  swim: ['var(--swim)', 'rgba(var(--swim-rgb),0.15)'], hip: ['var(--hip)', 'rgba(var(--hip-rgb),0.15)'], core: ['var(--core)', 'rgba(var(--core-rgb),0.15)'],
+  rest: ['var(--rest-ink)', 'rgba(var(--ink-rgb),0.05)'],
 };
 const TAG_LABEL: Record<string, string> = { test: 'Test Week', peak: 'Peak Week', run: 'Run', bike: 'Bike', swim: 'Swim', lift: 'Lift', hip: 'Hip', core: 'Core' };
 const HERO_STATUS: Record<string, string> = {
@@ -241,10 +241,10 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
       cls: 'wk-day' + (isToday ? ' today' : '') + (dim ? ' dim' : '') + (d.isTravel(day) ? ' away' : ''),
       label: x.toUpperCase(),
       top: code.top || '—',
-      topColor: isToday ? d.onGold(code.topColor) : dim ? '#5f5f62' : code.topColor,
+      topColor: isToday ? d.onGold(code.topColor) : dim ? 'var(--dim)' : code.topColor,
       center,
       bot: code.bot,
-      botColor: isToday ? d.onGold(code.botColor) : dim ? '#5f5f62' : code.botColor,
+      botColor: isToday ? d.onGold(code.botColor) : dim ? 'var(--dim)' : code.botColor,
     };
   });
 
@@ -288,7 +288,7 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
       time: '~' + d.sessionTime(day) + ' MIN',
       tags: (day.tags || []).filter((t) => t !== 'rest').map((t) => ({
         label: TAG_LABEL[t] || t,
-        style: 'color:' + (MOD[t] ? MOD[t][0] : '#181712') + ';background:' + (MOD[t] ? MOD[t][1] : 'rgba(24,23,18,0.15)'),
+        style: 'color:' + (MOD[t] ? MOD[t][0] : 'var(--text)') + ';background:' + (MOD[t] ? MOD[t][1] : 'rgba(var(--ink-rgb),0.15)'),
       })),
       travel: !!d.isTravel(day),
       summary: d.heroSummary(day),

@@ -144,8 +144,8 @@ function buildPaceChart(title: any, weeks: any, data: any, tgt: any, color: any)
   const yLabels=[lo,(lo+hi)/2,hi];
   let svg='';
   yLabels.forEach(yv=>{ const cy=Y(yv);
-    svg+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>'
-       +'<text x="'+(padL-4)+'" y="'+(cy+4).toFixed(1)+'" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="end" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">'+_fmtPaceShort(yv)+'</text>';
+    svg+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>'
+       +'<text x="'+(padL-4)+'" y="'+(cy+4).toFixed(1)+'" fill="rgba(var(--ink-rgb),0.3)" font-size="8" text-anchor="end" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">'+_fmtPaceShort(yv)+'</text>';
   });
   if(tgt){ const ty=Y(tgt);
     svg+='<line x1="'+padL+'" y1="'+ty.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+ty.toFixed(1)+'" stroke="'+color+'" stroke-width="1" stroke-dasharray="2,4" opacity="0.55"/>'
@@ -164,9 +164,9 @@ function buildPaceChart(title: any, weeks: any, data: any, tgt: any, color: any)
   if(lastPt) svg+='<text x="'+lastPt.x.toFixed(1)+'" y="'+(lastPt.y-8).toFixed(1)+'" font-size="8" font-weight="700" fill="'+color+'" text-anchor="middle">'+_fmtPaceShort(lastPt.v)+'</text>';
   const xLabelStep=n<=8?1:n<=16?2:4;
   weeks.forEach((w: any,i: any)=>{ if(i%xLabelStep!==0) return;
-    svg+='<text x="'+(padL+i*xStep).toFixed(1)+'" y="'+(H-padB+14)+'" font-size="8" fill="rgba(24,23,18,0.35)" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W'+w+'</text>';
+    svg+='<text x="'+(padL+i*xStep).toFixed(1)+'" y="'+(H-padB+14)+'" font-size="8" fill="rgba(var(--ink-rgb),0.35)" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W'+w+'</text>';
   });
-  svg+='<text x="'+(padL+plotW/2).toFixed(1)+'" y="'+(H-4)+'" font-size="8" fill="rgba(24,23,18,0.45)" text-anchor="middle">higher = faster easy pace \u00b7 dashed = plan target</text>';
+  svg+='<text x="'+(padL+plotW/2).toFixed(1)+'" y="'+(H-4)+'" font-size="8" fill="rgba(var(--ink-rgb),0.45)" text-anchor="middle">higher = faster easy pace \u00b7 dashed = plan target</text>';
   return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
     +'<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:'+color+';margin-bottom:10px">'+title+'</div>'
     +'<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">'+svg+'</svg></div>';

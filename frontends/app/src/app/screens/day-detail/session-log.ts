@@ -113,7 +113,7 @@ export class SessionLog {
     wrap.querySelectorAll<HTMLElement>('#cardioPicker button[data-sport]').forEach((btn) => {
       const on = btn.dataset['sport'] === sport;
       btn.style.border = '1px solid ' + (on ? 'var(--accent)' : 'var(--border2)');
-      btn.style.background = on ? 'rgba(24,23,18,0.12)' : 'var(--surface2)';
+      btn.style.background = on ? 'rgba(var(--ink-rgb),0.12)' : 'var(--surface2)';
       btn.style.color = on ? 'var(--accent)' : 'var(--muted)';
     });
     const note = document.getElementById('cardioSwapNote');

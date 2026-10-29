@@ -1,0 +1,333 @@
+files read: 109; colour occurrences: 324 (tokens 30, var() fallbacks 5, literals 289)
+var(--…) uses: 1543
+
+literals by area and class:
+area               bone       grey        ink ink shadow   modality      other     signal
+legacy css           30          5         48         15         45          6          6
+legacy js             0          9         33          0         36         11          4
+legacy html           1          0          0          0          0          0          0
+angular               0          4         20          0         15          1          0
+
+literals by file:
+   61  frontends/app/src/legacy/src/css/detail-sheet.css
+   37  frontends/app/src/legacy/src/js/week-view-sections.ts
+   31  frontends/app/src/legacy/src/css/overlays-components.css
+   19  frontends/app/src/legacy/src/js/wheel-log.ts
+   18  frontends/app/src/app/screens/week-view/week-view-model.ts
+   16  frontends/app/src/legacy/src/css/week-view.css
+   13  frontends/app/src/legacy/src/css/motion.css
+   12  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts
+   10  frontends/app/src/legacy/src/css/session-sheet.css
+    9  frontends/app/src/legacy/src/css/this-week.css
+    7  frontends/app/src/legacy/src/css/base.css
+    7  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts
+    7  frontends/app/src/legacy/src/js/progress-charts.ts
+    5  frontends/app/src/legacy/src/css/shell.css
+    4  frontends/app/src/legacy/src/js/progress-data.ts
+    4  frontends/app/src/legacy/src/js/wizard.ts
+    4  frontends/app/src/app/screens/progress/charts/run-charts-model.ts
+    4  frontends/app/src/app/screens/wizard/wizard.ts
+    3  frontends/app/src/legacy/src/css/wizard.css
+    3  frontends/app/src/app/screens/progress/charts/dot-chart.ts
+    3  frontends/app/src/app/screens/progress/progress-model.ts
+    2  frontends/app/src/app/screens/day-detail/sheet-marks-model.ts
+    2  frontends/app/src/app/screens/progress/charts/chart-card-model.ts
+    1  frontends/app/src/legacy/src/js/day-detail.ts
+    1  frontends/app/src/legacy/src/js/day-status.ts
+    1  frontends/app/src/legacy/src/js/wizard-generate.ts
+    1  frontends/app/src/legacy/src/html/head.html
+    1  frontends/app/src/app/screens/day-detail/session-log-model.ts
+    1  frontends/app/src/app/screens/day-detail/session-log.ts
+    1  frontends/app/src/app/screens/progress/charts/ledger-model.ts
+    1  frontends/app/src/app/screens/progress/progress-screen.ts
+
+every literal:
+  frontends/app/src/legacy/src/css/base.css:20  bone       #F4F1E8
+  frontends/app/src/legacy/src/css/base.css:21  bone       #F4F1E8
+  frontends/app/src/legacy/src/css/base.css:21  ink        #181712
+  frontends/app/src/legacy/src/css/base.css:24  bone       #F4F1E8
+  frontends/app/src/legacy/src/css/base.css:25  bone       #F4F1E8
+  frontends/app/src/legacy/src/css/base.css:25  ink        #181712
+  frontends/app/src/legacy/src/css/base.css:26  bone       #F4F1E8
+  frontends/app/src/legacy/src/css/detail-sheet.css:9  ink        rgba(24,23,18,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:9  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/css/detail-sheet.css:9  ink        rgba(24,23,18,0.28)
+  frontends/app/src/legacy/src/css/detail-sheet.css:21  signal     rgba(207,78,26,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:23  modality   rgba(126,94,150,0.25)
+  frontends/app/src/legacy/src/css/detail-sheet.css:24  modality   rgba(126,94,150,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:24  modality   rgba(126,94,150,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:25  modality   rgba(126,94,150,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:26  modality   rgba(166,130,47,0.25)
+  frontends/app/src/legacy/src/css/detail-sheet.css:27  modality   rgba(166,130,47,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:27  modality   rgba(166,130,47,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:28  modality   rgba(166,130,47,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:29  ink        rgba(24,23,18,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:31  ink        rgba(24,23,18,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:36  ink        rgba(24,23,18,0.55)
+  frontends/app/src/legacy/src/css/detail-sheet.css:61  ink shadow rgba(40,34,22,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:61  ink shadow rgba(40,34,22,0.07)
+  frontends/app/src/legacy/src/css/detail-sheet.css:62  ink shadow rgba(40,34,22,0.13)
+  frontends/app/src/legacy/src/css/detail-sheet.css:62  ink shadow rgba(40,34,22,0.05)
+  frontends/app/src/legacy/src/css/detail-sheet.css:62  other      rgba(255,255,255,0.16)
+  frontends/app/src/legacy/src/css/detail-sheet.css:62  ink shadow rgba(40,34,22,0.05)
+  frontends/app/src/legacy/src/css/detail-sheet.css:62  ink shadow rgba(40,34,22,0.13)
+  frontends/app/src/legacy/src/css/detail-sheet.css:63  bone       rgba(251,250,245,0.34)
+  frontends/app/src/legacy/src/css/detail-sheet.css:63  ink shadow rgba(40,34,22,0.07)
+  frontends/app/src/legacy/src/css/detail-sheet.css:63  ink shadow rgba(40,34,22,0.05)
+  frontends/app/src/legacy/src/css/detail-sheet.css:70  modality   rgba(94,140,84,0.30)
+  frontends/app/src/legacy/src/css/detail-sheet.css:73  modality   rgba(63,110,150,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:73  modality   rgba(63,110,150,0.30)
+  frontends/app/src/legacy/src/css/detail-sheet.css:87  ink        rgba(24,23,18,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:87  ink        rgba(24,23,18,0.5)
+  frontends/app/src/legacy/src/css/detail-sheet.css:88  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/css/detail-sheet.css:106  ink        rgba(24,23,18,0.25)
+  frontends/app/src/legacy/src/css/detail-sheet.css:117  grey       rgba(107,101,87,0.45)
+  frontends/app/src/legacy/src/css/detail-sheet.css:122  signal     rgba(207,78,26,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:122  signal     rgba(207,78,26,0.35)
+  frontends/app/src/legacy/src/css/detail-sheet.css:123  signal     rgba(207,78,26,0.20)
+  frontends/app/src/legacy/src/css/detail-sheet.css:128  bone       rgba(244,241,232,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:128  bone       rgba(244,241,232,0.30)
+  frontends/app/src/legacy/src/css/detail-sheet.css:129  bone       rgba(244,241,232,0.20)
+  frontends/app/src/legacy/src/css/detail-sheet.css:139  bone       rgba(244,241,232,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:139  bone       rgba(244,241,232,0.22)
+  frontends/app/src/legacy/src/css/detail-sheet.css:139  bone       rgba(244,241,232,0.78)
+  frontends/app/src/legacy/src/css/detail-sheet.css:149  signal     rgba(207,78,26,0.35)
+  frontends/app/src/legacy/src/css/detail-sheet.css:170  modality   rgba(94,140,84,.15)
+  frontends/app/src/legacy/src/css/detail-sheet.css:172  modality   rgba(94,140,84,.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:172  modality   rgba(94,140,84,.4)
+  frontends/app/src/legacy/src/css/detail-sheet.css:179  other      rgba(0,0,0,0.78)
+  frontends/app/src/legacy/src/css/detail-sheet.css:181  ink        #181712
+  frontends/app/src/legacy/src/css/detail-sheet.css:181  bone       rgba(244,241,232,0.14)
+  frontends/app/src/legacy/src/css/detail-sheet.css:181  ink shadow rgba(40,34,22,0.10)
+  frontends/app/src/legacy/src/css/detail-sheet.css:181  ink shadow rgba(40,34,22,0.06)
+  frontends/app/src/legacy/src/css/detail-sheet.css:191  bone       rgba(244,241,232,0.6)
+  frontends/app/src/legacy/src/css/detail-sheet.css:193  bone       rgba(244,241,232,0.06)
+  frontends/app/src/legacy/src/css/detail-sheet.css:193  bone       rgba(244,241,232,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:196  bone       rgba(244,241,232,0.5)
+  frontends/app/src/legacy/src/css/detail-sheet.css:203  bone       rgba(244,241,232,0.6)
+  frontends/app/src/legacy/src/css/detail-sheet.css:204  bone       rgba(244,241,232,0.3)
+  frontends/app/src/legacy/src/css/detail-sheet.css:209  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/css/detail-sheet.css:210  ink        #0a0a0a
+  frontends/app/src/legacy/src/css/detail-sheet.css:211  modality   rgba(94,140,84,0.12)
+  frontends/app/src/legacy/src/css/detail-sheet.css:211  modality   rgba(94,140,84,0.35)
+  frontends/app/src/legacy/src/css/motion.css:42  bone       rgba(244,241,232,0.30)
+  frontends/app/src/legacy/src/css/motion.css:43  bone       rgba(244,241,232,0.10)
+  frontends/app/src/legacy/src/css/motion.css:44  other      rgba(0,0,0,0.72)
+  frontends/app/src/legacy/src/css/motion.css:46  ink        #181712
+  frontends/app/src/legacy/src/css/motion.css:46  bone       rgba(244,241,232,0.14)
+  frontends/app/src/legacy/src/css/motion.css:46  bone       #f4f1e8
+  frontends/app/src/legacy/src/css/motion.css:46  other      rgba(0,0,0,0.4)
+  frontends/app/src/legacy/src/css/motion.css:48  bone       rgba(244,241,232,0.62)
+  frontends/app/src/legacy/src/css/motion.css:51  bone       #f4f1e8
+  frontends/app/src/legacy/src/css/motion.css:52  bone       rgba(244,241,232,0.78)
+  frontends/app/src/legacy/src/css/motion.css:53  bone       rgba(244,241,232,0.60)
+  frontends/app/src/legacy/src/css/motion.css:53  bone       rgba(244,241,232,0.12)
+  frontends/app/src/legacy/src/css/motion.css:54  ink        #0a0a0a
+  frontends/app/src/legacy/src/css/overlays-components.css:6  modality   rgba(188,106,67,0.40)
+  frontends/app/src/legacy/src/css/overlays-components.css:6  modality   rgba(188,106,67,0.12)
+  frontends/app/src/legacy/src/css/overlays-components.css:13  ink        #0a0a0a
+  frontends/app/src/legacy/src/css/overlays-components.css:17  ink        #0a0a0a
+  frontends/app/src/legacy/src/css/overlays-components.css:20  ink        rgba(24,23,18,0.18)
+  frontends/app/src/legacy/src/css/overlays-components.css:24  bone       rgba(251,246,238,0.18)
+  frontends/app/src/legacy/src/css/overlays-components.css:35  ink        rgba(24,23,18,0.18)
+  frontends/app/src/legacy/src/css/overlays-components.css:43  ink        rgba(24,23,18,0.18)
+  frontends/app/src/legacy/src/css/overlays-components.css:49  ink        rgba(24,23,18,0.18)
+  frontends/app/src/legacy/src/css/overlays-components.css:55  ink        rgba(24,23,18,0.08)
+  frontends/app/src/legacy/src/css/overlays-components.css:55  ink        rgba(24,23,18,0.2)
+  frontends/app/src/legacy/src/css/overlays-components.css:58  ink shadow rgba(40,34,22,0.06)
+  frontends/app/src/legacy/src/css/overlays-components.css:66  ink        rgba(24,23,18,0.10)
+  frontends/app/src/legacy/src/css/overlays-components.css:69  modality   rgba(94,140,84,0.10)
+  frontends/app/src/legacy/src/css/overlays-components.css:69  modality   rgba(94,140,84,0.04)
+  frontends/app/src/legacy/src/css/overlays-components.css:69  modality   rgba(94,140,84,0.30)
+  frontends/app/src/legacy/src/css/overlays-components.css:70  modality   rgba(63,110,150,0.10)
+  frontends/app/src/legacy/src/css/overlays-components.css:70  modality   rgba(63,110,150,0.04)
+  frontends/app/src/legacy/src/css/overlays-components.css:70  modality   rgba(63,110,150,0.30)
+  frontends/app/src/legacy/src/css/overlays-components.css:72  modality   rgba(63,110,150,0.12)
+  frontends/app/src/legacy/src/css/overlays-components.css:77  modality   rgba(166,130,47,0.10)
+  frontends/app/src/legacy/src/css/overlays-components.css:77  modality   rgba(166,130,47,0.04)
+  frontends/app/src/legacy/src/css/overlays-components.css:77  modality   rgba(166,130,47,0.30)
+  frontends/app/src/legacy/src/css/overlays-components.css:78  ink        rgba(24,23,18,0.10)
+  frontends/app/src/legacy/src/css/overlays-components.css:78  ink        rgba(24,23,18,0.04)
+  frontends/app/src/legacy/src/css/overlays-components.css:78  ink        rgba(24,23,18,0.30)
+  frontends/app/src/legacy/src/css/overlays-components.css:85  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/css/overlays-components.css:86  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/css/overlays-components.css:101  ink        rgba(24,23,18,0.08)
+  frontends/app/src/legacy/src/css/overlays-components.css:101  ink        rgba(24,23,18,0.22)
+  frontends/app/src/legacy/src/css/overlays-components.css:109  ink shadow rgba(40,34,22,0.06)
+  frontends/app/src/legacy/src/css/session-sheet.css:2  ink        #161618
+  frontends/app/src/legacy/src/css/session-sheet.css:5  ink        #0a0a0a
+  frontends/app/src/legacy/src/css/session-sheet.css:32  ink        rgba(24,23,18,0.55)
+  frontends/app/src/legacy/src/css/session-sheet.css:48  signal     rgba(207,78,26,0.35)
+  frontends/app/src/legacy/src/css/session-sheet.css:90  ink        rgba(24,23,18,0.55)
+  frontends/app/src/legacy/src/css/session-sheet.css:120  modality   rgba(94,140,84,0.30)
+  frontends/app/src/legacy/src/css/session-sheet.css:121  modality   rgba(63,110,150,0.30)
+  frontends/app/src/legacy/src/css/session-sheet.css:122  modality   rgba(63,110,150,0.30)
+  frontends/app/src/legacy/src/css/session-sheet.css:123  ink        rgba(24,23,18,0.30)
+  frontends/app/src/legacy/src/css/session-sheet.css:148  modality   rgba(94,140,84,0.40)
+  frontends/app/src/legacy/src/css/shell.css:20  ink shadow rgba(40,34,22,0.06)
+  frontends/app/src/legacy/src/css/shell.css:27  modality   rgba(126,94,150,0.15)
+  frontends/app/src/legacy/src/css/shell.css:27  modality   #7e5e96
+  frontends/app/src/legacy/src/css/shell.css:60  other      rgba(255,69,58,0.35)
+  frontends/app/src/legacy/src/css/shell.css:61  ink        rgba(24,23,18,0.35)
+  frontends/app/src/legacy/src/css/this-week.css:16  grey       #5f5f62
+  frontends/app/src/legacy/src/css/this-week.css:28  bone       rgba(244,241,232,0.30)
+  frontends/app/src/legacy/src/css/this-week.css:54  ink shadow rgba(40,34,22,0.06)
+  frontends/app/src/legacy/src/css/this-week.css:55  ink        rgba(24,23,18,0.45)
+  frontends/app/src/legacy/src/css/this-week.css:62  ink        rgba(24,23,18,0.08)
+  frontends/app/src/legacy/src/css/this-week.css:83  grey       #5f5f62
+  frontends/app/src/legacy/src/css/this-week.css:86  grey       #5f5f62
+  frontends/app/src/legacy/src/css/this-week.css:87  ink        rgba(24,23,18,0.07)
+  frontends/app/src/legacy/src/css/this-week.css:93  grey       #5f5f62
+  frontends/app/src/legacy/src/css/week-view.css:47  modality   rgba(158,51,40,0.07)
+  frontends/app/src/legacy/src/css/week-view.css:47  modality   rgba(158,51,40,0.22)
+  frontends/app/src/legacy/src/css/week-view.css:48  modality   rgba(158,51,40,0.07)
+  frontends/app/src/legacy/src/css/week-view.css:48  modality   rgba(158,51,40,0.22)
+  frontends/app/src/legacy/src/css/week-view.css:52  modality   rgba(188,106,67,0.40)
+  frontends/app/src/legacy/src/css/week-view.css:52  modality   rgba(188,106,67,0.12)
+  frontends/app/src/legacy/src/css/week-view.css:53  modality   rgba(188,106,67,0.40)
+  frontends/app/src/legacy/src/css/week-view.css:53  modality   rgba(188,106,67,0.12)
+  frontends/app/src/legacy/src/css/week-view.css:90  modality   rgba(188,106,67,0.45)
+  frontends/app/src/legacy/src/css/week-view.css:92  ink shadow rgba(40,34,22,0.06)
+  frontends/app/src/legacy/src/css/week-view.css:94  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/css/week-view.css:96  ink        rgba(24,23,18,0.2)
+  frontends/app/src/legacy/src/css/week-view.css:98  modality   rgba(94,140,84,0.6)
+  frontends/app/src/legacy/src/css/week-view.css:99  modality   rgba(94,140,84,0.18)
+  frontends/app/src/legacy/src/css/week-view.css:104  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/css/week-view.css:104  ink        rgba(24,23,18,0.25)
+  frontends/app/src/legacy/src/css/wizard.css:12  ink        rgba(24,23,18,0.18)
+  frontends/app/src/legacy/src/css/wizard.css:25  ink        rgba(24,23,18,0.55)
+  frontends/app/src/legacy/src/css/wizard.css:37  other      #fff
+  frontends/app/src/legacy/src/js/day-detail.ts:219  ink        rgba(24,23,18,0.20)
+  frontends/app/src/legacy/src/js/day-status.ts:291  ink        rgba(24,23,18,0.12)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:224  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:276  ink        rgba(24,23,18,0.3)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:521  modality   #3f6e96
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:527  modality   #f0a050
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:534  modality   #7e5e96
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:595  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:694  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:695  ink        rgba(24,23,18,0.3)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:705  ink        rgba(24,23,18,0.3)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:733  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:734  ink        rgba(24,23,18,0.3)
+  frontends/app/src/legacy/src/js/lift-ledger-progress-screen.ts:760  ink        rgba(24,23,18,0.3)
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts:69  ink        rgba(24,23,18,0.35)
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts:70  ink        rgba(24,23,18,0.30)
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts:71  modality   rgba(166,130,47,0.4)
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts:72  ink        rgba(24,23,18,0.55)
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts:74  other      #006BB6
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts:74  other      #F58426
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts:74  grey       #BEC0C2
+  frontends/app/src/legacy/src/js/progress-charts.ts:22  ink        rgba(24,23,18,0.3)
+  frontends/app/src/legacy/src/js/progress-charts.ts:40  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/progress-charts.ts:89  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/progress-charts.ts:135  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/progress-charts.ts:194  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/progress-charts.ts:247  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/progress-charts.ts:476  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/progress-data.ts:147  ink        rgba(24,23,18,0.06)
+  frontends/app/src/legacy/src/js/progress-data.ts:148  ink        rgba(24,23,18,0.3)
+  frontends/app/src/legacy/src/js/progress-data.ts:167  ink        rgba(24,23,18,0.35)
+  frontends/app/src/legacy/src/js/progress-data.ts:169  ink        rgba(24,23,18,0.45)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:277  grey       #5f5f62
+  frontends/app/src/legacy/src/js/week-view-sections.ts:277  grey       #5f5f62
+  frontends/app/src/legacy/src/js/week-view-sections.ts:281  modality   #5e8c54
+  frontends/app/src/legacy/src/js/week-view-sections.ts:281  modality   #3f6e96
+  frontends/app/src/legacy/src/js/week-view-sections.ts:281  grey       #5f5f62
+  frontends/app/src/legacy/src/js/week-view-sections.ts:283  modality   #bc6a43
+  frontends/app/src/legacy/src/js/week-view-sections.ts:285  modality   #bc6a43
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  modality   #5e8c54
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  other      #1c5f2c
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  modality   #3f6e96
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  other      #0a3a66
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  modality   #bc6a43
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  other      #7a3410
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  grey       #5f5f62
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  other      #3a2c08
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  modality   #a6822f
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  other      #7a4d00
+  frontends/app/src/legacy/src/js/week-view-sections.ts:290  other      #3a2c08
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   #bc6a43
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   rgba(188,106,67,0.15)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   #5e8c54
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   rgba(94,140,84,0.15)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   #3f6e96
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   rgba(63,110,150,0.15)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   #3f6e96
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   rgba(63,110,150,0.15)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   #7e5e96
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   rgba(126,94,150,0.15)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   #a6822f
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  modality   rgba(166,130,47,0.15)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  other      #2c2c2e
+  frontends/app/src/legacy/src/js/week-view-sections.ts:562  ink        rgba(24,23,18,0.05)
+  frontends/app/src/legacy/src/js/week-view-sections.ts:564  other      #3a3a3c
+  frontends/app/src/legacy/src/js/week-view-sections.ts:588  grey       #5f5f62
+  frontends/app/src/legacy/src/js/week-view-sections.ts:589  grey       #5f5f62
+  frontends/app/src/legacy/src/js/week-view-sections.ts:650  ink        #181712
+  frontends/app/src/legacy/src/js/week-view-sections.ts:650  ink        rgba(24,23,18,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:322  ink        rgba(24,23,18,0.12)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  signal     #CF4E1A
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  signal     rgba(207,78,26,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  signal     #CF4E1A
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  signal     rgba(207,78,26,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   #bc6a43
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   rgba(188,106,67,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   #5e8c54
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   rgba(94,140,84,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   #3f6e96
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   rgba(63,110,150,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   #3f6e96
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   rgba(63,110,150,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   #7e5e96
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   rgba(126,94,150,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   #a6822f
+  frontends/app/src/legacy/src/js/wheel-log.ts:379  modality   rgba(166,130,47,0.15)
+  frontends/app/src/legacy/src/js/wheel-log.ts:385  grey       #7d7668
+  frontends/app/src/legacy/src/js/wheel-log.ts:385  grey       rgba(125,118,104,0.12)
+  frontends/app/src/legacy/src/js/wizard-generate.ts:34  other      rgba(0,0,0,0.85)
+  frontends/app/src/legacy/src/js/wizard.ts:1127  ink        rgba(24,23,18,0.12)
+  frontends/app/src/legacy/src/js/wizard.ts:1127  ink        rgba(24,23,18,0.35)
+  frontends/app/src/legacy/src/js/wizard.ts:1139  ink        rgba(24,23,18,0.10)
+  frontends/app/src/legacy/src/js/wizard.ts:1139  ink        rgba(24,23,18,0.28)
+  frontends/app/src/legacy/src/html/head.html:7  bone       #F4F1E8
+  frontends/app/src/app/screens/day-detail/session-log-model.ts:89  ink        rgba(24,23,18,0.12)
+  frontends/app/src/app/screens/day-detail/session-log.ts:116  ink        rgba(24,23,18,0.12)
+  frontends/app/src/app/screens/day-detail/sheet-marks-model.ts:16  grey       #7d7668
+  frontends/app/src/app/screens/day-detail/sheet-marks-model.ts:16  grey       rgba(125,118,104,0.12)
+  frontends/app/src/app/screens/progress/charts/chart-card-model.ts:44  ink        rgba(24,23,18,0.3)
+  frontends/app/src/app/screens/progress/charts/chart-card-model.ts:55  ink        rgba(24,23,18,0.06)
+  frontends/app/src/app/screens/progress/charts/dot-chart.ts:21  ink        rgba(24,23,18,0.06)
+  frontends/app/src/app/screens/progress/charts/dot-chart.ts:22  ink        rgba(24,23,18,0.3)
+  frontends/app/src/app/screens/progress/charts/dot-chart.ts:30  ink        rgba(24,23,18,0.3)
+  frontends/app/src/app/screens/progress/charts/ledger-model.ts:155  ink        rgba(24,23,18,0.3)
+  frontends/app/src/app/screens/progress/charts/run-charts-model.ts:331  ink        rgba(24,23,18,0.06)
+  frontends/app/src/app/screens/progress/charts/run-charts-model.ts:368  ink        rgba(24,23,18,0.3)
+  frontends/app/src/app/screens/progress/charts/run-charts-model.ts:397  ink        rgba(24,23,18,0.35)
+  frontends/app/src/app/screens/progress/charts/run-charts-model.ts:399  ink        rgba(24,23,18,0.45)
+  frontends/app/src/app/screens/progress/progress-model.ts:177  modality   #3f6e96
+  frontends/app/src/app/screens/progress/progress-model.ts:180  modality   #f0a050
+  frontends/app/src/app/screens/progress/progress-model.ts:183  modality   #7e5e96
+  frontends/app/src/app/screens/progress/progress-screen.ts:243  ink        rgba(24,23,18,0.06)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:129  modality   #bc6a43
+  frontends/app/src/app/screens/week-view/week-view-model.ts:129  modality   rgba(188,106,67,0.15)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:129  modality   #5e8c54
+  frontends/app/src/app/screens/week-view/week-view-model.ts:129  modality   rgba(94,140,84,0.15)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:129  modality   #3f6e96
+  frontends/app/src/app/screens/week-view/week-view-model.ts:129  modality   rgba(63,110,150,0.15)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:130  modality   #3f6e96
+  frontends/app/src/app/screens/week-view/week-view-model.ts:130  modality   rgba(63,110,150,0.15)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:130  modality   #7e5e96
+  frontends/app/src/app/screens/week-view/week-view-model.ts:130  modality   rgba(126,94,150,0.15)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:130  modality   #a6822f
+  frontends/app/src/app/screens/week-view/week-view-model.ts:130  modality   rgba(166,130,47,0.15)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:131  other      #2c2c2e
+  frontends/app/src/app/screens/week-view/week-view-model.ts:131  ink        rgba(24,23,18,0.05)
+  frontends/app/src/app/screens/week-view/week-view-model.ts:244  grey       #5f5f62
+  frontends/app/src/app/screens/week-view/week-view-model.ts:247  grey       #5f5f62
+  frontends/app/src/app/screens/week-view/week-view-model.ts:291  ink        #181712
+  frontends/app/src/app/screens/week-view/week-view-model.ts:291  ink        rgba(24,23,18,0.15)
+  frontends/app/src/app/screens/wizard/wizard.ts:299  ink        rgba(24,23,18,0.12)
+  frontends/app/src/app/screens/wizard/wizard.ts:299  ink        rgba(24,23,18,0.35)
+  frontends/app/src/app/screens/wizard/wizard.ts:305  ink        rgba(24,23,18,0.10)
+  frontends/app/src/app/screens/wizard/wizard.ts:305  ink        rgba(24,23,18,0.28)

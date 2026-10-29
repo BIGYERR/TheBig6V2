@@ -27,6 +27,15 @@ import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './b
     <button id="bugSubmit" style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:14px;border-radius:4px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer" [disabled]="sending()" [style.opacity]="sending() ? '0.6' : null" (click)="send()">{{ sending() ? 'Sending…' : 'Send Bug Report' }}</button>
     <div id="bugStatus" style="font-size:13px;min-height:20px;line-height:1.5" [style.color]="status().color">{{ status().text }}</div>
     <div style="font-size:11px;color:var(--muted);line-height:1.5;opacity:0.8">Your device and app context is attached automatically to help track it down.</div>
+    <div class="look-row" role="group" aria-label="Look">
+      <div class="look-lbl">Look</div>
+      <div class="look-seg">
+        <button class="look-opt" data-look="auto" (click)="pickLook('auto')">Auto</button>
+        <button class="look-opt" data-look="day" (click)="pickLook('day')">Day</button>
+        <button class="look-opt" data-look="night" (click)="pickLook('night')">Night</button>
+      </div>
+      <div class="look-note">Auto follows your phone.</div>
+    </div>
     <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0.08em;text-align:center;padding-top:4px">{{ versionLabel }}</div>
   </div>
   `,
@@ -37,6 +46,11 @@ export class BugReport {
   protected readonly sending = signal(false);
   protected readonly status = signal<{ text: string; color: string }>({ text: '', color: 'var(--muted)' });
   protected readonly versionLabel = 'BUILD ' + this.bridge.call('iaVersionLabel', this.bridge.global('IA_VERSION'));
+
+  /** D261: the Look row; the legacy setTheme stores the choice and sets data-theme, which the row's CSS reads. */
+  protected pickLook(look: 'auto' | 'day' | 'night'): void {
+    this.bridge.call('setTheme', look);
+  }
 
   protected async send(): Promise<void> {
     const txt = this.text().trim();

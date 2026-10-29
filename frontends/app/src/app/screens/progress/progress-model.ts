@@ -174,13 +174,13 @@ export function chartChunks(c: ChartInput, d: ChartDeps): ChartBlock[] {
     cardOf(driftChart(d.plannedVsLogged(c.logs, c.hist, tw, c.cut, c.skip1), tw, c.cut, c.skip1, r));
   }
   if (c.cardioTypes.includes('swim') || loggedAny('swim')) {
-    dot(dotChart(d.icon('🏊', 15) + ' Weekly Swimming Volume', weeks, weeks.map((w) => c.sums[w]!.swim || null), '#3f6e96', 'yd'));
+    dot(dotChart(d.icon('🏊', 15) + ' Weekly Swimming Volume', weeks, weeks.map((w) => c.sums[w]!.swim || null), 'var(--bike)', 'yd'));
   }
   if (c.cardioTypes.includes('bike') || loggedAny('bike')) {
     dot(dotChart(d.icon('🚴', 15) + ' Weekly Cycling Time', weeks, weeks.map((w) => c.sums[w]!.bike || null), '#f0a050', 'min'));
   }
   const rpeData = weeks.map((w) => c.sums[w]!.rpe || null);
-  if (rpeData.some((v) => v !== null)) dot(dotChart(d.icon('💡', 15) + ' Average Session RPE', weeks, rpeData, '#7e5e96', '', 10));
+  if (rpeData.some((v) => v !== null)) dot(dotChart(d.icon('💡', 15) + ' Average Session RPE', weeks, rpeData, 'var(--hip)', '', 10));
   out.push({ kind: 'ledger', view: ledgerView(d.ledgerModel(d.exWeights(), c.hist), c.cfg.unit || 'lbs', d.icon) });
   return out;
 }

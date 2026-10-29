@@ -101,6 +101,7 @@ its own proof.
 | `css/motion.css` | motion, enriched strip, session journal, RPE modal |
 | `html/screens.html` | `</style></head><body>`, update banner, screens 1 to 4 (home, wizard, generating, week) |
 | `html/overlays.html` | detail, add, swap nudge, RPE info, random, rest, change, goal and mile sheets, rest float, the `<script>` open tag |
+| `js/theme.ts` | the look (D261): Auto, Day or Night, `ia_theme`, `getTheme`, `setTheme`, `applyTheme` (sets `data-theme` on `<html>`) |
 | `engine/icons.ts` | the Asylum icon set as inline SVG (`ASY_ICON_PATHS`), the emoji each stands in for, `asyIcon` |
 | `js/storage.ts` | `esc`, `ia_` program, log and history storage, set drafts, day history snapshots |
 | `js/rest-day-shell.ts` | rest-day sheet and moves (`ia_moves_`), collisions, eligibility; global UI state (`activeProgId`, `currentWeek`, ...), `showScreen`, tab bar, toast |

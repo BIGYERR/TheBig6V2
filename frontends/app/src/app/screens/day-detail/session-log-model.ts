@@ -86,7 +86,7 @@ export function logPlan(entry: LogEntry, cardioType: string | undefined): LogPla
 /** A sport chip's style: orange edged when it is the sport logged. */
 export function chipStyle(on: boolean): string {
   return 'flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid ' +
-    (on ? 'var(--accent)' : 'var(--border2)') + ';background:' + (on ? 'rgba(24,23,18,0.12)' : 'var(--surface2)') + ';color:' + (on ? 'var(--accent)' : 'var(--muted)') +
+    (on ? 'var(--accent)' : 'var(--border2)') + ';background:' + (on ? 'rgba(var(--ink-rgb),0.12)' : 'var(--surface2)') + ';color:' + (on ? 'var(--accent)' : 'var(--muted)') +
     ';font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em';
 }
 

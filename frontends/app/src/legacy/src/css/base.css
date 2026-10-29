@@ -15,15 +15,63 @@
   --swim:#3f6e96;--swim-dim:rgba(63,110,150,0.15);
   --core:#a6822f;--core-dim:rgba(166,130,47,0.15);
   --red:#9e3328;--green:#5e8c54;
+  /* D261: dark bands (the session header, pop-up cards, the rest tab) and the type on them; they stay dark at night */
+  --band:#181712;--band-header:#161618;--on-band:#F4F1E8;
+  --dim:#5F5F62;--mark:#7D7668;--rest-ink:#2C2C2E;--none-ink:#3A3A3C;
+  --wheel-hilite:rgba(255,255,255,0.16);--wheel-band:rgba(251,250,245,0.34);
+  /* D261: tints are rgba(var(--x-rgb), alpha); ink tints flip to bone at night, scrims and shadows stay dark */
+  --ink-rgb:24,23,18;--accent-rgb:24,23,18;--scrim-rgb:24,23,18;--shadow-rgb:40,34,22;--muted-rgb:107,101,87;--mark-rgb:125,118,104;
+  --on-band-rgb:244,241,232;--signal-rgb:207,78,26;--on-signal-rgb:251,246,238;
+  --run-rgb:94,140,84;--bike-rgb:63,110,150;--lift-rgb:188,106,67;--hip-rgb:126,94,150;--swim-rgb:63,110,150;--core-rgb:166,130,47;--red-rgb:158,51,40;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{background:#F4F1E8 !important;}
-html,body{background:#F4F1E8 !important;color:#181712 !important;font-family:var(--font-text);min-height:100vh;overscroll-behavior:none;font-variant-numeric:tabular-nums;touch-action:manipulation;}
-/* Lock light regardless of system or WebView color scheme */
+html{background:var(--bg) !important;}
+html,body{background:var(--bg) !important;color:var(--text) !important;font-family:var(--font-text);min-height:100vh;overscroll-behavior:none;font-variant-numeric:tabular-nums;touch-action:manipulation;}
+/* D261 night: the phone's dark setting picks it unless the athlete chose Day (data-theme="day"); Night picks it always.
+   The two blocks hold the same palette, and tests/unit/night-mode.test.ts holds them to it. */
 @media (prefers-color-scheme: dark) {
-  html{background:#F4F1E8 !important;}
-  html,body{background:#F4F1E8 !important;color:#181712 !important;}
-  .screen{background:#F4F1E8 !important;}
+:root:not([data-theme="day"]){
+  color-scheme: dark;
+  --bg:#12110D;--surface:#1B1A15;--surface2:#24221C;--surface3:#2E2B23;
+  --border:#38342B;--border2:#514B3E;
+  --text:#ECE7DA;--muted:#9C9584;--accent:#E4DFD2;--accent-dim:rgba(236,231,218,0.06);
+  --on-ink:#12110D;
+  --signal:#E2622B;--signal-press:#C4501E;--on-signal:#12110D;
+  --run:#86B27A;--run-dim:rgba(134,178,122,0.15);
+  --bike:#7FA6C9;--bike-dim:rgba(127,166,201,0.15);
+  --lift:#D98A63;--lift-dim:rgba(217,138,99,0.15);
+  --hip:#AB8CC4;--hip-dim:rgba(171,140,196,0.15);
+  --swim:#7FA6C9;--swim-dim:rgba(127,166,201,0.15);
+  --core:#CFA752;--core-dim:rgba(207,167,82,0.15);
+  --red:#D9665A;--green:#86B27A;
+  --band:#24221C;--band-header:#211F1A;--on-band:#ECE7DA;
+  --dim:#837D6F;--mark:#7A7467;--rest-ink:#837D6F;--none-ink:#837D6F;
+  --wheel-hilite:rgba(255,255,255,0.04);--wheel-band:rgba(236,231,218,0.06);
+  --ink-rgb:236,231,218;--accent-rgb:228,223,210;--scrim-rgb:0,0,0;--shadow-rgb:0,0,0;--muted-rgb:156,149,132;--mark-rgb:122,116,103;
+  --on-band-rgb:236,231,218;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
+  --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
+}
+}
+:root[data-theme="night"]{
+  color-scheme: dark;
+  --bg:#12110D;--surface:#1B1A15;--surface2:#24221C;--surface3:#2E2B23;
+  --border:#38342B;--border2:#514B3E;
+  --text:#ECE7DA;--muted:#9C9584;--accent:#E4DFD2;--accent-dim:rgba(236,231,218,0.06);
+  --on-ink:#12110D;
+  --signal:#E2622B;--signal-press:#C4501E;--on-signal:#12110D;
+  --run:#86B27A;--run-dim:rgba(134,178,122,0.15);
+  --bike:#7FA6C9;--bike-dim:rgba(127,166,201,0.15);
+  --lift:#D98A63;--lift-dim:rgba(217,138,99,0.15);
+  --hip:#AB8CC4;--hip-dim:rgba(171,140,196,0.15);
+  --swim:#7FA6C9;--swim-dim:rgba(127,166,201,0.15);
+  --core:#CFA752;--core-dim:rgba(207,167,82,0.15);
+  --red:#D9665A;--green:#86B27A;
+  --band:#24221C;--band-header:#211F1A;--on-band:#ECE7DA;
+  --dim:#837D6F;--mark:#7A7467;--rest-ink:#837D6F;--none-ink:#837D6F;
+  --wheel-hilite:rgba(255,255,255,0.04);--wheel-band:rgba(236,231,218,0.06);
+  --ink-rgb:236,231,218;--accent-rgb:228,223,210;--scrim-rgb:0,0,0;--shadow-rgb:0,0,0;--muted-rgb:156,149,132;--mark-rgb:122,116,103;
+  --on-band-rgb:236,231,218;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
+  --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
 }
 .screen{display:none;flex-direction:column;min-height:100vh;max-width:430px;margin:0 auto;background:var(--bg) !important;}
 .screen.active{display:flex;}

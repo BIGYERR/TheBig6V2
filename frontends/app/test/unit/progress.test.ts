@@ -77,7 +77,7 @@ describe('the Progress screen', () => {
     const [mileage, , , , rpe] = out;
     assert.ok(mileage?.kind === 'dot' && rpe?.kind === 'dot');
     assert.deepEqual([mileage.spec.points.length, mileage.spec.total, mileage.spec.unit, mileage.spec.color], [1, '4.0', 'mi', 'var(--run)'], 'the short first week withheld');
-    assert.deepEqual([rpe.spec.total, rpe.spec.unit, rpe.spec.color, rpe.spec.grid.map((g) => g.label)], ['6.0', '', '#7e5e96', [0, 5, 10]], 'RPE on a scale of 10');
+    assert.deepEqual([rpe.spec.total, rpe.spec.unit, rpe.spec.color, rpe.spec.grid.map((g) => g.label)], ['6.0', '', 'var(--hip)', [0, 5, 10]], 'RPE on a scale of 10');
   });
 
   it('draws the effort chart and the projection once there are enough easy runs over two weeks, and the pace chart or its empty state below that', () => {

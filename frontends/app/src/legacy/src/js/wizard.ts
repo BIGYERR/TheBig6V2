@@ -1124,7 +1124,7 @@ function renderWizardStep() {
       return null;
     })();
     const _floorBanner = _atFloor
-      ? '<div style="margin-top:10px;background:rgba(24,23,18,0.12);border:1px solid rgba(24,23,18,0.35);border-radius:4px;padding:12px 14px">' +
+      ? '<div style="margin-top:10px;background:rgba(var(--ink-rgb),0.12);border:1px solid rgba(var(--ink-rgb),0.35);border-radius:4px;padding:12px 14px">' +
           '<div style="font-size:13px;color:var(--accent);font-weight:700;line-height:1.5;margin-bottom:4px">'+asyIcon('🔒',13)+' You\'re at your minimum training days</div>' +
           '<div style="font-size:12px;color:var(--text);line-height:1.5">' +
             (_floorReason
@@ -1136,7 +1136,7 @@ function renderWizardStep() {
 
     // Other advisories (lifting volume, interval protection) — only shown when NOT the floor reason
     const _advisoryHtml = (_advisories.length && !_atFloor)
-      ? '<div style="margin-top:10px;background:rgba(24,23,18,0.10);border:1px solid rgba(24,23,18,0.28);border-radius:4px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">' +
+      ? '<div style="margin-top:10px;background:rgba(var(--ink-rgb),0.10);border:1px solid rgba(var(--ink-rgb),0.28);border-radius:4px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">' +
           _advisories.map(a => '<div style="font-size:12px;color:var(--accent);line-height:1.5">' + a + '</div>').join('') +
         '</div>'
       : '';

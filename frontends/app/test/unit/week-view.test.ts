@@ -18,7 +18,7 @@ const PROG: WeekProgram = {
 const deps = (over: Partial<WeekDeps> = {}): WeekDeps => ({
   weekRange: () => null, parseDate: (iso) => new Date(iso + 'T00:00:00'), isTravel: () => false, beforeStart: () => false,
   regionLabel: (r) => ({ knee: 'Knee' })[r], icon: (n, s) => `[${n}/${s}]`,
-  dayCode: (day) => (!day || day.rest ? { top: '', topColor: '#5f5f62', bot: 'REST', botColor: '#5f5f62' } : { top: 'RUN', topColor: '#5e8c54', bot: 'PUSH', botColor: '#bc6a43' }),
+  dayCode: (day) => (!day || day.rest ? { top: '', topColor: 'var(--dim)', bot: 'REST', botColor: 'var(--dim)' } : { top: 'RUN', topColor: 'var(--run)', bot: 'PUSH', botColor: 'var(--lift)' }),
   onGold: (hex) => `gold(${hex})`, wildcardOn: () => false, statusOf: () => undefined,
   heroSummary: (day) => `${day.title}<br>summary`, sessionTime: () => 45, restTip: () => ({ label: 'Fuel', text: 'Eat.', src: 'NSW' }),
   restLines: (rl) => Object.keys(rl || {}).map((t) => `20 min ${t} logged`), streak: () => 3, wildcardSub: (w, k) => `sub ${w} ${k}`,
@@ -69,8 +69,8 @@ describe('This Week', () => {
     ]);
     const wed = cells[2]!, fri = cells[4]!, mon = cells[0]!;
     assert.ok(!wed.pre && !fri.pre && !mon.pre);
-    assert.deepEqual([wed.top, wed.topColor, wed.bot, wed.botColor], ['—', 'gold(#5f5f62)', 'REST', 'gold(#5f5f62)']);
-    assert.deepEqual([fri.top, fri.topColor, fri.botColor, mon.topColor], ['RUN', '#5e8c54', '#bc6a43', '#5f5f62']);
+    assert.deepEqual([wed.top, wed.topColor, wed.bot, wed.botColor], ['—', 'gold(var(--dim))', 'REST', 'gold(var(--dim))']);
+    assert.deepEqual([fri.top, fri.topColor, fri.botColor, mon.topColor], ['RUN', 'var(--run)', 'var(--lift)', 'var(--dim)']);
     const pre = weekView(input(), deps({ beforeStart: (w, d) => d === 'mon' })).days!.strip[0]!;
     assert.deepEqual(pre, { pre: true, label: 'MON', num: '5' });
   });
@@ -107,9 +107,9 @@ describe('This Week', () => {
     assert.ok(h.kind === 'day');
     assert.deepEqual([h.key, h.today, h.over, h.cta], ['mon', false, 'Week 2 · Monday · moved from Sunday', 'OPEN SESSION']);
     assert.deepEqual(h.tags, [
-      { label: 'Lift', style: 'color:#bc6a43;background:rgba(188,106,67,0.15)' },
-      { label: 'Run', style: 'color:#5e8c54;background:rgba(94,140,84,0.15)' },
-      { label: 'mystery', style: 'color:#181712;background:rgba(24,23,18,0.15)' },
+      { label: 'Lift', style: 'color:var(--lift);background:rgba(var(--lift-rgb),0.15)' },
+      { label: 'Run', style: 'color:var(--run);background:rgba(var(--run-rgb),0.15)' },
+      { label: 'mystery', style: 'color:var(--text);background:rgba(var(--ink-rgb),0.15)' },
     ]);
     assert.equal(weekView(input({ week: 3 }), deps()).days, null, 'a week with no days draws no list');
   });
