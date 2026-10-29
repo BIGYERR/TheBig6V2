@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.251.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.251.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -34,7 +34,7 @@
   --dim:#5F5F62;--mark:#7D7668;--rest-ink:#2C2C2E;--none-ink:#3A3A3C;
   --wheel-hilite:rgba(255,255,255,0.16);--wheel-band:rgba(251,250,245,0.34);
   /* D261: tints are rgba(var(--x-rgb), alpha); ink tints flip to bone at night, scrims and shadows stay dark */
-  --ink-rgb:24,23,18;--scrim-rgb:24,23,18;--shadow-rgb:40,34,22;--muted-rgb:107,101,87;--mark-rgb:125,118,104;
+  --ink-rgb:24,23,18;--accent-rgb:24,23,18;--scrim-rgb:24,23,18;--shadow-rgb:40,34,22;--muted-rgb:107,101,87;--mark-rgb:125,118,104;
   --on-band-rgb:244,241,232;--signal-rgb:207,78,26;--on-signal-rgb:251,246,238;
   --run-rgb:94,140,84;--bike-rgb:63,110,150;--lift-rgb:188,106,67;--hip-rgb:126,94,150;--swim-rgb:63,110,150;--core-rgb:166,130,47;--red-rgb:158,51,40;
 }
@@ -61,7 +61,7 @@ html,body{background:var(--bg) !important;color:var(--text) !important;font-fami
   --band:#24221C;--band-header:#211F1A;--on-band:#ECE7DA;
   --dim:#837D6F;--mark:#7A7467;--rest-ink:#837D6F;--none-ink:#837D6F;
   --wheel-hilite:rgba(255,255,255,0.04);--wheel-band:rgba(236,231,218,0.06);
-  --ink-rgb:236,231,218;--scrim-rgb:0,0,0;--shadow-rgb:0,0,0;--muted-rgb:156,149,132;--mark-rgb:122,116,103;
+  --ink-rgb:236,231,218;--accent-rgb:228,223,210;--scrim-rgb:0,0,0;--shadow-rgb:0,0,0;--muted-rgb:156,149,132;--mark-rgb:122,116,103;
   --on-band-rgb:236,231,218;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
   --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
 }
@@ -83,7 +83,7 @@ html,body{background:var(--bg) !important;color:var(--text) !important;font-fami
   --band:#24221C;--band-header:#211F1A;--on-band:#ECE7DA;
   --dim:#837D6F;--mark:#7A7467;--rest-ink:#837D6F;--none-ink:#837D6F;
   --wheel-hilite:rgba(255,255,255,0.04);--wheel-band:rgba(236,231,218,0.06);
-  --ink-rgb:236,231,218;--scrim-rgb:0,0,0;--shadow-rgb:0,0,0;--muted-rgb:156,149,132;--mark-rgb:122,116,103;
+  --ink-rgb:236,231,218;--accent-rgb:228,223,210;--scrim-rgb:0,0,0;--shadow-rgb:0,0,0;--muted-rgb:156,149,132;--mark-rgb:122,116,103;
   --on-band-rgb:236,231,218;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
   --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
 }
@@ -12193,10 +12193,12 @@ function renderRand(){
   const done=getWildcardDone();
   const alreadyDone=done.some(d=>d.title===w.title);
   const goal=activeProg?.goal||'balanced';
-  const colors={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
-  const color=colors[goal];
+  const tones={strength:'lift',hypertrophy:'hip',fatloss:'run',athletic:'bike',balanced:'accent',endurance:'run',support_strength:'lift',support_athletic:'bike',support_prevention:'hip'};
+  const tone=tones[goal];
+  // D262: the badge sits on its goal colour's tint (0.133, the 22 alpha it was written with); a goal with no colour gets none
+  const badgeStyle=tone?'background:rgba(var(--'+tone+'-rgb),0.133);color:var(--'+tone+')':'';
   let html=`<div style="text-align:center;padding:4px 0 16px">
-    <div class="rand-badge" style="background:${color}22;color:${color}">${alreadyDone?'Done Before ✓':'Wildcard'}</div>
+    <div class="rand-badge" style="${badgeStyle}">${alreadyDone?'Done Before ✓':'Wildcard'}</div>
     <div class="rand-title">${w.title}</div>
   </div>`;
   if(w.cardio){

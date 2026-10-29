@@ -88,7 +88,7 @@ describe('night mode palettes', () => {
       ['--ink-rgb', '--text'], ['--on-band-rgb', '--on-band'], ['--signal-rgb', '--signal'],
       ['--on-signal-rgb', '--on-signal'], ['--muted-rgb', '--muted'], ['--mark-rgb', '--mark'],
       ['--run-rgb', '--run'], ['--bike-rgb', '--bike'], ['--swim-rgb', '--swim'], ['--lift-rgb', '--lift'],
-      ['--hip-rgb', '--hip'], ['--core-rgb', '--core'], ['--red-rgb', '--red'],
+      ['--hip-rgb', '--hip'], ['--core-rgb', '--core'], ['--red-rgb', '--red'], ['--accent-rgb', '--accent'],
     ];
     for (const [where, decls] of [['day', block(':root{')], ['night', block(NIGHT_OPEN)]] as const) {
       for (const [tint, colour] of pairs) {

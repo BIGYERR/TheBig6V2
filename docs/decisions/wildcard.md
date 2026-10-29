@@ -26,4 +26,4 @@ and `frontends/app/test/unit/random-workout.test.ts`.
 - **Expected values:** a strength program's badge reads `background:rgba(var(--lift-rgb),0.133);color:var(--lift)`; a
   balanced one `background:rgba(var(--accent-rgb),0.133);color:var(--accent)`; an endurance one
   `background:rgba(var(--run-rgb),0.133);color:var(--run)`; the same strings in both builds.
-- **Released:** pending.
+- **Released:** v0.251.1 (Patch, Mario 2026-10-28).

@@ -32,12 +32,14 @@ describe('Random Workout', () => {
 
   it('badges a workout in the goal\'s colour, says when it was done before, and shows its cardio and note', () => {
     assert.deepEqual(randView({ title: 'Heavy Day' }, [], 'strength'), {
-      title: 'Heavy Day', done: false, badgeStyle: 'background:var(--lift)22;color:var(--lift)', cardio: null, note: null,
+      title: 'Heavy Day', done: false, badgeStyle: 'background:rgba(var(--lift-rgb),0.133);color:var(--lift)', cardio: null, note: null,
     });
     const swim = randView({ title: 'Swim Day', cardio: { type: 'Swim', detail: '20 min easy' }, note: 'Sometimes showing up is the workout.' }, [{ title: 'Swim Day' }], 'balanced');
-    assert.deepEqual([swim.done, swim.badgeStyle, swim.cardio, swim.note], [true, 'background:var(--accent)22;color:var(--accent)', { blockCls: 'swim-block', labelCls: 'cardio-label-swim', type: 'Swim', detail: '20 min easy' }, 'Sometimes showing up is the workout.']);
+    assert.deepEqual([swim.done, swim.badgeStyle, swim.cardio, swim.note], [true, 'background:rgba(var(--accent-rgb),0.133);color:var(--accent)', { blockCls: 'swim-block', labelCls: 'cardio-label-swim', type: 'Swim', detail: '20 min easy' }, 'Sometimes showing up is the workout.']);
     assert.deepEqual(randView({ title: 'Row', cardio: { type: 'Rower', detail: '10 min' } }, [], 'mystery').cardio, { blockCls: 'cardio-block', labelCls: 'cardio-label-general', type: 'Rower', detail: '10 min' });
-    assert.equal(randView({ title: 'Row' }, [], 'mystery').badgeStyle, 'background:undefined22;color:undefined', 'a goal with no colour gets none, as before');
+    assert.equal(randView({ title: 'Row' }, [], 'mystery').badgeStyle, '', 'a goal with no colour gets none');
+    // D262: the badge sits on its goal colour's tint, 34/255 as the old 22 alpha (docs/decisions/wildcard.md)
+    assert.equal(randView({ title: 'Long Run' }, [], 'endurance').badgeStyle, 'background:rgba(var(--run-rgb),0.133);color:var(--run)');
   });
 
   it('counts the goal\'s own Wildcards done, out of the goal\'s pool', () => {

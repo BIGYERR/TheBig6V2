@@ -23,10 +23,10 @@ export const RAND_FILTERS = [
 ] as const;
 export type RandFilter = (typeof RAND_FILTERS)[number]['id'];
 
-/** The badge colour per program goal; a goal with none gets none, as before. */
+/** The badge colour per program goal, as a palette name (D262: its tint is that colour's -rgb token); a goal with none gets none. */
 export const RAND_COLORS: Readonly<Record<string, string>> = {
-  strength: 'var(--lift)', hypertrophy: 'var(--hip)', fatloss: 'var(--run)', athletic: 'var(--bike)', balanced: 'var(--accent)',
-  endurance: 'var(--run)', support_strength: 'var(--lift)', support_athletic: 'var(--bike)', support_prevention: 'var(--hip)',
+  strength: 'lift', hypertrophy: 'hip', fatloss: 'run', athletic: 'bike', balanced: 'accent',
+  endurance: 'run', support_strength: 'lift', support_athletic: 'bike', support_prevention: 'hip',
 };
 
 /** The pool for a goal and filter: the goal's own (balanced when the goal has none), or every pool's workouts in order. */
@@ -59,7 +59,7 @@ export interface RandView {
 
 /** The sheet for a workout, as the legacy reroll drew it. */
 export function randView(w: RandWorkout, done: readonly DoneWildcard[], goal: string): RandView {
-  const color = RAND_COLORS[goal];
+  const tone = RAND_COLORS[goal];
   let cardio: RandView['cardio'] = null;
   if (w.cardio) {
     const t = (w.cardio.type || '').toLowerCase();
@@ -74,7 +74,7 @@ export function randView(w: RandWorkout, done: readonly DoneWildcard[], goal: st
   return {
     title: w.title,
     done: done.some((d) => d.title === w.title),
-    badgeStyle: 'background:' + color + '22;color:' + color,
+    badgeStyle: tone ? 'background:rgba(var(--' + tone + '-rgb),0.133);color:var(--' + tone + ')' : '',
     cardio,
     note: w.note || null,
   };
