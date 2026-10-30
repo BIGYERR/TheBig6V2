@@ -196,7 +196,10 @@ v0.250.0 carried the D258/D259 line to `dev` while `docs/decisions/speed-work.md
   push to `dev`; the release is proved by the CI run on the commit Mario releases (Pipeline). Gatekeeper reads it, and also:
   - runs each new or changed test on the commit before the change (`node tools/app-at.mjs <previous>
     <scratch>/base_v<previous>.html`: that commit's root copy, or the build of its sources; then `cd tests && IA_APP=<that
-    file> npx vitest run <file>`): a test written for a changed
+    file> npx vitest run <file>`; a test that reads source files instead of the page, the native app's
+    `frontends/app/test`, runs on a copy of the previous commit's sources: `git archive <previous> frontends/app core |
+    tar -x -C <scratch>/prev`, the main checkout's `frontends/app/node_modules` linked in, the changed test files copied
+    over, then `node --test` on them): a test written for a changed
     behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
     must not change;
   - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
