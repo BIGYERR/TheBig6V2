@@ -1,9 +1,9 @@
 /* ===== SESSION SHEET · NIKE/RUNNA REDESIGN (V18.3) ===== */
 .detail-header{--text:var(--on-band);--muted:rgba(var(--on-band-rgb),0.6);--accent:var(--on-band);--accent-dim:rgba(var(--on-band-rgb),0.12);padding:env(safe-area-inset-top,44px) 20px 13px !important;background:var(--band-header) !important;border-bottom:1px solid var(--border) !important;display:block !important;position:sticky;top:0;z-index:10;}
 .dh-toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.dh-back{background:none;border:none;color:var(--muted);font-family:var(--font-display);font-size:15px;font-weight:600;cursor:pointer;padding:0;letter-spacing:0.04em;}
-.dh-counter{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:0.07em;color:#0a0a0a;background:var(--accent);padding:4px 9px;border-radius:4px;}
-.dh-over{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;}
+.dh-back{background:none;border:none;color:var(--muted);font-family:var(--font-display);font-size:15px;font-weight:600;cursor:pointer;padding:0;letter-spacing:0;}
+.dh-counter{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:0;color:#0a0a0a;background:var(--accent);padding:4px 9px;border-radius:4px;}
+.dh-over{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--accent);}
 .dh-title{font-family:var(--font-display);font-size:28px;font-weight:700;line-height:0.95;color:var(--text);margin-top:1px;}
 .dh-tagrow{display:flex;align-items:center;gap:10px;margin-top:9px;}
 .dh-tags{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0;}
@@ -21,8 +21,8 @@
 .ex-setsbar.done span{background:var(--run);}
 .ex-logrow{display:flex;gap:10px;align-items:stretch;margin-top:11px;}
 .ex-inputwrap{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
-.ex-unit-inline{color:var(--muted);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;}
-.ex-lastinline{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:0.04em;color:var(--muted);white-space:nowrap;overflow:hidden;}
+.ex-unit-inline{color:var(--muted);font-size:13px;font-weight:600;letter-spacing:0;}
+.ex-lastinline{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:0;color:var(--muted);white-space:nowrap;overflow:hidden;}
 .ex-lastinline .ex-last{color:var(--text);}
 .ex-lastinline .done{color:var(--run);}
 .ex-step{width:40px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--muted);font-size:22px;font-weight:500;cursor:pointer;flex-shrink:0;line-height:1;}
@@ -30,7 +30,7 @@
 .ex-input{flex:0 0 auto;width:64px;background:var(--surface);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:18px;font-weight:700;text-align:center;outline:none;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;padding:6px;}
 .ex-input::-webkit-outer-spin-button,.ex-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .ex-input:focus{border-color:rgba(var(--ink-rgb),0.55);}
-.ex-logbtn{padding:0 18px;background:var(--signal);border:none;border-radius:4px;color:var(--on-signal);font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;flex-shrink:0;}
+.ex-logbtn{padding:0 18px;background:var(--signal);border:none;border-radius:4px;color:var(--on-signal);font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0;cursor:pointer;flex-shrink:0;}
 .ex-logbtn:active{filter:brightness(0.92);}
 .ex-log{margin-top:11px;}
 /* ── Collapsed set bar (V105) ────────────────────────────────────────────────
@@ -38,14 +38,14 @@
    field and reuse pill sit below it untouched, so a lift performed as prescribed
    at one weight logs without ever expanding. Expanding is for divergence only. */
 .exset-head{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;border-top:1px solid var(--border);padding:9px 0;cursor:pointer;text-align:left;font-family:inherit;color:inherit;}
-.exset-head-lbl{font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);flex:0 0 auto;}
-.exset-head-val{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text);letter-spacing:0.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.exset-head-sub{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.02em;flex:0 0 auto;}
+.exset-head-lbl{font-size:10px;font-weight:700;letter-spacing:0;color:var(--muted);flex:0 0 auto;}
+.exset-head-val{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text);letter-spacing:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.exset-head-sub{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0;flex:0 0 auto;}
 .exset-head-sp{flex:1;}
 .exset-caret{color:var(--muted);transition:transform 0.16s ease;line-height:0;flex:0 0 auto;}
 @media (prefers-reduced-motion:reduce){.exset-caret{transition:none;}}
 .exset-open .exset-caret{transform:rotate(180deg);}
-.exset-head-vary{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--signal);border:1px solid rgba(var(--signal-rgb),0.35);border-radius:3px;padding:2px 6px;flex:0 0 auto;}
+.exset-head-vary{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:0;color:var(--signal);border:1px solid rgba(var(--signal-rgb),0.35);border-radius:3px;padding:2px 6px;flex:0 0 auto;}
 .exset-rows{border-top:1px solid var(--border);display:none;}
 .exset-open .exset-rows{display:block;}
 /* Collapsed owns the single Load row; expanded owns the per-set load cells.
@@ -55,14 +55,14 @@
 .exset-open .ex-reuse-fill{display:inline-flex;}
 .exset-foot{display:none;align-items:center;gap:8px;padding:9px 0 2px;border-top:1px solid var(--border);}
 .exset-open .exset-foot{display:flex;}
-.exset-foot-lbl{font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);}
+.exset-foot-lbl{font-size:10px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .exset-foot-val{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text);}
 .exset-foot-note{font-size:11px;color:var(--muted);margin-left:auto;text-align:right;line-height:1.25;}
 .exset-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
 .exset-row:last-child{border-bottom:none;}
 /* Set index is a bare numeral, not "Set 3" — the 44px word label cost the width
    the per-set load cell now needs, and the column position already says what it is. */
-.exset-num{font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--muted);width:16px;flex:0 0 16px;text-align:center;}
+.exset-num{font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);width:16px;flex:0 0 16px;text-align:center;}
 .exset-ctl{display:flex;align-items:stretch;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:var(--surface);flex:1;min-width:0;}
 .exset-btn{width:38px;flex:0 0 38px;border:none;background:var(--surface2);color:var(--text);font-family:var(--font-display);font-size:21px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;}
 .exset-btn:active{background:var(--border);}
@@ -73,39 +73,39 @@
 .exset-w input{width:100%;min-width:0;border:none;background:transparent;text-align:right;font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--text);outline:none;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;padding:0;}
 .exset-w input::-webkit-outer-spin-button,.exset-w input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .exset-w input.exw-inherit{color:var(--muted);}
-.exset-w-u{font-size:10px;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);flex:0 0 auto;}
+.exset-w-u{font-size:10px;font-weight:700;letter-spacing:0;color:var(--muted);flex:0 0 auto;}
 .exset-row.exset-top .exset-w{border-color:var(--signal);}
-.exset-toppip{display:none;position:absolute;top:-7px;right:6px;background:var(--signal);color:var(--on-signal);font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:1px 4px;border-radius:2px;}
+.exset-toppip{display:none;position:absolute;top:-7px;right:6px;background:var(--signal);color:var(--on-signal);font-size:8px;font-weight:700;letter-spacing:0;padding:1px 4px;border-radius:2px;}
 .exset-row.exset-top .exset-toppip{display:block;}
 .exset-val input::-webkit-outer-spin-button,.exset-val input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .exset-val input.bw-blank{color:var(--muted);}
-.exset-suf{font-size:11px;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
-.exset-delta{min-width:26px;text-align:left;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.02em;color:transparent;}
+.exset-suf{font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);}
+.exset-delta{min-width:26px;text-align:left;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;color:transparent;}
 .exset-delta.down{color:var(--signal);}
 .exset-delta.up{color:var(--run);}
 .ex-weight{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
-.ex-weight-lbl{font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);}
+.ex-weight-lbl{font-size:10px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .ex-winput{width:82px;border:1px solid var(--border2);border-radius:6px;background:var(--surface);font-family:var(--font-display);font-size:20px;font-weight:700;text-align:center;padding:7px 6px;color:var(--text);outline:none;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
 .ex-winput::-webkit-outer-spin-button,.ex-winput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .ex-winput:focus{border-color:rgba(var(--ink-rgb),0.55);}
-.ex-wunit{font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);}
+.ex-wunit{font-size:12px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .ex-reuse{margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:6px 12px;cursor:pointer;}
 .ex-reuse:active{background:var(--border);}
 .ex-reuse-ico{font-size:15px;color:var(--signal);font-weight:700;line-height:1;}
-.ex-reuse-txt{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text);letter-spacing:0.02em;line-height:1.15;text-align:left;}
-.ex-reuse-txt small{display:block;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.02em;margin-top:1px;text-transform:none;}
+.ex-reuse-txt{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text);letter-spacing:0;line-height:1.15;text-align:left;}
+.ex-reuse-txt small{display:block;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0;margin-top:1px;text-transform:none;}
 .ex-reuse.is-stale{background:transparent;border-style:dashed;}
 .ex-reuse.is-stale .ex-reuse-ico{color:var(--muted);}
 .ex-reuse.is-stale .ex-reuse-txt{color:var(--muted);}
 .ex-stale-warn{display:flex;gap:6px;align-items:flex-start;margin-top:9px;padding-top:9px;border-top:1px solid var(--border2);font-size:11px;color:var(--muted);line-height:1.35;}
 .ex-stale-warn i{font-style:normal;line-height:1.35;}
-.ex-log .ex-logbtn{width:100%;margin-top:12px;padding:12px;border-radius:6px;letter-spacing:0.08em;}
+.ex-log .ex-logbtn{width:100%;margin-top:12px;padding:12px;border-radius:6px;letter-spacing:0;}
 /* V236 (D218): the cardio card's Log button, the lift's full-width Log. Logged reads in the run green the logged
    tag (.t-logged) and a logged lift's inputs use; the inset ring is the border without moving the button. */
-#cardioLogBtn{width:100%;margin-top:12px;padding:12px;border-radius:6px;letter-spacing:0.08em;}
+#cardioLogBtn{width:100%;margin-top:12px;padding:12px;border-radius:6px;letter-spacing:0;}
 #cardioLogBtn.logged{background:var(--run-dim);color:var(--run);box-shadow:inset 0 0 0 1px var(--run);}
 .ex-meta{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
-.ex-unit{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+.ex-unit{font-size:11px;color:var(--muted);letter-spacing:0;}
 .ex-last{font-size:11px;color:var(--muted);}
 .hip-block,.core-block,.superset-wrap{border-radius:4px !important;margin-bottom:9px;}
 /* Optional-tail divider + sunken treatment. Ink/muted only — signal stays reserved for live
@@ -113,7 +113,7 @@
    Log buttons and check badges are untouched (they layer on top). */
 .opt-divider{display:flex;align-items:center;gap:12px;margin:16px 2px 12px;}
 .opt-divider .opt-rule{flex:1;height:1px;background:var(--border2);}
-.opt-divider .opt-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.opt-divider .opt-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);white-space:nowrap;}
 .opt-tail .section-block > .exercise-item{background:var(--surface2) !important;}
 .opt-tail .superset-wrap{background:var(--surface2);}
 .run-block,.bike-block,.swim-block,.cardio-block{background:var(--surface) !important;border-radius:4px !important;padding:16px 18px !important;}
@@ -160,19 +160,19 @@
 #rtCard{display:none;position:relative;width:196px;background:var(--surface);border:2px solid var(--signal);border-radius:12px 0 0 12px;border-right:none;padding:13px 14px 14px;box-sizing:border-box;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;}
 #rtNub{position:absolute;top:-13px;left:18px;width:46px;height:14px;background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2046%2014'%20fill='none'%3E%3Cpath%20d='M7%208%20L7%204%20Q7%202%209%202%20L37%202%20Q39%202%2039%204%20L39%208%20L28%208%20L28%2014%20L18%2014%20L18%208%20Z'%20fill='%23FBFAF5'/%3E%3Cpath%20d='M18%2014%20L18%208%20L7%208%20L7%204%20Q7%202%209%202%20L37%202%20Q39%202%2039%204%20L39%208%20L28%208%20L28%2014'%20stroke='%23CF4E1A'%20stroke-width='1.4'%20stroke-linejoin='round'%20stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;pointer-events:none;}
 .rt-head{display:flex;align-items:center;justify-content:space-between;}
-.rt-cap{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);}
+.rt-cap{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .rt-collapse{font-size:18px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px;background:none;border:none;}
 .rt-readout{text-align:center;margin:8px 0 11px;font-family:var(--font-mono);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
 #rtBig{font-size:clamp(22px,7vw,30px);letter-spacing:-0.02em;}
 #rtCs{font-size:17px;opacity:0.6;}
 .rt-actions{display:flex;gap:8px;}
-.rt-btn{flex:1 1 0;min-width:0;white-space:nowrap;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px 6px;border-radius:4px;border:none;background:var(--signal);color:var(--on-signal);cursor:pointer;}
+.rt-btn{flex:1 1 0;min-width:0;white-space:nowrap;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:9px 6px;border-radius:4px;border:none;background:var(--signal);color:var(--on-signal);cursor:pointer;}
 .rt-btn.running{background:transparent;border:2px solid var(--signal);color:var(--signal);padding:7px 0;}
-.rt-reset{flex:0 0 auto;white-space:nowrap;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;padding:9px 13px;border-radius:4px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;}
+.rt-reset{flex:0 0 auto;white-space:nowrap;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:9px 13px;border-radius:4px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;}
 /* First-run discovery: the expanded card pops out from the edge, wiggles, holds, then folds to the pill. */
 @keyframes rtCardIntro{0%{transform:translateX(115%) rotate(4deg);}14%{transform:translateX(-6px) rotate(-2deg);}20%{transform:translateX(0) rotate(0);}30%{transform:translateX(-6px) rotate(-4.2deg);}40%{transform:translateX(4.8px) rotate(3deg);}49%{transform:translateX(-2.7px) rotate(-1.8deg);}57%{transform:translateX(0) rotate(0);}100%{transform:translateX(0) rotate(0);}}
 @keyframes rtPillSettle{0%{transform:scale(.35) translateX(40%);opacity:0;}55%{transform:scale(1.08) translateX(0);opacity:1;}100%{transform:scale(1) translateX(0);opacity:1;}}
-.wk-hero-summary{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text);line-height:1.35;letter-spacing:0.04em;text-transform:uppercase;text-align:center;margin-top:14px;padding-top:13px;border-top:1px solid var(--border);}
+.wk-hero-summary{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text);line-height:1.35;letter-spacing:0;text-align:center;margin-top:14px;padding-top:13px;border-top:1px solid var(--border);}
 .wk-tag.wk-time{background:transparent;border:1px solid var(--border2);color:var(--text);}
 
 

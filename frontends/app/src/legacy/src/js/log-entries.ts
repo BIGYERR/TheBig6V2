@@ -326,7 +326,7 @@ function doseRep(delta: any){
   if(cardioLive(currentDayKey)) persistLogFields(currentDayKey);
   updateDoseDerived();
 }
-const _DOSE_INPUT_STYLE='width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-size:16px;padding:9px 12px;outline:none';
+const _DOSE_INPUT_STYLE='width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-size:16px;padding:9px 12px;outline:none';
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {

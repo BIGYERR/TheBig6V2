@@ -136,7 +136,7 @@ describe('the session log (buildLogHTML, phase E step 27)', () => {
         <div id="cardioFields">${fieldsMarkup(d.fields)}</div>
         <button type="button" id="cardioSwapLink" onclick="toggleCardioPicker()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:6px 0 0;display:inline-flex;align-items:center;gap:5px;text-decoration:underline;text-underline-offset:2px">${icon('history', 13)} Did a different activity?</button>
         <div id="cardioPicker" style="display:${c.swapped ? 'block' : 'none'};margin-top:8px">
-          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">Logged as</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0;margin-bottom:6px">Logged as</div>
           <div style="display:flex;gap:6px">${c.chips.map((ch) => `<button type="button" data-sport="${ch.sport}" onclick="setCardioSwap('${ch.sport}')" style="${ch.style}">${icon(ch.sport, 15)}<span>${ch.label}</span></button>`).join('')}</div>
           <div id="cardioSwapNote" style="font-size:11px;color:var(--accent);margin-top:8px;line-height:1.4;display:${c.swapped ? 'block' : 'none'}">${c.note}</div>
         </div>
@@ -231,8 +231,8 @@ describe('the sections and their exercise cards (buildSectionsHTML and buildExIt
       + (x.skip ? `<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" onclick="skipExercise('${q(x.name)}')">${icon('minus', 16)}</button>` : '')
       + `<span class="ex-badge" id="exbadge_${k}">${x.logged ? '✓' : ''}</span></div>`
       + (x.detail ? `<div class="ex-detail">${x.detail}</div>` : '')
-      + (x.added ? `<div class="ex-swapchip"><span class="ex-swapchip-lbl">YOU ADDED THIS</span> · not in the plan<button type="button" class="ex-swapundo" onclick="removeAddedExercise('${q(x.name)}')">remove</button></div>` : '')
-      + (x.swappedFrom ? `<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span> for ${x.swappedFrom}<button type="button" class="ex-swapundo" onclick="undoSwap('${q(x.swappedFrom)}')">put it back</button></div>` : '');
+      + (x.added ? `<div class="ex-swapchip"><span class="ex-swapchip-lbl">You added this</span> · not in the plan<button type="button" class="ex-swapundo" onclick="removeAddedExercise('${q(x.name)}')">remove</button></div>` : '')
+      + (x.swappedFrom ? `<div class="ex-swapchip"><span class="ex-swapchip-lbl">Swapped in</span> for ${x.swappedFrom}<button type="button" class="ex-swapundo" onclick="undoSwap('${q(x.swappedFrom)}')">put it back</button></div>` : '');
     if (x.log) {
       h += `<div class="ex-log" id="exlog_${k}">`;
       const st = x.log.sets;
@@ -336,7 +336,7 @@ describe('the sections and their exercise cards (buildSectionsHTML and buildExIt
       seed(w, d, P1.weeks[w]![d]!.sections!);
       for (const unit of ['lbs', 'kg']) compare(w, d, unit);
     }
-    covers(['class="section-label"', 'exercise-item logged', 'class="ex-swapbtn"', 'class="ex-skipbtn"', 'SWAPPED IN</span> for Farmer\'s walk', 'exset-delta down', 'exset-delta up',
+    covers(['class="section-label"', 'exercise-item logged', 'class="ex-swapbtn"', 'class="ex-skipbtn"', 'Swapped in</span> for Farmer\'s walk', 'exset-delta down', 'exset-delta up',
       'data-rx=', 'class="exw-inherit"', 'id="exvary_', '>Varied<', 'Top set', 'Every set', 'class="ex-reuse"', 'ex-reuse is-stale', 'class="ex-stale-warn"',
       'came from Old &lt;b&gt;Block&lt;/b&gt;', 'ex-reuse-fill', 'value="45"', '<span class="ex-wunit">kg</span>', '<span class="ex-wunit">lbs</span>']);
   });
@@ -372,7 +372,7 @@ describe('the sections and their exercise cards (buildSectionsHTML and buildExIt
     try {
       seed(w, d, crafted);
       for (const unit of ['lbs', 'kg']) compare(w, d, unit);
-      covers(['<span class="ex-skipped-name">', 'unskipSuperset(1)', 'reduced to straight sets', 'Finisher B', 'YOU ADDED THIS', 'style="color:var(--signal)">Your <i>adds</i>',
+      covers(['<span class="ex-skipped-name">', 'unskipSuperset(1)', 'reduced to straight sets', 'Finisher B', 'You added this', 'style="color:var(--signal)">Your <i>adds</i>',
         'style="color:var(--hip)">Hip stability', '<div class="core-header">Core — <b>anti-rotation</b></div>', 'class="superset-wrap"', 'class="ss-minus"',
         '<div class="section-label">Primer</div>', 'class="ex-name"><svg', 'bw-blank']);
     } finally {
@@ -428,7 +428,7 @@ describe('the sheet\'s marks (modTagsHTML, travelTagHTML, wildcardTagHTML, _benc
       IA.eval("wildcardDaySet = function(){ const o={}; for (const [w,d] of [[1,'mon'],[2,'sat'],[3,'mon']]) o[completedKey(w,d)]={title:'Wild'}; return o; }");
       for (const [w, d] of [[1, 'mon'], [2, 'sat'], [3, 'mon'], [1, 'tue'], [0, 'mon']] as const) {
         const sub = wildcardSub(W['wildcardOn'](w, d), active.weeks[w] ? active.weeks[w]![d] : null);
-        const got = sub === null ? '' : '<div class="wc-tag">' + W['wildcardMarkHTML'](16) + '<div class="wc-tag-txt"><div class="wc-tag-lbl">WILDCARD DONE</div><div class="wc-tag-sub">' + esc(sub) + '</div></div></div>';
+        const got = sub === null ? '' : '<div class="wc-tag">' + W['wildcardMarkHTML'](16) + '<div class="wc-tag-txt"><div class="wc-tag-lbl">Wildcard done</div><div class="wc-tag-sub">' + esc(sub) + '</div></div></div>';
         assert.equal(got, W['wildcardTagHTML'](w, d), `week ${w} ${d}`);
       }
       assert.equal(W['wildcardMarkHTML'](16), `<span class="wc-mark" aria-label="Wildcard done">${icon('flame', 16)}<span class="wc-mark-w">W</span></span>`, 'the mark the sheet draws itself');
@@ -455,7 +455,7 @@ describe('the sheet\'s marks (modTagsHTML, travelTagHTML, wildcardTagHTML, _benc
       .map((n) => '<div class="cardio-note">' + (n.lead ? '<b>' + n.lead + '</b>' : '') + n.text + '</div>').join('');
     const cases: [string, [number, string, number | null][], string][] = [
       ['no week 1', [], 'No week 1 benchmark'],
-      ['week 1 only', [[1, '2.5', 20]], 'WEEK 1 BASELINE'],
+      ['week 1 only', [[1, '2.5', 20]], 'Week 1 baseline'],
       ['faster', [[1, '2.5', 20], [6, '2.7', 20]], 'FASTER'],
       ['even', [[1, '2.5', 20], [6, '2.51', 20]], 'Even with week 1'],
       ['slower', [[1, '2.5', 20], [6, '2.3', null]], 'slower'],

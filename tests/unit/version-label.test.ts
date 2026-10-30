@@ -1,5 +1,5 @@
 // The version label people read: iaVersionLabel in index.html (next to IA_VERSION), used by the bug-report page
-// ('BUILD ' + label) and the report context ('build: ' + label), and its shared form versionLabel in @ia/core
+// ('Build ' + label) and the report context ('build: ' + label), and its shared form versionLabel in @ia/core
 // (core/src/format/version-label.ts), which the app imports once phase D moves it. Rulings:
 // docs/decisions/version-label.md.
 //

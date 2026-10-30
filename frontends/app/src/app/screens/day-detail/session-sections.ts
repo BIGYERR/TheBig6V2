@@ -54,8 +54,8 @@ import type { SectionView } from './session-sections-model';
             <span class="ex-badge" [id]="'exbadge_' + x.exKey">@if (x.logged) {✓}</span>
           </div>
           @if (x.detail) {<div class="ex-detail" [innerHTML]="html(x.detail)"></div>}
-          @if (x.added) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">YOU ADDED THIS</span>{{ ' · not in the plan' }}<button type="button" class="ex-swapundo" (click)="call('removeAddedExercise', x.name)">remove</button></div>}
-          @if (x.swappedFrom; as from) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span>{{ ' for ' + from }}<button type="button" class="ex-swapundo" (click)="call('undoSwap', from, src())">put it back</button></div>}
+          @if (x.added) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">You added this</span>{{ ' · not in the plan' }}<button type="button" class="ex-swapundo" (click)="call('removeAddedExercise', x.name)">remove</button></div>}
+          @if (x.swappedFrom; as from) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">Swapped in</span>{{ ' for ' + from }}<button type="button" class="ex-swapundo" (click)="call('undoSwap', from, src())">put it back</button></div>}
           @if (x.log; as lg) {
             <div class="ex-log" [id]="'exlog_' + x.exKey">
               @if (lg.sets; as st) {

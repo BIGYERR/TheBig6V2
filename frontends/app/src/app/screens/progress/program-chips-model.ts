@@ -59,6 +59,6 @@ export function chipsView(programs: ChipProgram[], vid: string, c: ChipsInput): 
 
 /** A chip's inline style: the shown program filled in the accent, the others outlined. */
 export function chipStyle(sel: boolean): string {
-  return 'flex:0 0 auto;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.04em;padding:8px 12px;border-radius:16px;cursor:pointer;white-space:nowrap;border:1px solid '
+  return 'flex:0 0 auto;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:8px 12px;border-radius:16px;cursor:pointer;white-space:nowrap;border:1px solid '
     + (sel ? 'var(--accent)' : 'var(--border)') + ';background:' + (sel ? 'var(--accent)' : 'var(--surface)') + ';color:' + (sel ? 'var(--on-ink)' : 'var(--muted)');
 }

@@ -51,7 +51,7 @@ export interface AlsoJog {
 
 /** The jog block for a day whose entry holds one: `ALSO ON <DAY>` over the hero's sentences; none without a line. */
 export function alsoJog(dayName: string, lines: readonly string[], week: number, dayKey: string): AlsoJog | null {
-  return lines.length ? { label: 'ALSO ON ' + dayName.toUpperCase(), lines: [...lines], week, dayKey } : null;
+  return lines.length ? { label: 'Also on ' + dayName, lines: [...lines], week, dayKey } : null;
 }
 
 /** The "logged but never marked" nudge: the day it marks done, and its title. */
@@ -142,7 +142,7 @@ export function logNudge(dayKey: string, title: string | undefined): LogNudge {
 
 /** The header's logged count, or none when the day has nothing to log. */
 export function loggedCount(p: { done: number; total: number }): string | null {
-  return p.total > 0 ? p.done + ' / ' + p.total + ' LOGGED' : null;
+  return p.total > 0 ? p.done + ' / ' + p.total + ' logged' : null;
 }
 
 /** One of the foot's two buttons: its id, its classes, its words (with the small undo line or not), and the status it sets. */

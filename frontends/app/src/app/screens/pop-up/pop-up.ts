@@ -23,7 +23,7 @@ import { confetti, type PopAction, type PopOptions, type PopStat, type PopTier, 
     <div class="pop-sub" id="popSub" [style.display]="sub() ? 'block' : 'none'">{{ sub() }}</div>
     <div class="pop-stat-row" id="popStatRow" [style.display]="statsDisplay()">@for (s of stats(); track $index) {<div class="pop-stat"><div [class]="'pop-stat-num ' + (s.cls || '')">{{ s.n }}</div><div class="pop-stat-lbl" [innerHTML]="markup(s.l)"></div></div>}</div>
     <div [class]="actionsClass()" id="popActions">@for (a of actions(); track $index) {<button [class]="'pop-act ' + (a.cls || '')" (click)="act(a)">{{ a.label }}</button>}</div>
-    <div class="pop-brand">THE ASYLUM</div>
+    <div class="pop-brand">The Asylum</div>
   </div>
   `,
 })
@@ -35,7 +35,7 @@ export class PopUp {
   private readonly icon = viewChild.required<ElementRef<HTMLElement>>('icon');
 
   protected readonly kickerClass = signal('pop-kicker');
-  protected readonly kicker = signal('WORKOUT COMPLETE');
+  protected readonly kicker = signal('Workout complete');
   protected readonly msg = signal('—');
   protected readonly sub = signal('');
   protected readonly stats = signal<PopStat[]>([]);

@@ -1,14 +1,14 @@
 /* ── WEEK VIEW (same as before) ── */
 .week-scroll{padding:12px 20px;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg);border-bottom:1px solid var(--border);}
 .week-scroll::-webkit-scrollbar{display:none;}
-.week-btn{flex-shrink:0;font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:7px 16px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.week-btn{flex-shrink:0;font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:0;padding:7px 16px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;}
 .week-btn.active{background:var(--accent);border-color:var(--accent);color:var(--on-ink);}
 /* V147: the highlight advances roughly every 78ms during the cold-boot scoot while this
    transition runs 150ms, so each chip only ever reached about half its fill before the
    class moved on — on device that read as NO highlighted chip at all for ~217ms. Killing
    the transition for the duration makes every step crisp. Restored the moment it ends. */
 .week-scroll.wk-scooting .week-btn{transition:none;}
-.phase-pill{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;padding:4px 10px;border-radius:2px;border:1px solid var(--accent);color:var(--accent);white-space:nowrap;}
+.phase-pill{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0;padding:4px 10px;border-radius:2px;border:1px solid var(--accent);color:var(--accent);white-space:nowrap;}
 .phase-pill--recovery{background:var(--accent);color:var(--on-ink);border-color:var(--accent);}
 /* Injury state — muted brick red, DS-adjacent (rectilinear, ink-weighted). Pill only for
    now; the full hero red-wash treatment ships with the injury UI mock for sign-off. */
@@ -16,30 +16,30 @@
    and day-card rail already carry the flag; a filled pill on top of all that shouts. */
 .phase-pill--injury{background:transparent;color:var(--red);border-color:var(--red);}
 /* Injury chip action + reassess card — same chip skeleton, red accents. */
-.change-chip-act{display:inline-block;margin-top:8px;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:7px 12px;border:1px solid var(--red);color:var(--red);border-radius:2px;cursor:pointer;}
+.change-chip-act{display:inline-block;margin-top:8px;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;padding:7px 12px;border:1px solid var(--red);color:var(--red);border-radius:2px;cursor:pointer;}
 .change-chip-act:active{transform:scale(0.97);}
 .reassess-card{border-color:var(--red);}
 .reassess-acts{display:flex;gap:6px;margin-top:8px;}
-.reassess-acts button{flex:1;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 4px;border:1px solid var(--border2);background:var(--surface);color:var(--text);border-radius:2px;cursor:pointer;}
+.reassess-acts button{flex:1;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;padding:9px 4px;border:1px solid var(--border2);background:var(--surface);color:var(--text);border-radius:2px;cursor:pointer;}
 .reassess-acts button:active{transform:scale(0.97);}
 /* Rest-day actions on the hero, and the cardio log sheet controls. */
 .wk-rest-acts{display:flex;gap:6px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
-.wk-rest-act{flex:1;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:11px 4px;border:1px solid var(--border2);background:transparent;color:var(--text);border-radius:2px;cursor:pointer;}
+.wk-rest-act{flex:1;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;padding:11px 4px;border:1px solid var(--border2);background:transparent;color:var(--text);border-radius:2px;cursor:pointer;}
 .wk-rest-act:active{transform:scale(0.97);}
 .wk-rest-logged{font-size:12px;color:var(--run);margin-top:8px;font-weight:500;}
 .rd-row{display:flex;gap:5px;align-items:center;}
-.rd-chip{flex:1;text-align:center;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.04em;padding:11px 4px;border:1px solid var(--border2);border-radius:2px;color:var(--text);cursor:pointer;}
+.rd-chip{flex:1;text-align:center;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:11px 4px;border:1px solid var(--border2);border-radius:2px;color:var(--text);cursor:pointer;}
 .rd-chip.sel{background:var(--text);color:var(--bg);border-color:var(--text);}
 .rd-chip.wide{display:block;text-align:left;flex:none;width:100%;margin-bottom:6px;font-weight:400;letter-spacing:0;font-size:13px;padding:11px 12px;}
-.rd-chip.wide b{font-family:var(--font-display);font-weight:700;letter-spacing:0.04em;}
+.rd-chip.wide b{font-family:var(--font-display);font-weight:700;letter-spacing:0;}
 .rd-chip.wide span{display:block;font-size:11px;opacity:0.7;margin-top:2px;}
 .rd-input{flex:1;font-family:var(--font-display);font-size:16px;font-weight:700;padding:11px 12px;border:1px solid var(--border2);border-radius:2px;background:var(--surface);color:var(--text);width:100%;}
-.rd-unit{font-family:var(--font-display);font-size:12px;color:var(--muted);letter-spacing:0.06em;}
+.rd-unit{font-family:var(--font-display);font-size:12px;color:var(--muted);letter-spacing:0;}
 /* HURT? shortcut — icon over label, sits beside WEEK N. Doubles as the injury-state
    readout: quiet and ink-colored when healthy, red with the region name when live. */
 .hurt-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:1px solid var(--border2);border-radius:4px;padding:7px 10px 6px;color:var(--muted);cursor:pointer;margin-bottom:4px;}
 .hurt-btn:active{transform:scale(.97);}
-.hurt-lbl{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;line-height:1;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hurt-lbl{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0;line-height:1;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .hurt-ico{display:flex;line-height:0;}
 .hurt-btn.is-injured{border-color:var(--red);color:var(--red);}
 /* ── INJURY WEEK WASH (option C) ── top rail + tinted hero + day-card rail. Scoped to
@@ -49,28 +49,28 @@
 .is-injury-week .day-card:not(.rest){border-left:3px solid var(--red);}
 .phase-pill:empty{display:none;}
 .random-bar{padding:12px 20px;border-bottom:1px solid var(--border);}
-.random-btn{width:100%;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:11px;border-radius:4px;border:1px solid rgba(var(--lift-rgb),0.40);background:rgba(var(--lift-rgb),0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
-.random-btn{flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:11px 12px;border-radius:4px;border:1px solid rgba(var(--lift-rgb),0.40);background:rgba(var(--lift-rgb),0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;gap:8px;}
+.random-btn{width:100%;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0;padding:11px;border-radius:4px;border:1px solid rgba(var(--lift-rgb),0.40);background:rgba(var(--lift-rgb),0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
+.random-btn{flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:11px 12px;border-radius:4px;border:1px solid rgba(var(--lift-rgb),0.40);background:rgba(var(--lift-rgb),0.12);color:var(--lift);cursor:pointer;display:flex;align-items:center;gap:8px;}
 .wk-actions-row{display:flex;gap:8px;align-items:stretch;}
-.change-btn{flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:11px 12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.change-btn{flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:11px 12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 .change-btn:active{transform:scale(.98);}
-.rand-reset-btn{flex:0 0 auto;font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:8px 12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;}
+.rand-reset-btn{flex:0 0 auto;font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0;padding:8px 12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;}
 .change-active-wrap:not(:empty){margin-top:8px;}
 .change-chip{border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:0;padding:11px 13px;display:flex;align-items:flex-start;gap:10px;background:var(--surface);}
 .change-chip-body{flex:1;}
-.change-chip-ttl{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text);}
+.change-chip-ttl{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;color:var(--text);}
 .change-chip-sub{font-size:12px;color:var(--muted);line-height:1.45;margin-top:3px;}
 .change-chip-x{font-size:15px;color:var(--muted);cursor:pointer;flex:0 0 auto;line-height:1;padding:2px;}
 .rand-counter{font-size:11px;font-weight:700;color:var(--muted);margin-left:auto;}
-.ov-kicker{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--muted);}
+.ov-kicker{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .ov-title{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.01em;line-height:1.1;margin-top:4px;color:var(--text);}
 .ov-intro{font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px;margin-bottom:18px;}
 .ov-dates{display:flex;gap:10px;margin-bottom:18px;}
 .ov-date{flex:1;position:relative;display:block;border:1px solid var(--border2);border-radius:4px;padding:9px 10px;cursor:pointer;background:var(--surface);}
-.ov-date-lbl{display:block;font-family:var(--font-display);font-size:10px;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px;}
+.ov-date-lbl{display:block;font-family:var(--font-display);font-size:10px;letter-spacing:0;color:var(--muted);margin-bottom:4px;}
 .ov-date-val{display:block;font-size:15px;font-weight:500;color:var(--text);}
 .ov-date input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
-.ov-eq-lbl{font-family:var(--font-display);font-size:10px;letter-spacing:0.08em;color:var(--muted);margin-bottom:7px;}
+.ov-eq-lbl{font-family:var(--font-display);font-size:10px;letter-spacing:0;color:var(--muted);margin-bottom:7px;}
 .ov-eq{border:1px solid var(--border2);border-radius:4px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;}
 .ov-eq.sel{border-color:var(--accent);background:var(--surface);}
 .ov-eq-body{flex:1;}
@@ -82,12 +82,12 @@
 .ov-effect{border-top:1px solid var(--border);padding-top:14px;margin-top:12px;margin-bottom:16px;}
 .ov-effect-ttl{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
 .ov-effect-sub{font-size:12px;color:var(--muted);line-height:1.5;}
-.ov-apply{width:100%;background:var(--accent);color:var(--on-ink);text-align:center;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:15px;border-radius:4px;border:none;cursor:pointer;}
+.ov-apply{width:100%;background:var(--accent);color:var(--on-ink);text-align:center;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0;padding:15px;border-radius:4px;border:none;cursor:pointer;}
 .ov-apply:active{transform:scale(.98);}
 /* v0.240.0 (D228): the rest sheet's Clear, under Log it. */
-.ov-clear{width:100%;margin-top:10px;background:transparent;color:var(--text);text-align:center;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:13px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;}
+.ov-clear{width:100%;margin-top:10px;background:transparent;color:var(--text);text-align:center;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:13px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;}
 .ov-clear:active{transform:scale(.98);}
-.wk-chip-ov{display:inline-block;font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.06em;color:var(--lift);border:1px solid rgba(var(--lift-rgb),0.45);border-radius:2px;padding:1px 4px;margin-top:3px;}
+.wk-chip-ov{display:inline-block;font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0;color:var(--lift);border:1px solid rgba(var(--lift-rgb),0.45);border-radius:2px;padding:1px 4px;margin-top:3px;}
 .days-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px;flex:1;background:var(--bg) !important;}
 .day-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color 0.15s;box-shadow:0 1px 2px rgba(var(--shadow-rgb),0.06);}
 .day-card:active{background:var(--surface2);}
@@ -97,16 +97,16 @@
 .day-card.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
 .day-card.completed{border-color:rgba(var(--run-rgb),0.6);}
 .day-card.completed .day-dot{background:rgba(var(--run-rgb),0.18);color:var(--run);}
-.day-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.04em;}
+.day-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;}
 .dot-run{background:var(--run-dim);color:var(--run);}
 .dot-bike{background:var(--bike-dim);color:var(--bike);}
 .dot-lift{background:var(--lift-dim);color:var(--lift);}
 .dot-rest{background:rgba(var(--ink-rgb),0.06);color:rgba(var(--ink-rgb),0.25);}
 .day-info{flex:1;}
-.day-name{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;}
-.day-title{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--text);letter-spacing:0.02em;}
+.day-name{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0;margin-bottom:2px;}
+.day-title{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--text);letter-spacing:0;}
 .day-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
-.tag{font-size:10px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;}
+.tag{font-size:10px;font-weight:600;letter-spacing:0;padding:2px 7px;border-radius:4px;}
 .t-run{background:var(--run-dim);color:var(--run);}
 .t-bike{background:var(--bike-dim);color:var(--bike);}
 .t-lift{background:var(--lift-dim);color:var(--lift);}
@@ -114,19 +114,19 @@
 .t-core{background:var(--core-dim);color:var(--core);}
 .t-core{background:var(--core-dim);color:var(--core);}
 .t-logged{background:var(--run-dim);color:var(--run);}
-.today-badge{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--on-ink);background:var(--accent);padding:2px 8px;border-radius:4px;margin-left:6px;}
+.today-badge{font-size:10px;font-weight:700;letter-spacing:0;color:var(--on-ink);background:var(--accent);padding:2px 8px;border-radius:4px;margin-left:6px;}
 .past-check{color:var(--run);font-size:20px;}
 .day-arrow{color:var(--muted);font-size:18px;}
 .settings-bar{padding:12px 20px 20px;border-top:1px solid var(--border);}
 .start-date-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;margin-bottom:8px;}
-.start-date-label{font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);}
+.start-date-label{font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:0;color:var(--accent);}
 .start-date-input{background:transparent;border:none;color:var(--text);font-family:var(--font-text);font-size:16px;font-weight:500;outline:none;color-scheme:dark;cursor:pointer;}
 .wk-subrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 22px 12px;border-bottom:1px solid var(--border);}
 .wk-subrow .phase-pill{flex:0 1 auto;min-width:0;white-space:normal;line-height:1.25;text-align:right;}
 .wk-startdate{position:relative;flex:0 0 auto;display:flex;flex-direction:row;align-items:center;gap:11px;cursor:pointer;}
 .wk-cal-ico{flex:0 0 auto;color:var(--accent);}
 .wk-startdate-stack{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
-.wk-startdate-lbl{font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.wk-startdate-lbl{font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .wk-startdate-txt{font-family:var(--font-text);font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;}
 .wk-startdate-txt.is-unset{color:var(--muted);font-weight:500;}
 .wk-startdate-native{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none;color-scheme:light;}

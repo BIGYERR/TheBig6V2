@@ -81,14 +81,14 @@ describe('the look', () => {
 });
 
 describe('colours as tokens', () => {
-  test("today's cell keeps its dark type on each sport now the codes carry tokens", () => {
+  test("today's cell writes each session code in its sport's own token, as every other day does (D263)", () => {
     const I = loadApp();
     const code = (day: unknown) => I.eval('dayCode')(day) as { topColor: string; botColor: string };
     const run = code({ title: 'Easy', sections: [], cardio: { type: 'run', subtype: 'Easy Run' } });
     const lift = code({ title: 'Posterior Chain', sections: [{ items: [{ name: 'Barbell row' }] }], cardio: { type: 'bike' } });
     const rest = code({ rest: true });
     assert.deepEqual([run.topColor, lift.topColor, lift.botColor, rest.botColor], ['var(--run)', 'var(--bike)', 'var(--lift)', 'var(--dim)']);
-    const onGold = I.eval('_onGold') as (c: string) => string;
-    assert.deepEqual([run.topColor, lift.topColor, lift.botColor, rest.botColor].map(onGold), ['#1c5f2c', '#0a3a66', '#7a3410', '#3a2c08']);
+    // today's date is an ink ring now, not an orange cell, so nothing darkens the codes for it
+    assert.equal(I.eval('typeof _onGold'), 'undefined');
   });
 });

@@ -260,7 +260,7 @@ function renderGoalSheet(){
   const opts=(CARDIO_GOALS_BY_TYPE[sport]||[]).filter(g=>(p.cfg&&p.cfg.primaryPath)!=='both'||!HYBRID_EXCLUDED_GOALS.has(g.id));
   // @ts-expect-error TS7006 Parameter 'g' implicitly has an 'any' type.
   const sel=_goalDraft.sel?opts.find(g=>g.id===_goalDraft.sel):null;
-  let h='<div class="det-label" style="font-size:14px;letter-spacing:1px;margin-bottom:4px">CHANGE '+sportLbl.toUpperCase()+' GOAL</div>'
+  let h='<div class="det-label" style="font-size:14px;letter-spacing:0;margin-bottom:4px">Change '+sportLbl.toLowerCase()+' goal</div>'
     +'<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px">Weeks you already trained stay on the books. The rest of the program rebuilds around the new goal.</div>'
     +'<div style="display:flex;flex-direction:column;gap:8px">'
     // @ts-expect-error TS7006 Parameter 'g' implicitly has an 'any' type.
@@ -272,7 +272,7 @@ function renderGoalSheet(){
       return '<div class="goal-option'+(isSel?' selected':'')+'" '
         +(isCur?'style="opacity:0.55;cursor:default"':'onclick="selectGoalOpt(\''+g.id+'\')"')+'>'
         +'<div class="goal-option-label" style="display:flex;justify-content:space-between;align-items:center">'+g.label
-        +(isCur?'<span style="font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:400">CURRENT</span>':'')+'</div>'
+        +(isCur?'<span style="font-size:10px;letter-spacing:0;color:var(--muted);font-weight:400">Current</span>':'')+'</div>'
         +'<div class="goal-option-desc">'+g.desc+(!isCur&&up?'<br><span style="color:var(--accent)">Bigger goal than your current build.</span>':'')+'</div>'
         +'</div>';
     }).join('')+'</div>';
@@ -313,7 +313,7 @@ function renderGoalSheet(){
     const commit='<button id="goalCommitBtn" class="prog-action-btn'+(up?'':' primary')+'" style="flex:1'+(up?';border-color:var(--accent);color:var(--accent)':'')+'" onclick="commitGoalChange()">'+(up?'Switch anyway':'Make the switch')+'</button>';
     const keep='<button class="prog-action-btn'+(up?' primary':'')+'" style="flex:1" onclick="closeGoalSheet()">'+(up?'Stay the course':'Keep '+(cur&&cur.label?cur.label:'current'))+'</button>';
     h+='<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">'
-      +'<div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:'+(up?'var(--accent)':'var(--text)')+'">'+title+'</div>'
+      +'<div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0;color:'+(up?'var(--accent)':'var(--text)')+'">'+title+'</div>'
       +'<div style="font-size:13px;color:var(--text);line-height:1.5;margin-top:6px">'+bodyTxt+'</div>'
       +inputs
       +'<div style="display:flex;gap:8px;margin-top:14px">'+(up?keep+commit:commit+keep)+'</div></div>';
@@ -408,7 +408,7 @@ function openMileSheet(progId: any){
     }
     facts+='<div class="det-row"><span class="k">Week</span><span class="v">'+curWk+' of '+tw+'</span></div>';
     const lb=document.getElementById('mileLockBody');
-    if(lb) lb.innerHTML='<div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:var(--accent)">THE ROW HOLDS</div>'
+    if(lb) lb.innerHTML='<div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0;color:var(--accent)">The row holds</div>'
       +'<div class="det-group" style="margin-top:10px">'+facts+'</div>'
       +'<div style="font-size:13px;color:var(--text);line-height:1.5;margin-top:12px">You are too close to the race. Three weeks out the work is done. Changing your mile now would reset the pace of every session left, and those sessions have one job. Get you to the line fresh.</div>'
       +'<div style="display:flex;gap:8px;margin-top:14px"><button class="prog-action-btn primary" style="flex:1" onclick="closeMileSheet()">Got it</button></div>';

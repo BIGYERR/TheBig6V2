@@ -7,8 +7,8 @@ import { type Overlay, type WeekDay, type WeekView as View, weekView } from './w
 
 /** The screen before any program is drawn, as the legacy markup stood. */
 const BLANK: View = {
-  overline: 'THE ASYLUM', bigNum: 'WEEK 1', pill: { html: '', cls: '' }, injuryWeek: false,
-  hurt: { icon: '', injured: false, label: 'HURT?' }, weeks: [], start: { shown: null, iso: '' },
+  overline: 'The Asylum', bigNum: 'Week 1', pill: { html: '', cls: '' }, injuryWeek: false,
+  hurt: { icon: '', injured: false, label: 'Hurt?' }, weeks: [], start: { shown: null, iso: '' },
   race: { aligned: false, iso: '', day: '\\u2014' }, days: null,
 };
 
@@ -75,7 +75,7 @@ const BLANK: View = {
       @switch (d.hero.kind) {
         @case ('rest') {
           @if (d.hero.kind === 'rest') {
-            <div class="wk-hero"><div class="wk-rest-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-rest-title">REST DAY</div><div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>@for (l of d.hero.lines; track $index) {<div class="wk-rest-logged">{{ l }}</div>}<div class="wk-rest-acts">@if (d.hero.anyway) {<button class="wk-rest-act" (click)="restSheet(d.hero.key, 'move')">Training anyway?</button>}<button class="wk-rest-act" (click)="restSheet(d.hero.key, 'cardio')">{{ d.hero.logLabel }}</button></div></div></div>
+            <div class="wk-hero"><div class="wk-rest-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-rest-title">Rest day</div><div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>@for (l of d.hero.lines; track $index) {<div class="wk-rest-logged">{{ l }}</div>}<div class="wk-rest-acts">@if (d.hero.anyway) {<button class="wk-rest-act" (click)="restSheet(d.hero.key, 'move')">Training anyway?</button>}<button class="wk-rest-act" (click)="restSheet(d.hero.key, 'cardio')">{{ d.hero.logLabel }}</button></div></div></div>
             <div class="wk-tip"><div class="wk-tip-lbl">{{ d.hero.tip.label }}</div><div class="wk-tip-txt">{{ d.hero.tip.text }}</div><div class="wk-tip-src">{{ '— ' + d.hero.tip.src }}</div></div>
           }
         }
@@ -85,11 +85,11 @@ const BLANK: View = {
           }
         }
         @default {
-          <div class="wk-hero"><div class="wk-rest-pad"><div class="wk-rest-title" style="font-size:30px">NO SESSIONS</div><div class="wk-rest-sub">This week has no scheduled training.</div></div></div>
+          <div class="wk-hero"><div class="wk-rest-pad"><div class="wk-rest-title" style="font-size:30px">No sessions</div><div class="wk-rest-sub">This week has no scheduled training.</div></div></div>
         }
       }
       @if (d.wildcard !== null) {<ia-wildcard-tag [sub]="d.wildcard" />}
-      <div class="wk-stats"><div class="wk-stat"><div class="wk-stat-num">{{ d.stats.done }}<span class="den">{{ '/' + d.stats.of }}</span></div><div class="wk-stat-lbl">DONE</div></div><div class="wk-stat"><div class="wk-stat-num" style="color:var(--run)">{{ d.stats.miles }}</div><div class="wk-stat-lbl">MILES</div></div><div class="wk-stat"><div class="wk-stat-num" style="color:var(--accent)">{{ d.stats.streak }}</div><div class="wk-stat-lbl">DAY STREAK</div></div></div>
+      <div class="wk-stats"><div class="wk-stat"><div class="wk-stat-num">{{ d.stats.done }}<span class="den">{{ '/' + d.stats.of }}</span></div><div class="wk-stat-lbl">Done</div></div><div class="wk-stat"><div class="wk-stat-num" style="color:var(--run)">{{ d.stats.miles }}</div><div class="wk-stat-lbl">Miles</div></div><div class="wk-stat"><div class="wk-stat-num" style="color:var(--accent)">{{ d.stats.streak }}</div><div class="wk-stat-lbl">Day streak</div></div></div>
     }
   </div>
   <div class="settings-bar">
@@ -181,7 +181,6 @@ export class WeekView {
       regionLabel: (r) => (regions[r] || {}).label,
       icon: (n, s) => b.call('asyIcon', n, s),
       dayCode: (day) => b.call('dayCode', day),
-      onGold: (hex) => b.call('_onGold', hex),
       wildcardOn: (w, d) => b.call('wildcardOn', w, d),
       statusOf: (w, d) => b.call('statusOf', w, d),
       heroSummary: (day) => b.call('heroSummary', day),

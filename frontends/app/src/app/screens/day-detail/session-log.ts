@@ -42,7 +42,7 @@ const CARDIO_FIELD_IDS = ['log_run_dist', 'log_run_pace', 'log_run_mins', 'log_r
           <div id="cardioFields">@for (fx of [fieldsNow()]; track fx) {<ia-cardio-fields [fields]="fx" />}</div>
           <button type="button" id="cardioSwapLink" (click)="call('toggleCardioPicker')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:6px 0 0;display:inline-flex;align-items:center;gap:5px;text-decoration:underline;text-underline-offset:2px" [innerHTML]="m.link"></button>
           <div id="cardioPicker" style="margin-top:8px" [style.display]="c.swapped ? 'block' : 'none'">
-            <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">Logged as</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0;margin-bottom:6px">Logged as</div>
             <div style="display:flex;gap:6px">@for (ch of c.chips; track ch.sport; let i = $index) {<button type="button" [attr.data-sport]="ch.sport" (click)="call('setCardioSwap', ch.sport)" [attr.style]="ch.style" [innerHTML]="m.chips[i]"></button>}</div>
             <div id="cardioSwapNote" style="font-size:11px;color:var(--accent);margin-top:8px;line-height:1.4" [style.display]="c.swapped ? 'block' : 'none'">{{ c.note }}</div>
           </div>

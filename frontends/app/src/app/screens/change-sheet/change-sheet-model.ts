@@ -139,7 +139,7 @@ const HOLDS_GEAR =
   'Lifting holds steady while you’re away. Grab the heaviest load you can control and work in the 8 to 12 range. If that still feels easy, go single arm. Your running keeps building. That only needs shoes.';
 
 function fromField(d: OverlayDraft, deps: SheetDeps): DateField {
-  return { key: 'from', label: 'FROM', shown: deps.fmtDate(d.from), value: d.from || '', min: null };
+  return { key: 'from', label: 'From', shown: deps.fmtDate(d.from), value: d.from || '', min: null };
 }
 
 /** The travel sheet, as the legacy _renderTravelTab drew it. */
@@ -169,7 +169,7 @@ export function travelView(d: OverlayDraft, deps: SheetDeps): TravelView {
     effect = { title: null, subs: [{ text: 'That range falls outside your program. Pick dates inside it.', style: 'color:var(--muted)' }] };
   }
   return {
-    dates: isNoOp ? null : [fromField(d, deps), { key: 'to', label: 'THROUGH', shown: deps.fmtDate(d.to), value: d.to || '', min: d.from || '' }],
+    dates: isNoOp ? null : [fromField(d, deps), { key: 'to', label: 'Through', shown: deps.fmtDate(d.to), value: d.to || '', min: d.from || '' }],
     cards: EQUIP_OPTS.map(([id, name, desc]) => ({ key: 'equipment', id, name, desc: d.equipment === id ? desc : null, sel: d.equipment === id })),
     effect,
     action: isNoOp ? 'close' : 'travel',
@@ -224,7 +224,7 @@ export function injuryView(d: OverlayDraft, regions: Readonly<Record<string, { l
 export function changeSheetView(d: OverlayDraft, regions: Readonly<Record<string, { label: string }>>, deps: SheetDeps): ChangeSheetView {
   const inj = (d.tab || 'travel') === 'injury';
   return {
-    kicker: inj ? 'HURT?' : 'TRAVELING?',
+    kicker: inj ? 'Hurt?' : 'Traveling?',
     title: inj ? 'Train around it' : 'Temporary change',
     intro: inj
       ? 'No end date on this one. You tell it when you’re back. Nothing you’ve already trained changes.'

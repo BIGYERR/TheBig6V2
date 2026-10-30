@@ -1,6 +1,7 @@
-// Night mode, the palettes (D261, docs/decisions/night-mode.md): the stylesheet of the page under test carries the day
-// palette, the night palette the ruling typed, and the same night palette again for Auto on a dark phone; and no colour
-// is written anywhere else except the few that are the same in both looks.
+// Night mode, the palettes (D261, docs/decisions/night-mode.md, their values amended by D263, docs/decisions/app-look.md):
+// the stylesheet of the page under test carries the day palette, the night palette the rulings typed, and the same night
+// palette again for Auto on a dark phone; and no colour is written anywhere else except the few that are the same in
+// both looks.
 //
 // Oracles are the ruling's tables, typed here by hand. The page's <style> is read as text; nothing in the app runs.
 // The last test reads the Angular screens' sources in the working tree (the native app's), not the page under test,
@@ -38,26 +39,27 @@ function assertHolds(decls: Map<string, string>, want: Record<string, string>, w
   }
 }
 
-// The ruling's table, day column, and the tokens it adds (D261 items 2 to 4).
+// The day column: D263's neutral paper and ink, and D261's signal and sport colours, which D263 keeps.
 const DAY: Record<string, string> = {
-  '--bg': '#F4F1E8', '--surface': '#FBFAF5', '--surface2': '#ECE7DA', '--surface3': '#E0DACA',
-  '--border': '#D5CEBD', '--border2': '#BCB29B', '--text': '#181712', '--muted': '#6B6557', '--accent': '#181712',
-  '--on-ink': '#F4F1E8', '--signal': '#CF4E1A', '--signal-press': '#AE3F12', '--on-signal': '#FBF6EE',
+  '--bg': '#F3F3F1', '--surface': '#FFFFFF', '--surface2': '#EDEDEA', '--surface3': '#E1E1DD',
+  '--border': '#E3E3DF', '--border2': '#CFCFCA', '--text': '#111111', '--muted': '#6E6E6A', '--accent': '#111111',
+  '--on-ink': '#FFFFFF', '--signal': '#CF4E1A', '--signal-press': '#AE3F12', '--on-signal': '#FBF6EE',
   '--run': '#5e8c54', '--green': '#5e8c54', '--bike': '#3f6e96', '--swim': '#3f6e96', '--lift': '#bc6a43',
   '--hip': '#7e5e96', '--core': '#a6822f', '--red': '#9e3328',
-  '--band-header': '#161618', '--band': '#181712', '--on-band': '#F4F1E8', '--dim': '#5F5F62', '--mark': '#7D7668',
+  '--band-header': '#161618', '--band': '#111111', '--on-band': '#FFFFFF', '--dim': '#5F5F62', '--mark': '#777773',
 };
-// The ruling's table, night column; each -dim keeps its 0.15 alpha over its colour's night value.
+// The night column: D263's true black, and D261's signal and sport colours; each -dim keeps its 0.15 alpha over its
+// colour's night value.
 const NIGHT: Record<string, string> = {
   'color-scheme': 'dark',
-  '--bg': '#12110D', '--surface': '#1B1A15', '--surface2': '#24221C', '--surface3': '#2E2B23',
-  '--border': '#38342B', '--border2': '#514B3E', '--text': '#ECE7DA', '--muted': '#9C9584', '--accent': '#E4DFD2',
-  '--on-ink': '#12110D', '--signal': '#E2622B', '--signal-press': '#C4501E', '--on-signal': '#12110D',
+  '--bg': '#000000', '--surface': '#161616', '--surface2': '#242424', '--surface3': '#2E2E2E',
+  '--border': '#262626', '--border2': '#3C3C3C', '--text': '#FFFFFF', '--muted': '#A3A3A3', '--accent': '#FFFFFF',
+  '--on-ink': '#000000', '--signal': '#E2622B', '--signal-press': '#C4501E', '--on-signal': '#12110D',
   '--run': '#86B27A', '--green': '#86B27A', '--bike': '#7FA6C9', '--swim': '#7FA6C9', '--lift': '#D98A63',
   '--hip': '#AB8CC4', '--core': '#CFA752', '--red': '#D9665A',
   '--run-dim': 'rgba(134,178,122,0.15)', '--bike-dim': 'rgba(127,166,201,0.15)', '--swim-dim': 'rgba(127,166,201,0.15)',
   '--lift-dim': 'rgba(217,138,99,0.15)', '--hip-dim': 'rgba(171,140,196,0.15)', '--core-dim': 'rgba(207,167,82,0.15)',
-  '--band-header': '#211F1A', '--band': '#24221C', '--on-band': '#ECE7DA', '--dim': '#837D6F', '--mark': '#7A7467',
+  '--band-header': '#1C1C1C', '--band': '#242424', '--on-band': '#FFFFFF', '--dim': '#7A7A7A', '--mark': '#767676',
 };
 
 /** '#5e8c54' -> '94,140,84' */
@@ -67,7 +69,7 @@ function channels(hex: string): string {
 }
 
 describe('night mode palettes', () => {
-  test('the day palette keeps every colour it had and adds the band and grey tokens at their day values', () => {
+  test('the day palette holds the values the rulings typed, the band and grey tokens included', () => {
     assertHolds(block(':root{'), DAY, 'day');
   });
 
@@ -108,7 +110,6 @@ const SAME_IN_BOTH = new Set([
   'rgba(255,69,58,0.35)', // the danger button's line
   '#f0a050', // the cycling chart's orange
   '#006bb6', '#f58426', '#bec0c2', // the Knicks pop-up colours
-  '#1c5f2c', '#0a3a66', '#7a3410', '#3a2c08', '#7a4d00', // type on today's signal cell
 ]);
 const LITERAL = /#[0-9A-Fa-f]{6}\b|#[0-9A-Fa-f]{3}(?![0-9A-Za-z])|rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*[0-9.]+\s*)?\)/g;
 const sameInBoth = (lit: string) => SAME_IN_BOTH.has(norm(lit)) || /^rgba\(0,0,0,[0-9.]+\)$/.test(norm(lit));
@@ -126,7 +127,7 @@ describe('one home for every colour', () => {
     let rest = HTML;
     for (const p of palettes) if (p) rest = rest.replace(p, '');
     // the theme-color meta starts on the day paper; applyTheme rewrites it from the resolved --bg
-    rest = rest.replace(/<meta name="theme-color" content="#F4F1E8">/, '');
+    rest = rest.replace(/<meta name="theme-color" content="#F3F3F1">/, '');
     assert.deepEqual(strayLiterals(rest), []);
   });
 

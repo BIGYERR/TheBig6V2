@@ -18,8 +18,8 @@ const BASE: SwapInput = {
 
 describe('the swap sheet', () => {
   it('tags the pattern and the day, with the legacy words and fallbacks', () => {
-    assert.deepEqual([patternTag('hip_ext'), patternTag('vpull'), patternTag(null), patternTag('carry')], ['HIP EXTENSION', 'VERTICAL PULL', 'LIFT', 'LIFT']);
-    assert.deepEqual([regionTag('legs'), regionTag('push'), regionTag(null)], ['LEG DAY', 'PUSH DAY', 'TODAY']);
+    assert.deepEqual([patternTag('hip_ext'), patternTag('vpull'), patternTag(null), patternTag('carry')], ['Hip extension', 'Vertical pull', 'Lift', 'Lift']);
+    assert.deepEqual([regionTag('legs'), regionTag('push'), regionTag(null)], ['Leg day', 'Push day', 'Today']);
   });
 
   it('shortens a prescription to its sets and reps and its RPE, or cuts it at 24 characters', () => {
@@ -37,7 +37,7 @@ describe('the swap sheet', () => {
 
   it('draws the sheet: the tags, what a pick keeps, the same-job rows with their load note, the other jobs as cautions', () => {
     assert.deepEqual(swapSheetView(BASE), {
-      outName: 'Barbell row', kindTag: 'ROW', regionTag: 'PULL DAY', slotTag: 'HEAVY COMPOUND', keeps: '4×8 at RPE 8',
+      outName: 'Barbell row', kindTag: 'Row', regionTag: 'Pull day', slotTag: 'Heavy compound', keeps: '4×8 at RPE 8',
       sameJob: [
         { name: 'Pendlay row', caution: false, note: '' },
         { name: 'Dumbbell row', caution: true, note: 'Much lighter than barbell row. Volume holds, top-end strength does not.' },
@@ -50,7 +50,7 @@ describe('the swap sheet', () => {
 
   it('marks the main lift, names an aux family, and says "the same" without a region', () => {
     const main = swapSheetView({ ...BASE, itemIdx: 0, section: { label: 'Main — Barbell row' }, compoundTier: 3 });
-    assert.equal(main.slotTag, 'MAIN LIFT');
+    assert.equal(main.slotTag, 'Main lift');
     const fam = swapSheetView({ ...BASE, familyLabel: 'CORE', compoundTier: 0, candidates: { tier1: ['Dead bugs'], tier2: [], pattern: null, region: null } });
     assert.deepEqual([fam.kindTag, fam.slotTag, fam.otherRegion, fam.givenUp], ['CORE', '', 'the same', 'lift']);
   });

@@ -29,20 +29,20 @@ interface GoalProgram {
   </div>
   <div class="rand-body" id="goalBody">
   @if (view(); as v) {
-    <div class="det-label" style="font-size:14px;letter-spacing:1px;margin-bottom:4px">{{ v.heading }}</div>
+    <div class="det-label" style="font-size:14px;letter-spacing:0;margin-bottom:4px">{{ v.heading }}</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px">Weeks you already trained stay on the books. The rest of the program rebuilds around the new goal.</div>
     <div style="display:flex;flex-direction:column;gap:8px">
       @for (o of v.options; track o.id) {
         <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- the legacy option row, kept as it was -->
         <div [class]="'goal-option' + (o.selected ? ' selected' : '')" [attr.style]="o.current ? 'opacity:0.55;cursor:default' : null" (click)="pick(o.id, o.current)">
-          <div class="goal-option-label" style="display:flex;justify-content:space-between;align-items:center">{{ o.label }}@if (o.current) {<span style="font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:400">CURRENT</span>}</div>
+          <div class="goal-option-label" style="display:flex;justify-content:space-between;align-items:center">{{ o.label }}@if (o.current) {<span style="font-size:10px;letter-spacing:0;color:var(--muted);font-weight:400">Current</span>}</div>
           <div class="goal-option-desc">{{ o.desc }}@if (!o.current && o.up) {<br><span style="color:var(--accent)">Bigger goal than your current build.</span>}</div>
         </div>
       }
     </div>
     @for (d of decisions(); track d) {
       <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
-        <div [attr.style]="'font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:' + (d.up ? 'var(--accent)' : 'var(--text)')">{{ d.title }}</div>
+        <div [attr.style]="'font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0;color:' + (d.up ? 'var(--accent)' : 'var(--text)')">{{ d.title }}</div>
         <div style="font-size:13px;color:var(--text);line-height:1.5;margin-top:6px">{{ d.body }}</div>
         @if (d.inputs === 'pace') {
           <div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:5px">Target distance and time. The engine will not guess these for you.</div><div style="display:flex;gap:6px;align-items:center"><input type="number" class="input-field" style="flex:1" placeholder="dist e.g. 1.5" [value]="d.values.targetDist" min="0.1" step="0.1" (input)="type('targetDist', $event)"><select class="input-field" style="flex:0 0 64px" (change)="type('paceUnit', $event)"><option value="mi" [selected]="d.values.paceUnit === 'mi'">mi</option><option value="km" [selected]="d.values.paceUnit === 'km'">km</option></select><input type="number" class="input-field" style="flex:0 0 58px;text-align:center" placeholder="min" min="0" max="99" [value]="d.values.targetMins" (input)="type('targetMins', $event)"><input type="number" class="input-field" style="flex:0 0 58px;text-align:center" placeholder="sec" min="0" max="59" [value]="d.values.targetSecs" (input)="type('targetSecs', $event)"></div></div>

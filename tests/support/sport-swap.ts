@@ -108,8 +108,8 @@ function sportWorld(): SportWorld {
       const r = tryv(() => E('renderWeekView()')); const out: { threw?: string; miles?: string; done?: string } = { threw: r && r.threw };
       for (const el of REG.values()) {
         const h = el._html || '';
-        const mi = /<div class="wk-stat-num" style="color:var\(--run\)">([^<]*)<\/div><div class="wk-stat-lbl">MILES<\/div>/.exec(h);
-        const dn = /<div class="wk-stat-num">(\d+)<span class="den">\/(\d+)<\/span><\/div><div class="wk-stat-lbl">DONE<\/div>/.exec(h);
+        const mi = /<div class="wk-stat-num" style="color:var\(--run\)">([^<]*)<\/div><div class="wk-stat-lbl">Miles<\/div>/.exec(h);
+        const dn = /<div class="wk-stat-num">(\d+)<span class="den">\/(\d+)<\/span><\/div><div class="wk-stat-lbl">Done<\/div>/.exec(h);
         if (mi) out.miles = mi[1]; if (dn) out.done = dn[1] + '/' + dn[2];
       }
       return out;

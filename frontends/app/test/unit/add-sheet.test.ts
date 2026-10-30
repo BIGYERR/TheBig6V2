@@ -17,9 +17,9 @@ const INPUT: AddInput = {
 describe('the add-an-exercise sheet', () => {
   it('tags the week, the day\'s region and its working sets', () => {
     const v = addSheetView(INPUT);
-    assert.deepEqual([v.title, v.weekTag, v.regionTag, v.setsTag], ['Push', 'WEEK 3', 'PUSH DAY', '14 SETS']);
+    assert.deepEqual([v.title, v.weekTag, v.regionTag, v.setsTag], ['Push', 'Week 3', 'Push day', '14 sets']);
     const bare = addSheetView({ ...INPUT, title: undefined, candidates: { gap: [], more: [], off: [], region: null } });
-    assert.deepEqual([bare.title, bare.regionTag], ['Training', 'TODAY']);
+    assert.deepEqual([bare.title, bare.regionTag], ['Training', 'Today']);
   });
 
   it('lists the gaps plain, more of the same with the sets it brings the day to, and other regions with a warning', () => {

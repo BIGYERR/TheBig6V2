@@ -220,7 +220,7 @@ export function stripOf(h: string): string {
 export function stripCells(h: string): Record<string, string> {
   const cells: Record<string, string> = {};
   stripOf(h).split(/(?=<div class="wk-day[ "])/).forEach((p) => {
-    const m = p.match(/<div class="wk-day-lbl">([A-Z]{3})<\/div>/);
+    const m = p.match(/<div class="wk-day-lbl">([A-Z][a-z]{2})<\/div>/);
     if (m && m[1]) cells[m[1].toLowerCase()] = p;
   });
   return cells;

@@ -1,0 +1,100 @@
+/* ══ D263 P-TRACK: the Track look with a light glow (docs/decisions/app-look.md) ══
+   One layer over the component sheets: the glow behind each tab screen's top, round shapes in place of outlines, pills,
+   heavy headline numbers, the day strip's round dates and the floating tab bar. Colours come from base.css only. */
+:root{--glow-light:radial-gradient(150% 455px at 50% -130px,var(--glow),transparent 68%);}
+
+/* ── The glow: painted on the screen and again on its sticky bar, in the same box, so the two meet without a seam ── */
+#screenHome.screen,#screenWeek.screen,#screenProgress.screen,#screenBugs.screen{background:var(--glow-light) no-repeat,var(--bg) !important;}
+#screenHome .top-bar,#screenProgress .top-bar,#screenBugs .top-bar,.wk-topbar{background:var(--glow-light) no-repeat,var(--bg);border-bottom:none;}
+#screenWeek .days-list,#screenHome .prog-list{background:transparent !important;}
+.week-scroll,.wk-subrow{background:transparent;}
+
+/* ── Tab screen headers: a small overline over a heavy title ── */
+.top-bar{padding-bottom:16px;}
+.top-bar .app-title{font-size:15px;font-weight:600;color:var(--muted);}
+.top-bar .app-title span{color:inherit;}
+.top-bar .app-subtitle{font-size:40px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:var(--text);margin-top:2px;}
+
+/* ── This Week ── */
+.wk-topbar{padding-bottom:0;}
+.wk-overline{letter-spacing:0;font-size:15px;font-weight:600;color:var(--muted);}
+.wk-bignum{font-size:58px;font-weight:800;letter-spacing:-0.045em;line-height:1;}
+.hurt-btn{flex-direction:row;gap:7px;border-radius:var(--r-pill);border:1.5px solid var(--border2);padding:9px 14px;color:var(--text);margin-bottom:6px;}
+.hurt-lbl{letter-spacing:0;font-size:14px;font-weight:700;}
+.week-scroll{border-bottom:1px solid var(--line);padding:6px 20px 0;gap:22px;}
+.week-btn{border:none;border-radius:0;background:transparent;color:var(--muted);letter-spacing:0;font-size:15px;font-weight:700;padding:10px 0 12px;border-bottom:3px solid transparent;}
+.week-btn.active{background:transparent;color:var(--text);border-bottom-color:var(--signal);}
+.wk-subrow{border-bottom:none;padding:16px 20px 2px;}
+.wk-startdate-lbl{letter-spacing:0;font-size:13px;font-weight:500;}
+.wk-startdate-txt{font-size:17px;font-weight:700;}
+.phase-pill{border:1.5px solid var(--signal);color:var(--signal);border-radius:var(--r-pill);letter-spacing:0;font-size:14px;font-weight:700;padding:6px 14px;}
+#screenWeek .days-list{padding:14px 16px 16px;gap:14px;}
+.wk-strip{background:var(--surface);border-radius:var(--r-card);padding:16px 8px 14px;gap:0;}
+.wk-day{display:flex;flex-direction:column;align-items:center;padding:0;border-radius:0;background:transparent !important;}
+.wk-day-lbl{order:0;font-size:0;font-weight:600;letter-spacing:0;color:var(--muted);margin-bottom:8px;}
+.wk-day-lbl::first-letter{font-size:14px;}
+.wk-day-num{order:1;width:38px;height:38px !important;border-radius:50%;background:var(--surface2);font-size:16px;font-weight:600;color:var(--text);}
+.wk-day-top{order:2;margin-top:8px;}
+.wk-day-bot{order:3;}
+.wk-day-top,.wk-day-bot{font-size:9px;letter-spacing:0;}
+.wk-day.dim .wk-day-num{background:transparent;}
+.wk-day-num:empty{display:none;}
+.wk-day.today .wk-day-num{background:transparent;box-shadow:inset 0 0 0 2px var(--text);color:var(--text);font-size:16px;}
+.wk-hero{margin:0;border:none;border-radius:var(--r-card);background:var(--surface);box-shadow:none;}
+.wk-hero.is-today{border:none;}
+.wk-hero-pad{padding:20px 20px 0;}
+.wk-hero-over{letter-spacing:0;font-size:14px;font-weight:600;color:var(--muted);}
+.wk-hero-title{font-size:34px;font-weight:800;letter-spacing:-0.035em;line-height:1.05;margin-top:4px;}
+.wk-tag,.wk-tag.wk-time{letter-spacing:0;font-size:13px;font-weight:600;background:transparent;border:1.5px solid var(--border2);border-radius:var(--r-pill);padding:4px 11px;color:var(--text);}
+.wk-hero-summary{letter-spacing:-0.01em;text-align:left;font-family:var(--font-text);font-size:17px;font-weight:600;color:var(--text);border-top:none;margin:0;padding:12px 20px 0;}
+.wk-hero-cta-wrap{padding:18px 20px 20px;}
+.wk-hero-cta{display:flex;align-items:center;justify-content:center;gap:10px;border-radius:var(--r-pill);letter-spacing:-0.01em;font-size:18px;font-weight:800;padding:17px;}
+.wk-hero-cta::before{content:"";width:13px;height:15px;background:currentColor;clip-path:polygon(0 0,100% 50%,0 100%);}
+.wk-stats{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:56px 20px 20px;background:var(--surface);border-radius:var(--r-card);}
+.wk-stats::before{content:"This week";position:absolute;left:20px;top:18px;font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-0.02em;color:var(--text);}
+.wk-stat{display:flex;flex-direction:column-reverse;justify-content:flex-end;text-align:left;background:transparent;border-radius:0;padding:0;}
+.wk-stat-lbl{letter-spacing:0;font-size:13px;font-weight:500;margin:0 0 4px;}
+.wk-stat-num{font-size:30px;font-weight:800;letter-spacing:-0.04em;}
+.wk-tip{border-top:none;border-right:none;border-bottom:none;border-radius:0 var(--r-tile) var(--r-tile) 0;}
+.wc-tag{border-top-color:transparent;border-right-color:transparent;border-bottom-color:transparent;border-radius:var(--r-tile);}
+.settings-bar{border-top:none;padding:0 16px 24px;}
+.wk-actions-row{gap:10px;}
+.random-btn,.change-btn{border-radius:var(--r-pill);border:1.5px solid var(--border2);background:transparent;color:var(--text);letter-spacing:0;font-size:15px;font-weight:700;padding:13px 14px;}
+.random-btn svg{color:var(--signal);}
+.rand-counter{font-size:12px;font-weight:600;}
+
+/* ── Labels that were small capitals read at a size sentence case needs ── */
+.superset-header,.hip-header,.core-header,.iaw-cap,.plan-strip .ps-lbl,.derived .d-lbl,.ex-skipped-lbl,.dh-addbtn,.e1rm-field label,.pop-stat-lbl,.pop-brand,.swim-seg-label,.exset-head-lbl,.exset-head-vary,.exset-foot-lbl,.ex-weight-lbl,.prog-card-badge,.det-label,.input-field.derived .src,.wc-tag-lbl,.wk-tip-lbl,.tag,.today-badge,.ov-date-lbl{font-size:12px;letter-spacing:0;}
+.detail-day-name,.cardio-type,.section-label,.log-field label,.export-label,.e1rm-hd,.e1rm-out .lbl,.swap-nudge-hd,.rand-label,.summary-block-header,.rpe-key-title,.dh-over,.opt-divider .opt-lbl,.rt-cap,.look-lbl,.day-name,.input-label,.ov-kicker,.ov-eq-lbl,.swap-sec-lbl,.also-lbl{font-size:13px;font-weight:600;letter-spacing:0;}
+.change-chip-act,.reassess-acts button,.wk-rest-act,.rand-reset-btn{font-size:13px;}
+.wk-rest-title{font-weight:800;letter-spacing:-0.04em;}
+
+/* ── The glow on the main button of a screen or sheet ── */
+.wk-hero-cta,.day-done,.pop-act.go{box-shadow:0 10px 28px rgba(var(--signal-rgb),0.42);}
+
+/* ── Cards lose their outlines and sit on a surface fill ── */
+.prog-card,.day-card,.summary-block,.section-block,.section-items,.export-section,.swap-cand,.swap-empty,.toggle-row,.log-section,.also-block,.e1rm,.swap-nudge-card{border-color:transparent;border-radius:var(--r-card);box-shadow:none;}
+.cardio-block,.run-block,.bike-block,.swim-block,.hip-block,.core-block,.superset-wrap,.plan-strip,.log-nudge,.prog-nudge,.pop-stat,.ex-skipped,.wildcard-done-block,.option-card,.goal-option,.cardio-type-card,.rpe-info-card,.pop-modal,.e1rm-out,.e1rm-saved{border-radius:var(--r-tile);}
+.note-block,.change-chip{border-radius:0 var(--r-tile) var(--r-tile) 0;}
+.section-block > .exercise-item,.log-section{border-color:transparent !important;border-radius:var(--r-tile) !important;}
+.hip-block,.core-block,.superset-wrap,.run-block,.bike-block,.swim-block,.cardio-block{border-radius:var(--r-tile) !important;}
+.prog-card{padding:18px 20px;}
+.prog-card.active-prog{border-color:var(--signal);}
+
+/* ── Buttons, chips and tags are pills ── */
+.back-btn,.export-btn,.also-btn,.log-nudge-btn,.day-done,.day-skip,.ex-swapbtn,.ex-skipbtn,.dh-addbtn,.e1rm-save,.swap-nudge-yes,.swap-nudge-no,.pop-act,.wildcard-complete-btn,.dh-rpe-btn,.rpe-info-close,.reroll-btn,.rand-filter-btn,.ia-update-banner .ia-update-dismiss,.ex-logbtn,.ex-log .ex-logbtn,#cardioLogBtn,.rt-btn,.rt-reset,.prog-action-btn,.new-prog-btn,.look-opt,.copy-icon-btn,.rand-reset-btn,.ov-apply,.ov-clear,.tag,.today-badge,.prog-card-badge,.lift-chip,.wizard-back,.wizard-next,.wk-rest-act,.reassess-acts button,.rd-chip,.toast,.ex-reuse,.ss-minus,.dh-counter{border-radius:var(--r-pill);}
+.status-btn{border-radius:var(--r-pill) !important;}
+.new-prog-btn{border:1.5px solid var(--border2);background:transparent;color:var(--text);padding:15px;}
+
+/* ── Fields keep a soft corner ── */
+.log-field input,.log-field textarea,.log-field select,.iaw,.export-text,.e1rm-field input,.e1rm-field select,.ex-step,.ex-input,.exset-ctl,.exset-w,.ex-winput,.rd-input,.ov-date,.ov-eq,.input-field,.start-date-row,.day-toggle,.ios-toggle{border-radius:var(--r-field);}
+
+/* ── The tab bar floats: a pill above the home indicator, its fill blurred, the active tab in signal ── */
+.tabbar{left:12px;right:12px;margin:0 auto;width:auto;max-width:406px;transform:none;bottom:max(12px,env(safe-area-inset-bottom,0px));border:1px solid var(--nav-edge);border-radius:34px;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:6px;box-shadow:0 10px 30px rgba(0,0,0,0.18);}
+.tabbar button{border-radius:28px;padding:9px 4px 8px;}
+.screen.with-tabbar{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px));}
+.tabbar button.active{background:var(--nav-on);color:var(--signal);}
+.tabbar .tab-lbl{letter-spacing:0;font-size:12px;font-weight:700;}
+.tabbar .tab-ico{filter:none;}
+/* the toast rises above the floating bar */
+.toast{bottom:calc(96px + env(safe-area-inset-bottom,0px));}

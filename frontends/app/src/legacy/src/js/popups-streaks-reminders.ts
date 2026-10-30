@@ -66,10 +66,10 @@ const POP_POOLS: Record<string, any>={
   ]
 };
 const POP_CFG: Record<string, any>={
-  workout: {icon:'🎉',kicker:'WORKOUT COMPLETE',kClass:'',glow:'rgba(var(--scrim-rgb),0.35)',confetti:72,shake:false},
-  reminder:{icon:'notebook',kicker:'UNFINISHED BUSINESS',kClass:'',glow:'rgba(var(--scrim-rgb),0.30)',confetti:0,shake:false},
-  streak:  {icon:'🔥',kicker:'STREAK ALIVE',kClass:'streak',glow:'rgba(var(--core-rgb),0.4)',confetti:100,shake:false},
-  season:  {icon:'🏆',kicker:'SEASON COMPLETE',kClass:'',glow:'rgba(var(--scrim-rgb),0.55)',confetti:200,shake:true}
+  workout: {icon:'🎉',kicker:'Workout complete',kClass:'',glow:'rgba(var(--scrim-rgb),0.35)',confetti:72,shake:false},
+  reminder:{icon:'notebook',kicker:'Unfinished business',kClass:'',glow:'rgba(var(--scrim-rgb),0.30)',confetti:0,shake:false},
+  streak:  {icon:'🔥',kicker:'Streak alive',kClass:'streak',glow:'rgba(var(--core-rgb),0.4)',confetti:100,shake:false},
+  season:  {icon:'🏆',kicker:'Season complete',kClass:'',glow:'rgba(var(--scrim-rgb),0.55)',confetti:200,shake:true}
 };
 const POP_KNICKS=['#006BB6','#F58426','#BEC0C2']; // NY Knicks — blue, orange, silver
 // User-voice acknowledgments (the user brushing off the app). Per-DAY rotation:
@@ -266,7 +266,7 @@ function skippedCount(){
 function streakMilestone(n: any){ return n===3||n===7||n===14||n===30||(n>30&&n%30===0); }
 function fireStreakPopup(streak: any){
   popFire('streak',{
-    kicker: streak+'-DAY STREAK 🔥',
+    kicker: streak+'-day streak 🔥',
     stats:[   // V181 (D4)
       {n:String(streak), l:'Day Streak', cls:'streak'}
     ]

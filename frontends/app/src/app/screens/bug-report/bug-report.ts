@@ -24,7 +24,7 @@ import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './b
   <div style="padding:16px 20px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-bottom:40px">
     <div style="font-size:13px;color:var(--muted);line-height:1.6">Found something broken or weird? Tell me what happened — what you tapped, what you expected, what it did instead. The more detail the better.</div>
     <textarea id="bugText" class="input-field" placeholder="e.g. Tapped Save on the program name and it didn't update the This Week header until I reopened the app…" style="min-height:160px;resize:vertical;line-height:1.5" [value]="text()" (input)="text.set($any($event.target).value)"></textarea>
-    <button id="bugSubmit" style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:14px;border-radius:4px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer" [disabled]="sending()" [style.opacity]="sending() ? '0.6' : null" (click)="send()">{{ sending() ? 'Sending…' : 'Send Bug Report' }}</button>
+    <button id="bugSubmit" style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0;padding:14px;border-radius:999px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer" [disabled]="sending()" [style.opacity]="sending() ? '0.6' : null" (click)="send()">{{ sending() ? 'Sending…' : 'Send Bug Report' }}</button>
     <div id="bugStatus" style="font-size:13px;min-height:20px;line-height:1.5" [style.color]="status().color">{{ status().text }}</div>
     <div style="font-size:11px;color:var(--muted);line-height:1.5;opacity:0.8">Your device and app context is attached automatically to help track it down.</div>
     <div class="look-row" role="group" aria-label="Look">
@@ -36,7 +36,7 @@ import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './b
       </div>
       <div class="look-note">Auto follows your phone.</div>
     </div>
-    <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0.08em;text-align:center;padding-top:4px">{{ versionLabel }}</div>
+    <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0;text-align:center;padding-top:4px">{{ versionLabel }}</div>
   </div>
   `,
 })
@@ -45,7 +45,7 @@ export class BugReport {
   protected readonly text = signal('');
   protected readonly sending = signal(false);
   protected readonly status = signal<{ text: string; color: string }>({ text: '', color: 'var(--muted)' });
-  protected readonly versionLabel = 'BUILD ' + this.bridge.call('iaVersionLabel', this.bridge.global('IA_VERSION'));
+  protected readonly versionLabel = 'Build ' + this.bridge.call('iaVersionLabel', this.bridge.global('IA_VERSION'));
 
   /** D261: the Look row; the legacy setTheme stores the choice and sets data-theme, which the row's CSS reads. */
   protected pickLook(look: 'auto' | 'day' | 'night'): void {

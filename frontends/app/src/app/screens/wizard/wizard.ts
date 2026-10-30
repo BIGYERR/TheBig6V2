@@ -93,11 +93,11 @@ type StepView =
               }
             </div>
             <div class="input-label" style="margin-bottom:8px">Units</div>
-            <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:16px">
-              <button (click)="call('setUnit', 'lbs')" [attr.style]="unit(!v.profile.kg)">LBS</button>
-              <button (click)="call('setUnit', 'kg')" [attr.style]="unit(v.profile.kg)">KG</button>
+            <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:16px">
+              <button (click)="call('setUnit', 'lbs')" [attr.style]="unit(!v.profile.kg)">lbs</button>
+              <button (click)="call('setUnit', 'kg')" [attr.style]="unit(v.profile.kg)">kg</button>
             </div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.8">
+            <div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.8">
               <div><b style="color:var(--accent)">Experience:</b>{{ ' ' + v.profile.expHint }}</div>
               <div style="margin-top:6px"><b style="color:var(--accent)">{{ v.profile.ageLabel }}</b>{{ ' ' + v.profile.ageHint }}</div>
             </div>
@@ -126,7 +126,7 @@ type StepView =
               <div class="wizard-subtitle">Select all sports you want to train. Set a goal for each.</div>
               <div style="display:flex;flex-direction:column;gap:10px">
                 @for (s of c.sports; track s.id) {
-                  <div [attr.style]="'background:var(--surface);border:1.5px solid ' + (s.sel ? 'var(--accent)' : 'var(--border)') + ';border-radius:4px;overflow:hidden'">
+                  <div [attr.style]="'background:var(--surface);border:1.5px solid ' + (s.sel ? 'var(--accent)' : 'var(--border)') + ';border-radius:16px;overflow:hidden'">
                     <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- the legacy sport header, kept as it was -->
                     <div (click)="call('toggleCardioTypeSport', s.id)" [attr.style]="'display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:' + (s.sel ? 'var(--accent-dim)' : 'transparent')">
                       <div [innerHTML]="icon(s.icon, 24)"></div>
@@ -152,7 +152,7 @@ type StepView =
                             <div style="margin-top:10px">
                               <div class="input-label" style="margin-bottom:6px">Distance</div>
                               <div style="display:flex;gap:0;align-items:stretch">
-                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" [attr.value]="f.dist" readonly>
+                                <input type="number" class="input-field" style="border-radius:12px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" [attr.value]="f.dist" readonly>
                                 <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
                                   <button (click)="call('setSwimUnit', 'yd')" [attr.style]="unitBtn(f.unit === 'yd', false)">yd</button>
                                   <button (click)="call('setSwimUnit', 'm')" [attr.style]="unitBtn(f.unit === 'm', true)">m</button>
@@ -180,7 +180,7 @@ type StepView =
                             <div style="margin-top:10px">
                               <div class="input-label" style="margin-bottom:6px">Target distance</div>
                               <div style="display:flex;gap:0;align-items:stretch">
-                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" [attr.value]="f.dist" (input)="edit('runDist', 'run', 'targetDist', $event)" min="0.1" step="0.1">
+                                <input type="number" class="input-field" style="border-radius:12px 0 0 8px;flex:1" placeholder="e.g. 1.5" [attr.value]="f.dist" (input)="edit('runDist', 'run', 'targetDist', $event)" min="0.1" step="0.1">
                                 <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
                                   <button (click)="call('setPaceUnit', 'mi')" [attr.style]="unitBtn(f.unit === 'mi', false)">mi</button>
                                   <button (click)="call('setPaceUnit', 'km')" [attr.style]="unitBtn(f.unit === 'km', true)">km</button>
@@ -222,19 +222,19 @@ type StepView =
                 }
               </div>
               @if (c.footer; as ft) {
-                <div style="background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:12px 14px;margin-top:4px">
+                <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:12px 14px;margin-top:4px">
                   <div style="font-size:12px;color:var(--muted);line-height:1.6"><span id="progLenLine" [innerHTML]="html(ft.progLen)"></span>@if (ft.multi) {<br>Sessions rotate across training days. Each sport gets its own days. }</div>
                   @if (ft.race; as r) {
                     <div style="margin-top:10px">
-                      <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Race date</div>
-                      <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:8px">
+                      <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0;margin-bottom:6px">Race date</div>
+                      <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:8px">
                         <button (click)="raceDate(true)" [attr.style]="raceBtn(r.targeted)">✓ I have a race date</button>
                         <button (click)="raceDate(false)" [attr.style]="raceBtn(!r.targeted)">✕ Just building fitness</button>
                       </div>
                       @if (r.targeted) {
                         <div>
-                          <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Race date</div>
-                          <input type="date" id="raceDateInput" [attr.value]="r.value" [attr.min]="r.min" (input)="setRaceDate($event)" style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0.04em;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
+                          <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0;margin-bottom:8px">Race date</div>
+                          <input type="date" id="raceDateInput" [attr.value]="r.value" [attr.min]="r.min" (input)="setRaceDate($event)" style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:12px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
                           <div id="raceDateFeedback" style="margin-top:8px"></div>
                           <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open the calendar. The final weeks taper so you arrive fresh.</div>
                         </div>
@@ -262,8 +262,8 @@ type StepView =
               }
             </div>
             @if (v.lifting.addOn; as a) {
-              <div style="margin-top:12px;background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden">
-                <div style="padding:10px 14px;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">Optional cardio add-on</div>
+              <div style="margin-top:12px;background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden">
+                <div style="padding:10px 14px;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);border-bottom:1px solid var(--border)">Optional cardio add-on</div>
                 <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
                   @for (t of a.sports; track t.id) {
                     <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- the legacy sport card, kept as it was -->
@@ -296,13 +296,13 @@ type StepView =
             </div>
             <div style="font-size:12px;color:var(--muted);margin-top:6px">{{ 'Gold = training · Grey = rest · ' }}<b style="color:var(--text)">{{ v.days.count }}</b>{{ ' selected' }}</div>
             @if (v.days.floor; as f) {
-              <div style="margin-top:10px;background:rgba(var(--ink-rgb),0.12);border:1px solid rgba(var(--ink-rgb),0.35);border-radius:4px;padding:12px 14px">
+              <div style="margin-top:10px;background:rgba(var(--ink-rgb),0.12);border:1px solid rgba(var(--ink-rgb),0.35);border-radius:16px;padding:12px 14px">
                 <div style="font-size:13px;color:var(--accent);font-weight:700;line-height:1.5;margin-bottom:4px" [innerHTML]="lockTitle()"></div>
                 <div style="font-size:12px;color:var(--text);line-height:1.5">@if (f.reason) {{{ 'Your ' }}<b>{{ f.reason }}</b>{{ ' goal needs at least ' }}<b>{{ f.min + ' training days a week' }}</b>{{ ' to build the volume safely and avoid injury. To add more rest, ease your goal or pick a shorter distance.' }}} @else {Three days a week is the floor, cardio or no cardio. Two gives you the same session twice with nowhere to put the hard work. Three is where real training days start.}</div>
               </div>
             }
             @if (v.days.advisories.length) {
-              <div style="margin-top:10px;background:rgba(var(--ink-rgb),0.10);border:1px solid rgba(var(--ink-rgb),0.28);border-radius:4px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">@for (a of v.days.advisories; track $index) {<div style="font-size:12px;color:var(--accent);line-height:1.5" [innerHTML]="html(a)"></div>}</div>
+              <div style="margin-top:10px;background:rgba(var(--ink-rgb),0.10);border:1px solid rgba(var(--ink-rgb),0.28);border-radius:16px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">@for (a of v.days.advisories; track $index) {<div style="font-size:12px;color:var(--accent);line-height:1.5" [innerHTML]="html(a)"></div>}</div>
             }
           }
         }
@@ -332,12 +332,12 @@ type StepView =
     <div style="display:flex;align-items:center;gap:6px">
       <div style="flex:1;text-align:center">
         <input type="number" class="input-field" style="text-align:center" placeholder="min" [attr.value]="p.mins" (input)="edit(p.field, sport, p.minsKey, $event)" [attr.min]="p.lo" [attr.max]="p.hi">
-        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">minutes</div>
       </div>
       <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
       <div style="flex:1;text-align:center">
         <input type="number" class="input-field" style="text-align:center" placeholder="sec" [attr.value]="p.secs" (input)="edit(p.field, sport, p.secsKey, $event)" min="0" max="59">
-        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">seconds</div>
       </div>
     </div>
   </ng-template>
@@ -352,8 +352,8 @@ type StepView =
     @if (sd.applied) {
       <div style="font-size:11px;color:var(--muted);margin:2px 0 8px" [innerHTML]="seedLine(12, ' Estimated from “' + sd.prog + '”. Edit if you know better.')"></div>
     } @else {
-      <div style="background:var(--surface);border:1px solid var(--accent);border-radius:4px;padding:12px 14px;margin-bottom:12px">
-        <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text);margin-bottom:4px" [innerHTML]="seedLine(13, ' Seed from “' + sd.prog + '”?')"></div>
+      <div style="background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;color:var(--text);margin-bottom:4px" [innerHTML]="seedLine(13, ' Seed from “' + sd.prog + '”?')"></div>
         <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px">{{ sd.found }}</div>
         <div style="display:flex;gap:8px">
           <button class="prog-action-btn primary" style="flex:1" (click)="call('applySeedData')">Use this data</button>

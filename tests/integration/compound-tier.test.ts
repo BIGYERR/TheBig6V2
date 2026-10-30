@@ -1,5 +1,5 @@
 // The compound tier: _compoundTier ranks a movement 0 to 3, and tier 3 is a loaded compound the session budget never
-// trims, the swap sheet tags HEAVY COMPOUND and the load note measures a swap against. Ruling D89 (V200): a drill
+// trims, the swap sheet tags Heavy compound and the load note measures a swap against. Ruling D89 (V200): a drill
 // declared family 'core' in _AUX_FAMILY is a core drill, never a loaded compound (the clause in _compoundTier returns
 // 0). _isCompound is untouched, so _itemCost still prices Pallof press as a compound; only the skip and the two copy
 // readers moved. D96's tier-3 controls hold. The record is in the handoff and tests/measure/v200_rulings/.
@@ -93,9 +93,9 @@ const DAY: Section[] = [
   { label: 'Accessory', items: [{ name: 'Back squat', detail: '3×8' }, { name: 'Dumbbell bench press', detail: '3×10' }, { name: 'Pallof press', detail: '3×10' }] },
 ];
 
-test('the swap sheet tags HEAVY COMPOUND from tier 3 outside the main slot, never on Pallof press; MAIN LIFT wins the main slot', () => {
+test('the swap sheet tags Heavy compound from tier 3 outside the main slot, never on Pallof press; Main lift wins the main slot', () => {
   // E0a, E0b (the predicate and its threshold, read from the sheet), E1, E2, E3
-  const H = '<span class="swap-tag">HEAVY COMPOUND</span>', M = '<span class="swap-tag">MAIN LIFT</span>';
+  const H = '<span class="swap-tag">Heavy compound</span>', M = '<span class="swap-tag">Main lift</span>';
   const squat = swapTags(null, DAY, 1, 0), bench = swapTags(null, DAY, 1, 1), pallof = swapTags(null, DAY, 1, 2), main = swapTags(null, DAY, 0, 0);
   assert.ok(squat.includes(H), squat);
   assert.ok(!bench.includes(H), 'a tier 2 lift is not tagged: ' + bench);
@@ -105,7 +105,7 @@ test('the swap sheet tags HEAVY COMPOUND from tier 3 outside the main slot, neve
 
 test('without the clause the sheet tags Pallof press HEAVY COMPOUND', () => {
   // E4
-  assert.ok(swapTags(SB.variant('no-core-clause', [[CLAUSE, '']]), DAY, 1, 2).includes('<span class="swap-tag">HEAVY COMPOUND</span>'));
+  assert.ok(swapTags(SB.variant('no-core-clause', [[CLAUSE, '']]), DAY, 1, 2).includes('<span class="swap-tag">Heavy compound</span>'));
 });
 
 test("HALF_MANNY without the clause matches tests/snapshots/compound-tier.json", () => {

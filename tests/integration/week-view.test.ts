@@ -148,7 +148,7 @@ test('an undo tap inside the settle window is not flushed; the wheel settles on 
 const HERO_WEEKS = [1, 7];
 const HS = W.heroAndStrip(E, HERO_WEEKS);
 
-test("today's hero says Done or Skipped after the close, offers OPEN SESSION, and goes back to START SESSION on undo", () => {
+test("today's hero says Done or Skipped after the close, offers Open session, and goes back to Start session on undo", () => {
   // A1a, A1b, A1c
   allPass(HS.q, 'A1a', HS.todays);
   allPass(HS.q, 'A1b', HS.todays);
@@ -195,9 +195,9 @@ test('handleDayStatus labels a skip with the new copy and no em-dash', () => {
   assert.equal(W.count(hd, 'Skipped ✕ —'), 0);
 });
 
-test('OPEN SESSION and each hero string appear once in the source', () => {
+test('Open session and each hero string appear once in the source', () => {
   // K3
-  assert.equal(W.count(SRC, 'OPEN SESSION'), 1);
+  assert.equal(W.count(SRC, 'Open session'), 1);
   assert.equal(W.count(SRC, W.DONE_STR), 1);
   assert.equal(W.count(SRC, W.SKIP_STR), 1);
 });

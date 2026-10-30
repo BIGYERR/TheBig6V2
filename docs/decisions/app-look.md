@@ -27,18 +27,30 @@ This Week markup and stylesheet, one option sheet on top of each). Tests: `tests
      build's code read in sentence case. Capitals stay on acronyms (RPE, AMRAP, NRC), on the session codes under each
      day (RUN, LIFT), and on a word stressed inside a sentence of copy. Headline numbers are heavy and tight.
   4. **The glow (C1).** A warm signal light sits behind the top of each tab screen (This Week, Your Programs, Progress,
-     Bugs), stronger at night. A signal-filled primary button glows. Nothing else glows: Mario declined the stronger
-     option (C2: a glow inside the session card, on today's date and on the active tab).
+     Bugs), stronger at night. The main signal button of a screen or sheet glows: Start session, the session sheet's
+     Done, the pop-up's main button. Nothing else glows: Mario declined the stronger option (C2: a glow inside the
+     session card, on today's date and on the active tab).
   5. **The tab bar floats.** A pill bar 12px in from each side above the home indicator, its fill blurred, the active
      tab tinted in signal.
   6. **The day strip.** One letter per day (M T W T F S S) over a round date; today's date is ringed in ink; the
-     session codes stay under each date.
+     session codes stay under each date, in their sport's colour on today as on every other day.
 - **Does not change:** what a program prescribes or what is stored (HALF_MANNY unmoved). The Look setting (Auto, Day,
   Night) and its key (D261 item 1). D261 item 4: every colour still has one home, so each new colour is a token. The
   words of every label, only their case. The copy rule. The website and the admin. The Dynamic Island timer.
   `config.xml`'s launch background (bone, shown only before the page draws).
-- **Amends:** D261 item 2's table (both columns) and the design system reference
+- **Amends:** D261 item 2's table (both columns). D185 P-WCTODAY: today's cell is no longer orange, so the rule that
+  turned the W mark and the tick on-signal there goes, and so does the dark type `_onGold` gave the session codes on
+  today's cell; both read as on every other day. The design system reference
   (`docs/design/THE_ASYLUM_DS_REFERENCE.md`: bone and warm ink, 4px corners, no pills and no glows give way to this).
+- **Form, the build's to decide (recorded here):** the look is one sheet, `css/look.css`, last in `order.json` after
+  the component sheets, so the preview's option sheet carried over almost whole; the rules it replaces in place are
+  the ones that would fight it (today's cell in `this-week.css`). The capitals and the tracking came out of every sheet
+  and every inline style of both builds by one rule (no `text-transform:uppercase`, positive `letter-spacing` to 0),
+  and a 4px inline corner became a pill on a button, 12px on a field and 16px on a block, with a surface card's
+  outline made transparent so nothing moves. Labels that were small capitals (9 to 11px) now read at 12 to 13px. The
+  day strip keeps the short day name in its markup ("Mon"), which the tests and a screen reader read, and draws its
+  first letter. Labels already in Title Case ("Race Day", "Random Workout", "Your Programs") are left as they are: the
+  ruling is about capitals, and a Title Case pass is a copy question of its own.
 - **Expected values:**
 
   | Token | Day | Night |
@@ -64,4 +76,4 @@ This Week markup and stylesheet, one option sheet on top of each). Tests: `tests
   at 4.5:1 or better (text 21, muted 8.3, dim 4.9, mark 4.6); in the day, muted reads 4.6 on the paper and 5.1 on a card.
   The glow is a radial light, 150% wide and 56% tall, centred above the top edge, fading out by 68%. The primary
   button's glow is a 28px signal shadow at 0.42.
-- **Released:** pending (0.252.0).
+- **Released:** v0.252.0 (MINOR, Mario 2026-10-30).

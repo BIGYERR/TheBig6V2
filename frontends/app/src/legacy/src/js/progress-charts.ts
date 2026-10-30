@@ -11,9 +11,9 @@ import {
 // D2 (ruled): static SVG, no interaction layer. D5: bars where composition or a
 // zero line carries the meaning, dot-and-dash where the existing grammar holds.
 function _iaCard(title: any, color: any, inner: any, footer?: any){
-  return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
-    + '<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;'
-    + 'text-transform:uppercase;color:'+(color||'var(--accent)')+';margin-bottom:12px">'+title+'</div>'
+  return '<div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">'
+    + '<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;'
+    + 'color:'+(color||'var(--accent)')+';margin-bottom:12px">'+title+'</div>'
     + inner
     + (footer?'<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">'+footer+'</div>':'')
     + '</div>';
@@ -43,7 +43,7 @@ function buildLadderChart(wk: any, totalWeeks: any, raceMi: any, cut: any, skip1
   if(raceMi>0&&raceMi<=mx){
     const hy=padT+plotH-(raceMi/mx)*plotH;
     s+='<line x1="'+padL+'" y1="'+hy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+hy.toFixed(1)+'" stroke="var(--signal)" stroke-width="1.2" stroke-dasharray="4,3"/>';
-    s+=_axTx(W-padR, hy-5, 'RACE — '+raceMi+' mi', 8, 'end', 'var(--signal)', '700');
+    s+=_axTx(W-padR, hy-5, 'Race — '+raceMi+' mi', 8, 'end', 'var(--signal)', '700');
   }
   for(let i=0;i<totalWeeks;i++){
     const w=i+1, x=padL+i*slot+(slot-barW)/2, v=wk[w];
@@ -310,7 +310,7 @@ function buildLedgerCard(led: any, unit: any){
   if(led.accessories.length){
     acc='<details style="margin-top:4px"><summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:11px 0 2px;font-size:12px;color:var(--muted)">'
       +'<span>'+led.accessories.length+' accessory movement'+(led.accessories.length===1?'':'s')+'</span>'
-      +'<span style="font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)">Show</span></summary>'
+      +'<span style="font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--text)">Show</span></summary>'
       +'<div style="padding-top:4px">'
       // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
       +led.accessories.map(r=>'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">'
@@ -430,7 +430,7 @@ function buildEasyZoneChart(runs: any){
   s+='<rect x="'+padL+'" y="'+capY.toFixed(1)+'" width="'+plotW+'" height="'+Math.max(padT+plotH-capY,0).toFixed(1)+'" fill="var(--run)" opacity="0.07"/>';
   s+='<line x1="'+padL+'" y1="'+capY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+capY.toFixed(1)+'" stroke="var(--red)" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.75"/>';
   s+=_axTx(padL+2, padT+9, 'too fast', 8, 'start', 'var(--red)', '700');
-  s+=_axTx(W-padR, capY-5, 'CEILING '+_fmtPaceShort(cap), 8, 'end', 'var(--red)', '700');
+  s+=_axTx(W-padR, capY-5, 'Ceiling '+_fmtPaceShort(cap), 8, 'end', 'var(--red)', '700');
   if(tgtY>capY+14&&tgtY<padT+plotH){
     s+='<line x1="'+padL+'" y1="'+tgtY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+tgtY.toFixed(1)+'" stroke="var(--run)" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>';
     s+=_axTx(W-padR, tgtY+12, 'aim '+_fmtPaceShort(tgt), 8, 'end', 'var(--run)', '700');
@@ -478,7 +478,7 @@ function buildEasyBandsFallback(byClass: any){
   }
   s+=_axTx(padL, padT-12, '\u2190 faster', 7, 'start');
   s+=_axTx(W-padR, padT-12, 'slower \u2192', 7, 'end');
-  [['HARD',hard,'var(--lift)'],['EASY',easy,'var(--run)']].forEach((row,i)=>{
+  [['Hard',hard,'var(--lift)'],['Easy',easy,'var(--run)']].forEach((row,i)=>{
     const y=padT+i*30, x1=xof(Math.min.apply(null,row[1])), x2=xof(Math.max.apply(null,row[1]));
     s+='<rect x="'+x1.toFixed(1)+'" y="'+y+'" width="'+Math.max(x2-x1,3).toFixed(1)+'" height="18" fill="'+row[2]+'" opacity="0.82" rx="1"/>';
     s+=_axTx(x1-4, y+13, row[0], 9, 'end', row[2], '700');

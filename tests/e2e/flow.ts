@@ -514,7 +514,7 @@ const STRENGTH: readonly Step[] = [
       await t.tap('#detailAddBtn');
       await t.overlayOpen('addOverlay');
       if (!(await t.count('#addOverlay .swap-cand'))) throw new Error('the add sheet offers nothing');
-      await t.expectText('#addTags', 'SETS');
+      await t.expectText('#addTags', 'sets');
     },
     async after(t, page) {
       // A pick adds it to the day for this session, under the day's own heading.
@@ -575,7 +575,7 @@ const STRENGTH: readonly Step[] = [
       await t.expectText('#swapOutName', name);
       await t.tap('#swapBody .swap-cand');
       if ((await t.openOverlays()).includes('swapOverlay')) throw new Error('the swap sheet stayed open after a pick');
-      await t.expectText('#randBody .ex-swapchip', 'SWAPPED IN for ' + name);
+      await t.expectText('#randBody .ex-swapchip', 'Swapped in for ' + name);
       await t.tap('#randBody .ex-swapundo');
       if (await t.count('#randBody .ex-swapchip')) throw new Error('the Wildcard card stayed swapped after put it back');
       await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
@@ -597,7 +597,7 @@ const STRENGTH: readonly Step[] = [
       await t.tap('#randBody .wildcard-complete-btn');
       if ((await t.openOverlays()).includes('randOverlay')) throw new Error('the sheet stayed open after Complete');
       await t.overlayOpen('popOverlay');
-      await t.expectText('#popKicker', 'WILDCARD DONE');
+      await t.expectText('#popKicker', 'Wildcard done');
       await t.tap('#popActions .pop-act.go');
       await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
       await t.expectMatch('#randCounter', /^1\/\d+$/);
@@ -697,7 +697,7 @@ const STRENGTH: readonly Step[] = [
       await t.tap('#tabBugs');
       await t.screen('screenBugs');
       if (!(await t.count('#bugSubmit'))) throw new Error('the bug form has no send button');
-      await t.expectText('#bugVersion', 'BUILD v');
+      await t.expectText('#bugVersion', 'Build v');
       // Sending with nothing typed asks for the text and posts nothing (the screen is an Angular component in the app
       // since phase E's first step, the legacy script's in the single-file page: both answer the same).
       await t.tap('#bugSubmit');
@@ -774,7 +774,7 @@ const STRENGTH: readonly Step[] = [
       // single-file page: both answer the same. The open card's run row carries the pencil.
       await t.tap('#progList .prog-card.active-prog [aria-label="Change Run goal"]');
       await t.overlayOpen('goalOverlay');
-      await t.expectText('#goalBody', 'CHANGE RUN GOAL');
+      await t.expectText('#goalBody', 'Change run goal');
       const labels = await page.$$eval('#goalBody .goal-option-label', (es) => es.map((e) => e.textContent ?? ''));
       const pace = labels.findIndex((l) => l.startsWith('Hit a Pace'));
       if (pace < 0) throw new Error(`the sheet offers no pace goal: ${labels.join(' | ')}`);
@@ -1019,7 +1019,7 @@ const TEST: readonly Step[] = [
       await t.tap(`${card} .prog-tap`);
       await t.tap(`${card} [aria-label="Change mile time"]`);
       await t.overlayOpen('mileOverlay');
-      await t.expectText('#mileOverlay', 'YOUR MILE');
+      await t.expectText('#mileOverlay', 'Your mile');
       await t.expectText('#mileOverlay', 'Put in the mile you can run today.');
       const fields = await mileFields(page);
       if (fields !== '7:30') throw new Error(`the mile sheet opened on ${fields}, not the stored 7:30`);
@@ -1065,7 +1065,7 @@ const TEST: readonly Step[] = [
       await t.tap(`${card} .prog-tap`);
       await t.tap(`${card} [aria-label="Change mile time"]`);
       await t.overlayOpen('mileLockOverlay');
-      await t.expectText('#mileLockBody', 'THE ROW HOLDS');
+      await t.expectText('#mileLockBody', 'The row holds');
       await t.expectText('#mileLockBody', 'Days out17');
       await t.expectText('#mileLockBody', 'Race daySat, Nov 14, 2026');
       await t.expectText('#mileLockBody', 'Week4 of 6');
@@ -1233,7 +1233,7 @@ const LOG_SESSION: readonly Step[] = [
         .catch(() => {
           throw new Error('no pop-up after the day closed');
         });
-      await t.expectText('#popKicker', 'WORKOUT COMPLETE');
+      await t.expectText('#popKicker', 'Workout complete');
       if (!(await t.count('#popActions .pop-act.go'))) throw new Error('the pop-up has no dismiss button');
       // The Done toast runs under the pop-up. An earlier toast's timer is never cancelled and can hide it early (handoff
       // §12), so the photograph waits it out: the pop-up stays until dismissed.

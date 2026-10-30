@@ -110,7 +110,7 @@ function restAlsoHTML(w: any,dayKey: any){
   const e=getLogs()[completedKey(w,dayKey)];
   const lines=restLogLines(e&&e.restLog);
   if(!lines.length) return '';
-  return '<div class="also-block"><div class="also-lbl">ALSO ON '+String((DAY_FULL as Record<string, string>)[dayKey]||dayKey).toUpperCase()+'</div>'
+  return '<div class="also-block"><div class="also-lbl">Also on '+String((DAY_FULL as Record<string, string>)[dayKey]||dayKey)+'</div>'
     +lines.map((l: any)=>'<div class="also-line">'+l+'</div>').join('')
     +'<button class="also-btn" onclick="openRestSheet('+w+',\''+dayKey+'\',\'cardio\')">Edit cardio</button></div>';
 }
@@ -140,7 +140,7 @@ function openDetail(dayKey: any,day: any){
   const tg=document.getElementById('detailTags');if(tg)tg.innerHTML=modTagsHTML(day.tags)+travelTagHTML(day);   // V175 (D30)
   const prog=sessionLogProgress(day);
   const ctr=document.getElementById('detailCounter');
-  if(ctr){if(prog.total>0){ctr.style.display='';ctr.textContent=prog.done+' / '+prog.total+' LOGGED';}else{ctr.style.display='none';}}
+  if(ctr){if(prog.total>0){ctr.style.display='';ctr.textContent=prog.done+' / '+prog.total+' logged';}else{ctr.style.display='none';}}
   ruResetIfIdle();
 
   const _secs=day.sections||[];
@@ -211,14 +211,14 @@ function buildKBChips(exKey: any, lastW: any, weekLabel: any, unit: any, exName:
   const kbUnit  = unit==='kg' ? 'kg' : 'lb';
   _kbPending[exKey] = {exName, setsReps, kbUnit};
   const lastTxt = lastW ? ' · Last: '+lastW+' '+kbUnit+weekLabel : '';
-  let html = `<div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Bell size${lastTxt}</div>`;
+  let html = `<div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0;margin-bottom:6px">Bell size${lastTxt}</div>`;
   html += '<div style="display:flex;flex-wrap:wrap;gap:5px">';
   kbSizes.forEach(function(s) {
     const sel = +lastW === s;
     const bdr = sel ? 'var(--accent)' : 'var(--border2)';
     const bg  = sel ? 'rgba(var(--ink-rgb),0.20)' : 'var(--surface2)';
     const clr = sel ? 'var(--accent)' : 'var(--muted)';
-    html += `<button data-exkey="${exKey}" data-size="${s}" onclick="selectKBByKey(this.dataset.exkey,+this.dataset.size)" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:5px 9px;border-radius:4px;cursor:pointer;border:1px solid ${bdr};background:${bg};color:${clr}">${s}</button>`;
+    html += `<button data-exkey="${exKey}" data-size="${s}" onclick="selectKBByKey(this.dataset.exkey,+this.dataset.size)" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;cursor:pointer;border:1px solid ${bdr};background:${bg};color:${clr}">${s}</button>`;
   });
   html += '</div>';
   return html;

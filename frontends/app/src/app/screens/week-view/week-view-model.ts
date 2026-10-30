@@ -51,7 +51,6 @@ export interface WeekDeps {
   regionLabel(region: string): string | undefined;
   icon(name: string, size: number): string;
   dayCode(day: WeekDay | undefined): { top: string; topColor: string; bot: string; botColor: string };
-  onGold(hex: string): string;
   wildcardOn(week: number, d: string): boolean;
   statusOf(week: number, d: string): string | undefined;
   heroSummary(day: WeekDay): string;
@@ -193,11 +192,11 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
   }
   const al = d.alignment();
   const view: WeekView = {
-    overline: nm.toUpperCase(),
-    bigNum: 'WEEK ' + week,
+    overline: nm,
+    bigNum: 'Week ' + week,
     pill,
     injuryWeek: !!injury,
-    hurt: { icon: d.icon('bandage', 17), injured: !!liveInj, label: liveInj ? (d.regionLabel(liveInj.region) || 'INJURY').toUpperCase() : 'HURT?' },
+    hurt: { icon: d.icon('bandage', 17), injured: !!liveInj, label: liveInj ? (d.regionLabel(liveInj.region) || 'Injury') : 'Hurt?' },
     weeks,
     start: {
       shown: p.startDate ? new Date(p.startDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null,
@@ -226,7 +225,7 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
     const isToday = isTodayKey(x);
     const isPast = !!(dd && dd < i.today);
     const dnum = dd ? String(dd.getDate()) : '';
-    if (d.beforeStart(week, x)) return { pre: true, label: x.toUpperCase(), num: dnum };
+    if (d.beforeStart(week, x)) return { pre: true, label: x.charAt(0).toUpperCase() + x.slice(1), num: dnum };
     const comp = i.completed[d.completedKey(week, x)];
     const st = comp ? comp.status || 'complete' : null;
     let center: CellCenter = { kind: 'num', text: dnum };
@@ -239,12 +238,12 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
       pre: false,
       key: x,
       cls: 'wk-day' + (isToday ? ' today' : '') + (dim ? ' dim' : '') + (d.isTravel(day) ? ' away' : ''),
-      label: x.toUpperCase(),
+      label: x.charAt(0).toUpperCase() + x.slice(1),
       top: code.top || '—',
-      topColor: isToday ? d.onGold(code.topColor) : dim ? 'var(--dim)' : code.topColor,
+      topColor: dim ? 'var(--dim)' : code.topColor,
       center,
       bot: code.bot,
-      botColor: isToday ? d.onGold(code.botColor) : dim ? 'var(--dim)' : code.botColor,
+      botColor: dim ? 'var(--dim)' : code.botColor,
     };
   });
 
@@ -285,7 +284,7 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
       today: mode === 'today',
       over: (mode === 'today' ? 'Today · ' : 'Week ' + week + ' · ') + i.dayFull[heroKey] + (movedFrom ? ' · moved from ' + movedFrom : ''),
       title: day.title || 'Training',
-      time: '~' + d.sessionTime(day) + ' MIN',
+      time: '~' + d.sessionTime(day) + ' min',
       tags: (day.tags || []).filter((t) => t !== 'rest').map((t) => ({
         label: TAG_LABEL[t] || t,
         style: 'color:' + (MOD[t] ? MOD[t][0] : 'var(--text)') + ';background:' + (MOD[t] ? MOD[t][1] : 'rgba(var(--ink-rgb),0.15)'),
@@ -293,7 +292,7 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
       travel: !!d.isTravel(day),
       summary: d.heroSummary(day),
       status,
-      cta: mode === 'today' && !status ? 'START SESSION' : 'OPEN SESSION',
+      cta: mode === 'today' && !status ? 'Start session' : 'Open session',
     };
   } else {
     hero = { kind: 'none' };

@@ -45,7 +45,7 @@ export function benchNotes(cardio: { subtype?: string; week?: number }, entryFor
   if (!/^Benchmark Run — Retest/.test(String(cardio.subtype || ''))) return [];
   const base = entryFor(1);
   if (!base) return [{ lead: null, text: 'No week 1 benchmark was logged — today’s result becomes your baseline for the next block. Run it exactly as written.' }];
-  const out: BenchNote[] = [{ lead: 'WEEK 1 BASELINE:', text: ' ' + base.dist + ' mi in ' + base.mins + ' min — ' + clock(base.sec) + '/mi. Same even effort today; the distance difference is your gain.' }];
+  const out: BenchNote[] = [{ lead: 'Week 1 baseline:', text: ' ' + base.dist + ' mi in ' + base.mins + ' min — ' + clock(base.sec) + '/mi. Same even effort today; the distance difference is your gain.' }];
   const now = entryFor(cardio.week);
   if (now) {
     const df = Math.round(base.sec - now.sec);
@@ -53,7 +53,7 @@ export function benchNotes(cardio: { subtype?: string; week?: number }, entryFor
       ? 'Even with week 1 — fitness held through a full build, which on this recovery budget is a result.'
       : df > 0 ? df + ' sec/mi FASTER at the same effort. The aerobic engine grew — the block worked.'
         : Math.abs(df) + ' sec/mi slower at the same effort. An off day happens; look at sleep, fuel, and heat before doubting six weeks of work.';
-    out.push({ lead: 'RETEST:', text: ' ' + now.dist + ' mi — ' + clock(now.sec) + '/mi. ' + verdict });
+    out.push({ lead: 'Retest:', text: ' ' + now.dist + ' mi — ' + clock(now.sec) + '/mi. ' + verdict });
   }
   return out;
 }

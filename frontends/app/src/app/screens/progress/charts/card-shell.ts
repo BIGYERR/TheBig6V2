@@ -10,8 +10,8 @@ import { DomSanitizer } from '@angular/platform-browser';
   host: { style: 'display: contents' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
-    <div [attr.style]="'font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:' + color() + ';margin-bottom:12px'" [innerHTML]="titleHtml()"></div>
+  <div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">
+    <div [attr.style]="'font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:' + color() + ';margin-bottom:12px'" [innerHTML]="titleHtml()"></div>
     <ng-content />
     @if (footHtml(); as f) {
       <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5" [innerHTML]="f"></div>

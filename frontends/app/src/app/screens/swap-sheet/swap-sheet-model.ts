@@ -6,17 +6,17 @@
 /** The movement pattern's tag (the legacy tagOf). */
 export function patternTag(pattern: string | null | undefined): string {
   const tags: Record<string, string> = {
-    hinge: 'HINGE', squat: 'SQUAT', lunge: 'LUNGE', hip_ext: 'HIP EXTENSION', row: 'ROW', vpull: 'VERTICAL PULL',
-    hpress: 'HORIZONTAL PRESS', vpress: 'VERTICAL PRESS', bi_iso: 'BICEPS', tri_iso: 'TRICEPS', delt_iso: 'DELTS',
-    leg_iso: 'LEG ISOLATION', calf_iso: 'CALVES',
+    hinge: 'Hinge', squat: 'Squat', lunge: 'Lunge', hip_ext: 'Hip extension', row: 'Row', vpull: 'Vertical pull',
+    hpress: 'Horizontal press', vpress: 'Vertical press', bi_iso: 'Biceps', tri_iso: 'Triceps', delt_iso: 'Delts',
+    leg_iso: 'Leg isolation', calf_iso: 'Calves',
   };
-  return (pattern && tags[pattern]) || 'LIFT';
+  return (pattern && tags[pattern]) || 'Lift';
 }
 
 /** The day's region tag (the legacy regionOf). */
 export function regionTag(region: string | null | undefined): string {
-  const tags: Record<string, string> = { push: 'PUSH DAY', pull: 'PULL DAY', legs: 'LEG DAY' };
-  return (region && tags[region]) || 'TODAY';
+  const tags: Record<string, string> = { push: 'Push day', pull: 'Pull day', legs: 'Leg day' };
+  return (region && tags[region]) || 'Today';
 }
 
 /** The prescription, short: 'N×reps at RPE r', 'N sets', or the text cut to 24 characters and an ellipsis. */
@@ -98,7 +98,7 @@ export function swapSheetView(s: SwapInput): SwapSheetView {
     outName: s.name,
     kindTag: s.familyLabel ?? patternTag(s.candidates.pattern),
     regionTag: regionTag(s.candidates.region),
-    slotTag: isMainSlot ? 'MAIN LIFT' : isHeavyCompound ? 'HEAVY COMPOUND' : '',
+    slotTag: isMainSlot ? 'Main lift' : isHeavyCompound ? 'Heavy compound' : '',
     keeps: rxShort(s.detail),
     sameJob: tier1.map((n) => row(n, false)),
     flowNote,

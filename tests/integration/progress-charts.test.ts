@@ -46,8 +46,8 @@ function markup(c: CardSpec | null): string {
   const svg = c.svg
     ? `<svg viewBox="0 0 ${c.svg.w} ${c.svg.h}"${c.titleGap === 10 ? ' xmlns="http://www.w3.org/2000/svg"' : ''} style="width:100%;height:auto;overflow:visible">${c.svg.els.map(el).join('')}</svg>`
     : '';
-  return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
-    + `<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${c.color};margin-bottom:${c.titleGap}px">${c.title}</div>`
+  return '<div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">'
+    + `<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:${c.color};margin-bottom:${c.titleGap}px">${c.title}</div>`
     + (c.head ?? '') + svg + (c.body ?? '')
     + (c.foot ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">${c.foot}</div>` : '')
     + '</div>';
@@ -135,8 +135,8 @@ function ledgerMarkup(v: LedgerView): string {
   };
   const pic = (p: Picture) => `<svg viewBox="${p.viewBox}" style="${p.style}">${p.els.map(el).join('')}</svg>`;
   const card = (title: string, color: string, inner: string, foot: string) =>
-    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
-    + `<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${color};margin-bottom:12px">${title}</div>`
+    '<div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">'
+    + `<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:${color};margin-bottom:12px">${title}</div>`
     + inner + `<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">${foot}</div></div>`;
   let out = '';
   if (v.mains) {
@@ -160,7 +160,7 @@ function ledgerMarkup(v: LedgerView): string {
       + `<div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.3">${r.name}</div>`
       + `<div style="font-size:10px;color:var(--muted);margin-top:2px"><b style="color:var(--text)">${r.weight}</b>${r.detail}</div>`
       + '<div style="margin-top:3px">' + (r.ready
-        ? '<span style="font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--signal)">Add weight</span>'
+        ? '<span style="font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0;color:var(--signal)">Add weight</span>'
         : `<span style="font-size:10px;color:var(--muted)">${r.toGo} to go</span>`) + '</div></div>'
       + `<div style="flex-shrink:0">${pic(r.track)}</div></div>`).join('');
     out += card(l.title, 'var(--lift)', head + rows, l.foot);
@@ -222,12 +222,12 @@ function chipsMarkup(v: ChipsView): string {
     + v.chips.map((c) => `<button onclick="setProgressView('${c.id}')" style="${chipStyle(c.sel)}">${c.label}</button>`).join('') + '</div>';
   const b = v.bar;
   if (b && b.kind === 'confirm') {
-    out += '<div style="display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--red);border-radius:4px;padding:10px 12px">'
+    out += '<div style="display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--red);border-radius:16px;padding:10px 12px">'
       + `<div style="font-size:12px;color:var(--red);line-height:1.5">This erases all logs, weights, and history for “${esc(b.name)}”. It cannot be undone.`
       + (b.warn ? '<br><span style="color:var(--muted)">Other programs are using these loads as starting points — those will go blank.</span>' : '') + '</div>'
       + `<div style="display:flex;gap:8px"><button class="prog-action-btn danger" onclick="deleteProg('${b.id}',true)">Delete Forever</button><button class="prog-action-btn" onclick="cancelProgressConfirm()">Cancel</button></div></div>`;
   } else if (b) {
-    out += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px">'
+    out += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid transparent;border-radius:16px;padding:10px 12px">'
       + '<div style="font-size:12px;color:var(--muted)">This program is archived — history only.</div>'
       + `<button class="prog-action-btn" style="flex:0 0 auto" onclick="unarchiveProg('${b.id}');renderProgressScreen()">Restore</button>`
       + `<button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" onclick="askPurgeFromProgress('${b.id}')">${icon('trash', 16)}</button></div>`;

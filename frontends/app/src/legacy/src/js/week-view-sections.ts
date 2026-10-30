@@ -285,10 +285,6 @@ function dayCode(day: any){
   else { bot=liftFocusCode(day.title); botColor='var(--lift)'; }
   return {top:top,topColor:topColor,bot:bot,botColor:botColor};
 }
-function _onGold(hex: any){
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ '#
-  return {'var(--run)':'#1c5f2c','var(--bike)':'#0a3a66','var(--lift)':'#7a3410','var(--dim)':'#3a2c08','var(--core)':'#7a4d00'}[hex]||'#3a2c08';
-}
 // ── V146: week-strip positioning ──────────────────────────────────────────────
 // The strip used to sit at scrollLeft 0 forever, so from week 6 on the week you were
 // actually training was off-screen. Note the old behaviour was not "keeps your scroll
@@ -402,8 +398,8 @@ function restLogLines(rl: any){
 function renderWeekView(){
   if(!activeProg) return;
   const nm=activeProg.name.length>26?activeProg.name.slice(0,26)+'…':activeProg.name;
-  const _ov=document.getElementById('weekOverline');if(_ov)_ov.textContent=nm.toUpperCase();
-  const _bn=document.getElementById('weekBigNum');if(_bn)_bn.textContent='WEEK '+currentWeek;
+  const _ov=document.getElementById('weekOverline');if(_ov)_ov.textContent=nm;
+  const _bn=document.getElementById('weekBigNum');if(_bn)_bn.textContent='Week '+currentWeek;
   const totalWeeks=activeProg.totalWeeks||6;
   // Dynamic phase labels based on program length.
   // Final phase wording follows whether the program actually tapers — race-targeted
@@ -495,7 +491,7 @@ function renderWeekView(){
     const _liveInj=_injWk||((_liveInjuryOverlay()||{}).patch||{}).injury||null;
     _hurtIco.innerHTML=asyIcon('bandage',17);
     _hurtBtn.classList.toggle('is-injured', !!_liveInj);
-    _hurtLbl.textContent=_liveInj?((INJURY_REGIONS[_liveInj.region]||{}).label||'INJURY').toUpperCase():'HURT?';
+    _hurtLbl.textContent=_liveInj?((INJURY_REGIONS[_liveInj.region]||{}).label||'Injury'):'Hurt?';
   }
   // ── slim week pills ──
   const wscroll=document.getElementById('weekScroll');
@@ -585,17 +581,17 @@ function renderWeekView(){
     const dimCls=(!isToday&&(isPast||!day||day.rest))?' dim':'';
     const code=dayCode(day);
     const dim=dimCls!=='';
-    const topC=isToday?_onGold(code.topColor):(dim?'var(--dim)':code.topColor);
-    const botC=isToday?_onGold(code.botColor):(dim?'var(--dim)':code.botColor);
+    const topC=dim?'var(--dim)':code.topColor;
+    const botC=dim?'var(--dim)':code.botColor;
     // V174 (D24): a before-start cell shows its date, no codes, no tap.
     strip+=isPre
       ? '<div class="wk-day pre" aria-label="Before your start date">'
-        +'<div class="wk-day-lbl">'+d.toUpperCase()+'</div>'
+        +'<div class="wk-day-lbl">'+d.charAt(0).toUpperCase()+d.slice(1)+'</div>'
         +'<div class="wk-day-top">\u2014</div>'
         +'<div class="wk-day-num">'+dnum+'</div>'
         +'<div class="wk-day-bot">\u2014</div></div>'
       : '<div class="wk-day'+(isToday?' today':'')+dimCls+(dayIsTravel(day)?' away':'')+'" onclick="openDayKey(\''+d+'\')">'
-        +'<div class="wk-day-lbl">'+d.toUpperCase()+'</div>'
+        +'<div class="wk-day-lbl">'+d.charAt(0).toUpperCase()+d.slice(1)+'</div>'
         +'<div class="wk-day-top" style="color:'+topC+'">'+(code.top||'\u2014')+'</div>'
         +'<div class="wk-day-num">'+center+'</div>'
         +'<div class="wk-day-bot" style="color:'+botC+'">'+code.bot+'</div></div>';
@@ -629,7 +625,7 @@ function renderWeekView(){
     hero='<div class="wk-hero"><div class="wk-rest-pad">'
       // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
       +'<div class="wk-hero-over">Today \u00b7 '+DAY_FULL[heroKey]+'</div>'
-      +'<div class="wk-rest-title">REST DAY</div>'
+      +'<div class="wk-rest-title">Rest day</div>'
       +'<div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>'
       +_rcLine
       +'<div class="wk-rest-acts">'
@@ -656,19 +652,19 @@ function renderWeekView(){
     // takes the open label (undo lives in the day's footer); a pending today keeps the start label.
     // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ co
     const _heroSt=({complete:'Done ✓ Closed out. Open the session to undo.',skipped:'Skipped ✕ The week moves on. Open the session to undo.'})[statusOf(currentWeek,heroKey)]||'';
-    const cta=(heroMode==='today'&&!_heroSt)?'START SESSION':'OPEN SESSION';
+    const cta=(heroMode==='today'&&!_heroSt)?'Start session':'Open session';
     hero='<div class="wk-hero'+(heroMode==='today'?' is-today':'')+'">'
       +'<div class="wk-hero-pad">'
         +'<div class="wk-hero-over">'+over+'</div>'
         +'<div class="wk-hero-title">'+(day.title||'Training')+'</div>'
-        +'<div class="wk-hero-tags"><span class="wk-tag wk-time">~'+est+' MIN</span>'+tags+travelTagHTML(day)+'</div>'
+        +'<div class="wk-hero-tags"><span class="wk-tag wk-time">~'+est+' min</span>'+tags+travelTagHTML(day)+'</div>'
       +'</div>'
       +(summ?'<div class="wk-hero-summary">'+summ+'</div>':'')
       +(_heroSt?'<div class="wk-hero-status">'+_heroSt+'</div>':'')
       +'<div class="wk-hero-cta-wrap"><button class="wk-hero-cta" onclick="openDayKey(\''+heroKey+'\')">'+cta+'</button></div>'
       +'</div>';
   } else {
-    hero='<div class="wk-hero"><div class="wk-rest-pad"><div class="wk-rest-title" style="font-size:30px">NO SESSIONS</div><div class="wk-rest-sub">This week has no scheduled training.</div></div></div>';
+    hero='<div class="wk-hero"><div class="wk-rest-pad"><div class="wk-rest-title" style="font-size:30px">No sessions</div><div class="wk-rest-sub">This week has no scheduled training.</div></div></div>';
   }
 
   // ── stat tiles ──
@@ -680,9 +676,9 @@ function renderWeekView(){
   miles=Math.round(miles*10)/10;
   const streak=computeStreak();
   const stats='<div class="wk-stats">'
-    +'<div class="wk-stat"><div class="wk-stat-num">'+doneN+'<span class="den">/'+trainDays.length+'</span></div><div class="wk-stat-lbl">DONE</div></div>'
-    +'<div class="wk-stat"><div class="wk-stat-num" style="color:var(--run)">'+miles+'</div><div class="wk-stat-lbl">MILES</div></div>'
-    +'<div class="wk-stat"><div class="wk-stat-num" style="color:var(--accent)">'+streak+'</div><div class="wk-stat-lbl">DAY STREAK</div></div>'
+    +'<div class="wk-stat"><div class="wk-stat-num">'+doneN+'<span class="den">/'+trainDays.length+'</span></div><div class="wk-stat-lbl">Done</div></div>'
+    +'<div class="wk-stat"><div class="wk-stat-num" style="color:var(--run)">'+miles+'</div><div class="wk-stat-lbl">Miles</div></div>'
+    +'<div class="wk-stat"><div class="wk-stat-num" style="color:var(--accent)">'+streak+'</div><div class="wk-stat-lbl">Day streak</div></div>'
     +'</div>';
 
   const _wcTag=wildcardTagHTML(currentWeek,heroKey);   // V195 (D64)

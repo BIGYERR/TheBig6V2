@@ -40,7 +40,7 @@ export function ladderChart(wk: Record<number, number>, totalWeeks: number, race
   if (raceMi > 0 && raceMi <= mx) {
     const hy = padT + plotH - (raceMi / mx) * plotH;
     s.push(svgEl('line', { x1: padL, y1: hy.toFixed(1), x2: W - padR, y2: hy.toFixed(1), stroke: 'var(--signal)', 'stroke-width': '1.2', 'stroke-dasharray': '4,3' }));
-    s.push(axTx(W - padR, hy - 5, 'RACE — ' + raceMi + ' mi', 8, 'end', 'var(--signal)', '700'));
+    s.push(axTx(W - padR, hy - 5, 'Race — ' + raceMi + ' mi', 8, 'end', 'var(--signal)', '700'));
   }
   for (let i = 0; i < totalWeeks; i++) {
     const w = i + 1, x = padL + i * slot + (slot - barW) / 2, v = wk[w];
@@ -286,7 +286,7 @@ export function easyZoneChart(runs: ZoneRun[], d: RunChartDeps): CardSpec | null
   s.push(svgEl('rect', { x: padL, y: capY.toFixed(1), width: plotW, height: Math.max(padT + plotH - capY, 0).toFixed(1), fill: 'var(--run)', opacity: '0.07' }));
   s.push(svgEl('line', { x1: padL, y1: capY.toFixed(1), x2: W - padR, y2: capY.toFixed(1), stroke: 'var(--red)', 'stroke-width': '1.2', 'stroke-dasharray': '4,3', opacity: '0.75' }));
   s.push(axTx(padL + 2, padT + 9, 'too fast', 8, 'start', 'var(--red)', '700'));
-  s.push(axTx(W - padR, capY - 5, 'CEILING ' + d.pace(cap), 8, 'end', 'var(--red)', '700'));
+  s.push(axTx(W - padR, capY - 5, 'Ceiling ' + d.pace(cap), 8, 'end', 'var(--red)', '700'));
   if (tgtY > capY + 14 && tgtY < padT + plotH) {
     s.push(svgEl('line', { x1: padL, y1: tgtY.toFixed(1), x2: W - padR, y2: tgtY.toFixed(1), stroke: 'var(--run)', 'stroke-width': '1', 'stroke-dasharray': '2,3', opacity: '0.7' }));
     s.push(axTx(W - padR, tgtY + 12, 'aim ' + d.pace(tgt), 8, 'end', 'var(--run)', '700'));
@@ -333,7 +333,7 @@ export function easyBandsFallback(byClass: RunsByClass, d: RunChartDeps): CardSp
   }
   s.push(axTx(padL, padT - 12, '← faster', 7, 'start'));
   s.push(axTx(W - padR, padT - 12, 'slower →', 7, 'end'));
-  ([['HARD', hard, 'var(--lift)'], ['EASY', easy, 'var(--run)']] as const).forEach((row, i) => {
+  ([['Hard', hard, 'var(--lift)'], ['Easy', easy, 'var(--run)']] as const).forEach((row, i) => {
     const y = padT + i * 30, x1 = xof(min(row[1])), x2 = xof(max(row[1]));
     s.push(svgEl('rect', { x: x1.toFixed(1), y, width: Math.max(x2 - x1, 3).toFixed(1), height: '18', fill: row[2], opacity: '0.82', rx: '1' }));
     s.push(axTx(x1 - 4, y + 13, row[0], 9, 'end', row[2], '700'));
@@ -370,7 +370,7 @@ export function paceChart(title: string, weeks: number[], data: (number | null)[
   if (tgt) {
     const ty = Y(tgt);
     s.push(svgEl('line', { x1: padL, y1: ty.toFixed(1), x2: W - padR, y2: ty.toFixed(1), stroke: color, 'stroke-width': '1', 'stroke-dasharray': '2,4', opacity: '0.55' }));
-    s.push(svgEl('text', { x: W - padR - 2, y: (ty - 3).toFixed(1), 'font-size': '7.5', fill: color, 'text-anchor': 'end', opacity: '0.85' }, 'PLAN ' + d.pace(tgt) + '/mi'));
+    s.push(svgEl('text', { x: W - padR - 2, y: (ty - 3).toFixed(1), 'font-size': '7.5', fill: color, 'text-anchor': 'end', opacity: '0.85' }, 'Plan ' + d.pace(tgt) + '/mi'));
   }
   let path = '';
   let prev: { x: number; y: number } | null = null;

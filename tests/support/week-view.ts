@@ -439,14 +439,14 @@ function heroAndStrip(E: WeekEnv, weeks: number[]): { q: Tally; pairs: number; t
       todays++;
       const over = 'Today · ' + FULL[T0];
       E.clearMarks(); at(w, T0); ev('renderWeekView()'); const h0 = E.html(); E.notePre(h0); const hp = hero(h0);
-      q.rec('A1c', hp.over === over && hp.status === null && !hp.hasDone && !hp.hasSkip && hp.cta === 'START SESSION' && /\bis-today\b/.test(hp.cls), 'pending W' + w + ' ' + T0 + ' over="' + hp.over + '" cta=' + hp.cta + ' status=' + hp.status);
+      q.rec('A1c', hp.over === over && hp.status === null && !hp.hasDone && !hp.hasSkip && hp.cta === 'Start session' && /\bis-today\b/.test(hp.cls), 'pending W' + w + ' ' + T0 + ' over="' + hp.over + '" cta=' + hp.cta + ' status=' + hp.status);
       for (const st of ['complete', 'skipped']) {
         E.clearMarks(); at(w, T0); markA(T0, st); const h1 = E.html(); E.notePre(h1); const h = hero(h1);
         const want = st === 'complete' ? DONE_STR : SKIP_STR, other = st === 'complete' ? 'hasSkip' : 'hasDone';
-        q.rec(st === 'complete' ? 'A1a' : 'A1b', h.over === over && h.status === want && !h[other] && h.cta === 'OPEN SESSION' && /\bis-today\b/.test(h.cls),
+        q.rec(st === 'complete' ? 'A1a' : 'A1b', h.over === over && h.status === want && !h[other] && h.cta === 'Open session' && /\bis-today\b/.test(h.cls),
           st + ' W' + w + ' ' + T0 + ' over="' + h.over + '" status=' + JSON.stringify(h.status) + ' cta=' + h.cta + ' cls=' + h.cls);
         markA(T0, st); const hu = hero(E.html());
-        q.rec('A1c', hu.over === over && hu.status === null && !hu.hasDone && !hu.hasSkip && hu.cta === 'START SESSION', 'undo ' + st + ' W' + w + ' ' + T0 + ' status=' + hu.status + ' cta=' + hu.cta);
+        q.rec('A1c', hu.over === over && hu.status === null && !hu.hasDone && !hu.hasSkip && hu.cta === 'Start session', 'undo ' + st + ' W' + w + ' ' + T0 + ' status=' + hu.status + ' cta=' + hu.cta);
       }
     }
     for (let i = 1; i < tr.length; i++) {
@@ -460,7 +460,7 @@ function heroAndStrip(E: WeekEnv, weeks: number[]): { q: Tally; pairs: number; t
           if (st === 'skipped') q.rec('A3a', c.cls === wantCls && c.center === '✕' && !/class="chk"/.test(c.center), which + '/skipped W' + w + ' ' + dk + ' cell=' + JSON.stringify(c));
           else q.rec('A3b', c.cls === wantCls && /<span class="chk">✓<\/span>/.test(c.center || '') && !/✕/.test(c.center || ''), which + '/complete W' + w + ' ' + dk + ' cell=' + JSON.stringify(c));
           if (which === 'past') {
-            q.rec('A2', hh.over === 'Today · ' + FULL[T0] && hh.status === null && !hh.hasDone && !hh.hasSkip && hh.cta === 'START SESSION' && heroBlock(h) === hb,
+            q.rec('A2', hh.over === 'Today · ' + FULL[T0] && hh.status === null && !hh.hasDone && !hh.hasSkip && hh.cta === 'Start session' && heroBlock(h) === hb,
               'past/' + st + ' W' + w + ' tapped=' + dk + ' today=' + T0 + ' over="' + hh.over + '" status=' + hh.status + ' cta=' + hh.cta + ' same=' + (heroBlock(h) === hb));
           }
           markA(dk, st); const cu = cells(E.html())[dk] || {};

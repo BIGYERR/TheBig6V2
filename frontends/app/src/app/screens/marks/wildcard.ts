@@ -28,7 +28,7 @@ export class WildcardMark {
   host: { style: 'display: contents' },
   imports: [WildcardMark],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<div class="wc-tag"><ia-wildcard-mark [size]="16" /><div class="wc-tag-txt"><div class="wc-tag-lbl">WILDCARD DONE</div><div class="wc-tag-sub">{{ sub() }}</div></div></div>`,
+  template: `<div class="wc-tag"><ia-wildcard-mark [size]="16" /><div class="wc-tag-txt"><div class="wc-tag-lbl">Wildcard done</div><div class="wc-tag-sub">{{ sub() }}</div></div></div>`,
 })
 export class WildcardTag {
   readonly sub = input.required<string>();

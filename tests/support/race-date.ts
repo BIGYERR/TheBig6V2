@@ -94,7 +94,7 @@ const weekHTML = (IA: App): string => IA.eval('Object.values(__els).map(e=>e.inn
 const render = (IA: App, w: number): string => { IA.eval('currentWeek=' + w + ';renderWeekView()'); return weekHTML(IA); };
 const text = (h: string): string => h.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 function wizard(IA: App, cfg: Partial<Cfg>): string | null { IA.eval('WD=Object.assign(WD||{},' + JSON.stringify(cfg) + ')'); IA.eval('doGenerate()'); IA.flushTimers(60); return IA.eval('activeProgId'); }
-/** A rendered week: its seven cells, the ones before signup (.pre), how many open a day, the hero, the DONE tile. */
+/** A rendered week: its seven cells, the ones before signup (.pre), how many open a day, the hero, the Done tile. */
 /** A rendered week read back (parseWeek). */
 export interface ParsedWeek { cells: number; pre: string; taps: number; hero: string; heroHtml: string; done: string }
 function parseWeek(h: string): ParsedWeek {
@@ -103,8 +103,8 @@ function parseWeek(h: string): ParsedWeek {
   const pre = T.ISO7.filter((d, i) => cls[i] !== undefined && /\bpre\b/.test(cls[i]));
   const taps = (strip.match(/onclick="openDayKey\('/g) || []).length;
   const hero = hi >= 0 ? text(h.slice(h.lastIndexOf('<', hi), si > hi ? h.lastIndexOf('<', si) : undefined)) : '';
-  const dm = text(h.slice(si >= 0 ? si : 0)).match(/(\d+) \/(\d+) DONE/);
-  return { cells: cls.length, pre: pre.join(' '), taps, hero, heroHtml: hi >= 0 ? h.slice(hi, si > hi ? si : undefined) : '', done: dm ? dm[1] + ' /' + dm[2] + ' DONE' : '?' };
+  const dm = text(h.slice(si >= 0 ? si : 0)).match(/(\d+) \/(\d+) Done/);
+  return { cells: cls.length, pre: pre.join(' '), taps, hero, heroHtml: hi >= 0 ? h.slice(hi, si > hi ? si : undefined) : '', done: dm ? dm[1] + ' /' + dm[2] + ' Done' : '?' };
 }
 
 const HM: Cfg = fixtures.HALF_MANNY;

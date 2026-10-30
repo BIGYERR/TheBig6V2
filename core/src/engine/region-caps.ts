@@ -292,7 +292,7 @@ const _AUX_FAMILY: Record<string, AuxFamily>={
   'Cable crossover':'chest_iso','Pec deck':'chest_iso'
 };
 function _auxFamily(name: string | null | undefined): AuxFamily | null{return _AUX_FAMILY[String(name||'').trim()]||null;}
-const _AUX_FAMILY_LABEL: Record<AuxFamily, string>={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLISTIC',cond:'CONDITIONING',hold:'ISOMETRIC HOLD',chest_iso:'CHEST ISOLATION'};
+const _AUX_FAMILY_LABEL: Record<AuxFamily, string>={core:'Core',carry:'Carry / grip',power:'Power / ballistic',cond:'Conditioning',hold:'Isometric hold',chest_iso:'Chest isolation'};
 // Gear legality for aux candidates. Mirrors the tier truths the engine pools use
 // (hasBarbell = home_full/commercial/crossfit); machines are commercial-only; med
 // balls live where med balls live. Anything unmatched is bodyweight-legal everywhere.

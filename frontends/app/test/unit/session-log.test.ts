@@ -65,7 +65,7 @@ describe('the session log', () => {
   });
 
   it('styles a chip orange edged when it is the sport logged', () => {
-    assert.equal(chipStyle(true), 'flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid var(--accent);background:rgba(var(--ink-rgb),0.12);color:var(--accent);font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em');
-    assert.equal(chipStyle(false), 'flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em');
+    assert.equal(chipStyle(true), 'flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:12px;cursor:pointer;border:1px solid var(--accent);background:rgba(var(--ink-rgb),0.12);color:var(--accent);font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0');
+    assert.equal(chipStyle(false), 'flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:12px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0');
   });
 });

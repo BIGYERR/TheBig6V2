@@ -37,7 +37,7 @@ import { SvgPicture } from './svg-picture';
           <div style="flex:1;min-width:0">
             <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.3">{{ r.name }}</div>
             <div style="font-size:10px;color:var(--muted);margin-top:2px"><b style="color:var(--text)">{{ r.weight }}</b>{{ r.detail }}</div>
-            <div style="margin-top:3px">@if (r.ready) {<span style="font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--signal)">Add weight</span>} @else {<span style="font-size:10px;color:var(--muted)">{{ r.toGo + ' to go' }}</span>}</div>
+            <div style="margin-top:3px">@if (r.ready) {<span style="font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0;color:var(--signal)">Add weight</span>} @else {<span style="font-size:10px;color:var(--muted)">{{ r.toGo + ' to go' }}</span>}</div>
           </div>
           <div style="flex-shrink:0"><ia-svg-picture [spec]="r.track" /></div>
         </div>

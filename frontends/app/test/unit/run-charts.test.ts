@@ -23,7 +23,7 @@ describe('the run charts', () => {
     const c = ladderChart({ 1: 4, 2: 6 }, 4, 13.1, 0, false, d)!;
     const els = c.svg!.els;
     assert.deepEqual(of(els, 'line').map((a) => a['y1']), ['126.0', '89.9', '53.8', '31.4']);
-    assert.deepEqual(texts(els), ['0', '5', '10', 'RACE — 13.1 mi', 'W1', 'W2', 'W3', 'W4']);
+    assert.deepEqual(texts(els), ['0', '5', '10', 'Race — 13.1 mi', 'W1', 'W2', 'W3', 'W4']);
     assert.deepEqual(of(els, 'rect').map((a) => [a['x'], a['y'], a['height'], a['opacity'] ?? a['stroke-dasharray']]), [
       ['40.2', '97.1', '28.9', '0.62'], ['111.2', '82.7', '43.3', '0.95'], ['182.2', '118.0', '8', '2,2'], ['253.2', '118.0', '8', '2,2'],
     ]);
@@ -68,7 +68,7 @@ describe('the run charts', () => {
     const c = easyZoneChart([run(1, 560), run(2, 650), run(2, 590), run(3, 680), run(4, 720)], d)!;
     assert.deepEqual([c.color, c.head!.includes('>2 of 5 were too fast<')], ['var(--red)', true]);
     assert.match(c.head!, /The plan asks for 11:40\/mi and sets a ceiling at 10:00\/mi\. 2 runs came in under it/);
-    assert.deepEqual(texts(c.svg!.els).slice(0, 3), ['too fast', 'CEILING 10:00', 'aim 11:40']);
+    assert.deepEqual(texts(c.svg!.els).slice(0, 3), ['too fast', 'Ceiling 10:00', 'aim 11:40']);
     assert.equal(easyZoneChart([run(1, 650), run(2, 650), run(3, 650)], d), null, 'three runs are too few');
   });
 
@@ -86,7 +86,7 @@ describe('the run charts', () => {
     const c = paceChart('[🏃] Recovery Pace — Easy-Effort Trend', [1, 2, 3, 4], [650, null, 640, 630], 645, 'var(--run)', d)!;
     assert.deepEqual([c.titleGap, c.foot, c.head], [10, null, null]);
     const t = texts(c.svg!.els);
-    assert.ok(t.includes('PLAN 10:45/mi') && t.includes('10:30') && t.includes('higher = faster easy pace · dashed = plan target'));
+    assert.ok(t.includes('Plan 10:45/mi') && t.includes('10:30') && t.includes('higher = faster easy pace · dashed = plan target'));
     assert.equal(paceChart('t', [1, 2], [600, null], 610, 'var(--run)', d), null, 'one dot is not a trend');
   });
 });

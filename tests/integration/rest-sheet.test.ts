@@ -212,23 +212,23 @@ test('each sport has its own controls on the sheet\'s own ids: wheels for run an
       distWheel: b.includes('<div class="iaw" data-kind="dist" data-for="rest_dist">'),
       box: (b.match(/<input class="rd-input"[^>]*id="rest_dist"[^>]*>/) || [''])[0],
       caps: [...b.matchAll(/<div class="iaw-cap">([^<]*)<\/div>/g)].map((m) => m[1]),
-      lbls: [...b.matchAll(/<div class="ov-eq-lbl"[^>]*>([^<]*)<\/div>/g)].map((m) => m[1]).filter((l) => /TIME|DISTANCE/.test(l!)),
+      lbls: [...b.matchAll(/<div class="ov-eq-lbl"[^>]*>([^<]*)<\/div>/g)].map((m) => m[1]).filter((l) => /Time|Distance/.test(l!)),
       cardIds: /log_run_(mins|dist)/.test(b),
       optional: b.includes('optional'),
     };
   };
   for (const t of ['run', 'bike']) {
     const s = shape(t);
-    assert.deepEqual([s.hms, s.distWheel, s.box, s.caps, s.lbls, s.cardIds, s.optional], [true, true, '', ['Time', 'Miles'], ['TIME', 'DISTANCE'], false, false], t);
+    assert.deepEqual([s.hms, s.distWheel, s.box, s.caps, s.lbls, s.cardIds, s.optional], [true, true, '', ['Time', 'Miles'], ['Time', 'Distance'], false, false], t);
   }
   const row = shape('row');
-  assert.deepEqual([row.hms, row.distWheel, row.lbls], [true, false, ['TIME', 'DISTANCE (METERS)']]);
+  assert.deepEqual([row.hms, row.distWheel, row.lbls], [true, false, ['Time', 'Distance (meters)']]);
   assert.ok(row.box.includes('placeholder="meters"') && row.box.includes('inputmode="numeric"') && !row.box.includes('step='), row.box);
   const swim = shape('swim');
-  assert.deepEqual([swim.hms, swim.distWheel, swim.lbls], [true, false, ['TIME', 'DISTANCE (YARDS)']]);
+  assert.deepEqual([swim.hms, swim.distWheel, swim.lbls], [true, false, ['Time', 'Distance (yards)']]);
   assert.ok(swim.box.includes('step="25"') && swim.box.includes('placeholder="yards"') && !swim.box.includes('step="0.1"'), swim.box);
   const walk = shape('walk');
-  assert.deepEqual([walk.hms, walk.distWheel, walk.box, walk.lbls], [true, false, '', ['TIME']]);
+  assert.deepEqual([walk.hms, walk.distWheel, walk.box, walk.lbls], [true, false, '', ['Time']]);
 });
 
 test('each sport stores its distance in its own unit, and walk never stores one (D229)', () => {
@@ -269,9 +269,9 @@ test('a day whose session moved away takes a jog and never a move (D231)', () =>
   assert.equal(C.ev('activeProg.weeks[1].thu.moved'), true);
   C.ev('currentWeek=1; renderWeekView()');
   const hero = C.els.daysList!.innerHTML || '';
-  assert.ok(hero.includes('REST DAY') && !hero.includes('Training anyway?') && hero.includes("openRestSheet(1,'thu','cardio')\">Log cardio</button>"), 'the hero offers the jog only');
+  assert.ok(hero.includes('Rest day') && !hero.includes('Training anyway?') && hero.includes("openRestSheet(1,'thu','cardio')\">Log cardio</button>"), 'the hero offers the jog only');
   C.ev('openDayKey("thu")');
-  assert.deepEqual([isOpen(), pick(/<div class="ov-kicker">([^<]*)<\/div>/), body().includes('Train a session here')], [true, 'THURSDAY · LOG CARDIO', false]);
+  assert.deepEqual([isOpen(), pick(/<div class="ov-kicker">([^<]*)<\/div>/), body().includes('Train a session here')], [true, 'Thursday · Log cardio', false]);
   commit('rest_mins', '20.00');
   log();
   assert.equal(J(entry(1, 'thu').restLog), J({ run: { mins: 20 } }));
@@ -287,7 +287,7 @@ test('a double day\'s session card shows the jog and edits it in the rest sheet;
   assert.equal(C.ev('activeProg.weeks[1].wed.movedFrom'), 'tue');
   C.ev("currentWeek=1; openDetail('wed', activeProg.weeks[1].wed); document.getElementById('detailOverlay').classList.add('open')");
   const card = C.els.detailBody!.innerHTML || '';
-  assert.ok(card.startsWith('<div class="also-block"><div class="also-lbl">ALSO ON WEDNESDAY</div><div class="also-line">30 min run logged · 3.1 mi · RPE 5</div>'), card.slice(0, 200));
+  assert.ok(card.startsWith('<div class="also-block"><div class="also-lbl">Also on Wednesday</div><div class="also-line">30 min run logged · 3.1 mi · RPE 5</div>'), card.slice(0, 200));
   const on = (card.match(/<button class="also-btn" onclick="([^"]*)">Edit cardio<\/button>/) || [])[1];
   assert.equal(on, "openRestSheet(1,'wed','cardio')");
   C.ev(on!);
@@ -312,6 +312,6 @@ test('the move sheet says what is already logged on the day; without a jog it sa
   C.setLog(1, 'wed', { restLog: WED_JOG, week: 1, ts: C.at(1, 'wed', 9) });
   open(1, 'wed', 'move');
   const b = body();
-  assert.ok(b.includes('<div class="ov-effect"><div class="ov-effect-ttl">Already logged here</div><div class="ov-effect-sub">30 min run · 3.1 mi · RPE 5<br>Move a session in and Wednesday is a double day. Your call.</div></div><div class="ov-eq-lbl">NOT LOGGED THIS WEEK</div>'), b);
+  assert.ok(b.includes('<div class="ov-effect"><div class="ov-effect-ttl">Already logged here</div><div class="ov-effect-sub">30 min run · 3.1 mi · RPE 5<br>Move a session in and Wednesday is a double day. Your call.</div></div><div class="ov-eq-lbl">Not logged this week</div>'), b);
   assert.equal(b.replace(/<div class="ov-effect"><div class="ov-effect-ttl">Already logged here[\s\S]*?<\/div><\/div>/, ''), plain, 'the rest of the sheet is as before');
 });

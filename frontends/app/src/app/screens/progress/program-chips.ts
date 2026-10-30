@@ -20,12 +20,12 @@ import { chipStyle, type ChipsView } from './program-chips-model';
   }
   @if (v.bar; as b) {
     @if (b.kind === 'confirm') {
-      <div style="display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--red);border-radius:4px;padding:10px 12px">
+      <div style="display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--red);border-radius:16px;padding:10px 12px">
         <div style="font-size:12px;color:var(--red);line-height:1.5">{{ 'This erases all logs, weights, and history for “' + b.name + '”. It cannot be undone.' }}@if (b.warn) {<br><span style="color:var(--muted)">Other programs are using these loads as starting points — those will go blank.</span>}</div>
         <div style="display:flex;gap:8px"><button class="prog-action-btn danger" (click)="purge(b.id)">Delete Forever</button><button class="prog-action-btn" (click)="cancel()">Cancel</button></div>
       </div>
     } @else {
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid transparent;border-radius:16px;padding:10px 12px">
         <div style="font-size:12px;color:var(--muted)">This program is archived — history only.</div>
         <button class="prog-action-btn" style="flex:0 0 auto" (click)="restore(b.id)">Restore</button>
         <button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" (click)="askPurge(b.id)" [innerHTML]="trash()"></button>

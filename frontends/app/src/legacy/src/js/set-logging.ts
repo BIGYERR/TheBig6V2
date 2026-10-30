@@ -459,9 +459,9 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any,src?: any){
     +(_canSkip?'<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" onclick="skipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\''+_srcArg+')">'+asyIcon('minus',16)+'</button>':'')
     +'<span class="ex-badge" id="exbadge_'+exKey+'">'+(loggedThisDay?'\u2713':'')+'</span></div>'
     +(_dispDetail?'<div class="ex-detail">'+_dispDetail+'</div>':'')
-    +(i._addedByUser?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">YOU ADDED THIS</span> \u00b7 not in the plan'
+    +(i._addedByUser?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">You added this</span> \u00b7 not in the plan'
       +'<button type="button" class="ex-swapundo" onclick="removeAddedExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">remove</button></div>':'')
-    +(_swappedFrom?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span> for '+_swappedFrom
+    +(_swappedFrom?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">Swapped in</span> for '+_swappedFrom
       +'<button type="button" class="ex-swapundo" onclick="undoSwap(\''+_swappedFrom.replace(/'/g,"\\'")+'\''+_srcArg+')">put it back</button></div>':'');
   const rx=parseRx(i.detail||'',i.name||'');
   const loaded=isKB||isWeight;
@@ -642,7 +642,7 @@ function _benchStripHTML(cardio: any){
     return '<div class="cardio-note">No week 1 benchmark was logged — today\u2019s result becomes your baseline for the next block. Run it exactly as written.</div>';
   }
   // @ts-expect-error TS2339 Property 'dist' does not exist on type 'never'.
-  let html='<div class="cardio-note"><b>WEEK 1 BASELINE:</b> '+base.dist+' mi in '+base.mins+' min — '+fmt(base.sec)+'/mi. Same even effort today; the distance difference is your gain.</div>';
+  let html='<div class="cardio-note"><b>Week 1 baseline:</b> '+base.dist+' mi in '+base.mins+' min — '+fmt(base.sec)+'/mi. Same even effort today; the distance difference is your gain.</div>';
   const now=_benchmarkEntryFor(cardio.week);
   if(now){
     // @ts-expect-error TS2339 Property 'sec' does not exist on type 'never'.
@@ -652,7 +652,7 @@ function _benchStripHTML(cardio: any){
       : (df>0 ? df+' sec/mi FASTER at the same effort. The aerobic engine grew — the block worked.'
               : Math.abs(df)+' sec/mi slower at the same effort. An off day happens; look at sleep, fuel, and heat before doubting six weeks of work.');
     // @ts-expect-error TS2339 Property 'dist' does not exist on type 'never'.
-    html+='<div class="cardio-note"><b>RETEST:</b> '+now.dist+' mi — '+fmt(now.sec)+'/mi. '+verdict+'</div>';
+    html+='<div class="cardio-note"><b>Retest:</b> '+now.dist+' mi — '+fmt(now.sec)+'/mi. '+verdict+'</div>';
   }
   return html;
 }

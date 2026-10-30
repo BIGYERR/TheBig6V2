@@ -65,7 +65,7 @@ function init(){
   // later throw in init can skip it; the stopwatch holds its initials here, so this is end() in the native app
   // and a no-op on the PWA (no window.iaIsland).
   _ruIsland();
-  const _bv=document.getElementById('bugVersion'); if(_bv) _bv.textContent='BUILD '+iaVersionLabel(IA_VERSION);
+  const _bv=document.getElementById('bugVersion'); if(_bv) _bv.textContent='Build '+iaVersionLabel(IA_VERSION);
   renderProgList();
   const aid=getActiveProgId();const programs=getPrograms();
   // V221 D178: boot switches through the loader, so a fallback pick is written back to ia_active.

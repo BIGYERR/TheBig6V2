@@ -409,7 +409,7 @@ before a merge into `main` touches the build).
   naming the first differing byte, unless the root copy is the build). The sources and the root copy are committed
   together; the root copy is never edited by hand. `tools/app-at.mjs <ref> <file>` writes the page as any commit had it.
 - `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
-- `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
+- `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (the Track look, D263: neutral paper `#F3F3F1` and ink, true black at night, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
 - `frontends/` — every UI: `app/` (above, and the Cordova iOS project), and the website, the admin and `common/` (what
   more than one frontend uses) as one Angular workspace (`frontends/README.md`), built into `frontends/dist/`, which the
   backend serves. `backend/` is the server only.

@@ -255,16 +255,16 @@ test("Mario's program builds the same twice and offers a main slot lift and a Ba
   assert.ok(G_TIER, 'a Barbell Romanian deadlift outside the main slot');
 });
 
-test('the swap sheet tags a main slot lift MAIN LIFT, never HEAVY COMPOUND', () => {
+test('the swap sheet tags a main slot lift Main lift, never Heavy compound', () => {
   const t = tagsAt(G_SLOT!);
-  assert.ok(t.includes('>MAIN LIFT<'), G_SLOT![4] + ': ' + textOf(t));
-  assert.ok(!t.includes('HEAVY COMPOUND'), textOf(t));
+  assert.ok(t.includes('>Main lift<'), G_SLOT![4] + ': ' + textOf(t));
+  assert.ok(!t.includes('Heavy compound'), textOf(t));
 });
 
-test('the swap sheet tags a barbell compound outside the main slot HEAVY COMPOUND, never MAIN LIFT, among its three tags', () => {
+test('the swap sheet tags a barbell compound outside the main slot Heavy compound, never Main lift, among its three tags', () => {
   const t = tagsAt(G_TIER!);
-  assert.ok(t.includes('>HEAVY COMPOUND<'), G_TIER![4] + ' at item ' + G_TIER![3] + ': ' + textOf(t));
-  assert.ok(!t.includes('MAIN LIFT'), textOf(t));
+  assert.ok(t.includes('>Heavy compound<'), G_TIER![4] + ' at item ' + G_TIER![3] + ': ' + textOf(t));
+  assert.ok(!t.includes('Main lift'), textOf(t));
   assert.equal(countOf(t, 'class="swap-tag"'), 3);
 });
 
