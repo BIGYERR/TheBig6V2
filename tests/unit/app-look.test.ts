@@ -78,6 +78,24 @@ describe('sentence case', () => {
     assert.deepEqual(bad, []);
   });
 
+  test('no text between tags is written in capitals in either build, but acronyms and the session codes', () => {
+    // The ruling's exceptions, typed by hand: acronyms, and the codes printed under each day of the strip.
+    const KEEP = new Set(['RPE', 'AMRAP', 'EMOM', 'NRC', 'NSW', 'FTP', 'OHP', 'RDL', 'GPS', 'PR', 'HR', 'RUN', 'LIFT', 'REST']);
+    const capitals = (text: string): string[] => [...text.matchAll(/>\s*([A-Z][A-Z0-9 ?!.,’'-]{1,30}?)\s*</g)]
+      .map((m) => (m[1] ?? '').trim())
+      .filter((t) => (t.match(/[A-Z]{2,}/g) || []).some((w) => !KEEP.has(w)));
+    assert.deepEqual(capitals(HTML), [], 'the page');
+    assert.deepEqual(nativeSources().flatMap((f) => capitals(readFileSync(f, 'utf8')).map((t) => f.split('/screens/')[1] + ': ' + t)), [], 'the native screens');
+  });
+
+  test('the wordmark over Your Programs, Progress and Bugs reads The Asylum in both builds', () => {
+    assert.equal((HTML.match(/<div class="app-title">The <span>Asylum<\/span><\/div>/g) || []).length, 3, 'the page');
+    for (const frame of ['frames/home-screen.ts', 'frames/progress-frame.ts', 'bug-report/bug-report.ts']) {
+      const src = readFileSync(join(REPO, 'frontends', 'app', 'src', 'app', 'screens', frame), 'utf8');
+      assert.ok(src.includes('<div class="app-title">The <span>Asylum</span></div>'), frame);
+    }
+  });
+
   test('the day strip keeps the short day name in its markup and shows its first letter', () => {
     assert.equal(ruleOf('.wk-day-lbl').get('font-size'), '0');
     assert.equal(ruleOf('.wk-day-lbl::first-letter').get('font-size'), '14px');

@@ -218,7 +218,7 @@ export function helpers(page: Page): Helpers {
       await h.restTimerSettled();
     },
     async tapDay(key) {
-      const label = key.toUpperCase();
+      const label = key.charAt(0).toUpperCase() + key.slice(1);
       for (const cell of await page.$$('.wk-strip .wk-day')) {
         if ((await cell.$eval('.wk-day-lbl', (e) => (e.textContent ?? '').trim())) !== label) continue;
         await cell.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
@@ -235,7 +235,7 @@ export function helpers(page: Page): Helpers {
       await sleep(SETTLE_MS);
     },
     async tapRest(key) {
-      const short = key.slice(0, 2).toUpperCase();
+      const short = key.charAt(0).toUpperCase() + key.charAt(1);
       for (const day of await page.$$('#wizardBody .day-toggle')) {
         if ((await day.$eval('div', (e) => (e.textContent ?? '').trim())) !== short) continue;
         await day.click();

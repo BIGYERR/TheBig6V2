@@ -15,7 +15,7 @@ import { ProgramList } from '../program-list/program-list';
   <div class="top-bar">
     <div class="top-bar-inner">
       <div>
-        <div class="app-title">THE <span>ASYLUM</span></div>
+        <div class="app-title">The <span>Asylum</span></div>
         <div class="app-subtitle" id="homeSubtitle">Your Programs</div>
       </div>
     </div>
