@@ -32,11 +32,11 @@ describe('the session sheet\'s marks', () => {
     ]);
     const base = { dist: 2.5, mins: 20, sec: 480 };
     const at = (now: { dist: number; mins: number; sec: number } | null) => (w: number | undefined) => (w === 1 ? base : w === 6 ? now : null);
-    const baseNote = { lead: 'WEEK 1 BASELINE:', text: ' 2.5 mi in 20 min — <480>/mi. Same even effort today; the distance difference is your gain.' };
+    const baseNote = { lead: 'Week 1 baseline:', text: ' 2.5 mi in 20 min — <480>/mi. Same even effort today; the distance difference is your gain.' };
     assert.deepEqual(benchNotes({ subtype: 'Benchmark Run — Retest', week: 6 }, at(null), clock), [baseNote]);
     // 480 − 452 = 28 s/mi faster; 480 − 484 = −4, within 5 of even; 480 − 500 = 20 s/mi slower.
     assert.deepEqual(benchNotes({ subtype: 'Benchmark Run — Retest', week: 6 }, at({ dist: 2.65, mins: 20, sec: 452 }), clock)[1],
-      { lead: 'RETEST:', text: ' 2.65 mi — <452>/mi. 28 sec/mi FASTER at the same effort. The aerobic engine grew — the block worked.' });
+      { lead: 'Retest:', text: ' 2.65 mi — <452>/mi. 28 sec/mi FASTER at the same effort. The aerobic engine grew — the block worked.' });
     assert.match(benchNotes({ subtype: 'Benchmark Run — Retest', week: 6 }, at({ dist: 2.48, mins: 20, sec: 484 }), clock)[1]!.text, / Even with week 1 — fitness held/);
     assert.match(benchNotes({ subtype: 'Benchmark Run — Retest', week: 6 }, at({ dist: 2.4, mins: 20, sec: 500 }), clock)[1]!.text, /20 sec\/mi slower at the same effort\. An off day happens/);
   });

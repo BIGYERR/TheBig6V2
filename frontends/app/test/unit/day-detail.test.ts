@@ -34,10 +34,10 @@ describe('the session sheet', () => {
 
   it('puts a double day\'s jog above everything, labelled with the day, one sentence per type, and none without a line (v0.240.0, D231)', () => {
     const jog = alsoJog('Wednesday', ['30 min run logged · 3.1 mi · RPE 5', '20 min walk logged · RPE 5'], 2, 'wed');
-    assert.deepEqual(jog, { label: 'ALSO ON WEDNESDAY', lines: ['30 min run logged · 3.1 mi · RPE 5', '20 min walk logged · RPE 5'], week: 2, dayKey: 'wed' });
+    assert.deepEqual(jog, { label: 'Also on Wednesday', lines: ['30 min run logged · 3.1 mi · RPE 5', '20 min walk logged · RPE 5'], week: 2, dayKey: 'wed' });
     assert.equal(alsoJog('Wednesday', [], 2, 'wed'), null);
     const all = detailBody({ ...P, also: jog, wildcard: 'Push is still on the board.', nudge: { shown: ['Row'], extra: '' } }, true, true);
-    assert.deepEqual(all.map(line), ['also ALSO ON WEDNESDAY', 'wildcard Push is still on the board.', 'nudge', '<M>', '<R>', 'cardio', 'log']);
+    assert.deepEqual(all.map(line), ['also Also on Wednesday', 'wildcard Push is still on the board.', 'nudge', '<M>', '<R>', 'cardio', 'log']);
   });
 
   it('estimates a test max by Epley, a single being itself', () => {
@@ -68,7 +68,7 @@ describe('the session sheet', () => {
   });
 
   it('counts what is logged, and hides the count with nothing to log', () => {
-    assert.deepEqual([loggedCount({ done: 2, total: 7 }), loggedCount({ done: 0, total: 0 })], ['2 / 7 LOGGED', null]);
+    assert.deepEqual([loggedCount({ done: 2, total: 7 }), loggedCount({ done: 0, total: 0 })], ['2 / 7 logged', null]);
   });
 
   it('puts the day\'s status on the big button, undoable, and the other status on the small one', () => {

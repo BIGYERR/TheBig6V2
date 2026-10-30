@@ -20,7 +20,7 @@ const toasts: string[] = [];
 IA.window.__toast = (m: string) => toasts.push(m);
 IA.eval('showToast = function(m){ __toast(m); }');
 
-const LOCK_HEADER = 'THE ROW HOLDS';
+const LOCK_HEADER = 'The row holds';
 const LOCK_BODY = 'You are too close to the race. Three weeks out the work is done. Changing your mile now would reset the pace of every session left, and those sessions have one job. Get you to the line fresh.';
 const LOCK_BTN = 'Got it';
 const COMMIT_TOAST: string = 'Mile updated. Every run still ahead of you now reads from your new row.';

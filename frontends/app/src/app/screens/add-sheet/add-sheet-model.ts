@@ -33,7 +33,7 @@ export interface AddInput {
   regionOf(name: string): string | null;
 }
 
-const REGION_TAG: Record<string, string> = { push: 'PUSH DAY', pull: 'PULL DAY', legs: 'LEG DAY' };
+const REGION_TAG: Record<string, string> = { push: 'Push day', pull: 'Pull day', legs: 'Leg day' };
 const REGION_WORK: Record<string, string> = { push: 'Push', pull: 'Pull', legs: 'Leg' };
 const REGION_DAY: Record<string, string> = { push: 'push', pull: 'pull', legs: 'leg' };
 
@@ -42,9 +42,9 @@ export function addSheetView(a: AddInput): AddSheetView {
   const region = a.candidates.region;
   return {
     title: a.title || 'Training',
-    weekTag: 'WEEK ' + a.week,
-    regionTag: (region && REGION_TAG[region]) || 'TODAY',
-    setsTag: a.setCount + ' SETS',
+    weekTag: 'Week ' + a.week,
+    regionTag: (region && REGION_TAG[region]) || 'Today',
+    setsTag: a.setCount + ' sets',
     gap: a.candidates.gap.map((n) => ({ name: n, caution: false, note: '' })),
     more: a.candidates.more.map((n) => ({
       name: n,

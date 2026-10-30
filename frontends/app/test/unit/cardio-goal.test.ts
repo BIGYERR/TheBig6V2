@@ -111,7 +111,7 @@ describe('the cardio goal step', () => {
   it('styles the unit and race date buttons as the legacy step did, and writes today as the local date', () => {
     assert.equal(unitButtonStyle(true, false), 'font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;cursor:pointer;background:var(--accent);color:var(--on-ink)');
     assert.equal(unitButtonStyle(false, true), 'font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;border-left:1px solid var(--border2);cursor:pointer;background:var(--surface2);color:var(--muted)');
-    assert.equal(raceButtonStyle(false), 'flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border:none;cursor:pointer;background:transparent;color:var(--muted)');
+    assert.equal(raceButtonStyle(false), 'flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:9px;border:none;cursor:pointer;background:transparent;color:var(--muted)');
     assert.equal(localIso(new Date(2026, 0, 5, 23, 59)), '2026-01-05');
   });
 

@@ -81,7 +81,7 @@ export function profileView(d: WizardDraft): { experience: Choice[]; age: Choice
 
 /** A unit button's inline style: the chosen unit filled in the accent. */
 export function unitStyle(on: boolean): string {
-  return 'flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 20px;border:none;cursor:pointer;background:'
+  return 'flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:9px 20px;border:none;cursor:pointer;background:'
     + (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? 'var(--on-ink)' : 'var(--muted)');
 }
 
@@ -126,7 +126,7 @@ export function liftingView(d: WizardDraft, options: { body: LiftOption[]; event
 
 /** The week as the legacy ALL_DAYS_ORDER runs it, Sunday first. */
 export const ALL_DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
-const DAY_SHORT: Record<string, string> = { sun: 'SU', mon: 'MO', tue: 'TU', wed: 'WE', thu: 'TH', fri: 'FR', sat: 'SA' };
+const DAY_SHORT: Record<string, string> = { sun: 'Su', mon: 'Mo', tue: 'Tu', wed: 'We', thu: 'Th', fri: 'Fr', sat: 'Sa' };
 
 /** What the days step reads beside the draft: the advisories, the floor, and the goals' names. */
 export interface DaysInput {

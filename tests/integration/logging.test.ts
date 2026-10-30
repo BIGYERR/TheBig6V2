@@ -646,7 +646,7 @@ function readers() {
   let wk = '(no MILES tile)';
   for (const k in C.els) {
     const h = C.els[k] && C.els[k].innerHTML;
-    const m = typeof h === 'string' && h.match(/<div class="wk-stat-num" style="color:var\(--run\)">([^<]*)<\/div><div class="wk-stat-lbl">MILES<\/div>/);
+    const m = typeof h === 'string' && h.match(/<div class="wk-stat-num" style="color:var\(--run\)">([^<]*)<\/div><div class="wk-stat-lbl">Miles<\/div>/);
     if (m) { wk = m[1]; break; }
   }
   const c = C.chart('Weekly Running Mileage', 1);
@@ -1322,7 +1322,7 @@ function drive(prog: Program, w: number, rest: DayKey, j: Jog, pick: string | nu
 const restLogOf = (w: number, d: string) => (C.entry(w, d) || {}).restLog;
 const milesTile = (w: number) => {
   C.ev('currentWeek=' + w + '; renderWeekView()');
-  const m = /color:var\(--run\)">([\d.]+)<\/div><div class="wk-stat-lbl">MILES/.exec(C.els.daysList.innerHTML || '');
+  const m = /color:var\(--run\)">([\d.]+)<\/div><div class="wk-stat-lbl">Miles/.exec(C.els.daysList.innerHTML || '');
   return m ? m[1] : null;
 };
 const progress = () => { C.ctx.__dots.length = 0; C.ev('progressViewId=null; renderProgressScreen()'); return C.els.progressBody.innerHTML || ''; };
@@ -1341,7 +1341,7 @@ function journal(html: string) {
     p = p.slice(0, p.indexOf('</details>') < 0 ? p.length : p.indexOf('</details>'));
     const wm = p.match(/<span>Week (\d+)<\/span>/);
     if (!wm) continue;
-    out[+wm[1]] = p.split('<div style="background:var(--surface2);border-radius:4px;padding:10px 12px;margin-bottom:6px">').slice(1)
+    out[+wm[1]] = p.split('<div style="background:var(--surface2);border-radius:16px;padding:10px 12px;margin-bottom:6px">').slice(1)
       .map((r) => { const segs = r.split(/<[^>]*>/).map((s) => s.replace(/\s+/g, ' ').trim()).filter(Boolean); return { day: segs[0], segs }; });
   }
   return out;
@@ -1356,7 +1356,7 @@ function heroOf(w: number, d: string) {
   const h = C.els.daysList.innerHTML || '';
   const lines = [...h.matchAll(/<div class="wk-rest-logged">([^<]*)<\/div>/g)].map((m) => m[1]);
   const b = h.match(new RegExp('openRestSheet\\(' + w + ",'" + d + "','cardio'\\)\">([^<]*)</button>"));
-  return { lines, btn: b ? b[1] : null, rest: h.includes('REST DAY') };
+  return { lines, btn: b ? b[1] : null, rest: h.includes('Rest day') };
 }
 
 test('the hosts are as typed: HALF_MANNY W1 has a rest Wednesday, a lifting Thursday (D243) and the three run doses; the multi-sport cells exist', () => {

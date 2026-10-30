@@ -9,7 +9,7 @@
 //   a1  inside POP_POOLS.workout, .streak or .season (never .reminder);
 //   a2  the icon of POP_CFG.workout, .streak or .season (never .reminder);
 //   a3  inside POP_DISMISS;
-//   a4  the streak kicker "-DAY STREAK <fire>";
+//   a4  the streak kicker "-day streak <fire>";
 //   a5  the confetti particle <trophy> in popConfetti;
 //   a6  the popIcon span's default <party popper>;
 //   b   a key of ASY_EMOJI;
@@ -262,7 +262,7 @@ function classify(S: Scan){
     if(t.type === 'str' && ['workout', 'streak', 'season'].some(k => within(tierExt[k], h.off))) m = MECHS[0];
     else if(t.type === 'str' && within(cfgExt, h.off) && /(^|[^A-Za-z0-9_$])(workout|streak|season)\s*:\s*\{\s*icon\s*:\s*$/.test(pc)){ m = MECHS[1]; tierCfg[(/(workout|streak|season)\s*:\s*\{\s*icon\s*:\s*$/.exec(pc) as RegExpExecArray)[1]]++; }
     else if(t.type === 'str' && within(disExt, h.off)) m = MECHS[2];
-    else if(t.type === 'str' && /kicker\s*:\s*streak\s*\+\s*$/.test(pc) && txt === '-DAY STREAK ' + CP(0x1F525)) m = MECHS[3];
+    else if(t.type === 'str' && /kicker\s*:\s*streak\s*\+\s*$/.test(pc) && txt === '-day streak ' + CP(0x1F525)) m = MECHS[3];
     else if(t.type === 'str' && within(confExt, h.off) && /(^|[^A-Za-z0-9_$.])p\.textContent\s*=\s*$/.test(pc) && txt === CP(0x1F3C6)) m = MECHS[4];
     else if(t.type === 'html' && S.src.slice(h.off - ICON_HTML.length, h.off) === ICON_HTML && h.seq === CP(0x1F389)) m = MECHS[5];
     else if(t.type === 'str' && within(emExt, h.off) && /^\s*:/.test(nextCode(S, h.ti))) m = MECHS[6];

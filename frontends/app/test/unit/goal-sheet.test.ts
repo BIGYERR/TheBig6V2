@@ -28,7 +28,7 @@ const BASE: GoalInput = {
 describe('the change-a-goal sheet', () => {
   it('heads the sheet with the sport, greys the current goal and marks the bigger ones', () => {
     const v = goalSheetView(BASE);
-    assert.equal(v.heading, 'CHANGE RUN GOAL');
+    assert.equal(v.heading, 'Change run goal');
     assert.deepEqual(v.options.map((o) => [o.id, o.current, o.selected, o.up]), [
       ['run_5k', true, false, false],
       ['run_half', false, false, true],
@@ -67,7 +67,7 @@ describe('the change-a-goal sheet', () => {
   it('reads a program with no goal as rank 2, asks a time goal for its time only, and keeps "current"', () => {
     const swim = [{ id: 'swim_100_time', label: '100 Time', desc: 'x' }, { id: 'swim_base', label: 'Swim Base', desc: 'y' }];
     const v = goalSheetView({ ...BASE, sportLabel: 'Swim', current: null, choices: swim, rank: { swim_100_time: 2, swim_base: 1 }, started: false, draft: { ...BASE.draft, sport: 'swim', sel: 'swim_100_time' } });
-    assert.equal(v.heading, 'CHANGE SWIM GOAL');
+    assert.equal(v.heading, 'Change swim goal');
     assert.deepEqual(v.options.map((o) => [o.current, o.selected, o.up]), [[false, true, false], [false, false, false]]);
     const d = v.decision!;
     assert.deepEqual([d.up, d.inputs, d.keepLabel, d.body], [false, 'time', 'Keep current', 'Past weeks stand as trained. Your swim work rebuilds from this week forward.']);

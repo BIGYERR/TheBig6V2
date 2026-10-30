@@ -114,7 +114,7 @@ describe('D250: the Wildcard edits the Wildcard', () => {
     const swapped = html(X, 'randBody');
     assert.ok(swapped.includes('<span class="ex-name">' + pick + '</span>'), pick + ' is on the Wildcard');
     assert.ok(!swapped.includes('<span class="ex-name">Barbell bench press</span>'));
-    assert.ok(swapped.includes('<span class="ex-swapchip-lbl">SWAPPED IN</span> for Barbell bench press'));
+    assert.ok(swapped.includes('<span class="ex-swapchip-lbl">Swapped in</span> for Barbell bench press'));
     assert.ok(lastToast(X).startsWith(pick + ' in, barbell bench press out.'), lastToast(X));
     assert.equal(JSON.stringify(X.ctx.__P), prog, 'the program is untouched');
     assert.equal(store(X), saved, 'nothing is stored: no swap record, no swap count, no snapshot');
@@ -122,7 +122,7 @@ describe('D250: the Wildcard edits the Wildcard', () => {
     const undo = (swapped.match(/onclick="(undoSwap\([^"]*\))"/) || [])[1]!.replace(/\\'/g, "'");
     X.eval(undo);
     const back = html(X, 'randBody');
-    assert.ok(back.includes('<span class="ex-name">Barbell bench press</span>') && !back.includes('SWAPPED IN'));
+    assert.ok(back.includes('<span class="ex-name">Barbell bench press</span>') && !back.includes('Swapped in'));
     assert.ok(back.includes('<div class="ex-detail">Work to 1–3RM, then 3×3 @ RPE 9</div>'), 'the pool\'s own prescription is back');
     assert.equal(lastToast(X), 'Barbell bench press is back on the card.');
     assert.equal(JSON.stringify(X.ctx.__P), prog);

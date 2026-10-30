@@ -48,8 +48,8 @@ describe('the wizard\'s small builders (phase E step 31)', () => {
     const banner = (v: SeedView | null): string => {
       if (!v) return '';
       if (v.applied) return `<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">${icon('chart', 12)} Estimated from “${v.prog}”. Edit if you know better.</div>`;
-      return `<div style="background:var(--surface);border:1px solid var(--accent);border-radius:4px;padding:12px 14px;margin-bottom:12px">
-    <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text);margin-bottom:4px">${icon('chart', 13)} Seed from “${v.prog}”?</div>
+      return `<div style="background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:12px 14px;margin-bottom:12px">
+    <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;color:var(--text);margin-bottom:4px">${icon('chart', 13)} Seed from “${v.prog}”?</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px">${v.found}</div>
     <div style="display:flex;gap:8px">
       <button class="prog-action-btn primary" style="flex:1" onclick="applySeedData()">Use this data</button>

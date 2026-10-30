@@ -194,7 +194,7 @@ export function unitButtonStyle(on: boolean, second: boolean): string {
 
 /** The style of a race date button (I have a race date, Just building fitness). */
 export function raceButtonStyle(on: boolean): string {
-  return 'flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border:none;cursor:pointer;background:' +
+  return 'flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:9px;border:none;cursor:pointer;background:' +
     (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? 'var(--on-ink)' : 'var(--muted)');
 }
 

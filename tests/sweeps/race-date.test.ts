@@ -28,5 +28,5 @@ test('every wizard row lands on week 1 as it renders after a reboot and as its o
     assert.equal(o.keysDiff, 'overlays', o.row.name);
   }
   for (const o of aligned) assert.deepEqual([o.stored.blockOpen, o.stored.startDate, R.parseWeek(o.landing).pre], [R.TODAY_ISO, o.hStart, o.hPre], o.row.name);
-  assert.equal(R.parseWeek(out.find(o => /HALF_MANNY/.test(o.row.name))!.landing).done, '0 /0 DONE');
+  assert.equal(R.parseWeek(out.find(o => /HALF_MANNY/.test(o.row.name))!.landing).done, '0 /0 Done');
 });

@@ -2,30 +2,30 @@
 
 Single-file distillation of "The Asylum" Claude Design system as **actually implemented** in the app's `:root` + `asyIcon()`. Drop this in the project alongside the handoff. The full DS handoff zip (UI-kit screens, React components, raw token CSS) is **not** needed for ongoing work — its decisions live here and in the app. Re-drop the zip in a chat only if you need the original screen comps.
 
-**Aesthetic:** warm light editorial / streetwear (Aimé Leon Dore / Palace references). Bone paper, ink ink, one rationed burnt-orange signal, rectilinear corners, Helvetica doing the talking. The inversion of the old dark-gym look.
+**Aesthetic (D263 P-TRACK, v0.252.0, `docs/decisions/app-look.md`):** the Track look. Neutral paper and ink, true black at night, one rationed burnt-orange signal with a light glow behind each tab screen's top, round cards with no outlines, pill buttons, sentence case, heavy headline numbers, Helvetica doing the talking. It replaced the bone, rectilinear, all-caps editorial look the Claude Design system first shipped. The look's own sheet is `frontends/app/src/legacy/src/css/look.css`; the comparison Mario chose from is `docs/design/look-options.html`.
 
 ---
 
-## Color tokens (`:root`)
+## Color tokens (`:root`, and the night palette of D261 on `:root[data-theme="night"]`)
 
-| token | value | role |
-|---|---|---|
-| `--bg` | `#F4F1E8` | app background (warm bone) |
-| `--surface` | `#FBFAF5` | card / paper-0 |
-| `--surface2` | `#ECE7DA` | sunken well |
-| `--surface3` | `#E0DACA` | panel |
-| `--border` | `#D5CEBD` | hairline |
-| `--border2` | `#BCB29B` | strong line |
-| `--text` | `#181712` | ink (primary text + primary actions) |
-| `--muted` | `#6B6557` | muted text |
-| `--accent` | `#181712` | = ink. Primary actions are ink, **not** a color |
-| `--accent-dim` | `rgba(24,23,18,0.06)` | faint ink wash |
-| `--on-ink` | `#F4F1E8` | cream text on ink surfaces |
-| `--signal` | `#CF4E1A` | **burnt orange — LIVE/ACTIVE ONLY** |
-| `--signal-press` | `#AE3F12` | signal pressed |
-| `--on-signal` | `#FBF6EE` | text on signal |
+| token | day | night | role |
+|---|---|---|---|
+| `--bg` | `#F3F3F1` | `#000000` | app background |
+| `--surface` | `#FFFFFF` | `#161616` | card |
+| `--surface2` | `#EDEDEA` | `#242424` | sunken well, date circles |
+| `--surface3` | `#E1E1DD` | `#2E2E2E` | panel |
+| `--border` | `#E3E3DF` | `#262626` | hairline |
+| `--border2` | `#CFCFCA` | `#3C3C3C` | the line of an outlined pill |
+| `--text` | `#111111` | `#FFFFFF` | ink (primary text + primary actions) |
+| `--muted` | `#6E6E6A` | `#A3A3A3` | muted text |
+| `--accent` | `#111111` | `#FFFFFF` | = ink. Primary actions are ink, **not** a color |
+| `--on-ink` | `#FFFFFF` | `#000000` | text on ink surfaces |
+| `--signal` | `#CF4E1A` | `#E2622B` | **burnt orange — LIVE/ACTIVE ONLY** |
+| `--signal-press` | `#AE3F12` | `#C4501E` | signal pressed |
+| `--on-signal` | `#FBF6EE` | `#12110D` | text on signal |
+| `--glow` | signal at 0.26 | signal at 0.64 | the light behind each tab screen's top |
 
-**Signal doctrine — non-negotiable:** *"If everything is orange, nothing is live."* Signal appears ONLY on: the **today marker**, the **Start/open-session hero CTA**, the **Log button**, the **running rest timer** (time + control + progress fill), and **popup achievement** accents (kicker / GO / streak / glow). Everything else is ink. ~10 `var(--signal)` references total; keep it that way.
+**Signal doctrine — non-negotiable:** *"If everything is orange, nothing is live."* Signal appears ONLY on: the **Start/open-session hero CTA** (with its glow), the **Log button**, the **running rest timer** (time + control + progress fill), **popup achievement** accents (kicker / GO / streak / glow), and, from D263, the **active week tab's underline**, the **phase pill**, the **active tab** in the floating bar, the **active program's card edge** and the **light behind each tab screen's top**. Today's date is an **ink ring**, not orange (D263 retired the orange today cell and D185's on-signal marks with it). Everything else is ink.
 
 ### Sport / category colors (muted earthy — hue kept, desaturated for paper)
 | sport | value |
@@ -40,16 +40,14 @@ Each has a `-dim` rgba at ~0.15 alpha. `--green` (status success) was unified to
 
 ---
 
-## Radii — rectilinear scale
-`--radius-0:0` · `--radius-1:2px` (tags, small controls) · `--radius-2:4px` (cards, buttons, sheets) · `--radius-3:6px` (large surfaces only). **No pills.** `50%` reserved for true circles/dots only (toggle knob, timer control, dots, spinner). App reality: 4px standard, 2px tags, 6px on `wk-hero`, 50% on the four circle elements.
+## Radii — round, by role (D263)
+`--r-card:24px` (This Week's strip, hero and stats, program cards, the big sheet cards) · `--r-tile:16px` (blocks inside a sheet, exercise cards, inline cards) · `--r-field:12px` (inputs, wheels, date rows) · `--r-pill:999px` (every button, chip and tag). `50%` for true circles: the day strip's dates, dots, the toggle knob. Cards carry **no outline**: a surface fill on the page does the separating. Outlined pills (a 1.5px `--border2` line) are for secondary actions.
 
-## Shadows — low, warm, never glow
-- `shadow-1`: `0 1px 2px rgba(40,34,22,0.06)` — cards (lifted paper)
-- `shadow-2`: `0 2px 6px rgba(40,34,22,0.07), 0 1px 2px rgba(40,34,22,0.05)`
-- `shadow-3`: `0 8px 24px rgba(40,34,22,0.10), 0 2px 6px rgba(40,34,22,0.06)` — modals/sheets (popup uses this)
-- `shadow-inset`: `inset 0 1px 2px rgba(40,34,22,0.08)`
-
-App reality: `shadow-1` on the five primary cards (`prog-card`, `day-card`, `summary-block`, `wk-hero`, `section-block`); popup uses `shadow-3`. Warm tint `40,34,22` — never `0,0,0`, never blurred colored glows.
+## Depth — one light, one glow (D263)
+- **The glow:** `--glow-light`, a radial light 150% wide and 455px tall centred 130px above the top edge, painted behind the four tab screens (Your programs, This week, Progress, Bugs) and their sticky bars. Stronger at night.
+- **The button glow:** `0 10px 28px rgba(var(--signal-rgb),0.42)` under the main signal button only: Start session, the session sheet's Done, the pop-up's main button.
+- **The tab bar** floats: a 34px pill 12px in from each side, `--nav` fill blurred 20px, `0 10px 30px rgba(0,0,0,0.18)` under it.
+- Nothing else glows. Cards sit flat (no shadow) on the page.
 
 ---
 
@@ -60,7 +58,7 @@ App reality: `shadow-1` on the five primary cards (`prog-card`, `day-card`, `sum
 
 **Loading:** Geist + Geist Mono via Google Fonts `@import` (free). **Helvetica Now Text is NOT shipped** — licensed Monotype, can't be redistributed in a public repo. On iOS/Mac the stack resolves to system **Helvetica Neue** (exactly the DS-intended look) with zero font files; Geist is the non-Apple fallback.
 
-**Tracking** (Helvetica needs far less than the old Barlow Condensed): heavy caps tracking was pulled to DS range — display can go negative (`-0.02em` tight), labels `~0.06–0.08em`, max wide `~0.12em`. **Tabular figures** (`font-variant-numeric:tabular-nums`) on `body` so numbers don't jitter. Big "WEEK N" label is `white-space:nowrap`.
+**Case and tracking (D263):** labels are sentence case. No style sets `text-transform:uppercase`, and no label is typed in capitals; capitals stay on acronyms (RPE, AMRAP), on the session codes under each day (RUN, LIFT) and on a word stressed inside a sentence of copy. Tracking is never positive; headlines go tight (`-0.035em` to `-0.045em`) at weight 800 (Week N at 58px, a tab screen's title at 40px). Small labels that were capitals read at 12–13px. **Tabular figures** (`font-variant-numeric:tabular-nums`) on `body` so numbers don't jitter. Big "Week N" label is `white-space:nowrap`.
 
 ---
 

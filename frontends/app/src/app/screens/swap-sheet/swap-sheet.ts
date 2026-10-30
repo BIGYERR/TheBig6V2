@@ -19,7 +19,7 @@ import { type SwapSheetView, swapSheetView } from './swap-sheet-model';
     <div class="dh-toprow">
       <button class="dh-back" (click)="close()">‹ Back</button>
     </div>
-    <div class="dh-over">SWAP OUT</div>
+    <div class="dh-over">Swap out</div>
     <div class="dh-title" id="swapOutName">{{ view()?.outName }}</div>
     <div class="swap-tags" id="swapTags">
       @if (view(); as v) {
@@ -30,7 +30,7 @@ import { type SwapSheetView, swapSheetView } from './swap-sheet-model';
   <div class="swap-body" id="swapBody">
     @if (view(); as v) {
       @if (v.sameJob.length) {
-        <div class="swap-sec-lbl">SAME JOB</div>
+        <div class="swap-sec-lbl">Same job</div>
         <div class="swap-sec-sub">These do the same work. Your week keeps its shape.</div>
         @if (v.flowNote) {<div class="swap-sec-sub">{{ v.flowNote }}</div>}
         @for (r of v.sameJob; track $index) {
@@ -65,7 +65,7 @@ export class SwapSheet {
   }
 
   protected warning(): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', 'warning', 13) + ' DIFFERENT JOB, SAME DAY');
+    return this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', 'warning', 13) + ' Different job, same day');
   }
 
   protected pick(name: string): void {

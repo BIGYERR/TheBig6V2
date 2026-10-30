@@ -26,7 +26,7 @@ import { type ChangeSheetView, changeSheetView, type DraftKey, type PreviewOverl
       @if (tr.dates; as dates) {
         <ng-container *ngTemplateOutlet="dateRow; context: { $implicit: dates, style: null }"></ng-container>
       }
-      <div class="ov-eq-lbl">WHAT YOU’LL HAVE</div>
+      <div class="ov-eq-lbl">What you’ll have</div>
       @for (c of tr.cards; track c.id) {
         <ng-container *ngTemplateOutlet="card; context: { $implicit: c }"></ng-container>
       }
@@ -34,12 +34,12 @@ import { type ChangeSheetView, changeSheetView, type DraftKey, type PreviewOverl
       <ng-container *ngTemplateOutlet="foot; context: { $implicit: tr.action }"></ng-container>
     }
     @if (v.injury; as inj) {
-      <div class="ov-eq-lbl">WHERE’S THE PROBLEM</div>
+      <div class="ov-eq-lbl">Where’s the problem</div>
       @for (c of inj.regions; track c.id) {
         <ng-container *ngTemplateOutlet="card; context: { $implicit: c }"></ng-container>
       }
       @if (inj.tiers; as tiers) {
-        <div class="ov-eq-lbl" style="margin-top:12px">HOW BAD IS IT</div>
+        <div class="ov-eq-lbl" style="margin-top:12px">How bad is it</div>
         @for (c of tiers; track c.id) {
           <ng-container *ngTemplateOutlet="card; context: { $implicit: c }"></ng-container>
         }

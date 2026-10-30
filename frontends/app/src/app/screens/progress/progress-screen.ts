@@ -65,17 +65,17 @@ interface ScreenView {
       }
     }
     @if (v.journal; as j) {
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
-        <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px" [innerHTML]="j.title"></div>
+      <div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">
+        <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:var(--muted);margin-bottom:12px" [innerHTML]="j.title"></div>
         @for (wk of j.weeks; track wk.week) {
           <details class="journal-week" [attr.open]="wk.open ? '' : null">
-            <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)">
+            <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted)">
               <span>Week {{ wk.week }}</span>
-              <span style="display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:0.04em;opacity:0.75">{{ wk.count }}<span class="journal-caret" style="display:inline-flex" [innerHTML]="j.caret"></span></span>
+              <span style="display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:0;opacity:0.75">{{ wk.count }}<span class="journal-caret" style="display:inline-flex" [innerHTML]="j.caret"></span></span>
             </summary>
             <div style="padding:2px 0 8px">
               @for (e of wk.entries; track $index) {
-                <div style="background:var(--surface2);border-radius:4px;padding:10px 12px;margin-bottom:6px">
+                <div style="background:var(--surface2);border-radius:16px;padding:10px 12px;margin-bottom:6px">
                   <div [attr.style]="e.headStyle">
                     <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text)">{{ e.day }}</div>
                     @if (e.rpe; as r) {<div [attr.style]="r.style">{{ r.text }}</div>}
@@ -91,11 +91,11 @@ interface ScreenView {
       </div>
     }
     @if (v.estimator; as est) {
-      <details style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0 16px;margin-top:4px">
-        <summary style="cursor:pointer;padding:14px 0;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)" [innerHTML]="est.title"></summary>
+      <details style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:0 16px;margin-top:4px">
+        <summary style="cursor:pointer;padding:14px 0;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:var(--muted)" [innerHTML]="est.title"></summary>
         <div style="padding-bottom:14px">
           <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px">Optional — estimate a one-rep max from any recent set, just for your own records. Your training still runs on RPE.</div>
-          <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px">@for (n of lifts; track n; let i = $index) {<button type="button" [id]="'calcLift_' + n" (click)="setLift(n, w.value, r.value)" [attr.style]="liftStyle(n, i)">{{ n }}</button>}</div>
+          <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:10px">@for (n of lifts; track n; let i = $index) {<button type="button" [id]="'calcLift_' + n" (click)="setLift(n, w.value, r.value)" [attr.style]="liftStyle(n, i)">{{ n }}</button>}</div>
           <div class="input-row" style="margin-bottom:10px">
             <div class="input-group"><div class="input-label">Weight</div><input #w type="number" class="input-field" id="calc_weight" placeholder="e.g. 185" (input)="calc(w.value, r.value)"></div>
             <div class="input-group"><div class="input-label">Reps</div><input #r type="number" class="input-field" id="calc_reps" placeholder="e.g. 5" (input)="calc(w.value, r.value)"></div>
@@ -126,7 +126,7 @@ export class ProgressScreen {
 
   protected liftStyle(n: string, i: number): string {
     const on = this.lift() === n;
-    return 'flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border:none;'
+    return 'flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:9px;border:none;'
       + (i ? 'border-left:1px solid var(--border2);' : '') + 'cursor:pointer;background:' + (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? 'var(--on-ink)' : 'var(--muted)');
   }
 

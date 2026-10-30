@@ -23,7 +23,7 @@ import { seedFromPriorPrograms } from './progress-data.ts';
 
 // ── SHARED DAY CONSTANTS ──
 const DAY_FULL={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
-const DAY_SHORT: Record<string, string>={sun:'SU',mon:'MO',tue:'TU',wed:'WE',thu:'TH',fri:'FR',sat:'SA'};
+const DAY_SHORT: Record<string, string>={sun:'Su',mon:'Mo',tue:'Tu',wed:'We',thu:'Th',fri:'Fr',sat:'Sa'};
 
 // ── MINIMUM TRAINING DAYS PER GOAL ──
 const MIN_TRAIN_DAYS = {
@@ -450,7 +450,7 @@ function updateRaceDateFeedback() {
     return;
   }
 
-  const card = (color: any, html: any) => '<div style="color:'+color+';font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:'+color+'18;border-radius:4px;border:1px solid '+color+'44">'+html+'</div>';
+  const card = (color: any, html: any) => '<div style="color:'+color+';font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:'+color+'18;border-radius:16px;border:1px solid '+color+'44">'+html+'</div>';
 
   // D183 (P-SAFEPACE R3, first amendment's null rows, amendment 3 F4(i)): a dated test goal. Every week
   // number is the pin's. Never red (the weeks are not his to change) and no glyph on a framed row. The
@@ -612,7 +612,7 @@ function paceCeilingSentence(f: any) {
 // D183 (amendment 3): the undated #paceFeasLine frame. The accent frame around the R1 sentence and nothing
 // else: no icon, no heading, no button. The dated card prints the same sentence inside its own row.
 function paceCeilingOfferHTML(f: any) {
-  return '<div style="color:var(--accent);font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:var(--accent)18;border-radius:4px;border:1px solid var(--accent)44">'+
+  return '<div style="color:var(--accent);font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:var(--accent)18;border-radius:16px;border:1px solid var(--accent)44">'+
     paceCeilingSentence(f)+
     '</div>';
 }
@@ -771,8 +771,8 @@ function _seedBannerHTML(){
   }
   const pace=_fmtPaceMi(s.avgRecSec)||'';
   const distLine=s.maxDist?`, longest run ${s.maxDist} mi`:'';
-  return `<div style="background:var(--surface);border:1px solid var(--accent);border-radius:4px;padding:12px 14px;margin-bottom:12px">
-    <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text);margin-bottom:4px">${asyIcon('chart',13)} Seed from \u201C${s.progName}\u201D?</div>
+  return `<div style="background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:12px 14px;margin-bottom:12px">
+    <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;color:var(--text);margin-bottom:4px">${asyIcon('chart',13)} Seed from \u201C${s.progName}\u201D?</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px">Recent logs found: ${s.n} recovery runs, avg ${pace}/mi${distLine} over your last 3 weeks.</div>
     <div style="display:flex;gap:8px">
       <button class="prog-action-btn primary" style="flex:1" onclick="applySeedData()">Use this data</button>
@@ -861,11 +861,11 @@ function renderWizardStep() {
         </div>`).join('')}
     </div>
     <div class="input-label" style="margin-bottom:8px">Units</div>
-    <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:16px">
-      <button onclick="setUnit('lbs')" style="flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 20px;border:none;cursor:pointer;background:${WD.unit!=='kg'?'var(--accent)':'transparent'};color:${WD.unit!=='kg'?'var(--on-ink)':'var(--muted)'}">LBS</button>
-      <button onclick="setUnit('kg')" style="flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 20px;border:none;cursor:pointer;background:${WD.unit==='kg'?'var(--accent)':'transparent'};color:${WD.unit==='kg'?'var(--on-ink)':'var(--muted)'}">KG</button>
+    <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:16px">
+      <button onclick="setUnit('lbs')" style="flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:9px 20px;border:none;cursor:pointer;background:${WD.unit!=='kg'?'var(--accent)':'transparent'};color:${WD.unit!=='kg'?'var(--on-ink)':'var(--muted)'}">lbs</button>
+      <button onclick="setUnit('kg')" style="flex:1;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:9px 20px;border:none;cursor:pointer;background:${WD.unit==='kg'?'var(--accent)':'transparent'};color:${WD.unit==='kg'?'var(--on-ink)':'var(--muted)'}">kg</button>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.8">
+    <div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.8">
       <div><b style="color:var(--accent)">Experience:</b> ${expHints[WD.experience||'intermediate']}</div>
       <div style="margin-top:6px"><b style="color:var(--accent)">Age ${WD.ageBracket||'18-35'}:</b> ${ageHints[WD.ageBracket||'18-35']}</div>
     </div>`;
@@ -910,7 +910,7 @@ function renderWizardStep() {
       ${['run','bike','swim'].map(t => {
         const sel = WD.cardioTypes.includes(t);
         const g = WD.cardioGoals[t];
-        return `<div style="background:var(--surface);border:1.5px solid ${sel?'var(--accent)':'var(--border)'};border-radius:4px;overflow:hidden">
+        return `<div style="background:var(--surface);border:1.5px solid ${sel?'var(--accent)':'var(--border)'};border-radius:16px;overflow:hidden">
           <div onclick="toggleCardioTypeSport('${t}')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:${sel?'var(--accent-dim)':'transparent'}">
             <div>${asyIcon(sportIcons[t],24)}</div>
             <div style="flex:1">
@@ -931,7 +931,7 @@ function renderWizardStep() {
             <div style="margin-top:10px">
               <div class="input-label" style="margin-bottom:6px">Distance</div>
               <div style="display:flex;gap:0;align-items:stretch">
-                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" value="${SWIM_GOAL_DIST[g.id]}" readonly>
+                <input type="number" class="input-field" style="border-radius:12px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" value="${SWIM_GOAL_DIST[g.id]}" readonly>
                 <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
                   <button onclick="setSwimUnit('yd')" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;cursor:pointer;background:${(g.swimUnit||'yd')==='yd'?'var(--accent)':'var(--surface2)'};color:${(g.swimUnit||'yd')==='yd'?'var(--on-ink)':'var(--muted)'}">yd</button>
                   <button onclick="setSwimUnit('m')" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;border-left:1px solid var(--border2);cursor:pointer;background:${(g.swimUnit||'yd')==='m'?'var(--accent)':'var(--surface2)'};color:${(g.swimUnit||'yd')==='m'?'var(--on-ink)':'var(--muted)'}">m</button>
@@ -943,12 +943,12 @@ function renderWizardStep() {
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['swim'].targetMins=this.value;updatePaceTime('swim');updateSwimPaceDisplay()" min="0" max="99">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">minutes</div>
                 </div>
                 <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.targetSecs||''}" oninput="WD.cardioGoals['swim'].targetSecs=this.value;updatePaceTime('swim');updateSwimPaceDisplay()" min="0" max="59">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">seconds</div>
                 </div>
               </div>
               <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(((+g.targetMins||0)*60)+(+g.targetSecs||0))>0?'block':'none'}">${asyIcon('🎯',13)} ${_clkMS(((+g.targetMins||0)*60)+(+g.targetSecs||0))} is ${_clkMS((((+g.targetMins||0)*60)+(+g.targetSecs||0))/(SWIM_GOAL_DIST[g.id]/100))} per 100 ${g.swimUnit||'yd'}.</div>
@@ -973,7 +973,7 @@ function renderWizardStep() {
             <div style="margin-top:10px">
               <div class="input-label" style="margin-bottom:6px">Target distance</div>
               <div style="display:flex;gap:0;align-items:stretch">
-                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" value="${g.targetDist||''}" oninput="WD.cardioGoals['run'].targetDist=this.value;updateRaceDateFeedback()" min="0.1" step="0.1">
+                <input type="number" class="input-field" style="border-radius:12px 0 0 8px;flex:1" placeholder="e.g. 1.5" value="${g.targetDist||''}" oninput="WD.cardioGoals['run'].targetDist=this.value;updateRaceDateFeedback()" min="0.1" step="0.1">
                 <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
                   <button onclick="setPaceUnit('mi')" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;cursor:pointer;background:${(WD.cardioGoals['run']?.paceUnit||'mi')==='mi'?'var(--accent)':'var(--surface2)'};color:${(WD.cardioGoals['run']?.paceUnit||'mi')==='mi'?'var(--on-ink)':'var(--muted)'}">mi</button>
                   <button onclick="setPaceUnit('km')" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;border-left:1px solid var(--border2);cursor:pointer;background:${(WD.cardioGoals['run']?.paceUnit||'mi')==='km'?'var(--accent)':'var(--surface2)'};color:${(WD.cardioGoals['run']?.paceUnit||'mi')==='km'?'var(--on-ink)':'var(--muted)'}">km</button>
@@ -985,12 +985,12 @@ function renderWizardStep() {
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.value;updatePaceTime('run');updateRaceDateFeedback()" min="0" max="99">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">minutes</div>
                 </div>
                 <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.targetSecs||''}" oninput="WD.cardioGoals['run'].targetSecs=this.value;updatePaceTime('run');updateRaceDateFeedback()" min="0" max="59">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">seconds</div>
                 </div>
               </div>
               <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.targetMins!==undefined&&WD.cardioGoals['run']?.targetMins!==''&&WD.cardioGoals['run']?.targetDist)?'block':'none'}">${asyIcon('🎯',13)} ${(()=>{ const _t: any=paceGoalTarget(WD.cardioGoals['run']); return _t.tPacePerMile ? _clkMS(_t.tTotalSecs)+' is '+_clkMS(_t.tPacePerMile)+' per mile.' : ''; })()}</div>
@@ -1008,12 +1008,12 @@ function renderWizardStep() {
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="3" max="20">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">minutes</div>
                 </div>
                 <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="0" max="59">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">seconds</div>
                 </div>
               </div>${_mileAdvisoryHTML()}
             </div>` : `
@@ -1029,12 +1029,12 @@ function renderWizardStep() {
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="3" max="20">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">minutes</div>
                 </div>
                 <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="0" max="59">
-                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;">seconds</div>
                 </div>
               </div>${_mileAdvisoryHTML()}
             </div>` : ''}`}
@@ -1044,24 +1044,24 @@ function renderWizardStep() {
       }).join('')}
     </div>
     ${WD.cardioTypes.length && Object.keys(WD.cardioGoals).length ? `
-    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:12px 14px;margin-top:4px">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:12px 14px;margin-top:4px">
       <div style="font-size:12px;color:var(--muted);line-height:1.6">
         <span id="progLenLine">${progLenLineHTML()}</span>
         ${WD.cardioTypes.length > 1 ? '<br>Sessions rotate across training days. Each sport gets its own days.' : ''}
       </div>
       ${WD.primaryPath==='event' ? `<div style="margin-top:10px">
-        <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Race date</div>
-        <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:8px">
-          <button onclick="WD.eventTargeted=true;if(!WD.raceDate){const t=new Date();WD.raceDate=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}renderWizardStep()" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border:none;cursor:pointer;background:${WD.eventTargeted?'var(--accent)':'transparent'};color:${WD.eventTargeted?'var(--on-ink)':'var(--muted)'}">✓ I have a race date</button>
-          <button onclick="WD.eventTargeted=false;WD.raceDate='';WD.raceDateWeeks=null;renderWizardStep()" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border:none;cursor:pointer;background:${!WD.eventTargeted?'var(--accent)':'transparent'};color:${!WD.eventTargeted?'var(--on-ink)':'var(--muted)'}">✕ Just building fitness</button>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0;margin-bottom:6px">Race date</div>
+        <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:8px">
+          <button onclick="WD.eventTargeted=true;if(!WD.raceDate){const t=new Date();WD.raceDate=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}renderWizardStep()" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:9px;border:none;cursor:pointer;background:${WD.eventTargeted?'var(--accent)':'transparent'};color:${WD.eventTargeted?'var(--on-ink)':'var(--muted)'}">✓ I have a race date</button>
+          <button onclick="WD.eventTargeted=false;WD.raceDate='';WD.raceDateWeeks=null;renderWizardStep()" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:9px;border:none;cursor:pointer;background:${!WD.eventTargeted?'var(--accent)':'transparent'};color:${!WD.eventTargeted?'var(--on-ink)':'var(--muted)'}">✕ Just building fitness</button>
         </div>
         ${WD.eventTargeted ? `<div>
-          <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Race date</div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0;margin-bottom:8px">Race date</div>
           <input type="date" id="raceDateInput"
             value="${WD.raceDate || (()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');})()}"
             min="${(()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');})()}"
             oninput="WD.raceDate=this.value;updateRaceDateFeedback()"
-            style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0.04em;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
+            style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:12px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
           <div id="raceDateFeedback" style="margin-top:8px"></div>
           <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open the calendar. The final weeks taper so you arrive fresh.</div>
         </div>` : `<div style="font-size:11px;color:var(--muted);line-height:1.5">${(WD.cardioGoals['run']&&(WD.cardioGoals['run'].id==='run_5k'||WD.cardioGoals['run'].id==='run_10k')) ? 'Runs the full 8-week '+(WD.cardioGoals['run'].id==='run_5k'?'5K':'10K')+' plan and finishes with a '+(WD.cardioGoals['run'].id==='run_5k'?'5K':'10K')+' time trial in place of race day.' : 'Program builds to peak fitness and holds. Pick a race when ready.'}</div>`}
@@ -1085,8 +1085,8 @@ function renderWizardStep() {
       </div>`).join('')}
     </div>
     ${WD.primaryPath === 'body' ? `
-    <div style="margin-top:12px;background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden">
-      <div style="padding:10px 14px;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">Optional cardio add-on</div>
+    <div style="margin-top:12px;background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden">
+      <div style="padding:10px 14px;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);border-bottom:1px solid var(--border)">Optional cardio add-on</div>
       <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
         ${['run','bike','swim'].map(t => {
           const icons: Record<string, string>={run:'🏃',bike:'🚴',swim:'🏊'};
@@ -1124,7 +1124,7 @@ function renderWizardStep() {
       return null;
     })();
     const _floorBanner = _atFloor
-      ? '<div style="margin-top:10px;background:rgba(var(--ink-rgb),0.12);border:1px solid rgba(var(--ink-rgb),0.35);border-radius:4px;padding:12px 14px">' +
+      ? '<div style="margin-top:10px;background:rgba(var(--ink-rgb),0.12);border:1px solid rgba(var(--ink-rgb),0.35);border-radius:16px;padding:12px 14px">' +
           '<div style="font-size:13px;color:var(--accent);font-weight:700;line-height:1.5;margin-bottom:4px">'+asyIcon('🔒',13)+' You\'re at your minimum training days</div>' +
           '<div style="font-size:12px;color:var(--text);line-height:1.5">' +
             (_floorReason
@@ -1136,7 +1136,7 @@ function renderWizardStep() {
 
     // Other advisories (lifting volume, interval protection) — only shown when NOT the floor reason
     const _advisoryHtml = (_advisories.length && !_atFloor)
-      ? '<div style="margin-top:10px;background:rgba(var(--ink-rgb),0.10);border:1px solid rgba(var(--ink-rgb),0.28);border-radius:4px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">' +
+      ? '<div style="margin-top:10px;background:rgba(var(--ink-rgb),0.10);border:1px solid rgba(var(--ink-rgb),0.28);border-radius:16px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">' +
           _advisories.map(a => '<div style="font-size:12px;color:var(--accent);line-height:1.5">' + a + '</div>').join('') +
         '</div>'
       : '';

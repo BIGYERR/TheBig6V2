@@ -319,7 +319,7 @@ function cardioFieldHTML(sport: any, e: any, dose: any, sub: any){
 function cardioSwapChip(sport: any, active: any, planned: any){
   const on=sport===active;
   const tag=sport===planned?' · planned':'';
-  return `<button type="button" data-sport="${sport}" onclick="setCardioSwap('${sport}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid ${on?'var(--accent)':'var(--border2)'};background:${on?'rgba(var(--ink-rgb),0.12)':'var(--surface2)'};color:${on?'var(--accent)':'var(--muted)'};font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em">${asyIcon(sport,15)}<span>${CARDIO_WORD[sport]}${tag}</span></button>`;
+  return `<button type="button" data-sport="${sport}" onclick="setCardioSwap('${sport}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:12px;cursor:pointer;border:1px solid ${on?'var(--accent)':'var(--border2)'};background:${on?'rgba(var(--ink-rgb),0.12)':'var(--surface2)'};color:${on?'var(--accent)':'var(--muted)'};font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0">${asyIcon(sport,15)}<span>${CARDIO_WORD[sport]}${tag}</span></button>`;
 }
 
 function buildLogHTML(dayKey: any, dayCardio: any){
@@ -357,7 +357,7 @@ function buildLogHTML(dayKey: any, dayCardio: any){
         <div id="cardioFields">${cardioFieldHTML(activeSport, e, _curLogDose, _curLogSub)}</div>
         <button type="button" id="cardioSwapLink" onclick="toggleCardioPicker()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:6px 0 0;display:inline-flex;align-items:center;gap:5px;text-decoration:underline;text-underline-offset:2px">${asyIcon('history',13)} Did a different activity?</button>
         <div id="cardioPicker" style="display:${swapped?'block':'none'};margin-top:8px">
-          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">Logged as</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0;margin-bottom:6px">Logged as</div>
           <div style="display:flex;gap:6px">${['run','bike','swim'].map(s=>cardioSwapChip(s, activeSport, ct)).join('')}</div>
           <div id="cardioSwapNote" style="font-size:11px;color:var(--accent);margin-top:8px;line-height:1.4;display:${swapped?'block':'none'}">${swapped?cardioSwapNoteText(activeSport, ct, e):''}</div>
         </div>

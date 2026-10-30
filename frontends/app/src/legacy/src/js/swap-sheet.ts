@@ -79,11 +79,11 @@ function openSwapSheet(secIdx: any,itemIdx: any,src?: any){
     }
   }
   // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
-  const tagOf=p=>({hinge:'HINGE',squat:'SQUAT',lunge:'LUNGE',hip_ext:'HIP EXTENSION',row:'ROW',vpull:'VERTICAL PULL',
-    hpress:'HORIZONTAL PRESS',vpress:'VERTICAL PRESS',bi_iso:'BICEPS',tri_iso:'TRICEPS',delt_iso:'DELTS',
-    leg_iso:'LEG ISOLATION',calf_iso:'CALVES'}[p]||'LIFT');
+  const tagOf=p=>({hinge:'Hinge',squat:'Squat',lunge:'Lunge',hip_ext:'Hip extension',row:'Row',vpull:'Vertical pull',
+    hpress:'Horizontal press',vpress:'Vertical press',bi_iso:'Biceps',tri_iso:'Triceps',delt_iso:'Delts',
+    leg_iso:'Leg isolation',calf_iso:'Calves'}[p]||'Lift');
   // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
-  const regionOf=r=>({push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[r]||'TODAY');
+  const regionOf=r=>({push:'Push day',pull:'Pull day',legs:'Leg day'}[r]||'Today');
   // V196 D56: two arms, two meanings. MAIN LIFT is reserved for the SLOT test — item 0
   // of a /^main/i section, the same test _slotOfEntry freezes into the ledger. The tier
   // arm is a heavy compound caution and says so. With the Progress card keeping the name
@@ -95,17 +95,17 @@ function openSwapSheet(secIdx: any,itemIdx: any,src?: any){
   document.getElementById('swapTags')!.innerHTML=
     '<span class="swap-tag">'+(_fam?_AUX_FAMILY_LABEL[_fam]:tagOf(c.pattern))+'</span>'
     +'<span class="swap-tag">'+regionOf(c.region)+'</span>'
-    +(isMainSlot?'<span class="swap-tag">MAIN LIFT</span>':(isHeavyCompound?'<span class="swap-tag">HEAVY COMPOUND</span>':''))
+    +(isMainSlot?'<span class="swap-tag">Main lift</span>':(isHeavyCompound?'<span class="swap-tag">Heavy compound</span>':''))
     +(rxs?'<div class="swap-keeps">Whatever you pick keeps '+rxs+'.</div>':'');
   let h='';
   if(c.tier1.length){
-    h+='<div class="swap-sec-lbl">SAME JOB</div>'
+    h+='<div class="swap-sec-lbl">Same job</div>'
       +'<div class="swap-sec-sub">These do the same work. Your week keeps its shape.</div>'
       +_flowNote
       +c.tier1.map(n=>_swapRow(n,false,item.name)).join('');
   }
   if(c.tier2.length){
-    h+='<div class="swap-sec-lbl caution">'+asyIcon('warning',13)+' DIFFERENT JOB, SAME DAY</div>'
+    h+='<div class="swap-sec-lbl caution">'+asyIcon('warning',13)+' Different job, same day</div>'
       +'<div class="swap-sec-sub">Still '+(c.region||'the same')+' work. You give up the '+tagOf(c.pattern).toLowerCase()+' for today.</div>'
       +c.tier2.map(n=>_swapRow(n,true,item.name)).join('');
   }
@@ -249,15 +249,15 @@ function openAddSheet(){
   if(!day||!activeProg){showToast('Nothing to add to here');return;}
   const c=addCandidates(day,currentWeek,activeProg);
   // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ pu
-  const regionLbl={push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[c.region]||'TODAY';
+  const regionLbl={push:'Push day',pull:'Pull day',legs:'Leg day'}[c.region]||'Today';
   let setCount=0;
   ((day.sections)||[]).forEach(function(s: any){(s.items||[]).forEach(function(it: any){
     if(!it||it._skipped) return; const rx=parseRx(it.detail||'',it.name||''); if(rx&&!rx.open) setCount+=rx.sets;
   });});
   document.getElementById('addOutName')!.textContent=(day.title||'Training');
   document.getElementById('addTags')!.innerHTML=
-    '<span class="swap-tag">WEEK '+currentWeek+'</span><span class="swap-tag">'+regionLbl+'</span>'
-    +'<span class="swap-tag">'+setCount+' SETS</span>'
+    '<span class="swap-tag">Week '+currentWeek+'</span><span class="swap-tag">'+regionLbl+'</span>'
+    +'<span class="swap-tag">'+setCount+' sets</span>'
     +'<div class="swap-keeps">Added work matches the closest thing to it in your week.</div>';
   const row=function(n: any,cls: any,note: any){
     return '<button type="button" class="swap-cand'+(cls?' '+cls:'')+'" onclick="applyAddChoice(\''+n.replace(/'/g,"\\'")+'\')">'
@@ -266,12 +266,12 @@ function openAddSheet(){
   };
   let h='';
   if(c.gap.length){
-    h+='<div class="swap-sec-lbl">TODAY ISN\'T TRAINING THESE</div>'
+    h+='<div class="swap-sec-lbl">Today isn\'t training these</div>'
       +'<div class="swap-sec-sub">Work your day has no movement for yet.</div>'
       +c.gap.map(function(n){return row(n,'','');}).join('');
   }
   if(c.more.length){
-    h+='<div class="swap-sec-lbl caution">'+asyIcon('warning',13)+' MORE OF WHAT YOU\'RE ALREADY DOING</div>'
+    h+='<div class="swap-sec-lbl caution">'+asyIcon('warning',13)+' More of what you\'re already doing</div>'
       +'<div class="swap-sec-sub">Your day already trains this pattern. Adding here stacks fatigue on the same tissue.</div>'
       +c.more.map(function(n){
         const rx=parseRx(addedDetailFor(day,n,currentWeek,activeProg),n);
@@ -281,7 +281,7 @@ function openAddSheet(){
   if(c.off.length){
     // Off-region work is offered, not hidden. This is the "hip thrusts on a push day"
     // case: the athlete gets the movement AND the thing they would want to know about it.
-    h+='<div class="swap-sec-lbl caution">'+asyIcon('warning',13)+' NOT WHAT TODAY IS FOR</div>'
+    h+='<div class="swap-sec-lbl caution">'+asyIcon('warning',13)+' Not what today is for</div>'
       +'<div class="swap-sec-sub">Different region than this day trains. Fine once, but watch what it lands next to.</div>'
       +c.off.map(function(n){
         // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.

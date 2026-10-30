@@ -149,7 +149,7 @@ test('the reminder pop-up shows the notebook icon', () => {
 test('the injury check-ins show the shield, or the warning when trending worse', () => {
   const INJURY = [['Good. One week to prove it.', 'shield'], ['Good. Two weeks to full send.', 'shield'], ['Good sign.', 'shield'], ['Two weeks and trending worse.', 'warning']];
   for (const [msg, want] of INJURY) {
-    const re = new RegExp('popFire' + BS + "('workout'," + BS + "{icon:'([^']*)',kicker:'(BACK IN|CHECK IN)',msg:'" + P.reEsc(msg) + "'", 'g');
+    const re = new RegExp('popFire' + BS + "('workout'," + BS + "{icon:'([^']*)',kicker:'(Back in|Check in)',msg:'" + P.reEsc(msg) + "'", 'g');
     const ms = [...S.stripped.matchAll(re)];
     assert.equal(ms.length, 1, msg);
     assert.equal(ms[0][1], want, msg);
@@ -194,8 +194,8 @@ test('a reminder pop-up writes the notebook SVG into its icon, not text', () => 
 
 test('an injury pop-up writes the shield or warning SVG into its icon', () => {
   const p = popIconWrites();
-  const r2 = p.fire('workout', { icon: 'shield', kicker: 'BACK IN', msg: 'm', dismiss: 'ok' });
-  const r3 = p.fire('workout', { icon: 'warning', kicker: 'CHECK IN', msg: 'm', dismiss: 'ok' });
+  const r2 = p.fire('workout', { icon: 'shield', kicker: 'Back in', msg: 'm', dismiss: 'ok' });
+  const r3 = p.fire('workout', { icon: 'warning', kicker: 'Check in', msg: 'm', dismiss: 'ok' });
   p.restore();
   assert.ok(svgOnly(r2) && svgOnly(r3), J([r2.w, r3.w]).slice(0, 200));
 });
@@ -491,7 +491,7 @@ test('marking a run-only weekday done draws only untagged lines', () => {
   install(handProg());
   setNow(DATES[4].wed, 10);
   assert.deepEqual(sweep("fireCompletionPopup(4,'wed')", null, true), UNTAGGED);
-  assert.equal(el('popKicker'), 'WORKOUT COMPLETE');
+  assert.equal(el('popKicker'), 'Workout complete');
 });
 
 test('marking Saturday\'s long run done on Monday can draw the weekend lines, never the morning or lifting ones', () => {
@@ -594,12 +594,12 @@ test('the draw never repeats the last line, and remembers the one it drew', () =
   assert.notEqual(mem.workout, 4);
 });
 
-test('the Wildcard pop-up says its own line under WILDCARD DONE', () => {
+test('the Wildcard pop-up says its own line under Wildcard done', () => {
   install(handProg());
   setNow(DATES[1].sat, 7);
   Q.eval('fireWildcardPopup(true)');
   Q.flushTimers();
-  assert.deepEqual([el('popKicker'), el('popMsg')], ['WILDCARD DONE', 'You showed up. That is the whole game.']);
+  assert.deepEqual([el('popKicker'), el('popMsg')], ['Wildcard done', 'You showed up. That is the whole game.']);
 });
 
 test('the streak and season pop-ups draw from their own pools', () => {

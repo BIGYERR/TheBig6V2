@@ -19,7 +19,7 @@ const deps = (over: Partial<WeekDeps> = {}): WeekDeps => ({
   weekRange: () => null, parseDate: (iso) => new Date(iso + 'T00:00:00'), isTravel: () => false, beforeStart: () => false,
   regionLabel: (r) => ({ knee: 'Knee' })[r], icon: (n, s) => `[${n}/${s}]`,
   dayCode: (day) => (!day || day.rest ? { top: '', topColor: 'var(--dim)', bot: 'REST', botColor: 'var(--dim)' } : { top: 'RUN', topColor: 'var(--run)', bot: 'PUSH', botColor: 'var(--lift)' }),
-  onGold: (hex) => `gold(${hex})`, wildcardOn: () => false, statusOf: () => undefined,
+  wildcardOn: () => false, statusOf: () => undefined,
   heroSummary: (day) => `${day.title}<br>summary`, sessionTime: () => 45, restTip: () => ({ label: 'Fuel', text: 'Eat.', src: 'NSW' }),
   restLines: (rl) => Object.keys(rl || {}).map((t) => `20 min ${t} logged`), streak: () => 3, wildcardSub: (w, k) => `sub ${w} ${k}`,
   liveInjury: () => null, alignment: () => null, raceDay: (iso) => `day(${iso})`, completedKey: (w, d) => `w${w}_${d}`, logKey: (w, d) => `w${w}_${d}`,
@@ -41,8 +41,8 @@ describe('This Week', () => {
 
   it('heads the week with the program name cut at 26 and the week number, and the phase in the pill', () => {
     const v = weekView(input(), deps());
-    assert.deepEqual([v.overline, v.bigNum, v.pill], ['STRENGTH BLOCK WITH A LONG…', 'WEEK 1', { html: 'Phase 1 — Rebuild', cls: '' }]);
-    assert.deepEqual(v.hurt, { icon: '[bandage/17]', injured: false, label: 'HURT?' });
+    assert.deepEqual([v.overline, v.bigNum, v.pill], ['Strength Block With A Long…', 'Week 1', { html: 'Phase 1 — Rebuild', cls: '' }]);
+    assert.deepEqual(v.hurt, { icon: '[bandage/17]', injured: false, label: 'Hurt?' });
     assert.deepEqual(v.start, { shown: 'Oct 5, 2026', iso: '2026-10-05' });
     assert.deepEqual(v.race, { aligned: false, iso: '', day: null });
   });
@@ -50,7 +50,7 @@ describe('This Week', () => {
   it('puts an injury before travel, the taper and a recovery week in the pill, and washes the screen only for an injury', () => {
     const knee = { ...PROG, overlays: [{ type: 'injury', from: '2026-10-01', patch: { injury: { region: 'knee' } } }] };
     const hurt = weekView(input({ prog: knee }), deps({ weekRange: () => ({ fromWeek: 1, toWeek: 2 }) }));
-    assert.deepEqual([hurt.pill, hurt.injuryWeek, hurt.hurt.label, hurt.hurt.injured], [{ html: 'Injury Week · Knee', cls: ' phase-pill--injury' }, true, 'KNEE', true]);
+    assert.deepEqual([hurt.pill, hurt.injuryWeek, hurt.hurt.label, hurt.hurt.injured], [{ html: 'Injury Week · Knee', cls: ' phase-pill--injury' }, true, 'Knee', true]);
     assert.deepEqual(hurt.weeks.map((w) => w.label), ['Wk 1 ● ✦', 'Wk 2 ✦', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6']);
     assert.deepEqual(weekView(input({ prog: { ...PROG, overlays: [] } }), deps({ isTravel: (day) => !!day && !day.rest })).pill, { html: 'Maintenance Week', cls: ' phase-pill--recovery' });
     assert.deepEqual(weekView(input({ week: 6, prog: { ...PROG, taperWeeks: [5, 6] } }), deps()).pill, { html: '[🏁/13] Race Week', cls: ' phase-pill--recovery' });
@@ -60,7 +60,7 @@ describe('This Week', () => {
     assert.equal(weekView(input({ prog: ended }), deps({ weekRange: () => ({ fromWeek: 1, toWeek: 1 }) })).injuryWeek, false, 'an overlay that ended yesterday is over');
   });
 
-  it('draws the strip: today in its gold codes, the past and rest days dim, a done day ticked, a Wildcard marked, a skipped day crossed', () => {
+  it('draws the strip: today in its own codes, the past and rest days dim, a done day ticked, a Wildcard marked, a skipped day crossed', () => {
     const v = weekView(input({ completed: { w1_mon: { status: 'complete' }, w1_thu: { status: 'skipped' } } }), deps({ wildcardOn: (w, d) => d === 'tue' }));
     const cells = v.days!.strip;
     assert.deepEqual(cells.map((c) => (c.pre ? 'pre' : [c.key, c.cls, c.center])), [
@@ -69,10 +69,10 @@ describe('This Week', () => {
     ]);
     const wed = cells[2]!, fri = cells[4]!, mon = cells[0]!;
     assert.ok(!wed.pre && !fri.pre && !mon.pre);
-    assert.deepEqual([wed.top, wed.topColor, wed.bot, wed.botColor], ['—', 'gold(var(--dim))', 'REST', 'gold(var(--dim))']);
+    assert.deepEqual([wed.top, wed.topColor, wed.bot, wed.botColor], ['—', 'var(--dim)', 'REST', 'var(--dim)']);
     assert.deepEqual([fri.top, fri.topColor, fri.botColor, mon.topColor], ['RUN', 'var(--run)', 'var(--lift)', 'var(--dim)']);
     const pre = weekView(input(), deps({ beforeStart: (w, d) => d === 'mon' })).days!.strip[0]!;
-    assert.deepEqual(pre, { pre: true, label: 'MON', num: '5' });
+    assert.deepEqual(pre, { pre: true, label: 'Mon', num: '5' });
   });
 
   it('makes today\'s rest day the hero, with its jog lines, Edit cardio and the tip', () => {
@@ -88,14 +88,14 @@ describe('This Week', () => {
     assert.deepEqual(v.days!.hero, { kind: 'rest', key: 'wed', over: 'Today · Wednesday', lines: [], logLabel: 'Log cardio', anyway: false, tip: { label: 'Fuel', text: 'Eat.', src: 'NSW' } });
   });
 
-  it('makes today\'s session the hero with START SESSION, and a closed day OPEN SESSION with its status', () => {
+  it('makes today\'s session the hero with Start session, and a closed day Open session with its status', () => {
     const today = weekView(input({ today: new Date(2026, 9, 9) }), deps());
     const h = today.days!.hero;
     assert.ok(h.kind === 'day');
-    assert.deepEqual([h.key, h.today, h.over, h.title, h.time, h.summary, h.cta], ['fri', true, 'Today · Friday', 'Push', '~45 MIN', 'Push<br>summary', 'START SESSION']);
+    assert.deepEqual([h.key, h.today, h.over, h.title, h.time, h.summary, h.cta], ['fri', true, 'Today · Friday', 'Push', '~45 min', 'Push<br>summary', 'Start session']);
     const closed = weekView(input({ today: new Date(2026, 9, 9) }), deps({ statusOf: () => 'complete' })).days!.hero;
     assert.ok(closed.kind === 'day');
-    assert.deepEqual([closed.status, closed.cta], ['Done ✓ Closed out. Open the session to undo.', 'OPEN SESSION']);
+    assert.deepEqual([closed.status, closed.cta], ['Done ✓ Closed out. Open the session to undo.', 'Open session']);
     assert.equal(h.travel, false);
     const away = weekView(input({ today: new Date(2026, 9, 9) }), deps({ isTravel: (day) => !!day && day.title === 'Push' })).days!.hero;
     assert.ok(away.kind === 'day' && away.travel, 'a travel day carries the travel tag');
@@ -105,7 +105,7 @@ describe('This Week', () => {
     const moved = { ...PROG, weeks: { ...PROG.weeks, 2: { ...PROG.weeks[2], mon: { ...lift('Upper', ['lift', 'run', 'mystery']), movedFrom: 'sun' } } } };
     const h = weekView(input({ week: 2, prog: moved }), deps()).days!.hero;
     assert.ok(h.kind === 'day');
-    assert.deepEqual([h.key, h.today, h.over, h.cta], ['mon', false, 'Week 2 · Monday · moved from Sunday', 'OPEN SESSION']);
+    assert.deepEqual([h.key, h.today, h.over, h.cta], ['mon', false, 'Week 2 · Monday · moved from Sunday', 'Open session']);
     assert.deepEqual(h.tags, [
       { label: 'Lift', style: 'color:var(--lift);background:rgba(var(--lift-rgb),0.15)' },
       { label: 'Run', style: 'color:var(--run);background:rgba(var(--run-rgb),0.15)' },

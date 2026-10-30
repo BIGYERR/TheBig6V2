@@ -29,7 +29,7 @@ import { type AddSheetView, addSheetView, workingSets } from './add-sheet-model'
   <div class="swap-body" id="addBody">
     @if (view(); as v) {
       @if (v.gap.length) {
-        <div class="swap-sec-lbl">TODAY ISN'T TRAINING THESE</div>
+        <div class="swap-sec-lbl">Today isn't training these</div>
         <div class="swap-sec-sub">Work your day has no movement for yet.</div>
         @for (r of v.gap; track $index) {
           <button type="button" class="swap-cand" (click)="pick(r.name)"><span class="swap-cand-name">{{ r.name }}</span></button>
@@ -70,7 +70,7 @@ export class AddSheet {
   }
 
   protected warning(which: 'more' | 'off'): SafeHtml {
-    const text = which === 'more' ? " MORE OF WHAT YOU'RE ALREADY DOING" : ' NOT WHAT TODAY IS FOR';
+    const text = which === 'more' ? " More of what you're already doing" : ' Not what today is for';
     return this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', 'warning', 13) + text);
   }
 

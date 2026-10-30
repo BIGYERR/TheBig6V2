@@ -154,7 +154,8 @@ export function ledgerBench(): LedgerBench {
 }
 
 // ── readers of the rendered Progress screen ──────────────────────────────────────────────────────────────────────────
-const CARD_OPEN = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">';
+// A card opens on its surface fill and its padding; its outline and corner are the look's and may change (D263 moved both).
+const CARD_OPEN = /<div style="background:var\(--surface\);border:[^;"]*;border-radius:[^;"]*;padding:14px 16px">/;
 const BLOCK_OPEN = '<div style="padding:12px 0;border-bottom:1px solid var(--border)">';
 const FOOT_OPEN = '<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">';
 export const cards = (h: string): string[] => h.split(CARD_OPEN).slice(1);

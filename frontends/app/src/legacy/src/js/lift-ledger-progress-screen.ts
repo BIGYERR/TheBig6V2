@@ -281,7 +281,7 @@ function _ladderRow(r: any, unit: any){
   const disp=w=>(unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w);
   const u=(unit==='kg')?'kg':'lbs';
   const status=r.ready
-    ? '<span style="font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--signal)">Add weight</span>'
+    ? '<span style="font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0;color:var(--signal)">Add weight</span>'
     : '<span style="font-size:10px;color:var(--muted)">'+(r.hi-Math.min.apply(null,r.sets))+' to go</span>';
   return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">'
     +'<div style="flex:1;min-width:0">'
@@ -587,7 +587,7 @@ function renderProgressScreen() {
         // (restLogLines), never an RPE_LABELS word: the sheet's effort words are not the label table's.
         const jogLines = restLogLines(entry.restLog);
         const headMb = (entry.notes||isSwap||jogLines.length) ? 6 : 0;
-        return `<div style="background:var(--surface2);border-radius:4px;padding:10px 12px;margin-bottom:6px">
+        return `<div style="background:var(--surface2);border-radius:16px;padding:10px 12px;margin-bottom:6px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${headMb}px">
             <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text)">${dayName}</div>
             ${entry.rpe ? `<div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:${rpeColor}">RPE ${entry.rpe} — ${RPE_LABELS[+entry.rpe]||''}</div>` : ''}
@@ -599,29 +599,29 @@ function renderProgressScreen() {
       }).join('');
       const n = byWeek[w].length;
       return `<details class="journal-week"${w===openWeek?' open':''}>
-        <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)">
+        <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted)">
           <span>Week ${w}</span>
-          <span style="display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:0.04em;opacity:0.75">${n} ${n===1?'entry':'entries'}<span class="journal-caret" style="display:inline-flex">${asyIcon('chevronDown',14)}</span></span>
+          <span style="display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:0;opacity:0.75">${n} ${n===1?'entry':'entries'}<span class="journal-caret" style="display:inline-flex">${asyIcon('chevronDown',14)}</span></span>
         </summary>
         <div style="padding:2px 0 8px">${entriesHtml}</div>
       </details>`;
     }).join('');
 
-    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
-      <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">${asyIcon('📓',15)} Session Journal</div>
+    html += `<div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">
+      <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:var(--muted);margin-bottom:12px">${asyIcon('📓',15)} Session Journal</div>
       ${journalHtml}
     </div>`;
   }
 
   const _liftBtns=['Deadlift','Squat','Bench'].map((n,i)=>{
     const on=(calcLift===n);
-    return `<button type="button" id="calcLift_${n}" onclick="setCalcLift('${n}')" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border:none;${i?'border-left:1px solid var(--border2);':''}cursor:pointer;background:${on?'var(--accent)':'transparent'};color:${on?'var(--on-ink)':'var(--muted)'}">${n}</button>`;
+    return `<button type="button" id="calcLift_${n}" onclick="setCalcLift('${n}')" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:9px;border:none;${i?'border-left:1px solid var(--border2);':''}cursor:pointer;background:${on?'var(--accent)':'transparent'};color:${on?'var(--on-ink)':'var(--muted)'}">${n}</button>`;
   }).join('');
-  const estimatorHtml = `<details style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0 16px;margin-top:4px">
-      <summary style="cursor:pointer;padding:14px 0;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">${asyIcon('🧮',15)} 1RM Estimator</summary>
+  const estimatorHtml = `<details style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:0 16px;margin-top:4px">
+      <summary style="cursor:pointer;padding:14px 0;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:var(--muted)">${asyIcon('🧮',15)} 1RM Estimator</summary>
       <div style="padding-bottom:14px">
         <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px">Optional — estimate a one-rep max from any recent set, just for your own records. Your training still runs on RPE.</div>
-        <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px">${_liftBtns}</div>
+        <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:10px">${_liftBtns}</div>
         <div class="input-row" style="margin-bottom:10px">
           <div class="input-group"><div class="input-label">Weight</div><input type="number" class="input-field" id="calc_weight" placeholder="e.g. 185" oninput="runCalc()"></div>
           <div class="input-group"><div class="input-label">Reps</div><input type="number" class="input-field" id="calc_reps" placeholder="e.g. 5" oninput="runCalc()"></div>
@@ -685,8 +685,8 @@ function buildDotChart(title: any, weeks: any, data: any, color: any, label: any
   // X axis labels (show every few weeks)
   const xLabelStep = n <= 8 ? 1 : n <= 16 ? 2 : 4;
 
-  return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
-    <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${color};margin-bottom:10px">${title}</div>
+  return `<div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">
+    <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:${color};margin-bottom:10px">${title}</div>
     <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">
       <!-- Grid lines -->
       ${yLabels.map(yv => {
@@ -767,8 +767,8 @@ function buildMultiDotChart(title: any, weeks: any, series: any) {
      <text x="${padL+i*80+11}" y="${legendY+4}" fill="${s.color}" font-size="8" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">${s.label}</text>`
   ).join('');
 
-  return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
-    <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--lift);margin-bottom:10px">${title}</div>
+  return `<div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">
+    <div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:var(--lift);margin-bottom:10px">${title}</div>
     <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">
       ${svgContent}${legendItems}
     </svg>

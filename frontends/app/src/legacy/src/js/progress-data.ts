@@ -149,7 +149,7 @@ function buildPaceChart(title: any, weeks: any, data: any, tgt: any, color: any)
   });
   if(tgt){ const ty=Y(tgt);
     svg+='<line x1="'+padL+'" y1="'+ty.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+ty.toFixed(1)+'" stroke="'+color+'" stroke-width="1" stroke-dasharray="2,4" opacity="0.55"/>'
-       +'<text x="'+(W-padR-2)+'" y="'+(ty-3).toFixed(1)+'" font-size="7.5" fill="'+color+'" text-anchor="end" opacity="0.85">PLAN '+_fmtPaceShort(tgt)+'/mi</text>';
+       +'<text x="'+(W-padR-2)+'" y="'+(ty-3).toFixed(1)+'" font-size="7.5" fill="'+color+'" text-anchor="end" opacity="0.85">Plan '+_fmtPaceShort(tgt)+'/mi</text>';
   }
   let path='', prev: any=null, dots='', lastPt: any=null;
   data.forEach((v: any,i: any)=>{
@@ -167,8 +167,8 @@ function buildPaceChart(title: any, weeks: any, data: any, tgt: any, color: any)
     svg+='<text x="'+(padL+i*xStep).toFixed(1)+'" y="'+(H-padB+14)+'" font-size="8" fill="rgba(var(--ink-rgb),0.35)" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W'+w+'</text>';
   });
   svg+='<text x="'+(padL+plotW/2).toFixed(1)+'" y="'+(H-4)+'" font-size="8" fill="rgba(var(--ink-rgb),0.45)" text-anchor="middle">higher = faster easy pace \u00b7 dashed = plan target</text>';
-  return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
-    +'<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:'+color+';margin-bottom:10px">'+title+'</div>'
+  return '<div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">'
+    +'<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:'+color+';margin-bottom:10px">'+title+'</div>'
     +'<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">'+svg+'</svg></div>';
 }
 
@@ -188,7 +188,7 @@ function _progChipsHTML(programs: any, vid: any){
   const chips=order.map(p=>{
     const sel=p.id===vid;
     const label=(p.archived?asyIcon('history',13)+' ':'')+(p.name||'Program');
-    return `<button onclick="setProgressView('${p.id}')" style="flex:0 0 auto;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.04em;padding:8px 12px;border-radius:16px;cursor:pointer;white-space:nowrap;border:1px solid ${sel?'var(--accent)':'var(--border)'};background:${sel?'var(--accent)':'var(--surface)'};color:${sel?'var(--on-ink)':'var(--muted)'}">${label}</button>`;
+    return `<button onclick="setProgressView('${p.id}')" style="flex:0 0 auto;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:8px 12px;border-radius:16px;cursor:pointer;white-space:nowrap;border:1px solid ${sel?'var(--accent)':'var(--border)'};background:${sel?'var(--accent)':'var(--surface)'};color:${sel?'var(--on-ink)':'var(--muted)'}">${label}</button>`;
   }).join('');
   // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const viewed=programs.find(p=>p.id===vid);
@@ -214,7 +214,7 @@ function _restoreBarHTML(p: any){
     const _x=_purgeWarnsCrossProg(p.id)
       ?'<br><span style="color:var(--muted)">Other programs are using these loads as starting points \u2014 those will go blank.</span>'
       :'';
-    return `<div style="display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--red);border-radius:4px;padding:10px 12px">
+    return `<div style="display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--red);border-radius:16px;padding:10px 12px">
       <div style="font-size:12px;color:var(--red);line-height:1.5">This erases all logs, weights, and history for \u201C${esc(p.name||'Program')}\u201D. It cannot be undone.${_x}</div>
       <div style="display:flex;gap:8px">
         <button class="prog-action-btn danger" onclick="deleteProg('${p.id}',true)">Delete Forever</button>
@@ -222,7 +222,7 @@ function _restoreBarHTML(p: any){
       </div>
     </div>`;
   }
-  return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px">
+  return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid transparent;border-radius:16px;padding:10px 12px">
     <div style="font-size:12px;color:var(--muted)">This program is archived \u2014 history only.</div>
     <button class="prog-action-btn" style="flex:0 0 auto" onclick="unarchiveProg('${p.id}');renderProgressScreen()">Restore</button>
     <button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" onclick="askPurgeFromProgress('${p.id}')">${asyIcon('trash',16)}</button>

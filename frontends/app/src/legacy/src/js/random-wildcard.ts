@@ -297,7 +297,7 @@ function wildcardTagHTML(week: any,dayKey: any){
     ? 'Rest day. The streak sits this one out.'
     : ((day&&day.title)||'Your session')+' is still on the board.';
   return '<div class="wc-tag">'+wildcardMarkHTML(16)
-    +'<div class="wc-tag-txt"><div class="wc-tag-lbl">WILDCARD DONE</div>'
+    +'<div class="wc-tag-txt"><div class="wc-tag-lbl">Wildcard done</div>'
     +'<div class="wc-tag-sub">'+esc(sub)+'</div></div></div>';
 }
 // Its own dispatcher. fireCompletionPopup escalates to the season banner on the final
@@ -305,7 +305,7 @@ function wildcardTagHTML(week: any,dayKey: any){
 // say that, claim a PR, or claim progress.
 function fireWildcardPopup(isTraining: any){
   popFire('workout',{
-    kicker:'WILDCARD DONE',
+    kicker:'Wildcard done',
     msg:'You showed up. That is the whole game.',
     sub:isTraining?('Streak: '+computeStreak()+'.'):'Streak holds.'
   });

@@ -99,6 +99,7 @@ its own proof.
 | `css/this-week.css` | this week: pills, strip, hero, tiles, up next |
 | `css/session-sheet.css` | session sheet, set bar, logged state, rest stopwatch |
 | `css/motion.css` | motion, enriched strip, session journal, RPE modal |
+| `css/look.css` | the Track look (D263): the glow, round shapes and pills, This Week's strip and cards, the floating tab bar |
 | `html/screens.html` | `</style></head><body>`, update banner, screens 1 to 4 (home, wizard, generating, week) |
 | `html/overlays.html` | detail, add, swap nudge, RPE info, random, rest, change, goal and mile sheets, rest float, the `<script>` open tag |
 | `js/theme.ts` | the look (D261): Auto, Day or Night, `ia_theme`, `getTheme`, `setTheme`, `applyTheme` (sets `data-theme` on `<html>`) |

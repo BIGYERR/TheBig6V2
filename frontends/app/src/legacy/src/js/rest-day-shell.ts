@@ -85,7 +85,7 @@ function renderRestSheet(){
     if(!body._rdIn){ body._rdIn=true; body.addEventListener('input',_restInput); }
   }
   else body.innerHTML=
-     '<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 REST DAY</div>'
+     '<div class="ov-kicker">'+dayName+' \u00b7 Rest day</div>'
     +'<div class="ov-title">Not resting?</div>'
     +'<div class="ov-intro">Two ways to use it. Move a session you have not done yet, or log whatever cardio you got in.</div>'
     +'<div class="ov-eq" onclick="_rdSet(\'view\',\'move\')"><div class="ov-eq-body"><div class="ov-eq-name">Train a session here</div><div class="ov-eq-desc">Move one of this week\u2019s untrained days onto today.</div></div></div>'
@@ -93,7 +93,7 @@ function renderRestSheet(){
 }
 function _renderRestMove(w: any,dk: any,dayName: any){
   const cands=restMoveCandidates(w);
-  const head='<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 TRAINING ANYWAY</div>'
+  const head='<div class="ov-kicker">'+dayName+' \u00b7 Training anyway</div>'
     +'<div class="ov-title">Move a session here</div>'
     +'<div class="ov-intro">Nothing gets added. Whatever you pick moves to '+dayName+', and its old day becomes your rest.</div>';
   // v0.240.0 (D232): a jog already on the day is said before the list, each line the sentence without "logged".
@@ -120,7 +120,7 @@ function _renderRestMove(w: any,dk: any,dayName: any){
         +'<div class="ov-effect-sub">You have '+reg+' work on '+names+' too. Stack it here and something gives. Your call.</div></div>';
     }
   }
-  return head+already+'<div class="ov-eq-lbl">NOT LOGGED THIS WEEK</div>'+rows+warn
+  return head+already+'<div class="ov-eq-lbl">Not logged this week</div>'+rows+warn
     +(_restDraft.pick?'<button class="ov-apply" onclick="applyRestMove()">Move it here</button>':'');
 }
 function _renderRestCardio(w: any,dk: any,dayName: any){
@@ -139,23 +139,23 @@ function _renderRestCardio(w: any,dk: any,dayName: any){
   // v0.240.0 (D229 item 2): controls by type, on the sheet's own hidden ids. Run and bike: the time wheel and the miles
   // wheel. Row: the time wheel and a meters box. Swim: the time wheel and the card's yards box. Walk: the time wheel.
   const lbl=(x: any)=>'<div class="ov-eq-lbl" style="margin-top:14px">'+x+'</div>';
-  let ctl=lbl('TIME')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('hms','rest_mins',_restDraft.mins)+'</div>';
-  if(t==='run'||t==='bike') ctl+=lbl('DISTANCE')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('dist','rest_dist',_restDraft.dist)+'</div>';
-  else if(t==='row'||t==='swim') ctl+=lbl(t==='row'?'DISTANCE (METERS)':'DISTANCE (YARDS)')
+  let ctl=lbl('Time')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('hms','rest_mins',_restDraft.mins)+'</div>';
+  if(t==='run'||t==='bike') ctl+=lbl('Distance')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('dist','rest_dist',_restDraft.dist)+'</div>';
+  else if(t==='row'||t==='swim') ctl+=lbl(t==='row'?'Distance (meters)':'Distance (yards)')
     +'<div class="rd-row"><input class="rd-input" type="number" inputmode="numeric" min="0"'+(t==='swim'?' step="25"':'')+' id="rest_dist" value="'+esc(_restDraft.dist)+'" placeholder="'+(t==='row'?'meters':'yards')+'"></div>';
   const note=_restDraft.rpe>=9
     ? '<div class="ov-effect" style="border-color:var(--accent)"><div class="ov-effect-ttl" style="color:var(--accent)">Noted</div><div class="ov-effect-sub">Hard effort is not a rest day, it is a training day. Logging it as it happened. Keep an eye on how tomorrow feels.</div></div>'
     : '';
   const word=REST_WORD[t]||t;
-  return '<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 LOG CARDIO</div>'
+  return '<div class="ov-kicker">'+dayName+' \u00b7 Log cardio</div>'
     +(rec
       ? '<div class="ov-title">Your '+word+' on '+dayName+'</div>'
         +'<div class="ov-intro">This is what you logged. Roll it to fix it, or clear it if it did not happen.</div>'
       : '<div class="ov-title">What did you do?</div>'
         +'<div class="ov-intro">Easy work on a rest day is recovery, not extra load. This will not touch your program.</div>')
-    +'<div class="ov-eq-lbl">MODALITY</div><div class="rd-row">'+chips+'</div>'
+    +'<div class="ov-eq-lbl">Modality</div><div class="rd-row">'+chips+'</div>'
     +ctl
-    +'<div class="ov-eq-lbl" style="margin-top:14px">HOW HARD</div>'+rpeRows
+    +'<div class="ov-eq-lbl" style="margin-top:14px">How hard</div>'+rpeRows
     +note
     +'<button class="ov-apply" id="restLogBtn" onclick="applyRestCardio()">'+(rec&&_restSame(rec)?'Logged \u2713':'Log it')+'</button>'
     // D228 item 6: Clear, two taps, only where the selected type holds a record.

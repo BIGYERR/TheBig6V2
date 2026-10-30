@@ -14,8 +14,8 @@ import type { DotSpec } from './dot-chart-model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @let s = spec();
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
-    <div [attr.style]="'font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:' + s.color + ';margin-bottom:10px'" [innerHTML]="title()"></div>
+  <div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">
+    <div [attr.style]="'font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:' + s.color + ';margin-bottom:10px'" [innerHTML]="title()"></div>
     <svg [attr.viewBox]="'0 0 ' + s.width + ' ' + s.height" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">
       @for (g of s.grid; track $index) {
         <line [attr.x1]="s.left" [attr.y1]="g.y" [attr.x2]="s.right" [attr.y2]="g.y" stroke="rgba(var(--ink-rgb),0.06)" stroke-width="1"/>

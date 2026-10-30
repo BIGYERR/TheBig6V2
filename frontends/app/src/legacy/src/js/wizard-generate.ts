@@ -32,13 +32,13 @@ function showLengthWarning(msg: any, weeks: any, onConfirm: any){
   const overlay=document.createElement('div');
   overlay.id='lengthWarnOverlay';
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;';
-  overlay.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:24px;max-width:360px;width:100%;">
-    <div style="font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">Heads Up</div>
+  overlay.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:24px;max-width:360px;width:100%;">
+    <div style="font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--accent);margin-bottom:10px;">Heads Up</div>
     <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--text);margin-bottom:12px;">${weeks}-Week Program</div>
     <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">${msg}<br><br>The app will build you a <b style="color:var(--text)">${weeks}-week program</b> that safely progresses toward your goal. Stick to the plan and you will get there.</div>
     <div style="display:flex;gap:10px;">
-      <button id="lengthWarnBack" style="flex:1;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;">Go Back</button>
-      <button id="confirmGenBtn" style="flex:2;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:12px;border-radius:4px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer;">Build ${weeks}-Week Plan</button>
+      <button id="lengthWarnBack" style="flex:1;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0;padding:12px;border-radius:999px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;">Go Back</button>
+      <button id="confirmGenBtn" style="flex:2;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0;padding:12px;border-radius:999px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer;">Build ${weeks}-Week Plan</button>
     </div>
   </div>`;
   document.body.appendChild(overlay);

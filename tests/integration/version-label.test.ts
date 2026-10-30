@@ -1,4 +1,4 @@
-// The version label where people read it: at boot init() writes 'BUILD ' + iaVersionLabel(IA_VERSION) into the
+// The version label where people read it: at boot init() writes 'Build ' + iaVersionLabel(IA_VERSION) into the
 // bug-report page (#bugVersion), and submitBug() posts a report whose context carries one 'build: ' line. Rulings:
 // docs/decisions/version-label.md (D236: the app shows its version in semver everywhere). The formatting rule on its
 // own is tests/unit/version-label.test.ts.
@@ -60,7 +60,7 @@ test('the bug-report page shows BUILD and the version as shipped, in semver', ()
   const shipped = 'v' + SV.str(SV.fromHtml(HTML));
   assert.match(shipped, /^v\d+\.\d+\.\d+$/);
   const IA = loadApp({ dom: true });
-  assert.equal(pageLabel(IA), 'BUILD ' + shipped);
+  assert.equal(pageLabel(IA), 'Build ' + shipped);
 });
 
 test('the bug report context carries exactly one build line with the version as shipped', async () => {
@@ -69,22 +69,22 @@ test('the bug report context carries exactly one build line with the version as 
   assert.deepEqual(await reportBuildLines(IA), ['build: ' + shipped]);
 });
 
-test('a pre-semver meta 239 reads BUILD v0.239.0 and build: v0.239.0, never v239', async () => {
+test('a pre-semver meta 239 reads Build v0.239.0 and build: v0.239.0, never v239', async () => {
   const IA = loadApp({ dom: true, file: relabelled('239') });
   assert.equal(IA.eval('IA_VERSION'), '239', 'the relabelled body reads its new meta');
   const label = pageLabel(IA);
-  assert.equal(label, 'BUILD v0.239.0');
+  assert.equal(label, 'Build v0.239.0');
   assert.doesNotMatch(String(label), /v239/i);
   const lines = await reportBuildLines(IA);
   assert.deepEqual(lines, ['build: v0.239.0']);
   assert.ok(!lines.some((l) => /v239/i.test(l)));
 });
 
-test('a meta written with a leading v reads BUILD v0.239.1 and build: v0.239.1, never vv', async () => {
+test('a meta written with a leading v reads Build v0.239.1 and build: v0.239.1, never vv', async () => {
   const IA = loadApp({ dom: true, file: relabelled('v0.239.1') });
   assert.equal(IA.eval('IA_VERSION'), 'v0.239.1', 'the relabelled body reads its new meta');
   const label = pageLabel(IA);
-  assert.equal(label, 'BUILD v0.239.1');
+  assert.equal(label, 'Build v0.239.1');
   assert.doesNotMatch(String(label), /vv/i);
   const lines = await reportBuildLines(IA);
   assert.deepEqual(lines, ['build: v0.239.1']);

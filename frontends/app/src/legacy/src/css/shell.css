@@ -4,16 +4,16 @@
 .tabbar button{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 4px;color:var(--muted);transition:color 0.15s;touch-action:manipulation;}
 .tabbar .tab-ico{font-size:20px;line-height:1;filter:grayscale(0.4) opacity(0.7);}
 .tabbar button.active .tab-ico{filter:none;}
-.tabbar .tab-lbl{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;}
+.tabbar .tab-lbl{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0;}
 .tabbar button.active{color:var(--accent);}
 .screen.with-tabbar{padding-bottom:calc(50px + env(safe-area-inset-bottom,0px));}
 
 /* ── TOP BAR ── */
 .top-bar{padding:env(safe-area-inset-top,44px) 20px 14px;background:var(--bg);position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);}
 .top-bar-inner{display:flex;align-items:flex-end;justify-content:space-between;}
-.app-title{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;}
+.app-title{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;}
 .app-title span{color:var(--accent);}
-.app-subtitle{font-family:var(--font-display);font-size:11px;letter-spacing:0.07em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.app-subtitle{font-family:var(--font-display);font-size:11px;letter-spacing:0;color:var(--muted);margin-top:2px;}
 
 /* ── PROGRAM LIST ── */
 .prog-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px;flex:1;background:var(--bg) !important;}
@@ -22,7 +22,7 @@
 .prog-card.active-prog{border-color:var(--accent);}
 .prog-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
 .prog-card-name{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text);}
-.prog-card-badge{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:4px;}
+.prog-card-badge{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0;padding:3px 8px;border-radius:4px;}
 .badge-strength{background:var(--lift-dim);color:var(--lift);}
 .badge-hypertrophy{background:rgba(var(--hip-rgb),0.15);color:var(--hip);}
 .badge-fatloss{background:var(--run-dim);color:var(--run);}
@@ -37,13 +37,13 @@
 .prog-card.open .prog-detail{display:block;}
 .det-group{margin-bottom:12px;}
 .det-group:last-of-type{margin-bottom:0;}
-.det-label{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--signal);margin-bottom:5px;}
+.det-label{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0;color:var(--signal);margin-bottom:5px;}
 .det-row{display:flex;justify-content:space-between;gap:14px;font-size:13px;line-height:1.7;}
 .det-row .k{color:var(--muted);}
 .det-row .v{color:var(--text);font-weight:600;text-align:right;}
 .det-lifts{display:flex;gap:6px;}
 .lift-chip{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:7px 4px;text-align:center;}
-.lift-chip .lc-k{font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
+.lift-chip .lc-k{font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .lift-chip .lc-v{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);line-height:1.1;}
 .lift-chip .lc-u{font-size:9px;color:var(--muted);}
 /* V172 (D7a): the run-pace row reuses lift-chip; six chips wrap 3+3 instead of crushing to 50px. */
@@ -55,15 +55,15 @@
 .det-seed{font-family:var(--font-mono);font-size:11px;color:var(--muted);}
 .copy-icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);cursor:pointer;flex-shrink:0;}
 .copy-icon-btn:active{background:var(--surface2);color:var(--signal);}
-.prog-action-btn{flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:7px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;}
+.prog-action-btn{flex:1;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;padding:7px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;}
 .prog-action-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-ink);}
 .prog-action-btn.danger{border-color:rgba(255,69,58,0.35);color:var(--red);}
-.new-prog-btn{margin:0 20px 20px;font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:14px;border-radius:4px;border:1px solid rgba(var(--ink-rgb),0.35);background:var(--accent-dim);color:var(--accent);cursor:pointer;}
+.new-prog-btn{margin:0 20px 20px;font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0;padding:14px;border-radius:4px;border:1px solid rgba(var(--ink-rgb),0.35);background:var(--accent-dim);color:var(--accent);cursor:pointer;}
 
 /* D261: the Look row on the Bugs page. The chosen option is read off <html>'s data-theme (none is Auto). */
 .look-row{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);padding-top:16px;margin-top:6px;}
-.look-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.look-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0;color:var(--muted);}
 .look-seg{display:flex;gap:8px;}
-.look-opt{flex:1;background:transparent;border:1px solid var(--border2);border-radius:4px;color:var(--muted);font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:11px 0;cursor:pointer;}
+.look-opt{flex:1;background:transparent;border:1px solid var(--border2);border-radius:4px;color:var(--muted);font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;padding:11px 0;cursor:pointer;}
 :root:not([data-theme]) .look-opt[data-look="auto"],:root[data-theme="day"] .look-opt[data-look="day"],:root[data-theme="night"] .look-opt[data-look="night"]{background:var(--accent);border-color:var(--accent);color:var(--on-ink);}
 .look-note{font-size:12px;color:var(--muted);line-height:1.5;}

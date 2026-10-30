@@ -15,8 +15,8 @@ import { SvgAttrs } from './svg-attrs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @let c = spec();
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
-    <div [attr.style]="'font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:' + c.color + ';margin-bottom:' + c.titleGap + 'px'" [innerHTML]="markup().title"></div>
+  <div style="background:var(--surface);border:1px solid transparent;border-radius:16px;padding:14px 16px">
+    <div [attr.style]="'font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0;color:' + c.color + ';margin-bottom:' + c.titleGap + 'px'" [innerHTML]="markup().title"></div>
     @if (markup().head; as h) {
       <div style="display:contents" [innerHTML]="h"></div>
     }

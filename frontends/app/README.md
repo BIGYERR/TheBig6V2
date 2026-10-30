@@ -151,6 +151,7 @@ with an iOS Simulator runtime.
 | `npm run typecheck` | `tsc` over the Node TypeScript (`test/`); Node runs those files without it, so this is the type check |
 | `npm run emulator-ios` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
 | `npm run device-ios` | signed build for the connected iPhone, install, launch |
+| `npm run release-ios` | archive the release signed for App Store Connect and upload it to TestFlight (the pipeline's TestFlight job, below); `-- --no-upload` keeps an `.ipa` instead |
 | `npm run pwa-pages` | sync, then a production build into `../../pwa/` for GitHub Pages, then the check below |
 | `npm run pwa-pages:check` | fail unless `../../pwa/` was built from the page as the source files build it now (no build) |
 | `npm run pwa-local` | sync, then a production build into `dist/pwa-local/`, the same check, then serve it on port 4400 for this Mac and the iPhone |
@@ -186,6 +187,46 @@ leaves it out, so the install fails with `0xe8008012` ("This provisioning profil
 device"). The script runs `cordova prepare`, then builds for the connected phone itself (`-destination id=<UDID>`
 with `-allowProvisioningUpdates -allowProvisioningDeviceRegistration`), the way Xcode's Run button does. Before it
 installs, it checks that the phone's UDID is in the embedded profile.
+
+### TestFlight from CI (one time)
+After each merge into `main`, the pipeline's TestFlight jobs archive the release, upload it to App Store Connect and
+wait until it is processed; the phone's TestFlight app then offers it. Until all seven secrets below are set, the jobs
+skip and stay green. A version goes up once: a merge that carries a version App Store Connect already holds skips the
+upload, and a fix is the next PATCH.
+
+The signing is plain (Post-v0.251.1): one Apple Distribution certificate and one App Store profile for each signed
+target, the app and its RestTimerWidget extension. `scripts/ios.mjs release` checks the profiles, signs the Release
+configuration of both targets by hand (`scripts/signing.mjs`), archives, and uploads with the App Store Connect API key
+(the App Manager role is enough). Debug keeps automatic signing, so `device-ios` is untouched.
+
+1. **Certificate.** In Xcode, Settings > Accounts, pick the paid team (not a Personal Team), Manage Certificates, then
+   **+** > Apple Distribution. Then in Keychain Access (login, My Certificates), right-click "Apple Distribution: …" >
+   Export, as a `.p12` with a password of your choosing. Keep the file outside iCloud and delete it once the secrets
+   are set.
+2. **Profiles.** At developer.apple.com > Certificates, Identifiers & Profiles > Profiles, press **+**, choose
+   Distribution > App Store Connect, App ID `com.bigyerr.ironasylum`, the certificate from step 1, name it
+   `Asylum App Store`, and download it. Do the same for `com.bigyerr.ironasylum.RestTimerWidget`, named
+   `Asylum Widget App Store`.
+3. **Secrets.** GitHub > the repo > Settings > Secrets and variables > Actions > New repository secret, one each:
+
+   | Secret | What goes in it |
+   | --- | --- |
+   | `ASC_KEY_ID` | the API key's Key ID (App Store Connect > Users and Access > Integrations > Team Keys) |
+   | `ASC_ISSUER_ID` | the Issuer ID shown above that list of keys |
+   | `ASC_KEY_P8` | the whole text of `AuthKey_<KeyID>.p8`, BEGIN and END lines included (`pbcopy < AuthKey_<KeyID>.p8`) |
+   | `IOS_DIST_CERT_P12` | the `.p12` from step 1 as base64 (`base64 -i <file>.p12 \| pbcopy`) |
+   | `IOS_DIST_CERT_PASSWORD` | the password you gave that `.p12` |
+   | `IOS_PROFILE_APP` | `Asylum_App_Store.mobileprovision` as base64 (`base64 -i <file> \| pbcopy`) |
+   | `IOS_PROFILE_WIDGET` | `Asylum_Widget_App_Store.mobileprovision` as base64 |
+4. **First upload.** Actions > pipeline > Run workflow, branch `main` (or wait for the next merge). The run's
+   TestFlight notice says what happened: `testflight 0.251.1 processed`, or why it skipped.
+5. **The phone.** App Store Connect > the app > TestFlight > Internal Testing: add a group, turn on automatic
+   distribution, and add yourself. Open TestFlight on the iPhone with the same Apple ID, install The Asylum, and turn
+   on Automatic Updates for it.
+
+**Once a year** the certificate expires, and both profiles with it. An upload within 30 days of that warns. Make a new
+certificate and both profiles again (steps 1 and 2), and replace `IOS_DIST_CERT_P12`, `IOS_DIST_CERT_PASSWORD`,
+`IOS_PROFILE_APP` and `IOS_PROFILE_WIDGET`. A new app extension needs its own App ID, profile and secret.
 
 ## Tests
 

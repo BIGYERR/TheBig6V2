@@ -27,7 +27,7 @@ interface MileProgram {
     <button class="back-btn" (click)="close()">← Back</button>
   </div>
   <div class="rand-body">
-    <div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:var(--text)">YOUR MILE</div>
+    <div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0;color:var(--text)">Your mile</div>
     <div id="mileSheetIntro" style="font-size:13px;color:var(--text);line-height:1.5;margin-top:6px">{{ opened() ? intro : '' }}</div>
     <div style="display:flex;gap:6px;margin-top:12px">
       <input #mins type="number" class="input-field" id="mileSheetMins" style="flex:1;text-align:center" placeholder="min" min="0" max="99">

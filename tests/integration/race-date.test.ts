@@ -23,7 +23,7 @@ import * as R from '../support/race-date.ts';
 import { loadApp, pinClock } from '../support/app.ts';
 // ── the block open (D180), the clock on Thu 2026-09-24 12:00 ─────────────────────────────────────────────────────
 const FIX_START = '2026-08-31', FIX_WEEKS = 14;
-const AFTER = { W1pre: 'mon tue wed thu fri sat sun', W1done: '0 /0 DONE', toast: 'Before your start date', W4pre: 'mon tue wed', W4taps: 4, W4done: '0 /3 DONE', sched: 1, streak: 0 };
+const AFTER = { W1pre: 'mon tue wed thu fri sat sun', W1done: '0 /0 Done', toast: 'Before your start date', W4pre: 'mon tue wed', W4taps: 4, W4done: '0 /3 Done', sched: 1, streak: 0 };
 const PRE_REST_DAYS = [[1, 'wed'], [1, 'sun'], [2, 'wed'], [2, 'sun'], [3, 'wed'], [3, 'sun'], [4, 'wed']];
 
 test('the fixture arithmetic: HALF_MANNY starts Mon 2026-08-31, so W1 and W4 Mon to Wed are before Thu 2026-09-24, and one training day is due', () => {

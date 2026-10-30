@@ -21,16 +21,16 @@ const HURT: OverlayDraft = { ...TRIP, type: 'injury', tab: 'injury', to: null };
 describe('the injury and travel sheet', () => {
   it('heads each sheet with its own kicker, title and promise', () => {
     const t = changeSheetView(TRIP, REGIONS, deps());
-    assert.deepEqual([t.kicker, t.title, t.intro, !!t.travel, t.injury], ['TRAVELING?', 'Temporary change', 'Your program reverts on its own. Nothing you’ve already trained changes.', true, null]);
+    assert.deepEqual([t.kicker, t.title, t.intro, !!t.travel, t.injury], ['Traveling?', 'Temporary change', 'Your program reverts on its own. Nothing you’ve already trained changes.', true, null]);
     const i = changeSheetView(HURT, REGIONS, deps());
-    assert.deepEqual([i.kicker, i.title, i.intro, i.travel, !!i.injury], ['HURT?', 'Train around it', 'No end date on this one. You tell it when you’re back. Nothing you’ve already trained changes.', null, true]);
+    assert.deepEqual([i.kicker, i.title, i.intro, i.travel, !!i.injury], ['Hurt?', 'Train around it', 'No end date on this one. You tell it when you’re back. Nothing you’ve already trained changes.', null, true]);
   });
 
   it('dates a trip, describes the chosen tier only, and says when the program picks back up', () => {
     const v = travelView(TRIP, deps());
     assert.deepEqual(v.dates, [
-      { key: 'from', label: 'FROM', shown: 'd(2026-10-07)', value: '2026-10-07', min: null },
-      { key: 'to', label: 'THROUGH', shown: 'd(2026-10-20)', value: '2026-10-20', min: '2026-10-07' },
+      { key: 'from', label: 'From', shown: 'd(2026-10-07)', value: '2026-10-07', min: null },
+      { key: 'to', label: 'Through', shown: 'd(2026-10-20)', value: '2026-10-20', min: '2026-10-07' },
     ]);
     assert.deepEqual(v.cards.map((c) => [c.id, c.name, c.sel, c.desc]), [
       ['bodyweight', 'Room only', false, null],
@@ -75,7 +75,7 @@ describe('the injury and travel sheet', () => {
     assert.match(v.effect!.subs[0]!.text, /^Nothing loads the spine\./);
     assert.match(v.effect!.subs[1]!.text, /^Every two weeks it asks how the lower feels\./);
     assert.deepEqual(v.effect!.subs.map((s) => s.style), [null, 'margin-top:6px', 'margin-top:6px;color:var(--muted)']);
-    assert.deepEqual([v.dates, v.action], [[{ key: 'from', label: 'FROM', shown: 'd(2026-10-07)', value: '2026-10-07', min: null }], 'injury']);
+    assert.deepEqual([v.dates, v.action], [[{ key: 'from', label: 'From', shown: 'd(2026-10-07)', value: '2026-10-07', min: null }], 'injury']);
     assert.equal(injuryView({ ...HURT, injRegion: 'knee', injTier: '' }, REGIONS, deps()).effect!.title, 'Working around it · Knee');
   });
 

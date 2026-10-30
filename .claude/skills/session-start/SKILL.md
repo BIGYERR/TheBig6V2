@@ -16,7 +16,7 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
    A file version with NO digest line means a build was dropped or the previous session never folded its entry. Say so; do not silently continue.
 4. Git state: `git status --short && git log --oneline -3 && git tag --list 'v*' 'V*' --sort=-creatordate | head -3`.
    Uncommitted changes in `index.html` at session start are a red flag: ask Mario before proceeding.
-5. Deploy picture: read local, GitHub, Pages, live and any native build version, each from its own source, as CLAUDE.md Session rhythm step 7 sets out. A lagging deploy is reported, never a blocker.
+5. Deploy picture: read local, GitHub, Pages, live, any native build version and TestFlight (`node frontends/app/scripts/testflight.mjs leg`), each from its own source, as CLAUDE.md Session rhythm step 7 sets out. A lagging deploy is reported, never a blocker.
 6. Feature tests (CLAUDE.md Test layout): `bash -c 'set -eo pipefail; cd tests && npx vitest run unit integration' 2>&1 | grep -E '^ *(Test Files|Tests) |FAIL'` (a few seconds; `npm ci` in `tests/` first if `tests/node_modules` is missing). A red test at session start is reported before any work, never worked around.
 
 Then print the before-picture for the live program so the session has a baseline in context:
@@ -28,6 +28,6 @@ FILE     index.html  ia-version M.m.p
 HANDOFF  header vM.m.p / digest line: present|MISSING
 GIT      clean|dirty, HEAD <sha> <msg>, last tag vM.m.p
 QUEUE    <§12 ruled-and-unbuilt items, one line>
-DEPLOY   local M.m.p (HEAD <sha>, +a/-b origin)  github M.m.p  pages built <sha>  live M.m.p  native M.m.p|none
+DEPLOY   local M.m.p (HEAD <sha>, +a/-b origin)  github M.m.p  pages built <sha>  live M.m.p  native M.m.p|none  testflight M.m.p <state>|skipped|none
 TESTS    <n> pass, <n> fail (tests/unit, tests/integration)
 ```

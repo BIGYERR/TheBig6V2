@@ -55,7 +55,7 @@ describe('the wizard', () => {
 
   it('marks the rest days, locks the training days at the floor, and says whose goal sets it', () => {
     const v = daysView({ restDays: ['wed', 'sun'], cardioTypes: ['run', 'bike'], cardioGoals: { run: { id: 'run_half' } } }, { advisories: ['<b>x</b>'], minDays: 4, goalLabel: (id) => `goal(${id})` });
-    assert.deepEqual(v.days.map((x) => [x.short, x.rest, x.blocked]), [['SU', true, false], ['MO', false, false], ['TU', false, false], ['WE', true, false], ['TH', false, false], ['FR', false, false], ['SA', false, false]]);
+    assert.deepEqual(v.days.map((x) => [x.short, x.rest, x.blocked]), [['Su', true, false], ['Mo', false, false], ['Tu', false, false], ['We', true, false], ['Th', false, false], ['Fr', false, false], ['Sa', false, false]]);
     assert.deepEqual([v.count, v.floor, v.advisories], ['5 training days', null, ['<b>x</b>']]);
     const floor = daysView({ restDays: ['mon', 'wed', 'fri', 'sun'], cardioTypes: ['run'], cardioGoals: { run: { id: 'run_half' } } }, { advisories: ['hidden at the floor'], minDays: 3, goalLabel: (id) => `goal(${id})` });
     assert.deepEqual([floor.count, floor.floor, floor.advisories], ['3 training days', { reason: 'goal(run_half)', min: 3 }, []]);
@@ -71,8 +71,8 @@ describe('the wizard', () => {
     );
     assert.deepEqual(rows.map((r) => [r.k, r.v]), [
       ['Path', 'Race / Event'], ['Race date', 'Sun, Nov 29, 2026 (7 weeks away)'], ['Lifting', 'Injury Prevention'], ['Cardio', '[run] Run: 10K'],
-      ['Program length', '1 week'], ['Start date', '<span id="sumStartDate">Mon, Oct 12, 2026</span>'], ['Training days', 'SU · TU · WE · TH · FR · SA'],
-      ['Rest days', 'MO'], ['Experience', 'beginner'], ['Age range', '55+'], ['Equipment', 'Minimal / Travel'],
+      ['Program length', '1 week'], ['Start date', '<span id="sumStartDate">Mon, Oct 12, 2026</span>'], ['Training days', 'Su · Tu · We · Th · Fr · Sa'],
+      ['Rest days', 'Mo'], ['Experience', 'beginner'], ['Age range', '55+'], ['Equipment', 'Minimal / Travel'],
     ]);
     const body = nameSummary({ primaryPath: 'body', liftingFocus: 'balanced', restDays: [], experience: 'intermediate', ageBracket: '18-35', equipment: 'commercial' },
       { weeks: 6, cardio: 'Lift only', raceRow: null, startSummary: 's', aligned: null, resolveCopy: '' });

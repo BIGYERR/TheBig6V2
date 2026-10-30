@@ -98,6 +98,6 @@ export function goalSheetView(g: GoalInput): GoalSheetView {
       keepLabel: up ? 'Stay the course' : 'Keep ' + (g.current && g.current.label ? g.current.label : 'current'),
     };
   }
-  return { heading: 'CHANGE ' + g.sportLabel.toUpperCase() + ' GOAL', options, decision };
+  return { heading: 'Change ' + g.sportLabel.toLowerCase() + ' goal', options, decision };
 }
 

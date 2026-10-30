@@ -228,7 +228,7 @@ function overlayBackCopy(prog: any, ov: any){
   return _fmtDateWd(next)+' picks your program back up.';
 }
 
-const OVERLAY_TYPE_LABEL: Record<string, string>={substitute:'TRAVEL',injury:'INJURY',reduce:'LESS TIME',suspend:'SUSPENDED'};
+const OVERLAY_TYPE_LABEL: Record<string, string>={substitute:'Travel',injury:'Injury',reduce:'Less time',suspend:'Suspended'};
 // Renders the active-overlay chip on the week screen (only overlays whose range is still live).
 function renderOverlayChip(){
   const wrap=document.getElementById('changeActiveWrap'); if(!wrap) return;
@@ -256,11 +256,11 @@ function renderOverlayChip(){
       // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ bo
       patchLbl=({bodyweight:'Room only',home_basic:'Mini gym',commercial:'Full gym',home_full:'Home Full',crossfit:'CrossFit Box',minimal:'Minimal / Travel'})[ov.patch.equipment]||ov.patch.equipment;
     }
-    const _tail=_isBridge?'':(_isInj&&!ov.to?' Tap I\u2019M BACK when it\u2019s ready.':backOn);
+    const _tail=_isBridge?'':(_isInj&&!ov.to?' Tap I\u2019m back when it\u2019s ready.':backOn);
     const div=document.createElement('div');
     div.className='change-chip';
-    const _backBtn=(_isInj&&!_isBridge)?'<div class="change-chip-act" role="button" data-ovid="'+ov.id+'">I\u2019M BACK</div>':'';
-    div.innerHTML='<div class="change-chip-body"><div class="change-chip-ttl">'+(_isBridge?'RETURN WEEK':(OVERLAY_TYPE_LABEL[ov.type]||'CHANGE'))+' \u00b7 '+overlaySpanLabel(activeProg,ov)+'</div><div class="change-chip-sub">'+patchLbl+(_isBridge?'':'.')+_tail+'</div>'+_backBtn+'</div><div class="change-chip-x" role="button" aria-label="Remove change" data-ovid="'+ov.id+'">\u2715</div>';
+    const _backBtn=(_isInj&&!_isBridge)?'<div class="change-chip-act" role="button" data-ovid="'+ov.id+'">I\u2019m back</div>':'';
+    div.innerHTML='<div class="change-chip-body"><div class="change-chip-ttl">'+(_isBridge?'Return week':(OVERLAY_TYPE_LABEL[ov.type]||'Change'))+' \u00b7 '+overlaySpanLabel(activeProg,ov)+'</div><div class="change-chip-sub">'+patchLbl+(_isBridge?'':'.')+_tail+'</div>'+_backBtn+'</div><div class="change-chip-x" role="button" aria-label="Remove change" data-ovid="'+ov.id+'">\u2715</div>';
     // @ts-expect-error TS2339 Property 'onclick' does not exist on type 'Element'.
     div.querySelector('.change-chip-x')!.onclick=()=>removeOverlay(ov.id);
     // @ts-expect-error TS2339 Property 'onclick' does not exist on type 'Element'.
@@ -275,7 +275,7 @@ function renderOverlayChip(){
         const _rl=(INJURY_REGIONS[ov.patch.injury.region]||{}).label||'it';
         const card=document.createElement('div');
         card.className='change-chip reassess-card';
-        card.innerHTML='<div class="change-chip-body"><div class="change-chip-ttl">CHECK IN</div>'
+        card.innerHTML='<div class="change-chip-body"><div class="change-chip-ttl">Check in</div>'
           +'<div class="change-chip-sub">Two weeks on the '+_rl.toLowerCase()+' plan. How is it feeling?</div>'
           +'<div class="reassess-acts">'
           +'<button data-ans="better">Better</button>'
@@ -359,7 +359,7 @@ function renderOverlaySheet(){
   // No tab row: each entry point opens its own single-purpose sheet. "Traveling?" in the
   // action row, HURT? beside the week number. Tabs were a leftover from the old
   // catch-all "something changed" hub and only made both flows harder to read.
-  const head='<div class="ov-kicker">'+(inj?'HURT?':'TRAVELING?')+'</div>'
+  const head='<div class="ov-kicker">'+(inj?'Hurt?':'Traveling?')+'</div>'
     +'<div class="ov-title">'+(inj?'Train around it':'Temporary change')+'</div>'
     +'<div class="ov-intro">'+(inj
       ?'No end date on this one. You tell it when you\u2019re back. Nothing you\u2019ve already trained changes.'
@@ -429,10 +429,10 @@ function _renderTravelTab(){
     return '<div class="ov-eq'+(sel?' sel':'')+'" onclick="_ovSet(\'equipment\',\''+id+'\')"><div class="ov-eq-body"><div class="ov-eq-name">'+name+'</div>'+(sel?'<div class="ov-eq-desc">'+desc+'</div>':'')+'</div>'+(sel?'<span class="ov-eq-chk">\u2713</span>':'')+'</div>';
   }).join('');
   return (isNoOp?'':'<div class="ov-dates">'
-      +'<label class="ov-date"><span class="ov-date-lbl">FROM</span><span class="ov-date-val">'+_fmtDate(_ovDraft.from)+'</span><input type="date" value="'+(_ovDraft.from||'')+'" onchange="_ovSet(\'from\',this.value)"></label>'
-      +'<label class="ov-date"><span class="ov-date-lbl">THROUGH</span><span class="ov-date-val">'+_fmtDate(_ovDraft.to)+'</span><input type="date" min="'+(_ovDraft.from||'')+'" value="'+(_ovDraft.to||'')+'" onchange="_ovSet(\'to\',this.value)"></label>'
+      +'<label class="ov-date"><span class="ov-date-lbl">From</span><span class="ov-date-val">'+_fmtDate(_ovDraft.from)+'</span><input type="date" value="'+(_ovDraft.from||'')+'" onchange="_ovSet(\'from\',this.value)"></label>'
+      +'<label class="ov-date"><span class="ov-date-lbl">Through</span><span class="ov-date-val">'+_fmtDate(_ovDraft.to)+'</span><input type="date" min="'+(_ovDraft.from||'')+'" value="'+(_ovDraft.to||'')+'" onchange="_ovSet(\'to\',this.value)"></label>'
     +'</div>')
-    +'<div class="ov-eq-lbl">WHAT YOU\u2019LL HAVE</div>'+eqCards
+    +'<div class="ov-eq-lbl">What you\u2019ll have</div>'+eqCards
     +effect
     +(isNoOp
       ?'<button class="ov-apply" onclick="closeOverlaySheet()">Got it</button>'
@@ -449,7 +449,7 @@ function _renderInjuryTab(){
   // to guess whether their situation is covered, but choosing it answers the question
   // and saves nothing. A neck or an unlisted problem is not app territory.
   if(R==='other'){
-    return '<div class="ov-eq-lbl">WHERE\u2019S THE PROBLEM</div>'+regions
+    return '<div class="ov-eq-lbl">Where\u2019s the problem</div>'+regions
       +'<div class="ov-effect"><div class="ov-effect-ttl">That one\u2019s above my pay grade</div>'
       +'<div class="ov-effect-sub">Get eyes on it from someone qualified. In the meantime train what doesn\u2019t touch it and cut anything that does. When you know what you\u2019re working with, come back and set it up here if it fits one of the regions above.</div></div>'
       +'<button class="ov-apply" onclick="closeOverlaySheet()">Got it</button>';
@@ -468,10 +468,10 @@ function _renderInjuryTab(){
       +'<div class="ov-effect-sub" style="margin-top:6px">Every two weeks it asks how the '+INJURY_REGIONS[R].label.toLowerCase().split(' ')[0]+' feels. When you\u2019re ready, tap I\u2019m back and it eases you in over one light week before full prescription.</div>'
       +'<div class="ov-effect-sub" style="margin-top:6px;color:var(--muted)">'+_INJ_SAFETY+'</div></div>';
   }
-  return '<div class="ov-eq-lbl">WHERE\u2019S THE PROBLEM</div>'+regions
-    +(R?'<div class="ov-eq-lbl" style="margin-top:12px">HOW BAD IS IT</div>'+tiers:'')
+  return '<div class="ov-eq-lbl">Where\u2019s the problem</div>'+regions
+    +(R?'<div class="ov-eq-lbl" style="margin-top:12px">How bad is it</div>'+tiers:'')
     +effect
-    +(R?'<div class="ov-dates" style="margin-top:12px"><label class="ov-date"><span class="ov-date-lbl">FROM</span><span class="ov-date-val">'+_fmtDate(_ovDraft.from)+'</span><input type="date" value="'+(_ovDraft.from||'')+'" onchange="_ovSet(\'from\',this.value)"></label></div>':'')
+    +(R?'<div class="ov-dates" style="margin-top:12px"><label class="ov-date"><span class="ov-date-lbl">From</span><span class="ov-date-val">'+_fmtDate(_ovDraft.from)+'</span><input type="date" value="'+(_ovDraft.from||'')+'" onchange="_ovSet(\'from\',this.value)"></label></div>':'')
     +(R?'<button class="ov-apply" onclick="applyInjuryDraft()">Apply change</button>':'');
 }
 function applyInjuryDraft(){
@@ -526,8 +526,8 @@ function imBackFromInjury(id: any){
   renderWeekView();
   const lbl=(INJURY_REGIONS[region]||{}).label||'injury';
   if(!_hadRunSuppression){
-    popFire('workout',{icon:'shield',kicker:'BACK IN',msg:'Good. One week to prove it.',
-      sub:'The '+lbl.toLowerCase()+' work comes back light this week, held at RPE 7. Full send next week.',dismiss:'LET\u2019S GO'});
+    popFire('workout',{icon:'shield',kicker:'Back in',msg:'Good. One week to prove it.',
+      sub:'The '+lbl.toLowerCase()+' work comes back light this week, held at RPE 7. Full send next week.',dismiss:'Let\u2019s go'});
     return;
   }
   // ── D2b (V142) — the popup only promises what the engine enforces ──
@@ -551,8 +551,8 @@ function imBackFromInjury(id: any){
       }
     }
   }catch(e){}
-  popFire('workout',{icon:'shield',kicker:'BACK IN',msg:'Good. Two weeks to full send.',
-    sub:_sub,dismiss:'LET\u2019S GO'});
+  popFire('workout',{icon:'shield',kicker:'Back in',msg:'Good. Two weeks to full send.',
+    sub:_sub,dismiss:'Let\u2019s go'});
 }
 // 14-day reassess: pain-gated injuries get a check-in card on This Week, not a
 // calendar revert — nobody knows the end date on day one, and dumping someone back
@@ -563,16 +563,16 @@ function injReassess(id: any,ans: any){
   const ov=activeProg.overlays.find(o=>o&&o.id===id);
   if(!ov) return;
   if(ans==='better'){
-    popFire('workout',{icon:'shield',kicker:'CHECK IN',msg:'Good sign.',
+    popFire('workout',{icon:'shield',kicker:'Check in',msg:'Good sign.',
       sub:'Ready to bring it back, or give it more time? Coming back starts with one light week.',
-      actions:[{label:'I\u2019M BACK',cls:'go',onclick:"popClose();imBackFromInjury('"+id+"')"},
-               {label:'MORE TIME',cls:'skip',onclick:"popClose();injSnooze('"+id+"')"}]});
+      actions:[{label:'I\u2019m back',cls:'go',onclick:"popClose();imBackFromInjury('"+id+"')"},
+               {label:'More time',cls:'skip',onclick:"popClose();injSnooze('"+id+"')"}]});
     return;
   }
   if(ans==='worse'){
     ov.lastAsk=Date.now(); _saveOverlays();
-    popFire('workout',{icon:'warning',kicker:'CHECK IN',msg:'Two weeks and trending worse.',
-      sub:'That is a job for a professional, not an app. Get it looked at. The plan keeps protecting it in the meantime.',dismiss:'UNDERSTOOD'});
+    popFire('workout',{icon:'warning',kicker:'Check in',msg:'Two weeks and trending worse.',
+      sub:'That is a job for a professional, not an app. Get it looked at. The plan keeps protecting it in the meantime.',dismiss:'Understood'});
     renderWeekView();
     return;
   }

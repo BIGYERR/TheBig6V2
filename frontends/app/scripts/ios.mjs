@@ -8,6 +8,10 @@
 //   npm run device-ios -- --udid <id>           pick a device when more than one is connected
 //   npm run device-ios -- --team <id>           Apple team ID (default: IOS_TEAM_ID, or the first team Xcode knows)
 //   npm run build-ios                           build for the simulator and stop (the compile proof; CI's native job)
+//   npm run release-ios                         archive the release signed for App Store Connect and upload it to
+//                                               TestFlight (CI's TestFlight upload job; the profiles in IOS_PROFILES,
+//                                               the API key in ASC_KEY_PATH, ASC_KEY_ID, ASC_ISSUER_ID)
+//   npm run release-ios -- --no-upload          the same archive, exported as an .ipa and kept (a local proof)
 //   npm run version-ios                         write the page's ia-version into config.xml and stop (a release commit)
 //   npm run xcode-ios                           open the native project in Xcode
 //   add --no-web to skip the Angular build and reuse www/ as it is
@@ -16,11 +20,13 @@
 // repo lived in iCloud-synced ~/Desktop, iCloud stamped Finder metadata onto a fresh .app, which codesign refused
 // ("resource fork, Finder information, or similar detritus not allowed"). It lives in ~/Developer now; the builds stay out.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { attachRun } from '../../../tools/runlog.mjs';
+import { exportOptions, profileProblems, readProfile, signForRelease } from './signing.mjs';
 import { canonical, withNativeVersion } from './version.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -109,6 +115,9 @@ const KNOWN_FAILURES = [
   [/has no devices from which to generate a provisioning profile/, 'Xcode has not registered this iPhone yet. Keep it plugged in and unlocked, then rerun.'],
   [/No profiles for '.*' were found/, 'Xcode could not create a signing profile. Check the Apple ID in Xcode > Settings > Accounts, keep the iPhone connected, then rerun.'],
   [/detritus not allowed/, `Finder metadata reached the app bundle. Build products must stay outside iCloud-synced folders (IOS_BUILD_DIR, now ${BUILD_ROOT}).`],
+  [/bundle version must be higher|Redundant Binary Upload|has already been (used|uploaded)/i, 'App Store Connect already holds this version. A version is uploaded once; a re-upload is the next PATCH (CLAUDE.md, Native).'],
+  [/doesn't include signing certificate|No signing certificate "(iOS|Apple) Distribution"/, 'The distribution certificate in the keychain is not the one the App Store profiles were made with. Make both profiles again with this certificate, or export the one they name (frontends/app/README.md, TestFlight from CI).'],
+  [/Authentication failed|NOT_AUTHORIZED|Unable to authenticate|invalid authentication/i, 'App Store Connect refused the API key. ASC_KEY_ID, ASC_ISSUER_ID and ASC_KEY_P8 must hold that one key\'s own values.'],
 ];
 
 /**
@@ -134,7 +143,7 @@ function buildStep(label, cmd, cmdArgs, cwd = APP) {
     console.log(`ios: Xcode build succeeded (log: ${log})`);
     return;
   }
-  const errors = output.split('\n').filter((l) => /error:|\*\* (BUILD|ARCHIVE) FAILED/.test(l));
+  const errors = output.split('\n').filter((l) => /error:|\*\* (BUILD|ARCHIVE|EXPORT) FAILED/.test(l));
   console.error(errors.slice(0, 12).join('\n'));
   const known = KNOWN_FAILURES.find(([re]) => re.test(output));
   fail(`${known ? known[1] : 'the Xcode build failed.'}\n  Full log: ${log}`);
@@ -363,6 +372,159 @@ function device() {
   console.log('ios: built with a free Personal Team? The install expires in 7 days; run this again to renew it.');
 }
 
+// ---------------------------------------------------------------------------------------------------- release
+
+/** Where Xcode looks for installed profiles: the folder Xcode 16 and later reads, and the one before it. */
+const PROFILE_DIRS = [
+  join(homedir(), 'Library', 'Developer', 'Xcode', 'UserData', 'Provisioning Profiles'),
+  join(homedir(), 'Library', 'MobileDevice', 'Provisioning Profiles'),
+];
+
+const inActions = process.env.GITHUB_ACTIONS === 'true';
+
+/** A warning for a person: its own line here, an annotation on the run in the pipeline. */
+function warn(msg) {
+  console.log(inActions ? `::warning title=TestFlight::${msg}` : `ios: warning: ${msg}`);
+}
+
+/**
+ * The App Store profiles in IOS_PROFILES (or --profiles), .mobileprovision paths joined by commas, one for the app
+ * and one for each extension: each read and checked (App Store type, not expired, one team) and installed where
+ * Xcode finds it.
+ */
+function installProfiles() {
+  const paths = (flag('profiles') || process.env.IOS_PROFILES || '').split(',').map((p) => p.trim()).filter(Boolean);
+  if (!paths.length) {
+    fail('no App Store profiles: set IOS_PROFILES to the .mobileprovision files, joined by commas (the app, RestTimerWidget)');
+  }
+  const now = new Date();
+  const profiles = paths.map((path) => {
+    if (!existsSync(path)) fail(`no profile at ${path}`);
+    let plist = '';
+    try {
+      plist = capture('security', ['cms', '-D', '-i', path]);
+    } catch {
+      fail(`${path} is not a provisioning profile (security cms could not decode it)`);
+    }
+    const profile = readProfile(plist);
+    const { errors, warnings } = profileProblems(profile, now);
+    if (errors.length) fail(`${basename(path)}: ${errors.join('; ')}`);
+    warnings.forEach(warn);
+    return { ...profile, path };
+  });
+  const teams = [...new Set(profiles.map((p) => p.team))];
+  if (teams.length !== 1) fail(`the profiles belong to ${teams.length} teams (${teams.join(', ')}); they must share one`);
+  for (const dir of PROFILE_DIRS) {
+    mkdirSync(dir, { recursive: true });
+    for (const p of profiles) copyFileSync(p.path, join(dir, `${p.uuid}.mobileprovision`));
+  }
+  for (const p of profiles) console.log(`ios: profile "${p.name}" for ${p.bundleId}, expires ${p.expires?.toISOString().slice(0, 10)}`);
+  return { team: teams[0], profiles };
+}
+
+/** An Apple Distribution identity in the keychain that every profile was made with; fails naming what does not match. */
+function checkIdentity(team, profiles) {
+  const found = capture('security', ['find-identity', '-v', '-p', 'codesigning'])
+    .split('\n')
+    .map((line) => /\)\s+([0-9A-F]{40})\s+"(Apple Distribution: [^"]*\((\w+)\))"/.exec(line))
+    .filter((m) => m && m[3] === team)
+    .map((m) => ({ hash: m[1], name: m[2] }));
+  if (!found.length) {
+    fail(`no Apple Distribution identity for team ${team} in the keychain (in the pipeline, the IOS_DIST_CERT_P12 secret holds it)`);
+  }
+  const identity = found.find((id) => profiles.every((p) => p.certs.includes(id.hash)));
+  if (!identity) {
+    const stray = profiles.filter((p) => !found.some((id) => p.certs.includes(id.hash))).map((p) => `"${p.name}"`);
+    fail(
+      `${stray.length ? stray.join(' and ') : 'the profiles'} not made with the Apple Distribution certificate in the ` +
+        `keychain (${found.map((id) => id.name).join(', ')}); make both profiles with that one certificate`,
+    );
+  }
+  console.log(`ios: signing as ${identity.name}`);
+}
+
+/** The API key xcodebuild uploads with: ASC_KEY_PATH, ASC_KEY_ID and ASC_ISSUER_ID together, or none of them. */
+function uploadAuth() {
+  const { ASC_KEY_PATH: path, ASC_KEY_ID: id, ASC_ISSUER_ID: issuer } = process.env;
+  const given = [path, id, issuer].filter(Boolean).length;
+  if (given === 0) {
+    console.log('ios: no ASC_KEY_PATH; uploading with the Apple ID Xcode is signed in with');
+    return [];
+  }
+  if (given !== 3) fail('ASC_KEY_PATH, ASC_KEY_ID and ASC_ISSUER_ID go together; set all three or none');
+  if (!existsSync(path)) fail(`no API key file at ${path}`);
+  return ['-authenticationKeyPath', path, '-authenticationKeyID', id, '-authenticationKeyIssuerID', issuer];
+}
+
+/** The generated project's Release configuration signed by hand: the app and each extension with its own profile. */
+function signProject(team, profiles) {
+  const pbxPath = join(APP, 'platforms', 'ios', 'App.xcodeproj', 'project.pbxproj');
+  const require = createRequire(join(APP, 'package.json'));
+  const xcode = require(require.resolve('xcode', { paths: [join(APP, 'node_modules', 'cordova-ios'), APP] }));
+  const project = xcode.project(pbxPath);
+  project.parseSync();
+  let signed = [];
+  try {
+    signed = signForRelease(project.hash.project.objects, team, profiles);
+  } catch (err) {
+    fail(err.message);
+  }
+  writeFileSync(pbxPath, project.writeSync());
+  for (const s of signed) console.log(`ios: ${s.target} (${s.bundleId}) signs with "${s.profile}"`);
+}
+
+/**
+ * The TestFlight release: the Angular app, config.xml's version, cordova prepare, then the Release configuration
+ * signed by hand (scripts/signing.mjs), archived for any iOS device and exported for App Store Connect: uploaded (the
+ * pipeline's TestFlight upload job, after each merge into main) or, with --no-upload, kept as an .ipa. Needs an Apple
+ * Distribution identity in the keychain and the App Store profiles in IOS_PROFILES; the pipeline makes both from
+ * Mario's secrets. Debug keeps automatic signing, so device-ios is untouched, and the next prepare resets Release.
+ */
+function release() {
+  const upload = !has('no-upload');
+  const { team, profiles } = installProfiles();
+  checkIdentity(team, profiles);
+  const auth = upload ? uploadAuth() : [];
+  const version = prepare();
+  step('preparing the native project (cordova prepare)');
+  run('npx', ['cordova', 'prepare', 'ios', '--no-telemetry']);
+  signProject(team, profiles);
+
+  const out = join(BUILD_ROOT, 'release');
+  rmSync(out, { recursive: true, force: true });
+  mkdirSync(out, { recursive: true });
+  const archive = join(out, 'App.xcarchive');
+  const ios = join(APP, 'platforms', 'ios');
+  step(`archiving The Asylum ${version} (Release, any iOS device)`);
+  buildStep('archive', 'xcodebuild', [
+    '-workspace', 'App.xcworkspace',
+    '-scheme', 'App',
+    '-configuration', 'Release',
+    '-destination', 'generic/platform=iOS',
+    '-archivePath', archive,
+    'archive',
+  ], ios);
+
+  const options = join(out, 'ExportOptions.plist');
+  writeFileSync(options, exportOptions({ team, profiles, upload }));
+  step(upload ? `uploading The Asylum ${version} to App Store Connect` : `exporting The Asylum ${version} as an .ipa`);
+  // -allowProvisioningUpdates lets xcodebuild reach App Store Connect with the API key; for manually signed targets it
+  // only fetches a profile that is missing, and both are installed.
+  buildStep(upload ? 'upload' : 'export', 'xcodebuild', [
+    '-exportArchive',
+    '-archivePath', archive,
+    '-exportOptionsPlist', options,
+    '-exportPath', join(out, 'export'),
+    ...(auth.length ? ['-allowProvisioningUpdates', ...auth] : []),
+  ], ios);
+  if (!upload) {
+    console.log(`\nios: The Asylum ${version} exported: ${join(out, 'export')}`);
+    return;
+  }
+  console.log(`\nios: The Asylum ${version} uploaded to App Store Connect; TestFlight offers it once processing ends.`);
+  if (inActions) console.log(`::notice title=TestFlight::testflight ${version} uploaded`);
+}
+
 // ---------------------------------------------------------------------------------------------------- open
 
 function openXcode() {
@@ -374,6 +536,7 @@ if (process.platform !== 'darwin') fail('iOS builds need macOS with Xcode.');
 if (mode === 'emulator') simulator();
 else if (mode === 'device') device();
 else if (mode === 'build') buildOnly();
+else if (mode === 'release') release();
 else if (mode === 'version') versionOnly();
 else if (mode === 'open') openXcode();
-else fail('usage: node scripts/ios.mjs <emulator|device|build|version|open> [--sim <name>] [--udid <id>] [--team <id>] [--no-web]');
+else fail('usage: node scripts/ios.mjs <emulator|device|build|release|version|open> [--sim <name>] [--udid <id>] [--team <id>] [--profiles <a,b>] [--no-upload] [--no-web]');

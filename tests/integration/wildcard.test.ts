@@ -81,11 +81,11 @@ test('a Wildcard on a rest day leaves the streak at 2 and the completed count at
   }
 });
 
-test('the rest day pop-up says WILDCARD DONE, You showed up. That is the whole game., Streak holds., with no stats and no season or completion pop-up', () => {
+test('the rest day pop-up says Wildcard done, You showed up. That is the whole game., Streak holds., with no stats and no season or completion pop-up', () => {
   for (const today of WEEK) {
     const r = restDay(B.at(today));
     assert.ok(r.cap, 'a pop-up fired');
-    assert.equal(r.cap.opts.kicker, 'WILDCARD DONE');
+    assert.equal(r.cap.opts.kicker, 'Wildcard done');
     assert.equal(r.cap.opts.msg, 'You showed up. That is the whole game.');
     assert.equal(r.cap.opts.sub, 'Streak holds.');
     assert.ok(!(r.cap.opts.stats && r.cap.opts.stats.length), 'no PR and no progress: ' + J(r.cap.opts.stats));
@@ -213,7 +213,7 @@ test('a browsed future week shows no Wildcard mark and no tag', () => {
 });
 
 // ── the week view tag ────────────────────────────────────────────────────────────────────────────────────────────────
-test('on a rest day the week view prints the tag WILDCARD DONE, Rest day. The streak sits this one out., below the hero and above the stat tiles', () => {
+test('on a rest day the week view prints the tag Wildcard done, Rest day. The streak sits this one out., below the hero and above the stat tiles', () => {
   for (const today of WEEK) {
     const F = B.at(today);
     B.install(F.mkProg(F.RESTS, 'Recovery Lift'), null, 3);
@@ -224,7 +224,7 @@ test('on a rest day the week view prints the tag WILDCARD DONE, Rest day. The st
     assert.ok(h.includes('Rest day. The streak sits this one out.'));
     assert.ok(h.indexOf('wc-tag') > h.indexOf('wk-hero') && h.indexOf('wc-tag') < h.indexOf('wk-stats'),
       'hero@' + h.indexOf('wk-hero') + ' tag@' + h.indexOf('wc-tag') + ' stats@' + h.indexOf('wk-stats'));
-    assert.match(h, /<div class="wc-tag-lbl">WILDCARD DONE<\/div>/);
+    assert.match(h, /<div class="wc-tag-lbl">Wildcard done<\/div>/);
   }
 });
 
@@ -429,10 +429,10 @@ test('the flame comes from the icon table, which defines it once', () => {
 
 // ── the copy, harvested from what the app rendered and popped ────────────────────────────────────────────────────────
 const RULED = {
-  tagLabel: 'WILDCARD DONE',
+  tagLabel: 'Wildcard done',
   restSub: 'Rest day. The streak sits this one out.',
   trainSub: 'Recovery Lift is still on the board.',
-  popKicker: 'WILDCARD DONE',
+  popKicker: 'Wildcard done',
   popMsg: 'You showed up. That is the whole game.',
   popSubRest: 'Streak holds.',
   popSubTrain: 'Streak: 3.',
@@ -581,18 +581,17 @@ test('a missing day, a missing start date or no program resolves to nothing', ()
   assert.deepEqual(nyRows(['dst23-missing-day', 'dst24-no-start', 'dst25-no-prog']), []);
 });
 
-// ── the today cell: the W mark and the tick on orange (D185) ─────────────────────────────────────────────────────────
+// ── the today cell: the W mark and the tick on today's ink ring (D185, amended by D263) ─────────────────────────
 // The markup, by hand: renderWeekView writes .wk-day[.today] > .wk-day-num > span.chk | span.wc-mark, and the skip glyph
-// is bare text in .wk-day-num. The tokens, by hand from the design system: signal #CF4E1A (the today cell's
-// background), on-signal #FBF6EE, run #5e8c54, the page background #f4f1e8. By the WCAG formula, on-signal over signal
-// is about 4.10:1, signal over the page about 3.91:1, run over the page about 3.47:1.
+// is bare text in .wk-day-num. D185 turned the marks on-signal on today's orange cell; D263 rings today's date in ink on
+// the strip's white card instead, so the today rule is gone and the marks keep their own colours every day. The tokens,
+// by hand from the rulings: signal #CF4E1A, run #5e8c54, ink #111111, the card #FFFFFF. By the WCAG formula, signal
+// over the card is about 4.41:1 and run over the card about 3.92:1.
 const CSS = cssRules(IA.html);
-const TODAY_RULE = '.wk-day.today .chk,.wk-day.today .wc-mark{color:var(--on-signal);}';
 const GLYPH_BLOCK = [
   '.wk-day-num .chk{color:var(--run);}',
   '.wk-day-num .wc-mark{color:var(--signal);}',
   '.wc-mark{display:inline-flex;align-items:center;gap:1px;color:var(--signal);line-height:1;}',
-  TODAY_RULE,
   '.wc-mark-w{font-family:var(--font-display);font-weight:800;font-size:11px;letter-spacing:0;}',
 ];
 const cellNum = (today: boolean) => el('div', ['wk-day-num'], el('div', ['wk-day'].concat(today ? ['today'] : [])));
@@ -609,10 +608,10 @@ const win = (k: keyof typeof NODES) => {
 };
 const tok = (n: string) => CSS.resolveVar(CSS.rootVars[n]).toLowerCase();
 
-test('the five glyph colour rules sit together in the stylesheet once each, in order: tick, W mark, mark base, the today rule, the W letter', () => {
+test('the four glyph rules sit together in the stylesheet once each, in order: tick, W mark, mark base, the W letter', () => {
   const st = styleText(IA.html);
   for (const r of GLYPH_BLOCK) assert.equal(st.split(r).length - 1, 1, r);
-  assert.equal((IA.html.match(/\.wk-day\.today \.chk,\.wk-day\.today \.wc-mark\{color:var\(--on-signal\);\}/g) || []).length, 1, 'the today rule carries no third selector');
+  assert.equal((IA.html.match(/\.wk-day\.today \.(chk|wc-mark)/g) || []).length, 0, 'no today rule recolours the marks');
   const lines = st.split('\n');
   const at = lines.indexOf(GLYPH_BLOCK[0]);
   assert.ok(at >= 0, 'the tick rule is a whole line');
@@ -625,9 +624,9 @@ test('the colour tokens are signal #CF4E1A, on-signal #FBF6EE and run #5e8c54', 
   assert.equal(tok('--run'), '#5e8c54');
 });
 
-test('on today\'s orange cell the W mark and the tick resolve to on-signal, through the today rule', () => {
-  assert.deepEqual(win('todayMark'), { sel: '.wk-day.today .wc-mark', hex: '#FBF6EE' });
-  assert.deepEqual(win('todayChk'), { sel: '.wk-day.today .chk', hex: '#FBF6EE' });
+test('on today\'s ringed cell the W mark stays signal and the tick stays run, through their own rules', () => {
+  assert.deepEqual(win('todayMark'), { sel: '.wk-day-num .wc-mark', hex: '#CF4E1A' });
+  assert.deepEqual(win('todayChk'), { sel: '.wk-day-num .chk', hex: '#5e8c54' });
 });
 
 test('on any other day the W mark stays signal and the tick stays run', () => {
@@ -635,34 +634,28 @@ test('on any other day the W mark stays signal and the tick stays run', () => {
   assert.equal(win('otherChk').hex, '#5e8c54');
 });
 
-test('the skip glyph on today\'s cell takes on-signal from the today date rule, and no tick or W rule reaches it', () => {
+test('the skip glyph on today\'s cell takes the ink from the today date rule, and no tick or W rule reaches it', () => {
   const sels = colorCandidates(CSS.rules, NODES.todayNum).map((c) => c.sel);
   assert.deepEqual(sels.filter((s) => {
     const o = parseCompound(s.trim().split(/\s+/).pop()!);
     return o.cls.includes('chk') || o.cls.includes('wc-mark');
   }), []);
-  assert.deepEqual(win('todayNum'), { sel: '.wk-day.today .wk-day-num', hex: '#FBF6EE' });
+  assert.deepEqual(win('todayNum'), { sel: '.wk-day.today .wk-day-num', hex: '#111111' });
 });
 
-test('on today\'s cell the W mark and the tick read at the skip glyph\'s contrast, about 4.10:1, above the 3:1 floor', () => {
-  const signal = '#CF4E1A';
-  const skip = contrast('#FBF6EE', signal);
-  assert.ok(Math.abs(skip - 4.10) < 0.01, skip.toFixed(4));
-  for (const k of ['todayMark', 'todayChk'] as const) {
-    const c = contrast(win(k).hex!, signal);
-    assert.equal(+c.toFixed(4), +skip.toFixed(4), k);
-    assert.ok(c >= 3, k + ' ' + c.toFixed(2));
-  }
+test('on today\'s cell the W mark reads about 4.41:1 and the tick about 3.92:1 on the strip\'s card, above the 3:1 floor', () => {
+  assert.equal(tok('--surface'), '#ffffff');
+  const mark = contrast(win('todayMark').hex!, '#FFFFFF');
+  const chk = contrast(win('todayChk').hex!, '#FFFFFF');
+  assert.ok(Math.abs(mark - 4.41) < 0.05, mark.toFixed(2));
+  assert.ok(Math.abs(chk - 3.92) < 0.05, chk.toFixed(2));
 });
 
-test('off today the W mark reads about 3.91:1 and the tick between 3 and 3.6 on the page background', () => {
-  const mark = contrast(win('otherMark').hex!, '#f4f1e8');
-  const chk = contrast(win('otherChk').hex!, '#f4f1e8');
-  assert.ok(Math.abs(mark - 3.91) < 0.05, mark.toFixed(2));
-  assert.ok(chk > 3 && chk < 3.6, chk.toFixed(2));
+test('off today the marks read the same as today, on the same card', () => {
+  assert.deepEqual([win('otherMark').hex, win('otherChk').hex], [win('todayMark').hex, win('todayChk').hex]);
 });
 
-test('only five colour rules name the tick or the W mark: three for the glyphs and two from the today rule', () => {
+test('only three colour rules name the tick or the W mark, the glyphs\' own', () => {
   const fam = CSS.rules.filter((r) => !r.media && r.decls.some((d) => d.p === 'color') && /\.(chk|wc-mark)(?![\w-])/.test(r.sel));
-  assert.deepEqual(fam.map((r) => r.sel), ['.wk-day-num .chk', '.wk-day-num .wc-mark', '.wc-mark', '.wk-day.today .chk', '.wk-day.today .wc-mark']);
+  assert.deepEqual(fam.map((r) => r.sel), ['.wk-day-num .chk', '.wk-day-num .wc-mark', '.wc-mark']);
 });

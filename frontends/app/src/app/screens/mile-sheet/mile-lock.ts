@@ -19,7 +19,7 @@ import { MileSheetState } from './mile-sheet-state';
   </div>
   <div class="rand-body" id="mileLockBody">
   @if (state.lock().length) {
-    <div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:var(--accent)">THE ROW HOLDS</div>
+    <div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0;color:var(--accent)">The row holds</div>
     <div class="det-group" style="margin-top:10px">
       @for (f of state.lock(); track f.k) {
         <div class="det-row"><span class="k">{{ f.k }}</span><span class="v">{{ f.v }}</span></div>

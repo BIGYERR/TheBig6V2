@@ -10,8 +10,10 @@
 #   pull request dev -> main   the same checks again, plus "PR source is dev". All must pass to merge.
 #   push to main (the merge)   Pages: dist-github-pages/ is built from the sources and, once the Pages source is "GitHub
 #                              Actions" (Mario's setting, handoff §12), deployed; then the deploy proof: Pages has that
-#                              commit and the live URL serves it.
-#   workflow_dispatch          run the checks by hand on any branch.
+#                              commit and the live URL serves it; then TestFlight: the release signed and uploaded, so
+#                              the phone's TestFlight app offers it (skipped while Mario's secrets are unset).
+#   workflow_dispatch          run the checks by hand on any branch; on main, TestFlight runs too (the first upload
+#                              needs no merge).
 #
 # Every job keeps its run log (temp/, tools/runlog.mjs) as an artifact, so a red check can be read the same way as a
 # local one: summary.txt, events.log, output.log and artifacts/ per run.
@@ -162,7 +164,7 @@ jobs:
 
   # The native app's compile proof: the Angular app, the Cordova iOS platform and an unsigned Xcode build for the
   # simulator, on a macOS runner (the 60-second check cannot build iOS; the app lane only holds config.xml's version to
-  # the page's). Nothing is booted, installed or signed; signing and TestFlight are a later pass.
+  # the page's). Nothing is booted, installed or signed; the signed release is TestFlight's, after a merge into main.
   native:
     name: native (iOS simulator)
     if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
@@ -251,3 +253,125 @@ jobs:
           name: deploy-run-log
           path: temp/
           retention-days: 30
+
+  # TestFlight (handoff §12, the native lane): after the deploy proof, the release goes up to App Store Connect and the
+  # phone's TestFlight app offers it. Plain signing (Mario, Post-v0.251.1): one Apple Distribution certificate and the
+  # App Store profiles of the app and its RestTimerWidget extension, made once by Mario, plus his App Store Connect API
+  # key, all seven as repo secrets (frontends/app/README.md, TestFlight from CI). After the deploy proof, but a lagging
+  # Pages does not hold the phone back. Three jobs, so the macOS runner is used only for the archive:
+  #   gate        skips cleanly (green) while any secret is unset, or when App Store Connect already holds config.xml's
+  #               build: a version goes up once, a fix is the next PATCH (CLAUDE.md, Native)
+  #   upload      the signing files from the secrets, then scripts/ios.mjs release: archive and upload
+  #   processed   waits until App Store Connect has processed the build. Its notice ("testflight 0.251.1 processed") is
+  #               rhythm step 7's TestFlight leg (node frontends/app/scripts/testflight.mjs leg).
+  testflight-gate:
+    name: TestFlight (gate)
+    needs: deployed
+    if: ${{ !cancelled() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      upload: ${{ steps.gate.outputs.upload }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Upload only with every secret set and a version App Store Connect does not hold yet
+        id: gate
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          # Whether each secret is set, never its value: this job reads App Store Connect, it signs nothing.
+          HAS_ASC_KEY_ID: ${{ secrets.ASC_KEY_ID != '' }}
+          HAS_ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID != '' }}
+          HAS_ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 != '' }}
+          HAS_IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 != '' }}
+          HAS_IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD != '' }}
+          HAS_IOS_PROFILE_APP: ${{ secrets.IOS_PROFILE_APP != '' }}
+          HAS_IOS_PROFILE_WIDGET: ${{ secrets.IOS_PROFILE_WIDGET != '' }}
+        run: node frontends/app/scripts/testflight.mjs gate
+
+  testflight:
+    name: TestFlight (upload)
+    needs: testflight-gate
+    if: ${{ !cancelled() && needs.testflight-gate.outputs.upload == 'true' }}
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Xcode on this runner
+        run: xcodebuild -version
+      - name: The signing files from the secrets (a keychain of this run's own, the two App Store profiles, the API key)
+        env:
+          IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROFILE_APP: ${{ secrets.IOS_PROFILE_APP }}
+          IOS_PROFILE_WIDGET: ${{ secrets.IOS_PROFILE_WIDGET }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          set -eo pipefail
+          dir="$RUNNER_TEMP/signing"
+          mkdir -p "$dir"
+          decode() { printf '%s' "$1" | tr -d ' \r\n' | base64 --decode > "$2"; }
+          decode "$IOS_DIST_CERT_P12" "$dir/distribution.p12"
+          decode "$IOS_PROFILE_APP" "$dir/app.mobileprovision"
+          decode "$IOS_PROFILE_WIDGET" "$dir/widget.mobileprovision"
+          printf '%s\n' "$ASC_KEY_P8" > "$dir/AuthKey.p8"
+          keychain="$dir/signing.keychain-db"
+          pass="$(openssl rand -base64 24)"
+          echo "::add-mask::$pass"
+          security create-keychain -p "$pass" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$pass" "$keychain"
+          security import "$dir/distribution.p12" -P "$IOS_DIST_CERT_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple: -k "$pass" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          rm "$dir/distribution.p12"
+          {
+            echo "IOS_KEYCHAIN=$keychain"
+            echo "IOS_PROFILES=$dir/app.mobileprovision,$dir/widget.mobileprovision"
+            echo "ASC_KEY_PATH=$dir/AuthKey.p8"
+          } >> "$GITHUB_ENV"
+      - name: Archive the release and upload it to App Store Connect (frontends/app/scripts/ios.mjs release)
+        working-directory: frontends/app
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          npm ci --no-audit --no-fund
+          npm run release-ios
+      - name: Remove the signing files
+        if: always()
+        run: |
+          if [ -n "$IOS_KEYCHAIN" ]; then security delete-keychain "$IOS_KEYCHAIN" || true; fi
+          rm -rf "$RUNNER_TEMP/signing"
+      - name: Keep the Xcode logs and the run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testflight-run-log
+          path: temp/
+          retention-days: 30
+
+  testflight-processed:
+    name: TestFlight (processed)
+    needs: testflight
+    if: ${{ !cancelled() && needs.testflight.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: App Store Connect has processed the build (TestFlight offers it from then on)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: node frontends/app/scripts/testflight.mjs wait
