@@ -1,0 +1,37 @@
+storage calls: 49; key families named as ia_ literals: 17
+
+  ia_active          frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/storage.ts
+  ia_comp_           frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/storage.ts
+  ia_edits_          frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/swaps-edits.ts
+  ia_exw_            frontends/app/src/legacy/src/js/log-entries.ts, frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/storage.ts
+  ia_hist_           frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/storage.ts
+  ia_logs_           frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/storage.ts
+  ia_moves_          frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/rest-day-shell.ts
+  ia_pop_dismiss_    frontends/app/src/legacy/src/js/popups-streaks-reminders.ts, frontends/app/src/legacy/src/js/program-manage.ts
+  ia_pop_idx_        frontends/app/src/legacy/src/js/popups-streaks-reminders.ts, frontends/app/src/legacy/src/js/program-manage.ts
+  ia_programs        frontends/app/src/legacy/src/js/storage.ts
+  ia_remind_last_    frontends/app/src/legacy/src/js/popups-streaks-reminders.ts, frontends/app/src/legacy/src/js/program-manage.ts
+  ia_reminded_       frontends/app/src/legacy/src/js/popups-streaks-reminders.ts, frontends/app/src/legacy/src/js/program-manage.ts
+  ia_season_shown_   frontends/app/src/legacy/src/js/popups-streaks-reminders.ts, frontends/app/src/legacy/src/js/program-manage.ts
+  ia_swapct_         frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/swaps-edits.ts
+  ia_swaps_          frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/swaps-edits.ts
+  ia_theme           frontends/app/src/legacy/src/js/theme.ts
+  ia_wild_           frontends/app/src/legacy/src/js/program-manage.ts, frontends/app/src/legacy/src/js/storage.ts
+
+calls whose key is not an ia_ literal (16), each traced by hand in the ruling:
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts: localStorage.getItem(key
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts: localStorage.setItem(key
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts: localStorage.getItem(memKey
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts: localStorage.setItem(memKey
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts: localStorage.getItem(lastKey
+  frontends/app/src/legacy/src/js/popups-streaks-reminders.ts: localStorage.setItem(lastKey
+  frontends/app/src/legacy/src/js/program-manage.ts: localStorage.removeItem(p+id
+  frontends/app/src/legacy/src/js/swaps-edits.ts: localStorage.getItem(editStoreKey(pid
+  frontends/app/src/legacy/src/js/swaps-edits.ts: localStorage.setItem(editStoreKey(pid
+  frontends/app/src/legacy/src/js/swaps-edits.ts: localStorage.getItem(swapStoreKey(pid
+  frontends/app/src/legacy/src/js/swaps-edits.ts: localStorage.setItem(swapStoreKey(pid
+  frontends/app/src/legacy/src/js/swaps-edits.ts: localStorage.getItem(swapCountKey(pid
+  frontends/app/src/legacy/src/js/swaps-edits.ts: localStorage.setItem(swapCountKey(pid
+  frontends/app/src/legacy/src/js/theme.ts: localStorage.getItem(THEME_KEY
+  frontends/app/src/legacy/src/js/theme.ts: localStorage.setItem(THEME_KEY
+  frontends/app/src/legacy/src/js/theme.ts: localStorage.removeItem(THEME_KEY
