@@ -2,14 +2,15 @@
 // any secret is unset and when App Store Connect already holds the build (a version goes up once; a fix is the next
 // PATCH), the wait ends only on a processed or failed build, the API token is an ES256 JWT in the raw signature form
 // Apple reads, the gate's secret list is the one the pipeline passes, and config.xml answers the export compliance
-// question. Expected values are typed by hand or checked by Node's own verifier, never asked of the script.
+// question, and the deploy picture's TestFlight leg names a TestFlight job that failed instead of the last notice before
+// it. Expected values are typed by hand or checked by Node's own verifier, never asked of the script.
 import assert from 'node:assert/strict';
 import { generateKeyPairSync, verify } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { SECRETS, ascToken, gateDecision, nativeRelease, processingVerdict } from '../../scripts/testflight.mjs';
+import { SECRETS, ascToken, gateDecision, legLine, nativeRelease, processingVerdict } from '../../scripts/testflight.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const REPO = join(APP, '..', '..');
@@ -53,6 +54,42 @@ describe('the wait ends on a processed or failed build', () => {
   it('ends badly on FAILED or INVALID', () => {
     assert.deepEqual(processingVerdict('0.251.1', [{ state: 'FAILED' }]), { done: true, ok: false, notice: 'testflight 0.251.1 failed processing' });
     assert.equal(processingVerdict('0.251.1', [{ state: 'INVALID' }]).ok, false);
+  });
+});
+
+describe('the leg names a failed TestFlight job, never the notice before it', () => {
+  // Run #48 (v0.253.0's merge, 803baf3): the gate wrote "uploading", then the upload job failed on App Store Connect's
+  // orientation rule, and the leg still printed "uploading" twenty minutes after the run had ended.
+  const run48 = {
+    run: 41202156759, sha: '803baf3c', completed: true,
+    jobs: [{ name: 'TestFlight (gate)', conclusion: 'success' }, { name: 'TestFlight (upload)', conclusion: 'failure' }, { name: 'TestFlight (processed)', conclusion: 'skipped' }],
+    notices: ['testflight 0.253.0 is not in App Store Connect yet; uploading'],
+  };
+
+  it('a failed upload reads as failed, naming the job, after the gate\'s notice', () => {
+    assert.equal(legLine(run48), 'testflight failed in TestFlight (upload), after: testflight 0.253.0 is not in App Store Connect yet; uploading (run 41202156759, 803baf3)');
+  });
+
+  it('a cancelled job reads as cancelled', () => {
+    const jobs = [{ name: 'TestFlight (gate)', conclusion: 'success' }, { name: 'TestFlight (upload)', conclusion: 'success' }, { name: 'TestFlight (processed)', conclusion: 'cancelled' }];
+    assert.equal(legLine({ ...run48, jobs }), 'testflight cancelled in TestFlight (processed), after: testflight 0.253.0 is not in App Store Connect yet; uploading (run 41202156759, 803baf3)');
+  });
+
+  // The three below guard what the leg printed before this change, and must keep printing.
+  it('a processed build reads as its last notice', () => {
+    const jobs = run48.jobs.map((j) => ({ ...j, conclusion: 'success' }));
+    assert.equal(legLine({ ...run48, jobs, notices: [...run48.notices, 'testflight 0.253.0 processed'] }), 'testflight 0.253.0 processed (run 41202156759, 803baf3)');
+  });
+
+  it('a skipped upload reads as the gate\'s skip notice', () => {
+    const jobs = [{ name: 'TestFlight (gate)', conclusion: 'success' }, { name: 'TestFlight (upload)', conclusion: 'skipped' }, { name: 'TestFlight (processed)', conclusion: 'skipped' }];
+    const notices = ['testflight 0.252.0 processed (uploaded before this run; a version goes up once, a fix is the next PATCH)'];
+    assert.equal(legLine({ ...run48, jobs, notices }), 'testflight 0.252.0 processed (uploaded before this run; a version goes up once, a fix is the next PATCH) (run 41202156759, 803baf3)');
+  });
+
+  it('a run still going with no notice yet says so', () => {
+    const jobs = [{ name: 'TestFlight (gate)', conclusion: '' }];
+    assert.equal(legLine({ ...run48, completed: false, jobs, notices: [] }), 'testflight no notice yet (run 41202156759, 803baf3, still running)');
   });
 });
 
