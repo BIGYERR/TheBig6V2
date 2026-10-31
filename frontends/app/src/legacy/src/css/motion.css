@@ -17,6 +17,11 @@
 /* tap responsiveness on the primary controls */
 .wk-hero-cta:active,.wizard-next:active,.new-prog-btn:active{transform:scale(.98);}
 .status-btn:active,.rt-btn:active,.rt-reset:active,.prog-action-btn:active,.ex-logbtn:active{transform:scale(.97);}
+/* v0.254.0 (D266): every press that scales a control sinks over --press-in and springs back over --press-out
+   (installPressFeel is what lets the phone show a press at all). Tints keep their own timing. */
+:root{--press-in:100ms;--press-out:340ms;--press-sink:cubic-bezier(.2,0,.2,1);--press-back:cubic-bezier(.34,1.56,.64,1);}
+.change-btn,.change-chip-act,.ex-logbtn,.ex-skipbtn,.ex-swapbtn,.hurt-btn,.log-nudge-btn,.new-prog-btn,.ov-apply,.ov-clear,.pop-act,.prog-action-btn,.reassess-acts button,.rt-btn,.rt-reset,.ss-minus,.status-btn,.swap-cand,.wizard-next,.wk-hero-cta,.wk-rest-act{transition:transform var(--press-out) var(--press-back);}
+.change-btn:active,.change-chip-act:active,.ex-logbtn:active,.ex-skipbtn:active,.ex-swapbtn:active,.hurt-btn:active,.log-nudge-btn:active,.new-prog-btn:active,.ov-apply:active,.ov-clear:active,.pop-act:active,.prog-action-btn:active,.reassess-acts button:active,.rt-btn:active,.rt-reset:active,.ss-minus:active,.status-btn:active,.swap-cand:active,.wizard-next:active,.wk-hero-cta:active,.wk-rest-act:active{transition-duration:var(--press-in);transition-timing-function:var(--press-sink);}
 @media (prefers-reduced-motion: reduce){
   .screen.active,.pop-overlay.show,.pop-overlay.show>*{animation:none;}
   .overlay,.rand-overlay,.overlay.open,.rand-overlay.open{transition:none;}

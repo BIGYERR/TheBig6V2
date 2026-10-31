@@ -38,10 +38,10 @@ The bottom tab bar (`nav.tabbar`, `frontends/app/src/legacy/src/css/shell.css`),
   bar stays at the bottom. **Confirmed 2026-10-27** on v0.249.1, installed by `npm run device-ios`: "Tested on the
   phone: the tab bar stays at the bottom on Progress after typing." The app shell stays held, not needed.
 
-## D266: P-LIQUIDTAB, the tab highlight glides like liquid and can be dragged, and every press shows (release to fill)
+## D266: P-LIQUIDTAB, the tab highlight glides like liquid and can be dragged, and every press shows (v0.254.0)
 
 - **Date:** asked and ruled 2026-10-31. **Ruled by:** the main session (design), Mario's concurrence after trying the
-  prototype on his phone ("Yep fluid is great!"). **Bump:** asked before the build. **Shipped:** filled at ship.
+  prototype on his phone ("Yep fluid is great!"). **Bump:** MINOR, v0.254.0 (Mario). **Shipped:** v0.254.0.
 - **The ask (Mario):** "the clicks and stuff feel too fast you know, and the bottom bar like when you click the other
   buttons for the "highlight" bubble to move like liquid over to the one that got selected, or be able to grab it and
   just drag it back and forth all fluid like".
@@ -71,7 +71,9 @@ The bottom tab bar (`nav.tabbar`, `frontends/app/src/legacy/src/css/shell.css`),
      On release it opens the tab nearest the finger's position plus 0.12 s of its velocity (measured over the last
      80 ms), held within the end tabs, by clicking that tab's button: the same path a tap takes. The pill then aims at
      whichever tab is active, so a tab that refuses (This Week or Progress with no active program) sends it back. The
-     tap the drag ends in opens nothing itself: a real click on the bar within 400 ms after a drag is swallowed.
+     tap the drag ends in opens nothing itself: a real click on the bar within 400 ms after a drag is swallowed. The bar
+     takes no browser gesture (`touch-action:none`, was `manipulation`), so a slide along it is the pill's; a vertical
+     swipe that starts on the bar no longer scrolls the page under it, as on a native tab bar.
   3. **Every press shows.** One touch listener on the document, passive and empty, so WebKit applies the 38 press
      styles on the phone. The 21 scaling presses sink over 100 ms (cubic-bezier(.2,0,.2,1)) and spring back over
      340 ms (cubic-bezier(.34,1.56,.64,1)); a tab's icon sinks to 0.84 the same way. The tinting presses show at their
@@ -98,3 +100,8 @@ The bottom tab bar (`nav.tabbar`, `frontends/app/src/legacy/src/css/shell.css`),
 - **Tests:** `tests/unit/tab-bar.test.ts`, both installers lifted out of the page and run on a hand-built window.
 - **Proof only the phone can give:** Mario taps across the tabs and drags the pill, and taps buttons on This Week, on
   the release in TestFlight.
+- **Built (v0.254.0):** the pill is appended to the bar and kept under the buttons by `z-index` (the buttons are
+  `position:relative`), in the single-file page and inside the iOS app's Angular tab bar alike. Checked in the dev
+  container's page (`localhost:3000/app/`, a 375 px viewport): a tap from This Week to Progress stretched the pill to
+  1.28 tabs and it came to rest on Progress; a drag from This Week to Bugs marked the bar dragging, held the pill lifted
+  under the finger and opened Bugs on release. WebKit's press state and the feel under a finger wait for the phone.

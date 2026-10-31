@@ -93,8 +93,18 @@
 .tabbar{left:12px;right:12px;margin:0 auto;width:auto;max-width:406px;transform:none;bottom:max(12px,env(safe-area-inset-bottom,0px));border:1px solid var(--nav-edge);border-radius:34px;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:6px;box-shadow:0 10px 30px rgba(0,0,0,0.18);}
 .tabbar button{border-radius:28px;padding:9px 4px 8px;}
 .screen.with-tabbar{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px));}
-.tabbar button.active{background:var(--nav-on);color:var(--signal);}
 .tabbar .tab-lbl{letter-spacing:0;font-size:12px;font-weight:700;}
 .tabbar .tab-ico{filter:none;}
+/* v0.254.0 (D266): the highlight is one pill (.tab-pill, installTabGlide) gliding behind the buttons, and the bar can be
+   dragged. Each tab is signal by its share of the pill (--on, painted per frame); before the pill exists the active
+   tab is full. A tab's icon sinks on a press like every other control (motion.css), but not while the pill is held.
+   The bar takes no browser gesture (touch-action:none, shell.css), so a slide along it is the pill's. */
+.tabbar button{position:relative;z-index:1;transition:none;}
+.tabbar button.active{color:var(--signal);--on:1;}
+.tabbar button,.tabbar button.active{color:color-mix(in srgb,var(--signal) calc(var(--on,0) * 100%),var(--muted));}
+.tab-pill{position:absolute;z-index:0;top:6px;bottom:6px;left:0;width:0;border-radius:28px;background:var(--nav-on);pointer-events:none;will-change:transform,width;}
+.tabbar .tab-ico{transition:transform var(--press-out) var(--press-back);}
+.tabbar button:active .tab-ico{transform:scale(.84);transition-duration:var(--press-in);transition-timing-function:var(--press-sink);}
+.tabbar.dragging button:active .tab-ico{transform:none;}
 /* the toast rises above the floating bar */
 .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px));}

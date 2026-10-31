@@ -375,6 +375,7 @@ function updateTabBar(id: any){
   if(isDest)document.getElementById(id)!.classList.add('with-tabbar');
   Object.values(TAB_MAP).forEach(tid=>{const t=document.getElementById(tid);if(t)t.classList.remove('active');});
   if(isDest){const t=document.getElementById(TAB_MAP[id]);if(t)t.classList.add('active');}
+  const glide=installTabGlide(window);if(glide)glide.aim();   // v0.254.0 (D266): the pill follows the tab marked
 }
 function tabGo(target: any){
   if(target==='screenHome'){showScreen('screenHome');renderProgList();return;}
@@ -401,6 +402,116 @@ function installKeyboardResync(win: any){
   doc.addEventListener('focusout',()=>{ win.setTimeout(()=>{ if(!isField(doc.activeElement)) resync(); },350); });
 }
 installKeyboardResync(window);
+
+// v0.254.0 (D266): the tab highlight is one pill that glides from tab to tab like liquid, and the bar can be dragged.
+// Its two edges are separate springs (unit mass): the edge on the side it travels toward leads, the other trails, so the
+// pill stretches toward the new tab and its tail catches up, thinning as it stretches. Each tab's colour is signal by
+// its share of the pill (--on). A finger that moves more than 8px along the bar grabs the pill; the release opens the
+// tab nearest the finger plus a flick by clicking its button, the path a tap takes, then the pill aims at whichever tab
+// is active, so a tab that refuses (no active program) sends it back. Installed once per bar, from updateTabBar.
+function installTabGlide(win: any){
+  const doc=win.document, bar=doc.getElementById('tabBar');
+  if(!bar)return null;
+  if(bar._glide)return bar._glide;
+  const LEAD=[260,23], TRAIL=[140,21], HELD=2.6, FLICK=0.12, GRAB=8, BAND=26, BAND_D=90, SWALLOW=400;
+  const reduce=win.matchMedia?win.matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
+  const pill=doc.createElement('span');pill.className='tab-pill';pill.setAttribute('aria-hidden','true');
+  bar.appendChild(pill);   // under the buttons by z-index (look.css)
+  const L={x:0,v:0,t:0}, R={x:0,v:0,t:0};
+  let geo: any[]=[], btns: any[]=[], dir=1, raf=0, last=0, placed=false, drag: any=null, swallowUntil=0;
+  const now=()=>win.performance.now();
+  function measure(){
+    btns=Array.from(bar.querySelectorAll('button'));
+    const b=bar.getBoundingClientRect(), off=b.left+(bar.clientLeft||0);
+    geo=btns.map((t: any)=>{const r=t.getBoundingClientRect();return {l:r.left-off,r:r.right-off,c:(r.left+r.right)/2-off,w:r.width};});
+    return geo.length>0&&geo[0].w>0;
+  }
+  function paint(){
+    const w=Math.max(8,R.x-L.x);
+    let sy=Math.min(1.04,Math.max(0.84,1/Math.sqrt(w/geo[0].w)));   // stretched thin, squashed fat
+    if(drag&&drag.held)sy*=1.08;                                    // held: the pill lifts
+    pill.style.width=w+'px';
+    pill.style.transform='translateX('+L.x.toFixed(2)+'px) scaleY('+sy.toFixed(3)+')';
+    btns.forEach((t: any,i: number)=>{const g=geo[i], ov=Math.max(0,Math.min(R.x,g.r)-Math.max(L.x,g.l));t.style.setProperty('--on',Math.min(1,ov/(g.w*0.75)).toFixed(3));});
+  }
+  function snap(){L.x=L.t;R.x=R.t;L.v=R.v=0;paint();}
+  function spring(s: any,k: number,c: number,dt: number){const a=-k*(s.x-s.t)-c*s.v;s.v+=a*dt;s.x+=s.v*dt;}
+  function tick(t: number){
+    raf=0;
+    let dt=Math.min(0.05,Math.max(0,(t-last)/1000));last=t;
+    const m=drag&&drag.held?HELD:1, q=Math.sqrt(m);   // held: stiffer, the same damping ratio
+    const lead=[LEAD[0]*m,LEAD[1]*q], trail=[TRAIL[0]*m,TRAIL[1]*q], el=dir>0?trail:lead, er=dir>0?lead:trail;
+    while(dt>1e-6){const s=Math.min(1/240,dt);spring(L,el[0],el[1],s);spring(R,er[0],er[1],s);dt-=s;}
+    if(!(drag&&drag.held)&&Math.abs(L.x-L.t)<0.2&&Math.abs(R.x-R.t)<0.2&&Math.abs(L.v)<2&&Math.abs(R.v)<2){snap();return;}
+    paint();
+    raf=win.requestAnimationFrame(tick);
+  }
+  function go(l: number,r: number){
+    const cx=(l+r)/2, cur=(L.x+R.x)/2;
+    if(Math.abs(cx-cur)>0.5)dir=cx>cur?1:-1;
+    L.t=l;R.t=r;
+    if(reduce.matches){if(raf){win.cancelAnimationFrame(raf);raf=0;}snap();return;}
+    if(!raf){last=now();raf=win.requestAnimationFrame(tick);}
+  }
+  function aim(){
+    if(!bar.classList.contains('show')||!measure()){placed=false;return;}   // hidden: the next show snaps
+    const i=btns.findIndex((t: any)=>t.classList.contains('active'));
+    if(i<0)return;
+    if(!placed){placed=true;L.t=geo[i].l;R.t=geo[i].r;snap();return;}
+    go(geo[i].l,geo[i].r);
+  }
+  const xOf=(e: any)=>{const b=bar.getBoundingClientRect();return e.clientX-b.left-(bar.clientLeft||0);};
+  function nearest(x: number){let best=0,bd=Infinity;geo.forEach((g: any,i: number)=>{const d=Math.abs(g.c-x);if(d<bd){bd=d;best=i;}});return best;}
+  function follow(x: number){
+    const lo=geo[0].c, hi=geo[geo.length-1].c, hw=geo[0].w/2;
+    let c=x;
+    if(c<lo)c=lo-BAND*(1-Math.exp(-(lo-c)/BAND_D));   // rubber band past the end tabs
+    if(c>hi)c=hi+BAND*(1-Math.exp(-(c-hi)/BAND_D));
+    go(c-hw,c+hw);
+  }
+  function sample(x: number){const t=now();drag.s.push([t,x]);while(t-drag.s[0][0]>80)drag.s.shift();}   // the last 80 ms
+  function velocity(){const s=drag.s, a=s[0], b=s[s.length-1];return b[0]>a[0]?(b[1]-a[1])/((b[0]-a[0])/1000):0;}
+  bar.addEventListener('pointerdown',(e: any)=>{
+    if(drag||!placed||!measure())return;
+    drag={id:e.pointerId,x0:xOf(e),held:false,s:[]};sample(drag.x0);
+  });
+  bar.addEventListener('pointermove',(e: any)=>{
+    if(!drag||e.pointerId!==drag.id)return;
+    const x=xOf(e);sample(x);
+    if(!drag.held&&Math.abs(x-drag.x0)>GRAB){
+      drag.held=true;bar.classList.add('dragging');
+      try{bar.setPointerCapture(e.pointerId);}catch(_e){}   // only once dragging: a capture at the press would take the tap's click
+    }
+    if(drag.held)follow(x);
+  });
+  function end(e: any,cancel: boolean){
+    if(!drag||e.pointerId!==drag.id)return;
+    if(!drag.held){drag=null;return;}
+    if(!cancel)sample(xOf(e));
+    const x=drag.s[drag.s.length-1][1], v=velocity();
+    drag=null;bar.classList.remove('dragging');swallowUntil=now()+SWALLOW;
+    if(!cancel){
+      const btn=btns[nearest(Math.max(geo[0].c,Math.min(geo[geo.length-1].c,x+v*FLICK)))];
+      if(btn&&!btn.classList.contains('active'))btn.click();
+    }
+    aim();
+  }
+  bar.addEventListener('pointerup',(e: any)=>end(e,false));
+  bar.addEventListener('pointercancel',(e: any)=>end(e,true));
+  // the tap a drag ends in opens nothing itself; the release's own click is not trusted, so it passes
+  bar.addEventListener('click',(e: any)=>{if(e.isTrusted&&now()<swallowUntil){e.stopPropagation();e.preventDefault();}},true);
+  win.addEventListener('resize',()=>{placed=false;aim();});
+  const glide={aim};
+  bar._glide=glide;
+  return glide;
+}
+
+// v0.254.0 (D266): WebKit shows a press (:active) on a touch only where a touch listener exists, and the page had none,
+// so no press showed on the phone. One passive, empty listener on the document turns every press style on.
+function installPressFeel(win: any){
+  win.document.addEventListener('touchstart',()=>{},{passive:true});
+}
+installPressFeel(window);
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
