@@ -84,6 +84,10 @@ session's files written into `tests/measure/` mid-proof.
 registry line and the decision file it names together, at once, in a `docs:` commit, so no other session's commit carries
 the line alone. A session that finds another's uncommitted registry text in its own commit says so in its report.
 v0.250.0 carried the D258/D259 line to `dev` while `docs/decisions/speed-work.md` stayed untracked.
+**Never name a D-code to Mario before it is in the registry (Mario, Post-v0.254.0).** Until the registry line that
+issues it is written, a ruling is "the next D-code" in chat, a brief and a report. The number is read from the registry
+in the same step that writes the decision file. v0.254.0's ruling was promised as D265 in chat; a concurrent session
+issued D265 before the ruling was written, and it shipped as D266.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it, and print the deploy picture (step 7).
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `<feature>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience. The main session appends the ruling to its feature's decision file (Proof for new work).

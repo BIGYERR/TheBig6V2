@@ -1,0 +1,343 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- D266 (docs/decisions/tab-bar.md): the feel prototype Mario chose Fluid from, published as an artifact on 2026-10-31. -->
+<title>Tab Bar Feel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one phone column. The tuning card sits on top, the mock app below it, the floating tab bar fixed at the bottom.
+   Tokens are the app's own Track look (D263): neutral paper and ink, true black at night, signal orange. */
+:root{
+  --bg:#F3F3F1;--surface:#FFFFFF;--surface2:#EDEDEA;--text:#111111;--muted:#6E6E6A;
+  --signal:#CF4E1A;--on-signal:#FBF6EE;
+  --nav:rgba(255,255,255,0.92);--nav-edge:rgba(0,0,0,0.06);--nav-on:rgba(0,0,0,0.07);--shadow:rgba(0,0,0,0.18);
+  --font-display:'Helvetica Now Text','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --font-mono:ui-monospace,'SF Mono',Menlo,monospace;
+  --pin:100ms;--pout:340ms;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000;--surface:#161616;--surface2:#242424;--text:#FFFFFF;--muted:#A3A3A3;
+  --signal:#E2622B;--on-signal:#12110D;
+  --nav:rgba(28,28,28,0.92);--nav-edge:rgba(255,255,255,0.08);--nav-on:rgba(255,255,255,0.12);--shadow:rgba(0,0,0,0.5);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000000;--surface:#161616;--surface2:#242424;--text:#FFFFFF;--muted:#A3A3A3;
+  --signal:#E2622B;--on-signal:#12110D;
+  --nav:rgba(28,28,28,0.92);--nav-edge:rgba(255,255,255,0.08);--nav-on:rgba(255,255,255,0.12);--shadow:rgba(0,0,0,0.5);color-scheme:dark}
+@property --on{syntax:'<number>';inherits:true;initial-value:0}
+
+body{background:var(--bg);color:var(--text);font-family:var(--font-display);-webkit-tap-highlight-color:transparent;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 128px}
+.col{max-width:406px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+
+/* tuning card */
+.tune{background:var(--surface);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.tune h1{font-size:17px;font-weight:700;margin:0;text-wrap:balance}
+.tune p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.row{display:flex;flex-direction:column;gap:6px}
+.lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.seg{display:flex;background:var(--surface2);border-radius:999px;padding:3px;gap:2px;transition:opacity .2s}
+.seg button{flex:1;border:0;background:none;font:inherit;font-size:13px;font-weight:700;color:var(--muted);padding:8px 6px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px var(--shadow)}
+.seg button:focus-visible,.btn:focus-visible,.tab:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.seg.off{opacity:.4;pointer-events:none}
+.readout{font-family:var(--font-mono);font-size:11.5px;line-height:1.5;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* mock app */
+.screen{display:none;flex-direction:column;gap:12px}
+.screen.on{display:flex;animation:scrIn .30s cubic-bezier(.32,.72,0,1)}
+@keyframes scrIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.h{font-size:30px;font-weight:700;letter-spacing:-0.01em;margin:2px 0 0}
+.sub{color:var(--muted);font-size:14px;margin:0}
+.card{background:var(--surface);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:12px;font-weight:700;color:var(--signal)}
+.ttl{font-size:18px;font-weight:700;margin:0}
+.txt{font-size:14px;color:var(--muted);margin:0;line-height:1.45}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:13px 18px;background:var(--signal);color:var(--on-signal);cursor:pointer}
+.btn.ghost{background:var(--surface2);color:var(--text)}
+.btn.wide{width:100%}
+.chip{align-self:flex-start;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(207,78,26,0.12);color:var(--signal)}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{background:var(--surface);border-radius:14px;padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700;color:var(--muted)}
+.day b{font-size:16px;color:var(--text)}
+.day.today{background:var(--signal);color:var(--on-signal)}
+.day.today b{color:var(--on-signal)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px}
+.bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bars i{display:block;width:100%;border-radius:8px;background:var(--surface2)}
+.bars div:last-child i{background:var(--signal)}
+.field{border-radius:16px;background:var(--surface2);min-height:96px;padding:12px;font-size:14px;color:var(--muted)}
+
+/* press feedback, After only: sinks over --pin, springs back over --pout */
+.after .press{transition:transform var(--pout) cubic-bezier(.34,1.56,.64,1),filter var(--pout) ease}
+.after .press.is-pressed{transform:scale(.96);filter:brightness(.93);transition-duration:var(--pin);transition-timing-function:cubic-bezier(.2,0,.2,1)}
+
+/* the floating tab bar */
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(406px,calc(100% - 24px));
+  display:flex;padding:6px;border-radius:34px;background:var(--nav);border:1px solid var(--nav-edge);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 10px 30px var(--shadow);
+  touch-action:none;user-select:none;-webkit-user-select:none;z-index:10}
+.pill{position:absolute;top:6px;bottom:6px;left:0;width:0;border-radius:28px;background:var(--nav-on);pointer-events:none;will-change:transform,width}
+.tab{position:relative;flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 8px;font:inherit;cursor:pointer;
+  color:color-mix(in srgb,var(--signal) calc(var(--on) * 100%),var(--muted))}
+.before .tab{transition:--on .15s}
+.tab .ico{display:block;line-height:0}
+.after .tab .ico{transition:transform var(--pout) cubic-bezier(.34,1.56,.64,1)}
+.after .tab.is-pressed .ico{transform:scale(.84);transition-duration:var(--pin);transition-timing-function:cubic-bezier(.2,0,.2,1)}
+.tab .t{font-size:12px;font-weight:700}
+@media (prefers-reduced-motion: reduce){.screen.on{animation:none}}
+</style>
+
+<div id="root" class="after">
+<div class="col">
+  <section class="tune" aria-label="Tuning">
+    <h1>Tab bar feel</h1>
+    <p>Tap a tab, or hold the bar and slide. Buttons below sink when pressed. Before is your phone today: no press state shows and the pill jumps.</p>
+    <div class="row">
+      <span class="lbl" id="modeLbl">Version</span>
+      <div class="seg" id="modeSeg" role="group" aria-labelledby="modeLbl">
+        <button id="mBefore" data-mode="before" aria-pressed="false">Before</button>
+        <button id="mAfter" data-mode="after" aria-pressed="true">After</button>
+      </div>
+    </div>
+    <div class="row">
+      <span class="lbl" id="feelLbl">Feel</span>
+      <div class="seg" id="feelSeg" role="group" aria-labelledby="feelLbl">
+        <button id="fQuick" data-feel="quick" aria-pressed="false">Quick</button>
+        <button id="fFluid" data-feel="fluid" aria-pressed="true">Fluid</button>
+        <button id="fHeavy" data-feel="heavy" aria-pressed="false">Heavy</button>
+      </div>
+    </div>
+    <div class="readout" id="readout" aria-live="polite"></div>
+  </section>
+
+  <section class="screen" aria-label="Programs">
+    <h2 class="h">Programs</h2>
+    <div class="card">
+      <span class="chip">Active</span>
+      <p class="ttl">Half Manny</p>
+      <p class="txt">Half marathon. Week 7 of 11.</p>
+    </div>
+    <div class="card">
+      <p class="ttl">Spring base</p>
+      <p class="txt">Base builder. Archived.</p>
+      <div class="acts"><button class="btn ghost press js-toggle" data-alt="Active now">Set active</button></div>
+    </div>
+    <button class="btn wide press">Build a new program</button>
+  </section>
+
+  <section class="screen on" aria-label="This Week">
+    <h2 class="h">This week</h2>
+    <p class="sub">Week 7 of 11. Half Manny.</p>
+    <div class="strip">
+      <div class="day">M<b>2</b>UP</div><div class="day">T<b>3</b>RUN</div><div class="day today">W<b>4</b>LO</div>
+      <div class="day">T<b>5</b>TMP</div><div class="day">F<b>6</b>REST</div><div class="day">S<b>7</b>UP</div><div class="day">S<b>8</b>LONG</div>
+    </div>
+    <div class="card">
+      <span class="eyebrow">Today</span>
+      <p class="ttl">Lower strength and an easy run</p>
+      <p class="txt">Deadlift 4×5. Split squats, carries. 3 mi easy.</p>
+      <div class="acts">
+        <button class="btn press">Open session</button>
+        <button class="btn ghost press js-toggle" data-alt="Done ✓">Mark done</button>
+      </div>
+    </div>
+    <div class="card">
+      <span class="eyebrow">Tomorrow</span>
+      <p class="ttl">Tempo run</p>
+      <p class="txt">5 mi. Two at tempo in the middle.</p>
+    </div>
+  </section>
+
+  <section class="screen" aria-label="Progress">
+    <h2 class="h">Progress</h2>
+    <div class="card">
+      <p class="ttl">Weekly miles</p>
+      <div class="bars">
+        <div><i style="height:57%"></i>12</div><div><i style="height:67%"></i>14</div><div><i style="height:71%"></i>15</div>
+        <div><i style="height:62%"></i>13</div><div><i style="height:81%"></i>17</div><div><i style="height:86%"></i>18</div><div><i style="height:76%"></i>16</div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="ttl">Deadlift</p>
+      <p class="txt">315 lb for 5. Up 20 lb in six weeks.</p>
+      <div class="acts"><button class="btn ghost press">See the log</button></div>
+    </div>
+  </section>
+
+  <section class="screen" aria-label="Bugs">
+    <h2 class="h">Bugs</h2>
+    <div class="card">
+      <p class="ttl">Tell me what broke</p>
+      <div class="field">What went wrong?</div>
+      <button class="btn wide press">Send report</button>
+    </div>
+  </section>
+</div>
+
+<nav class="bar" id="bar" aria-label="Tabs">
+  <div class="pill" id="pill"></div>
+  <button class="tab" id="tHome" aria-selected="false"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span class="t">Programs</span></button>
+  <button class="tab" id="tWeek" aria-selected="true"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="t">This Week</span></button>
+  <button class="tab" id="tProgress" aria-selected="false"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span><span class="t">Progress</span></button>
+  <button class="tab" id="tBugs" aria-selected="false"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg></span><span class="t">Bugs</span></button>
+</nav>
+</div>
+
+<script>
+(() => {
+  // Each feel: the leading edge's spring and the trailing edge's spring as [stiffness, damping] (unit mass),
+  // and the press timing in ms. The leading edge is stiffer, so the pill stretches toward where it is going
+  // and its tail catches up: that lag is the liquid.
+  const FEELS = {
+    quick: { lead: [520, 36], trail: [300, 30], pin: 70, pout: 200 },
+    fluid: { lead: [260, 23], trail: [140, 21], pin: 100, pout: 340 },
+    heavy: { lead: [150, 19], trail: [85, 17], pin: 130, pout: 460 },
+  };
+  const DRAG_STIFF = 2.6;          // springs this much stiffer while a finger holds the pill
+  const FLICK_S = 0.12;            // a release carries this many seconds of finger velocity
+  const root = document.getElementById('root'), bar = document.getElementById('bar'), pill = document.getElementById('pill');
+  const tabs = [...bar.querySelectorAll('.tab')], screens = [...document.querySelectorAll('.screen')];
+  const out = document.getElementById('readout'), feelSeg = document.getElementById('feelSeg');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  let mode = 'after', feel = 'fluid', active = 1, geo = [], dir = 1, raf = 0, last = 0, drag = null;
+  const L = { x: 0, v: 0, t: 0 }, R = { x: 0, v: 0, t: 0 };
+
+  function measure() {
+    const b = bar.getBoundingClientRect(), off = b.left + bar.clientLeft;
+    geo = tabs.map(t => { const r = t.getBoundingClientRect(); return { l: r.left - off, r: r.right - off, c: (r.left + r.right) / 2 - off, w: r.width }; });
+  }
+  function localX(e) { const b = bar.getBoundingClientRect(); return e.clientX - b.left - bar.clientLeft; }
+  function idxAt(x) { let best = 0, bd = Infinity; geo.forEach((g, i) => { const d = Math.abs(g.c - x); if (d < bd) { bd = d; best = i; } }); return best; }
+
+  function paint() {
+    const w = Math.max(8, R.x - L.x), base = geo[0] ? geo[0].w : w;
+    let sy = Math.min(1.04, Math.max(0.84, 1 / Math.sqrt(w / base)));   // stretched thin, squashed fat: area roughly kept
+    if (drag && drag.started) sy *= 1.08;                                // held: the pill lifts a little
+    pill.style.width = w + 'px';
+    pill.style.transform = `translateX(${L.x.toFixed(2)}px) scaleY(${sy.toFixed(3)})`;
+    tabs.forEach((t, i) => {
+      const g = geo[i], ov = Math.max(0, Math.min(R.x, g.r) - Math.max(L.x, g.l));
+      t.style.setProperty('--on', Math.min(1, ov / (g.w * 0.75)).toFixed(3));
+    });
+  }
+  function snapTo(i) { L.x = L.t = geo[i].l; R.x = R.t = geo[i].r; L.v = R.v = 0; paint(); }
+  function spring(s, k, c, dt) { const a = -k * (s.x - s.t) - c * s.v; s.v += a * dt; s.x += s.v * dt; }
+  function edges(f, m) {
+    const sq = Math.sqrt(m), lead = [f.lead[0] * m, f.lead[1] * sq], trail = [f.trail[0] * m, f.trail[1] * sq];
+    return dir > 0 ? { l: trail, r: lead } : { l: lead, r: trail };
+  }
+  function tick(now) {
+    let dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const held = drag && drag.started, e = edges(FEELS[feel], held ? DRAG_STIFF : 1);
+    while (dt > 1e-6) { const s = Math.min(1 / 240, dt); spring(L, e.l[0], e.l[1], s); spring(R, e.r[0], e.r[1], s); dt -= s; }
+    paint();
+    const still = Math.abs(L.x - L.t) < 0.2 && Math.abs(R.x - R.t) < 0.2 && Math.abs(L.v) < 2 && Math.abs(R.v) < 2;
+    if (still && !held) { snapTo(active); raf = 0; return; }
+    raf = requestAnimationFrame(tick);
+  }
+  function run() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }
+  function aimAt(i) {
+    const c = (geo[i].l + geo[i].r) / 2, now = (L.x + R.x) / 2;
+    if (Math.abs(c - now) > 1) dir = c > now ? 1 : -1;
+    L.t = geo[i].l; R.t = geo[i].r;
+    if (mode === 'before' || reduce.matches) { if (raf) { cancelAnimationFrame(raf); raf = 0; } snapTo(i); return; }
+    run();
+  }
+  function follow(x) {
+    const lo = geo[0].c, hi = geo[geo.length - 1].c;
+    let c = x;
+    if (c < lo) c = lo - 26 * (1 - Math.exp(-(lo - c) / 90));          // rubber band past the ends
+    if (c > hi) c = hi + 26 * (1 - Math.exp(-(c - hi) / 90));
+    const hw = geo[0].w / 2, cur = (L.x + R.x) / 2;
+    if (Math.abs(c - cur) > 0.5) dir = c > cur ? 1 : -1;
+    L.t = c - hw; R.t = c + hw;
+    if (reduce.matches) { L.x = L.t; R.x = R.t; paint(); return; }
+    run();
+  }
+  function select(i) {
+    const prev = active; active = i;
+    aimAt(i);
+    tabs.forEach((t, j) => t.setAttribute('aria-selected', String(j === i)));
+    if (i !== prev) { screens.forEach((s, j) => s.classList.toggle('on', j === i)); window.scrollTo(0, 0); }
+  }
+
+  // press feedback: a press shows for at least --pin, so even a quick tap is seen to land
+  function press(el) { if (mode !== 'after') return; el.classList.add('is-pressed'); el._down = performance.now(); }
+  function release(el) {
+    if (!el.classList.contains('is-pressed')) return;
+    const wait = Math.max(0, FEELS[feel].pin - (performance.now() - (el._down || 0)));
+    setTimeout(() => el.classList.remove('is-pressed'), wait);
+  }
+  document.addEventListener('pointerdown', e => { const el = e.target.closest('.press'); if (el) press(el); });
+  ['pointerup', 'pointercancel'].forEach(ev => document.addEventListener(ev, () => document.querySelectorAll('.press.is-pressed').forEach(release)));
+  document.querySelectorAll('.js-toggle').forEach(b => b.addEventListener('click', () => { const t = b.textContent; b.textContent = b.dataset.alt; b.dataset.alt = t; }));
+
+  // the bar: a tap selects the tab pressed; a slide past 8px grabs the pill, and the release snaps to the nearest tab
+  bar.addEventListener('pointerdown', e => {
+    if (drag) return;
+    measure();
+    const x = localX(e), now = performance.now();
+    drag = { id: e.pointerId, x0: x, lastX: x, lastT: now, vx: 0, started: false, tab: idxAt(x) };
+    bar.setPointerCapture(e.pointerId);
+    press(tabs[drag.tab]);
+  });
+  bar.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const x = localX(e), now = performance.now();
+    drag.vx = 0.7 * drag.vx + 0.3 * ((x - drag.lastX) / Math.max(1, now - drag.lastT) * 1000);
+    drag.lastX = x; drag.lastT = now;
+    if (!drag.started && mode === 'after' && Math.abs(x - drag.x0) > 8) { drag.started = true; release(tabs[drag.tab]); }
+    if (drag.started) follow(x);
+  });
+  function end(e, cancel) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag; drag = null;
+    release(tabs[d.tab]);
+    if (d.started) {
+      const lo = geo[0].c, hi = geo[geo.length - 1].c;
+      select(idxAt(Math.max(lo, Math.min(hi, d.lastX + d.vx * FLICK_S))));
+    } else if (!cancel) select(d.tab);
+  }
+  bar.addEventListener('pointerup', e => end(e, false));
+  bar.addEventListener('pointercancel', e => end(e, true));
+  tabs.forEach((t, i) => t.addEventListener('click', e => { if (e.detail === 0) select(i); }));   // keyboard
+
+  // tuning
+  function settleTime(f) {
+    // one tab to the right, from rest: the time until both edges are within half a pixel and still
+    const w = geo[0] ? geo[0].w : 90, l = { x: 0, v: 0, t: w }, r = { x: w, v: 0, t: 2 * w }, h = 1 / 240;
+    for (let t = 0; t < 3; t += h) {
+      spring(l, f.trail[0], f.trail[1], h); spring(r, f.lead[0], f.lead[1], h);
+      if (Math.abs(l.x - l.t) < 0.5 && Math.abs(r.x - r.t) < 0.5 && Math.abs(l.v) < 5 && Math.abs(r.v) < 5) return t;
+    }
+    return 3;
+  }
+  function readout() {
+    if (mode === 'before') { out.textContent = 'Pill jumps at once. No press state on the phone.'; return; }
+    const f = FEELS[feel];
+    out.textContent = `Pill settles in ${settleTime(f).toFixed(2)} s. Press sinks in ${f.pin} ms, springs back in ${f.pout} ms.` +
+      (reduce.matches ? ' Reduce Motion is on, so the pill moves without the glide.' : '');
+  }
+  function setMode(m) {
+    mode = m; root.classList.toggle('after', m === 'after'); root.classList.toggle('before', m === 'before');
+    document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+    feelSeg.classList.toggle('off', m === 'before');
+    document.querySelectorAll('.is-pressed').forEach(el => el.classList.remove('is-pressed'));
+    snapTo(active); readout();
+  }
+  function setFeel(f) {
+    feel = f; const F = FEELS[f], s = document.documentElement.style;
+    s.setProperty('--pin', F.pin + 'ms'); s.setProperty('--pout', F.pout + 'ms');
+    document.querySelectorAll('[data-feel]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.feel === f)));
+    readout();
+  }
+  document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  document.querySelectorAll('[data-feel]').forEach(b => b.addEventListener('click', () => setFeel(b.dataset.feel)));
+
+  function layout() { measure(); if (!raf && !drag) snapTo(active); }
+  addEventListener('resize', layout);
+  layout(); setFeel(feel); readout();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+})();
+</script>
