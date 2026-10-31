@@ -36,6 +36,20 @@ import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './b
       </div>
       <div class="look-note">Auto follows your phone.</div>
     </div>
+    <div class="look-row" role="group" aria-label="Your data">
+      <div class="look-lbl">Your data</div>
+      <div class="look-note">Your logs live on this phone. Save a backup to keep them safe or move them to a new phone.</div>
+      <div class="look-seg">
+        <button class="look-opt" id="backupSave" (click)="saveBackup()">Save a backup</button>
+        <button class="look-opt" id="backupLoad" (click)="backupFile.value = ''; backupFile.click()">Load a backup</button>
+      </div>
+      <input #backupFile type="file" id="backupFile" accept="application/json,.json" style="display:none" (change)="backupChosen(backupFile)">
+      <div class="look-note" id="backupMsg" aria-live="polite">{{ backupMsg() }}</div>
+      <div class="look-seg" id="backupAsk" [style.display]="backupPending() ? 'flex' : 'none'">
+        <button class="look-opt" (click)="backupLoadIt()">Load it</button>
+        <button class="look-opt" (click)="backupCancel()">Cancel</button>
+      </div>
+    </div>
     <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0;text-align:center;padding-top:4px">{{ versionLabel }}</div>
   </div>
   `,
@@ -50,6 +64,33 @@ export class BugReport {
   /** D261: the Look row; the legacy setTheme stores the choice and sets data-theme, which the row's CSS reads. */
   protected pickLook(look: 'auto' | 'day' | 'night'): void {
     this.bridge.call('setTheme', look);
+  }
+
+  /** D264: the Your data block. The legacy functions make, check and load the file; this keeps what the block shows. */
+  protected readonly backupMsg = signal('');
+  protected readonly backupPending = signal<Record<string, string> | null>(null);
+
+  protected saveBackup(): void {
+    this.bridge.call('saveBackup');
+  }
+
+  protected async backupChosen(input: HTMLInputElement): Promise<void> {
+    const file = input.files?.[0];
+    if (!file) return;
+    const read = await this.bridge.call('readBackupFile', file);
+    this.backupPending.set(read.ok ? read.data : null);
+    this.backupMsg.set(this.bridge.call('backupMessage', read));
+  }
+
+  protected backupLoadIt(): void {
+    const data = this.backupPending();
+    if (data && this.bridge.call('applyBackup', data)) return;
+    this.backupCancel();
+  }
+
+  protected backupCancel(): void {
+    this.backupPending.set(null);
+    this.backupMsg.set('');
   }
 
   protected async send(): Promise<void> {

@@ -140,6 +140,7 @@ its own proof.
 | `js/progress-data.ts` | progress screen entry, recovery pace trend, wizard seed, progress chips, ladder, class, easy, drift and ledger data |
 | `js/progress-charts.ts` | chart builders, easy-zone charts |
 | `js/lift-ledger-progress-screen.ts` | lift ledger model and cards; `renderProgressScreen`, dot charts |
+| `js/data-backup.ts` | the backup file (D264): `backupSnapshot`, `readBackup`, `loadBackupData`, `saveBackup` (the share sheet or a download) and the Bugs page's Your data block |
 | `js/bug-report-init.ts` | bug report, `init` |
 | `js/popups-streaks-reminders.ts` | reinforcement pop-ups; streaks, stats, reminders |
 | `js/update-check.ts` | version label, update banner and check, and the boot statements that end the script (they call `init`) |
