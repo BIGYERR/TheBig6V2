@@ -22,5 +22,14 @@ module.exports = {
     },
     end: function () {
         send('end', []);
+    },
+    // D264 P-BACKUP, not the island's: the iOS share sheet for one file the page made. Unlike the three above it
+    // reports back: done(completed) once the sheet closes, fail(message) when the file could not be written or shared.
+    share: function (fileName, text, done, fail) {
+        try {
+            cordova.exec(done, fail, 'IAIsland', 'share', [fileName, text]);
+        } catch (e) {
+            if (fail) fail(String(e));
+        }
     }
 };

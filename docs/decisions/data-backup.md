@@ -25,7 +25,7 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
     the app can carry the data across. Deleting the app or clearing website data loses all of it. Handoff §12 (Delivery
     and data, item 2) already lists export and import as needed before the app changes address.
   - The native web view cannot save a file the page makes. The web app can, through the share sheet or a download.
-- **Changes:**
+- **Changes** (items 3 to 5 amended by Amendment 1, below):
   1. **Siting.** A "Your data" block on the Bugs page, under Look (the page that holds the app's one setting), in the
      legacy page and the Angular screen alike. Its caption: "Your logs live on this phone. Save a backup to keep them
      safe or move them to a new phone." Two buttons: **Save a backup** and **Load a backup**.
@@ -37,16 +37,19 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
      file to the app's temporary folder and opens the iOS share sheet). In the web app, the share sheet
      (`navigator.share` with the file) when `navigator.canShare` accepts the file, else a download. The share sheet is
      its own confirmation, so it shows no toast, and a cancel is silent. A download shows "Backup saved." A failure
-     shows "Backup failed. Try again."
+     shows "Backup failed. Try again." With no program stored (`ia_programs` missing or an empty list) there is nothing
+     to keep: no file is made, and the toast reads "Nothing to back up yet."
   4. **Load.** A file picker (`.json`). The file is checked before anything changes: it parses as JSON, `kind` is
      `asylum-backup`, `data` is an object whose every key starts `ia_` and every value is a string, and
      `data.ia_programs` parses as an array. A `format` above 1 is refused with "This backup is from a newer app. Update
      the app first." Any other failure: "That file is not an Asylum backup." Nothing changes on either refusal.
-  5. **Confirm.** A good file shows in the block: "Backup from 30 Oct. 2 programs. Loading it replaces everything on
-     this phone." (the date it was made, in the phone's time; "1 program" for one; archived programs count), with
+  5. **Confirm.** A good file shows in the block: "Backup from Oct 30. 2 programs. Loading it replaces everything on
+     this phone." (the date it was made, in the phone's time, printed as the app prints dates elsewhere; "1 program"
+     for one; archived programs count), with
      **Load it** and **Cancel**. Load it removes every `ia_` key on the phone, writes every key in the file, and
      reloads the app, so it boots on the loaded data as it would on its own. A key that does not start `ia_` is left
-     alone.
+     alone. If the phone refuses a write (storage full), every key the phone held before is put back, nothing else
+     changes, and the toast reads "Loading failed. Nothing changed."
 - **Does not change:** a load replaces and never merges (merging two histories collides with the per-day week freeze);
   no server, no account, and nothing is sent anywhere (the file goes only where the athlete sends it); no CSV and no runs
   archive (the next step, its own ruling); no version is compared (`format` is a counter for the file's shape, not a
@@ -60,10 +63,21 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
     number; `ia_programs` of `{}`; no `data`. Refused as newer: `format` 2.
   - Loading that file over `{ia_programs:'[{"id":"P9"}]', ia_active:'P9', ia_logs_P9:'{}', keep:'1'}` leaves exactly
     the file's three keys plus `keep:'1'`; `ia_logs_P9` is gone.
-  - The confirm line for a file made 2026-10-30 with two programs reads "Backup from 30 Oct. 2 programs. Loading it
+  - The confirm line for a file made 2026-10-30 with two programs reads "Backup from Oct 30. 2 programs. Loading it
     replaces everything on this phone."; with one, "1 program".
+  - Storage with no `ia_programs`, or `ia_programs` of `[]`, makes no file.
   - A backup taken from an app booted on HALF_MANNY with a logged day, loaded into a freshly booted app, boots the same
     active program with the same logged entry.
 - **Proof the tests cannot make:** the native share sheet. CI's native job compiles the plugin; the share itself is
   checked on the simulator or the phone.
-- **Release:** not yet built.
+- **Release:** v0.253.0 (Minor, Mario's pick, 2026-10-30).
+
+## D264 Amendment 1: the date as the app prints it, an empty save, a refused write
+
+- **Date:** 2026-10-30. **Ruled by:** the session, before any code was written, on reading the code the build would
+  touch. No new D-code; the text above already carries it.
+- **Changes:** (1) the confirm line prints the date as the app prints dates elsewhere, `Oct 30`, not `30 Oct`
+  (`toLocaleDateString('en-US', {month:'short', day:'numeric'})`, as in `overlays.ts` and `wizard.ts`); (2) Save with no
+  program stored makes no file and toasts "Nothing to back up yet.", so no backup exists that Load would refuse; (3) a
+  write the phone refuses during a load puts back every key it held, and toasts "Loading failed. Nothing changed."
+- **Release:** v0.253.0, with D264.

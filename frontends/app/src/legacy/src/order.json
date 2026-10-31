@@ -50,6 +50,7 @@
   "js/progress-data.ts",
   "js/progress-charts.ts",
   "js/lift-ledger-progress-screen.ts",
+  "js/data-backup.ts",
   "js/bug-report-init.ts",
   "js/popups-streaks-reminders.ts",
   "js/update-check.ts",

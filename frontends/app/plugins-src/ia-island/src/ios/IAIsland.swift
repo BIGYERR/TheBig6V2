@@ -4,9 +4,13 @@
 //   end   []              no activity
 // Display only (R5): no push type, no network, no intents. The app's deployment target stays 13.0, so every
 // ActivityKit path sits behind iOS 16.2, where ActivityContent and the content-based update/end/request exist.
+// One more call, not the island's (D264 P-BACKUP): the web view cannot save a file the page makes, so
+//   share [fileName, text]  writes the text to that file in the app's temporary folder and opens the share sheet;
+//                           success carries whether the athlete finished a share, error why it failed
 
 import ActivityKit
 import Foundation
+import UIKit
 #if canImport(Cordova)
 import Cordova
 #endif
@@ -49,6 +53,37 @@ class IAIsland: CDVPlugin {
     func end(_ command: CDVInvokedUrlCommand) {
         enqueue {
             if #available(iOS 16.2, *) { await RestActivity.endAll() }
+        }
+    }
+
+    @objc(share:)
+    func share(_ command: CDVInvokedUrlCommand) {
+        guard let name = command.argument(at: 0) as? String, let text = command.argument(at: 1) as? String,
+              !name.isEmpty, let bytes = text.data(using: .utf8) else {
+            commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: "bad arguments"), callbackId: command.callbackId)
+            return
+        }
+        // Only the last path component, so a name can never write outside the temporary folder.
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent((name as NSString).lastPathComponent)
+        do {
+            try bytes.write(to: file, options: .atomic)
+        } catch {
+            commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: error.localizedDescription), callbackId: command.callbackId)
+            return
+        }
+        DispatchQueue.main.async {
+            let sheet = UIActivityViewController(activityItems: [file], applicationActivities: nil)
+            if let pop = sheet.popoverPresentationController, let view = self.viewController.view {
+                pop.sourceView = view
+                pop.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            }
+            sheet.completionWithItemsHandler = { _, completed, _, error in
+                let result = error == nil
+                    ? CDVPluginResult(status: CDVCommandStatus_OK, messageAs: completed)
+                    : CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: error?.localizedDescription ?? "share failed")
+                self.commandDelegate.send(result, callbackId: command.callbackId)
+            }
+            self.viewController.present(sheet, animated: true)
         }
     }
 

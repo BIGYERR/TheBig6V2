@@ -37,6 +37,20 @@
       </div>
       <div class="look-note">Auto follows your phone.</div>
     </div>
+    <div class="look-row" role="group" aria-label="Your data">
+      <div class="look-lbl">Your data</div>
+      <div class="look-note">Your logs live on this phone. Save a backup to keep them safe or move them to a new phone.</div>
+      <div class="look-seg">
+        <button class="look-opt" id="backupSave" onclick="saveBackup()">Save a backup</button>
+        <button class="look-opt" id="backupLoad" onclick="backupPick()">Load a backup</button>
+      </div>
+      <input type="file" id="backupFile" accept="application/json,.json" style="display:none" onchange="backupFileChosen(this)">
+      <div class="look-note" id="backupMsg" aria-live="polite"></div>
+      <div class="look-seg" id="backupAsk" style="display:none">
+        <button class="look-opt" onclick="backupLoadIt()">Load it</button>
+        <button class="look-opt" onclick="backupCancel()">Cancel</button>
+      </div>
+    </div>
     <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0;text-align:center;padding-top:4px"></div>
   </div>
 </div>
