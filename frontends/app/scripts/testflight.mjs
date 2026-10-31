@@ -8,7 +8,8 @@
 //   node frontends/app/scripts/testflight.mjs wait   CI, after the upload: waits until App Store Connect has processed
 //                                                    that build (up to 45 minutes); fails if processing fails
 //   node frontends/app/scripts/testflight.mjs leg    rhythm step 7's TestFlight leg: the TestFlight notice of the latest
-//                                                    pipeline run on main (only CI holds the key; needs gh logged in)
+//                                                    pipeline run on main, or the TestFlight job that failed in it
+//                                                    (only CI holds the key; needs gh logged in)
 //
 // A version goes up once (Mario, Post-v0.251.1): App Store Connect refuses a second build of one version anyway, so
 // a merge that carries a version it holds skips the upload, and a fix is the next PATCH. The gate and wait read the
@@ -195,21 +196,31 @@ function gh(args) {
   return execFileSync('gh', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000 }).trim();
 }
 
-/** The leg as one line: the last TestFlight notice of the newest pipeline run on main. */
+/**
+ * The leg as one line: the last TestFlight notice of a run, unless one of its TestFlight jobs ended badly, which the
+ * line names first. An upload that fails writes no notice of its own, so the gate's "uploading" is the last one left.
+ */
+export function legLine({ run, sha, completed, jobs, notices }) {
+  const where = `run ${run}, ${sha.slice(0, 7)}${completed ? '' : ', still running'}`;
+  const last = notices.at(-1);
+  const bad = jobs.find((j) => j.conclusion && !['success', 'skipped', 'neutral'].includes(j.conclusion));
+  if (bad) return `testflight ${bad.conclusion === 'failure' ? 'failed' : bad.conclusion} in ${bad.name}${last ? `, after: ${last}` : ''} (${where})`;
+  return `${last ?? 'testflight no notice yet'} (${where})`;
+}
+
+/** The leg, read from the newest pipeline run on main. */
 function leg() {
   const [run] = JSON.parse(gh(['run', 'list', '--workflow', 'pipeline.yml', '--branch', 'main', '--limit', '1', '--json', 'databaseId,status,headSha']));
   if (!run) return console.log('testflight none (no pipeline run on main)');
-  const where = `run ${run.databaseId}, ${run.headSha.slice(0, 7)}`;
   const jobs = JSON.parse(gh(['run', 'view', String(run.databaseId), '--json', 'jobs'])).jobs.filter((j) => j.name.startsWith('TestFlight'));
-  if (!jobs.length) return console.log(`testflight none (${where} has no TestFlight job)`);
+  if (!jobs.length) return console.log(`testflight none (run ${run.databaseId}, ${run.headSha.slice(0, 7)} has no TestFlight job)`);
   const repo = gh(['repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner']);
   const notices = jobs.flatMap((j) =>
     JSON.parse(gh(['api', `repos/${repo}/check-runs/${j.databaseId}/annotations`]))
       .filter((a) => a.annotation_level === 'notice' && a.title === 'TestFlight')
       .map((a) => a.message),
   );
-  const running = run.status === 'completed' ? '' : ', still running';
-  console.log(`${notices.at(-1) ?? 'testflight no notice yet'} (${where}${running})`);
+  console.log(legLine({ run: run.databaseId, sha: run.headSha, completed: run.status === 'completed', jobs, notices }));
 }
 
 const MODES = { gate, wait, leg };

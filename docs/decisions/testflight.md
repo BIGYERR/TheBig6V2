@@ -9,7 +9,7 @@ after the deploy proof on `main`, `frontends/app/scripts/ios.mjs release` (the s
 ## D265: P-IPHONEONLY, the native app is iPhone only (v0.253.1)
 
 - **Date:** 2026-10-31. **Ruled by:** Mario, choosing "iPhone only" over keeping iPad with a full-screen flag.
-  **Bump:** PATCH (Mario). **Shipped:** not yet.
+  **Bump:** PATCH (Mario). **Shipped:** v0.253.1.
 - **The finding:** the first upload (pipeline run #45, 41166198014, on `main` at 1c1d89a, v0.252.0) signed and
   archived both targets, then App Store Connect refused the export: the bundle provided only portrait orientations
   (`UIInterfaceOrientationPortrait`, `UIInterfaceOrientationPortraitUpsideDown`), and an iPad-capable bundle must list
