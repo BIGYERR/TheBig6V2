@@ -108,4 +108,12 @@ describe('the pipeline and config.xml agree with the gate', () => {
   it('config.xml answers the export compliance question: no non-exempt encryption', () => {
     assert.match(config, /<config-file target="\*-Info\.plist" parent="ITSAppUsesNonExemptEncryption">\s*<false \/>\s*<\/config-file>/);
   });
+
+  it('config.xml makes the app iPhone only, so its portrait-only screens pass App Store Connect', () => {
+    // App Store Connect refused 0.252.0 (pipeline run #45): an iPad-capable bundle must list all four orientations.
+    // The app is portrait only by design, so it is iPhone only; Cordova writes TARGETED_DEVICE_FAMILY "1" from this.
+    const ios = (config.match(/<platform name="ios">([\s\S]*?)<\/platform>/) || [])[1] || '';
+    assert.match(ios, /<preference name="target-device" value="handset" \/>/);
+    assert.match(ios, /<preference name="Orientation" value="portrait" \/>/);
+  });
 });
