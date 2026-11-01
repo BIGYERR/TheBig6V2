@@ -19,7 +19,7 @@ saved source file rebuilds the app at http://localhost:3000/app/ within a second
 
 ## How the build works
 
-`frontends/app/scripts/build-index.mjs` concatenates the files `order.json` lists, in that order, byte for byte, with nothing
+`frontends/app/scripts/build-index.mjs` concatenates the files `order.json` lists, in that order, each without its comments (D268, `docs/decisions/page-comments.md`), with nothing
 added between them. `order.json` is the only list of pieces. A file under `html/`, `css/` or `js/` that it does not
 list fails the build, as does an entry that is missing, listed twice, or not named in lower case words joined by
 dashes. No file name carries a version.

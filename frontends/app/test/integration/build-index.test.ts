@@ -1,4 +1,5 @@
-// build-index: the page is the build of src/legacy/src/, byte for byte (the test strips and joins the files itself);
+// build-index: the page is the build of src/legacy/src/, each piece without its comments (D268; the test strips and joins
+// the files itself, its own comment stripper on acorn's parse);
 // writePages() writes it and its icon into the folder GitHub Pages deploys; and the check that the root index.html is
 // that build names the first byte that drifts. The live sources, then fixture source folders for every way the list can
 // be wrong.
@@ -12,6 +13,7 @@ import { dirname, join } from 'node:path';
 import { after, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
+import * as acorn from '../../scripts/vendor/acorn.mjs';
 import { buildIndex, checkIndex, collapseTypes, firstDifference, ICON, PAGES_DIR, readOrder, SOURCES, TARGET, writePages } from '../../scripts/build-index.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -39,10 +41,31 @@ const LIVE_ENGINE = join(REPO, 'core', 'src', 'engine');
  */
 const stripped = (code: string) =>
   collapseTypes(code, stripTypeScriptTypes(code, { mode: 'strip' })).split('\n').filter((l) => !/^[ \t]*\/\/ @ts-expect-error TS\d+ /.test(l)).join('\n');
+/**
+ * A piece without its comments, as the page carries it (D268, docs/decisions/page-comments.md), written here by hand: a
+ * script's comments by acorn's parse (a block comment leaves its line breaks, or one space; a line comment leaves its own
+ * line break), a stylesheet's and a markup file's by their own syntax.
+ */
+function uncommented(text: string, piece: string): string {
+  if (/\.(js|ts)$/.test(piece)) {
+    const comments: acorn.Comment[] = [];
+    acorn.parse(text, { ecmaVersion: 'latest', sourceType: 'script', onComment: comments });
+    let out = '';
+    let at = 0;
+    for (const c of comments) {
+      out += text.slice(at, c.start) + (c.type === 'Block' ? '\n'.repeat((c.value.match(/\n/g) ?? []).length) || ' ' : '');
+      at = c.end;
+    }
+    return out + text.slice(at);
+  }
+  if (piece.endsWith('.css')) return text.replace(/\/\*[\s\S]*?\*\//g, '');
+  if (piece.endsWith('.html')) return text.replace(/<!--[\s\S]*?-->/g, '');
+  return text;
+}
 const pieceOnPage = (piece: string) => {
-  const bytes = readFileSync(piece.startsWith('engine/') ? join(LIVE_ENGINE, piece.slice('engine/'.length)) : join(LIVE_SOURCES, piece));
-  if (piece.endsWith('.ts')) return Buffer.from(stripped(classic(bytes.toString('utf8'))), 'utf8');
-  return piece.endsWith('.js') ? Buffer.from(classic(bytes.toString('utf8')), 'utf8') : bytes;
+  const text = readFileSync(piece.startsWith('engine/') ? join(LIVE_ENGINE, piece.slice('engine/'.length)) : join(LIVE_SOURCES, piece), 'utf8');
+  if (piece.endsWith('.ts')) return Buffer.from(uncommented(stripped(classic(text)), piece), 'utf8');
+  return Buffer.from(uncommented(piece.endsWith('.js') ? classic(text) : text, piece), 'utf8');
 };
 
 describe('build-index on the live sources', () => {
@@ -55,7 +78,7 @@ describe('build-index on the live sources', () => {
     assert.equal(ICON, join(REPO, 'apple-touch-icon.png'));
   });
 
-  it('the files order.json lists, read straight from disk and joined (the JS files without their module blocks), are the page byte for byte', () => {
+  it('the files order.json lists, read straight from disk, each without its comments, and joined (the JS files without their module blocks), are the page byte for byte', () => {
     // Independent of the build function: the test strips and joins the files itself.
     const joined = Buffer.concat(order.map(pieceOnPage));
     const page = buildIndex();
@@ -250,13 +273,13 @@ describe('build-index on fixture sources', () => {
     assert.doesNotThrow(() => readOrder(dir), 'the engine\'s index.ts is the package entry, never a piece');
   });
 
-  it('builds an app file turned TypeScript in place: its types out, the type checker\'s marker lines out, a hand marker kept', () => {
+  it('builds an app file turned TypeScript in place: its types out, the type checker\'s marker lines out, a hand marker\'s line left empty (D268)', () => {
     const { dir } = fixture();
     rmSync(join(dir, 'js', 'app.js'));
     writeFileSync(join(dir, 'js', 'app.ts'), "function go(n: any): string {\n  // @ts-expect-error TS2339 Property 'x' does not exist on type '{}'.\n  const v = ({}).x;\n  // @ts-expect-error kept: a finding, written by hand\n  return 'x' + v + n;\n}\n");
     writeFileSync(join(dir, 'order.json'), JSON.stringify(['html/top.html', 'css/base.css', 'html/body.html', 'js/app.ts', 'html/end.html']));
     assert.equal(buildIndex(dir).toString('utf8'), '<!doctype html>\n<html><head><style>body{color:red}\n</style></head><body><script>'
-      + "function go(n) {\n  const v = ({}).x;\n  // @ts-expect-error kept: a finding, written by hand\n  return 'x' + v + n;\n}\n</script></body></html>\n");
+      + "function go(n) {\n  const v = ({}).x;\n  \n  return 'x' + v + n;\n}\n</script></body></html>\n");
     writeFileSync(join(dir, 'js', 'stray.ts'), 'export {};\n');
     assert.throws(() => readOrder(dir), /js\/stray\.ts is not in order\.json/);
   });

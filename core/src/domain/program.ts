@@ -121,7 +121,7 @@ export interface Item {
 
 export interface Cardio {
   type: CardioType;
-  /** The session name ('Speed Run — Intervals', 'Long Run'); NRC names are Nike-verbatim. */
+  /** The session name ('Speed Run — Intervals', 'Long Run'), in the app's own words (D269). */
   subtype: string;
   detail: string;
   note: string;

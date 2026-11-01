@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Builds the app's page from its source files: the pieces src/legacy/src/order.json lists, concatenated in that order,
-// byte for byte, with nothing added between them. Code is edited in src/legacy/src/; the page is generated.
+// with nothing added between them and nothing taken out but each piece's comments (D268, withoutComments: the sources
+// keep them, the page ships none). Code is edited in src/legacy/src/; the page is generated.
 //
 //   node scripts/build-index.mjs            write ../../dist-github-pages/ (the page and its icon: what GitHub Pages
 //                                           deploys, what the tests boot, what the backend serves at /app/) and the
@@ -37,6 +38,7 @@ import { stripTypeScriptTypes } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as acorn from './vendor/acorn.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /** The app's source files: html/, css/, js/ and order.json. */
@@ -174,20 +176,61 @@ export function collapseTypes(ts, js, at) {
 }
 
 /**
- * What a piece adds to the page: an HTML or CSS file as it is, a JS file without its module blocks, a TypeScript file
- * without its module blocks and its types (collapseTypes).
+ * What a piece adds to the page: an HTML or CSS file, a JS file without its module blocks, a TypeScript file without
+ * its module blocks and its types (collapseTypes); each without its comments (withoutComments, D268).
  * @param {string} srcDir
  * @param {string} piece
  * @returns {Buffer}
  */
 export function pieceBytes(srcDir, piece) {
   const bytes = readFileSync(piecePath(srcDir, piece));
-  if (piece.endsWith('.js')) return Buffer.from(moduleParts(bytes.toString('utf8')).body, 'utf8');
+  const text = bytes.toString('utf8');
+  if (piece.endsWith('.js')) return Buffer.from(withoutComments(moduleParts(text).body, piece), 'utf8');
   if (piece.endsWith('.ts')) {
-    const body = moduleParts(bytes.toString('utf8')).body;
-    return Buffer.from(withoutMarkers(collapseTypes(body, stripTypes(body, piece))), 'utf8');
+    const body = moduleParts(text).body;
+    return Buffer.from(withoutComments(withoutMarkers(collapseTypes(body, stripTypes(body, piece))), piece), 'utf8');
   }
-  return bytes;
+  return Buffer.from(withoutComments(text, piece), 'utf8');
+}
+
+/**
+ * The piece without its comments (D268, docs/decisions/page-comments.md): the sources keep every comment they are
+ * written with, and the page ships none. A JS or TS piece (its types already stripped) is parsed by acorn and each
+ * comment is cut by its range: a block comment leaves the line breaks it held, or one space when it held none, and a
+ * line comment leaves its own line break, so the piece keeps its line count and --check still names the right line.
+ * The script runs the same, token for token (tools/same-script.mjs). A CSS piece loses its slash-star comments and an
+ * HTML piece its angle-bracket comments, each by its own syntax; a CSS piece whose openers and closers do not pair up
+ * is refused rather than guessed at. Any other piece is returned as it is.
+ * @param {string} text
+ * @param {string} piece
+ * @returns {string}
+ */
+export function withoutComments(text, piece) {
+  if (/\.(js|ts)$/.test(piece)) {
+    /** @type {{ type: string, value: string, start: number, end: number }[]} */
+    const comments = [];
+    try {
+      acorn.parse(text, { ecmaVersion: 'latest', sourceType: 'script', onComment: comments });
+    } catch (err) {
+      throw new Error(`${piece} does not parse as a script, so its comments cannot be stripped: ${err instanceof Error ? err.message : err}`, { cause: err });
+    }
+    let out = '';
+    let at = 0;
+    for (const c of comments) {
+      out += text.slice(at, c.start);
+      if (c.type === 'Block') out += '\n'.repeat((c.value.match(/\n/g) ?? []).length) || ' ';
+      at = c.end;
+    }
+    return out + text.slice(at);
+  }
+  if (piece.endsWith('.css')) {
+    const opens = (text.match(/\/\*/g) ?? []).length;
+    const closes = (text.match(/\*\//g) ?? []).length;
+    if (opens !== closes) throw new Error(`${piece}: ${opens} comment openers and ${closes} closers, so its comments cannot be stripped`);
+    return text.replace(/\/\*[\s\S]*?\*\//g, '');
+  }
+  if (piece.endsWith('.html')) return text.replace(/<!--[\s\S]*?-->/g, '');
+  return text;
 }
 
 /**

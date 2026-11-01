@@ -48,10 +48,16 @@ export function appHtml(): string {
 export const countIn = (t: string): number => appHtml().split(t).length - 1;
 /** A text replacement: [the text the app carries, what to write in its place]. */
 export type Rep = [string, string];
-/** `text` with each [from, to] replaced; every `from` must occur exactly once. */
+/**
+ * A replacement text as the page carries it: the page ships without its comments (D268, docs/decisions/page-comments.md),
+ * so a `// ` line comment quoted here for the reader is taken off before the text is matched or written, and the
+ * whitespace before it stays, as it does on the page. A `//` with no space after it (a URL inside a string) is kept.
+ */
+export const asOnPage = (t: string): string => t.replace(/\/\/ [^\n]*/g, '');
+/** `text` with each [from, to] replaced, both read as the page carries them; every `from` must occur exactly once. */
 export function edit(text: string, reps: Rep[]): string {
   let t = text;
-  for (const [from, to] of reps) {
+  for (const [from, to] of reps.map(([f, r]): Rep => [asOnPage(f), asOnPage(r)])) {
     const n = t.split(from).length - 1;
     if (n !== 1) throw new Error(`variant: the text to replace occurs ${n} times (want 1): ${from.slice(0, 120)}`);
     t = t.replace(from, () => to);
