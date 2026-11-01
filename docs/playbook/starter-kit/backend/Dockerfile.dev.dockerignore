@@ -1,0 +1,7 @@
+# The context is the repo root (docker-compose.dev.yml); the dev image bakes in only the toolchain, and the sources
+# are mounted.
+*
+!backend/package.json
+!backend/package-lock.json
+!backend/tsconfig.server.json
+!backend/tsconfig.test.json

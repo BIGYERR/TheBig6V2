@@ -1,0 +1,33 @@
+{
+  "name": "__SLUG__-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "__PROJECT__ backend. Its version field is the release version (CLAUDE.md, PRIORITY 1).",
+  "type": "module",
+  "main": "dist/server/server.js",
+  "engines": {
+    "node": "26.x"
+  },
+  "scripts": {
+    "start": "node --enable-source-maps dist/server/server.js",
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.server.json",
+    "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.test.json",
+    "test": "node --test --test-reporter=spec \"test/**/*.test.ts\"",
+    "lint": "eslint .",
+    "dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d --wait && docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f --since 1m api",
+    "dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "docker:up": "docker compose up --build -d --wait",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f --timestamps api",
+    "heroku": "bash scripts/heroku.sh",
+    "heroku:local": "bash scripts/heroku.sh local"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.69.0"
+  }
+}
