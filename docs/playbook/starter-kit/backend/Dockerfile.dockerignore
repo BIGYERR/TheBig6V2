@@ -1,0 +1,7 @@
+# The context is the repo root (docker-compose.yml); send only what Dockerfile builds from. An allowlist, so a new
+# folder never leaks into the image by accident.
+*
+!backend/package.json
+!backend/package-lock.json
+!backend/tsconfig.server.json
+!backend/server/

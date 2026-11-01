@@ -1,0 +1,7 @@
+#!/bin/sh
+# Every commit runs the 60-second check on what it touches (tools/check.mjs --staged): nothing for docs alone. The full
+# suite runs in GitHub Actions on every push to dev and on the pull request into main. Never skip it (--no-verify).
+# Enabled per clone with: git config core.hooksPath .githooks
+root="$(git rev-parse --show-toplevel)" || exit 1
+command -v node >/dev/null 2>&1 || { echo "pre-commit: node is not on PATH; skipping the check" >&2; exit 0; }
+exec node "$root/tools/check.mjs" --staged

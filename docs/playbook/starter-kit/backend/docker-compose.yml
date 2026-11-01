@@ -1,0 +1,19 @@
+# The backend in Docker, production build, on http://localhost:__PORT__ (API_PORT to change). Pick a port no other
+# project's container holds: restart: unless-stopped brings each one back whenever Docker starts.
+#   npm run docker:up      build and start, wait for the health check
+#   npm run docker:logs    follow the logs
+#   npm run docker:down    stop
+name: __SLUG__
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-}
+    ports:
+      - "127.0.0.1:${API_PORT:-__PORT__}:3000"
+    environment:
+      # The container's own hostname is a random id; name it so /healthz can.
+      BACKEND_NAME: ${BACKEND_NAME:-docker on this Mac}
+    restart: unless-stopped

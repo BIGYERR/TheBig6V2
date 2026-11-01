@@ -1,0 +1,14 @@
+# dependencies, build output and OS junk
+node_modules/
+backend/dist/
+.DS_Store
+
+# local secrets, never committed (Heroku config vars and GitHub secrets hold the real ones)
+.env
+.env.*
+
+# run logs and scratch output (tools/check.mjs, heroku.sh local)
+/temp/
+
+# other sessions work in their own git worktrees here (one writer per working tree)
+.claude/worktrees/

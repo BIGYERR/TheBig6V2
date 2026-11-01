@@ -1,0 +1,23 @@
+# npm run dev lays this over docker-compose.yml: the same container name and port, run from the dev image
+# (Dockerfile.dev) instead of the production one. The container restarts the server on every save by itself, so nothing
+# on the Mac has to run, and restart: unless-stopped (from docker-compose.yml) brings it back whenever Docker starts.
+# npm run dev:down stops it; npm run docker:up puts back the plain production image.
+#
+# The sources are mounted read-only: the container can never write the checkout. Its node_modules are the image's own
+# (Linux). Add a mount here for every source folder the server reads.
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile.dev
+    image: __SLUG__-api-dev
+    # tini as PID 1: passes docker stop on to node --watch and reaps what it leaves behind.
+    init: true
+    environment:
+      BACKEND_NAME: ${BACKEND_NAME:-docker dev on this Mac (npm run dev)}
+      LOG_REQUESTS: ${LOG_REQUESTS:-1}
+      # The Mac's time zone, so the log's times read as the Mac's clock (TZ=America/New_York npm run dev).
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./server:/srv/backend/server:ro
+      - ./test:/srv/backend/test:ro

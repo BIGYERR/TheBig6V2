@@ -1,0 +1,13 @@
+{
+  "name": "__SLUG__-heroku",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Heroku's manifest. It sits at the repo root because Heroku deploys the branch main from GitHub as it is. Heroku's Node buildpack runs npm ci here, then npm run build (with NODE_ENV=production, so each folder installs its dev dependencies on purpose, builds, then prunes them), then the Procfile's web process. npm start runs the same server. The release version is backend/package.json's, not this one's.",
+  "engines": {
+    "node": "26.x"
+  },
+  "scripts": {
+    "build": "npm ci --prefix backend --include=dev --no-audit --no-fund && npm run build --prefix backend && npm prune --prefix backend --omit=dev --no-audit --no-fund",
+    "start": "cd backend && node --enable-source-maps dist/server/server.js"
+  }
+}
