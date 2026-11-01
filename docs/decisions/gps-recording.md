@@ -1,9 +1,10 @@
 # GPS recording: the iOS app records a run, checked against the watch
 
-## D267: P-GPSTEST, the iOS app records a test run by GPS, and a script checks it against the watch (PROPOSED)
+## D267: P-GPSTEST, the iOS app records a test run by GPS, and a script checks it against the watch (v0.255.0)
 
-- **Date:** ruled 2026-10-31. **Ruled by:** the main session in the coach hat; awaiting Mario. **Bump:** Mario picks.
-  **Shipped:** not yet.
+- **Date:** ruled 2026-10-31. **Ruled by:** the main session in the coach hat; Mario concurred 2026-10-31 ("Concur"),
+  with the plugin in its own folder and CLAUDE.md's Native line reworded to match ("Approve the wording").
+  **Bump:** MINOR, v0.255.0 (Mario). **Shipped:** v0.255.0.
 - **The ask (Mario):** "integrate some GPS tracking so we are rocking nice like strava" (2026-10-27); "i use a coros
   pace 4 to track my runs and want to record the run on my phone to compare while we do testing, unless we can build it
   super accurate first time up ... one day id like to be able to sync with coros and other watchs" (2026-10-28);
@@ -85,3 +86,17 @@
   a chime at the prescribed time or distance; a warning past "Do not run faster than"); stage 3 the map and splits on
   the day and Progress; stage 4 speed sessions effort by effort, after D258; stage 5 COROS: watch runs into the card,
   the day's run onto the watch; Apple Health for other watches.
+- **Built (v0.255.0), the form the ruling left open:** the Bugs tab row reads **Run recorder**, its note, and one
+  **Open** button. The screen opens over the tab bar with **‹ Back**; Back from a finished run returns to the start, and
+  Back from the start or from a live run closes the screen (a live run keeps recording). The screen turns location on
+  when it opens, so the GPS line reads iOS's accuracy before Start, and off again when it closes unless a run is
+  recording. Its numbers read **Miles**, **Avg pace** and **This mile** (the pace of the mile in progress), and the
+  splits list under **Splits**; past runs list under **Past runs** in the phone's own short date and time, "Nov 1 at 12:26 AM · 0.25 mi · 1:42" on iOS 26. Fixes iOS
+  delivers during a pause are written raw like every other and count for nothing, so the GPX leaves them out. A run iOS
+  ended without a finish mark reads as finished at its last line. The plugin skips iOS's "location unknown" error,
+  which is iOS still looking. Shared files are named `asylum-run-<local date>-<hhmm>.gpx`.
+- **Proved (v0.255.0):** the FIT reader read the Pace 4's file of 2026-10-26 (93,169 bytes, 2,185 records, one a second
+  but for one 20 s gap) and matched COROS's own summary: session 5,640.39 m, timer 36:24, 15 laps, the first 1,028.58 m
+  in 420 s. The comparison, fed the watch's own track as the phone, read the tracks 0.0 m apart and the splits within
+  1.3 s. On the simulator (iPhone 17 Pro, iOS 26.5, the debug build), a straight route played north at 4 m/s recorded
+  through a screen lock: 84 fixes one a second, 4 m each, 4.006 m/s; the screen read the file back on unlock, finished at 1:42 and 0.25 mi, and shared `asylum-run-2026-11-01-0026.gpx` (101 points). Early in a run the average pace reads slow (85 s in, 6:51 against 6:42 played): the second before the first fix and the second since the last one count with no distance yet. The first runs against the watch decide whether that needs a ruling.

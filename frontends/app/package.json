@@ -55,6 +55,7 @@
     "cordova-ios": "^8.1.1",
     "eslint": "^10.9.1",
     "globals": "^17.13.0",
+    "ia-gps": "file:plugins-src/ia-gps",
     "ia-island": "file:plugins-src/ia-island",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
@@ -73,7 +74,8 @@
       "ios"
     ],
     "plugins": {
-      "ia-island": {}
+      "ia-island": {},
+      "ia-gps": {}
     }
   }
 }
