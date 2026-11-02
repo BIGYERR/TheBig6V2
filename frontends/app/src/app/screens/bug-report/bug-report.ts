@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './bug-report-model';
+import { RunRecorder } from '../run-recorder/run-recorder';
+import { RECORDER_COPY, recorderAvailable } from '../run-recorder/run-recorder-model';
 
 /**
  * The bug report screen (architecture phase E, step 1), in place of the legacy script's submitBug inside #screenBugs.
@@ -10,6 +12,7 @@ import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './b
  */
 @Component({
   selector: 'ia-bug-report',
+  imports: [RunRecorder],
   host: { style: 'display: contents' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -50,6 +53,18 @@ import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './b
         <button class="look-opt" (click)="backupCancel()">Cancel</button>
       </div>
     </div>
+    @if (recorder) {
+      <div class="look-row" role="group" aria-label="Run recorder">
+        <div class="look-lbl">{{ recorderCopy.row }}</div>
+        <div class="look-note">{{ recorderCopy.rowNote }}</div>
+        <div class="look-seg">
+          <button class="look-opt" id="runRecorderOpen" (click)="recorderOpen.set(true)">Open</button>
+        </div>
+      </div>
+    }
+    @if (recorderOpen()) {
+      <ia-run-recorder (closed)="recorderOpen.set(false)" />
+    }
     <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0;text-align:center;padding-top:4px">{{ versionLabel }}</div>
   </div>
   `,
@@ -69,6 +84,11 @@ export class BugReport {
   /** D264: the Your data block. The legacy functions make, check and load the file; this keeps what the block shows. */
   protected readonly backupMsg = signal('');
   protected readonly backupPending = signal<Record<string, string> | null>(null);
+
+  /** D267: the Run recorder row, iOS only (the e2e's parity sees no row in a browser), and its screen. */
+  protected readonly recorder = recorderAvailable(window as { iaGps?: unknown });
+  protected readonly recorderCopy = RECORDER_COPY;
+  protected readonly recorderOpen = signal(false);
 
   protected saveBackup(): void {
     this.bridge.call('saveBackup');

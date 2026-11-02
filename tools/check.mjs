@@ -62,7 +62,8 @@ const want = {
   build: touches(/^(index\.html|frontends\/app\/src\/legacy\/src\/|core\/src\/engine\/|frontends\/app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
   app: touches(/^(frontends\/app\/|core\/src\/engine\/|tools\/|index\.html)/),
   frontends: touches(/^frontends\/(?!app\/)/),
-  backend: touches(/^(backend\/|package\.json$|package-lock\.json$|Procfile$)/),
+  // The deploy tree builds the page with frontends/app/scripts (backend/test/deploy.test.ts), so a change there is a backend change too.
+  backend: touches(/^(backend\/|package\.json$|package-lock\.json$|Procfile$|frontends\/app\/scripts\/)/),
 };
 
 if (LIST) {

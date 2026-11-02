@@ -39,7 +39,7 @@ if (has('index.html')) {
   try {
     const top = git(['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
     // From phase D on, the engine's files are core/src/engine/*.ts, which the build reads beside the app's sources.
-    const paths = ['frontends/app/scripts/build-index.mjs', 'frontends/app/src/legacy/src', ...(has('core/src') ? ['core/src'] : [])];
+    const paths = ['frontends/app/scripts', 'frontends/app/src/legacy/src', ...(has('core/src') ? ['core/src'] : [])];
     const tar = git(['-C', top, 'archive', ref, ...paths]);
     execFileSync('tar', ['-x', '-C', dir], { input: tar });
     const { buildIndex } = await import(pathToFileURL(join(dir, 'frontends', 'app', 'scripts', 'build-index.mjs')).href);

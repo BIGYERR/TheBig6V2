@@ -86,7 +86,7 @@ describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) 
         const out = realpathSync(mkdtempSync(join(tmpdir(), 'ia-deploy-page-')));   // the real path, as Linux CI has it
         // The engine's files are TypeScript in core/src/engine from architecture phase D on, built into the same page.
         const core = (() => { try { git('cat-file', '-e', `${ref}:core/src`); return ' core/src'; } catch { return ''; } })();
-        execFileSync('sh', ['-c', `git -C "${top}" archive ${ref} frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src${core} | tar -x -C "${out}"`], { env });
+        execFileSync('sh', ['-c', `git -C "${top}" archive ${ref} frontends/app/scripts frontends/app/src/legacy/src${core} | tar -x -C "${out}"`], { env });
         // The builder's path in the environment, as heroku.sh passes it: as argv[1] it would run its own command line.
         const built = execFileSync(process.execPath, ['--input-type=module', '-e', 'process.stdout.write((await import(process.env.IA_BUILD_INDEX)).buildIndex())'], { env: { ...env, IA_BUILD_INDEX: join(out, 'frontends/app/scripts/build-index.mjs') } });
         rmSync(out, { recursive: true, force: true });

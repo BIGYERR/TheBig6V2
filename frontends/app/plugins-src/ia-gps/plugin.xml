@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ia-gps: records a run by GPS for the Run recorder (D267 P-GPSTEST, docs/decisions/gps-recording.md). The page drives
+  it through window.iaGps. Location is asked while the app is in use only; recording keeps going with the screen locked
+  under the blue location pill, which needs the location background mode. Neither key is a capability on the signing
+  profile, so the TestFlight secrets do not change.
+-->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="ia-gps" version="1.0.0">
+  <name>IA GPS</name>
+  <description>GPS run recorder for The Asylum.</description>
+
+  <js-module src="www/gps.js" name="gps">
+    <clobbers target="iaGps" />
+  </js-module>
+
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="IAGps">
+        <param name="ios-package" value="IAGps" />
+      </feature>
+    </config-file>
+
+    <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+      <string>The Asylum records your route while you run. It stays on this phone.</string>
+    </config-file>
+    <config-file target="*-Info.plist" parent="UIBackgroundModes">
+      <array>
+        <string>location</string>
+      </array>
+    </config-file>
+
+    <framework src="CoreLocation.framework" />
+    <source-file src="src/ios/IAGps.swift" />
+  </platform>
+</plugin>

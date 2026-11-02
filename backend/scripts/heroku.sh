@@ -101,10 +101,12 @@ app_page_blob() {
     # Its real path: macOS hands out /var/folders/..., a symlink, and a run here should walk the path Linux CI walks.
     tmp="$(cd "$(mktemp -d)" && pwd -P)" || die "cannot make a temporary folder"
     # git archive takes paths from the current folder (backend/); from the top they name the repo's layout. The
-    # engine's files are TypeScript in core/src/engine from architecture phase D on, built into the same page.
+    # engine's files are TypeScript in core/src/engine from architecture phase D on, built into the same page. The whole
+    # scripts/ folder goes, not the builder alone: it imports its own vendored acorn (D268), and CI went red on v0.255.1
+    # when this list named only build-index.mjs (tools/app-at.mjs and backend/test/deploy.test.ts keep the same list).
     local core=""
     git cat-file -e "$ref:core/src" 2>/dev/null && core="core/src"
-    git -C "$(git rev-parse --show-toplevel)" archive "$ref" frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src $core |
+    git -C "$(git rev-parse --show-toplevel)" archive "$ref" frontends/app/scripts frontends/app/src/legacy/src $core |
       tar -x -C "$tmp" || die "cannot extract the app's source files at $ref"
     # The builder's path goes in the environment, never in argv[1]: build-index.mjs runs its own command line when
     # argv[1] is its own path, which is what `node -e ... <path>` makes it wherever no symlink sits in the temp path

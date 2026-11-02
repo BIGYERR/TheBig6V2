@@ -18,6 +18,8 @@ module.exports = defineConfig([
     // The app's source files: the pieces of the root index.html (scripts/build-index.mjs), not Angular templates.
     'src/legacy/src/',
     'public/legacy/',
+    // acorn's own build, copied whole (scripts/vendor/README.md): never edited, never linted.
+    'scripts/vendor/',
   ]),
   {
     files: ['**/*.ts'],

@@ -7,3 +7,4 @@ export { VERSION } from './version.ts';
 export { versionLabel } from './format/version-label.ts';
 export * as semver from './semver.ts';
 export * from './domain/index.ts';
+export * from './gps/index.ts';
