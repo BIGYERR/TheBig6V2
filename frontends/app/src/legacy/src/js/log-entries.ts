@@ -297,7 +297,7 @@ function updateDoseDerived(){
   const d=doseDerived(_curLogDose,{mins:g('log_run_mins'),dist:g('log_run_dist'),reps:g('log_run_reps'),rep:g('log_run_rep_time')});
   if(!d){ el.innerHTML=''; return; }
   let rows='';
-  if(d.vol) rows+='<div class="derived"><span class="d-lbl">Work volume — derived</span><span class="d-val">'+(d.dist!=null?d.dist+' mi':'')+'<small>'+d.vol+'</small></span></div>';
+  if(d.vol) rows+='<div class="derived"><span class="d-lbl">Work done</span><span class="d-val">'+(d.dist!=null?d.dist+' mi':'')+'<small>'+d.vol+'</small></span></div>';
   if(d.pace){
     let delta='';
     // V191 (D40): a gap of a minute or more prints m:ss. "73s/mi" makes the athlete
@@ -305,9 +305,9 @@ function updateDoseDerived(){
     // Under a minute stays in seconds — that is the runner-native unit at that scale.
     if(d.tgt&&d.sec){ const df=Math.round(d.sec-d.tgt), ad=Math.abs(df); const mag=ad<60?(ad+'s/mi'):(Math.floor(ad/60)+':'+String(ad%60).padStart(2,'0')+'/mi'); delta=ad<5?'on target':(mag+' '+(df<0?'faster than target':'slower than target')); }
     const note=[d.assumed,delta,(d.workMin?('over '+d.workMin+' work min'):null)].filter(Boolean).join(' · ');
-    rows+='<div class="derived"'+(d.vol?' style="border-top:none;padding-top:0"':'')+'><span class="d-lbl">Pace — derived</span><span class="d-val">'+d.pace+(note?'<small>'+note+'</small>':'')+'</span></div>';
+    rows+='<div class="derived"'+(d.vol?' style="border-top:none;padding-top:0"':'')+'><span class="d-lbl">Your pace</span><span class="d-val">'+d.pace+(note?'<small>'+note+'</small>':'')+'</span></div>';
   }
-  if(!rows) rows='<div class="derived"><span class="d-lbl">'+(_curLogDose.k==='reps_dist'?'Rep pace — derived':'Pace — derived')+'</span><span class="d-val empty">'+(_curLogDose.k==='dist'?'enter minutes':(_curLogDose.k==='reps_dist'?'enter a rep time':'enter distance'))+'</span></div>';
+  if(!rows) rows='<div class="derived"><span class="d-lbl">'+(_curLogDose.k==='reps_dist'?'Your rep pace':'Your pace')+'</span><span class="d-val empty">'+(_curLogDose.k==='dist'?'enter minutes':(_curLogDose.k==='reps_dist'?'enter a rep time':'enter distance'))+'</span></div>';
   el.innerHTML=rows;
 }
 // Rep stepper for interval / multi-rep forms. Hidden input starts '' (untouched) so an

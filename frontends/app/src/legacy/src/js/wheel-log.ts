@@ -298,8 +298,8 @@ function cardioFieldHTML(sport: any, e: any, dose: any, sub: any){
   }
   // V171 (D5): the generic form stays the form for NRC speed days (post-V154 ruling);
   // it just says what to log so warm up and recoveries are not left off the watch total.
-  const _speedHint = /speed run/i.test(sub||'') ? `<div class="f-sub" style="margin-bottom:6px">Whole session off the watch — warm up, efforts and recoveries all count.</div>` : '';
-  if(sport==='run') return `<label>${asyIcon('run',15)} Run — actual distance & pace</label>${_speedHint}
+  const _speedHint = /speed run/i.test(sub||'') ? `<div class="f-sub" style="margin-bottom:6px">Whole session off the watch. Warm up, efforts and recoveries all count.</div>` : '';
+  if(sport==='run') return `<label>${asyIcon('run',15)} Log the run</label>${_speedHint}
         <div class="iaw-wrap">
           ${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}
           ${iaWheelHTML('pace','log_run_pace',e.run_pace||'')}
@@ -311,7 +311,7 @@ function cardioFieldHTML(sport: any, e: any, dose: any, sub: any){
   // the id log_bike_mins, so both listener arrays and persistLogFields read it unchanged.
   if(sport==='bike') return (dose?_doseStripHTML('bike',dose,sub||''):'')+`<label>${asyIcon('bike',15)} Log the ride</label>
         <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')}</div>`;
-  if(sport==='swim') return `<label>${asyIcon('swim',15)} Swim — actual yardage</label>
+  if(sport==='swim') return `<label>${asyIcon('swim',15)} Log the swim</label>
         <input type="number" id="log_swim_yards" placeholder="yards" value="${e.swim_yards||''}" min="0" step="25" class="input-field">`;
   return '';
 }

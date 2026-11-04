@@ -68,7 +68,7 @@ function fieldsMarkupFor(icon: (key: string, size: number) => string, esc: (x: s
         <div class="f-sub">Leave out the easy jog between reps.</div>
         <div id="doseDerived"></div>`;
       case 'run':
-        return `<label>${icon('run', 15)} Run — actual distance & pace</label>${f.speedHint ? '<div class="f-sub" style="margin-bottom:6px">Whole session off the watch — warm up, efforts and recoveries all count.</div>' : ''}
+        return `<label>${icon('run', 15)} Log the run</label>${f.speedHint ? '<div class="f-sub" style="margin-bottom:6px">Whole session off the watch. Warm up, efforts and recoveries all count.</div>' : ''}
         <div class="iaw-wrap">
           ${wheel(f.dist)}
           ${wheel(f.pace)}
@@ -77,7 +77,7 @@ function fieldsMarkupFor(icon: (key: string, size: number) => string, esc: (x: s
         return (f.strip ? strip(f.strip) : '') + `<label>${icon('bike', 15)} Log the ride</label>
         <div class="iaw-wrap iaw-solo">${wheel(f.wheel)}</div>`;
       case 'swim':
-        return `<label>${icon('swim', 15)} Swim — actual yardage</label>
+        return `<label>${icon('swim', 15)} Log the swim</label>
         <input type="number" id="log_swim_yards" placeholder="yards" value="${f.yards}" min="0" step="25" class="input-field">`;
       default:
         return '';

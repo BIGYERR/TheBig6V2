@@ -33,10 +33,11 @@ form asks for, per dose, is not this file's (`docs/decisions/lsd-pace.md`, the V
   values and notes (`assuming planned 15 min`, the pace gap of D40); anything stored. Seen and left, each a separator
   between a value or code and its name, not a clause joined by a dash: the plan strip's session code (`Run — INT ·
   Planned`, `runSessionCode`), the RPE readout (`7 — working, three left`), and the log's RPE label (`How hard was it? —
-  RPE`), which heads every day's log, lifting days too, outside the cardio form this ruling covers. Listed to Mario
-  with the release.
+  RPE`), which heads every day's log, lifting days too, outside the cardio form this ruling covers. Seen in the
+  dev app too, outside the form: the sheet's section headers (`Main — Close-grip bench press`) and the cardio card label
+  (`Run — Recovery Run`). Listed to Mario with the release.
 - **Expected values:** the After column, word for word, in both builders; none of the six Before strings, and no
   em-dash, in any text the cardio form or its readout prints for a run with no dose (speed and not), a time dose, a
   distance dose, a reps by distance dose (volume and pace), a ride and a swim. The Angular template prints the same
   three label and hint strings as the page. No program output moves.
-- **Release:** not yet.
+- **Release:** v0.255.2 (2026-11-03).
