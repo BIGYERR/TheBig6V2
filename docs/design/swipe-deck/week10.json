@@ -1,0 +1,1565 @@
+{
+ "M": {
+  "head": {
+   "dayLine": "Week 10 · Monday · THE HALF MANNY",
+   "title": "Posterior Chain",
+   "day": "Monday"
+  },
+  "cards": [
+   {
+    "kind": "run",
+    "c": "#3F6236",
+    "kicker": "Speed Run — Intervals",
+    "title": "5K reps around a 10:00 tempo",
+    "rx": "22:00 of work",
+    "chips": [
+     "22:00 work"
+    ],
+    "log": {
+     "sport": "run",
+     "dose": null,
+     "code": "INT",
+     "speedHint": true
+    },
+    "lines": [
+     "7:00 warm up",
+     "3 × 2:00 at 5K Pace (11:15/mi) — 1:00 recovery after each",
+     "10:00 at Tempo Pace (12:00/mi) — 2:00 recovery",
+     "3 × 2:00 at 5K Pace (11:15/mi) — 1:00 recovery after each"
+    ],
+    "note": "Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort).",
+    "word": "the intervals session"
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Main",
+    "title": "Deadlift",
+    "main": true,
+    "rx": "3×8 — RPE 7",
+    "cue": "Leave about three reps in reserve. Ramp up with two or three warmup sets. Three minutes rest.",
+    "chips": [
+     "3 sets",
+     "3 min rest"
+    ],
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 155,
+    "keeps": "3×8 at RPE 7"
+   },
+   {
+    "kind": "round",
+    "c": "#8F4A28",
+    "kicker": "Round",
+    "title": "Pull superset A",
+    "rounds": 2,
+    "rx": "2 rounds, no rest inside · 90 sec between rounds",
+    "chips": [
+     "2 rounds",
+     "90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Barbell row",
+      "detail": "6–10 @ RPE 7",
+      "straight": "2×6–10 @ RPE 7",
+      "keeps": "2×6–10 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 8,
+       "unit": "",
+       "loaded": true,
+       "last": 95
+      }
+     },
+     {
+      "name": "Chinups",
+      "detail": "RPE 7 (leave 3 or more in reserve)",
+      "straight": "2 sets — RPE 7 (leave 3 or more in reserve)",
+      "keeps": "2 sets at RPE 7",
+      "log": {
+       "n": 2,
+       "target": null,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     }
+    ]
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Pull superset B",
+    "title": "Dumbbell row",
+    "main": false,
+    "rx": "2×8–12 each @ RPE 7",
+    "cue": "",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "sets": [
+     10,
+     10
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 40,
+    "keeps": "2×8–12 at RPE 7"
+   },
+   {
+    "kind": "finish",
+    "c": "var(--finish)",
+    "kicker": "Finish",
+    "title": "Call it",
+    "rx": "How did the whole thing feel?",
+    "chips": []
+   }
+  ],
+  "swaps": {
+   "Deadlift": {
+    "tags": [
+     "Hinge",
+     "Leg day",
+     "Main lift"
+    ],
+    "t1": [
+     "Barbell Romanian deadlift",
+     "Sumo deadlift",
+     "Trap bar deadlift",
+     "Dumbbell split-stance deadlift",
+     "Kettlebell single-leg deadlift",
+     "Barbell good mornings",
+     "Kettlebell swing"
+    ],
+    "t2": [
+     "Back squat",
+     "Barbell reverse lunge",
+     "Front squat",
+     "Goblet side lunge to knee drive",
+     "Jump squats"
+    ],
+    "sub": "Still legs work. You give up the hinge for today."
+   },
+   "Barbell row": {
+    "tags": [
+     "Row",
+     "Pull day"
+    ],
+    "t1": [
+     "Pendlay row",
+     "Kettlebell single-arm row",
+     "Feet-elevated inverted rows",
+     "Inverted rows (bodyweight)",
+     "Inverted rows (rings)"
+    ],
+    "t2": [
+     "Weighted chinups",
+     "L-sit chinups",
+     "Neutral-grip chinups"
+    ],
+    "sub": "Still pull work. You give up the row for today."
+   },
+   "Chinups": {
+    "tags": [
+     "Vertical pull",
+     "Pull day"
+    ],
+    "t1": [
+     "L-sit chinups",
+     "Neutral-grip chinups",
+     "Weighted chinups"
+    ],
+    "t2": [
+     "Feet-elevated inverted rows",
+     "Inverted rows (bodyweight)",
+     "Inverted rows (rings)",
+     "Kettlebell single-arm row",
+     "Pendlay row"
+    ],
+    "sub": "Still pull work. You give up the vertical pull for today."
+   },
+   "Dumbbell row": {
+    "tags": [
+     "Row",
+     "Pull day"
+    ],
+    "t1": [
+     "Kettlebell single-arm row",
+     "Pendlay row",
+     "Feet-elevated inverted rows",
+     "Inverted rows (bodyweight)",
+     "Inverted rows (rings)"
+    ],
+    "t2": [
+     "Weighted chinups",
+     "L-sit chinups",
+     "Neutral-grip chinups"
+    ],
+    "sub": "Still pull work. You give up the row for today."
+   }
+  },
+  "runIdx": 0,
+  "runWord": "the intervals session",
+  "week": [
+   {
+    "k": "tue",
+    "name": "Tuesday · Strength Support",
+    "tone": "warn",
+    "note": "Already has a 15 min recovery run. The intervals session takes its place.",
+    "effect": "Tuesday becomes the hard run. Its easy one drops."
+   },
+   {
+    "k": "wed",
+    "name": "Wednesday · Rest",
+    "tone": "warn",
+    "note": "Your midweek rest goes. No rest day until Sunday.",
+    "effect": "Wednesday stops being a rest day. Monday is lifting only."
+   },
+   {
+    "k": "thu",
+    "name": "Thursday · Leg Strength + Mobility",
+    "tone": "good",
+    "note": "Good fit. Pairs with your back squat. Hard day stays hard.",
+    "effect": "Thursday is back squat and the intervals session. Monday is lifting only."
+   },
+   {
+    "k": "fri",
+    "name": "Friday · Recovery Lift",
+    "tone": "bad",
+    "note": "Eve of your long run. Saturday's 13.1K Dress Rehearsal starts on tired legs.",
+    "effect": "Friday gets the intervals session and its easy run drops. Hard running the day before the long run."
+   },
+   {
+    "k": "sat",
+    "name": "Saturday · Post-Run Mobility",
+    "tone": "off",
+    "note": "Your long run. Not offered."
+   },
+   {
+    "k": "sun",
+    "name": "Sunday · Rest",
+    "tone": "warn",
+    "note": "The day after your long run. Legs still cooked.",
+    "effect": "Sunday stops being a rest day. Monday is lifting only."
+   }
+  ]
+ },
+ "T": {
+  "head": {
+   "dayLine": "Week 10 · Tuesday · THE HALF MANNY",
+   "title": "Strength Support",
+   "day": "Tuesday"
+  },
+  "cards": [
+   {
+    "kind": "run",
+    "c": "#3F6236",
+    "kicker": "Recovery Run",
+    "title": "15 min recovery run",
+    "rx": "at Recovery Pace (13:20/mi)",
+    "chips": [
+     "15 min"
+    ],
+    "log": {
+     "sport": "run",
+     "dose": {
+      "k": "time",
+      "mins": 15,
+      "tgt": 800,
+      "cap": 760
+     },
+     "code": "RUN",
+     "speedHint": false
+    },
+    "lines": [
+     "4–5/10 effort, easy enough to talk, laugh, or argue freely.",
+     "Start a touch slower than that, finish a touch faster.",
+     "Do not run faster than 12:40/mi."
+    ],
+    "note": "Just as important as the hard days. This is where your body absorbs the training. Going too fast here steals from your speed and long runs.",
+    "word": "the recovery run"
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Main",
+    "title": "Incline barbell press",
+    "main": true,
+    "rx": "3×8 — RPE 7",
+    "cue": "Leave about three reps in reserve. Ramp up with two or three warmup sets. Two to three minutes rest.",
+    "chips": [
+     "3 sets",
+     "2–3 min rest"
+    ],
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 95,
+    "keeps": "3×8 at RPE 7"
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Main, second lift",
+    "title": "Barbell overhead press",
+    "main": false,
+    "rx": "2×6–10 @ RPE 7",
+    "cue": "",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "sets": [
+     8,
+     8
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 65,
+    "keeps": "2×6–10 at RPE 7"
+   },
+   {
+    "kind": "round",
+    "c": "#8F4A28",
+    "kicker": "Round",
+    "title": "Accessory",
+    "rounds": 2,
+    "rx": "2 rounds, no rest inside · 90 sec between rounds",
+    "chips": [
+     "2 rounds",
+     "90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Single-arm dumbbell bench press",
+      "detail": "8–12 each @ RPE 7",
+      "straight": "2×8–12 each @ RPE 7",
+      "keeps": "2×8–12 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 10,
+       "unit": "",
+       "loaded": true,
+       "last": 35
+      }
+     },
+     {
+      "name": "Seated dumbbell shoulder press",
+      "detail": "12–15 @ RPE 7",
+      "straight": "2×12–15 @ RPE 7",
+      "keeps": "2×12–15 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 14,
+       "unit": "",
+       "loaded": true,
+       "last": 30
+      }
+     }
+    ]
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Chest + knee",
+    "title": "Spanish squat hold (KB)",
+    "main": false,
+    "rx": "3×25 sec",
+    "cue": "",
+    "chips": [
+     "3 sets",
+     "60–90 sec rest"
+    ],
+    "sets": [
+     25,
+     25,
+     25
+    ],
+    "unit": "sec",
+    "loaded": true,
+    "last": 35,
+    "keeps": "3×25"
+   },
+   {
+    "kind": "block",
+    "c": "#6F5620",
+    "kicker": "Core",
+    "title": "Rotational Power",
+    "rx": "One block, straight through",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Landmine rotations",
+      "detail": "2×8–12 each @ RPE 7",
+      "straight": "2×8–12 each @ RPE 7",
+      "keeps": "2×8–12 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 10,
+       "unit": "",
+       "loaded": false,
+       "last": 25
+      }
+     },
+     {
+      "name": "Standing torso rotations (slow)",
+      "detail": "2×8–12 each @ RPE 7",
+      "straight": "2×8–12 each @ RPE 7",
+      "keeps": "2×8–12 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 10,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     }
+    ]
+   },
+   {
+    "kind": "finish",
+    "c": "var(--finish)",
+    "kicker": "Finish",
+    "title": "Call it",
+    "rx": "How did the whole thing feel?",
+    "chips": []
+   }
+  ],
+  "swaps": {
+   "Incline barbell press": {
+    "tags": [
+     "Vertical press",
+     "Push day",
+     "Main lift"
+    ],
+    "t1": [
+     "Barbell push press",
+     "Dumbbell Arnold press",
+     "Dumbbell incline press",
+     "Kettlebell single-arm press"
+    ],
+    "t2": [
+     "Barbell bench press",
+     "Close-grip bench press",
+     "Landmine rotational press",
+     "Dumbbell bench press",
+     "Dumbbell decline press"
+    ],
+    "sub": "Still push work. You give up the vertical press for today."
+   },
+   "Barbell overhead press": {
+    "tags": [
+     "Vertical press",
+     "Push day"
+    ],
+    "t1": [
+     "Barbell push press",
+     "Dumbbell Arnold press",
+     "Dumbbell incline press",
+     "Kettlebell single-arm press"
+    ],
+    "t2": [
+     "Barbell bench press",
+     "Close-grip bench press",
+     "Landmine rotational press",
+     "Dumbbell bench press",
+     "Dumbbell decline press"
+    ],
+    "sub": "Still push work. You give up the vertical press for today."
+   },
+   "Single-arm dumbbell bench press": {
+    "tags": [
+     "Horizontal press",
+     "Push day"
+    ],
+    "t1": [
+     "Dumbbell bench press",
+     "Dumbbell decline press",
+     "Dumbbell floor press",
+     "Barbell bench press",
+     "Close-grip bench press",
+     "Landmine rotational press",
+     "Bench dips",
+     "Dips"
+    ],
+    "t2": [
+     "Dumbbell Arnold press",
+     "Dumbbell incline press",
+     "Kettlebell single-arm press",
+     "Barbell push press",
+     "Dumbbell front raise"
+    ],
+    "sub": "Still push work. You give up the horizontal press for today."
+   },
+   "Seated dumbbell shoulder press": {
+    "tags": [
+     "Vertical press",
+     "Push day"
+    ],
+    "t1": [
+     "Dumbbell Arnold press",
+     "Dumbbell incline press",
+     "Kettlebell single-arm press",
+     "Barbell push press"
+    ],
+    "t2": [
+     "Dumbbell bench press",
+     "Dumbbell decline press",
+     "Dumbbell floor press",
+     "Barbell bench press",
+     "Close-grip bench press"
+    ],
+    "sub": "Still push work. You give up the vertical press for today."
+   },
+   "Spanish squat hold (KB)": {
+    "tags": [
+     "Isometric hold",
+     "Today"
+    ],
+    "t1": [
+     "Single-leg wall sit",
+     "Wall sit"
+    ],
+    "t2": [],
+    "sub": "Still the same work. You give up the lift for today."
+   },
+   "Landmine rotations": {
+    "tags": [
+     "Core",
+     "Today"
+    ],
+    "t1": [
+     "Ab wheel rollouts",
+     "Band woodchopper (door anchor)",
+     "Bird dogs",
+     "Dead bug (slow tempo)",
+     "Dead bugs",
+     "Farmer march",
+     "Garhammer raises",
+     "Hanging hold",
+     "Hanging knee raises",
+     "Hanging leg raises",
+     "Hollow hold dumbbell press",
+     "L-sit hold",
+     "McGill curl-up",
+     "Medicine ball rotary toss",
+     "Overhead sit-up",
+     "Pallof press",
+     "Plank hold",
+     "RKC plank",
+     "Russian twist (heels down)",
+     "Side plank",
+     "Side plank thread-the-needle",
+     "Superman",
+     "Toes-to-bar",
+     "V-ups",
+     "Wall-press dead bug",
+     "Windshield wipers"
+    ],
+    "t2": [],
+    "sub": "Still the same work. You give up the lift for today."
+   },
+   "Standing torso rotations (slow)": {
+    "tags": [
+     "Core",
+     "Today"
+    ],
+    "t1": [
+     "Ab wheel rollouts",
+     "Band woodchopper (door anchor)",
+     "Bird dogs",
+     "Dead bug (slow tempo)",
+     "Dead bugs",
+     "Farmer march",
+     "Garhammer raises",
+     "Hanging hold",
+     "Hanging knee raises",
+     "Hanging leg raises",
+     "Hollow hold dumbbell press",
+     "L-sit hold",
+     "McGill curl-up",
+     "Medicine ball rotary toss",
+     "Overhead sit-up",
+     "Pallof press",
+     "Plank hold",
+     "RKC plank",
+     "Russian twist (heels down)",
+     "Side plank",
+     "Side plank thread-the-needle",
+     "Superman",
+     "Toes-to-bar",
+     "V-ups",
+     "Wall-press dead bug",
+     "Windshield wipers"
+    ],
+    "t2": [],
+    "sub": "Still the same work. You give up the lift for today."
+   }
+  },
+  "runIdx": 0,
+  "runWord": "the recovery run",
+  "week": [
+   {
+    "k": "wed",
+    "name": "Wednesday · Rest",
+    "tone": "warn",
+    "note": "Your midweek rest goes. No rest day until Sunday.",
+    "effect": "Wednesday stops being a rest day. Tuesday is lifting only."
+   },
+   {
+    "k": "thu",
+    "name": "Thursday · Leg Strength + Mobility",
+    "tone": "good",
+    "note": "Fine. An easy run fits after the lifts.",
+    "effect": "Thursday is back squat and the recovery run. Tuesday is lifting only."
+   },
+   {
+    "k": "fri",
+    "name": "Friday · Recovery Lift",
+    "tone": "warn",
+    "note": "Eve of your long run. Keep it very easy, or leave it.",
+    "effect": "Friday runs twice, the day before the 13.1K Dress Rehearsal."
+   },
+   {
+    "k": "sat",
+    "name": "Saturday · Post-Run Mobility",
+    "tone": "off",
+    "note": "Your long run. Not offered."
+   },
+   {
+    "k": "sun",
+    "name": "Sunday · Rest",
+    "tone": "good",
+    "note": "The day after your long run. Easy miles help here.",
+    "effect": "Sunday gets the recovery run. Tuesday is lifting only."
+   }
+  ]
+ },
+ "W": {
+  "head": {
+   "dayLine": "Week 10 · Wednesday · THE HALF MANNY",
+   "title": "Rest day",
+   "day": "Wednesday"
+  },
+  "cards": [
+   {
+    "kind": "rest",
+    "c": "#3B5266",
+    "kicker": "Rest day",
+    "title": "Rest",
+    "rx": "Recovery is where the work sets in. Move easy, refuel, sleep.",
+    "chips": [],
+    "date": "2026-11-04",
+    "types": [
+     "run",
+     "walk"
+    ],
+    "cands": [
+     {
+      "k": "mon",
+      "label": "Monday",
+      "title": "Posterior Chain",
+      "warn": null
+     },
+     {
+      "k": "tue",
+      "label": "Tuesday",
+      "title": "Strength Support",
+      "warn": null
+     },
+     {
+      "k": "thu",
+      "label": "Thursday",
+      "title": "Leg Strength + Mobility",
+      "warn": null
+     },
+     {
+      "k": "fri",
+      "label": "Friday",
+      "title": "Recovery Lift",
+      "warn": {
+       "ttl": "That’s push on top of push",
+       "sub": "You have push work on Tuesday too. Stack it here and something gives. Your call."
+      }
+     },
+     {
+      "k": "sat",
+      "label": "Saturday",
+      "title": "Post-Run Mobility",
+      "warn": null
+     }
+    ],
+    "tip": {
+     "label": "Fuel · recovery nutrition",
+     "text": "Carbohydrate refills the muscle glycogen you burned — make it the backbone of recovery-day meals.",
+     "src": "NSW Physical Fitness Guide"
+    }
+   }
+  ],
+  "swaps": {},
+  "runIdx": -1,
+  "runWord": "",
+  "week": []
+ },
+ "H": {
+  "head": {
+   "dayLine": "Week 10 · Thursday · THE HALF MANNY",
+   "title": "Leg Strength + Mobility",
+   "day": "Thursday"
+  },
+  "cards": [
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Main",
+    "title": "Back squat",
+    "main": true,
+    "rx": "3×8 — RPE 7",
+    "cue": "Leave about three reps in reserve. Ramp up with two or three warmup sets. Two to three minutes rest.",
+    "chips": [
+     "3 sets",
+     "2–3 min rest"
+    ],
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 135,
+    "keeps": "3×8 at RPE 7"
+   },
+   {
+    "kind": "round",
+    "c": "#8F4A28",
+    "kicker": "Round",
+    "title": "Leg circuit — runner armor",
+    "rounds": 2,
+    "rx": "2 rounds, no rest inside · 90 sec between rounds",
+    "chips": [
+     "2 rounds",
+     "90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Dumbbell goblet side lunge",
+      "detail": "8–12 each @ RPE 7",
+      "straight": "2×8–12 each @ RPE 7",
+      "keeps": "2×8–12 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 10,
+       "unit": "",
+       "loaded": true,
+       "last": 30
+      }
+     },
+     {
+      "name": "Spanish squat hold (KB)",
+      "detail": "25 sec",
+      "straight": "2×25 sec",
+      "keeps": "2×25",
+      "log": {
+       "n": 2,
+       "target": 25,
+       "unit": "sec",
+       "loaded": true,
+       "last": 35
+      }
+     },
+     {
+      "name": "Dumbbell split-stance deadlift",
+      "detail": "6–10 @ RPE 7",
+      "straight": "2×6–10 @ RPE 7",
+      "keeps": "2×6–10 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 8,
+       "unit": "",
+       "loaded": true,
+       "last": 40
+      }
+     }
+    ]
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Glute — runner armor",
+    "title": "Single-leg hip thrust",
+    "main": false,
+    "rx": "2×6–10 each @ RPE 7",
+    "cue": "",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "sets": [
+     8,
+     8
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 45,
+    "keeps": "2×6–10 at RPE 7"
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Calf — achilles armor",
+    "title": "Dumbbell standing calf raise",
+    "main": false,
+    "rx": "2×12–15 each, slow 3-sec lower",
+    "cue": "",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "sets": [
+     14,
+     14
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 30,
+    "keeps": "2×12–15"
+   },
+   {
+    "kind": "block",
+    "c": "#574068",
+    "kicker": "Prehab",
+    "title": "Hip stability",
+    "rx": "One block, straight through",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Clamshells w/ band",
+      "detail": "2×15 each",
+      "straight": "2×15 each",
+      "keeps": "2×15",
+      "log": {
+       "n": 2,
+       "target": 15,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     },
+     {
+      "name": "Banded monster walks",
+      "detail": "2×12–15 each @ RPE 7",
+      "straight": "2×12–15 each @ RPE 7",
+      "keeps": "2×12–15 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 14,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     },
+     {
+      "name": "IT band stretch",
+      "detail": "2×30 sec each",
+      "straight": "2×30 sec each",
+      "keeps": "2×30",
+      "log": {
+       "n": 2,
+       "target": 30,
+       "unit": "sec",
+       "loaded": false,
+       "last": null
+      }
+     }
+    ]
+   },
+   {
+    "kind": "block",
+    "c": "#574068",
+    "kicker": "Prehab",
+    "title": "Foot & ankle",
+    "rx": "One block, straight through",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Standing ankle CARs",
+      "detail": "2×5 each direction",
+      "straight": "2×5 each direction",
+      "keeps": "2×5",
+      "log": {
+       "n": 2,
+       "target": 5,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     },
+     {
+      "name": "Towel scrunches",
+      "detail": "2×20 each foot",
+      "straight": "2×20 each foot",
+      "keeps": "2×20",
+      "log": {
+       "n": 2,
+       "target": 20,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     }
+    ]
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Loaded carry finisher",
+    "title": "Farmer carry",
+    "main": false,
+    "rx": "3×40 yards, heavy",
+    "cue": "",
+    "chips": [
+     "3 sets",
+     "60–90 sec rest"
+    ],
+    "sets": [
+     40,
+     40,
+     40
+    ],
+    "unit": "yd",
+    "loaded": true,
+    "last": 53,
+    "keeps": "3×40"
+   },
+   {
+    "kind": "finish",
+    "c": "var(--finish)",
+    "kicker": "Finish",
+    "title": "Call it",
+    "rx": "How did the whole thing feel?",
+    "chips": []
+   }
+  ],
+  "swaps": {
+   "Back squat": {
+    "tags": [
+     "Squat",
+     "Leg day",
+     "Main lift"
+    ],
+    "t1": [
+     "Front squat",
+     "Jump squats"
+    ],
+    "t2": [
+     "Barbell reverse lunge",
+     "Barbell Romanian deadlift",
+     "Deadlift",
+     "Goblet side lunge to knee drive",
+     "Landmine reverse lunge"
+    ],
+    "sub": "Still legs work. You give up the squat for today."
+   },
+   "Dumbbell goblet side lunge": {
+    "tags": [
+     "Lunge",
+     "Leg day"
+    ],
+    "t1": [
+     "Deficit reverse lunge (KB)",
+     "Dumbbell Bulgarian split squat",
+     "Reverse lunge (KB)",
+     "Walking lunge (KB)",
+     "Barbell reverse lunge",
+     "Goblet side lunge to knee drive",
+     "Landmine reverse lunge",
+     "Step-downs (KB)"
+    ],
+    "t2": [
+     "Kettlebell single-leg deadlift",
+     "Barbell Romanian deadlift",
+     "Deadlift",
+     "Front squat",
+     "Jump squats"
+    ],
+    "sub": "Still legs work. You give up the lunge for today."
+   },
+   "Spanish squat hold (KB)": {
+    "tags": [
+     "Isometric hold",
+     "Today"
+    ],
+    "t1": [
+     "Single-leg wall sit",
+     "Wall sit"
+    ],
+    "t2": [],
+    "sub": "Still the same work. You give up the lift for today."
+   },
+   "Dumbbell split-stance deadlift": {
+    "tags": [
+     "Hinge",
+     "Leg day"
+    ],
+    "t1": [
+     "Kettlebell single-leg deadlift",
+     "Barbell Romanian deadlift",
+     "Deadlift",
+     "Sumo deadlift",
+     "Trap bar deadlift",
+     "Barbell good mornings",
+     "Kettlebell swing"
+    ],
+    "t2": [
+     "Deficit reverse lunge (KB)",
+     "Dumbbell Bulgarian split squat",
+     "Reverse lunge (KB)",
+     "Walking lunge (KB)",
+     "Barbell reverse lunge"
+    ],
+    "sub": "Still legs work. You give up the hinge for today."
+   },
+   "Single-leg hip thrust": {
+    "tags": [
+     "Hip extension",
+     "Leg day"
+    ],
+    "t1": [
+     "45° back extension",
+     "Barbell hip thrust",
+     "Glute-ham raise"
+    ],
+    "t2": [
+     "Barbell good mornings",
+     "Dumbbell seated calf raise",
+     "Dumbbell split-stance calf raise",
+     "Kettlebell swing",
+     "Step-downs (KB)"
+    ],
+    "sub": "Still legs work. You give up the hip extension for today."
+   },
+   "Dumbbell standing calf raise": {
+    "tags": [
+     "Calves",
+     "Leg day"
+    ],
+    "t1": [
+     "Dumbbell seated calf raise",
+     "Dumbbell split-stance calf raise"
+    ],
+    "t2": [
+     "45° back extension",
+     "Barbell good mornings",
+     "Barbell hip thrust",
+     "Glute-ham raise",
+     "Kettlebell swing"
+    ],
+    "sub": "Still legs work. You give up the calves for today."
+   },
+   "Farmer carry": {
+    "tags": [
+     "Carry / grip",
+     "Today"
+    ],
+    "t1": [
+     "Overhead carry",
+     "Suitcase carry",
+     "Trap bar farmer carry"
+    ],
+    "t2": [],
+    "sub": "Still the same work. You give up the lift for today."
+   }
+  },
+  "runIdx": -1,
+  "runWord": "",
+  "week": []
+ },
+ "F": {
+  "head": {
+   "dayLine": "Week 10 · Friday · THE HALF MANNY",
+   "title": "Recovery Lift",
+   "day": "Friday"
+  },
+  "cards": [
+   {
+    "kind": "run",
+    "c": "#3F6236",
+    "kicker": "Recovery Run",
+    "title": "45 min recovery run",
+    "rx": "at Recovery Pace (13:20/mi)",
+    "chips": [
+     "45 min"
+    ],
+    "log": {
+     "sport": "run",
+     "dose": {
+      "k": "time",
+      "mins": 45,
+      "tgt": 800,
+      "cap": 760
+     },
+     "code": "RUN",
+     "speedHint": false
+    },
+    "lines": [
+     "4–5/10 effort, easy enough to talk, laugh, or argue freely.",
+     "Start a touch slower than that, finish a touch faster.",
+     "Do not run faster than 12:40/mi."
+    ],
+    "note": "Just as important as the hard days. This is where your body absorbs the training. Going too fast here steals from your speed and long runs.",
+    "word": "the recovery run"
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Main",
+    "title": "Dumbbell bench press",
+    "main": true,
+    "rx": "3×12 — RPE 6–7, leave 3+ in reserve",
+    "cue": "Leave about three reps in reserve. Ramp up with two or three warmup sets. ",
+    "chips": [
+     "3 sets",
+     "2–3 min rest"
+    ],
+    "sets": [
+     12,
+     12,
+     12
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": null,
+    "keeps": "3×12 at RPE 6"
+   },
+   {
+    "kind": "lift",
+    "c": "#8F4A28",
+    "kicker": "Main, second lift",
+    "title": "Seated dumbbell shoulder press",
+    "main": false,
+    "rx": "2×10–15 @ RPE 7",
+    "cue": "",
+    "chips": [
+     "2 sets",
+     "60–90 sec rest"
+    ],
+    "sets": [
+     13,
+     13
+    ],
+    "unit": "",
+    "loaded": true,
+    "last": 30,
+    "keeps": "2×10–15 at RPE 7"
+   },
+   {
+    "kind": "round",
+    "c": "#8F4A28",
+    "kicker": "Round",
+    "title": "Pump",
+    "rounds": 2,
+    "rx": "2 rounds, no rest inside · 90 sec between rounds",
+    "chips": [
+     "2 rounds",
+     "90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Dumbbell incline press",
+      "detail": "12–15 @ RPE 7",
+      "straight": "2×12–15 @ RPE 7",
+      "keeps": "2×12–15 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 14,
+       "unit": "",
+       "loaded": true,
+       "last": null
+      }
+     },
+     {
+      "name": "Overhead dumbbell extension",
+      "detail": "12–15 @ RPE 7",
+      "straight": "2×12–15 @ RPE 7",
+      "keeps": "2×12–15 at RPE 7",
+      "log": {
+       "n": 2,
+       "target": 14,
+       "unit": "",
+       "loaded": true,
+       "last": null
+      }
+     }
+    ]
+   },
+   {
+    "kind": "block",
+    "c": "#6F5620",
+    "kicker": "Core",
+    "title": "Anti-Rotation",
+    "rx": "One block, straight through",
+    "chips": [
+     "3 sets",
+     "60–90 sec rest"
+    ],
+    "members": [
+     {
+      "name": "Plank shoulder taps",
+      "detail": "3×12 each",
+      "straight": "3×12 each",
+      "keeps": "3×12",
+      "log": {
+       "n": 3,
+       "target": 12,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     },
+     {
+      "name": "Pallof press",
+      "detail": "3×12 each",
+      "straight": "3×12 each",
+      "keeps": "3×12",
+      "log": {
+       "n": 3,
+       "target": 12,
+       "unit": "",
+       "loaded": false,
+       "last": null
+      }
+     }
+    ]
+   },
+   {
+    "kind": "finish",
+    "c": "var(--finish)",
+    "kicker": "Finish",
+    "title": "Call it",
+    "rx": "How did the whole thing feel?",
+    "chips": []
+   }
+  ],
+  "swaps": {
+   "Dumbbell bench press": {
+    "tags": [
+     "Horizontal press",
+     "Push day",
+     "Main lift"
+    ],
+    "t1": [
+     "Dumbbell decline press",
+     "Dumbbell floor press",
+     "Single-arm dumbbell bench press",
+     "Barbell bench press",
+     "Close-grip bench press",
+     "Landmine rotational press",
+     "Bench dips",
+     "Dips"
+    ],
+    "t2": [
+     "Dumbbell Arnold press",
+     "Kettlebell single-arm press",
+     "Barbell overhead press",
+     "Barbell push press",
+     "Incline barbell press"
+    ],
+    "sub": "Still push work. You give up the horizontal press for today."
+   },
+   "Seated dumbbell shoulder press": {
+    "tags": [
+     "Vertical press",
+     "Push day"
+    ],
+    "t1": [
+     "Dumbbell Arnold press",
+     "Kettlebell single-arm press",
+     "Barbell overhead press",
+     "Barbell push press",
+     "Incline barbell press"
+    ],
+    "t2": [
+     "Dumbbell decline press",
+     "Dumbbell floor press",
+     "Single-arm dumbbell bench press",
+     "Barbell bench press",
+     "Close-grip bench press"
+    ],
+    "sub": "Still push work. You give up the vertical press for today."
+   },
+   "Dumbbell incline press": {
+    "tags": [
+     "Vertical press",
+     "Push day"
+    ],
+    "t1": [
+     "Dumbbell Arnold press",
+     "Kettlebell single-arm press",
+     "Barbell overhead press",
+     "Barbell push press",
+     "Incline barbell press"
+    ],
+    "t2": [
+     "Dumbbell decline press",
+     "Dumbbell floor press",
+     "Single-arm dumbbell bench press",
+     "Barbell bench press",
+     "Close-grip bench press"
+    ],
+    "sub": "Still push work. You give up the vertical press for today."
+   },
+   "Overhead dumbbell extension": {
+    "tags": [
+     "Triceps",
+     "Push day"
+    ],
+    "t1": [
+     "Dumbbell skullcrushers"
+    ],
+    "t2": [
+     "Decline pushups",
+     "Diamond pushups",
+     "Dumbbell front raise",
+     "Dumbbell lateral raise",
+     "Dumbbell rear delt fly"
+    ],
+    "sub": "Still push work. You give up the triceps for today."
+   },
+   "Pallof press": {
+    "tags": [
+     "Core",
+     "Today"
+    ],
+    "t1": [
+     "Ab wheel rollouts",
+     "Band woodchopper (door anchor)",
+     "Bird dogs",
+     "Dead bug (slow tempo)",
+     "Dead bugs",
+     "Farmer march",
+     "Garhammer raises",
+     "Hanging hold",
+     "Hanging knee raises",
+     "Hanging leg raises",
+     "Hollow hold dumbbell press",
+     "L-sit hold",
+     "Landmine rotations",
+     "McGill curl-up",
+     "Medicine ball rotary toss",
+     "Overhead sit-up",
+     "Plank hold",
+     "RKC plank",
+     "Russian twist (heels down)",
+     "Side plank",
+     "Side plank thread-the-needle",
+     "Standing torso rotations (slow)",
+     "Superman",
+     "Toes-to-bar",
+     "V-ups",
+     "Wall-press dead bug",
+     "Windshield wipers"
+    ],
+    "t2": [],
+    "sub": "Still the same work. You give up the lift for today."
+   }
+  },
+  "runIdx": 0,
+  "runWord": "the recovery run",
+  "week": [
+   {
+    "k": "sat",
+    "name": "Saturday · Post-Run Mobility",
+    "tone": "off",
+    "note": "Your long run. Not offered."
+   },
+   {
+    "k": "sun",
+    "name": "Sunday · Rest",
+    "tone": "good",
+    "note": "The day after your long run. Easy miles help here.",
+    "effect": "Sunday gets the recovery run. Friday is lifting only."
+   }
+  ]
+ },
+ "S": {
+  "head": {
+   "dayLine": "Week 10 · Saturday · THE HALF MANNY",
+   "title": "Post-Run Mobility",
+   "day": "Saturday"
+  },
+  "cards": [
+   {
+    "kind": "run",
+    "c": "#3F6236",
+    "kicker": "Long Run — Dress Rehearsal",
+    "title": "13.1K Dress Rehearsal: 8 mile run",
+    "rx": "run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (13:20/mi) across the run. Comfortable the whole way. Average no faster than 12:40/mi.",
+    "chips": [],
+    "log": {
+     "sport": "run",
+     "dose": {
+      "k": "dist",
+      "mi": 8,
+      "tgt": 800,
+      "cap": 760
+     },
+     "code": "RUN",
+     "speedHint": false
+    },
+    "lines": [],
+    "note": "Run this at your race start time, in the shoes and kit you will race in, with the breakfast and fueling you plan to use. Pace stays the progression. This rehearses the routine, not the race. Distance steps back on purpose this week.",
+    "word": "the dress rehearsal"
+   },
+   {
+    "kind": "block",
+    "c": "#574068",
+    "kicker": "After the run",
+    "title": "Stretch and roll",
+    "mobility": true,
+    "rx": "Five easy moves, about 14 minutes. Take your time.",
+    "chips": [],
+    "members": [
+     {
+      "name": "Standing calf stretch",
+      "detail": "2×45 sec each side — knee straight, then bent",
+      "straight": "2×45 sec each side — knee straight, then bent",
+      "keeps": "2×45",
+      "log": null
+     },
+     {
+      "name": "Couch stretch",
+      "detail": "2×45 sec each side — hip flexors; squeeze the trailing glute",
+      "straight": "2×45 sec each side — hip flexors; squeeze the trailing glute",
+      "keeps": "2×45",
+      "log": null
+     },
+     {
+      "name": "Hip 90/90 stretch",
+      "detail": "2×45 sec each side",
+      "straight": "2×45 sec each side",
+      "keeps": "2×45",
+      "log": null
+     },
+     {
+      "name": "T-spine mobility",
+      "detail": "2×45 sec — thread the needle, reach long",
+      "straight": "2×45 sec — thread the needle, reach long",
+      "keeps": "2×45",
+      "log": null
+     },
+     {
+      "name": "Foam roll",
+      "detail": "~3 min — calves, quads, glutes; slow passes",
+      "straight": "~3 min — calves, quads, glutes; slow passes",
+      "keeps": "~3 min — calves, quads, …",
+      "log": null
+     }
+    ]
+   },
+   {
+    "kind": "finish",
+    "c": "var(--finish)",
+    "kicker": "Finish",
+    "title": "Call it",
+    "rx": "How did the whole thing feel?",
+    "chips": []
+   }
+  ],
+  "swaps": {},
+  "runIdx": 0,
+  "runWord": "the dress rehearsal",
+  "week": [
+   {
+    "k": "sun",
+    "name": "Sunday · Rest",
+    "tone": "warn",
+    "note": "The day after your long run. Legs still cooked.",
+    "effect": "Sunday stops being a rest day. Saturday is lifting only."
+   }
+  ]
+ },
+ "U": {
+  "head": {
+   "dayLine": "Week 10 · Sunday · THE HALF MANNY",
+   "title": "Rest day",
+   "day": "Sunday"
+  },
+  "cards": [
+   {
+    "kind": "rest",
+    "c": "#3B5266",
+    "kicker": "Rest day",
+    "title": "Rest",
+    "rx": "Recovery is where the work sets in. Move easy, refuel, sleep.",
+    "chips": [],
+    "date": "2026-11-08",
+    "types": [
+     "run",
+     "walk"
+    ],
+    "cands": [
+     {
+      "k": "mon",
+      "label": "Monday",
+      "title": "Posterior Chain",
+      "warn": null
+     },
+     {
+      "k": "tue",
+      "label": "Tuesday",
+      "title": "Strength Support",
+      "warn": null
+     },
+     {
+      "k": "thu",
+      "label": "Thursday",
+      "title": "Leg Strength + Mobility",
+      "warn": null
+     },
+     {
+      "k": "fri",
+      "label": "Friday",
+      "title": "Recovery Lift",
+      "warn": null
+     },
+     {
+      "k": "sat",
+      "label": "Saturday",
+      "title": "Post-Run Mobility",
+      "warn": null
+     }
+    ],
+    "tip": {
+     "label": "Fuel · recovery nutrition",
+     "text": "For a 175-lb operator that's roughly 105–140 g of protein a day — and a 6-oz can of tuna already brings 48.",
+     "src": "NSW Physical Fitness Guide"
+    }
+   }
+  ],
+  "swaps": {},
+  "runIdx": -1,
+  "runWord": "",
+  "week": []
+ }
+}
