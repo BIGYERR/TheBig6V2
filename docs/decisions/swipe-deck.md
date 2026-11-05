@@ -8,7 +8,7 @@ writes them.
 
 ## P-DECK: the session as a swipe deck (design agreed, not built)
 
-- **Date:** designed 2026-10-25 to 2026-11-03; Mario 2026-11-04: "ok i like where were at! lets save this and we are
+- **Date:** designed 2026-10-25 to 2026-11-03; Mario 2026-11-04, then his three answers the same day (below): "ok i like where were at! lets save this and we are
   going to need to roll this into our app so ill need to wrap up anothe chat before we can implement this".
   **Ruled by:** Mario, call by call on the canvas (below). **D-code:** assigned from the registry when the build is
   slotted. **Bump:** not picked (MINOR recommended: a new way to run a session, no program output moves).
@@ -63,12 +63,16 @@ writes them.
   `auxSwapCandidates`, `doseFromCardio`, `runSessionCode`, `restMoveCandidates`, `restMoveCollisions`, `restDayTip`;
   and the stores the session sheet writes today (sets, cardio, rest log). The deck is a new view of the day, not a new
   record.
+- **Mario's answers (2026-11-04, "i concur with all", each the main session's recommendation):** (1) prehab and
+  mobility blocks are one card each, as the week 10 decks build them (the case against: a long block such as Thursday's
+  hip stability is one tall card to scroll); (2) Can't run? ships on the run card as the canvas has it, move to a later
+  day with each day marked good, careful or bad for the run, or skip it, which rules D249 (the case against: a move
+  rewrites the rest of the week, which nothing in the app does today); (3) the deck is what Start session opens, and the
+  day sheet stays for reviewing and editing a day (the case against: two ways into one day to keep in step).
 - **Before the build, in this order:** measure the day shapes across the lattice (cards per day, rounds, blocks, run
-  first or last); coach's read-ahead ruling, carried from the first round: the deck shows one card at a time, so does
-  meeting a hinge cold on card 4 break hard days hard; Mario ratifies prehab and mobility blocks as one card each (the
-  week 10 decks build them that way); then the new behaviour is ruled: Can't run? (move or skip the run, with its
-  warnings), the deck as the way a session runs (recommendation: it is what Start session opens, and the day sheet
-  stays for review and edits), the done motion and the double tap. The deck lands on the Angular screens
+  first or last); then coach's read-ahead ruling, carried from the first round: the deck shows one card at a time, so
+  does meeting a hinge cold on card 4 break hard days hard. If either refutes a premise of the answers above, it goes
+  back to Mario before any edit (standing ruling 7). The deck lands on the Angular screens
   (`frontends/app/src/app/screens/day-detail/`), not the legacy builders.
 - **Found in the app while building the canvas, not fixed:** (1) the rest sheet's clash check warns about the day a
   session leaves (move Thursday's legs onto Wednesday and it warns about Thursday, which becomes the rest);
