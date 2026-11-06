@@ -118,8 +118,9 @@
     owns the fixed dimension, the log captures the free one).
   - HALF_MANNY's 56 runs: 28 Recovery Runs name a target pace and a mile ceiling ("Do not run faster than"), 26 dosed by
     time and 2 by distance; 13 of the 14 Long Runs name an average ceiling ("Average no faster than") and run as a
-    progression, so `doseFromCardio` gives them no target; 14 Speed Runs (10 intervals, 3 tempo, 1 fartlek) name
-    several zones and no one ceiling; Race Day names none.
+    progression; 14 Speed Runs (10 intervals, 3 tempo, 1 fartlek) name
+    several zones, no one ceiling and no dose; Race Day has a target and no ceiling. Every Recovery Run and Long Run
+    carries its target and ceiling in the dose the engine emits (`dose.tgt` 800 s and `dose.cap` 760 s on HALF_MANNY).
   - The agreed deck (P-DECK, `docs/decisions/swipe-deck.md`) carries three things on its run card: run first (call 9),
     the hand log (call 11) and Can't run? (call 12, which ruled D249). The cool down after the run (call 14) is its own
     card.
@@ -144,7 +145,8 @@
      dose) with the dose under it; Miles and Avg pace; the pace guard; the splits table, one row a mile, the mile in
      progress live; Pause, Resume and Finish. **The pace guard reads only what the session names:** a mile ceiling and
      a target (the 28 Recovery Runs) put the pace of the mile in progress against both; an average ceiling (the 13 Long
-     Runs) puts the average against it; any other session (Speed Runs, Race Day) shows no guard. The splits table's
+     Runs) puts the average against it and the target; Race Day shows its target only; a Speed Run, which has no dose, shows
+     no guard. The guard reads `dose.cap` and `dose.tgt`, never the session text. The splits table's
      "vs" column shows only when the session names a target. Minimize keeps recording, puts a live bar on This Week, and
      Record run reads "Back to your run" with the time.
   4. **Finish shows the summary:** time, miles, average pace, the splits, an Effort slider 1 to 10 (untouched stores
@@ -169,9 +171,8 @@
 - **Not in this stage (later, no D-codes):** a run Live Activity on the lock screen; a chime at the dose and a warning
   past the ceiling; the map (stage 3); effort by effort on speed sessions (stage 4, after D258).
 - **Tests (each fails on v0.255.2, where none of this exists):**
-  - `tests/unit/gps-recording.test.ts` (`@ia/core`): the ceiling reader on hand typed strings: "Do not run faster than
-    12:40/mi" gives a 760 s mile ceiling, "Average no faster than 12:40/mi" a 760 s average ceiling, a Speed Run's text
-    none; the log fields for 2,700 s moving over 3.379 mi are `run_mins` 45.00 and `run_dist` 3.38, with the pace the
+  - `tests/unit/gps-recording.test.ts` (`@ia/core`): the guard's kind from hand typed doses: `{k:'time', mins:45, tgt:800, cap:760}` gives the
+    mile guard at 760 and 800, `{k:'dist', mi:8, tgt:800, cap:760}` on a Long Run the average guard, no dose none; the log fields for 2,700 s moving over 3.379 mi are `run_mins` 45.00 and `run_dist` 3.38, with the pace the
     hand log derives for them.
   - `tests/integration/this-week-hero.test.ts`: on HALF_MANNY week 10 Friday the hero prints a run block with Record run
     before a lift block with Start lift; Thursday prints no Record; a saved run moves the glow to Start lift; with no
@@ -183,3 +184,7 @@
   run can happen any time before; stage 1 is already on the phone.
 - **Calls for Mario:** (1) the gate in item 5, at 2%; (2) Speed Runs record whole run totals with no guard until stage
   4; (3) rides, swims and rows keep Log by hand with no Record.
+- **Correction (2026-11-05, before Mario's answer):** the measure first said the Long Runs carry no target, read off
+  `doseFromCardio`'s parse of the session text. The doses the engine emits carry `tgt` and `cap` on all 28 Recovery
+  Runs and 13 of the 14 Long Runs, and Race Day carries `tgt` alone, so the guard reads the dose, and the test of a
+  text reader became a test of the guard's kind. Found while building the full week prototype.
