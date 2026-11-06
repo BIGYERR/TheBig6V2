@@ -100,3 +100,86 @@
   in 420 s. The comparison, fed the watch's own track as the phone, read the tracks 0.0 m apart and the splits within
   1.3 s. On the simulator (iPhone 17 Pro, iOS 26.5, the debug build), a straight route played north at 4 m/s recorded
   through a screen lock: 84 fixes one a second, 4 m each, 4.006 m/s; the screen read the file back on unlock, finished at 1:42 and 0.25 mi, and shared `asylum-run-2026-11-01-0026.gpx` (101 points). Early in a run the average pace reads slow (85 s in, 6:51 against 6:42 played): the second before the first fix and the second since the last one count with no distance yet. The first runs against the watch decide whether that needs a ruling.
+
+## D272 P-RECORDRUN: This Week records the run, and the deck holds no run cards (PROPOSED)
+
+- **Date:** 2026-11-05. **Ruled by:** the main session in the coach hat, on Mario's picks the same day: hero draft A
+  ("i like A lets try that one out"), the recording screen as R2 with R3's splits underneath ("i concur"), and "we dont
+  need any cardio cards if we are going with A since the cardio and lift blocks are seperate and we are placing the
+  record button on it". Awaiting Mario on the calls at the end. **Bump:** Mario picks at the build (MINOR recommended:
+  a new capability, no program output moves). **Shipped:** not yet. This is D267's stage 2.
+- **The designs:** the canvas "This Week hero drafts" (https://claude.ai/artifact/1km7jKQuQTDrdVQ71roHaH), board A
+  (clickable, the recorder inside it) and boards R2 and R3; week 10 Friday of HALF_MANNY.
+- **The measure (2026-11-05, on v0.255.2):**
+  - D267 is on `main` since v0.255.0. No phone run against the watch is saved yet: `tests/measure/` holds the
+    comparison script and no report, so the track test D267 names has not been recorded.
+  - A run's log entry is the three fields the hand log writes: `run_mins`, `run_dist` and `run_pace`
+    (`log-entries.ts`: `doseFromCardio` reads the dose and its target, `doseDerived` derives the pace; the prescription
+    owns the fixed dimension, the log captures the free one).
+  - HALF_MANNY's 56 runs: 28 Recovery Runs name a target pace and a mile ceiling ("Do not run faster than"), 26 dosed by
+    time and 2 by distance; 13 of the 14 Long Runs name an average ceiling ("Average no faster than") and run as a
+    progression, so `doseFromCardio` gives them no target; 14 Speed Runs (10 intervals, 3 tempo, 1 fartlek) name
+    several zones and no one ceiling; Race Day names none.
+  - The agreed deck (P-DECK, `docs/decisions/swipe-deck.md`) carries three things on its run card: run first (call 9),
+    the hand log (call 11) and Can't run? (call 12, which ruled D249). The cool down after the run (call 14) is its own
+    card.
+- **The coaching argument.** The run is a different job from the lift: outside, on a clock, the phone in a pocket. One
+  block that owns the run and the button that records it keeps the run whole; a run card inside a lift deck splits the
+  run from its record. D267's argument still holds: a recorder that reads long writes a pace too fast into every chart
+  that reads the log, the next program's seed included. So a recorded run reaches the log only after the recorder has
+  matched a known distance.
+- **What changes:**
+  1. **This Week's hero splits the day (draft A).** A training day with a run shows a run block and a lift block in one
+     card, in the day's order (`_liftFirst`: on a race plan the run first, "Run first" and "Then lift"). The run block
+     prints the run's name, its dose and target as chips, the ceiling line from the session text, and **Record run**.
+     The lift block prints the lift's name, its first movement and the count, and **Start lift**, which opens the deck
+     (P-DECK answer 3). One button glows (D263): Record run until the run is saved, then Start lift. A saved run shows
+     a check with its miles, time and pace; the day closes when both are done. A lift only day shows the lift block
+     alone, a run only day the run block alone. A rest day keeps its hero (D224).
+  2. **Two quiet links sit under Record run:** Log by hand, which opens the run's log as call 11 has it (the plan strip,
+     the Time and Miles wheels, the pace against the target, Did a different activity?, Log), and Can't run?, which
+     opens call 12's sheet (move it to a later day marked good, careful or bad, or skip it; D249 as ruled).
+  3. **The recording screen is R2 over R3.** Full screen from Record run: the state and the GPS accuracy at the top
+     (D267's words); a ring around the time that fills toward the dose (time for a time dose, miles for a distance
+     dose) with the dose under it; Miles and Avg pace; the pace guard; the splits table, one row a mile, the mile in
+     progress live; Pause, Resume and Finish. **The pace guard reads only what the session names:** a mile ceiling and
+     a target (the 28 Recovery Runs) put the pace of the mile in progress against both; an average ceiling (the 13 Long
+     Runs) puts the average against it; any other session (Speed Runs, Race Day) shows no guard. The splits table's
+     "vs" column shows only when the session names a target. Minimize keeps recording, puts a live bar on This Week, and
+     Record run reads "Back to your run" with the time.
+  4. **Finish shows the summary:** time, miles, average pace, the splits, an Effort slider 1 to 10 (untouched stores
+     nothing, D219), Save to the day, Share (the GPX, D267) and Delete (D267's confirm). **Save writes the run's log
+     entry through the writer the hand log uses:** `run_mins` the moving time in minutes to two places, `run_dist` the
+     miles to two places, `run_pace` derived as the hand log derives it. A recorded entry is edited like a typed one.
+     The track stays a file on the phone (D267); the entry keeps the run's file id, so a later stage can draw its splits
+     and its map.
+  5. **The gate.** Save to the day appears once the recorder has passed the track test D267 set: four laps of a 400 m
+     track in lane 1, the phone within 2% of 1,600 m (32 m), and one road run whose phone distance is within 2% of the
+     watch's. Until then the summary offers Share and Delete and says the run is kept for the comparison, and Log by
+     hand stays the log. The result is written to `tests/measure/gps-recording_track-test.md`.
+  6. **Where Record shows:** the iOS app only, when the `ia-gps` plugin is present (D267's rule for its row); the page on
+     Pages keeps Log by hand. Runs only: a ride, a swim or a row block shows Log by hand and no Record.
+  7. **The deck holds no cardio cards (amends P-DECK).** Calls 9, 11 and 12 move from the deck's run card to the hero's
+     run block, as items 1 and 2 say. Call 14's cool down stays a deck card, so a run day whose only lift work is the
+     cool down opens a deck of that one card. The day sheet (P-DECK answer 3) keeps the run's log for review and edits.
+- **Does not change:** what any program prescribes (HALF_MANNY and the lattice do not move); the log's fields and their
+  format (a recorded run is an entry the hand log could have written); D267's recorder math, and the Run recorder row on
+  the Bugs tab, which stays the test bench until the gate passes; the rest day hero and its jog log (D223, D224); the
+  deck's lift cards, rounds, rest day card and journal.
+- **Not in this stage (later, no D-codes):** a run Live Activity on the lock screen; a chime at the dose and a warning
+  past the ceiling; the map (stage 3); effort by effort on speed sessions (stage 4, after D258).
+- **Tests (each fails on v0.255.2, where none of this exists):**
+  - `tests/unit/gps-recording.test.ts` (`@ia/core`): the ceiling reader on hand typed strings: "Do not run faster than
+    12:40/mi" gives a 760 s mile ceiling, "Average no faster than 12:40/mi" a 760 s average ceiling, a Speed Run's text
+    none; the log fields for 2,700 s moving over 3.379 mi are `run_mins` 45.00 and `run_dist` 3.38, with the pace the
+    hand log derives for them.
+  - `tests/integration/this-week-hero.test.ts`: on HALF_MANNY week 10 Friday the hero prints a run block with Record run
+    before a lift block with Start lift; Thursday prints no Record; a saved run moves the glow to Start lift; with no
+    plugin there is no Record and Log by hand remains.
+  - `frontends/app/test/unit/run-recorder.test.ts`: the guard shows for a mile ceiling, the average for an average
+    ceiling and nothing for a Speed Run; Save stays hidden until the gate passes; an untouched Effort stores nothing.
+  - The deck's own tests when it is built: a run and lift day's deck holds no cardio card.
+- **Order:** builds after the deck (P-DECK), or in one release with it, since item 7 changes the deck. The gate's test
+  run can happen any time before; stage 1 is already on the phone.
+- **Calls for Mario:** (1) the gate in item 5, at 2%; (2) Speed Runs record whole run totals with no guard until stage
+  4; (3) rides, swims and rows keep Log by hand with no Record.

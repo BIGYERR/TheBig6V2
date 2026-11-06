@@ -81,3 +81,12 @@ writes them.
 - **Open on the canvas:** a stray board "Div" (`Piece-w0mf`, dragged out of W by accident); the moved run's
   "Bring it back to Monday" button, which could be the undo arrow; whether the punched hole stays as the skip motion;
   W, X and Y not brought up to the week 10 behaviour.
+
+## D272 amends P-DECK: no cardio cards (PROPOSED)
+
+- **Date:** 2026-11-05. **Ruled by:** Mario, picking This Week's hero draft A: "we dont need any cardio cards if we are
+  going with A since the cardio and lift blocks are seperate and we are placing the record button on it". Written up
+  by the main session in the coach hat as D272 P-RECORDRUN, item 7 (`docs/decisions/gps-recording.md`).
+- **What changes in the deck:** calls 9 (run first), 11 (the run's hand log) and 12 (Can't run?, D249) move from the
+  run card to the run block on This Week's hero; the deck holds lift work only. Call 14's cool down stays a card.
+- **Does not change:** every other call and answer above; the day sheet keeps the run's log for review and edits.
