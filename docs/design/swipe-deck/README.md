@@ -28,3 +28,9 @@ is what the canvas's Version 76 holds (`build.mjs` also fails if the header line
 the switch toast come back). Since Version 76 the build drops each day's run card (D272 item 7: the run lives on This
 Week), so `week10.json` stays the engine's own output and the four run days build as lift decks. To show a change,
 publish the boards to the canvas.
+
+`live.mjs` builds the same deck as a component This Week opens (`out/project/DeckLive.dc.html`): the day passed in, a
+back button, the progress handed back as it changes, Mark the day done reported, This Week's orange. It also writes all
+14 weeks of HALF_MANNY as one data file (`out/half-manny-decks.json`, run cards dropped) and smoke-tests every card of
+every day. Feed it `deck-data.ts` run over all 98 days (`w1mon:1:mon,…,w14sun:14:sun` into
+`out/half-manny-decks-raw.json`). Both land on the This Week canvas (the "all together" board), not this one.
