@@ -44,8 +44,7 @@ input[type=range].rpe::-moz-range-thumb{width:28px;height:28px;border-radius:50%
 
   <div style="box-sizing: border-box; padding: 16px 14px 2px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-shrink: 0;">
     <div style="min-width: 0;">
-      <div style="font-size: 12px; color: var(--muted);">{{dayLine}}</div>
-      <div style="font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; padding-top: 2px;">{{dayTitle}}</div>
+      <div style="font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; padding-top: 6px;">{{dayTitle}}</div>
     </div>
     <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
       <button type="button" onClick="{{openMap}}" aria-label="See the whole session" style="width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; color: var(--text); display: flex; align-items: center; justify-content: center;">
@@ -54,7 +53,7 @@ input[type=range].rpe::-moz-range-thumb{width:28px;height:28px;border-radius:50%
     </div>
   </div>
 
-  <div style="box-sizing: border-box; padding: 2px 20px 10px; font-size: 13px; color: var(--muted); flex-shrink: 0;">{{progress}}</div>
+  <div style="height: 10px; flex-shrink: 0;"></div>
 
   <div style="{{deckStyle}}" onPointerMove="{{onMove}}" onPointerUp="{{onUp}}" onPointerLeave="{{onUp}}" onWheel="{{onWheel}}">
 
@@ -823,7 +822,6 @@ input[type=range].rpe::-moz-range-thumb{width:28px;height:28px;border-radius:50%
       </sc-for>
     </div>
   </sc-if>
-  <div style="text-align: center; font-size: 12px; color: var(--muted); padding: 8px 20px 0; flex-shrink: 0;">{{hint}}</div>
 
   <div style="box-sizing: border-box; padding: 12px 20px 20px; flex-shrink: 0;">
     <sc-if value="{{showCta}}" hint-placeholder-val="{{true}}">
@@ -1079,7 +1077,7 @@ class Component extends DCLogic {
       let d = null;
       if (dose.k === 'time' && dist > 0) { const useM = mins > 0 ? mins : dose.mins; d = { sec: useM * 60 / dist, assumed: mins > 0 ? null : 'assuming planned ' + dose.mins + ' min' }; }
       if (dose.k === 'dist' && mins > 0) { const useD = dist > 0 ? dist : dose.mi; d = { sec: mins * 60 / useD, assumed: dist > 0 ? null : 'assuming planned ' + dose.mi + ' mi' }; }
-      out.hasDerived = true; out.dLbl = 'Pace — derived';
+      out.hasDerived = true; out.dLbl = 'Your pace';
       if (d) {
         let delta = '';
         if (dose.tgt) { const df = Math.round(d.sec - dose.tgt), ad = Math.abs(df); const mag = ad < 60 ? ad + 's/mi' : clk(ad) + '/mi'; delta = ad < 5 ? 'on target' : mag + ' ' + (df < 0 ? 'faster than target' : 'slower than target'); }
@@ -1092,7 +1090,7 @@ class Component extends DCLogic {
       any = mins > 0 || dist > 0;
       summary = [mins > 0 ? hmsTxt(mins) : (dose.k === 'time' ? hmsTxt(dose.mins) : ''), dist > 0 ? dist.toFixed(2) + ' mi' : (dose.k === 'dist' ? dose.mi + ' mi' : ''), d ? clk(d.sec) + '/mi' : ''].filter(Boolean).join(' · ');
     } else if (sport === 'run') {
-      Object.assign(out, { label: 'Run — actual distance & pace', hasHint: !!L.speedHint, hint: L.speedHint ? 'Whole session off the watch — warm up, efforts and recoveries all count.' : '',
+      Object.assign(out, { label: 'Log the run', hasHint: !!L.speedHint, hint: L.speedHint ? 'Whole session off the watch. Warm up, efforts and recoveries all count.' : '',
         hasWheels: true, wrapStyle: pair, wheels: [wheel('dist', 'dist', null, ''), wheel('pace', 'pace', null, '')] });
       const dist = valOf('dist', 'dist', null), pace = valOf('pace', 'pace', null);
       any = dist > 0 || pace > 0;
@@ -1102,7 +1100,7 @@ class Component extends DCLogic {
       const m = valOf('bike', 'hms', null);
       any = m > 0; summary = 'Ride · ' + hmsTxt(m);
     } else {
-      Object.assign(out, { label: 'Swim — actual yardage', isSwimForm: true });
+      Object.assign(out, { label: 'Log the swim', isSwimForm: true });
       const y = +out.yards || 0;
       any = y > 0; summary = 'Swim · ' + y + ' yd';
     }
@@ -1437,11 +1435,6 @@ class Component extends DCLogic {
         setTimeout(() => this.setState({ snap: false }), 40);
       }, 290);
     };
-    const doneN = Object.keys(st.done).filter((k) => st.done[k] && !st.skip[k]).length;
-    const skipN = Object.keys(st.skip).filter((k) => st.skip[k]).length;
-    const bits = [doneN + ' of ' + n + ' done'];
-    if (skipN) bits.push(skipN + ' skipped');
-    if (st.moved) bits.push(D.runWord + ' moved to ' + DAYNAME[st.moved]);
     const stateOf = (k) => (st.skip[k] ? 'Skipped' : (list[k].kind === 'run' && st.moved ? 'Moved to ' + DAYNAME[st.moved] : (st.done[k] ? 'Logged' : (k === i ? 'You are here' : 'Up next'))));
     const titleNow = c.kind === 'round' && demoted ? liveMs[0].name : curName;
     // Mid-swipe the card being swiped toward rises out of the fan and its face fades in with the drag.
@@ -1474,18 +1467,16 @@ class Component extends DCLogic {
       try { pvView = this.renderVals(true); } finally { this._view = null; }
     }
     const SH = [{ a: 'd1', s: 17, f: '#A6633A' }, { a: 'd2', s: 13, f: '#FFFFFF' }, { a: 'd3', s: 11, f: '#9C5A33' }, { a: 'd4', s: 15, f: '#FFFFFF' }];
-    const flipNow = () => { this.setState({ vert: !vert, dx: 0, dy: 0 }); this.say(vert ? 'Sideways. Double tap a card to flip back.' : 'Up and down. Double tap a card to flip back.'); };
+    const flipNow = () => { this.setState({ vert: !vert, dx: 0, dy: 0 }); };
 
     return {
       look: this.props.look || 'auto',
       vert: vert, horiz: !vert, total: String(n),
-      dayLine: H.dayLine, dayTitle: H.title,
+      dayTitle: H.title,
       ids: { time: H.key + '-time', dist: H.key + '-dist', notes: H.key + '-notes' },
       flip: flipNow,
       flipText: vert ? 'Up and down' : 'Sideways', flipLabel: vert ? 'Swiping up and down. Switch to sideways' : 'Swiping sideways. Switch to up and down',
       flipIcon: 'display: flex; transition: transform 220ms ease; transform: rotate(' + (vert ? 90 : 0) + 'deg);',
-      hint: vert ? 'Swipe or scroll up for the next card · double tap to switch' : 'Swipe sideways for the next card · double tap to switch',
-      progress: bits.join(' · '),
       deckStyle: 'position: relative; flex-grow: 1; min-height: 0; margin: 6px ' + (vert ? '34px' : '20px') + ' 0 20px;' + (vert ? ' clip-path: inset(0px -40px 0px -24px);' : ''),
       ghosts: ghosts,
       pv: pvView || {},
@@ -1662,7 +1653,6 @@ class Component extends DCLogic {
           const now = Date.now();
           if (now - s.lastTap < 320) {
             this.setState({ vert: !s.vert, drag: false, dx: 0, dy: 0, lastTap: 0 });
-            this.say(s.vert ? 'Sideways. Double tap a card to flip back.' : 'Up and down. Double tap a card to flip back.');
           } else this.setState({ drag: false, dx: 0, dy: 0, lastTap: now });
           return;
         }

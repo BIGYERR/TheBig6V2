@@ -122,3 +122,11 @@ for (const [k, file, title] of B) {
   const runSaid = restSmoke(c, d, k, WIN) || runSmoke(c, d, k, WIN); v = c.renderVals();
   console.log(k, file, html.length, runSaid + ',', 'bytes,', d.cards.length, 'cards,', n, 'renders ok, last CTA:', v.ctaText);
 }
+// The deck explains nothing (Mario 2026-11-06): no week, day or program line, no done count, no gesture hint, no toast
+// on a view switch.
+for (const [, file] of B) {
+  const html = readFileSync(OUT + file, 'utf8');
+  for (const gone of ['{{dayLine}}', '{{progress}}', '{{hint}}', ' of 7 done', 'Double tap a card', 'double tap to switch', 'Swipe sideways for the next card'])
+    if (html.includes(gone)) throw new Error(file + ' still carries ' + gone);
+}
+console.log('no explaining text on', B.length, 'boards');

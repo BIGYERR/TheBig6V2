@@ -24,7 +24,7 @@ export function runSmoke(c, d, k, WIN) {
     if (f.label !== 'Log the run' || f.wheels.map((w) => w.cap).join() !== 'Time,Miles') throw new Error(k + ' time dose fields: ' + f.wheels.map((w) => w.cap));
     if (faces(f.wheels[0]) !== X.faces0 || faces(f.wheels[1]) !== X.faces1) throw new Error(k + ' faces: ' + faces(f.wheels[0]) + ' / ' + faces(f.wheels[1]));
     if (f.wheels[0].sub !== 'Shows the plan. Move it to match the watch.' || f.wheels[1].sub !== 'Off the watch.') throw new Error(k + ' wheel subs');
-    if (f.dLbl !== 'Pace — derived' || f.dVal !== 'enter distance') throw new Error(k + ' derived before: ' + f.dVal);
+    if (f.dLbl !== 'Your pace' || f.dVal !== 'enter distance') throw new Error(k + ' derived before: ' + f.dVal);
     for (let s2 = 0; s2 < X.stepMiles[1]; s2++) { col(f.wheels[1], 0).wheel({ deltaY: 30 }); f = rf(); }
     if (f.dVal !== X.after1[0] || f.dNote !== X.after1[1]) throw new Error(k + ' derived: ' + f.dVal + ' | ' + f.dNote);
     const L0 = {}; WIN.addEventListener = (t, h) => { L0[t] = h; }; WIN.removeEventListener = () => {};
@@ -51,7 +51,7 @@ export function runSmoke(c, d, k, WIN) {
     if (faces(f.wheels[0]) !== '8 .1 0' || f.dVal !== '13:05/mi' || f.dNote !== '15s/mi faster than target') throw new Error(k + ' 8.1: ' + f.dVal + ' | ' + f.dNote);
     f.log(); if (c.state.ran !== '1:46:00 · 8.10 mi · 13:05/mi' || !c.state.done[r]) throw new Error(k + ' log: ' + c.state.ran);
   } else {
-    if (f.hasStrip || f.label !== 'Run — actual distance & pace' || !f.hasHint || f.hint !== 'Whole session off the watch — warm up, efforts and recoveries all count.') throw new Error(k + ' no dose form: ' + f.label);
+    if (f.hasStrip || f.label !== 'Log the run' || !f.hasHint || f.hint !== 'Whole session off the watch. Warm up, efforts and recoveries all count.') throw new Error(k + ' no dose form: ' + f.label);
     if (f.wheels.map((w) => w.cap).join() !== 'Miles,Pace / mile' || faces(f.wheels[1]) !== '— 00' || f.hasDerived) throw new Error(k + ' no dose wheels: ' + faces(f.wheels[1]));
     col(f.wheels[0], 0).wheel({ deltaY: 30 }); f = rf(); col(f.wheels[0], 0).wheel({ deltaY: 30 }); f = rf();
     for (let s = 0; s < 8; s++) { col(f.wheels[1], 0).wheel({ deltaY: 30 }); f = rf(); }
@@ -68,7 +68,7 @@ export function runSmoke(c, d, k, WIN) {
   if (!f.isBike || f.label !== 'Log the ride' || f.wheels.map((w) => w.cap).join() !== 'Time' || f.logLabel !== 'Log') throw new Error(k + ' bike form');
   if (f.swapNote !== 'Counts toward Bike, not Run. Your Run numbers are kept. Switch back and they return.') throw new Error(k + ' note: ' + f.swapNote);
   if (L.dose && (!f.hasStrip || f.stripLabel !== 'Bike · Planned' || f.stripVal !== (L.dose.k === 'time' ? L.dose.mins + ' min' : L.dose.mi + ' mi'))) throw new Error(k + ' bike strip: ' + f.stripVal);
-  f.chips[2].pick(); f = rf(); if (!f.isSwimForm || f.label !== 'Swim — actual yardage') throw new Error(k + ' swim form');
+  f.chips[2].pick(); f = rf(); if (!f.isSwimForm || f.label !== 'Log the swim') throw new Error(k + ' swim form');
   f.setYards({ target: { value: '800' } }); f = rf(); f.log(); if (c.state.ran !== 'Swim · 800 yd' || said !== 'Swim logged ✓') throw new Error(k + ' swim log: ' + c.state.ran);
   c.setState({ open: true }); f = rf(); f.chips[0].pick(); f = rf();
   if (!f.isRun || f.hasNote || f.logLabel !== 'Logged ✓' && f.logLabel !== 'Log') throw new Error(k + ' back to run');

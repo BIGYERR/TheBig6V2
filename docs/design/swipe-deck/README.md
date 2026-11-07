@@ -23,5 +23,6 @@ node holes.mjs out/project/AE_Week10Tue.dc.html
 node check-i.mjs
 ```
 
-The boards land in `out/project/` (gitignored), or in `$DECK_OUT/project/`. On 2026-11-04 the build from this folder
-was byte for byte the canvas's Version 67. To show a change, publish the boards to the canvas.
+The boards land in `out/project/` (gitignored), or in `$DECK_OUT/project/`. On 2026-11-06 the build from this folder
+is what the canvas's Version 74 holds (`build.mjs` also fails if the header line, the done count, the gesture hint or
+the switch toast come back). To show a change, publish the boards to the canvas.

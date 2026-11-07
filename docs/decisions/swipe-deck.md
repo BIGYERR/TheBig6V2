@@ -2,7 +2,7 @@
 
 A day's session as a deck of cards, one card per thing to do (the run, each lift, each round or block, Call it), swiped
 through while training. Designed with Mario on the Claude Design canvas "Swipe Deck Concepts" (private to Mario:
-https://claude.ai/artifact/Nh3ymF2Fh9TC8KY1oZ66uS), Version 67 the state he approved. The boards' generator is saved in
+https://claude.ai/artifact/Nh3ymF2Fh9TC8KY1oZ66uS), Version 74 the state he approved (Version 67 on 2026-11-04, then call 15). The boards' generator is saved in
 `docs/design/swipe-deck/` (its README says how to rebuild them). Not built in the app. Tests: none yet; the build
 writes them.
 
@@ -58,6 +58,10 @@ writes them.
       day, with the clash warning) and Log cardio (run or walk on the wheels, an RPE, Edit and Clear).
   14. Post-run mobility is a cool down, not a circuit: After the run, Stretch and roll, five easy moves with a tap
       each, no pills, its name not repeating the day's (2026-11-03).
+  15. The deck explains nothing (2026-11-06: "its alot of over explaining in the UI, good UI needs NO explanation"):
+      the header carries the session's name only, with no week, day or program line; no "x of x done" line; no hint
+      under the deck about swiping or the double tap; and no toast when the double tap switches the view. The run
+      card's words follow the app's since v0.255.2 (D271): Log the run, the hint as two sentences, Your pace.
 - **What the build reuses, not re-derives:** every number on a card comes from the engine and the app's own readers,
   as the generator does (`deck-data.ts`): `parseRx`, `isTrackableWeight`, `isKBExercise`, `swapCandidates`,
   `auxSwapCandidates`, `doseFromCardio`, `runSessionCode`, `restMoveCandidates`, `restMoveCollisions`, `restDayTip`;
