@@ -188,3 +188,25 @@
   `doseFromCardio`'s parse of the session text. The doses the engine emits carry `tgt` and `cap` on all 28 Recovery
   Runs and 13 of the 14 Long Runs, and Race Day carries `tgt` alone, so the guard reads the dose, and the test of a
   text reader became a test of the guard's kind. Found while building the full week prototype.
+
+## D272 Amendment 1: two cards on This Week, and no Log by hand under Record (Mario, 2026-11-06)
+
+- **Date:** 2026-11-06. **Ruled by:** Mario, on the canvas board "Your design, wired" (his This Week redesign from another
+  chat, `week-screen-mockup.dc.html` with `WEEK_SCREEN_REDESIGN.md`, wired to D272): "we are splitting the cardio from
+  the run on the hero page lets make sure we do that, and take out the "log by hand" under the record"; and earlier the
+  same day, of the rest day's two actions, "Keep them as links". No new D-code. **Shipped:** not yet.
+- **What changes in D272:**
+  1. **Item 1: the run and the lift are two cards**, not two blocks in one card. The run card comes first: the day,
+     the run's name, its dose and pace, the coaching line, Record run. The lift card follows: "Then lift" (or "After the
+     run" for the cool down), the lift's name, its first movement and the count, and Start lift, an outline button until
+     the run is saved and the accent button after it (one glow, D263). A lift only day and a run only day show one card.
+     A card that is done shows a done row with its own Reopen, so the run and the lift reopen apart.
+  2. **Item 2: Log by hand comes off the hero.** Can't run? stays, alone, under Record run. The hand log keeps its home
+     on the day sheet (P-DECK answer 3), for review and edits; item 5's "Log by hand stays the log" until the gate passes
+     now means that log.
+  3. **Rest days keep Training anyway? and Log cardio** as two small links under the rest card, where the redesign's
+     spec had no button.
+  4. A ride, a swim or a row has no Record (call 3 of D272), so its card's button opens the hand log for that sport.
+- **Open:** where a run done without the phone (a treadmill, the watch alone) is logged from This Week now that Log by
+  hand is off the run card. The main session recommends a quiet "Ran without the phone?" link on the recorder before
+  Start, which opens the same hand log.
