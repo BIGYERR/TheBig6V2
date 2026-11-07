@@ -8,6 +8,9 @@ const D = JSON.parse(readFileSync('week10.json', 'utf8'));
 const B = [['M', 'AD_Week10Mon.dc.html', 'The Half Manny, week 10 Monday'], ['T', 'AE_Week10Tue.dc.html', 'The Half Manny, week 10 Tuesday'], ['W', 'AG_Week10Wed.dc.html', 'The Half Manny, week 10 Wednesday'], ['H', 'AF_Week10Thu.dc.html', 'The Half Manny, week 10 Thursday'], ['F', 'AH_Week10Fri.dc.html', 'The Half Manny, week 10 Friday'], ['S', 'AI_Week10Sat.dc.html', 'The Half Manny, week 10 Saturday'], ['U', 'AJ_Week10Sun.dc.html', 'The Half Manny, week 10 Sunday']];
 for (const [k, file, title] of B) {
   const d = D[k]; d.head.key = k.toLowerCase();
+  // The deck holds no cardio cards (D272 item 7, Mario 2026-11-05): the run is This Week's run card, recorded or moved
+  // from there, so a day's deck is its lift work only. A day whose only work was the run builds like a rest day's.
+  if (d.runIdx >= 0) { d.cards = d.cards.filter((x) => x.kind !== 'run'); d.runIdx = -1; d.runWord = ''; d.week = []; }
   const html = T.replace('__TITLE__', title).replace('__DATA__', JSON.stringify(d));
   writeFileSync(OUT + file, html);
   // smoke: run the logic class with a stub runtime over every card and the main actions

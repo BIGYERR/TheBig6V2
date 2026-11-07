@@ -94,3 +94,9 @@ writes them.
 - **What changes in the deck:** calls 9 (run first), 11 (the run's hand log) and 12 (Can't run?, D249) move from the
   run card to the run block on This Week's hero; the deck holds lift work only. Call 14's cool down stays a card.
 - **Does not change:** every other call and answer above; the day sheet keeps the run's log for review and edits.
+- **On the canvas (2026-11-06):** Version 76 carries it. The run cards are off the Monday, Tuesday, Friday and Saturday
+  decks (Monday 4 cards, Tuesday 6, Friday 5, Saturday 2: the cool down and Call it); `build.mjs` drops them before it
+  builds, and Wednesday, Thursday and Sunday build byte for byte as Version 74 had them. This item is Mario's own call
+  and does not wait on D272's open calls, which are about the recorder. The deck chat ("Swap/skip functionality for
+  workouts") was merged into the This Week chat the same day, Mario's call; the build order is the deck first, then
+  This Week's redesign with D272.

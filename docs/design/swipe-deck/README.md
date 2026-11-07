@@ -24,5 +24,7 @@ node check-i.mjs
 ```
 
 The boards land in `out/project/` (gitignored), or in `$DECK_OUT/project/`. On 2026-11-06 the build from this folder
-is what the canvas's Version 74 holds (`build.mjs` also fails if the header line, the done count, the gesture hint or
-the switch toast come back). To show a change, publish the boards to the canvas.
+is what the canvas's Version 76 holds (`build.mjs` also fails if the header line, the done count, the gesture hint or
+the switch toast come back). Since Version 76 the build drops each day's run card (D272 item 7: the run lives on This
+Week), so `week10.json` stays the engine's own output and the four run days build as lift decks. To show a change,
+publish the boards to the canvas.
