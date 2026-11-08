@@ -62,11 +62,17 @@ in D37 and D38. Measure: `tests/measure/leg-day-volume_peak-week.md`.
   cleaner fix is the day: a leg day on Tuesday, four days out, beside the 15-minute recovery run, would cost one line in
   `_nrcLegCost` (price the day two before the long run); Mario held moves on 2026-10-24 and the measure then showed how
   few calendars have room.
-- **Coaching call for Mario himself (not a rule):** the long run was run 2:17 a mile faster than prescribed, at 88 to
-  92% of maximum heart rate from mile two, which COROS classed as a tempo. The 10:30 mile anchor is two chart rows slow
-  for his week 10 tempo; re-enter it from a recent effort (the pencil on the program card, D189; about a 9:00 mile fits
-  the watch) and run every remaining long run at talking pace, heart rate in the 140s. Four weeks out the missed 20K is
-  not made up: week 12's 60-minute cutback as written, at easy effort.
+- **Coaching call for Mario himself (not a rule), corrected 2026-11-07 against his live program:** the first draft of this
+  paragraph read his paces off the test fixture, which carries a 10:30 mile; his live program carries an **8:00 mile, edited
+  in week 5** (his Program selections copy: recovery 10:30, tempo 9:25, 10K 9:00, half 9:30). So the week 11 long run was
+  prescribed at 10:30/mi, and he ran 11:03/mi, 33 s/mi SLOWER than prescribed, at 88 to 92% of maximum heart rate. His
+  week 10 tempo ran 10:23/mi against a prescribed 9:25. The anchor is too fast for him by about two chart rows, not too
+  slow: the tempo column reads his 10:23 as an 8:54 mile. Re-enter about 9:00 (recovery 11:35, tempo 10:30, 10K 10:00)
+  with the pencil before the week 12 lock, and run the remaining long runs by heart rate (140s to low 150s), accepting
+  whatever pace that is. Four weeks out the missed 20K is not made up: week 12's 60-minute cutback as written. On his live
+  program the cap reaches weeks 6 to 11 (the 6.2-mile runs at 10:30 are 65 minutes, tier B); the fixture's weeks 4 and 5
+  are tier A only because of its slower anchor. Lesson: ask for the Program selections copy before framing anything
+  about his paces (the fixture's anchor is stale against his program).
 - **Release:** v0.256.0 (MINOR, Mario's pick 2026-11-07: it changes what a program prescribes). Threshold confirmed at 75 minutes (Mario asked; coach: one line for a big run, used everywhere; the cap steps back by itself when the mile anchor is corrected, since the tier reads the prescribed pace).
 - **Tests at build time:** `tests/integration/leg-day-volume.test.ts` (the week 11 Thursday card after the cap, typed
   from the After above; a tier B week's leg day untouched; a leg day three days out untouched; the deload week 8 card

@@ -14,6 +14,15 @@ card, a run logged **about 35 s/mi faster than prescribed reads as one whole row
 
 ## 2. Mario's runs, by column
 
+**Correction (same day, after Mario pasted his Program selections):** his live program's anchor is an **8:00 mile, edited in
+week 5**, not the fixture's 10:30. Prescribed recovery 10:30/mi, tempo 9:25, 10K 9:00. Read against that, his long runs
+(11:01, 11:03) were 31 to 33 s/mi SLOWER than prescribed and his tempo (10:23) 58 s/mi slower, all at tempo heart rates.
+The implied anchors below stand (the chart arithmetic is the same); the direction flips: his anchor is about two rows too
+fast, and a nudge built only for runs coming in faster than the plan would never have spoken to him. The rule has to be
+symmetric: two easy runs in a row more than a row off the prescribed pace in either direction offer the pencil with the
+implied number. The table keeps the 10:30 column headings because they are what the fixture prescribes; his own rows
+faster figures are therefore overstated by two rows.
+
 | Run (COROS, typed by hand) | Pace | Read as | Implied mile | Rows faster than 10:30 |
 |---|---|---|---|---|
 | Mon 26 Oct tempo, 36:24 | 10:23/mi | tempo | 8:54 | 3.2 |
