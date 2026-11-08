@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.255.2">
+<meta name="ia-version" content="0.256.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -11886,6 +11886,9 @@ function engineD_synthesis(cfg, A, B, plan, C){
   
   
   { const _isBW=cfg.equipment==='bodyweight'; const _u=_swapUniverseList().filter(n=>gearOK(n)&&!(_isBW&&(_BW_SUBS[n]||_BW_GEAR.test(n)))); _swapUniverseReset(); _swapUniverseAdd(_u); }
+  
+  
+  d273PeakLegsPass(weeks, dayRoles, totalWeeks);
   deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks);
   
   
@@ -12034,6 +12037,49 @@ function d18LongRunDayPass(weeks){
       }
       else day.sections=secs;   
     });
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function d273PeakLegsPass(weeks, dayRoles, totalWeeks){
+  const flat = [];
+  for(let w=1; w<=totalWeeks; w++){ if(weeks[w]) _ISO_ORDER.forEach(d => flat.push({w,d})); }
+  const _isCarry = it => /carry/i.test((it&&it.name)||'');
+  flat.forEach((x, i) => {
+    if((dayRoles[x.d]||'full')!=='legs') return;
+    const day = weeks[x.w][x.d]; if(!day || day.rest || !Array.isArray(day.sections)) return;
+    let near=false;
+    for(let k=1; k<=2 && !near; k++){ const y=flat[i+k]; if(!y) break; const ld=weeks[y.w][y.d]; if(ld && !ld.rest && _longRunTier(ld.cardio)==='A') near=true; }
+    if(!near) return;
+    let loaded=0;
+    const secs=[];
+    day.sections.forEach(sec => {
+      if(!sec) return;
+      if(/carry/i.test(sec.label||'')||/carry/i.test(sec.coreHeader||'')) return;
+      const its=(sec.items||[]).filter(it=>!_isCarry(it));
+      if((sec.items||[]).length && !its.length) return;
+      const kept = its.length===(sec.items||[]).length ? sec : {...sec, items: its};
+      if(sec.hip || sec.core || sec.coreHeader){ secs.push(kept); return; }
+      if(!its.some(it => it && it.detail)){ secs.push(kept); return; }   
+      if(++loaded <= 2) secs.push(kept);
+    });
+    day.sections = secs;
   });
 }
 

@@ -20,15 +20,15 @@
     "runnerLegDays": 1544,
     "nonRunnerLegDays": 528,
     "kneeProtectLegDays": 95,
-    "runnerDaysWithTheFourthItem": 1164,
+    "runnerDaysWithTheFourthItem": 944,
     "fourthItemByFamily": {
-      "race": 652,
+      "race": 432,
       "test": 512
     },
     "itemsRemovedBySection": {
       "core block": 23,
       "carry finisher": 7
     },
-    "calfDays": 1290
+    "calfDays": 1108
   }
 }

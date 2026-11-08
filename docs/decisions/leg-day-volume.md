@@ -4,7 +4,7 @@ How much the squat-and-armor leg day carries against the week's long run. Placem
 `leg-lift-placement.md` (D36, D243); the long-run day itself in the handoff (D18, D33, D34, D140, D153, D155); the taper
 in D37 and D38. Measure: `tests/measure/leg-day-volume_peak-week.md`.
 
-## D273 P-PEAKLEGS: the leg day inside two days of a tier A long run is a maintenance day (PROPOSED, awaiting Mario's concurrence)
+## D273 P-PEAKLEGS: the leg day inside two days of a tier A long run is a maintenance day (Mario concurred 2026-11-07; Amendment 1 below)
 
 - **Date:** 2026-11-07. **Ruled by:** the main session in the coach hat, on Mario's report of the week 11 peak long run
   (HALF_MANNY, 12.5 miles) stopped at 5.5 miles with heavy legs, two days after the 25-set Thursday leg day, with
@@ -67,7 +67,7 @@ in D37 and D38. Measure: `tests/measure/leg-day-volume_peak-week.md`.
   for his week 10 tempo; re-enter it from a recent effort (the pencil on the program card, D189; about a 9:00 mile fits
   the watch) and run every remaining long run at talking pace, heart rate in the 140s. Four weeks out the missed 20K is
   not made up: week 12's 60-minute cutback as written, at easy effort.
-- **Release:** not yet built. Bump: MINOR (it changes what a program prescribes), Mario's pick before the first edit.
+- **Release:** v0.256.0 (MINOR, Mario's pick 2026-11-07: it changes what a program prescribes). Threshold confirmed at 75 minutes (Mario asked; coach: one line for a big run, used everywhere; the cap steps back by itself when the mile anchor is corrected, since the tier reads the prescribed pace).
 - **Tests at build time:** `tests/integration/leg-day-volume.test.ts` (the week 11 Thursday card after the cap, typed
   from the After above; a tier B week's leg day untouched; a leg day three days out untouched; the deload week 8 card
   under both rules; the hip and foot & ankle drills kept whole; no carry and no `slow 3-sec lower` line on a capped
@@ -81,3 +81,62 @@ in D37 and D38. Measure: `tests/measure/leg-day-volume_peak-week.md`.
   to fit leg day into marathon training" (Centenari, Milton); Laura Norris Running, "How to schedule strength training
   around running"; RunnersConnect, "Customizing resistance training for specific race distances"; the half marathon
   source plan's own text (pages 4, 5 and 14).
+
+## D273 Amendment 1: the main lift whole and the first accessory block, not a flat eight (Mario concurred 2026-11-07)
+
+- **Date:** 2026-11-07. **Ruled by:** the main session in the coach hat, mid-build, before any edit; Mario chose it from
+  three options ("Squat whole + first block", "Eight sets, trim the squat", "Eight sets, drop what does not fit") and
+  asked whether it cuts the hip work (it does not: both hip-flagged blocks stay whole; the one hip item that goes is
+  the single-leg hip thrust block).
+- **Finding:** D273 item 1 counted eight working sets in card order and dropped whole any block that did not fit. The
+  after-card was typed from week 11, where the squat is 2×8, so squat (2) plus circuit (6) is eight. The squat is not
+  always two sets: the wave writes 3×8 in weeks 9 and 10 and 3×13 in the deload weeks 4 and 8 (HALF_MANNY, v0.255.2),
+  4×3 on support_strength, 4×4 on balanced and up to 5×10 on hypertrophy. Under the letter of item 1 a three-set squat
+  plus the six-set circuit is nine, so the circuit would drop whole and those Thursdays would be the squat and the
+  drills alone: not the card Mario concurred to, and a Thursday that changes shape week to week for no coaching reason.
+- **What changes (replaces item 1):** on a maintenance day the card keeps, in order, **the main lift exactly as
+  written** (its sets, reps, load and RPE) and **the first accessory block after it, whole** (the runner-armor circuit on
+  prevention; Leg superset A on the other templates). Every other loaded block is dropped whole. Items 2 to 5 stand:
+  hip stability and foot & ankle (the engine's `hip` flag) are free and untouched; trunk sections are free; an
+  informational section (the taper note) stays; no carry section or carry item; the eccentric calf block and the
+  glute block go because they sit after the first accessory block. Coach: the squat is the stimulus the ruling
+  promised to keep, the circuit is the armor; one sentence to the athlete, the same shape every week.
+- **The numbers (typed from the v0.255.2 cards):** HALF_MANNY Thursdays in weeks 4 to 11 carry 8 loaded sets (2-set
+  squat weeks 5, 6, 7, 11) or 9 (3-set squat weeks 4, 8, 9, 10), against 15 before; support_strength 8 (4×3 squat and
+  the four-set superset A, superset B gone) against 15; balanced and athletic 10 against 19 and 22; hypertrophy 9 to 11
+  against 15 to 17; bodyweight 9 against 13. Week 13's primer has no accessory block and does not change.
+- **What deliberately does not change:** everything D273 lists, and the threshold (75 minutes, confirmed).
+- **Tests:** `tests/integration/leg-day-volume.test.ts` carries the week 9 card (3×8 squat kept whole, circuit kept) and
+  the deload week 8 card (3×13 recovery squat kept, circuit kept, glute block gone) as the amendment's own tests.
+- **Release:** v0.256.0, with D273.
+- **Where the pass sits (builder, 2026-11-07):** `d273PeakLegsPass` in `core/src/engine/budget-engine-d.ts`, called right
+  before `deconflictAdjacentDupes`, after the session budget and the swap preferences. The first draft ran it beside
+  `d18LongRunDayPass`, after the dedupe, and the dedupe sweep (D167's invariant) went red on NSW multi-sport programs:
+  a rename on the day after the leg day answered to a block the cap then removed. Settling the maintenance day first
+  lets the dedupe judge the leg day as it ships. The HALF_MANNY digest is the same in either position.
+- **Blast radius, as built (every golden file regenerated under this ruling, in the release commit):** program-output
+  (HALF_MANNY `147f083be4e04e34`; the marathon athletic-support program, Friday leg day with a recovery run before a
+  Sunday long run, `a01b89a7f5dc45ff`; the 1.5-mile test program whose W11 Saturday crosses 75 minutes, `86fef027fd390de6`);
+  program-output-lattice, 216 of 864 programs; compound-tier and core-trunk (HALF_MANNY's digest); deload (zero-posterior
+  weeks 240 → 396, deload-off digest `d30129f464b47586`: the glute block was the only posterior item on many leg days);
+  leg-accessory-lattice (leg isolation sections 2,020 → 1,948); leg-accessory-trim-order (over-cap days 6,320 → 5,576);
+  runner-armor-circuit-lattice (runner days with the fourth item 1,164 → 944, calf days 1,290 → 1,108); session-budget-
+  lattice (sections and items per tier, about 2% fewer). Tests amended with the ruling named in each: runner-armor-
+  circuit (the fourth item prints on W1 to W3 and W12; the calf and carry strings read `YYY-----------`; the part A and
+  part B digests `093dc6c47c697d03` and `5d061b2ad525a435`), session-budget (the same part B digest), and the
+  injury-overlays sweep's three lite-lattice counts (W5 sheet rows 4,626 → 4,567 and aux 1,875 → 1,860, fewer leg rows on
+  the maintenance day; Main and Power swap pairs 156,872 → 156,892; every other tally held, no rejected name, no pair
+  differing from its fixture). Each amended test fails on v0.255.2.
+- **The digest, printed before the snapshots were regenerated (standing ruling 5):** HALF_MANNY `e47eb1012ab04bff` →
+  `147f083be4e04e34` (14 weeks, taper 13 and 14, deloads 4, 8 and 12 unchanged). The Thursday cards after, from the
+  surgery build, every one: the main squat as written, the circuit, the three hip drills, the two foot & ankle drills,
+  nothing else. Week 4: Back squat 3×13 RPE 6 (recovery), Dumbbell goblet side lunge / Wall sit / Kettlebell swing.
+  Weeks 5 and 6: Front squat 3×8 RPE 7; week 7: Front squat 3×10 RPE 6.5; week 11: Back squat 2×8 RPE 6.5, each with the
+  week's circuit. Week 8: Front squat 3×13 RPE 6, Step-downs (KB) / Wall sit /
+  Kettlebell single-leg deadlift. Week 9 and 10: Back squat 3×8 RPE 7, Dumbbell goblet side lunge / Spanish squat hold
+  (KB) / Dumbbell split-stance deadlift. Loaded sets 9 in weeks 4 to 10 (three-set squats) and 8 in week 11 (2×8), against 15.
+  Weeks 1 to 3, 12, 13 and 14 are byte-identical to v0.255.2. The leg day three days out (run_10k, beginner, seed 1013,
+  rest Sunday and Thursday) is untouched: digest `086840410c1ed62a` before and after. support_strength (run_10k, beginner,
+  seed 1013) week 5: Back squat 4×3 RPE 7 and Leg superset A (Goblet side lunge to knee drive / Wall sit); superset B,
+  the hip drills' neighbours and the Farmer carry gone, 18 sets against 25. balanced week 5: Front squat 4×4 RPE 9 and
+  Leg superset A (Step-downs / Spanish squat hold), 20 sets against 29.

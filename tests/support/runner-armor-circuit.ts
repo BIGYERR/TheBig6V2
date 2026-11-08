@@ -16,8 +16,12 @@ const { clone, clean, DAYS, liveSecs, cardLines } = SB;
 type Pair = [string, string];
 
 const FOURTH: Pair = ['Single-leg hip thrust', '2×6–10 each @ RPE 7'];
-const CALF_STR = 'YYY-YYY-YYY---';
-const CARRY_STR = 'YYY-YYY-YYY---';
+// D273 (v0.256.0): W4 to W11 are maintenance days (a tier A long run two days later), so the calf block and the carry
+// print on W1 to W3 only; until D273 both read YYY-YYY-YYY--- (the deloads W4, W8, W12 and the taper never had them).
+const CALF_STR = 'YYY-----------';
+const CARRY_STR = 'YYY-----------';
+/** HALF_MANNY's weeks whose Thursday is a D273 maintenance day: the Saturday long run is 75 minutes or more. */
+const D273_WEEKS = [4, 5, 6, 7, 8, 9, 10, 11];
 const CIRCUIT_RE = /^Leg circuit — runner armor/;
 /** D254 (v0.249.0): the P-HIPEXT hip extension's own section, right after the circuit. */
 const GLUTE_RE = /^Glute — runner armor/;
@@ -271,6 +275,6 @@ function analyse(z: LegDayRec) {
 export type AnalysedDay = LegDayRec & { r: ShardRec; a: ReturnType<typeof analyse> };
 
 export {
-  FOURTH, CALF_STR, CARRY_STR, CIRCUIT_RE, GLUTE_RE, UNIVERSE, TUE, hasSec, circuit, glute, circuitItems, LEGS_DAYS, CELL_F1, CELL_FH, CARD_F1, CARD_F1_THREE,
+  FOURTH, CALF_STR, D273_WEEKS, CARRY_STR, CIRCUIT_RE, GLUTE_RE, UNIVERSE, TUE, hasSec, circuit, glute, circuitItems, LEGS_DAYS, CELL_F1, CELL_FH, CARD_F1, CARD_F1_THREE,
   CARD_FH, CARD_FH_THREE, cardLines, FB_TIERS, FB_FROM, floorBLattice, noFloorB, floorBFires, preventionShard, BED_THRUST, RUNNER, shardBuild, analyse,
 };

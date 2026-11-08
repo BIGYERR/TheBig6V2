@@ -30,38 +30,49 @@ const { clone, clean, DAYS } = SB;
 const C = SB.twice(null, fixtures.HALF_MANNY), N = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY);
 const p = C.prog, q = N.prog;
 
-test("HALF_MANNY's W1 to W12 leg day (Thursday since D243): a three-item circuit, then Single-leg hip thrust 2×6–10 each @ RPE 7 on its own (D254)", () => {
+test("HALF_MANNY's W1 to W12 leg day (Thursday since D243): a three-item circuit, then Single-leg hip thrust 2×6–10 each @ RPE 7 on its own (D254) on W1 to W3 and W12; on W4 to W11 (D273 maintenance days) the drills follow the circuit and the glute section is gone", () => {
   // D195-A-a: a-tue (the fourth item and items 1 to 3). D243 (v0.243.0) moved his leg day from Tuesday to Thursday,
   // the card the same in all 14 weeks. D254 (v0.249.0): the fourth item is the section right after the circuit, recovery
-  // weeks (W4, W8, W12) included.
+  // weeks (W4, W8, W12) included. D273 (v0.256.0): a leg day two days before a tier A long run (W4 to W11, 83 to 167
+  // minutes) keeps the squat and the circuit and loses every loaded block after them, the fourth item first among them;
+  // W1 to W3 (tier C and B) and W12 (the 60-minute cutback) keep it.
   assert.ok(C.self && N.self);
   for (let w = 1; w <= 12; w++) {
     const day = JSON.parse(JSON.stringify(p.weeks[w].thu));
     assert.deepEqual(RA.circuitItems(day), RA.TUE[w], 'W' + w);
     const secs = day.sections.map((s: AppDay) => clean(s.label));
     const ci = secs.findIndex((l: string) => RA.CIRCUIT_RE.test(l));
+    if (RA.D273_WEEKS.includes(w)) {
+      assert.equal(secs[ci + 1], 'Hip stability', 'W' + w);
+      assert.ok(!secs.some((l: string) => RA.GLUTE_RE.test(l)), 'W' + w + ': no glute section on a D273 maintenance day');
+      continue;
+    }
     assert.equal(secs[ci + 1], 'Glute — runner armor', 'W' + w);
     assert.deepEqual(day.sections[ci + 1].items.map((i: AppDay) => [clean(i.name), clean(i.detail)]), [RA.FOURTH], 'W' + w);
   }
 });
 
-test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 leg day (Thursday) less the glute section, and every other day whole', () => {
-  // D195-A-a: a-tue (the day otherwise unchanged), a-other (W13, W14 and every other day)
+test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 leg day (Thursday) less the glute section where it prints (W1 to W3, W12; D273 already took it on W4 to W11), and every other day whole', () => {
+  // D195-A-a: a-tue (the day otherwise unchanged), a-other (W13, W14 and every other day). D273 (v0.256.0): on W4 to W11
+  // the glute section is gone on both builds, so the Thursday is compared whole.
   assert.equal(SB.weekKeys(p).length, 14);
-  let other = 0;
+  let other = 0, spliced = 0;
   for (let w = 1; w <= 14; w++) for (const d of DAYS) {
     const a = clone(p.weeks[w][d]);
     if (d === 'thu' && w <= 12) {
       const si = a.sections.findIndex((s: AppDay) => RA.GLUTE_RE.test(clean(s.label)));
-      a.sections.splice(si, 1);
+      assert.equal(si >= 0, !RA.D273_WEEKS.includes(w), 'W' + w + ' thu: the glute section prints exactly off the D273 weeks');
+      if (si >= 0) { a.sections.splice(si, 1); spliced++; }
     } else other++;
     assert.equal(SB.dayJ(a), SB.dayJ(q.weeks[w][d]), 'W' + w + ' ' + d);
   }
   assert.equal(other, 86);
+  assert.equal(spliced, 4);
 });
 
-test('the leg day\'s calf and carry strings (Thursday since D243) read YYY-YYY-YYY--- over the 14 weeks', () => {
-  // D195-A-a: a-calf, a-carry
+test('the leg day\'s calf and carry strings (Thursday since D243) read YYY----------- over the 14 weeks (YYY-YYY-YYY--- until D273)', () => {
+  // D195-A-a: a-calf, a-carry. D273 (v0.256.0): the calf block and the carry leave W5 to W7 and W9 to W11 (the
+  // maintenance days); W4, W8 and W12 to W14 never had them.
   let calf = '', carry = '';
   for (let w = 1; w <= 14; w++) { calf += RA.hasSec(p.weeks[w].thu, /^Calf — achilles/) ? 'Y' : '-'; carry += RA.hasSec(p.weeks[w].thu, /carry/i) ? 'Y' : '-'; }
   assert.equal(calf, RA.CALF_STR);
@@ -77,18 +88,19 @@ test("HALF_MANNY's swap universe is the 107 names, with the fourth item and with
   }
 });
 
-test('part A without part B is 5151533e6e85fd11, part B without part A is 7ed355470630a9c5 (the ruling printed both, moved by D239, D241, D243, D251, D252 and D254)', () => {
+test('part A without part B is 093dc6c47c697d03, part B without part A is 5d061b2ad525a435 (the ruling printed both, moved by D239, D241, D243, D251, D252, D254 and D273)', () => {
   // D195-A-a: a-cfA, a-cfB. D239 (v0.241.0) moved both (were f5ed630033ebe3db, 0ac7da6b1691a8e1), D241 (v0.242.0) again
   // (were 3e88e365246858f3, b1b15c80f1a703f1): their draws reach his Tuesdays and his core days. D243 (v0.243.0) again
   // (were 93fd2d1d3a43f192, c17e854e54e86f57): one speed day moves his leg day to Thursday. D251 (v0.247.0) again
   // (were b8a8aabf561bfc44, 895bb404a809927b): his week 10 speed day is Nike's tempo session. D252 (v0.248.0) again
   // (were 3c253c3fd440dad5, df75a47fc8917305): his speed day is the longer of Nike's two sessions. D254 (v0.249.0) moved
   // part A alone (was b443e538b40890bd): the fourth item left the circuit for its own section; part B alone has no
-  // fourth item, so it stands.
+  // fourth item, so it stands. D273 (v0.256.0) moved both (were 5151533e6e85fd11, 7ed355470630a9c5): his W4 to W11
+  // Thursdays are maintenance days on every build.
   const A = SB.twice(SB.noCostLens(), fixtures.HALF_MANNY);
   assert.ok(A.self);
-  assert.equal(A.dig, '5151533e6e85fd11');
-  assert.equal(N.dig, '7ed355470630a9c5');
+  assert.equal(A.dig, '093dc6c47c697d03');
+  assert.equal(N.dig, '5d061b2ad525a435');
   assert.equal(Array.from(A.prog._swapUniverse || []).length, 107);
 });
 

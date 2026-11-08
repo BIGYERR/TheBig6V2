@@ -1,15 +1,15 @@
 {
   "builds": 3528,
   "dayCells": 134946,
-  "legIsolationSections": 2020,
-  "sectionsWithAHarvestedName": 1820,
+  "legIsolationSections": 1948,
+  "sectionsWithAHarvestedName": 1764,
   "wallSitsInTheSection": 1386,
   "sameCardDuplicates": 0,
   "bodyweightSectionNames": {
     "Wall sit": 240,
-    "Single-leg glute bridge": 70,
-    "Single-leg hip thrust": 42,
-    "Nordic hamstring curl (anchored)": 80
+    "Single-leg glute bridge": 66,
+    "Single-leg hip thrust": 36,
+    "Nordic hamstring curl (anchored)": 70
   },
   "denials": {
     "commercial": {
