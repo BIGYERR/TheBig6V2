@@ -62,6 +62,26 @@ writes them.
       the header carries the session's name only, with no week, day or program line; no "x of x done" line; no hint
       under the deck about swiping or the double tap; and no toast when the double tap switches the view. The run
       card's words follow the app's since v0.255.2 (D271): Log the run, the hint as two sentences, Your pace.
+  16. The deck opens out of the card that started it, **Lift first at 420 ms** (2026-11-08, "i like the lift first at
+      420 ms", picked on the canvas's THE MOCKUP, Version 54, from Smooth, Spring, Lift first and Zoom at 300, 420, 550
+      and 700 ms; Slide up, Push and no motion were tried first on 2026-11-07, and he liked the grow). Start lift's card
+      rises off the page, then opens to the whole screen as the deck fades in; leaving the deck plays it back into the
+      card. The numbers, so the build copies them:
+      - **Drawn first.** The deck is drawn at the card's place under a copy of the card (its label, name and summary)
+        for two frames before anything moves, so the motion starts on a finished frame.
+      - **Lift, 168 ms** (0.4 of the speed), `cubic-bezier(.3,0,.2,1)`: the card grows 10 px at top and bottom and
+        8 px at each side, its corners 24 to 28 px, its fill one step lighter (`#161616` to `#202020`); the copy scales
+        to 1.04; This Week dims under a 30% scrim.
+      - **Open, 420 ms**, `cubic-bezier(.05,.7,.1,1)`: the clip opens to the whole screen with square corners and the
+        fill turns to the screen's ground; the deck fades in over 294 ms after 84 ms while it grows from 94% to full
+        size; the copy fades out over 126 ms; the scrim deepens to 55%; This Week shrinks to 96%. Open to settled:
+        588 ms.
+      - **Close, 357 ms** (0.85 of the speed), `cubic-bezier(.3,0,.8,.15)`: the clip shrinks back to the card, the deck
+        fades out over 143 ms and back to 94%, the copy returns from 161 ms to 286 ms and lands flat (1.04 to 1), the
+        scrim clears and This Week grows back; This Week takes over when the close ends. Back, and Mark the day done,
+        both close this way.
+      - **Reduced motion:** no motion; the deck opens and closes at once.
+      The recorder opens the same way from the run card (D272 Amendment 2, `docs/decisions/gps-recording.md`).
 - **What the build reuses, not re-derives:** every number on a card comes from the engine and the app's own readers,
   as the generator does (`deck-data.ts`): `parseRx`, `isTrackableWeight`, `isKBExercise`, `swapCandidates`,
   `auxSwapCandidates`, `doseFromCardio`, `runSessionCode`, `restMoveCandidates`, `restMoveCollisions`, `restDayTip`;

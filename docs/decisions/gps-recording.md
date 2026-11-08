@@ -210,3 +210,20 @@
 - **Open:** where a run done without the phone (a treadmill, the watch alone) is logged from This Week now that Log by
   hand is off the run card. The main session recommends a quiet "Ran without the phone?" link on the recorder before
   Start, which opens the same hand log.
+
+## D272 Amendment 2: Record run opens out of the run card, Lift first at 420 ms (Mario, 2026-11-08)
+
+- **Date:** 2026-11-08. **Ruled by:** Mario, on the canvas's THE MOCKUP (Version 54, four styles at four speeds, with
+  Record run growing out of its card beside Start lift): "i like the lift first at 420 ms". No new D-code.
+  **Shipped:** not yet.
+- **What changes in D272:** the recorder no longer appears at once. Record run opens it out of the run card with the
+  same motion as the deck, P-DECK call 16 (`docs/decisions/swipe-deck.md`), whose numbers are the ones to build: drawn
+  at the card first under a copy of it, the card lifts for 168 ms, opens over 420 ms (588 ms in all), closes over
+  357 ms, and reduced motion opens and closes at once. Here the copy is the run card's top: the day, the run's name in
+  the card's own size, and its dose line; the recorder's ground is the screen's ground.
+- **Every way out closes into the run card:** Minimize and Back, Save, Keep for the test, and Delete (its confirm sheet
+  goes first, then the recorder closes). Save's done row and its toast land after the close, so the card the recorder
+  shrinks into is the card the run was saved to.
+- **The live bar** (a run still going, the recorder minimized) opens the recorder the same way from the bar itself,
+  with no card copy.
+- **Does not change:** the recorder's screens, D267's track test gate, and D272's three open calls.
