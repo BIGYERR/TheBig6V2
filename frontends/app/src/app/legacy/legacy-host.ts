@@ -11,6 +11,7 @@ import { SwapSheet } from '../screens/swap-sheet/swap-sheet';
 import { AddSheet } from '../screens/add-sheet/add-sheet';
 import { ChangeSheet } from '../screens/change-sheet/change-sheet';
 import { DayDetail } from '../screens/day-detail/day-detail';
+import { Deck } from '../screens/deck/deck';
 import { GeneratingScreen } from '../screens/frames/generating-screen';
 import { HomeScreen } from '../screens/frames/home-screen';
 import { ProgressFrame } from '../screens/frames/progress-frame';
@@ -43,7 +44,7 @@ import { Wizard } from '../screens/wizard/wizard';
   selector: 'ia-legacy-host',
   host: { style: 'display: contents' },
   imports: [
-    BugReport, RestTimer, PopUp, RandomWorkout, SwapSheet, AddSheet, ChangeSheet, DayDetail, GeneratingScreen, HomeScreen,
+    BugReport, RestTimer, PopUp, RandomWorkout, SwapSheet, AddSheet, ChangeSheet, DayDetail, Deck, GeneratingScreen, HomeScreen,
     ProgressFrame, TabBar, GoalSheet, MileLock, MileSheet, RpeInfo, SwapNudge, Toast, UpdateBanner, WeekView, Wizard,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +56,7 @@ import { Wizard } from '../screens/wizard/wizard';
   <div class="screen" id="screenGenerate">@if (booted()) {<ia-generating-screen />}</div>
   <div class="screen" id="screenWeek">@if (booted()) {<ia-week-view />}</div>
   <div class="overlay" id="detailOverlay">@if (booted()) {<ia-day-detail />}</div>
+  @if (booted()) {<ia-deck />}
   <div class="overlay" id="swapOverlay">@if (booted()) {<ia-swap-sheet />}</div>
   <div class="overlay" id="addOverlay">@if (booted()) {<ia-add-sheet />}</div>
   <div class="pop-overlay" id="swapNudgeOverlay">@if (booted()) {<ia-swap-nudge />}</div>
