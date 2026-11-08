@@ -50,9 +50,9 @@ what the app does when the logged runs disagree with it. Measure: `tests/measure
   mile locks from week 12." Faster case (fixture anchor 10:30, recovery 13:20): logged 12:40 and 12:30 → implied 9:59 and
   9:50 → less extreme 9:59 → slower row 10:00 → offer 10:00. One row off at 15 s/mi: no fire. Two runs off in opposite
   directions: no fire. Week 12 of 14: no fire.
-- **Release:** not yet built. Bump: Mario's pick before the first edit (MINOR recommended: a new capability, no change to
-  what a program prescribes). Build order: after Mario's own UI pass commits, so the sheet lands on the buttons as he leaves
-  them.
+- **Release:** not yet built. Bump: MINOR, v0.257.0 (Mario, 2026-11-08). Build order (Mario): after his UI/UX pass merges
+  into `main`; the loop mockup is then redone inside the new UI and he picks again before the build, so the sheet lands
+  on the buttons as he leaves them.
 - **Tests at build time:** `tests/integration/mile-anchor.test.ts` (the feature's existing file): the trigger on two slow
   runs (Mario's values), on two fast runs (the fixture), no fire on one run, on 15 s/mi, on opposite directions, on a
   speed card, in week 12; the offer arithmetic from the hand table above; the sheet's text; Update opens the pencil with
