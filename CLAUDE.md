@@ -220,7 +220,7 @@ issued D265 before the ruling was written, and it shipped as D266.
     tar -x -C <scratch>/prev`, the main checkout's `frontends/app/node_modules` linked in, the changed test files copied
     over, then `node --test` on them): a test written for a changed
     behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
-    must not change;
+    must not change. A new test file that cannot load on the previous release (it imports a module that release does not have) fails there before its first test, by construction: `git cat-file -e <previous>:<that module>` failing is its proof, the report names it so, and no run is needed. A new file that loads there is run as usual, and each of its tests must fail (Post-v0.257.0).
   - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
   - reads every hunk of the diff on the page (`git diff` on the root copy; after the Pages switch, `tools/app-at.mjs` of
     both commits) and on `tests/snapshots/`, and classifies each against the ruling. A release meant to change no
@@ -319,11 +319,11 @@ which does reach him arrives with a recommendation.
 - **Grep the file, never trust a label.** Filename, chat title, memory and handoff can all lag the artifact.
 
 ## Engineering invariants (from §10b — each one was paid for)
-- Every shell pipeline that proves something is `bash -c 'set -eo pipefail; …'` with `;` separators. `set -e` alone lets a pipe swallow node's exit code. Delete artifacts before regenerating them; an empty diff is a failure, not a clean result.
+- Every shell pipeline that proves something is `bash -c 'set -eo pipefail; …'` with `;` separators. `set -e` alone lets a pipe swallow node's exit code. Delete artifacts before regenerating them; an empty diff is a failure, not a clean result. In a chat's worktree, write every path out in full: the isolation guard refuses a command it cannot read through (a `bash -c "…"` string that expands a shell variable such as `$S`, a variable where an option may stand, git inside a loop), and `bash -c '…'` with literal paths runs as usual (Post-v0.257.0).
 - No process substitution `<(...)` — use temp files.
 - Oracles are independent: a test never asserts the engine equals its own output. Hand tables, the doctrine text, date arithmetic; a golden snapshot is the one deliberate exception.
 - A test file that crashes before its first test, or registers no tests, is a failure, never a pass. Count a ported or rewritten file's tests against the original: phase 2's pace-clock lattice helper returned its tests instead of registering them, and two sweeps and two integration files ran green without their lattices (Post-v0.239.1).
-- Run every new or changed test against the previous release first (`IA_APP`). A test that passes on both is not testing what it claims.
+- Run every new or changed test against the previous release first (`IA_APP`). A test that passes on both is not testing what it claims. A new file that cannot load there (its module is missing) fails by construction; `git cat-file -e` on the module is the proof (Post-v0.257.0).
 - Every hunk of the diff on `index.html` and `tests/snapshots/` is classified against the ruling before ship. A removal that was not ruled is a regression (a ruling that SELECTS is not a ruling that DELETES).
 - Pin `cfg.seed`, strip clock fields, and prove a program equals itself built twice before comparing anything.
 - Any harness stub that accepts a callback must be able to run it. `requestAnimationFrame` that never fires deletes a code path from the test.
