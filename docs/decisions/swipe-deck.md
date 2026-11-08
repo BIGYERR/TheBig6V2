@@ -3,15 +3,15 @@
 A day's session as a deck of cards, one card per thing to do (the run, each lift, each round or block, Call it), swiped
 through while training. Designed with Mario on the Claude Design canvas "Swipe Deck Concepts" (private to Mario:
 https://claude.ai/artifact/Nh3ymF2Fh9TC8KY1oZ66uS), Version 74 the state he approved (Version 67 on 2026-11-04, then call 15). The boards' generator is saved in
-`docs/design/swipe-deck/` (its README says how to rebuild them). Not built in the app. Tests: none yet; the build
-writes them.
+`docs/design/swipe-deck/` (its README says how to rebuild them). Being built on the Angular day screen (D275, below).
+Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` and the app's own, written by the build.
 
-## P-DECK: the session as a swipe deck (design agreed, not built)
+## D275 P-DECK: the session as a swipe deck (design agreed, building)
 
 - **Date:** designed 2026-10-25 to 2026-11-03; Mario 2026-11-04, then his three answers the same day (below): "ok i like where were at! lets save this and we are
   going to need to roll this into our app so ill need to wrap up anothe chat before we can implement this".
-  **Ruled by:** Mario, call by call on the canvas (below). **D-code:** assigned from the registry when the build is
-  slotted. **Bump:** not picked (MINOR recommended: a new way to run a session, no program output moves).
+  **Ruled by:** Mario, call by call on the canvas (below). **D-code:** D275, issued Post-v0.256.0 (2026-11-08) when the
+  build was slotted. **Bump:** not picked (MINOR recommended: a new way to run a session, no program output moves).
   **Shipped:** not yet.
 - **Where it came from:** Mario's 2026-10-25 report that the main lift and the cardio could not be skipped (D248 and
   D250 shipped in v0.246.0; D249, the cardio card, stayed open for ideas, `docs/decisions/session-edits.md`). He asked
@@ -120,3 +120,38 @@ writes them.
   and does not wait on D272's open calls, which are about the recorder. The deck chat ("Swap/skip functionality for
   workouts") was merged into the This Week chat the same day, Mario's call; the build order is the deck first, then
   This Week's redesign with D272.
+
+## D275: coach's read-ahead ruling, no premise refuted (2026-11-08)
+
+- **Date:** 2026-11-08, Post-v0.256.0. **Ruled by:** the main session in the coach hat, on the measure below; it changes
+  nothing Mario ruled, so it did not go back to him first (standing ruling 7 applies only to a refuted premise).
+- **The question (carried from the first round):** the deck shows one card at a time, so does an athlete who meets a
+  hinge cold on card 4 or later break hard days hard?
+- **The measure:** `tests/measure/swipe-deck_read-ahead.js` on `index.html` at v0.256.0 (HALF_MANNY digest
+  `147f083be4e04e34`), the same sets and card rule as `tests/measure/swipe-deck_day-shapes.md`; its output is
+  `tests/measure/swipe-deck_read-ahead.md`.
+  - **HALF_MANNY:** 29 hinges, on card 1 (15), 2 (12) or 3 (2), never later. 12 are the Main card, 14 come after lower
+    body work, and the 3 others open the deck (a trap bar deadlift twice, a kettlebell swing once).
+  - **The lattice:** 18 of 15,134 hinges on card 4 or later (0.1%). Every one is a cable pull-through after a goblet
+    squat, a split squat round and a hip thrust; none is met cold.
+  - **The other goals:** 31 of 576 on card 4 or later; 21 after lower body work; 10 with none before, every one a
+    dumbbell or kettlebell hinge (a dumbbell Romanian deadlift, a double kettlebell deadlift, a kettlebell swing) closing a
+    Push (light) day on the 1.5 mile fat loss and marathon programs, after three cards of pressing. No barbell.
+  - **Not the Main card and no lower body card before it:** 2,253 on the lattice, on card 1 (1,661), 2 (520) or 3 (72);
+    105 in the other goals, 76 on card 1. A card 1 hinge is the first thing the deck shows, so no read ahead is involved.
+- **The coaching argument:** hard days hard is a rule about which day carries the hinge (heavy lower beside the speed
+  run, not the recovery run; D36 keeps it off the long run and its eve). The deck moves no lift between days and
+  reorders nothing inside one: its cards are the day's sections in the engine's order, so the deck cannot break it.
+  What a one card view could cost is preparation, a heavy pull met by a body that did not see it coming. The measure
+  says that never happens with a heavy pull: on Mario's program no hinge sits past card 3, on the lattice the late ones
+  are a cable pull-through after three lower body cards, and off it the cold late ones are light finishers. The deck
+  also reads ahead by design: the up and down pager (call 1) shows every card in order, the position numeral says how
+  far in the athlete is, and This Week names the session before Start lift.
+- **What changes:** nothing in P-DECK or Mario's three answers. Answer (1), blocks one card each, and answer (3), the
+  deck behind Start session, rest on nothing the measure moved; answer (2) went to This Week with D272.
+- **What the build must hold:** the deck's cards are the day's sections in the engine's order, never re-sorted, the
+  run left out (D272) and nothing else dropped; a test holds it on a hinge day.
+- **Seen, not ruled (the engine, not the deck):** the 10 cold late hinges sit on Push (light) days whose run is a
+  Recovery Run (marathon) or a long slow run (1.5 mile fat loss), a light hinge on an easy day; the 654 barbell hinges
+  that open a lattice deck without being the Main card carry no warm up cue. Both print the same in the day sheet
+  today. Handoff §12.
