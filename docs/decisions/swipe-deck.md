@@ -11,7 +11,8 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
 - **Date:** designed 2026-10-25 to 2026-11-03; Mario 2026-11-04, then his three answers the same day (below): "ok i like where were at! lets save this and we are
   going to need to roll this into our app so ill need to wrap up anothe chat before we can implement this".
   **Ruled by:** Mario, call by call on the canvas (below). **D-code:** D275, issued Post-v0.256.0 (2026-11-08) when the
-  build was slotted. **Bump:** not picked (MINOR recommended: a new way to run a session, no program output moves).
+  build was slotted. **Bump:** MINOR, v0.257.0 (Mario, 2026-11-08: a new way to run a session, no program output moves; it builds
+  before D274, which gave up the number).
   **Shipped:** not yet.
 - **Where it came from:** Mario's 2026-10-25 report that the main lift and the cardio could not be skipped (D248 and
   D250 shipped in v0.246.0; D249, the cardio card, stayed open for ideas, `docs/decisions/session-edits.md`). He asked
