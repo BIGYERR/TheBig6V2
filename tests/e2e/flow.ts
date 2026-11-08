@@ -1177,7 +1177,9 @@ const LOG_SESSION: readonly Step[] = [
     id: 'log-exercises',
     page: 'Log: two exercises logged',
     async run(t, page) {
-      await t.tap('.wk-hero-cta');
+      // Today's session from the day strip, which opens the session sheet in both builds. The hero's Start session opens
+      // the swipe deck, which only the Angular build has (v0.257.0, D275), so a parity journey cannot tap it.
+      await t.tap('.wk-strip .wk-day.today');
       await t.overlayOpen('detailOverlay');
       await t.tapNth('#detailOverlay .ex-logbtn', 0);
       await t.tapNth('#detailOverlay .ex-logbtn', 1);

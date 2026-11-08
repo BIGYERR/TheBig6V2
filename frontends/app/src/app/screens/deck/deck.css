@@ -1,5 +1,5 @@
 /*
- * The swipe deck (D275 P-DECK). Plain cards in the Track look, one colour per kind (call 4): a lift or a round
+ * The swipe deck (D275 P-DECK). A global stylesheet (angular.json's styles), every rule under .deck-ov or .exset-pip. Plain cards in the Track look, one colour per kind (call 4): a lift or a round
  * terracotta, hip work plum, core ochre, the finish ink. The deck sits over the session sheet (200) and the tab bar
  * (150), under the rest timer (240), the swap sheet (310), the toast and the pop-ups, as the sheet does. The app's own exercise cards sit on each card; the deck
  * re-themes them by redefining the tokens their rules read (inside .deck-work), so the session sheet's markup and

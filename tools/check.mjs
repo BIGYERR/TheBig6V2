@@ -11,7 +11,7 @@
 //   build    index.html is the build of frontends/app/src/legacy/src and core/src/engine (frontends/app/scripts/build-index.mjs), its ia-version meta reads
 //            as a version, its inline script compiles, and it boots in the harness and builds HALF_MANNY, self-stable.
 //   frontends frontends/ (the website, the admin, common/): type check, lint.
-//   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint.
+//   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint, the production build.
 //   backend  backend/, and the root's package.json, lock file and Procfile (Heroku's build, which its tests read):
 //            type checks, tests, lint.
 //
@@ -208,6 +208,9 @@ async function appLane() {
     step('app', 'unit tests', process.execPath, ['--test', '--test-reporter=spec', 'test/unit/**/*.test.ts'], app),
     step('app', 'integration tests', process.execPath, ['--test', '--test-reporter=spec', 'test/integration/**/*.test.ts'], app),
     step('app', 'lint', bin('ng'), ['lint'], app),
+    // The production build, with the budgets the iOS simulator job and the e2e's web image hold it to (a component
+    // stylesheet over 8 kB fails it). The development build has no budgets: v0.257.0 passed it and failed both jobs.
+    step('app', 'production build', bin('ng'), ['build'], app),
   ]);
 }
 

@@ -154,7 +154,7 @@ issued D265 before the ruling was written, and it shipped as D266.
 - **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs four lanes and stops at 60 s: tests (the type
   check of `core/` and `tests/`, and the unit and integration tests by Vitest), build (the page builds from
   `frontends/app/src/legacy/src/` into `dist-github-pages/`, its version meta, its inline script compiles, it boots and builds
-  HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint) and backend (type checks, tests, lint). The pre-commit hook
+  HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint, the production build with its budgets) and backend (type checks, tests, lint). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
   slower belongs in CI.
 - **The full suite runs in CI** (`.github/workflows/pipeline.yml`) on every push to `dev`, and again on the pull request

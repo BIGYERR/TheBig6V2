@@ -60,7 +60,8 @@
             ],
             "styles": [
               "src/legacy/generated/legacy.css",
-              "src/styles.css"
+              "src/styles.css",
+              "src/app/screens/deck/deck.css"
             ]
           },
           "configurations": {

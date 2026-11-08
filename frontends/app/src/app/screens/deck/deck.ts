@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, type ElementRef, inject, signal, untracked, viewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, type ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import { SessionSections } from '../day-detail/session-sections';
@@ -28,15 +28,14 @@ const TONE_RGB: Record<string, string> = { lift: 'var(--lift-rgb)', hip: 'var(--
  * (call 1). Each card carries the app's own exercise cards (SessionSections), so a set is logged, a lift swapped or
  * skipped exactly as on the session sheet, into the same stores (call 8). Done, next one logs what the card shows and
  * sends it behind the deck with a glow (call 10); a skip punches the card and leaves an undo (call 5, board V). Call it
- * closes the deck: the day's RPE and notes, then Mark the day done. The deck explains nothing (call 15).
+ * closes the deck: the day's RPE and notes, then Mark the day done. The deck explains nothing (call 15). Its stylesheet,
+ * deck.css, is global (angular.json's styles, beside the legacy CSS), since it styles the session sheet's own cards inside it.
  */
 @Component({
   selector: 'ia-deck',
   // After a tap or a field leaving focus while the deck is open, what the app logged is read back (touched()).
   host: { style: 'display: contents', '(document:click)': 'touched()', '(document:focusout)': 'touched()' },
   imports: [SessionSections],
-  encapsulation: ViewEncapsulation.None,
-  styleUrl: './deck.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @if (stage() !== null) {
