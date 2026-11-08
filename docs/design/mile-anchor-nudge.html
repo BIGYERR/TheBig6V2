@@ -1,0 +1,141 @@
+<title>Mile Anchor Nudge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one phone frame centred on paper, a preset bar above it, Before and After toggled inside the frame. The Track look: neutral paper and ink, true black at night, signal orange on the one live control only. */
+:root{
+  --bg:#F3F3F1; --paper:#FFFFFF; --ink:#141414; --muted:#6E6E6A; --border:#E2E2DE; --border2:#CFCFC9;
+  --signal:#CF4E1A; --signal-press:#AE3F12; --signal-rgb:207,78,26; --soft:#F7F1EC;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --sans:-apple-system,"SF Pro Text",system-ui,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#000000; --paper:#111111; --ink:#F2F2EE; --muted:#9A9A94; --border:#262626; --border2:#3A3A3A; --signal:#E2622B; --signal-press:#C4501E; --signal-rgb:226,98,43; --soft:#1C140F; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#000000; --paper:#111111; --ink:#F2F2EE; --muted:#9A9A94; --border:#262626; --border2:#3A3A3A; --signal:#E2622B; --signal-press:#C4501E; --signal-rgb:226,98,43; --soft:#1C140F; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);margin:0;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+.wrap{max-width:430px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:15px;font-weight:700;letter-spacing:0.02em;margin:0;text-wrap:balance}
+.lede{font-size:13px;color:var(--muted);margin:0;line-height:1.45}
+.lede b{color:var(--ink);font-weight:600}
+.bar{display:flex;gap:6px;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--border2);border-radius:10px;overflow:hidden;flex:1 1 auto}
+.seg button{flex:1 1 0;background:var(--paper);color:var(--muted);border:none;padding:9px 6px;font:600 12px var(--sans);letter-spacing:0.02em;cursor:pointer}
+.seg button+button{border-left:1px solid var(--border2)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg button:focus-visible{outline:2px solid var(--signal);outline-offset:-2px}
+.phone{background:var(--paper);border:1px solid var(--border2);border-radius:26px;padding:18px 14px 20px;display:flex;flex-direction:column;gap:14px;min-height:560px}
+.hdr{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.hdr .t{font-size:17px;font-weight:700}
+.hdr .s{font-size:11px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+.det-group{border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.det-label{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:7px}
+.det-row{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.det-row .k{color:var(--muted)}
+.det-row .v{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.anchor{font-size:13px;line-height:1.45}
+.pencil{display:inline-flex;width:14px;height:14px;color:var(--muted)}
+.pencil svg{width:14px;height:14px}
+.coach{border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:9px}
+.coach .lbl{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--signal)}
+.coach p{margin:0;font-size:14px;line-height:1.45}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border-radius:10px;padding:10px 14px;font:600 13px var(--sans);border:1px solid var(--border2);background:var(--paper);color:var(--ink);cursor:pointer}
+.btn.live{background:var(--signal);border-color:var(--signal);color:#fff;box-shadow:0 10px 28px rgba(var(--signal-rgb),0.42)}
+.btn.live:active{background:var(--signal-press)}
+.sheet{background:var(--bg);border:1px solid var(--border2);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sheet .st{font-size:15px;font-weight:700}
+.readout{display:flex;justify-content:space-between;font-size:13px;border-top:1px solid var(--border);padding-top:8px}
+.readout .d-lbl{color:var(--muted)}
+.readout .d-val{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.readout small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.plan{display:flex;justify-content:space-between;font-size:12px;background:var(--soft);border-radius:8px;padding:7px 9px}
+.plan .ps-lbl{color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;font-size:10px;font-weight:700}
+.run-card{border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.run-card .ty{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)}
+.run-card .dt{font-size:13px;line-height:1.5;white-space:pre-line}
+.run-card .note{font-size:12.5px;line-height:1.45;color:var(--ink);border-top:1px solid var(--border);padding-top:8px}
+.toast{align-self:center;background:var(--ink);color:var(--bg);font-size:12.5px;padding:9px 14px;border-radius:999px}
+.where{font-size:12px;color:var(--muted);line-height:1.45;margin:0}
+.where b{color:var(--ink);font-weight:600}
+.facts{font-size:12px;color:var(--muted);line-height:1.5;margin:0;padding-left:18px}
+.facts li+li{margin-top:3px}
+@media (prefers-reduced-motion:no-preference){ .phone{transition:opacity .15s} }
+</style>
+<div class="wrap">
+  <h1>The anchor nudge, three places it could live</h1>
+  <p class="lede">Your case, as the app saw it: anchor <b>10:30 mile</b>, Saturday prescribed <b>13:20/mi</b>, logged <b>11:03/mi</b>, the second easy run in a row more than a chart row faster. The app never rewrites the anchor. It offers the pencil once, and only while the pencil is unlocked.</p>
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Where the nudge lives">
+      <button id="pA" aria-pressed="true">A · Program card</button>
+      <button id="pB" aria-pressed="false">B · After logging</button>
+      <button id="pC" aria-pressed="false">C · Next run card</button>
+    </div>
+    <div class="seg" role="group" aria-label="Before or after">
+      <button id="vBefore" aria-pressed="false">Before</button>
+      <button id="vAfter" aria-pressed="true">After</button>
+    </div>
+  </div>
+
+  <div class="phone" id="phone"></div>
+
+  <p class="where" id="where"></p>
+  <ul class="facts">
+    <li>Fires only on recovery and long run cards, never on a speed session, and only after two in a row each a chart row (about 35 s/mi) or more faster than prescribed.</li>
+    <li>The number offered is the slower of the two runs, rounded to the slower row. Your 11:01 and 11:03 read as 8:31 and 8:33 by the recovery column; the tempo column says 8:54; the offer says 9:00.</li>
+    <li>Silent in the last three weeks, when the pencil is locked. For you that is week 12 on. This week is the last week it could speak.</li>
+    <li>Dismissed once, it stays quiet until two new runs qualify.</li>
+  </ul>
+</div>
+<script>
+(function(){
+  var PENCIL='<span class="pencil" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>';
+  function progCard(after, nudge){
+    var h='<div class="hdr"><span class="t">THE HALF MANNY</span><span class="s">Week 11 of 14</span></div>';
+    h+='<div class="det-group"><div class="det-label">Run paces '+PENCIL+'</div>';
+    h+='<p class="anchor">Anchored on a <b>10:30 mile</b>, the time you entered. Recovery 13:20/mi. Tempo 12:00/mi. 10K pace 11:35/mi.</p></div>';
+    if(after && nudge){
+      h+='<div class="coach"><div class="lbl">Coach</div>';
+      h+='<p>Your last two easy runs came in well under the plan. 11:01 and 11:03 a mile against 13:20. Your runs say your mile is nearer 9:00. Update it and every run ahead of you rebuilds. The last three weeks lock it, so this week is the last chance.</p>';
+      h+='<div class="btns"><button class="btn live">Update mile time</button><button class="btn">Keep 10:30</button></div></div>';
+    }
+    h+='<div class="det-group"><div class="det-row"><span class="k">Cardio</span><span class="v">Half marathon</span></div><div class="det-row"><span class="k">Race date</span><span class="v">Sun 6 Dec</span></div></div>';
+    return h;
+  }
+  function logSheet(after){
+    var h='<div class="hdr"><span class="t">Sat · Long Run Peak</span><span class="s">Week 11</span></div>';
+    h+='<div class="plan"><span class="ps-lbl">Run · Planned</span><span>12.5 mi @ 13:20/mi</span></div>';
+    h+='<div class="det-row"><span class="k">Distance</span><span class="v">5.52 mi</span></div><div class="det-row"><span class="k">Time</span><span class="v">60:59</span></div>';
+    h+='<div class="readout"><span class="d-lbl">Your pace</span><span class="d-val">11:03/mi<small>2:17/mi faster than target</small></span></div>';
+    if(!after){ h+='<div class="toast">Run logged.</div>'; return h; }
+    h+='<div class="sheet"><div class="st">Two easy runs in a row faster than the plan.</div>';
+    h+='<p class="anchor" style="margin:0">11:01 and 11:03 a mile against 13:20. Your runs say your mile is nearer 9:00. Change it now and every run ahead of you rebuilds. The last three weeks lock it.</p>';
+    h+='<div class="btns"><button class="btn live">Update mile time</button><button class="btn">Not now</button></div></div>';
+    return h;
+  }
+  function runCard(after){
+    var h='<div class="hdr"><span class="t">Tue · Strength Support</span><span class="s">Week 12</span></div>';
+    h+='<div class="run-card"><div class="ty">Run — Recovery Run</div><div class="dt">60 min recovery run at Recovery Pace (13:20/mi). 4 to 5 out of 10 effort, easy enough to talk, laugh or argue freely. Start a touch slower than that, finish a touch faster.</div>';
+    if(after){ h+='<div class="note">Your last two easy runs beat this pace by more than a chart row. If 13:20 feels slow, your mile is nearer 9:00. Tap the pencil on your program card to change it. From week 12 the mile is locked.</div>'; }
+    h+='</div>';
+    if(after){ h+='<p class="where" style="margin:0">On week 12 the note would already be too late: the pencil locks at week 12 of 14. For preset C the line has to print on the first run card after the second fast run, which for you was Monday or Tuesday of week 12. That is why C is the weakest placement for your own case.</p>'; }
+    return h;
+  }
+  var WHERE={
+    A:'<b>A, the program card.</b> Where the anchor already lives and where the pencil is. The athlete sees it the next time they open Programs, which may be days later. Quiet, in place, easy to miss.',
+    B:'<b>B, right after logging the run.</b> The moment the readout says 2:17 faster. The athlete is holding the evidence. One sheet, two buttons, and the pencil opens with 9:00 already filled in. Loudest, and the only one that reaches a runner who never opens the program card.',
+    C:'<b>C, the next run card.</b> A coach line on the next easy run, where the stale pace prints. Reads as coaching, not as a pop up. Arrives a day or two later and asks the athlete to go find the pencil.'
+  };
+  var preset='A', view='after';
+  function render(){
+    var after=view==='after';
+    var ph=document.getElementById('phone');
+    ph.innerHTML = preset==='A' ? progCard(after,true) : preset==='B' ? logSheet(after) : runCard(after);
+    document.getElementById('where').innerHTML=WHERE[preset];
+    ['A','B','C'].forEach(function(k){ document.getElementById('p'+k).setAttribute('aria-pressed', String(k===preset)); });
+    document.getElementById('vBefore').setAttribute('aria-pressed', String(!after));
+    document.getElementById('vAfter').setAttribute('aria-pressed', String(after));
+  }
+  ['A','B','C'].forEach(function(k){ document.getElementById('p'+k).addEventListener('click', function(){ preset=k; render(); }); });
+  document.getElementById('vBefore').addEventListener('click', function(){ view='before'; render(); });
+  document.getElementById('vAfter').addEventListener('click', function(){ view='after'; render(); });
+  render();
+})();
+</script>
