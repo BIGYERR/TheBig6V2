@@ -12,6 +12,8 @@ import { AddSheet } from '../screens/add-sheet/add-sheet';
 import { ChangeSheet } from '../screens/change-sheet/change-sheet';
 import { DayDetail } from '../screens/day-detail/day-detail';
 import { Deck } from '../screens/deck/deck';
+import { RecordHost } from '../screens/run-recorder/record-host';
+import { SwipeBack } from '../screens/frames/swipe-back';
 import { GeneratingScreen } from '../screens/frames/generating-screen';
 import { HomeScreen } from '../screens/frames/home-screen';
 import { ProgressFrame } from '../screens/frames/progress-frame';
@@ -45,7 +47,7 @@ import { Wizard } from '../screens/wizard/wizard';
   host: { style: 'display: contents' },
   imports: [
     BugReport, RestTimer, PopUp, RandomWorkout, SwapSheet, AddSheet, ChangeSheet, DayDetail, Deck, GeneratingScreen, HomeScreen,
-    ProgressFrame, TabBar, GoalSheet, MileLock, MileSheet, RpeInfo, SwapNudge, Toast, UpdateBanner, WeekView, Wizard,
+    ProgressFrame, RecordHost, TabBar, GoalSheet, MileLock, MileSheet, RpeInfo, SwapNudge, Toast, UpdateBanner, WeekView, Wizard,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -57,6 +59,7 @@ import { Wizard } from '../screens/wizard/wizard';
   <div class="screen" id="screenWeek">@if (booted()) {<ia-week-view />}</div>
   <div class="overlay" id="detailOverlay">@if (booted()) {<ia-day-detail />}</div>
   @if (booted()) {<ia-deck />}
+  @if (booted()) {<ia-record-host />}
   <div class="overlay" id="swapOverlay">@if (booted()) {<ia-swap-sheet />}</div>
   <div class="overlay" id="addOverlay">@if (booted()) {<ia-add-sheet />}</div>
   <div class="pop-overlay" id="swapNudgeOverlay">@if (booted()) {<ia-swap-nudge />}</div>
@@ -88,6 +91,8 @@ export class LegacyHost {
 
   constructor() {
     afterNextRender(() => void this.mount());
+    // D277 P-SWIPEBACK: a swipe from the left edge goes back on every full-screen page with a Back.
+    inject(SwipeBack).install();
   }
 
   protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {

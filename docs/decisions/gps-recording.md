@@ -107,7 +107,7 @@
   ("i like A lets try that one out"), the recording screen as R2 with R3's splits underneath ("i concur"), and "we dont
   need any cardio cards if we are going with A since the cardio and lift blocks are seperate and we are placing the
   record button on it". Awaiting Mario on the calls at the end. **Bump:** Mario picks at the build (MINOR recommended:
-  a new capability, no program output moves). **Shipped:** not yet. This is D267's stage 2.
+  a new capability, no program output moves). **Shipped:** items 1, 2, 6 and 7 as Amendments 1 and 2 left them in v0.258.0 (2026-11-08, with D276: the run card and the lift card, Record run opening D267's recorder); items 3 to 5 (R2 over R3, Save, the gate) build next. This is D267's stage 2.
 - **The designs:** the canvas "This Week hero drafts" (https://claude.ai/artifact/1km7jKQuQTDrdVQ71roHaH), board A
   (clickable, the recorder inside it) and boards R2 and R3; week 10 Friday of HALF_MANNY.
 - **The measure (2026-11-05, on v0.255.2):**
@@ -194,7 +194,7 @@
 - **Date:** 2026-11-06. **Ruled by:** Mario, on the canvas board "Your design, wired" (his This Week redesign from another
   chat, `week-screen-mockup.dc.html` with `WEEK_SCREEN_REDESIGN.md`, wired to D272): "we are splitting the cardio from
   the run on the hero page lets make sure we do that, and take out the "log by hand" under the record"; and earlier the
-  same day, of the rest day's two actions, "Keep them as links". No new D-code. **Shipped:** not yet.
+  same day, of the rest day's two actions, "Keep them as links". No new D-code. **Shipped:** v0.258.0 (2026-11-08), but Can't run? (D249), which builds next.
 - **What changes in D272:**
   1. **Item 1: the run and the lift are two cards**, not two blocks in one card. The run card comes first: the day,
      the run's name, its dose and pace, the coaching line, Record run. The lift card follows: "Then lift" (or "After the
@@ -215,7 +215,7 @@
 
 - **Date:** 2026-11-08. **Ruled by:** Mario, on the canvas's THE MOCKUP (Version 54, four styles at four speeds, with
   Record run growing out of its card beside Start lift): "i like the lift first at 420 ms". No new D-code.
-  **Shipped:** not yet.
+  **Shipped:** v0.258.0 (2026-11-08), but the live bar, which comes with R2 over R3.
 - **What changes in D272:** the recorder no longer appears at once. Record run opens it out of the run card with the
   same motion as the deck, P-DECK call 16 (`docs/decisions/swipe-deck.md`), whose numbers are the ones to build: drawn
   at the card first under a copy of it, the card lifts for 168 ms, opens over 420 ms (588 ms in all), closes over

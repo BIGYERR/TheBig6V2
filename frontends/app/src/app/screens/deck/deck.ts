@@ -6,12 +6,13 @@ import { type ExSection, sectionsView } from '../day-detail/session-sections-mod
 import { type BridgeLike, sectionReads } from '../day-detail/session-sections-reads';
 import { CALL_IT_WORDS, type CardAct, callItLog, ctaText, type DayLog, type DeckCard, deckCards, deckOpens, numeral, openMotion, PIP_THRESHOLD, rpeBubble, stateOf } from './deck-model';
 import { DeckState } from './deck-state';
+import { type GrowBox, type GrowStage, growBox, growCopy, growFx, growWeek } from './grow-motion';
 
 /** A scheduled day, as far as the deck reads it. */
 interface DeckDay { title?: string; rest?: unknown; sections?: ExSection[] }
 
 /** The opening motion's stage (call 16): drawn under the copy, lifted, opening, open, closing. */
-type Stage = 'pre' | 'lift' | 'in' | 'open' | 'out' | null;
+type Stage = GrowStage;
 /** A card's done motion (call 10): it lifts with a glow, then leaves. */
 interface DoneAnim { phase: 'lift' | 'leave'; glow: boolean }
 
@@ -153,7 +154,7 @@ export class Deck {
   private readonly dayDone = signal(false);
   private dayKey = '';
   private week = 0;
-  private origin: { t: number; l: number; w: number; h: number } | null = null;
+  private origin: GrowBox | null = null;
   private x0 = 0;
   private y0 = 0;
   private lastTap = 0;
@@ -249,7 +250,7 @@ export class Deck {
     this.anim.set(null);
     this.doneAnim.set(null);
     this.state.isOpen.set(true);
-    this.origin = this.boxOf(from);
+    this.origin = growBox(from);
     if (this.calm || !this.origin) {
       this.stage.set('open');
       this.cdr.detectChanges();
@@ -278,25 +279,10 @@ export class Deck {
     this.later(lift, 64);
   }
 
-  private boxOf(el: HTMLElement | null): { t: number; l: number; w: number; h: number } | null {
-    if (!el || typeof el.getBoundingClientRect !== 'function') return null;
-    const r = el.getBoundingClientRect();
-    return r.width > 0 && r.height > 0 ? { t: r.top, l: r.left, w: r.width, h: r.height } : null;
-  }
-
   /** The copy of the card the deck opens out of: its label, name and summary, without its button. */
   private copyCard(from: HTMLElement): void {
     const host = this.ghostEl()?.nativeElement;
-    if (!host) return;
-    host.textContent = '';
-    const copy = from.cloneNode(true) as HTMLElement;
-    copy.querySelectorAll('button, .wk-hero-cta-wrap, [id]').forEach((n) => {
-      if (n.matches('button, .wk-hero-cta-wrap')) n.remove();
-      else n.removeAttribute('id');
-    });
-    copy.style.margin = '0';
-    copy.style.background = 'transparent';
-    host.appendChild(copy);
+    if (host) growCopy(host, from);
   }
 
   /** Back and Mark the day done close the same way: the opening played back into the card. */
@@ -325,59 +311,12 @@ export class Deck {
   }
 
   /** The motion's styles for each stage: the scrim, the copy, the deck's frame and its content, and This Week. */
-  protected readonly fx = computed(() => {
-    const s = this.stage();
-    const o = this.origin;
-    const M = openMotion();
-    const vw = typeof innerWidth === 'number' ? innerWidth : 390, vh = typeof innerHeight === 'number' ? innerHeight : 844;
-    if (!o || s === 'open' || s === null) {
-      return { week: s === 'open' && o ? 'transform:scale(.96)' : '', scrim: 'opacity:' + (o ? '.55' : '0'), ghost: 'display:none', frame: 'clip-path:none;-webkit-clip-path:none;background-color:var(--bg)', content: 'opacity:1' };
-    }
-    const px = (v: number) => v.toFixed(1) + 'px';
-    const clip = (dt: number, dx: number, r: number) => {
-      const v = 'inset(' + px(o.t - dt) + ' ' + px(Math.max(0, vw - o.l - o.w) - dx) + ' ' + px(Math.max(0, vh - o.t - o.h) - dt) + ' ' + px(o.l - dx) + ' round ' + r + 'px)';
-      return 'clip-path:' + v + ';-webkit-clip-path:' + v + ';';
-    };
-    const box = 'left:' + px(o.l) + ';top:' + px(o.t) + ';width:' + px(o.w) + ';height:' + px(o.h) + ';';
-    const tr = (props: string[], ms: number, ease: string, delay = 0) => 'transition:' + props.map((p) => p + ' ' + ms + 'ms ' + ease + (delay ? ' ' + delay + 'ms' : '')).join(',') + ';';
-    const FULL = 'clip-path:inset(0px 0px 0px 0px round 0px);-webkit-clip-path:inset(0px 0px 0px 0px round 0px);';
-    if (s === 'pre') {
-      return { week: 'transform:none;transition:none', scrim: 'opacity:0;transition:none', ghost: box + 'opacity:1;transform:none;transition:none', frame: clip(0, 0, 24) + 'background-color:var(--surface);transition:none', content: 'opacity:0;transform:scale(.94);transition:none' };
-    }
-    if (s === 'lift') {
-      return {
-        week: 'transform:none;transition:none',
-        scrim: 'opacity:.3;' + tr(['opacity'], M.lift, 'ease'),
-        ghost: box + 'opacity:1;transform:scale(1.04);background-color:var(--surface2);' + tr(['transform', 'background-color'], M.lift, M.ease.lift),
-        frame: clip(10, 8, 28) + 'background-color:var(--surface2);' + tr(['clip-path', '-webkit-clip-path', 'background-color'], M.lift, M.ease.lift),
-        content: 'opacity:0;transform:scale(.94);transition:none',
-      };
-    }
-    if (s === 'in') {
-      return {
-        week: 'transform:scale(.96);' + tr(['transform'], M.open, M.ease.open),
-        scrim: 'opacity:.55;' + tr(['opacity'], M.open, M.ease.open),
-        ghost: box + 'opacity:0;transform:scale(1.04);background-color:var(--surface2);' + tr(['opacity'], M.copyFadeOut, 'ease'),
-        frame: FULL + 'background-color:var(--bg);' + tr(['clip-path', '-webkit-clip-path', 'background-color'], M.open, M.ease.open),
-        content: 'opacity:1;transform:none;transition:opacity ' + M.deckFadeIn + 'ms ease ' + M.deckFadeDelay + 'ms,transform ' + M.open + 'ms ' + M.ease.open,
-      };
-    }
-    return {
-      week: 'transform:none;' + tr(['transform'], M.close, M.ease.close),
-      scrim: 'opacity:0;' + tr(['opacity'], M.close, M.ease.close),
-      ghost: box + 'opacity:1;transform:none;background-color:var(--surface);transition:opacity ' + (M.copyBackTo - M.copyBackFrom) + 'ms ease ' + M.copyBackFrom + 'ms,transform ' + M.close + 'ms ' + M.ease.close + ',background-color ' + M.close + 'ms ease',
-      frame: clip(0, 0, 24) + 'background-color:var(--surface);' + tr(['clip-path', '-webkit-clip-path', 'background-color'], M.close, M.ease.close),
-      content: 'opacity:0;transform:scale(.94);transition:opacity ' + M.deckFadeOut + 'ms ease,transform ' + M.close + 'ms ' + M.ease.close,
-    };
-  });
+  protected readonly fx = computed(() =>
+    growFx(this.stage(), this.origin, typeof innerWidth === 'number' ? innerWidth : 390, typeof innerHeight === 'number' ? innerHeight : 844));
 
   /** This Week under the deck: it shrinks to 96% as the deck opens and grows back as it closes. */
   private setWeek(css: string): void {
-    const el = typeof document !== 'undefined' ? document.getElementById('screenWeek') : null;
-    if (!el) return;
-    const get = (p: string) => (css.match(new RegExp('(?:^|;)' + p + ':([^;]*)')) || [])[1] || '';
-    el.style.transform = get('transform');
-    el.style.transition = get('transition');
+    growWeek(css);
   }
 
   // ── The cards ────────────────────────────────────────────────────────────────────────────────────────────────

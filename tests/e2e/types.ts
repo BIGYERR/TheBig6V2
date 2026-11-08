@@ -27,6 +27,11 @@ export interface StepResult {
   angular: TargetResult;
   reference: TargetResult;
   parity: Parity | null;
+  /**
+   * Set when the app draws this step's screen its own way by ruling (This Week since D276): the parity is recorded and
+   * shown, never judged. The words say which ruling.
+   */
+  own?: string;
   ok: boolean;
 }
 

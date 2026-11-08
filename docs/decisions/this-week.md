@@ -14,7 +14,7 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   2026-11-06) and THE MOCKUP; today, on the build's scope: "Screen now, rest next"; on the day strip's order: "sunday
   through saturday + race day title" (he had asked for race day to stand out on plans that have one: "i like the idea
   of highliting the race day for programs with a race day"). **Bump:** MINOR, v0.258.0 (Mario, 2026-11-08: a new
-  screen and a new way into the deck and the recorder; no program output moves). **Shipped:** not yet.
+  screen and a new way into the deck and the recorder; no program output moves). **Shipped:** v0.258.0 (2026-11-08), with D277; "D276 as built", below.
 - **Why (his spec):** today's screen says "Week 11" four times, cuts the day words to `RUN POSTE`, puts a big button
   on a session already closed out, shows a race date instead of a countdown, and drops a session's detail into a strip
   too small for it. The look stays (the Track look, D263); the structure changes.
@@ -88,3 +88,41 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
 - **Does not change:** what any program prescribes (HALF_MANNY digest `147f083be4e04e34`); the stores (the week strip
   sets the legacy `currentWeek` as the chips did); the session sheet, the deck, the rest sheet and the injury sheet;
   the page Pages serves, whose This Week stays as it is (the iOS app is the product).
+
+## D276 as built (v0.258.0, 2026-11-08)
+
+- **Where:** the iOS app's Angular screens. `frontends/app/src/app/screens/week-view/` (`week-view-model.ts` the logic,
+  `week-view.ts` the screen, `week-view.css` its styles, global in `angular.json` beside the deck's); Record run's host
+  `screens/run-recorder/record-host.ts`; the grow out of a card, moved out of the deck unchanged into
+  `screens/deck/grow-motion.ts` so the deck and the recorder open with the same numbers. The page Pages serves changes
+  only by its version.
+- **Mario saw it first:** the build itself, served on the Mac with HALF_MANNY loaded (weeks 1 to 10 done) and a simulated
+  GPS plugin, clicked through in the browser pane at 375 px: "looks right!" (2026-11-08). D277 (swipe back) followed.
+- **Decisions the build made (siting and form, recorded here):**
+  1. The legacy `currentWeek` follows what the screen shows or opens: the title's own week, and the week before for a
+     Sunday. A value the screen did not write (a boot, a program loaded, the wizard) moves the strip to the title holding
+     today when it is today's week.
+  2. A tap on a week title, or a scroll that settles, picks the week; each title keeps the day picked in it until the
+     program changes. With no pick, the ruling's default (item 4).
+  3. The day card's top carries a chevron that opens the day's session sheet (the hand log, review and edits); Reopen on
+     a done row opens it too, where a closed day is undone (D179). Log the run (no GPS plugin) opens it as well.
+  4. A day is done for the lift card when it is marked complete or partial; the run card is done once the run is logged
+     for the sport it is credited to (D213) or the day is marked; a skipped day shows Skipped on both.
+  5. The run card's words come from the engine's session: the name (the subtype's head; the race as Race Day, the
+     shakeout as Shakeout Run), the meta (the kind, the dose or a speed session's work, the target pace), the coaching
+     line (the note's first sentence without its label, then the ceiling sentence the detail names).
+  6. On a program where lifting is the priority, a day with both puts the lift card first and the run second ("Then
+     run"), as the session sheet orders it (`liftsFirst`).
+  7. The race row reads `{N} days out` and `Race day Sun, Dec 6`, `1 day out` the day before, `Race day today` on the
+     day and `Raced` after; tapping it opens the race date picker.
+  8. The tiles count the seven days the strip shows, the week before's Sunday jog included.
+  9. Record run's recorder sits beside the deck, outside This Week's screen, since the screen's shrink under an overlay
+     holds anything fixed inside it. Ran without the phone? closes the recorder into the card, then opens the hand log.
+  10. Mouse drags move the week strip in a browser, as fingers do on the phone (the dev server and the pane).
+- **The e2e:** the journeys reach every shared sheet by each build's own path (`tests/e2e/flow.ts`: `tapDay`, `tapToday`,
+  `weekBtn`), since the page keeps its own This Week.
+- **Tests:** `tests/unit/this-week-hero.test.ts` (the titles, the live title and the Sunday column, the day words, the
+  run card's words from the engine's text, the race row, Record run's grow), `tests/integration/this-week-hero.test.ts`
+  (HALF_MANNY's strips and cards through the legacy helpers), `frontends/app/test/unit/week-view.test.ts` (the screen's
+  assembly on stubs), `frontends/app/test/unit/run-recorder.test.ts` (Ran without the phone?). Each fails on v0.257.0
+  but the phase label test, carried over unchanged to guard what does not change.

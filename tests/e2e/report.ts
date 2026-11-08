@@ -13,7 +13,8 @@ const STATUS_LABEL: Record<Status, string> = { pass: 'Pass', fail: 'Fail', skipp
 
 const badge = (status: Status): string => `<span class="badge ${status}">${STATUS_LABEL[status]}</span>`;
 
-function parityCell(p: Parity | null, maxPct: number): string {
+function parityCell(p: Parity | null, maxPct: number, own?: string): string {
+  if (own) return `<span class="muted">the app's own (${esc(own)})${p && 'pct' in p ? `, ${p.pct.toFixed(3)}%` : ''}</span>`;
   if (!p) return '<span class="muted">n/a</span>';
   if ('error' in p) return `<span class="badge fail">${esc(p.error)}</span>`;
   return `<span class="badge ${p.pct <= maxPct ? 'pass' : 'fail'}">${p.pct.toFixed(3)}%${p.pixels ? ` (${p.pixels} px)` : ''}</span>`;
@@ -49,7 +50,7 @@ function card(s: StepResult, r: RunReport): string {
   return `<section class="card" id="${esc(s.id)}">
   <header>
     <div><span class="step">#${stepLabel(s.n)}</span> <span class="muted">${esc(s.journey)}</span><h2>${esc(s.page)}</h2><div class="muted mono">${esc(s.journeyId)}/${esc(s.id)}</div></div>
-    <div class="right">${badge(stepStatus(s))}<div class="muted">Parity ${parityCell(s.parity, r.parityMaxPct)}</div></div>
+    <div class="right">${badge(stepStatus(s))}<div class="muted">Parity ${parityCell(s.parity, r.parityMaxPct, s.own)}</div></div>
   </header>
   ${notes(s)}
   <div class="shots">
@@ -121,7 +122,7 @@ function row(s: StepResult, r: RunReport): string {
     <td><a href="#${esc(s.id)}">${esc(s.page)}</a><div class="muted mono">${esc(s.id)}</div></td>
     <td>${badge(s.angular.status)}</td>
     <td>${badge(s.reference.status)}</td>
-    <td>${parityCell(s.parity, r.parityMaxPct)}</td>
+    <td>${parityCell(s.parity, r.parityMaxPct, s.own)}</td>
     <td class="num">${s.angular.ms ?? ''}</td>
   </tr>`;
 }

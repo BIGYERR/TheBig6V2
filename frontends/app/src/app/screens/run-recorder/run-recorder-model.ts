@@ -52,6 +52,8 @@ export const RECORDER_COPY = {
   denied: 'Location is off for The Asylum. Turn it on in Settings.',
   confirmDelete: 'Delete this run? It cannot come back.',
   shareFailed: 'That run could not be shared.',
+  /** D272's open item, answered 2026-11-08: a run done without the phone is logged by hand. */
+  noPhone: 'Ran without the phone?',
 } as const;
 
 export type RecorderButton = 'start' | 'pause' | 'resume' | 'finish' | 'share' | 'delete';

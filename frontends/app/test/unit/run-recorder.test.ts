@@ -40,6 +40,10 @@ describe('the Run recorder row', () => {
     assert.equal(RECORDER_COPY.rowNote, 'Test GPS against your watch. Runs stay on this phone.');
     assert.equal(RECORDER_COPY.confirmDelete, 'Delete this run? It cannot come back.');
   });
+
+  it('offers a run done without the phone the hand log, in the words Mario concurred to (D272\'s open item, 2026-11-08)', () => {
+    assert.equal(RECORDER_COPY.noPhone, 'Ran without the phone?');
+  });
 });
 
 describe('the screen', () => {
