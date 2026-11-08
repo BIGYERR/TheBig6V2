@@ -51,7 +51,7 @@ Mario is the sole developer, product owner and primary user.
 Mario: "please stop using multi-agent? our context required is too big and it is much cheaper and efficient to have just 1
 context at work at a time ... we do NOT spin up agents like that ever again (unless I explicitly ask for it)".
 - **The main session does all the work itself, in this one context.** No subagents, no parallel agents, no agent worktrees,
-  unless Mario explicitly asks for one in chat. `.claude/settings.json` makes every `Agent`/`Task` launch ask Mario
+  unless Mario explicitly asks for one in chat (a chat's own worktree, One chat per worktree, is the chat itself, not an agent). `.claude/settings.json` makes every `Agent`/`Task` launch ask Mario
   first; never ask to launch one on your own initiative.
 - **The four roles are hats the main session wears in order,** and the files in `.claude/agents/` are their checklists
   (read the one you are switching to):
@@ -76,10 +76,24 @@ a build. A compaction mid-build is not a stop: re-read the tree state (`git stat
 D-CODE REGISTRY lines) before the next step; a builder slice either landed whole or stays parked (its diff saved as a
 patch in the scratchpad, nothing committed), and nothing merges into `main` that the pipeline has not proved. Standing rules live in this file; per-build scope lives in
 handoff §12.
-**One writer per working tree (Mario, Post-V238).** While a build is in flight, from the first builder dispatch to the
-deploy proof, one session writes to this working tree. Any other session that needs to write (a measure, a queue review,
-a docs pass) works in its own git worktree or waits until the build commits. V238's final hash went red on another
-session's files written into `tests/measure/` mid-proof.
+**One chat per worktree, and a push carries one chat (Mario, Post-v0.256.0: "i only want to push to dev changes that
+are made in the chat i built it in").** The three sentences, in force from Post-v0.256.0:
+1. **A chat never commits on local `dev`.** Every chat works on its own branch in its own worktree
+   (`EnterWorktree` at session start; branch `chat/<work>`, named for the work), and every commit it makes carries the
+   trailer `Chat: <work>` (`.githooks/prepare-commit-msg` writes it). The main checkout holds `dev` and nothing else;
+   `.githooks/pre-commit` refuses a commit on `dev` there.
+2. **Local `dev` only ever holds pushed commits.** When Mario says push, the chat runs `node tools/land.mjs` from its
+   worktree: it fetches, refuses if `dev` holds anything unpushed or the branch is not rebased onto `dev`, fast-forwards
+   local `dev` to the branch and pushes `origin dev`, as one step. Work Mario wants held stays on its branch.
+3. **The hooks enforce it.** `.githooks/pre-push` refuses a push of `dev` whose new commits carry more than one chat's
+   trailer; `land.mjs` refuses a landing while `dev` has unpushed commits; `IA_PUSH_ALL=1` overrides both when Mario wants
+   everything pushed together on purpose.
+Why: on 2026-11-08 the swipe-deck chat pushed `dev` and carried this chat's unpushed v0.256.0 with it, because every chat
+committed onto one shared `dev`. Before that, V238's final hash went red on another session's files written into
+`tests/measure/` mid-proof (one writer per working tree, Post-V238, which this rule replaces). A conflict between two
+chats now shows at landing (git refuses the fast-forward; the chat rebases, resolves, runs the check) instead of as a
+silent overwrite. `index.html` is regenerated after a rebase, never resolved by hand; the second ruling to land
+regenerates its golden files on top of the first.
 **A D-code travels with its decision file (Mario, Post-v0.250.0).** The session that issues a D-code commits the handoff's
 registry line and the decision file it names together, at once, in a `docs:` commit, so no other session's commit carries
 the line alone. A session that finds another's uncommitted registry text in its own commit says so in its report.
@@ -94,8 +108,8 @@ issued D265 before the ruling was written, and it shipped as D266.
 4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to the source files under `frontends/app/src/legacy/src/` (every text replaced occurs exactly once in the file it edits before it is replaced), `index.html` rebuilt from them (`npm run build:index`), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
 5. Gatekeeper proves it as **Pipeline** and **Proof for new work** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews. Green, or a NAMED failing test.
 6. `handoff-update` skill: the seven-element session entry, with the release line of each decision this version shipped filled in (`docs/decisions/<feature>.md`). Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
-   `git add -A`**, Mario, Post-V238) and commit on `dev` (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check).
-   **Push only when Mario asks** (`git push origin dev`), and never wait on CI (Mario, Post-v0.250.0): the push runs the full suite there and Mario
+   `git add -A`**, Mario, Post-V238) and commit on the chat's branch in its worktree (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check; the Chat trailer is written for you).
+   **Push only when Mario asks**, with `node tools/land.mjs` from the worktree (local `dev` fast-forwarded and pushed in one step; One chat per worktree), and never wait on CI (Mario, Post-v0.250.0): the push runs the full suite there and Mario
    reviews it himself; read a run (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) only when he asks. **Mario opens
    every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one (Mario, Post-V239).** When he has merged it, tag what merged: `git fetch origin && git tag v<version> origin/main && git push origin v<version>`.
 7. **Report the deploy picture; a lagging deploy does not block** (Mario, Post-V239). A push or a merge is not a deploy:
@@ -117,25 +131,26 @@ issued D265 before the ruling was written, and it shipped as D266.
    ~40 s); Mario may leave it behind. Tell Mario the live number you read back, never the number you pushed.
 
 ## Pipeline (Mario, Post-V239): fast locally, the full suite in CI, `main` only by pull request
-- **Branches.** Work lands on the local `dev` branch in the main checkout: commit there as often as needed. Only that
-  branch, from that checkout, is ever pushed to `origin/dev`. Every push to `dev` runs the full suite in
+- **Branches.** A chat commits on its own `chat/<work>` branch in its own worktree, as often as needed. Local `dev` in
+  the main checkout is the landing strip: it only ever holds pushed commits, and only `node tools/land.mjs` moves it (a
+  fast-forward to one chat's branch and the push, as one step; One chat per worktree, above). Every push to `dev` runs the full suite in
   CI and nothing waits for it; Mario reviews the results and, to release, opens the pull request into `main` himself.
   `main` is what Pages serves and what Heroku deploys: Heroku's automatic deploy from GitHub builds every push to
   `main` with the repo root's `package.json` and `Procfile` (the website, the admin, the app at `/app/` and the
   backend, one dyno; Mario, Post-v0.242.0), and `backend/scripts/heroku.sh deploy` is the manual path. Branch
   protection lets `main` change only through a pull request from `dev` whose pipeline checks all passed; its required
   checks are the pipeline's PR job names, kept in GitHub's settings, not in the repo, so a renamed job is renamed there
-  too. A branch off `dev` is rare and merges back into local `dev`, never into `main`.
-- **A worktree never pushes (Mario, Post-V239).** A session in a git worktree (`.claude/worktrees/*`) commits on its own
-  branch and never runs `git push`, not to `dev` and not to any other branch. When its work is done it rebases that
-  branch onto the current local `dev`, fast-forwards local `dev` to it (`git -C <main checkout> merge --ff-only
-  <branch>`), then deletes the worktree and the branch. If a build is in flight in the main checkout (One writer per
-  working tree), it waits until that build commits. Its work reaches GitHub with the main checkout's next push. On
-  Post-V239 the semver worktree pushed three commits straight to `origin/dev` while the main checkout held four
-  unpushed ones, and `dev` forked (4 ahead, 3 behind) on a project with one developer. `.githooks/pre-push` enforces
-  this for pushes to GitHub: it refuses any push from a worktree, and from the main checkout anything but local `dev`'s
-  own commit to `dev`, or a tag. A worktree runs the hooks of the commit it has checked out, so one made from `dev`
-  carries the guard.
+  too. Nothing but a chat branch lands on `dev`, and nothing lands on `main` but Mario's pull request.
+- **A worktree never runs `git push` itself (Mario, Post-V239), and lands with `tools/land.mjs` (Post-v0.256.0).** A
+  chat's worktree (`.claude/worktrees/*`) commits on its `chat/<work>` branch. When Mario says push, `node tools/land.mjs`
+  from the worktree fetches, checks (`dev` equals `origin/dev`; the branch is on top of `dev`; its new commits carry one
+  Chat trailer), fast-forwards local `dev` and pushes it from the main checkout, in one step; `--dry-run` only checks.
+  When the work is finished the chat deletes its worktree and branch. On Post-V239 the semver worktree pushed three
+  commits straight to `origin/dev` while the main checkout held four unpushed ones, and `dev` forked (4 ahead, 3
+  behind); on 2026-11-08 one chat's push carried another chat's unpushed release. `.githooks/pre-push` refuses any push
+  from a worktree, from the main checkout anything but local `dev`'s own commit to `dev` or a tag, and a push of `dev`
+  whose new commits come from more than one chat (`IA_PUSH_ALL=1` to carry them together on purpose). A worktree runs
+  the hooks of the commit it has checked out, so one made from `dev` carries the guards.
 - **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs four lanes and stops at 60 s: tests (the type
   check of `core/` and `tests/`, and the unit and integration tests by Vitest), build (the page builds from
   `frontends/app/src/legacy/src/` into `dist-github-pages/`, its version meta, its inline script compiles, it boots and builds
@@ -378,7 +393,8 @@ every open page reloads itself. The watcher (`backend/scripts/dev-watch.ts`) run
 (`backend/Dockerfile.dev`, `backend/docker-compose.dev.yml`); it reads the checkout read-only and writes only
 `backend/dist/`, `backend/app-web/` and `frontends/dist/`. The container comes back by itself whenever Docker starts.
 `cd backend && npm run dev` starts it (building its image when needed) and follows its log: Ctrl-C stops following,
-never the container. `npm run dev:down` stops it; `npm run docker:up` puts back the plain production image. When Mario
+never the container. `npm run dev:down` stops it; `npm run docker:up` puts back the plain production image. The container mounts the checkout the compose file sits in, so a chat runs `npm run dev` from ITS worktree's `backend/`
+to see its own edits; there is one container, and it follows the chat that last started it. When Mario
 wants to see an edit, check it answers (`curl -s localhost:3000/healthz`), run `npm run dev` in the background if not,
 and hand him the link to the page that changed. It shows; it proves nothing: no test or CI result comes
 from it, and a version ships only through the session rhythm. The other paths stay for devices, deploys and full
@@ -427,6 +443,6 @@ before a merge into `main` touches the build).
   rulings). `core/` (`@ia/core`: the release version, semver, the domain types in `core/src/domain`).
   `docs/decisions/<feature>.md` (the rulings, one file per feature); `docs/test-migration.md` and
   `docs/test-migration/*.md` (how every legacy gate row was carried over or dropped); `docs/architecture-migration.md`.
-- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit, and `.githooks/pre-push` lets only local `dev` and tags reach GitHub (`git config core.hooksPath .githooks` once per clone; keep it relative). `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
+- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit and refuses a commit on `dev` in the main checkout; `.githooks/prepare-commit-msg` writes the `Chat: <work>` trailer on a `chat/<work>` branch; `.githooks/pre-push` lets only local `dev` and tags reach GitHub and a push of `dev` carry one chat (`git config core.hooksPath .githooks` once per clone; keep it relative). `tools/land.mjs` — how a chat's branch reaches `origin/dev` (One chat per worktree), its judges tested in `tests/unit/landing.test.ts`. `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
 - `tools/` — the run log (`tools/README.md`): every test, build, deploy and server run is a folder under `temp/runs/` (gitignored) with a line in `temp/events.log`; `~/Library/Logs/IronAsylum/orchestration.log` has one line per top-level start on this Mac. When something went wrong, `node tools/logs.mjs` is the first place to look. `tools/deploy-check.mjs` is rhythm step 7 as one command.
 - `doctrine/*.txt` — page-ordered OCR of the NSW guide and the four NRC plans. Gitignored (not published by Pages); regenerate from the archives with `doctrine/README.md` if missing.

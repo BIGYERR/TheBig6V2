@@ -4,5 +4,13 @@
 # The full suite runs in GitHub Actions on the pull request from dev into main. Skip this once: git commit --no-verify.
 # Enabled per clone with: git config core.hooksPath .githooks
 root="$(git rev-parse --show-toplevel)" || exit 1
+# One chat per worktree (Mario, Post-v0.256.0): local dev only ever holds pushed commits, so nothing is committed on it
+# in the main checkout. A chat works on chat/<work> in its own worktree and lands with node tools/land.mjs. IA_ON_DEV=1
+# is the one deliberate exception (the tooling pass that installed this rule).
+git_dir="$(cd "$(git rev-parse --git-dir)" && pwd -P)"; common_dir="$(cd "$(git rev-parse --git-common-dir)" && pwd -P)"
+if [ "$(git branch --show-current)" = "dev" ] && [ "$git_dir" = "$common_dir" ] && [ -z "$IA_ON_DEV" ]; then
+  echo "pre-commit: refused. A chat never commits on local dev; work on chat/<work> in a worktree (EnterWorktree) and land it with node tools/land.mjs." >&2
+  exit 1
+fi
 command -v node >/dev/null 2>&1 || { echo "pre-commit: node is not on PATH; skipping the check" >&2; exit 0; }
 exec node "$root/tools/check.mjs" --staged
