@@ -1,0 +1,152 @@
+<title>Mile Anchor Nudge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: the rules on top, then one phone frame that plays the five-step loop (two runs logged, the sheet, the pencil, the result). The Track look: neutral paper and ink, true black at night, signal orange on the one live control only. */
+:root{
+  --bg:#F3F3F1; --paper:#FFFFFF; --ink:#141414; --muted:#6E6E6A; --border:#E2E2DE; --border2:#CFCFC9;
+  --signal:#CF4E1A; --signal-press:#AE3F12; --signal-rgb:207,78,26; --soft:#F7F1EC;
+  --sans:-apple-system,"SF Pro Text",system-ui,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#000000; --paper:#111111; --ink:#F2F2EE; --muted:#9A9A94; --border:#262626; --border2:#3A3A3A; --signal:#E2622B; --signal-press:#C4501E; --signal-rgb:226,98,43; --soft:#1C140F; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#000000; --paper:#111111; --ink:#F2F2EE; --muted:#9A9A94; --border:#262626; --border2:#3A3A3A; --signal:#E2622B; --signal-press:#C4501E; --signal-rgb:226,98,43; --soft:#1C140F; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);margin:0;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+.wrap{max-width:430px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:15px;font-weight:700;letter-spacing:0.02em;margin:0;text-wrap:balance}
+h2{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin:0}
+.rules{display:flex;flex-direction:column;gap:8px;border:1px solid var(--border);border-radius:14px;padding:12px 14px;background:var(--paper)}
+.rules p{margin:0;font-size:13px;line-height:1.45}
+.rules b{font-weight:600}
+.steps{display:flex;gap:4px}
+.steps button{flex:1 1 0;border:1px solid var(--border2);background:var(--paper);color:var(--muted);border-radius:8px;padding:7px 2px;font:600 11px var(--sans);cursor:pointer;min-width:0}
+.steps button[aria-current="step"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.steps button:focus-visible{outline:2px solid var(--signal);outline-offset:-2px}
+.ctl{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ctl .cap{font-size:12px;color:var(--muted);line-height:1.4;min-width:0}
+.ctl button{border:1px solid var(--border2);background:var(--paper);color:var(--ink);border-radius:8px;padding:7px 10px;font:600 12px var(--sans);cursor:pointer;white-space:nowrap}
+.phone{background:var(--paper);border:1px solid var(--border2);border-radius:26px;padding:18px 14px 20px;display:flex;flex-direction:column;gap:12px;min-height:520px;position:relative;overflow:hidden}
+.hdr{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.hdr .t{font-size:17px;font-weight:700}
+.hdr .s{font-size:11px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+.plan{display:flex;justify-content:space-between;font-size:12px;background:var(--soft);border-radius:8px;padding:7px 9px;gap:8px}
+.plan .ps-lbl{color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;font-size:10px;font-weight:700}
+.det-row{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.det-row .k{color:var(--muted)}
+.det-row .v{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.readout{display:flex;justify-content:space-between;font-size:13px;border-top:1px solid var(--border);padding-top:8px;gap:8px}
+.readout .d-lbl{color:var(--muted)}
+.readout .d-val{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.readout small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.toast{align-self:center;background:var(--ink);color:var(--bg);font-size:12.5px;padding:9px 14px;border-radius:999px;text-align:center}
+.quiet{font-size:12px;color:var(--muted);text-align:center;line-height:1.4}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,0.28);display:flex;align-items:flex-end;padding:10px}
+.sheet{background:var(--paper);border:1px solid var(--border2);border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;width:100%}
+.sheet .lbl{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--signal)}
+.sheet .st{font-size:16px;font-weight:700;line-height:1.3;text-wrap:balance}
+.sheet p{margin:0;font-size:14px;line-height:1.45}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border-radius:10px;padding:10px 14px;font:600 13px var(--sans);border:1px solid var(--border2);background:var(--paper);color:var(--ink);cursor:default}
+.btn.live{background:var(--signal);border-color:var(--signal);color:#fff;box-shadow:0 10px 28px rgba(var(--signal-rgb),0.42)}
+.fields{display:flex;gap:8px;align-items:center;justify-content:center}
+.field{border:1px solid var(--border2);border-radius:10px;padding:10px 0;width:84px;text-align:center;font:600 22px var(--sans);font-variant-numeric:tabular-nums;background:var(--bg)}
+.field small{display:block;font:600 10px var(--sans);letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.colon{font:600 22px var(--sans)}
+.paces{display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--border);padding-top:10px}
+.paces .det-row .v.new{color:var(--signal)}
+.anchor{font-size:13px;line-height:1.45;margin:0}
+.facts{font-size:12px;color:var(--muted);line-height:1.5;margin:0;padding-left:18px}
+.facts li+li{margin-top:3px}
+.hand{animation:none}
+@media (prefers-reduced-motion:no-preference){ .frame{animation:fadein .25s ease} @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}} }
+</style>
+<div class="wrap">
+  <h1>The anchor nudge, played on your own two runs</h1>
+
+  <div class="rules">
+    <h2>What we ruled, built in v0.256.0</h2>
+    <p><b>D273.</b> A leg day one or two days before a long run of 75 minutes or more keeps the squat as written and the circuit, keeps every hip and ankle drill, and drops the glute block, the eccentric calf block and the carry. The day does not move.</p>
+    <h2 style="margin-top:4px">What we are adding, proposed</h2>
+    <p><b>The nudge.</b> Two easy runs in a row (recovery or long run cards, never a speed session), each more than a chart row off the prescribed pace, faster or slower. After the second one is logged, a sheet says what your runs imply your mile is and offers the pencil with that number filled in. The app never changes the number itself. One run never speaks. Skipped runs do not count. Silent in the last three weeks, when the mile is locked.</p>
+  </div>
+
+  <div class="steps" role="tablist" aria-label="Steps">
+    <button id="s1" aria-current="step">1 · Run</button>
+    <button id="s2">2 · Run</button>
+    <button id="s3">3 · Sheet</button>
+    <button id="s4">4 · Pencil</button>
+    <button id="s5">5 · Done</button>
+  </div>
+  <div class="ctl">
+    <div class="cap" id="cap"></div>
+    <button id="play" aria-pressed="true">Pause</button>
+  </div>
+
+  <div class="phone" id="phone"></div>
+
+  <ul class="facts">
+    <li>Your anchor is an 8:00 mile, entered in week 5. Recovery 10:30, tempo 9:25, 10K 9:00.</li>
+    <li>31 October: 5.46 mi in 60:10, 11:01 a mile, 31 s slower than the plan. 7 November: 5.52 mi in 60:59, 11:03, 33 s slower. A chart row on your card is about 30 s. Both runs qualify; the second one opens the sheet.</li>
+    <li>The number offered is the slower of the two runs read on the recovery column (8:33), rounded to the slower row: 9:00. Your tempo on 26 October (10:23 a mile) reads 8:54 and agrees.</li>
+    <li>Keep 8:00 and it stays quiet until two new runs qualify. From week 12 the mile is locked and the sheet never shows.</li>
+  </ul>
+</div>
+<script>
+(function(){
+  var CAP=[
+    'Saturday 31 October. You log the long run. 31 seconds a mile slower than the plan. One run never speaks: the app says Run logged and nothing else.',
+    'Saturday 7 November. You log today. 33 seconds a mile slower. That is two easy runs in a row more than a row off the plan.',
+    'The sheet opens over the day. It names both runs, says what they imply, and offers the pencil with 9:00 filled in. Two buttons. The app writes nothing on its own.',
+    'Update mile time opens the pencil sheet you already have, with 9:00 in the fields instead of blanks. You can still type anything.',
+    'Saved. The toast you already get, then the program card shows the new paces. Every run ahead of you rebuilds off 9:00.'
+  ];
+  function runLog(date, wk, title, planned, dist, time, pace, slower, quiet){
+    var h='<div class="frame"><div class="hdr"><span class="t">'+title+'</span><span class="s">'+date+' · Week '+wk+'</span></div>';
+    h+='<div class="plan"><span class="ps-lbl">Run · Planned</span><span>'+planned+'</span></div>';
+    h+='<div class="det-row"><span class="k">Distance</span><span class="v">'+dist+' mi</span></div><div class="det-row"><span class="k">Time</span><span class="v">'+time+'</span></div>';
+    h+='<div class="readout"><span class="d-lbl">Your pace</span><span class="d-val">'+pace+'/mi<small>'+slower+' slower than target</small></span></div>';
+    h+='<div class="toast">Run logged.</div>';
+    if(quiet) h+='<div class="quiet">One run never speaks.</div>';
+    h+='</div>';
+    return h;
+  }
+  function sheet(){
+    var h=runLog('Sat 7 Nov', 11, 'Long Run', '12.5 mi @ 10:30/mi', '5.52', '60:59', '11:03', '33s/mi', false);
+    h+='<div class="scrim"><div class="sheet frame"><div class="lbl">Coach</div><div class="st">Two easy runs in a row off the plan.</div>';
+    h+='<p>11:01 and 11:03 a mile against 10:30. Your runs say your mile is nearer 9:00 than 8:00. Change it and every run ahead of you rebuilds. The mile locks from week 12.</p>';
+    h+='<div class="btns"><span class="btn live">Update mile time</span><span class="btn">Keep 8:00</span></div></div></div>';
+    return h;
+  }
+  function pencil(){
+    var h='<div class="frame"><div class="hdr"><span class="t">Change mile time</span><span class="s">THE HALF MANNY</span></div>';
+    h+='<p class="anchor">Your best recent mile. Every pace in the program is worked out from it. Your runs say about 9:00. Change it if you know better.</p>';
+    h+='<div class="fields"><div class="field">9<small>min</small></div><span class="colon">:</span><div class="field">00<small>sec</small></div></div>';
+    h+='<p class="anchor" style="color:var(--muted);font-size:12px">Before this it was 8:00, the time you entered in week 5.</p>';
+    h+='<div class="btns"><span class="btn live">Save</span><span class="btn">Cancel</span></div></div>';
+    return h;
+  }
+  function done(){
+    var h='<div class="frame"><div class="toast">Mile set to 9:00. Every run ahead of you rebuilds off it.</div>';
+    h+='<div class="hdr" style="margin-top:6px"><span class="t">THE HALF MANNY</span><span class="s">Week 11 of 14</span></div>';
+    h+='<p class="anchor">Anchored on a <b>9:00 mile</b>, the time you entered in week 11. Before that it was 8:00.</p>';
+    h+='<div class="paces"><div class="det-row"><span class="k">Recovery</span><span class="v new">11:35/mi</span></div><div class="det-row"><span class="k">Tempo</span><span class="v new">10:30/mi</span></div><div class="det-row"><span class="k">10K pace</span><span class="v new">10:00/mi</span></div><div class="det-row"><span class="k">Half</span><span class="v new">10:40/mi</span></div></div>';
+    h+='<div class="quiet" style="margin-top:8px">Next Saturday, 12.5 mi at 11:35: about 2 h 25. Run it by heart rate anyway.</div></div>';
+    return h;
+  }
+  var FR=[
+    function(){ return runLog('Sat 31 Oct', 10, 'Long Run', '8 mi @ 10:30/mi', '5.46', '60:10', '11:01', '31s/mi', true); },
+    function(){ return runLog('Sat 7 Nov', 11, 'Long Run', '12.5 mi @ 10:30/mi', '5.52', '60:59', '11:03', '33s/mi', false); },
+    sheet, pencil, done
+  ];
+  var step=0, playing=true, timer=null;
+  var reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(i){ step=i; document.getElementById('phone').innerHTML=FR[i](); document.getElementById('cap').textContent=CAP[i];
+    for(var k=1;k<=5;k++){ var b=document.getElementById('s'+k); if(k===i+1) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current'); } }
+  function tick(){ show((step+1)%FR.length); }
+  function start(){ if(timer) clearInterval(timer); timer=setInterval(tick, 3200); }
+  function stop(){ if(timer) clearInterval(timer); timer=null; }
+  for(var k=1;k<=5;k++){ (function(n){ document.getElementById('s'+n).addEventListener('click', function(){ show(n-1); if(playing) start(); }); })(k); }
+  var pb=document.getElementById('play');
+  pb.addEventListener('click', function(){ playing=!playing; pb.textContent=playing?'Pause':'Play'; pb.setAttribute('aria-pressed', String(playing)); if(playing) start(); else stop(); });
+  show(0);
+  if(reduce){ playing=false; pb.textContent='Play'; pb.setAttribute('aria-pressed','false'); } else start();
+})();
+</script>

@@ -20,7 +20,7 @@ import { applySwapPrefs } from './swap-prefs.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 import type { Cardio, Cfg, DayKey, DayTag, Item, Program, Section, Week, WeekGrid, Weeks } from '../domain/index.ts';
 import type { EngineCfg } from './cardio-progression.ts';
-import type { CalendarPlan, EngineA, EngineB } from './engine-a-b-calendar.ts';
+import type { CalendarPlan, DayRoles, EngineA, EngineB } from './engine-a-b-calendar.ts';
 import type { EngineC } from './engine-c.ts';
 
 declare global {
@@ -654,6 +654,9 @@ function engineD_synthesis(cfg: EngineCfg, A: EngineA, B: EngineB, plan: Calenda
   // so it sees the settled block, and BEFORE bodyweightSweep so its substitutions are swept
   // by the same gear catch-all as everything else.
   { const _isBW=cfg.equipment==='bodyweight'; const _u=_swapUniverseList().filter(n=>gearOK(n)&&!(_isBW&&(_BW_SUBS[n]||_BW_GEAR.test(n)))); _swapUniverseReset(); _swapUniverseAdd(_u); }
+  // v0.256.0 (D273): the maintenance day is settled BEFORE the adjacent-day dedupe, so the dedupe judges the leg day
+  // as it ships (a block this pass drops can no longer force a rename on the day after it, D167's invariant).
+  d273PeakLegsPass(weeks, dayRoles, totalWeeks);
   deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks);
   // Final catch-all for the "Room only" tier — see bodyweightSweep. Runs AFTER core/hip
   // injection so it catches gear arriving from those subsystems too.
@@ -802,6 +805,49 @@ function d18LongRunDayPass(weeks: WeekGrid): void{
       }
       else day.sections=secs;   // tier C: carry ban only; the interference model owns the rest
     });
+  });
+}
+// ── v0.256.0 (D273, P-PEAKLEGS): THE LEG DAY BEFORE A TIER A LONG RUN IS A MAINTENANCE DAY ──
+// Mario's week 11 peak long run (12.5 miles) stopped at 5.5 with heavy legs, two days after the
+// 25-set Thursday leg day. The leg day was the same 25 sets in week 1 (3.1 miles) as in week 11,
+// and the deload never lands on the peak week (0 of 1,728 race programs). Doctrine agrees on the
+// shape (Doma 2013, 2017; Beattie 2017; Blagrove 2018; Centenari; Norris): a lift's fatigue lasts
+// days, lower-body work sits 48 to 72 hours before the long run, and as the running climbs the
+// lifting's volume falls while its intensity holds. So a day whose ROLE is legs, one or two days
+// before a long run _longRunTier reads A (the long-run day's own predicate: one doctrine line for
+// a big run, used everywhere), keeps the main lift exactly as written and the first accessory
+// block after it, whole (Amendment 1: the squat is the stimulus the ruling promised to keep, the
+// circuit the armor; a flat eight would have dropped the circuit on every three-set squat week).
+// Hip stability and foot & ankle (hip:true) and trunk sections are free; an informational
+// section (the taper note) stays. Every other loaded block goes whole: the glute block, the
+// eccentric calf block, the carry. The day never moves (D36; Mario, 2026-10-24: "not a move").
+// Weeks are flattened Monday to Sunday so a long run early in its week reaches back into the
+// week before, the way raceEveLiftPass reads. Runs after the session budget and the swap preferences
+// (the day is otherwise settled) and before the adjacent-day dedupe, which must judge the leg day as it
+// ships; the long-run day's own rules (d18LongRunDayPass) and race week (D37/D38) are never touched here.
+function d273PeakLegsPass(weeks: WeekGrid, dayRoles: DayRoles, totalWeeks: number): void{
+  const flat: { w: number; d: DayKey }[] = [];
+  for(let w=1; w<=totalWeeks; w++){ if(weeks[w]) _ISO_ORDER.forEach(d => flat.push({w,d})); }
+  const _isCarry: (it: Item) => boolean = it => /carry/i.test((it&&it.name)||'');
+  flat.forEach((x, i) => {
+    if((dayRoles[x.d]||'full')!=='legs') return;
+    const day = weeks[x.w][x.d]; if(!day || day.rest || !Array.isArray(day.sections)) return;
+    let near=false;
+    for(let k=1; k<=2 && !near; k++){ const y=flat[i+k]; if(!y) break; const ld=weeks[y.w][y.d]; if(ld && !ld.rest && _longRunTier(ld.cardio)==='A') near=true; }
+    if(!near) return;
+    let loaded=0;
+    const secs: Section[]=[];
+    day.sections.forEach(sec => {
+      if(!sec) return;
+      if(/carry/i.test(sec.label||'')||/carry/i.test(sec.coreHeader||'')) return;
+      const its=(sec.items||[]).filter(it=>!_isCarry(it));
+      if((sec.items||[]).length && !its.length) return;
+      const kept = its.length===(sec.items||[]).length ? sec : {...sec, items: its};
+      if(sec.hip || sec.core || sec.coreHeader){ secs.push(kept); return; }
+      if(!its.some(it => it && it.detail)){ secs.push(kept); return; }   // informational: the taper note
+      if(++loaded <= 2) secs.push(kept);
+    });
+    day.sections = secs;
   });
 }
 // ── V189 (D38): NO LIFTING FROM TWO DAYS OUT THROUGH THE RACE ─────────────────────

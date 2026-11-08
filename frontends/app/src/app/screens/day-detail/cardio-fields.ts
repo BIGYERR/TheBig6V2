@@ -67,8 +67,8 @@ import type { CardioFields as Fields } from './cardio-fields-model';
     @case ('run') {
       @if (f.kind === 'run') {
         <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -- the legacy label, kept as it was -->
-        <label [innerHTML]="label('run', ' Run — actual distance & pace')"></label>
-        @if (f.speedHint) {<div class="f-sub" style="margin-bottom:6px">Whole session off the watch — warm up, efforts and recoveries all count.</div>}
+        <label [innerHTML]="label('run', ' Log the run')"></label>
+        @if (f.speedHint) {<div class="f-sub" style="margin-bottom:6px">Whole session off the watch. Warm up, efforts and recoveries all count.</div>}
         <div class="iaw-wrap"><ng-container [ngTemplateOutlet]="wheel" [ngTemplateOutletContext]="{ $implicit: f.dist }" /><ng-container [ngTemplateOutlet]="wheel" [ngTemplateOutletContext]="{ $implicit: f.pace }" /></div>
       }
     }
@@ -83,7 +83,7 @@ import type { CardioFields as Fields } from './cardio-fields-model';
     @case ('swim') {
       @if (f.kind === 'swim') {
         <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -- the legacy label, kept as it was -->
-        <label [innerHTML]="label('swim', ' Swim — actual yardage')"></label>
+        <label [innerHTML]="label('swim', ' Log the swim')"></label>
         <input type="number" id="log_swim_yards" placeholder="yards" [attr.value]="f.yards" min="0" step="25" class="input-field">
       }
     }

@@ -1,0 +1,1674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>__TITLE__</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit}
+.ia{--bg:#F3F3F1;--surface:#FFFFFF;--surface2:#EDEDEA;--text:#111111;--muted:#6E6E6A;--border2:#CFCFCA;--band:#161618;--signal:#CF4E1A;--signal-press:#AE3F12;--on-signal:#FBF6EE;--signal-rgb:207,78,26;--glow:rgba(207,78,26,0.26);--finish:#111111;--scrim:rgba(17,17,17,0.42)}
+.ia[data-look="night"]{--bg:#000000;--surface:#161616;--surface2:#242424;--text:#FFFFFF;--muted:#A3A3A3;--border2:#3C3C3C;--band:#1C1C1C;--signal:#E2622B;--signal-press:#C4501E;--on-signal:#12110D;--signal-rgb:226,98,43;--glow:rgba(226,98,43,0.64);--finish:#1C1C1C;--scrim:rgba(0,0,0,0.6)}
+@media (prefers-color-scheme: dark){.ia[data-look="auto"]{--bg:#000000;--surface:#161616;--surface2:#242424;--text:#FFFFFF;--muted:#A3A3A3;--border2:#3C3C3C;--band:#1C1C1C;--signal:#E2622B;--signal-press:#C4501E;--on-signal:#12110D;--signal-rgb:226,98,43;--glow:rgba(226,98,43,0.64);--finish:#1C1C1C;--scrim:rgba(0,0,0,0.6)}}
+.ia input.fld::placeholder{color:rgba(255,255,255,0.5)}
+.ia textarea::placeholder{color:rgba(255,255,255,0.45)}
+input[type=range].rpe{position:absolute;left:0;right:0;top:0;width:100%;height:40px;margin:0;-webkit-appearance:none;appearance:none;background:transparent}
+input[type=range].rpe::-webkit-slider-runnable-track{height:40px;background:transparent}
+input[type=range].rpe::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--signal);border:2px solid #FFFFFF;margin-top:6px;box-shadow:0 1px 4px rgba(0,0,0,0.45)}
+input[type=range].rpe::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:var(--signal);border:2px solid #FFFFFF}
+.dz{scrollbar-width:none}.dz::-webkit-scrollbar{display:none}
+@keyframes hitshk{0%{transform:translate(0,0) rotate(0)}7%{transform:translate(-14px,6px) rotate(-2deg)}17%{transform:translate(12px,-5px) rotate(1.6deg)}29%{transform:translate(-9px,4px) rotate(-1.1deg)}43%{transform:translate(6px,-2px) rotate(0.7deg)}59%{transform:translate(-4px,2px) rotate(-0.4deg)}77%{transform:translate(2px,-1px) rotate(0.2deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes holein{0%{transform:rotate(-13deg) scale(0.2);opacity:0}55%{transform:rotate(-13deg) scale(1.12);opacity:1}100%{transform:rotate(-13deg) scale(1);opacity:1}}
+@keyframes d1{0%{transform:translate(0,0) rotate(0);opacity:1}38%{transform:translate(-52px,-26px) rotate(-140deg);opacity:1}100%{transform:translate(-98px,86px) rotate(-300deg);opacity:0}}
+@keyframes d2{0%{transform:translate(0,0) rotate(0);opacity:1}38%{transform:translate(46px,-34px) rotate(120deg);opacity:1}100%{transform:translate(88px,74px) rotate(280deg);opacity:0}}
+@keyframes d3{0%{transform:translate(0,0) rotate(0);opacity:1}38%{transform:translate(-22px,-44px) rotate(-90deg);opacity:1}100%{transform:translate(-44px,104px) rotate(-210deg);opacity:0}}
+@keyframes d4{0%{transform:translate(0,0) rotate(0);opacity:1}38%{transform:translate(28px,-40px) rotate(100deg);opacity:1}100%{transform:translate(58px,112px) rotate(240deg);opacity:0}}
+@keyframes deckTuck{0%{transform:translateY(-10px) scale(1.03) rotate(0deg);z-index:20;opacity:1}42%{transform:translateX(72%) translateY(-30px) scale(0.97) rotate(10deg);z-index:20;opacity:1}43%{z-index:1}82%{opacity:1}100%{transform:translateX(45px) translateY(-21px) scale(0.895) rotate(4.8deg);z-index:1;opacity:0}}
+@keyframes pagerLeave{from{transform:translateY(-10px) scale(1.03)}to{transform:translateY(calc(-100% - 14px)) scale(1)}}
+@keyframes peekRise{from{transform:translate(15px,-7px) scale(0.965) rotate(1.6deg)}to{transform:translate(0,0) scale(1) rotate(0deg)}}
+@keyframes pagerRise{from{transform:translateY(calc(100% + 14px))}to{transform:translateY(0)}}
+@keyframes peekFade{from{opacity:0.25}to{opacity:1}}
+@keyframes rpeWarpIn{0%{transform:scale(0.04) rotate(-12deg);opacity:0;filter:blur(4px)}55%{transform:scale(1.07) rotate(1.5deg);opacity:1;filter:blur(0)}78%{transform:scale(0.97) rotate(-0.5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes rpeWarpOut{0%{transform:scale(1) rotate(0);opacity:1}25%{transform:scale(1.05) rotate(-1.5deg);opacity:1}100%{transform:scale(0.04) rotate(12deg);opacity:0;filter:blur(4px)}}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}
+@keyframes scrimOut{from{opacity:1}to{opacity:0}}
+@keyframes toastin{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+<div class="ia" data-look="{{look}}" style="position: relative; width: 390px; height: 844px; box-sizing: border-box; background: radial-gradient(150% 455px at 50% -130px, var(--glow), transparent 68%) no-repeat, var(--bg); color: var(--text); overflow: hidden; display: flex; flex-direction: column;">
+
+  <div style="box-sizing: border-box; padding: 16px 14px 2px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-shrink: 0;">
+    <div style="min-width: 0;">
+      <div style="font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; padding-top: 6px;">{{dayTitle}}</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+      <button type="button" onClick="{{openMap}}" aria-label="See the whole session" style="width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; color: var(--text); display: flex; align-items: center; justify-content: center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg>
+      </button>
+    </div>
+  </div>
+
+  <div style="height: 10px; flex-shrink: 0;"></div>
+
+  <div style="{{deckStyle}}" onPointerMove="{{onMove}}" onPointerUp="{{onUp}}" onPointerLeave="{{onUp}}" onWheel="{{onWheel}}">
+
+    <sc-for list="{{ghosts}}" as="g" hint-placeholder-count="3">
+      <div style="{{g.style}}"></div>
+    </sc-for>
+
+    <sc-if value="{{peekOn}}" hint-placeholder-val="{{false}}">
+      <div style="{{peekStyle}}" aria-hidden="true">
+
+
+      <sc-if value="{{pv.c.done}}" hint-placeholder-val="{{true}}">
+        <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; background: var(--signal-press); padding: 11px 20px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span style="font-size: 14px; font-weight: 700; color: #FFFFFF;">Logged</span>
+        </div>
+      </sc-if>
+
+      <div class="dz" style="position: relative; flex-grow: 1; min-height: 0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;">
+
+        <sc-if value="{{pv.c.done}}" hint-placeholder-val="{{true}}">
+          <div style="position: absolute; top: 88px; right: -46px; color: #FFFFFF; opacity: 0.18; pointer-events: none;">
+            <svg width="240" height="240" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+        </sc-if>
+
+        <div style="position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0;">
+          <div style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 64px; font-weight: 800; line-height: 0.82; letter-spacing: -0.06em; color: #FFFFFF;">{{pv.c.num}}<span style="font-size: 23px; font-weight: 600; color: rgba(255,255,255,0.7);">/{{pv.total}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end; padding-top: 2px;">
+            <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end;">
+              <sc-for list="{{pv.c.chips}}" as="ch" hint-placeholder-count="2">
+                <span style="font-size: 12px; font-weight: 600; color: #FFFFFF; background: rgba(255,255,255,0.16); border-radius: 999px; padding: 4px 10px; white-space: nowrap;">{{ch.t}}</span>
+              </sc-for>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <sc-if value="{{pv.c.canSwap}}" hint-placeholder-val="{{true}}">
+                <button type="button" aria-label="Swap this exercise" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 8 16 13"></polyline><path d="M21 8H8a5 5 0 0 0-5 5"></path><polyline points="8 21 3 16 8 11"></polyline><path d="M3 16h13a5 5 0 0 0 5-5"></path></svg>
+                </button>
+              </sc-if>
+              <sc-if value="{{pv.c.canCant}}" hint-placeholder-val="{{true}}">
+                <button type="button" style="height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: #FFFFFF; color: #3F6236; font-size: 13px; font-weight: 700;">Can't run?</button>
+              </sc-if>
+              <sc-if value="{{pv.c.canAll}}" hint-placeholder-val="{{true}}">
+                <button type="button" aria-label="Skip the whole card" style="height: 40px; padding: 0 12px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  All
+                </button>
+              </sc-if>
+              <sc-if value="{{pv.c.dead}}" hint-placeholder-val="{{false}}">
+                <button type="button" aria-label="Put it back" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center; position: relative; z-index: 6;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+              </sc-if>
+              <sc-if value="{{pv.c.canSkip}}" hint-placeholder-val="{{true}}">
+                <button type="button" aria-label="Skip this card" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative; height: 1px; background: rgba(255,255,255,0.22); margin: 16px 0 12px; flex-shrink: 0;"></div>
+        <div style="position: relative; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">{{pv.c.kicker}}</div>
+        <div style="{{pv.c.titleStyle}}">{{pv.c.title}}</div>
+        <div style="position: relative; display: flex; align-items: flex-start; gap: 2px; padding-top: 10px; flex-shrink: 0;">
+          <span style="font-size: 17px; font-weight: 600; color: #FFFFFF; line-height: 1.3;">{{pv.c.rx}}</span>
+          <sc-if value="{{pv.c.hasRpe}}" hint-placeholder-val="{{true}}"><button type="button" aria-label="What RPE means" style="flex-shrink: 0; align-self: flex-start; margin: -5px 0 0 -2px; width: 22px; height: 22px; border: 0; padding: 0; background: transparent; color: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="11" x2="12" y2="17" stroke-linecap="round"></line><circle cx="12" cy="7.3" r="1.3" fill="currentColor" stroke="none"></circle></svg></button></sc-if>
+        </div>
+
+        <sc-if value="{{pv.c.hasFrom}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 6px 6px 6px 12px; background: rgba(255,255,255,0.16); border-radius: 999px; flex-shrink: 0;">
+            <span style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Swapped in</span>
+            <span style="flex-grow: 1; font-size: 12px; color: rgba(255,255,255,0.78);">for {{pv.c.from}}</span>
+            <button type="button" aria-label="Put it back" style="width: 32px; height: 32px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.c.hasLines}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; padding-top: 12px; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;">
+            <sc-for list="{{pv.c.lines}}" as="ln" hint-placeholder-count="3">
+              <div style="display: flex; gap: 8px;">
+                <span style="color: rgba(255,255,255,0.5); flex-shrink: 0;">&middot;</span>
+                <span style="font-size: 13px; line-height: 1.35; color: rgba(255,255,255,0.84);">{{ln.t}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.c.hasMembers}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; padding-top: 12px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
+            <sc-for list="{{pv.c.members}}" as="m" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+              <div style="{{m.rowStyle}}">
+                <span style="width: 18px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; color: rgba(255,255,255,0.7);">{{m.n}}</span>
+                <span style="flex-grow: 1; min-width: 0;">
+                  <span style="{{m.nameStyle}}">{{m.name}}</span>
+                  <span style="display: flex; align-items: flex-start; gap: 2px; padding-top: 2px;"><span style="font-size: 12px; color: rgba(255,255,255,0.78);">{{m.detail}}</span><sc-if value="{{m.hasRpe}}" hint-placeholder-val="{{false}}"><button type="button" aria-label="What RPE means" style="flex-shrink: 0; align-self: flex-start; margin: -4px 0 0 -3px; width: 18px; height: 18px; border: 0; padding: 0; background: transparent; color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="11" x2="12" y2="17" stroke-linecap="round"></line><circle cx="12" cy="7.3" r="1.3" fill="currentColor" stroke="none"></circle></svg></button></sc-if></span>
+                  <sc-if value="{{m.hasFrom}}" hint-placeholder-val="{{true}}">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; border-radius: 999px; background: rgba(255,255,255,0.2); color: #FFFFFF; padding: 3px 3px 3px 10px; font-size: 11px; font-weight: 600;">Swapped in for {{m.from}}<button type="button" aria-label="Put it back" style="width: 24px; height: 24px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button></span>
+                  </sc-if>
+                </span>
+                <sc-if value="{{m.live}}" hint-placeholder-val="{{true}}">
+                  <span style="display: flex; gap: 5px; flex-shrink: 0;">
+                    <sc-if value="{{m.hasLog}}" hint-placeholder-val="{{true}}">
+                      <button type="button" aria-label="{{m.toggleLabel}}" style="{{m.toggleStyle}}">
+                        <sc-if value="{{m.allOn}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></sc-if>
+                        <sc-if value="{{m.notAll}}" hint-placeholder-val="{{true}}"><span style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; font-weight: 700;">{{m.count}}</span></sc-if>
+                        <span style="{{m.caretStyle}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{m.canTick}}" hint-placeholder-val="{{false}}">
+                      <button type="button" aria-label="Mark this movement done" style="{{m.tickStyle}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+                    </sc-if>
+                    <sc-if value="{{m.canSwap}}" hint-placeholder-val="{{true}}">
+                      <button type="button" aria-label="Swap this movement" style="width: 34px; height: 34px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 8 16 13"></polyline><path d="M21 8H8a5 5 0 0 0-5 5"></path><polyline points="8 21 3 16 8 11"></polyline><path d="M3 16h13a5 5 0 0 0 5-5"></path></svg>
+                      </button>
+                    </sc-if>
+                    <button type="button" aria-label="Take this movement out" style="width: 34px; height: 34px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                  </span>
+                </sc-if>
+                <sc-if value="{{m.isOut}}" hint-placeholder-val="{{true}}">
+                  <button type="button" aria-label="Put it back" style="flex-shrink: 0; width: 34px; height: 34px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+                </sc-if>
+              </div>
+              <sc-if value="{{m.isOpen}}" hint-placeholder-val="{{false}}">
+                <div style="display: flex; flex-direction: column; gap: 6px; padding: 0 0 6px 16px;">
+                  <sc-for list="{{m.rows}}" as="mr" hint-placeholder-count="2">
+                    <div style="{{mr.wrap}}">
+                      <span style="width: 24px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);">{{mr.lbl}}</span>
+                      <sc-if value="{{mr.loaded}}" hint-placeholder-val="{{true}}">
+                        <label for="{{mr.id}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{mr.lbl}} load</label>
+                        <input class="fld" id="{{mr.id}}" type="text" inputmode="decimal" value="{{mr.w}}" placeholder="{{mr.ph}}" style="flex-grow: 1; min-width: 0; height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700;">
+                      </sc-if>
+                      <sc-if value="{{mr.typed}}" hint-placeholder-val="{{false}}">
+                        <label for="{{mr.rid}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{mr.lbl}} reps</label>
+                        <input class="fld" id="{{mr.rid}}" type="text" inputmode="numeric" value="{{mr.r}}" placeholder="reps" style="{{mr.repsBox}}">
+                      </sc-if>
+                      <sc-if value="{{mr.stepped}}" hint-placeholder-val="{{true}}">
+                        <div style="{{mr.stepBox}}">
+                          <button type="button" aria-label="One fewer" style="width: 30px; height: 42px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                          <span style="flex-grow: 1; text-align: center; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700; color: #FFFFFF;">{{mr.r}}<span style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7);">{{mr.unit}}</span></span>
+                          <button type="button" aria-label="One more" style="width: 30px; height: 42px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                      </sc-if>
+                      <button type="button" style="{{mr.btn}}" aria-label="Log this set"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{m.hasLoad}}" hint-placeholder-val="{{true}}">
+                    <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
+                      <label for="{{m.loadId}}" style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">Load</label>
+                      <input class="fld" id="{{m.loadId}}" type="text" inputmode="decimal" value="{{m.loadVal}}" placeholder="" style="width: 68px; flex-shrink: 0; height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700;">
+                      <span style="font-size: 12px; color: rgba(255,255,255,0.7); flex-shrink: 0;">lb</span>
+                      <sc-if value="{{m.hasLast}}" hint-placeholder-val="{{true}}">
+                        <button type="button" aria-label="Use last time's load" style="margin-left: auto; display: flex; align-items: center; gap: 6px; min-height: 42px; padding: 4px 12px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="display: flex; flex-direction: column; line-height: 1.15;"><span style="font-size: 13px; font-weight: 700;">{{m.lastText}}</span><span style="font-size: 10px; color: rgba(255,255,255,0.7);">last time</span></span></button>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{m.hasLast}}" hint-placeholder-val="{{true}}">
+                      <button type="button" style="display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="flex-grow: 1; font-size: 13px;">{{m.fillText}}</span><span style="font-size: 11px; color: rgba(255,255,255,0.7);">last time</span></button>
+                    </sc-if>
+                  </sc-if>
+                </div>
+              </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.c.hasCue}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.84); padding-top: 12px; flex-shrink: 0;">{{pv.c.cue}}</div>
+        </sc-if>
+
+        <div style="flex-grow: 1; min-height: 12px;"></div>
+
+        <sc-if value="{{pv.c.showSets}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0;">
+            <button type="button" style="{{pv.headStyle}}">
+              <span style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">Sets</span>
+              <span style="flex-grow: 1; text-align: left; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 15px; font-weight: 700; color: #FFFFFF;">{{pv.setSummary}}</span>
+              <span style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">{{pv.setCount}}</span>
+              <span style="{{pv.caretStyle}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </button>
+            <sc-if value="{{pv.open}}" hint-placeholder-val="{{true}}">
+              <div style="padding-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                <sc-for list="{{pv.rows}}" as="r" hint-placeholder-count="3">
+                  <div style="{{r.wrap}}">
+                    <span style="width: 24px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);">S{{r.n}}</span>
+                    <label for="{{r.id}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Set {{r.n}} load</label>
+                    <input class="fld" id="{{r.id}}" type="text" inputmode="decimal" value="{{r.w}}" placeholder="{{r.ph}}" style="flex-grow: 1; min-width: 0; height: 44px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 17px; font-weight: 700;">
+                    <div style="width: 104px; flex-shrink: 0; display: flex; align-items: center; border-radius: 12px; background: rgba(255,255,255,0.14);">
+                      <button type="button" aria-label="One fewer" style="width: 30px; height: 44px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                      <span style="flex-grow: 1; text-align: center; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700; color: #FFFFFF;">{{r.r}}<span style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7);">{{r.unit}}</span></span>
+                      <button type="button" aria-label="One more" style="width: 30px; height: 44px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                    </div>
+                    <button type="button" style="{{r.btn}}" aria-label="Log this set"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+                  </div>
+                </sc-for>
+                <sc-if value="{{pv.c.hasLoad}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
+                    <label for="peek-{{pv.loadId}}" style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">Load</label>
+                    <input class="fld" id="peek-{{pv.loadId}}" type="text" inputmode="decimal" value="{{pv.loadVal}}" placeholder="" style="width: 76px; flex-shrink: 0; height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700;">
+                    <span style="font-size: 12px; color: rgba(255,255,255,0.7); flex-shrink: 0;">lb</span>
+                    <sc-if value="{{pv.c.hasLast}}" hint-placeholder-val="{{true}}">
+                      <button type="button" aria-label="Use last time's load" style="margin-left: auto; display: flex; align-items: center; gap: 6px; min-height: 42px; padding: 4px 12px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="display: flex; flex-direction: column; line-height: 1.15;"><span style="font-size: 13px; font-weight: 700;">{{pv.c.lastText}}</span><span style="font-size: 10px; color: rgba(255,255,255,0.7);">last time</span></span></button>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{pv.c.hasLast}}" hint-placeholder-val="{{true}}">
+                    <button type="button" style="display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="flex-grow: 1; font-size: 13px;">{{pv.c.fillText}}</span><span style="font-size: 11px; color: rgba(255,255,255,0.7);">last time</span></button>
+                  </sc-if>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.c.showRun}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0;">
+            <button type="button" style="{{pv.headStyle}}">
+              <span style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">The run</span>
+              <span style="flex-grow: 1; text-align: left; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 15px; font-weight: 700; color: #FFFFFF;">{{pv.runSummary}}</span>
+              <span style="{{pv.caretStyle}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.c.isMoved}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: rgba(255,255,255,0.12); border-radius: 16px;">
+            <span style="align-self: flex-start; font-size: 12px; font-weight: 700; color: #111111; background: #FFFFFF; border-radius: 999px; padding: 4px 10px;">{{pv.movedTag}}</span>
+            <span style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.88);">{{pv.movedLine}}</span>
+            <button type="button" style="min-height: 44px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; font-size: 14px; font-weight: 700;">{{pv.unmoveText}}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.c.isFinish}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0;">
+            <div style="display: flex; align-items: baseline; gap: 12px; padding-bottom: 10px;">
+              <span style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: #FFFFFF;">{{pv.rpe}}</span>
+              <span style="font-size: 13px; color: rgba(255,255,255,0.7);">{{pv.rpeWord}}</span>
+            </div>
+            <div style="position: relative; height: 40px;">
+              <div style="position: absolute; left: 0; right: 0; top: 17px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.18);"></div>
+              <div style="{{pv.fillStyle}}"></div>
+              <input class="rpe" type="range" min="1" max="10" step="1" value="{{pv.rpe}}" aria-label="How hard was the whole session, 1 to 10">
+            </div>
+            <label for="peek-{{pv.ids.notes}}" style="display: block; font-size: 13px; color: rgba(255,255,255,0.7); padding: 12px 0 7px;">Anything to remember next week?</label>
+            <textarea id="peek-{{pv.ids.notes}}" placeholder="Left hamstring was tight on the last set." style="width: 100%; box-sizing: border-box; height: 66px; resize: none; padding: 12px; border: 0; border-radius: 16px; background: rgba(255,255,255,0.1); color: #FFFFFF; font-size: 14px; line-height: 1.4;"></textarea>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{pv.c.punched}}" hint-placeholder-val="{{true}}">
+        <svg viewBox="0 0 350 560" preserveAspectRatio="none" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;" aria-hidden="true">
+          <g fill="none" stroke="rgba(0,0,0,0.42)" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M170,196 L182,158 L172,126 L192,88 L184,54" stroke-width="3.4"></path>
+            <path d="M182,158 L214,140 L228,108" stroke-width="1.6"></path>
+            <path d="M126,214 L92,186 L86,146 L52,116" stroke-width="3"></path>
+            <path d="M124,286 L88,318 L80,364 L44,398" stroke-width="2.6"></path>
+            <path d="M186,290 L220,324 L224,372 L258,408" stroke-width="3.2"></path>
+            <path d="M212,246 L268,238 L312,258" stroke-width="2.2"></path>
+            <path d="M96,250 L44,242 L10,266" stroke-width="1.8"></path>
+          </g>
+        </svg>
+        <div style="{{pv.holeStyle}}">
+          <svg viewBox="0 0 220 220" width="200" height="200" aria-hidden="true">
+            <path d="M110,30 L122,52 L142,42 L140,66 L164,60 L154,82 L182,84 L164,102 L190,114 L166,124 L184,146 L158,144 L166,168 L142,158 L138,186 L118,166 L104,192 L96,164 L72,178 L74,152 L48,158 L60,136 L32,130 L52,112 L28,98 L54,88 L40,64 L66,68 L64,42 L88,54 Z" fill="rgba(0,0,0,0.62)" transform="translate(5,7)"></path>
+            <path d="M110,30 L122,52 L142,42 L140,66 L164,60 L154,82 L182,84 L164,102 L190,114 L166,124 L184,146 L158,144 L166,168 L142,158 L138,186 L118,166 L104,192 L96,164 L72,178 L74,152 L48,158 L60,136 L32,130 L52,112 L28,98 L54,88 L40,64 L66,68 L64,42 L88,54 Z" fill="var(--bg)"></path>
+            <g stroke="rgba(0,0,0,0.32)" stroke-width="1.2" stroke-linejoin="round">
+              <path d="M140,66 L168,44 L186,62 L154,82 Z" fill="#A6633A"></path>
+              <path d="M60,136 L30,152 L26,128 L52,112 Z" fill="#9C5A33"></path>
+              <path d="M138,186 L152,214 L126,218 L118,166 Z" fill="#AA6A40"></path>
+              <path d="M184,146 L212,158 L196,176 L166,168 Z" fill="#A6633A"></path>
+            </g>
+          </svg>
+        </div>
+      </sc-if>
+      <sc-if value="{{pv.c.hitting}}" hint-placeholder-val="{{true}}">
+        <sc-for list="{{pv.shards}}" as="sh" hint-placeholder-count="4">
+          <div style="{{sh.style}}"><svg viewBox="0 0 30 30" width="{{sh.size}}" height="{{sh.size}}" aria-hidden="true"><path d="M4,8 L20,2 L28,18 L12,28 Z" fill="{{sh.fill}}"></path></svg></div>
+        </sc-for>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <div style="{{cardStyle}}" onPointerDown="{{onDown}}">
+
+
+      <sc-if value="{{c.done}}" hint-placeholder-val="{{true}}">
+        <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; background: var(--signal-press); padding: 11px 20px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span style="font-size: 14px; font-weight: 700; color: #FFFFFF;">Logged</span>
+        </div>
+      </sc-if>
+
+      <div class="dz" style="position: relative; flex-grow: 1; min-height: 0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;">
+
+        <sc-if value="{{c.done}}" hint-placeholder-val="{{true}}">
+          <div style="position: absolute; top: 88px; right: -46px; color: #FFFFFF; opacity: 0.18; pointer-events: none;">
+            <svg width="240" height="240" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+        </sc-if>
+
+        <div style="position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0;">
+          <div style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 64px; font-weight: 800; line-height: 0.82; letter-spacing: -0.06em; color: #FFFFFF;">{{c.num}}<span style="font-size: 23px; font-weight: 600; color: rgba(255,255,255,0.7);">/{{total}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end; padding-top: 2px;">
+            <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end;">
+              <sc-for list="{{c.chips}}" as="ch" hint-placeholder-count="2">
+                <span style="font-size: 12px; font-weight: 600; color: #FFFFFF; background: rgba(255,255,255,0.16); border-radius: 999px; padding: 4px 10px; white-space: nowrap;">{{ch.t}}</span>
+              </sc-for>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <sc-if value="{{c.canSwap}}" hint-placeholder-val="{{true}}">
+                <button type="button" onClick="{{c.swap}}" aria-label="Swap this exercise" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 8 16 13"></polyline><path d="M21 8H8a5 5 0 0 0-5 5"></path><polyline points="8 21 3 16 8 11"></polyline><path d="M3 16h13a5 5 0 0 0 5-5"></path></svg>
+                </button>
+              </sc-if>
+              <sc-if value="{{c.canCant}}" hint-placeholder-val="{{true}}">
+                <button type="button" onClick="{{openCant}}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: #FFFFFF; color: #3F6236; font-size: 13px; font-weight: 700;">Can't run?</button>
+              </sc-if>
+              <sc-if value="{{c.canAll}}" hint-placeholder-val="{{true}}">
+                <button type="button" onClick="{{c.skip}}" aria-label="Skip the whole card" style="height: 40px; padding: 0 12px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  All
+                </button>
+              </sc-if>
+              <sc-if value="{{c.dead}}" hint-placeholder-val="{{false}}">
+                <button type="button" onClick="{{c.unskip}}" aria-label="Put it back" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center; position: relative; z-index: 6;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+              </sc-if>
+              <sc-if value="{{c.canSkip}}" hint-placeholder-val="{{true}}">
+                <button type="button" onClick="{{c.skip}}" aria-label="Skip this card" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative; height: 1px; background: rgba(255,255,255,0.22); margin: 16px 0 12px; flex-shrink: 0;"></div>
+        <div style="position: relative; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">{{c.kicker}}</div>
+        <div style="{{c.titleStyle}}">{{c.title}}</div>
+        <div style="position: relative; display: flex; align-items: flex-start; gap: 2px; padding-top: 10px; flex-shrink: 0;">
+          <span style="font-size: 17px; font-weight: 600; color: #FFFFFF; line-height: 1.3;">{{c.rx}}</span>
+          <sc-if value="{{c.hasRpe}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{c.openRpe}}" aria-label="What RPE means" style="flex-shrink: 0; align-self: flex-start; margin: -5px 0 0 -2px; width: 22px; height: 22px; border: 0; padding: 0; background: transparent; color: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="11" x2="12" y2="17" stroke-linecap="round"></line><circle cx="12" cy="7.3" r="1.3" fill="currentColor" stroke="none"></circle></svg></button></sc-if>
+        </div>
+
+        <sc-if value="{{c.hasFrom}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 6px 6px 6px 12px; background: rgba(255,255,255,0.16); border-radius: 999px; flex-shrink: 0;">
+            <span style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Swapped in</span>
+            <span style="flex-grow: 1; font-size: 12px; color: rgba(255,255,255,0.78);">for {{c.from}}</span>
+            <button type="button" onClick="{{c.unswap}}" aria-label="Put it back" style="width: 32px; height: 32px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{c.hasLines}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; padding-top: 12px; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;">
+            <sc-for list="{{c.lines}}" as="ln" hint-placeholder-count="3">
+              <div style="display: flex; gap: 8px;">
+                <span style="color: rgba(255,255,255,0.5); flex-shrink: 0;">&middot;</span>
+                <span style="font-size: 13px; line-height: 1.35; color: rgba(255,255,255,0.84);">{{ln.t}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{c.hasMembers}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; padding-top: 12px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
+            <sc-for list="{{c.members}}" as="m" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+              <div style="{{m.rowStyle}}">
+                <span style="width: 18px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; color: rgba(255,255,255,0.7);">{{m.n}}</span>
+                <span style="flex-grow: 1; min-width: 0;">
+                  <span style="{{m.nameStyle}}">{{m.name}}</span>
+                  <span style="display: flex; align-items: flex-start; gap: 2px; padding-top: 2px;"><span style="font-size: 12px; color: rgba(255,255,255,0.78);">{{m.detail}}</span><sc-if value="{{m.hasRpe}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{m.openRpe}}" aria-label="What RPE means" style="flex-shrink: 0; align-self: flex-start; margin: -4px 0 0 -3px; width: 18px; height: 18px; border: 0; padding: 0; background: transparent; color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="11" x2="12" y2="17" stroke-linecap="round"></line><circle cx="12" cy="7.3" r="1.3" fill="currentColor" stroke="none"></circle></svg></button></sc-if></span>
+                  <sc-if value="{{m.hasFrom}}" hint-placeholder-val="{{true}}">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; border-radius: 999px; background: rgba(255,255,255,0.2); color: #FFFFFF; padding: 3px 3px 3px 10px; font-size: 11px; font-weight: 600;">Swapped in for {{m.from}}<button type="button" onClick="{{m.unswap}}" aria-label="Put it back" style="width: 24px; height: 24px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button></span>
+                  </sc-if>
+                </span>
+                <sc-if value="{{m.live}}" hint-placeholder-val="{{true}}">
+                  <span style="display: flex; gap: 5px; flex-shrink: 0;">
+                    <sc-if value="{{m.hasLog}}" hint-placeholder-val="{{true}}">
+                      <button type="button" onClick="{{m.toggle}}" aria-label="{{m.toggleLabel}}" style="{{m.toggleStyle}}">
+                        <sc-if value="{{m.allOn}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></sc-if>
+                        <sc-if value="{{m.notAll}}" hint-placeholder-val="{{true}}"><span style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; font-weight: 700;">{{m.count}}</span></sc-if>
+                        <span style="{{m.caretStyle}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{m.canTick}}" hint-placeholder-val="{{false}}">
+                      <button type="button" onClick="{{m.tick}}" aria-label="Mark this movement done" style="{{m.tickStyle}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+                    </sc-if>
+                    <sc-if value="{{m.canSwap}}" hint-placeholder-val="{{true}}">
+                      <button type="button" onClick="{{m.swap}}" aria-label="Swap this movement" style="width: 34px; height: 34px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 8 16 13"></polyline><path d="M21 8H8a5 5 0 0 0-5 5"></path><polyline points="8 21 3 16 8 11"></polyline><path d="M3 16h13a5 5 0 0 0 5-5"></path></svg>
+                      </button>
+                    </sc-if>
+                    <button type="button" onClick="{{m.out}}" aria-label="Take this movement out" style="width: 34px; height: 34px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                  </span>
+                </sc-if>
+                <sc-if value="{{m.isOut}}" hint-placeholder-val="{{true}}">
+                  <button type="button" onClick="{{m.back}}" aria-label="Put it back" style="flex-shrink: 0; width: 34px; height: 34px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+                </sc-if>
+              </div>
+              <sc-if value="{{m.isOpen}}" hint-placeholder-val="{{false}}">
+                <div style="display: flex; flex-direction: column; gap: 6px; padding: 0 0 6px 16px;">
+                  <sc-for list="{{m.rows}}" as="mr" hint-placeholder-count="2">
+                    <div style="{{mr.wrap}}">
+                      <span style="width: 24px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);">{{mr.lbl}}</span>
+                      <sc-if value="{{mr.loaded}}" hint-placeholder-val="{{true}}">
+                        <label for="{{mr.id}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{mr.lbl}} load</label>
+                        <input class="fld" id="{{mr.id}}" type="text" inputmode="decimal" value="{{mr.w}}" onInput="{{mr.setW}}" placeholder="{{mr.ph}}" style="flex-grow: 1; min-width: 0; height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700;">
+                      </sc-if>
+                      <sc-if value="{{mr.typed}}" hint-placeholder-val="{{false}}">
+                        <label for="{{mr.rid}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{mr.lbl}} reps</label>
+                        <input class="fld" id="{{mr.rid}}" type="text" inputmode="numeric" value="{{mr.r}}" onInput="{{mr.setR}}" placeholder="reps" style="{{mr.repsBox}}">
+                      </sc-if>
+                      <sc-if value="{{mr.stepped}}" hint-placeholder-val="{{true}}">
+                        <div style="{{mr.stepBox}}">
+                          <button type="button" onClick="{{mr.rDown}}" aria-label="One fewer" style="width: 30px; height: 42px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                          <span style="flex-grow: 1; text-align: center; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700; color: #FFFFFF;">{{mr.r}}<span style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7);">{{mr.unit}}</span></span>
+                          <button type="button" onClick="{{mr.rUp}}" aria-label="One more" style="width: 30px; height: 42px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                      </sc-if>
+                      <button type="button" onClick="{{mr.log}}" style="{{mr.btn}}" aria-label="Log this set"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{m.hasLoad}}" hint-placeholder-val="{{true}}">
+                    <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
+                      <label for="{{m.loadId}}" style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">Load</label>
+                      <input class="fld" id="{{m.loadId}}" type="text" inputmode="decimal" value="{{m.loadVal}}" onInput="{{m.setLoad}}" placeholder="" style="width: 68px; flex-shrink: 0; height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700;">
+                      <span style="font-size: 12px; color: rgba(255,255,255,0.7); flex-shrink: 0;">lb</span>
+                      <sc-if value="{{m.hasLast}}" hint-placeholder-val="{{true}}">
+                        <button type="button" onClick="{{m.reuseLast}}" aria-label="Use last time's load" style="margin-left: auto; display: flex; align-items: center; gap: 6px; min-height: 42px; padding: 4px 12px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="display: flex; flex-direction: column; line-height: 1.15;"><span style="font-size: 13px; font-weight: 700;">{{m.lastText}}</span><span style="font-size: 10px; color: rgba(255,255,255,0.7);">last time</span></span></button>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{m.hasLast}}" hint-placeholder-val="{{true}}">
+                      <button type="button" onClick="{{m.fill}}" style="display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="flex-grow: 1; font-size: 13px;">{{m.fillText}}</span><span style="font-size: 11px; color: rgba(255,255,255,0.7);">last time</span></button>
+                    </sc-if>
+                  </sc-if>
+                </div>
+              </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{c.hasCue}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.84); padding-top: 12px; flex-shrink: 0;">{{c.cue}}</div>
+        </sc-if>
+
+        <div style="flex-grow: 1; min-height: 12px;"></div>
+
+        <sc-if value="{{c.showSets}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0;">
+            <button type="button" onClick="{{toggle}}" style="{{headStyle}}">
+              <span style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">Sets</span>
+              <span style="flex-grow: 1; text-align: left; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 15px; font-weight: 700; color: #FFFFFF;">{{setSummary}}</span>
+              <span style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">{{setCount}}</span>
+              <span style="{{caretStyle}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </button>
+            <sc-if value="{{open}}" hint-placeholder-val="{{true}}">
+              <div style="padding-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                <sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
+                  <div style="{{r.wrap}}">
+                    <span style="width: 24px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);">S{{r.n}}</span>
+                    <label for="{{r.id}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Set {{r.n}} load</label>
+                    <input class="fld" id="{{r.id}}" type="text" inputmode="decimal" value="{{r.w}}" onInput="{{r.setW}}" placeholder="{{r.ph}}" style="flex-grow: 1; min-width: 0; height: 44px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 17px; font-weight: 700;">
+                    <div style="width: 104px; flex-shrink: 0; display: flex; align-items: center; border-radius: 12px; background: rgba(255,255,255,0.14);">
+                      <button type="button" onClick="{{r.rDown}}" aria-label="One fewer" style="width: 30px; height: 44px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                      <span style="flex-grow: 1; text-align: center; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700; color: #FFFFFF;">{{r.r}}<span style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7);">{{r.unit}}</span></span>
+                      <button type="button" onClick="{{r.rUp}}" aria-label="One more" style="width: 30px; height: 44px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                    </div>
+                    <button type="button" onClick="{{r.log}}" style="{{r.btn}}" aria-label="Log this set"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+                  </div>
+                </sc-for>
+                <sc-if value="{{c.hasLoad}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
+                    <label for="{{loadId}}" style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">Load</label>
+                    <input class="fld" id="{{loadId}}" type="text" inputmode="decimal" value="{{loadVal}}" onInput="{{setLoad}}" placeholder="" style="width: 76px; flex-shrink: 0; height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 16px; font-weight: 700;">
+                    <span style="font-size: 12px; color: rgba(255,255,255,0.7); flex-shrink: 0;">lb</span>
+                    <sc-if value="{{c.hasLast}}" hint-placeholder-val="{{true}}">
+                      <button type="button" onClick="{{reuseLast}}" aria-label="Use last time's load" style="margin-left: auto; display: flex; align-items: center; gap: 6px; min-height: 42px; padding: 4px 12px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="display: flex; flex-direction: column; line-height: 1.15;"><span style="font-size: 13px; font-weight: 700;">{{c.lastText}}</span><span style="font-size: 10px; color: rgba(255,255,255,0.7);">last time</span></span></button>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{c.hasLast}}" hint-placeholder-val="{{true}}">
+                    <button type="button" onClick="{{fillAll}}" style="display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: #FFFFFF; text-align: left;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg><span style="flex-grow: 1; font-size: 13px;">{{c.fillText}}</span><span style="font-size: 11px; color: rgba(255,255,255,0.7);">last time</span></button>
+                  </sc-if>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{c.showRun}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0;">
+            <button type="button" onClick="{{toggle}}" style="{{headStyle}}">
+              <span style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">The run</span>
+              <span style="flex-grow: 1; text-align: left; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 15px; font-weight: 700; color: #FFFFFF;">{{runSummary}}</span>
+              <span style="{{caretStyle}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </button>
+            <sc-if value="{{open}}" hint-placeholder-val="{{true}}">
+              <div style="padding-top: 8px; display: flex; flex-direction: column; gap: 10px;">
+                <sc-if value="{{rf.hasStrip}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(0,0,0,0.16);">
+                    <span style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);">{{rf.stripLabel}}</span>
+                    <span style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 14px; font-weight: 700; color: #FFFFFF; white-space: nowrap;">{{rf.stripVal}}</span>
+                  </div>
+                </sc-if>
+                <div style="display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: #FFFFFF;">
+                  <sc-if value="{{rf.isRun}}" hint-placeholder-val="{{true}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="5" r="2"></circle><path d="M14 7l-3 6"></path><path d="M14 9l4 1"></path><path d="M14 9l-4-1"></path><path d="M11 13l3 4-1 4"></path><path d="M11 13l-3 3 1 4"></path></svg></sc-if>
+                  <sc-if value="{{rf.isBike}}" hint-placeholder-val="{{false}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="M12 17.5V14l-3-3 4-3 2 3h2"></path></svg></sc-if>
+                  <sc-if value="{{rf.isSwim}}" hint-placeholder-val="{{false}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="2"></circle><path d="M10 10l4-2 3 2"></path><path d="M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0"></path><path d="M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0"></path></svg></sc-if>
+                  <span>{{rf.label}}</span>
+                </div>
+                <sc-if value="{{rf.hasHint}}" hint-placeholder-val="{{true}}">
+                  <div style="margin-top: -4px; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,0.84);">{{rf.hint}}</div>
+                </sc-if>
+                <sc-if value="{{rf.hasWheels}}" hint-placeholder-val="{{true}}">
+                  <div style="{{rf.wrapStyle}}">
+                    <sc-for list="{{rf.wheels}}" as="wh" hint-placeholder-count="2">
+                      <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0;">
+                        <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);">{{wh.cap}}</div>
+                        <div class="iaw" style="position: relative; display: flex; justify-content: center; align-items: flex-start; gap: 2px; height: 110px; border-radius: 12px; background: rgba(0,0,0,0.16); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none;">
+                          <div style="position: absolute; left: 6px; right: 6px; top: 40px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.16); pointer-events: none;"></div>
+                          <sc-for list="{{wh.cols}}" as="col" hint-placeholder-count="3">
+                            <sc-if value="{{col.isSep}}" hint-placeholder-val="{{false}}">
+                              <div style="position: relative; height: 110px; line-height: 110px; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 20px; font-weight: 800; color: #FFFFFF; pointer-events: none;">{{col.sep}}</div>
+                            </sc-if>
+                            <sc-if value="{{col.isCol}}" hint-placeholder-val="{{true}}">
+                              <div style="{{col.style}}" onPointerDown="{{col.down}}" onWheel="{{col.wheel}}">
+                                <div style="{{col.stackStyle}}">
+                                  <sc-for list="{{col.rows}}" as="r" hint-placeholder-count="7">
+                                    <div style="{{r.style}}">{{r.face}}</div>
+                                  </sc-for>
+                                </div>
+                              </div>
+                            </sc-if>
+                          </sc-for>
+                        </div>
+                        <sc-if value="{{wh.hasSub}}" hint-placeholder-val="{{true}}">
+                          <div style="font-size: 12px; line-height: 1.35; color: rgba(255,255,255,0.78);">{{wh.sub}}</div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{rf.isSwimForm}}" hint-placeholder-val="{{false}}">
+                  <input class="fld" id="{{rf.yardsId}}" type="number" min="0" step="25" inputmode="numeric" value="{{rf.yards}}" onInput="{{rf.setYards}}" placeholder="yards" aria-label="Swim yards" style="width: 100%; box-sizing: border-box; height: 50px; padding: 0 14px; border: 0; border-radius: 12px; background: rgba(0,0,0,0.16); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 19px; font-weight: 700;">
+                </sc-if>
+                <sc-if value="{{rf.hasDerived}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.22);">
+                    <span style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78); flex-shrink: 0;">{{rf.dLbl}}</span>
+                    <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right;">
+                      <span style="{{rf.dValStyle}}">{{rf.dVal}}</span>
+                      <sc-if value="{{rf.hasDNote}}" hint-placeholder-val="{{true}}"><span style="font-size: 11px; line-height: 1.3; color: rgba(255,255,255,0.78);">{{rf.dNote}}</span></sc-if>
+                    </span>
+                  </div>
+                </sc-if>
+                <button type="button" onClick="{{rf.togglePick}}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; padding: 2px 0; border: 0; background: none; color: rgba(255,255,255,0.78); font-size: 12px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v5h5"></path><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path><polyline points="12 7 12 12 15 15"></polyline></svg> Did a different activity?</button>
+                <sc-if value="{{rf.pickOpen}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.78);">Logged as</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                      <sc-for list="{{rf.chips}}" as="ch" hint-placeholder-count="3">
+                        <button type="button" onClick="{{ch.pick}}" style="{{ch.style}}">
+                          <sc-if value="{{ch.isRun}}" hint-placeholder-val="{{true}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="5" r="2"></circle><path d="M14 7l-3 6"></path><path d="M14 9l4 1"></path><path d="M14 9l-4-1"></path><path d="M11 13l3 4-1 4"></path><path d="M11 13l-3 3 1 4"></path></svg></sc-if>
+                          <sc-if value="{{ch.isBike}}" hint-placeholder-val="{{false}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="M12 17.5V14l-3-3 4-3 2 3h2"></path></svg></sc-if>
+                          <sc-if value="{{ch.isSwim}}" hint-placeholder-val="{{false}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="2"></circle><path d="M10 10l4-2 3 2"></path><path d="M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0"></path><path d="M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0"></path></svg></sc-if>
+                          <span>{{ch.label}}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{rf.hasNote}}" hint-placeholder-val="{{false}}">
+                      <div style="font-size: 11px; line-height: 1.4; color: #FFFFFF;">{{rf.swapNote}}</div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                <button type="button" onClick="{{rf.log}}" style="{{rf.logStyle}}">{{rf.logLabel}}</button>
+                <div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.84); border-top: 1px solid rgba(255,255,255,0.22); padding-top: 10px;">{{c.note}}</div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{c.isMoved}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: rgba(255,255,255,0.12); border-radius: 16px;">
+            <span style="align-self: flex-start; font-size: 12px; font-weight: 700; color: #111111; background: #FFFFFF; border-radius: 999px; padding: 4px 10px;">{{movedTag}}</span>
+            <span style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.88);">{{movedLine}}</span>
+            <button type="button" onClick="{{unmove}}" style="min-height: 44px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; font-size: 14px; font-weight: 700;">{{unmoveText}}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{c.showRest}}" hint-placeholder-val="{{false}}">
+          <div style="position: relative; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding-top: 16px;">
+            <sc-for list="{{rs.lines}}" as="ln" hint-placeholder-count="1">
+              <div style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13px; font-weight: 700; color: #FFFFFF; padding: 9px 12px; border-radius: 12px; background: rgba(0,0,0,0.16);">{{ln.text}}</div>
+            </sc-for>
+            <sc-if value="{{rs.isMoved}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 12px 12px 12px 14px; background: rgba(255,255,255,0.12); border-radius: 16px;">
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+                  <span style="align-self: flex-start; font-size: 12px; font-weight: 700; color: #111111; background: #FFFFFF; border-radius: 999px; padding: 4px 10px;">{{rs.movedTag}}</span>
+                  <span style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.88);">{{rs.movedLine}}</span>
+                </div>
+                <button type="button" onClick="{{rs.unmove}}" aria-label="Put it back" style="flex-shrink: 0; width: 40px; height: 40px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+              </div>
+            </sc-if>
+            <sc-if value="{{rs.canMove}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{rs.toMove}}" style="{{rs.moveHead}}">
+                <span style="flex-grow: 1; text-align: left; font-size: 15px; font-weight: 700; color: #FFFFFF;">Training anyway?</span>
+                <span style="{{rs.moveCaret}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+              </button>
+            </sc-if>
+            <sc-if value="{{rs.moveOpen}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 0 2px 6px;">
+                <div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.84);">{{rs.moveIntro}}</div>
+                <sc-if value="{{rs.hasAlready}}" hint-placeholder-val="{{false}}">
+                  <div style="padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,0.16);">
+                    <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">Already logged here</div>
+                    <sc-for list="{{rs.already}}" as="al" hint-placeholder-count="1"><div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.88);">{{al.text}}</div></sc-for>
+                    <div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.88);">{{rs.alreadyTail}}</div>
+                  </div>
+                </sc-if>
+                <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78); padding-top: 4px;">Not logged this week</div>
+                <sc-for list="{{rs.cands}}" as="cd" hint-placeholder-count="4">
+                  <button type="button" onClick="{{cd.pick}}" style="{{cd.style}}">
+                    <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">{{cd.title}}</span><span style="font-size: 12px; opacity: 0.8;">{{cd.desc}}</span></span>
+                  </button>
+                </sc-for>
+                <sc-if value="{{rs.hasWarn}}" hint-placeholder-val="{{false}}">
+                  <div style="padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,0.2); box-shadow: inset 3px 0 0 #FFB199;">
+                    <div style="font-size: 13px; font-weight: 700; color: #FFB199;">{{rs.warnTtl}}</div>
+                    <div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.88); padding-top: 3px;">{{rs.warnSub}}</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{rs.hasPick}}" hint-placeholder-val="{{false}}">
+                  <button type="button" onClick="{{rs.applyMove}}" style="min-height: 46px; border: 0; border-radius: 999px; background: #FFFFFF; color: #111111; font-size: 15px; font-weight: 700;">Move it here</button>
+                </sc-if>
+              </div>
+            </sc-if>
+            <button type="button" onClick="{{rs.toCardio}}" style="{{rs.cardioHead}}">
+              <span style="flex-grow: 1; text-align: left; font-size: 15px; font-weight: 700; color: #FFFFFF;">{{rs.cardioWord}}</span>
+              <span style="{{rs.cardioCaret}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </button>
+            <sc-if value="{{rs.cardioOpen}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 10px; padding: 0 2px 6px;">
+                <div style="font-size: 19px; font-weight: 800; letter-spacing: -0.02em; color: #FFFFFF;">{{rs.cTitle}}</div>
+                <div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.84);">{{rs.cIntro}}</div>
+                <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78); padding-top: 4px;">Modality</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  <sc-for list="{{rs.types}}" as="ty" hint-placeholder-count="2"><button type="button" onClick="{{ty.pick}}" style="{{ty.style}}">{{ty.label}}</button></sc-for>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <sc-for list="{{rs.wheels}}" as="wh" hint-placeholder-count="2">
+                <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0;">
+                  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);">{{wh.cap}}</div>
+                  <div class="iaw" style="position: relative; display: flex; justify-content: center; align-items: flex-start; gap: 2px; height: 110px; border-radius: 12px; background: rgba(0,0,0,0.16); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none;">
+                    <div style="position: absolute; left: 6px; right: 6px; top: 40px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.16); pointer-events: none;"></div>
+                    <sc-for list="{{wh.cols}}" as="col" hint-placeholder-count="3">
+                      <sc-if value="{{col.isSep}}" hint-placeholder-val="{{false}}">
+                        <div style="position: relative; height: 110px; line-height: 110px; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 20px; font-weight: 800; color: #FFFFFF; pointer-events: none;">{{col.sep}}</div>
+                      </sc-if>
+                      <sc-if value="{{col.isCol}}" hint-placeholder-val="{{true}}">
+                        <div style="{{col.style}}" onPointerDown="{{col.down}}" onWheel="{{col.wheel}}">
+                          <div style="{{col.stackStyle}}">
+                            <sc-for list="{{col.rows}}" as="r" hint-placeholder-count="7">
+                              <div style="{{r.style}}">{{r.face}}</div>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-if>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{wh.hasSub}}" hint-placeholder-val="{{true}}">
+                    <div style="font-size: 12px; line-height: 1.35; color: rgba(255,255,255,0.78);">{{wh.sub}}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78); padding-top: 4px;">How hard</div>
+                <sc-for list="{{rs.rpes}}" as="rp" hint-placeholder-count="3">
+                  <button type="button" onClick="{{rp.pick}}" style="{{rp.style}}"><span style="font-size: 14px; font-weight: 800;">{{rp.head}}</span><span style="font-size: 12px; opacity: 0.82;">{{rp.desc}}</span></button>
+                </sc-for>
+                <sc-if value="{{rs.hard}}" hint-placeholder-val="{{false}}">
+                  <div style="padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,0.2); box-shadow: inset 3px 0 0 #FFB199;">
+                    <div style="font-size: 13px; font-weight: 700; color: #FFB199;">Noted</div>
+                    <div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.88); padding-top: 3px;">Hard effort is not a rest day, it is a training day. Logging it as it happened. Keep an eye on how tomorrow feels.</div>
+                  </div>
+                </sc-if>
+                <button type="button" onClick="{{rs.log}}" style="{{rs.logStyle}}">{{rs.logLabel}}</button>
+                <sc-if value="{{rs.hasClear}}" hint-placeholder-val="{{false}}">
+                  <button type="button" onClick="{{rs.clear}}" style="min-height: 36px; border: 0; background: none; color: rgba(255,255,255,0.84); font-size: 13px; font-weight: 600;">{{rs.clearLabel}}</button>
+                </sc-if>
+              </div>
+            </sc-if>
+            <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.22);">
+              <div style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.78);">{{rs.tipLbl}}</div>
+              <div style="font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.9);">{{rs.tipTxt}}</div>
+              <div style="font-size: 11px; color: rgba(255,255,255,0.66);">{{rs.tipSrc}}</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{c.isFinish}}" hint-placeholder-val="{{true}}">
+          <div style="position: relative; flex-shrink: 0;">
+            <div style="display: flex; align-items: baseline; gap: 12px; padding-bottom: 10px;">
+              <span style="font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: #FFFFFF;">{{rpe}}</span>
+              <span style="font-size: 13px; color: rgba(255,255,255,0.7);">{{rpeWord}}</span>
+            </div>
+            <div style="position: relative; height: 40px;">
+              <div style="position: absolute; left: 0; right: 0; top: 17px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.18);"></div>
+              <div style="{{fillStyle}}"></div>
+              <input class="rpe" type="range" min="1" max="10" step="1" value="{{rpe}}" onInput="{{setR}}" aria-label="How hard was the whole session, 1 to 10">
+            </div>
+            <label for="{{ids.notes}}" style="display: block; font-size: 13px; color: rgba(255,255,255,0.7); padding: 12px 0 7px;">Anything to remember next week?</label>
+            <textarea id="{{ids.notes}}" placeholder="Left hamstring was tight on the last set." style="width: 100%; box-sizing: border-box; height: 66px; resize: none; padding: 12px; border: 0; border-radius: 16px; background: rgba(255,255,255,0.1); color: #FFFFFF; font-size: 14px; line-height: 1.4;"></textarea>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{c.punched}}" hint-placeholder-val="{{true}}">
+        <svg viewBox="0 0 350 560" preserveAspectRatio="none" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;" aria-hidden="true">
+          <g fill="none" stroke="rgba(0,0,0,0.42)" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M170,196 L182,158 L172,126 L192,88 L184,54" stroke-width="3.4"></path>
+            <path d="M182,158 L214,140 L228,108" stroke-width="1.6"></path>
+            <path d="M126,214 L92,186 L86,146 L52,116" stroke-width="3"></path>
+            <path d="M124,286 L88,318 L80,364 L44,398" stroke-width="2.6"></path>
+            <path d="M186,290 L220,324 L224,372 L258,408" stroke-width="3.2"></path>
+            <path d="M212,246 L268,238 L312,258" stroke-width="2.2"></path>
+            <path d="M96,250 L44,242 L10,266" stroke-width="1.8"></path>
+          </g>
+        </svg>
+        <div style="{{holeStyle}}">
+          <svg viewBox="0 0 220 220" width="200" height="200" aria-hidden="true">
+            <path d="M110,30 L122,52 L142,42 L140,66 L164,60 L154,82 L182,84 L164,102 L190,114 L166,124 L184,146 L158,144 L166,168 L142,158 L138,186 L118,166 L104,192 L96,164 L72,178 L74,152 L48,158 L60,136 L32,130 L52,112 L28,98 L54,88 L40,64 L66,68 L64,42 L88,54 Z" fill="rgba(0,0,0,0.62)" transform="translate(5,7)"></path>
+            <path d="M110,30 L122,52 L142,42 L140,66 L164,60 L154,82 L182,84 L164,102 L190,114 L166,124 L184,146 L158,144 L166,168 L142,158 L138,186 L118,166 L104,192 L96,164 L72,178 L74,152 L48,158 L60,136 L32,130 L52,112 L28,98 L54,88 L40,64 L66,68 L64,42 L88,54 Z" fill="var(--bg)"></path>
+            <g stroke="rgba(0,0,0,0.32)" stroke-width="1.2" stroke-linejoin="round">
+              <path d="M140,66 L168,44 L186,62 L154,82 Z" fill="#A6633A"></path>
+              <path d="M60,136 L30,152 L26,128 L52,112 Z" fill="#9C5A33"></path>
+              <path d="M138,186 L152,214 L126,218 L118,166 Z" fill="#AA6A40"></path>
+              <path d="M184,146 L212,158 L196,176 L166,168 Z" fill="#A6633A"></path>
+            </g>
+          </svg>
+        </div>
+      </sc-if>
+      <sc-if value="{{c.hitting}}" hint-placeholder-val="{{true}}">
+        <sc-for list="{{shards}}" as="sh" hint-placeholder-count="4">
+          <div style="{{sh.style}}"><svg viewBox="0 0 30 30" width="{{sh.size}}" height="{{sh.size}}" aria-hidden="true"><path d="M4,8 L20,2 L28,18 L12,28 Z" fill="{{sh.fill}}"></path></svg></div>
+        </sc-for>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{vert}}" hint-placeholder-val="{{false}}">
+      <div style="position: absolute; right: -24px; top: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+        <sc-for list="{{dots}}" as="d" hint-placeholder-count="5">
+          <button type="button" onClick="{{d.pick}}" style="{{d.vStyle}}" aria-label="{{d.label}}"></button>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{horiz}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 14px 20px 0; flex-shrink: 0;">
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="5">
+        <button type="button" onClick="{{d.pick}}" style="{{d.hStyle}}" aria-label="{{d.label}}"></button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="box-sizing: border-box; padding: 12px 20px 20px; flex-shrink: 0;">
+    <sc-if value="{{showCta}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{advance}}" style="{{cta}}">{{ctaText}}</button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; left: 20px; right: 20px; bottom: 96px; z-index: 60; display: flex; justify-content: center; pointer-events: none;">
+      <div style="background: var(--text); color: var(--bg); font-size: 14px; font-weight: 600; padding: 11px 18px; border-radius: 999px; text-align: center; animation: toastin 180ms ease-out;">{{toast}}</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isRpeSheet}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; z-index: 55;">
+      <button type="button" onClick="{{closeRpe}}" aria-label="Close" style="{{rpeScrim}}"></button>
+      <div role="dialog" aria-label="What RPE means" style="{{rpeBubble}}">
+        <div style="font-size: 12px; font-weight: 600; line-height: 16px; color: var(--muted);">Rate of perceived exertion</div>
+        <div style="font-size: 30px; font-weight: 800; line-height: 34px; letter-spacing: -0.03em; padding-top: 2px;">RPE {{rpeN}}</div>
+        <div style="font-size: 16px; font-weight: 400; line-height: 22px; padding-top: 6px;">{{rpeLine}}</div>
+        <div style="font-size: 12px; font-weight: 600; line-height: 16px; color: var(--muted); padding: 20px 0 8px;">The talk test</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <sc-for list="{{rpeRows}}" as="rr" hint-placeholder-count="4">
+            <div style="{{rr.style}}">
+              <span style="{{rr.rangeStyle}}">{{rr.range}}</span>
+              <span style="{{rr.labelStyle}}">{{rr.label}}</span>
+              <span style="{{rr.detailStyle}}">{{rr.detail}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size: 12px; font-weight: 400; line-height: 16px; color: var(--muted); padding: 8px 12px 0;">Lifting uses the same feel: how many reps you leave in reserve.</div>
+        <button type="button" onClick="{{closeRpe}}" style="width: 100%; height: 48px; margin-top: 20px; border: 0; border-radius: 999px; background: var(--text); color: var(--bg); font-size: 16px; font-weight: 700;">Got it</button>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{hasSheet}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; z-index: 50;">
+      <button type="button" onClick="{{closeSheet}}" aria-label="Close" style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--scrim);"></button>
+      <div class="dz" style="position: absolute; left: 0; right: 0; bottom: 0; max-height: 88%; overflow-y: auto; background: var(--bg); border-radius: 24px 24px 0 0;">
+
+        <sc-if value="{{isSwapSheet}}" hint-placeholder-val="{{true}}">
+          <div style="background: var(--band); color: #FFFFFF; padding: 16px 20px 16px; border-radius: 24px 24px 0 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 13px; color: rgba(255,255,255,0.6);">Swap</span>
+              <button type="button" onClick="{{closeSheet}}" style="min-width: 44px; min-height: 36px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.12); color: #FFFFFF; font-size: 13px; font-weight: 600; padding: 0 12px;">Close</button>
+            </div>
+            <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; padding-top: 4px;">{{sw.name}}</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; padding-top: 10px;">
+              <sc-for list="{{sw.tags}}" as="tg" hint-placeholder-count="3">
+                <span style="font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.12); color: #FFFFFF; border-radius: 999px; padding: 4px 10px;">{{tg.t}}</span>
+              </sc-for>
+            </div>
+            <div style="font-size: 13px; color: rgba(255,255,255,0.7); padding-top: 10px;">Whatever you pick keeps {{sw.keeps}}.</div>
+          </div>
+          <div style="padding: 16px 20px 26px;">
+            <sc-if value="{{sw.hasT1}}" hint-placeholder-val="{{true}}">
+              <div style="font-size: 15px; font-weight: 700; color: var(--text);">Same job</div>
+              <div style="font-size: 13px; color: var(--muted); padding: 2px 0 10px;">These do the same work. Your week keeps its shape.</div>
+              <sc-for list="{{sw.t1}}" as="o" hint-placeholder-count="3">
+                <button type="button" onClick="{{o.pick}}" style="display: block; width: 100%; text-align: left; min-height: 48px; margin-bottom: 6px; padding: 12px 16px; border: 0; border-radius: 16px; background: var(--surface); color: var(--text); font-size: 15px; font-weight: 600;">{{o.name}}</button>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{sw.hasT2}}" hint-placeholder-val="{{true}}">
+              <div style="font-size: 15px; font-weight: 700; color: var(--signal); padding-top: 12px;">Different job, same day</div>
+              <div style="font-size: 13px; color: var(--muted); padding: 2px 0 10px;">{{sw.t2Sub}}</div>
+              <sc-for list="{{sw.t2}}" as="o" hint-placeholder-count="3">
+                <button type="button" onClick="{{o.pick}}" style="display: block; width: 100%; text-align: left; min-height: 48px; margin-bottom: 6px; padding: 10px 16px; border: 0; border-radius: 16px; background: var(--surface); color: var(--text);"><span style="display: block; font-size: 15px; font-weight: 600;">{{o.name}}</span><span style="display: block; font-size: 12px; color: var(--signal); padding-top: 2px;">Different job. Region volume holds.</span></button>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{sw.empty}}" hint-placeholder-val="{{false}}">
+              <div style="font-size: 14px; line-height: 1.5; color: var(--muted); padding: 4px 0 8px;">Nothing else in your kit does this job. Keep it, or drop it with the minus and move on.</div>
+            </sc-if>
+            <div style="font-size: 13px; color: var(--muted); padding-top: 8px;">Swaps hold for this session only. Next week says what it always said.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isCantSheet}}" hint-placeholder-val="{{true}}">
+          <div style="padding: 22px 20px 26px;">
+            <div style="font-size: 13px; color: var(--muted);">{{cantKicker}}</div>
+            <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.03em; padding-top: 4px;">Can't run today?</div>
+            <div style="font-size: 14px; color: var(--muted); line-height: 1.5; padding: 6px 0 16px;">Move it to another day this week, or take it off today. Your lifts stay put.</div>
+            <button type="button" onClick="{{toMove}}" style="display: block; width: 100%; text-align: left; margin-bottom: 8px; padding: 14px 16px; border: 0; border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 2px var(--text);"><span style="display: block; font-size: 16px; font-weight: 700;">Move it</span><span style="display: block; font-size: 13px; color: var(--muted); padding-top: 2px;">Pick a day. Anything that clashes gets flagged.</span></button>
+            <button type="button" onClick="{{skipRun}}" style="display: block; width: 100%; text-align: left; padding: 14px 16px; border: 0; border-radius: 16px; background: var(--surface); color: var(--text);"><span style="display: block; font-size: 16px; font-weight: 700;">Skip it</span><span style="display: block; font-size: 13px; color: var(--muted); padding-top: 2px;">Off today. Finish the lifts and the day still counts.</span></button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isMoveSheet}}" hint-placeholder-val="{{true}}">
+          <div style="padding: 14px 20px 26px;">
+            <button type="button" onClick="{{openCant}}" style="min-height: 36px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--surface); color: var(--text); font-size: 13px; font-weight: 600;">‹ Back</button>
+            <div style="font-size: 13px; color: var(--muted); padding-top: 10px;">{{moveKicker}}</div>
+            <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.03em; padding: 4px 0 12px;">Pick a day</div>
+            <sc-for list="{{days}}" as="dy" hint-placeholder-count="5">
+              <button type="button" onClick="{{dy.pick}}" style="{{dy.style}}"><span style="display: block; font-size: 15px; font-weight: 700;">{{dy.name}}</span><span style="{{dy.noteStyle}}">{{dy.note}}</span></button>
+            </sc-for>
+            <sc-if value="{{hasPick}}" hint-placeholder-val="{{true}}">
+              <div style="font-size: 13px; color: var(--muted); line-height: 1.5; padding: 6px 2px 14px;">{{pickEffect}}</div>
+              <button type="button" onClick="{{applyMove}}" style="width: 100%; min-height: 52px; border: 0; border-radius: 999px; background: var(--signal); color: var(--on-signal); font-size: 16px; font-weight: 700; box-shadow: 0 10px 28px rgba(var(--signal-rgb),0.42);">{{moveCta}}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isMapSheet}}" hint-placeholder-val="{{true}}">
+          <div style="padding: 20px 20px 26px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em;">The whole session</div>
+              <button type="button" onClick="{{closeSheet}}" style="min-height: 36px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--surface); color: var(--text); font-size: 13px; font-weight: 600;">Close</button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 14px;">
+              <sc-for list="{{tiles}}" as="tl" hint-placeholder-count="5">
+                <button type="button" onClick="{{tl.go}}" style="{{tl.style}}">
+                  <span style="display: block; font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size: 20px; font-weight: 800; color: #FFFFFF;">{{tl.num}}</span>
+                  <span style="display: block; font-size: 12px; color: rgba(255,255,255,0.78); padding-top: 4px;">{{tl.kicker}}</span>
+                  <span style="display: block; font-size: 14px; font-weight: 700; color: #FFFFFF; padding-top: 2px; line-height: 1.2;">{{tl.title}}</span>
+                  <span style="display: block; font-size: 12px; color: #FFFFFF; padding-top: 6px;">{{tl.state}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"look":{"editor":"enum","options":["auto","day","night"],"default":"auto"},"vertical":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  data() {
+    return __DATA__;
+  }
+  constructor(props) {
+    super(props);
+    const sets = {}, members = {}, msets = {};
+    this.data().cards.forEach((c, i) => {
+      if (c.sets) sets[i] = c.sets.map(() => ({ w: '', r: null, on: false }));
+      if (c.members) {
+        members[i] = c.members.map((m) => ({ name: m.name, from: null, out: false, tick: false }));
+        msets[i] = c.members.map((m) => this.fresh(m.log));
+      }
+    });
+    this.state = {
+      i: 0, vert: !!props.vertical, open: false, dx: 0, dy: 0, drag: false, x0: 0, y0: 0, lastTap: 0,
+      done: {}, skip: {}, names: {}, sets: sets, members: members, msets: msets, mopen: {}, load: {}, mload: {},
+      sheet: null, pick: null, moved: null, toast: '', rpe: 7, rest: {}, rw: {}, wdrag: null, sport: {}, spick: {}, rlog: {}, yards: {}, ran: '', dayDone: false
+    };
+  }
+  fresh(log) {
+    return log ? Array.from({ length: log.n }, () => ({ w: '', r: null, on: false })) : [];
+  }
+  // Where the tapped i sits on the phone, in the artboard's own pixels, so the bubble can grow out of it and back into it.
+  originOf(e) {
+    try {
+      const b = e.currentTarget.getBoundingClientRect(), root = e.currentTarget.closest('.ia'), r = root.getBoundingClientRect();
+      const k = r.width / 390 || 1;
+      return [(b.left + b.width / 2 - r.left) / k, (b.top + b.height / 2 - r.top) / k];
+    } catch (x) { return [195, 300]; }
+  }
+  calm() {
+    return typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  say(t) {
+    if (this._tt) clearTimeout(this._tt);
+    this.setState({ toast: t });
+    this._tt = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+  punch(i) {
+    const calm = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (this._pt) clearTimeout(this._pt);
+    this.setState({ skip: Object.assign({}, this.state.skip, { [i]: calm ? 'dead' : 'hit' }), open: false, sheet: null });
+    if (!calm) this._pt = setTimeout(() => this.setState({ skip: Object.assign({}, this.state.skip, { [i]: 'dead' }) }), 520);
+  }
+  // The app's scroll wheels (_IAW_SPEC): columns, faces, wrap rules, what a face stores. One card's fields live under st.rw[i].
+  wheelKit(i, st) {
+    const MONO = "font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;";
+    const W = {
+      dist: { cap: 'Miles', cols: [{ min: 0, max: 99, wrap: false }, { min: 0, max: 9, dot: true }, { min: 0, max: 9 }] },
+      pace: { cap: 'Pace / mile', cols: [{ min: 4, max: 17, nil: true }, { min: 0, max: 59, pad: 2, sep: ':' }] },
+      hms: { cap: 'Time', cols: [{ min: 0, max: 9, wrap: false }, { min: 0, max: 59, pad: 2, sep: ':' }, { min: 0, max: 59, pad: 2, sep: ':' }] }
+    };
+    const rowsOf = (cc) => { const o = cc.nil ? [''] : []; for (let v = cc.min; v <= cc.max; v++) o.push(String(v)); return o; };
+    const wraps = (cc) => (cc.wrap === false ? false : !cc.nil);
+    const face = (cc, v) => (v === '' ? '—' : (cc.dot ? '.' + v : (cc.pad === 2 ? ('00' + v).slice(-2) : v)));
+    const seed = (kind, plan) => {
+      let v;
+      if (kind === 'hms') { const s = Math.round((+plan || 0) * 60); v = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60]; }
+      else if (kind === 'dist') { const x = Math.round((+plan || 0) * 100); v = [Math.floor(x / 100), Math.floor(x / 10) % 10, x % 10]; }
+      else v = ['', 0];
+      return v.map((x, ci) => Math.max(0, rowsOf(W[kind].cols[ci]).indexOf(String(x))));
+    };
+    const RW = (st.rw && st.rw[i]) || {};
+    const field = (f, kind, plan) => {
+      const s = RW[f], idx = s ? s.idx : seed(kind, plan);
+      return { idx, vals: idx.map((k, ci) => rowsOf(W[kind].cols[ci])[k]), touched: !!s };
+    };
+    // What the app would store: the plan seeds a face but is never written; zero faces store nothing.
+    const valOf = (f, kind, plan) => {
+      const x = field(f, kind, plan), v = x.vals.map((s) => (s === '' ? '' : +s));
+      if (kind === 'hms') { const m = v[0] * 60 + v[1] + v[2] / 60; return x.touched && m > 0 ? m : 0; }
+      if (kind === 'dist') return v[0] + v[1] / 10 + v[2] / 100;
+      return v[0] === '' ? 0 : v[0] * 60 + v[1];
+    };
+    const drag = st.wdrag || null;
+    const wheel = (f, kind, plan, sub, cap) => {
+      const spec = W[kind], x = field(f, kind, plan);
+      const cols = [];
+      spec.cols.forEach((cc, ci) => {
+        const rows = rowsOf(cc), n = rows.length, wr = wraps(cc), k = x.idx[ci];
+        const off = drag && drag.i === i && drag.f === f && drag.ci === ci ? drag.off : 0;
+        const list = [];
+        for (let d = -3; d <= 3; d++) {
+          let j = k + d; if (wr) j = ((j % n) + n) % n;
+          const ok = j >= 0 && j < n;
+          list.push({ face: ok ? face(cc, rows[j]) : '',
+            style: 'height: 30px; line-height: 30px; text-align: center; ' + MONO + ' font-size: ' + (d === 0 ? 20 : 17) + 'px; font-weight: ' + (d === 0 ? 800 : 600) + '; color: ' + (d === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.5)') + ';' });
+        }
+        if (cc.sep) cols.push({ isSep: true, isCol: false, sep: cc.sep, rows: [], style: '', stackStyle: '', down: () => {}, wheel: () => {} });
+        cols.push({ isSep: false, isCol: true, sep: '', rows: list,
+          style: 'position: relative; flex-shrink: 0; width: ' + (cc.max >= 10 || cc.nil ? 42 : 30) + 'px; height: 110px; overflow: hidden; cursor: ns-resize; touch-action: none;'
+            + ' -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);',
+          stackStyle: 'position: absolute; left: 0; right: 0; top: ' + (40 - 90 + off) + 'px;' + (off ? '' : ' transition: top 160ms ease-out;'),
+          down: (e) => this.wheelDown(e, i, f, ci, x.idx, n, wr),
+          wheel: (e) => this.wheelStep(e, i, f, ci, x.idx, n, wr) });
+      });
+      return { cap: cap || spec.cap, hasSub: !!sub, sub: sub || '', cols };
+    };
+    return { MONO, RW, field, valOf, wheel };
+  }
+  // The run log as the app draws it today (cardio-fields-model.ts, doseDerived): the prescription owns one dimension,
+  // the athlete logs the free one, the third derives. Wheels carry the app's columns, captions and wrap rules.
+  runFields(i, c, st) {
+    const L = c.log || { sport: 'run', dose: null, code: 'RUN', speedHint: false };
+    const dose = L.dose, planned = L.sport || 'run';
+    const sport = (st.sport && st.sport[i]) || planned;
+    const K = this.wheelKit(i, st), MONO = K.MONO, RW = K.RW, valOf = K.valOf, wheel = K.wheel;
+    const clk = (sec) => { const s = Math.round(sec); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+    const hmsTxt = (m) => { const s = Math.round(m * 60), h = Math.floor(s / 3600); return (h ? h + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0') : Math.floor(s / 60)) + ':' + String(s % 60).padStart(2, '0'); };
+    const codeTxt = L.code && L.code !== 'RUN' ? ' — ' + L.code : '';
+    const doseTxt = (sp) => !dose ? '' : (dose.k === 'time' ? dose.mins + ' min' : (dose.k === 'dist' ? dose.mi + ' mi' : (dose.k === 'reps_dist' ? dose.reps + ' × ' + dose.m + 'm' : dose.reps + ' × ' + dose.mins + ' min')))
+      + (dose.tgt && sp === 'run' ? ' @ ' + clk(dose.tgt) + '/mi' : '');
+    const out = { hasStrip: false, stripLabel: '', stripVal: '', isRun: sport === 'run', isBike: sport === 'bike', isSwim: sport === 'swim',
+      label: '', hasHint: false, hint: '', hasWheels: false, wrapStyle: '', wheels: [], isSwimForm: false, yardsId: this.data().head.key + '-yards-' + i,
+      yards: (st.yards && st.yards[i]) || '', setYards: (e) => this.setState({ yards: Object.assign({}, this.state.yards, { [i]: e.target.value }) }),
+      hasDerived: false, dLbl: '', dVal: '', dValStyle: '', hasDNote: false, dNote: '' };
+    const solo = 'display: flex; flex-direction: column; gap: 12px;', pair = 'display: grid; grid-template-columns: 1fr 1fr; gap: 10px;';
+    const timed = sport === 'run' && dose && (dose.k === 'time' || dose.k === 'dist');
+    let summary = '', any = false;
+    if (timed) {
+      Object.assign(out, { hasStrip: true, stripLabel: 'Run' + codeTxt + ' · Planned', stripVal: doseTxt('run'), label: 'Log the run', hasWheels: true, wrapStyle: solo });
+      const PLAN = 'Shows the plan. Move it to match the watch.', OFF = 'Off the watch.';
+      out.wheels = dose.k === 'time' ? [wheel('mins', 'hms', dose.mins, PLAN), wheel('dist', 'dist', null, OFF)] : [wheel('dist', 'dist', dose.mi, PLAN), wheel('mins', 'hms', null, OFF)];
+      const mins = valOf('mins', 'hms', dose.k === 'time' ? dose.mins : null);
+      const distTouched = dose.k === 'dist' ? !!RW.dist : true;
+      const dist = distTouched ? valOf('dist', 'dist', dose.k === 'dist' ? dose.mi : null) : 0;
+      let d = null;
+      if (dose.k === 'time' && dist > 0) { const useM = mins > 0 ? mins : dose.mins; d = { sec: useM * 60 / dist, assumed: mins > 0 ? null : 'assuming planned ' + dose.mins + ' min' }; }
+      if (dose.k === 'dist' && mins > 0) { const useD = dist > 0 ? dist : dose.mi; d = { sec: mins * 60 / useD, assumed: dist > 0 ? null : 'assuming planned ' + dose.mi + ' mi' }; }
+      out.hasDerived = true; out.dLbl = 'Your pace';
+      if (d) {
+        let delta = '';
+        if (dose.tgt) { const df = Math.round(d.sec - dose.tgt), ad = Math.abs(df); const mag = ad < 60 ? ad + 's/mi' : clk(ad) + '/mi'; delta = ad < 5 ? 'on target' : mag + ' ' + (df < 0 ? 'faster than target' : 'slower than target'); }
+        out.dVal = clk(d.sec) + '/mi'; out.dNote = [d.assumed, delta].filter(Boolean).join(' · '); out.hasDNote = !!out.dNote;
+        out.dValStyle = MONO + ' font-size: 17px; font-weight: 800; color: #FFFFFF;';
+      } else {
+        out.dVal = dose.k === 'dist' ? 'enter minutes' : 'enter distance';
+        out.dValStyle = 'font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6);';
+      }
+      any = mins > 0 || dist > 0;
+      summary = [mins > 0 ? hmsTxt(mins) : (dose.k === 'time' ? hmsTxt(dose.mins) : ''), dist > 0 ? dist.toFixed(2) + ' mi' : (dose.k === 'dist' ? dose.mi + ' mi' : ''), d ? clk(d.sec) + '/mi' : ''].filter(Boolean).join(' · ');
+    } else if (sport === 'run') {
+      Object.assign(out, { label: 'Log the run', hasHint: !!L.speedHint, hint: L.speedHint ? 'Whole session off the watch. Warm up, efforts and recoveries all count.' : '',
+        hasWheels: true, wrapStyle: pair, wheels: [wheel('dist', 'dist', null, ''), wheel('pace', 'pace', null, '')] });
+      const dist = valOf('dist', 'dist', null), pace = valOf('pace', 'pace', null);
+      any = dist > 0 || pace > 0;
+      summary = [dist > 0 ? dist.toFixed(2) + ' mi' : '', pace > 0 ? clk(pace) + '/mi' : ''].filter(Boolean).join(' · ');
+    } else if (sport === 'bike') {
+      Object.assign(out, { hasStrip: !!dose, stripLabel: 'Bike' + codeTxt + ' · Planned', stripVal: doseTxt('bike'), label: 'Log the ride', hasWheels: true, wrapStyle: solo, wheels: [wheel('bike', 'hms', null, '')] });
+      const m = valOf('bike', 'hms', null);
+      any = m > 0; summary = 'Ride · ' + hmsTxt(m);
+    } else {
+      Object.assign(out, { label: 'Log the swim', isSwimForm: true });
+      const y = +out.yards || 0;
+      any = y > 0; summary = 'Swim · ' + y + ' yd';
+    }
+    const WORD = { run: 'Run', bike: 'Bike', swim: 'Swim' };
+    const swapped = sport !== planned;
+    const kept = swapped && planned === 'run' && Object.keys(RW).some((f) => f === 'mins' || f === 'dist' || f === 'pace');
+    const logged = !!(st.rlog && st.rlog[i] === sport);
+    return Object.assign(out, {
+      togglePick: () => this.setState({ spick: Object.assign({}, this.state.spick, { [i]: !(this.state.spick && this.state.spick[i]) }) }),
+      pickOpen: swapped || !!(st.spick && st.spick[i]),
+      chips: ['run', 'bike', 'swim'].map((s) => ({ isRun: s === 'run', isBike: s === 'bike', isSwim: s === 'swim', label: WORD[s] + (s === planned ? ' · planned' : ''),
+        style: 'display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 700;'
+          + (s === sport ? ' border: 0; background: #FFFFFF; color: ' + c.c + ';' : ' border: 1px solid rgba(255,255,255,0.4); background: transparent; color: #FFFFFF;'),
+        pick: () => this.setState({ sport: Object.assign({}, this.state.sport, { [i]: s }) }) })),
+      hasNote: swapped, swapNote: swapped ? 'Counts toward ' + WORD[sport] + ', not ' + WORD[planned] + '.' + (kept ? ' Your ' + WORD[planned] + ' numbers are kept. Switch back and they return.' : '') : '',
+      logLabel: logged ? 'Logged ✓' : 'Log',
+      logStyle: 'min-height: 46px; border-radius: 999px; font-size: 15px; font-weight: 700;'
+        + (logged ? ' border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF;' : ' border: 0; background: #FFFFFF; color: ' + c.c + ';'),
+      log: () => {
+        if (!any) { this.say('Nothing to log yet.'); return; }
+        const s = this.state;
+        this.setState({ ran: summary, rlog: Object.assign({}, s.rlog, { [i]: sport }), done: Object.assign({}, s.done, { [i]: true }), open: false });
+        this.say({ run: 'Run logged ✓', bike: 'Ride logged ✓', swim: 'Swim logged ✓' }[sport]);
+      }
+    });
+  }
+  // A wheel column follows the finger in steps of one row, the way the app's scroll wheels do.
+  wheelDown(e, i, f, ci, idx0, n, wr) {
+    if (e.stopPropagation) e.stopPropagation();
+    if (e.cancelable && e.preventDefault) e.preventDefault();
+    let k = 1;
+    try { const root = e.currentTarget.closest('.ia'); k = root.getBoundingClientRect().width / 390 || 1; } catch (x) { k = 1; }
+    const y0 = e.clientY, base = idx0.slice();
+    const at = (y) => {
+      const dy = (y - y0) / k, steps = -Math.round(dy / 30);
+      let j = base[ci] + steps;
+      j = wr ? ((j % n) + n) % n : Math.max(0, Math.min(n - 1, j));
+      const moved = wr ? steps : j - base[ci];
+      return { j, off: Math.max(-15, Math.min(15, dy + moved * 30)) };
+    };
+    if (typeof window === 'undefined') return;
+    const move = (ev) => { const r = at(ev.clientY); this.setWheel(i, f, ci, base, r.j, { i, f, ci, off: r.off }); };
+    const up = (ev) => {
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
+      const r = at(ev.clientY); this.setWheel(i, f, ci, base, r.j, null);
+    };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  }
+  wheelStep(e, i, f, ci, idx0, n, wr) {
+    if (e.stopPropagation) e.stopPropagation();
+    if (e.cancelable && e.preventDefault) e.preventDefault();
+    this._wacc = (this._wacc || 0) + (e.deltaY || 0);
+    if (Math.abs(this._wacc) < 24) return;
+    const s = this._wacc > 0 ? 1 : -1; this._wacc = 0;
+    let j = idx0[ci] + s;
+    j = wr ? ((j % n) + n) % n : Math.max(0, Math.min(n - 1, j));
+    this.setWheel(i, f, ci, idx0, j, null);
+  }
+  setWheel(i, f, ci, base, j, drag) {
+    const st = this.state, rw = Object.assign({}, st.rw), mine = Object.assign({}, rw[i] || {});
+    const cur = (mine[f] ? mine[f].idx : base).slice();
+    cur[ci] = j;
+    if (mine[f] || cur.join() !== base.join()) mine[f] = { idx: cur };
+    rw[i] = mine;
+    this.setState({ rw, wdrag: drag });
+  }
+  // The rest day as the app has it (the rest hero on This Week and renderRestSheet in rest-day-shell.ts): Training
+  // anyway? moves an untrained session onto the day, Log cardio records easy work that touches no program.
+  restFields(i, c, st) {
+    const R = (st.rest && st.rest[i]) || {};
+    const day = this.data().head.day;
+    const K = this.wheelKit(i, st);
+    const put = (o) => this.setState({ rest: Object.assign({}, this.state.rest, { [i]: Object.assign({}, (this.state.rest || {})[i] || {}, o) }) });
+    const WORD = { run: 'run', bike: 'ride', walk: 'walk' }, UNIT = { run: 'mi', bike: 'mi' }, LBL = { run: 'Run', bike: 'Bike', walk: 'Walk' };
+    const types = c.types || ['run', 'walk'];
+    const t = R.type || types[0];
+    const recs = R.log || {};
+    const head = (ty, r) => { const m = r.mins > 0 ? Math.round(r.mins) : 0; return m > 0 ? m + ' min ' + WORD[ty] : r.dist + ' ' + UNIT[ty] + ' ' + WORD[ty]; };
+    const lines = Object.keys(recs).filter((ty) => recs[ty]).map((ty) => {
+      const r = recs[ty];
+      return { text: head(ty, r) + ' logged' + (r.mins > 0 && r.dist > 0 ? ' · ' + r.dist + ' ' + UNIT[ty] : '') + ' · RPE ' + (r.rpe || '—') };
+    });
+    const face = { mins: K.valOf('rm_' + t, 'hms', null), dist: t === 'walk' ? 0 : Math.round(K.valOf('rd_' + t, 'dist', null) * 100) / 100, rpe: R.rpe == null ? null : R.rpe };
+    const rec = recs[t] || null;
+    const same = !!rec && (rec.mins || 0) === (face.mins > 0 ? face.mins : 0) && (rec.dist || 0) === (face.dist > 0 ? face.dist : 0) && (rec.rpe == null ? null : rec.rpe) === face.rpe;
+    const view = R.view || null;
+    const moved = R.moved || null;
+    const cands = c.cands || [];
+    const picked = cands.find((x) => x.k === R.pick) || null;
+    const CARET = 'flex-shrink: 0; color: #FFFFFF; display: flex; transition: transform 220ms ease; transform: rotate(';
+    const headStyle = (on) => 'width: 100%; box-sizing: border-box; min-height: 52px; padding: 9px 14px; display: flex; align-items: center; gap: 9px; border: 0; border-radius: 16px; background: rgba(255,255,255,' + (on ? '0.22' : '0.14') + ');';
+    const chip = (on) => 'display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 700;'
+      + (on ? ' border: 0; background: #FFFFFF; color: ' + c.c + ';' : ' border: 1px solid rgba(255,255,255,0.4); background: transparent; color: #FFFFFF;');
+    const RPE = [[5, 'Easy', 'Conversational, full sentences'], [7, 'Steady', 'Working, sentences getting short'], [9, 'Hard', 'That’s a training day, not a rest day']];
+    const wheels = [K.wheel('rm_' + t, 'hms', null, '', 'Time')];
+    if (t === 'run' || t === 'bike') wheels.push(K.wheel('rd_' + t, 'dist', null, '', 'Distance'));
+    return {
+      lines, hasLines: lines.length > 0,
+      isMoved: !!moved, movedTag: moved ? 'Moved here from ' + moved.label : '',
+      movedLine: moved ? moved.title + ' is on ' + day + ' now. ' + moved.label + ' is your rest.' : '',
+      unmove: () => put({ moved: null, pick: null }),
+      canMove: !moved,
+      moveHead: headStyle(view === 'move'), moveCaret: CARET + (view === 'move' ? 180 : 0) + 'deg);',
+      toMove: () => put({ view: view === 'move' ? null : 'move' }),
+      moveOpen: view === 'move' && !moved,
+      moveIntro: 'Nothing gets added. Whatever you pick moves to ' + day + ', and its old day becomes your rest.',
+      hasAlready: lines.length > 0, already: lines.map((l) => ({ text: l.text.replace(' logged', '') })),
+      alreadyTail: 'Move a session in and ' + day + ' is a double day. Your call.',
+      cands: cands.map((x) => ({ title: x.title, desc: x.label + ' · not logged', pick: () => put({ pick: x.k }),
+        style: 'display: flex; align-items: center; width: 100%; box-sizing: border-box; min-height: 56px; padding: 8px 14px; border-radius: 14px; text-align: left; color: ' + (R.pick === x.k ? c.c : '#FFFFFF') + ';'
+          + (R.pick === x.k ? ' border: 0; background: #FFFFFF;' : ' border: 1px solid rgba(255,255,255,0.28); background: transparent;') })),
+      hasWarn: !!(picked && picked.warn), warnTtl: picked && picked.warn ? picked.warn.ttl : '', warnSub: picked && picked.warn ? picked.warn.sub : '',
+      hasPick: !!picked,
+      applyMove: () => {
+        if (!picked) { this.say('Pick a session'); return; }
+        put({ moved: { k: picked.k, label: picked.label, title: picked.title }, view: null, pick: null });
+        this.say('Moved. ' + picked.label + ' is your rest now ✓');
+      },
+      cardioWord: lines.length ? 'Edit cardio' : 'Log cardio',
+      cardioHead: headStyle(view === 'cardio'), cardioCaret: CARET + (view === 'cardio' ? 180 : 0) + 'deg);',
+      toCardio: () => put({ view: view === 'cardio' ? null : 'cardio' }),
+      cardioOpen: view === 'cardio',
+      cTitle: rec ? 'Your ' + WORD[t] + ' on ' + day : 'What did you do?',
+      cIntro: rec ? 'This is what you logged. Roll it to fix it, or clear it if it did not happen.' : 'Easy work on a rest day is recovery, not extra load. This will not touch your program.',
+      types: types.map((ty) => ({ label: LBL[ty] + (recs[ty] ? ' ✓' : ''), style: chip(ty === t), pick: () => put({ type: ty, armed: false }) })),
+      wheels,
+      rpes: RPE.map(([v, n, d]) => ({ head: 'RPE ' + v + (v === 9 ? '+' : '') + ' · ' + n, desc: d, pick: () => put({ rpe: v }),
+        style: 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; box-sizing: border-box; padding: 9px 14px; border-radius: 14px; text-align: left; color: ' + (face.rpe === v ? c.c : '#FFFFFF') + ';'
+          + (face.rpe === v ? ' border: 0; background: #FFFFFF;' : ' border: 1px solid rgba(255,255,255,0.28); background: transparent;') })),
+      hard: face.rpe != null && face.rpe >= 9,
+      logLabel: rec && same ? 'Logged ✓' : 'Log it',
+      logStyle: 'min-height: 46px; border-radius: 999px; font-size: 15px; font-weight: 700;'
+        + (rec && same ? ' border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF;' : ' border: 0; background: #FFFFFF; color: ' + c.c + ';'),
+      log: () => {
+        if (rec && same) { put({ view: null }); return; }
+        const m = face.mins, d = face.dist;
+        if (m <= 0 && d <= 0) { this.say(rec ? 'To remove it, use Clear.' : (t === 'walk' ? 'Nothing to log yet. Add a time.' : 'Nothing to log yet. Add a time or a distance.')); return; }
+        const o = {}; if (m > 0) o.mins = m; if (d > 0) o.dist = d; if (face.rpe != null) o.rpe = face.rpe;
+        put({ log: Object.assign({}, recs, { [t]: o }), view: null, armed: false });
+        this.say(head(t, o) + ' logged ✓');
+      },
+      hasClear: !!rec, clearLabel: R.armed ? 'Tap again to clear' : 'Clear this ' + WORD[t],
+      clear: () => {
+        if (!R.armed) { put({ armed: true }); return; }
+        const next = Object.assign({}, recs); delete next[t];
+        put({ log: next, armed: false });
+      },
+      tipLbl: (c.tip && c.tip.label) || '', tipTxt: (c.tip && c.tip.text) || '', tipSrc: (c.tip && c.tip.src) ? '— ' + c.tip.src : ''
+    };
+  }
+  renderVals(noPeek) {
+    const D = this.data(), st = this._view || this.state, list = D.cards, SW = D.swaps, n = list.length, i = st.i, c = list[i];
+    const H = D.head, day = H.day, runIdx = D.runIdx;
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    const isDone = !!st.done[i], sk = st.skip[i] || null, dead = sk === 'dead', hit = sk === 'hit';
+    const moved = c.kind === 'run' && !!st.moved;
+    const live = !sk && !moved;
+    const vert = st.vert;
+    const nameOf = (k) => (st.names[k] && st.names[k].name) || list[k].title;
+    const onCard = {};
+    list.forEach((x, k) => { onCard[nameOf(k)] = 1; (st.members[k] || []).forEach((m) => { onCard[m.name] = 1; }); });
+    const RING_DONE = '0 0 0 3px var(--signal), 0 14px 38px rgba(var(--signal-rgb),0.40), 0 8px 24px rgba(0,0,0,0.14)';
+    const RING_OPEN = '0 10px 28px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08)';
+    const tone = (k) => ((st.skip[k] === 'dead' || (list[k].kind === 'run' && st.moved)) ? '#8C8C88' : list[k].c);
+    const DAYNAME = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
+
+    const ghosts = [];
+    for (let p = vert ? 0 : Math.min(3, n - 1); p >= 1; p--) {
+      const k = (i + p) % n;
+      const t = vert
+        ? 'translateY(' + (p * 13) + 'px) scale(' + (1 - p * 0.05) + '); transform-origin: bottom center;'
+        : 'translateX(' + (p * 15) + 'px) translateY(' + (p * -7) + 'px) scale(' + (1 - p * 0.035) + ') rotate(' + (p * 1.6) + 'deg); transform-origin: bottom left;';
+      ghosts.push({ style: 'position: absolute; top: 0; left: 0; width: 100%; height: ' + (vert ? 'calc(100% - 42px)' : '100%')
+        + '; border-radius: 24px; background: ' + tone(k) + '; transform: ' + t + ' z-index: ' + (10 - p) + ';'
+        + ' box-shadow: ' + (st.done[k] && !st.skip[k] ? '0 0 0 2px var(--signal), 0 6px 18px rgba(var(--signal-rgb),0.26)' : '0 2px 8px rgba(0,0,0,0.08)') + ';'
+        + ' transition: transform 260ms ease;' });
+    }
+
+    const curName = nameOf(i);
+    const swappedTo = st.names[i] || null;
+    const rows = (st.sets[i] || []).map((s, k) => {
+      const target = c.sets[k];
+      const put = (patch) => {
+        const arr = (st.sets[i] || []).map((x, j) => (j === k ? Object.assign({}, x, patch(x)) : x));
+        this.setState({ sets: Object.assign({}, st.sets, { [i]: arr }), done: Object.assign({}, st.done, { [i]: arr.every((x) => x.on) }) });
+      };
+      return {
+        n: k + 1, w: s.w, r: s.r == null ? target : s.r, unit: c.unit ? ' ' + c.unit : '', id: H.key + '-load-' + i + '-' + k, ph: (c.last && !swappedTo) ? String(c.last) : 'lb',
+        wrap: 'position: relative; display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 10px; border-radius: 16px; background: rgba(255,255,255,' + (s.on ? '0.22' : '0.08') + ');',
+        btn: 'width: 44px; height: 44px; flex-shrink: 0; border: 0; border-radius: 999px; display: flex; align-items: center; justify-content: center; '
+          + (s.on ? 'background: #FFFFFF; color: ' + c.c + ';' : 'background: rgba(255,255,255,0.16); color: #FFFFFF;'),
+        setW: (e) => put(() => ({ w: e.target.value })),
+        rUp: () => put((x) => ({ r: (x.r == null ? target : x.r) + 1 })),
+        rDown: () => put((x) => ({ r: Math.max(0, (x.r == null ? target : x.r) - 1) })),
+        log: () => put((x) => ({ on: !x.on }))
+      };
+    });
+    const loggedN = (st.sets[i] || []).filter((s) => s.on).length;
+    const first = (st.sets[i] || []).find((s) => s.on);
+    const u = c.unit ? ' ' + c.unit : '';
+    const setSummary = !c.sets ? '' : (loggedN === 0
+      ? (c.sets.length + ' × ' + (String(c.rx).match(/^\d+\s*×\s*([\d–-]+)/) || [0, c.sets[0]])[1] + u)
+      : ((first.w === '' ? 'no load' : first.w) + ' × ' + (st.sets[i] || []).map((s, k) => (s.on ? (s.r == null ? c.sets[k] : s.r) : '—')).join(', ') + u));
+
+    const cascade = (v) => {
+      const prev = st.load[i] || '';
+      const sets = (st.sets[i] || []).map((x) => (x.w === '' || x.w === prev ? Object.assign({}, x, { w: v }) : x));
+      this.setState({ load: Object.assign({}, st.load, { [i]: v }), sets: Object.assign({}, st.sets, { [i]: sets }) });
+    };
+    const openSwap = (slot, member) => this.setState({ sheet: { kind: 'swap', slot: slot, member: member }, open: false });
+    const ms = st.members[i] || [];
+    const liveMs = ms.filter((m) => !m.out);
+    const demoted = c.kind === 'round' && liveMs.length === 1;
+    const msAll = st.msets[i] || [];
+    const logged = (k, mArr, sArr) => (c.members[k].log ? (sArr[k] || []).length > 0 && (sArr[k] || []).every((x) => x.on) : !!mArr[k].tick);
+    const cardDone = (mArr, sArr) => { const lv = mArr.map((m, k) => k).filter((k) => !mArr[k].out); return lv.length > 0 && lv.every((k) => logged(k, mArr, sArr)); };
+    const setMember = (k, patch, extra) => {
+      const arr = ms.map((m, j) => (j === k ? Object.assign({}, m, patch) : m));
+      this.setState(Object.assign({ members: Object.assign({}, st.members, { [i]: arr }), done: Object.assign({}, st.done, { [i]: cardDone(arr, msAll) }) }, extra || {}));
+    };
+    // Load box: what is typed there, or last time's load, goes into every set nobody has typed over (the app's cascade).
+    const mcascade = (k, v) => {
+      const prev = (st.mload[i] || {})[k] || '';
+      const all = msAll.map((sets, kk) => (kk === k ? sets.map((x) => (x.w === '' || x.w === prev ? Object.assign({}, x, { w: v }) : x)) : sets));
+      this.setState({ mload: Object.assign({}, st.mload, { [i]: Object.assign({}, st.mload[i] || {}, { [k]: v }) }), msets: Object.assign({}, st.msets, { [i]: all }) });
+    };
+    const putSet = (k, j, fn) => {
+      const all = msAll.map((sets, kk) => (kk === k ? sets.map((x, jj) => (jj === j ? Object.assign({}, x, fn(x)) : x)) : sets));
+      this.setState({ msets: Object.assign({}, st.msets, { [i]: all }), done: Object.assign({}, st.done, { [i]: cardDone(ms, all) }) });
+    };
+    const members = ms.map((m, k) => {
+      const spec = c.members[k], lg = spec.log, msets = msAll[k] || [];
+      const onN = msets.filter((x) => x.on).length, allOn = !!lg && msets.length > 0 && onN === msets.length;
+      const isOpen = !m.out && !!lg && st.mopen[i] === k;
+      const typed = !!lg && lg.target == null;
+      return {
+        hasLog: !!lg, canTick: !lg, isOpen: isOpen, allOn: allOn, notAll: !allOn,
+        count: lg ? onN + '/' + msets.length : '',
+        toggleLabel: (isOpen ? 'Close ' : 'Log ') + m.name,
+        toggle: () => this.setState({ mopen: Object.assign({}, st.mopen, { [i]: isOpen ? null : k }) }),
+        toggleStyle: 'height: 34px; padding: 0 8px 0 10px; border: 0; border-radius: 999px; display: flex; align-items: center; gap: 3px; '
+          + (allOn ? 'background: #FFFFFF; color: ' + c.c + ';' : (isOpen ? 'background: rgba(255,255,255,0.3); color: #FFFFFF;' : 'background: rgba(255,255,255,0.16); color: #FFFFFF;')),
+        caretStyle: 'display: flex; transition: transform 200ms ease; transform: rotate(' + (isOpen ? 180 : 0) + 'deg);',
+        hasLast: !!(lg && lg.loaded && lg.last && !m.from), lastLine: lg && lg.last ? 'Last time ' + lg.last + ' lb' : '',
+        hasLoad: !!(lg && lg.loaded), loadId: H.key + '-mload-' + i + '-' + k, loadVal: (st.mload[i] || {})[k] || '',
+        lastText: lg && lg.last ? lg.last + ' lb' : '', fillText: lg && lg.last ? 'Fill every set with ' + lg.last + ' lb' : '',
+        setLoad: (e) => mcascade(k, e.target.value), reuseLast: () => mcascade(k, String(lg.last)),
+        fill: () => { const all = msAll.map((sets, kk) => (kk === k ? sets.map((x) => Object.assign({}, x, { w: String(lg.last) })) : sets)); this.setState({ msets: Object.assign({}, st.msets, { [i]: all }) }); },
+        rows: msets.map((x, j) => {
+          const target = lg.target;
+          const r = x.r == null ? (target == null ? '' : target) : x.r;
+          return {
+            lbl: (c.kind === 'round' ? 'R' : 'S') + (j + 1), id: H.key + '-m' + i + '-' + k + '-' + j, rid: H.key + '-mr' + i + '-' + k + '-' + j,
+            w: x.w, r: r, unit: lg.unit ? ' ' + lg.unit : '', loaded: lg.loaded, typed: typed, stepped: !typed, ph: lg.last ? String(lg.last) : 'lb',
+            wrap: 'position: relative; display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 10px; border-radius: 16px; background: rgba(255,255,255,' + (x.on ? '0.22' : '0.08') + ');',
+            repsBox: (lg.loaded ? 'width: 104px; flex-shrink: 0;' : 'flex-grow: 1; min-width: 0;') + ' height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #FFFFFF; font-family: \'Geist Mono\', ui-monospace, \'SF Mono\', Menlo, monospace; font-size: 16px; font-weight: 700;',
+            stepBox: (lg.loaded ? 'width: 104px; flex-shrink: 0;' : 'flex-grow: 1; min-width: 0;') + ' display: flex; align-items: center; border-radius: 12px; background: rgba(255,255,255,0.14);',
+            btn: 'width: 42px; height: 42px; flex-shrink: 0; border: 0; border-radius: 999px; display: flex; align-items: center; justify-content: center; '
+              + (x.on ? 'background: #FFFFFF; color: ' + c.c + ';' : 'background: rgba(255,255,255,0.16); color: #FFFFFF;'),
+            setW: (e) => putSet(k, j, () => ({ w: e.target.value })),
+            setR: (e) => putSet(k, j, () => ({ r: e.target.value })),
+            rUp: () => putSet(k, j, (y) => ({ r: (y.r == null ? (target || 0) : +y.r) + 1 })),
+            rDown: () => putSet(k, j, (y) => ({ r: Math.max(0, (y.r == null ? (target || 0) : +y.r) - 1) })),
+            log: () => putSet(k, j, (y) => ({ on: !y.on }))
+          };
+        }),
+        n: String(k + 1).padStart(2, '0'), name: m.name, live: !m.out, isOut: m.out, hasFrom: !!m.from && !m.out, from: m.from || '',
+        canSwap: !!SW[spec.name],
+        detail: m.out ? (c.kind === 'round' ? 'Out of the round' : (c.mobility ? 'Left out today' : 'Out of the block')) : (demoted ? spec.straight + ', straight sets' : spec.detail),
+        rowStyle: 'display: flex; align-items: center; gap: 9px; padding: 9px 8px 9px 12px; border-radius: 16px; background: ' + (m.out ? 'rgba(0,0,0,0.22)' : (m.tick ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.1)')) + ';',
+        nameStyle: 'display: block; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: #FFFFFF; line-height: 1.2;' + (m.out ? ' text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.5);' : ''),
+        tickStyle: 'width: 34px; height: 34px; border: 0; border-radius: 999px; display: flex; align-items: center; justify-content: center; '
+          + (m.tick ? 'background: #FFFFFF; color: ' + c.c + ';' : 'background: rgba(255,255,255,0.16); color: #FFFFFF;'),
+        tick: () => setMember(k, { tick: !m.tick }),
+        hasRpe: false,
+        openRpe: (e) => this.setState({ sheet: { kind: 'rpe', n: +((spec.detail.match(/RPE\s*(\d+)/) || [0, 7])[1]), at: this.originOf(e) } }),
+        swap: () => openSwap(i, k),
+        out: () => {
+          if (liveMs.length <= 1) { this.punch(i); return; }
+          setMember(k, { out: true, tick: false }, { mopen: Object.assign({}, st.mopen, { [i]: null }) });
+        },
+        back: () => { setMember(k, { out: false }); },
+        unswap: () => { setMember(k, { name: m.from, from: null }); }
+      };
+    });
+
+    let sw = null;
+    if (st.sheet && st.sheet.kind === 'swap') {
+      const slot = st.sheet.slot, mem = st.sheet.member;
+      const orig = mem == null ? list[slot].title : list[slot].members[mem].name;
+      const now = mem == null ? nameOf(slot) : st.members[slot][mem].name;
+      const d = SW[orig];
+      const apply = (to, same) => {
+        if (mem == null) this.setState({ load: Object.assign({}, st.load, { [slot]: '' }), names: Object.assign({}, st.names, { [slot]: to === orig ? undefined : { name: to, from: orig } }), sheet: null, sets: Object.assign({}, st.sets, { [slot]: (list[slot].sets || []).map(() => ({ w: '', r: null, on: false })) }) });
+        else {
+          const arr = st.members[slot].map((m, j) => (j === mem ? Object.assign({}, m, { name: to, from: to === orig ? null : orig }) : m));
+          const sArr = (st.msets[slot] || []).map((x, j) => (j === mem ? this.fresh(list[slot].members[mem].log) : x));
+          this.setState({ members: Object.assign({}, st.members, { [slot]: arr }), msets: Object.assign({}, st.msets, { [slot]: sArr }), sheet: null });
+        }
+        this.say(to + ' in, ' + now.toLowerCase() + ' out. ' + (same ? 'Same job, same numbers.' : 'Same numbers, different job today.'));
+      };
+      const mk = (arr, same) => arr.filter((x) => !onCard[x]).map((x) => ({ name: x, pick: () => apply(x, same) }));
+      const t1 = mk(d.t1, true), t2 = mk(d.t2, false);
+      sw = { name: now, tags: d.tags.filter((t) => t !== 'Main lift' || mem == null).map((t) => ({ t: t })),
+        keeps: mem == null ? list[slot].keeps : list[slot].members[mem].keeps,
+        t1: t1, t2: t2, hasT1: t1.length > 0, hasT2: t2.length > 0, empty: !t1.length && !t2.length, t2Sub: d.sub };
+    }
+
+    const days = (D.week || []).map((d) => {
+      const sel = st.pick === d.k;
+      const col = { good: '#3B6D11', warn: '#9A5B0B', bad: 'var(--signal)', off: 'var(--muted)' }[d.tone];
+      return {
+        name: d.name, note: d.note,
+        noteStyle: 'display: block; font-size: 13px; line-height: 1.4; padding-top: 3px; color: ' + col + ';',
+        style: 'display: block; width: 100%; text-align: left; margin-bottom: 6px; padding: 12px 16px; border: 0; border-radius: 16px; color: ' + (d.tone === 'off' ? 'var(--muted)' : 'var(--text)') + ';'
+          + (d.tone === 'off' ? ' background: var(--surface2);' : ' background: var(--surface);' + (sel ? ' box-shadow: inset 0 0 0 2px var(--text);' : '')),
+        pick: () => { if (d.tone !== 'off') this.setState({ pick: d.k }); }
+      };
+    });
+    const picked = (D.week || []).find((d) => d.k === st.pick) || null;
+
+    const WORDS = { 1: 'barely moving', 2: 'a walk in the park', 3: 'very easy', 4: 'easy', 5: 'steady',
+      6: 'comfortable, four left in the tank', 7: 'working, three left', 8: 'hard, two left', 9: 'very hard, one left', 10: 'everything you had' };
+
+    const go = (k) => this.setState({ i: (k + n) % n, dx: 0, dy: 0, drag: false, open: false });
+    const slide = (dir) => {
+      if (this.state.anim) return;
+      if (this.calm()) { go(this.state.i + dir); return; }
+      this.setState({ anim: { dir: dir }, drag: false });
+      setTimeout(() => {
+        this.setState({ i: (this.state.i + dir + n) % n, anim: null, dx: 0, dy: 0, open: false, snap: true });
+        setTimeout(() => this.setState({ snap: false }), 40);
+      }, 290);
+    };
+    const stateOf = (k) => (st.skip[k] ? 'Skipped' : (list[k].kind === 'run' && st.moved ? 'Moved to ' + DAYNAME[st.moved] : (st.done[k] ? 'Logged' : (k === i ? 'You are here' : 'Up next'))));
+    const titleNow = c.kind === 'round' && demoted ? liveMs[0].name : curName;
+    // Mid-swipe the card being swiped toward rises out of the fan and its face fades in with the drag.
+    const dd = vert ? st.dy : st.dx;
+    const prog = Math.min(1, Math.abs(dd) / 140);
+    const leaving = !!(st.doneAnim && st.doneAnim.phase === 'leave');
+    const peekOn = ((!!st.drag && Math.abs(dd) > 2) || (vert && !!st.anim) || leaving) && n > 1;
+    const pdir = leaving ? 1 : ((vert && st.anim) ? st.anim.dir : (dd < 0 ? 1 : -1));
+    const pk = (i + pdir + n) % n, pc = list[pk];
+    const pFrom = pdir === 1 ? (vert ? { x: 0, y: 13, s: 0.95, r: 0 } : { x: 15, y: -7, s: 0.965, r: 1.6 }) : { x: 0, y: 0, s: 0.92, r: 0 };
+    const lerp = (a, b) => a + (b - a) * prog;
+    const pTitle = (pc.kind === 'round' || pc.kind === 'block') ? pc.title : nameOf(pk);
+    const cardT = vert ? (st.anim ? (st.anim.dir > 0 ? 'translateY(calc(-100% - 14px))' : 'translateY(calc(100% + 14px))') : 'translateY(' + st.dy + 'px)') : 'translateX(' + st.dx + 'px) rotate(' + (st.dx / 26).toFixed(2) + 'deg)';
+    // Done: the card lifts with a glow in its own colour, then leaves slowly: behind the deck sideways, up and away in the pager.
+    const DA = st.doneAnim || null;
+    const glow = (hex, a) => { const h = String(hex).replace('#', ''); if (h.length !== 6) return 'rgba(255,255,255,' + a + ')'; return 'rgba(' + parseInt(h.slice(0, 2), 16) + ',' + parseInt(h.slice(2, 4), 16) + ',' + parseInt(h.slice(4, 6), 16) + ',' + a + ')'; };
+    let cardShadow = isDone && !sk ? RING_DONE : RING_OPEN, cardAnim = hit ? 'hitshk 520ms cubic-bezier(0.22,0.9,0.3,1)' : '', cardT2 = cardT;
+    let cardTrans = (st.drag || st.snap) ? '' : ' transition: transform 290ms cubic-bezier(0.22,0.61,0.36,1), box-shadow 260ms ease, filter 460ms ease, opacity 460ms ease;';
+    if (DA && DA.phase === 'lift') {
+      cardT2 = 'translateY(-10px) scale(1.03)';
+      if (DA.glow) cardShadow = '0 0 0 2px ' + glow(c.c, 0.9) + ', 0 0 42px 8px ' + glow(c.c, 0.6) + ', 0 20px 44px rgba(0,0,0,0.26)';
+      cardTrans = ' transition: transform 340ms cubic-bezier(0.2,0.8,0.2,1), box-shadow 340ms ease;';
+    } else if (DA && DA.phase === 'leave') {
+      cardAnim = (vert ? 'pagerLeave' : 'deckTuck') + ' 760ms cubic-bezier(0.45,0,0.2,1) forwards';
+      cardTrans = '';
+    }
+    let pvView = null;
+    if (!noPeek) {
+      this._view = Object.assign({}, st, { i: pk, open: false, mopen: {}, drag: false, dx: 0, dy: 0, anim: null, doneAnim: null, sheet: null, snap: true });
+      try { pvView = this.renderVals(true); } finally { this._view = null; }
+    }
+    const SH = [{ a: 'd1', s: 17, f: '#A6633A' }, { a: 'd2', s: 13, f: '#FFFFFF' }, { a: 'd3', s: 11, f: '#9C5A33' }, { a: 'd4', s: 15, f: '#FFFFFF' }];
+    const flipNow = () => { this.setState({ vert: !vert, dx: 0, dy: 0 }); };
+
+    return {
+      look: this.props.look || 'auto',
+      vert: vert, horiz: !vert, total: String(n),
+      dayTitle: H.title,
+      ids: { time: H.key + '-time', dist: H.key + '-dist', notes: H.key + '-notes' },
+      flip: flipNow,
+      flipText: vert ? 'Up and down' : 'Sideways', flipLabel: vert ? 'Swiping up and down. Switch to sideways' : 'Swiping sideways. Switch to up and down',
+      flipIcon: 'display: flex; transition: transform 220ms ease; transform: rotate(' + (vert ? 90 : 0) + 'deg);',
+      deckStyle: 'position: relative; flex-grow: 1; min-height: 0; margin: 6px ' + (vert ? '34px' : '20px') + ' 0 20px;' + (vert ? ' clip-path: inset(0px -40px 0px -24px);' : ''),
+      ghosts: ghosts,
+      pv: pvView || {},
+      peekOn: peekOn,
+      peekStyle: 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column;'
+        + ' background: ' + list[pk].c + '; z-index: 15; pointer-events: none;'
+        + ' filter: grayscale(' + ((st.skip[pk] === 'dead' || (list[pk].kind === 'run' && st.moved)) ? 0.9 : 0) + ');' + (st.skip[pk] === 'dead' ? ' opacity: 0.72;' : '')
+        + (vert
+          ? ' transform: ' + (st.anim ? 'translateY(0)' : (pdir > 0 ? 'translateY(calc(100% + 14px)) translateY(' + dd + 'px)' : 'translateY(calc(-100% - 14px)) translateY(' + dd + 'px)')) + ';'
+            + ((st.drag || st.snap) ? '' : ' transition: transform 290ms cubic-bezier(0.22,0.61,0.36,1);')
+          : ' transform: translate(' + lerp(pFrom.x, 0).toFixed(1) + 'px, ' + lerp(pFrom.y, 0).toFixed(1) + 'px) scale(' + lerp(pFrom.s, 1).toFixed(3) + ') rotate(' + lerp(pFrom.r, 0).toFixed(2) + 'deg);')
+        + ' transform-origin: ' + (vert ? 'bottom center' : 'bottom left') + ';'
+        + ' box-shadow: ' + (st.done[pk] && !st.skip[pk] ? RING_DONE : RING_OPEN) + ';'
+        + (leaving ? ' animation: ' + (vert ? 'pagerRise' : 'peekRise') + ' 760ms cubic-bezier(0.45,0,0.2,1) forwards;' : ''),
+      peekInner: (leaving && !vert ? 'animation: peekFade 760ms ease forwards; ' : '') + 'opacity: ' + (vert ? 1 : (0.25 + 0.75 * prog)).toFixed(2) + '; filter: ' + (st.skip[pk] === 'dead' ? 'grayscale(1)' : 'none') + ';',
+      peek: { num: String(pk + 1).padStart(2, '0'), kicker: pc.kicker, title: pTitle, rx: pc.rx,
+        titleStyle: 'font-weight: 800; letter-spacing: -0.04em; line-height: 0.98; color: #FFFFFF; padding-top: 6px; font-size: ' + (pTitle.length > 26 ? 28 : (pTitle.length > 16 ? 32 : 40)) + 'px;' },
+      sidePressed: vert ? 'false' : 'true', vertPressed: vert ? 'true' : 'false',
+      sideStyle: 'width: 38px; height: 32px; border: 0; border-radius: 999px; display: flex; align-items: center; justify-content: center; transition: background 160ms ease, color 160ms ease;'
+        + (vert ? ' background: transparent; color: var(--muted);' : ' background: var(--text); color: var(--bg);'),
+      vertStyle: 'width: 38px; height: 32px; border: 0; border-radius: 999px; display: flex; align-items: center; justify-content: center; transition: background 160ms ease, color 160ms ease;'
+        + (vert ? ' background: var(--text); color: var(--bg);' : ' background: transparent; color: var(--muted);'),
+      setSide: () => { if (vert) this.setState({ vert: false, dx: 0, dy: 0, anim: null }); },
+      setVert: () => { if (!vert) this.setState({ vert: true, dx: 0, dy: 0, anim: null }); },
+      onWheel: (e) => {
+        const t = e.target, z = t && t.closest ? t.closest('.dz') : null;
+        if (z && z.scrollHeight > z.clientHeight + 2) return;
+        const S = this.state, dv = S.vert ? e.deltaY : (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0);
+        if (!dv || S.anim || S.sheet) return;
+        this._wa = (this._wa || 0) + dv;
+        if (this._wt) clearTimeout(this._wt);
+        if (Math.abs(this._wa) > 50) { const dir = this._wa > 0 ? 1 : -1; this._wa = 0; if (S.vert) slide(dir); else go(S.i + dir); return; }
+        this._wt = setTimeout(() => { this._wa = 0; }, 180);
+      },
+      cardStyle: 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box; border-radius: 24px;'
+        + ' background: ' + c.c + '; display: flex; flex-direction: column; overflow: hidden; z-index: 20; cursor: grab; touch-action: none; user-select: none;'
+        + ' box-shadow: ' + cardShadow + ';'
+        + (cardAnim ? ' animation: ' + cardAnim + ';' : ' transform: ' + cardT2 + ';')
+        + ' filter: grayscale(' + (dead || moved ? 0.9 : 0) + '); opacity: ' + (dead ? 0.72 : (moved ? 0.88 : 1)) + ';'
+        + cardTrans,
+      holeStyle: 'position: absolute; left: 50%; top: 46%; margin: -100px 0 0 -100px; pointer-events: none; z-index: 3; transform: rotate(-13deg);' + (hit ? ' animation: holein 380ms cubic-bezier(0.3,1.2,0.4,1);' : ''),
+      shards: SH.map((x, k) => ({ size: x.s, fill: x.f, style: 'position: absolute; left: 50%; top: 46%; z-index: 4; pointer-events: none; animation: ' + x.a + ' 620ms cubic-bezier(0.2,0.6,0.5,1) ' + (k * 15) + 'ms forwards;' })),
+      c: {
+        num: String(i + 1).padStart(2, '0'), kicker: moved ? c.kicker + ' · moved' : c.kicker,
+        title: titleNow,
+        rx: (c.kind === 'round' || c.kind === 'block') ? (liveMs.length === 0 ? 'Every movement is out.' : (demoted ? 'One movement left, so the round is off. It keeps its own sets.' : c.rx)) : c.rx,
+        cue: c.cue || '', hasCue: !!c.cue && live,
+        chips: (dead ? ['Skipped'] : (c.chips || [])).map((t) => ({ t: t })),
+        lines: (c.lines || []).map((t) => ({ t: t })), hasLines: !!(c.lines && c.lines.length) && !sk,
+        members: members, hasMembers: (c.kind === 'round' || c.kind === 'block') && !sk,
+        hasFrom: !!swappedTo && live, from: swappedTo ? swappedTo.from : '',
+        unswap: () => { this.setState({ names: Object.assign({}, st.names, { [i]: undefined }) }); },
+        canSwap: c.kind === 'lift' && live && !!SW[c.title], canSkip: c.kind === 'lift' && live,
+        canAll: (c.kind === 'round' || c.kind === 'block') && live, canCant: c.kind === 'run' && live,
+        swap: () => openSwap(i, null), skip: () => this.punch(i),
+        hasRpe: live && /RPE\s*\d/.test(c.rx),
+        openRpe: (e) => this.setState({ sheet: { kind: 'rpe', n: +((String(c.rx).match(/RPE\s*(\d+)/) || [0, 7])[1]), at: this.originOf(e) } }),
+        unskip: () => { this.setState({ skip: Object.assign({}, st.skip, { [i]: null }) }); },
+        skipLine: c.kind === 'run' ? cap(D.runWord) + ' is off today.' : ((c.kind === 'round' || c.kind === 'block') ? 'The whole card is off today.' : curName + ' is off today.'),
+        showSets: !!c.sets && live, showRun: c.kind === 'run' && live, isMoved: moved, isFinish: c.kind === 'finish', showRest: c.kind === 'rest',
+        hasLast: !swappedTo && !!c.last, noLast: !!swappedTo || !c.last,
+        hasLoad: !!c.sets && c.loaded !== false, lastText: c.last ? c.last + ' lb' : '', fillText: c.last ? 'Fill every set with ' + c.last + ' lb' : '',
+        lastLine: swappedTo ? 'Nothing logged for ' + curName + ' yet.' : (c.last ? 'Last time ' + c.last + ' lb' : 'Nothing logged for this one yet.'),
+        note: c.note || '',
+        done: isDone && !sk, punched: !!sk, hitting: hit, dead: dead,
+        titleStyle: 'position: relative; font-weight: 800; letter-spacing: -0.04em; line-height: 0.98; color: #FFFFFF; padding-top: 6px; flex-shrink: 0;'
+          + ' font-size: ' + (titleNow.length > 26 ? 28 : (titleNow.length > 16 ? 32 : 40)) + 'px;'
+          + (dead ? ' text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.5);' : '')
+      },
+      open: st.open, rows: rows, setSummary: setSummary, setCount: c.sets ? loggedN + '/' + c.sets.length : '',
+      loadId: H.key + '-load-' + i, loadVal: st.load[i] || '',
+      setLoad: (e) => cascade(e.target.value), reuseLast: () => cascade(String(c.last)),
+      fillAll: () => this.setState({ sets: Object.assign({}, st.sets, { [i]: (st.sets[i] || []).map((x) => Object.assign({}, x, { w: String(c.last) })) }) }),
+      headStyle: 'width: 100%; box-sizing: border-box; min-height: 52px; padding: 9px 14px; display: flex; align-items: center; gap: 9px; border: 0; border-radius: 16px; background: rgba(255,255,255,' + (st.open ? '0.22' : '0.14') + ');',
+      caretStyle: 'flex-shrink: 0; color: #FFFFFF; display: flex; transition: transform 220ms ease; transform: rotate(' + (st.open ? 180 : 0) + 'deg);',
+      toggle: () => this.setState({ open: !st.open }),
+      rf: this.runFields(i, c, st),
+      rs: this.restFields(i, c, st),
+      runSummary: st.ran || 'Not logged',
+      movedTag: st.moved ? 'Moved to ' + DAYNAME[st.moved] : '',
+      movedLine: picked && picked.effect ? picked.effect : '',
+      unmoveText: 'Bring it back to ' + day,
+      unmove: () => { this.setState({ moved: null, pick: null }); },
+      rpe: st.rpe, rpeWord: WORDS[st.rpe], setR: (e) => this.setState({ rpe: parseInt(e.target.value, 10) }),
+      fillStyle: 'position: absolute; left: 0; top: 17px; height: 6px; border-radius: 999px; background: var(--signal); width: ' + (((st.rpe - 1) / 9) * 100).toFixed(1) + '%;',
+      dots: list.map((x, k) => {
+        const bg = st.skip[k] ? 'var(--border2)' : (st.done[k] ? 'var(--signal)' : (k === i ? 'var(--text)' : 'var(--border2)'));
+        return { label: 'Card ' + (k + 1) + ', ' + stateOf(k), pick: () => go(k),
+          hStyle: 'width: ' + (k === i ? 22 : 8) + 'px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: ' + bg + '; transition: width 200ms;',
+          vStyle: 'width: 8px; height: ' + (k === i ? 22 : 8) + 'px; padding: 0; border: 0; border-radius: 999px; background: ' + bg + '; transition: height 200ms;' };
+      }),
+      showCta: c.kind !== 'rest',
+      ctaText: c.kind === 'finish' ? (st.dayDone ? 'Day done' : 'Mark the day done') : (sk || moved || isDone ? 'Next one' : 'Done, next one'),
+      cta: 'width: 100%; height: 54px; border: 0; border-radius: 999px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em;'
+        + ((c.kind === 'finish' ? st.dayDone : (isDone || sk || moved)) ? ' background: var(--text); color: var(--bg);' : ' background: var(--signal); color: var(--on-signal); box-shadow: 0 10px 28px rgba(var(--signal-rgb),0.42);'),
+      advance: () => {
+        if (c.kind === 'finish') { if (!st.dayDone) { this.setState({ dayDone: true }); this.say(H.title + ' is done. Streak holds.'); } return; }
+        if (st.doneAnim || st.anim) return;
+        const marking = !isDone && !sk && !moved;
+        if (marking) this.setState({ done: Object.assign({}, st.done, { [i]: true }) });
+        if (this.calm()) { setTimeout(() => go(i + 1), 200); return; }
+        const leave = () => {
+          this.setState({ doneAnim: { phase: 'leave' }, open: false });
+          setTimeout(() => {
+            this.setState({ i: (this.state.i + 1) % n, doneAnim: null, dx: 0, dy: 0, open: false, snap: true });
+            setTimeout(() => this.setState({ snap: false }), 40);
+          }, 760);
+        };
+        this.setState({ doneAnim: { phase: 'lift', glow: marking } });
+        setTimeout(leave, marking ? 560 : 220);
+      },
+      hasToast: !!st.toast, toast: st.toast,
+      hasSheet: !!st.sheet && st.sheet.kind !== 'rpe', closeSheet: () => this.setState({ sheet: null }),
+      closeRpe: () => {
+        if (!st.sheet || st.sheet.kind !== 'rpe' || st.sheet.closing) return;
+        if (this.calm()) { this.setState({ sheet: null }); return; }
+        this.setState({ sheet: Object.assign({}, st.sheet, { closing: true }) });
+        setTimeout(() => this.setState({ sheet: null }), 300);
+      },
+      rpeScrim: 'position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; background: var(--scrim);'
+        + (this.calm() ? '' : ' animation: ' + (st.sheet && st.sheet.closing ? 'scrimOut 300ms ease forwards' : 'scrimIn 220ms ease both') + ';'),
+      rpeBubble: (() => {
+        const at = (st.sheet && st.sheet.at) || [195, 300];
+        return 'position: absolute; left: 24px; right: 24px; top: 170px; box-sizing: border-box; padding: 20px; border-radius: 28px;'
+          + ' background: var(--surface); color: var(--text); box-shadow: 0 24px 60px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.12);'
+          + ' transform-origin: ' + (at[0] - 24).toFixed(0) + 'px ' + (at[1] - 170).toFixed(0) + 'px;'
+          + (this.calm() ? '' : ' animation: ' + (st.sheet && st.sheet.closing ? 'rpeWarpOut 300ms cubic-bezier(0.5,0,0.75,0) forwards' : 'rpeWarpIn 460ms cubic-bezier(0.22,0.9,0.3,1) both') + ';');
+      })(),
+      isSwapSheet: !!sw, sw: sw || { name: '', tags: [], keeps: '', t1: [], t2: [], hasT1: false, hasT2: false, empty: false, t2Sub: '' },
+      isCantSheet: !!st.sheet && st.sheet.kind === 'cant', isMoveSheet: !!st.sheet && st.sheet.kind === 'move', isMapSheet: !!st.sheet && st.sheet.kind === 'map',
+      cantKicker: runIdx >= 0 ? day + ' · ' + list[runIdx].kicker : '',
+      moveKicker: 'Move ' + D.runWord,
+      openCant: () => this.setState({ sheet: { kind: 'cant' }, open: false }),
+      toMove: () => this.setState({ sheet: { kind: 'move' } }),
+      skipRun: () => this.punch(runIdx),
+      days: days, hasPick: !!picked && picked.tone !== 'off',
+      pickEffect: picked && picked.effect ? picked.effect : '',
+      moveCta: picked ? (picked.tone === 'bad' ? 'Move it anyway' : 'Move it to ' + (DAYNAME[picked.k] || '')) : '',
+      applyMove: () => { this.setState({ moved: st.pick, sheet: null }); this.say(cap(D.runWord) + ' moved to ' + DAYNAME[st.pick] + '.'); },
+      openMap: () => this.setState({ sheet: { kind: 'map' } }),
+      isRpeSheet: !!st.sheet && st.sheet.kind === 'rpe',
+      rpeN: st.sheet && st.sheet.kind === 'rpe' ? st.sheet.n : 7,
+      rpeLine: (() => {
+        const n = st.sheet && st.sheet.kind === 'rpe' ? st.sheet.n : 7;
+        const left = { 6: 'four', 7: 'three', 8: 'two' }[n];
+        if (n <= 5) return 'Easy to moderate. You could keep going for a while.';
+        if (n >= 10) return 'Nothing left. Every rep you had.';
+        if (n === 9) return 'About one rep left in the tank. Stop the set there.';
+        return 'About ' + left + ' reps left in the tank. Stop the set there.';
+      })(),
+      rpeRows: [['1–3', 'Easy', 'Full conversation', 1, 3], ['4–6', 'Moderate', 'Short sentences only', 4, 6], ['7–8', 'Hard', 'A few words at a time', 7, 8], ['9–10', 'Max', "Can't talk. All out.", 9, 10]].map((r) => {
+        const n = st.sheet && st.sheet.kind === 'rpe' ? st.sheet.n : 7, on = n >= r[3] && n <= r[4];
+        const ink = on ? 'var(--on-signal)' : 'var(--text)', soft = on ? 'var(--on-signal)' : 'var(--muted)';
+        return { range: r[0], label: r[1], detail: r[2],
+          style: 'display: grid; grid-template-columns: 40px 76px minmax(0, 1fr); align-items: baseline; padding: 9px 12px; border-radius: 12px;' + (on ? ' background: var(--signal);' : ''),
+          rangeStyle: "font-family: 'Geist Mono', ui-monospace, Menlo, monospace; font-size: 13px; font-weight: 600; line-height: 18px; color: " + soft + ';',
+          labelStyle: 'font-size: 14px; font-weight: 600; line-height: 18px; color: ' + ink + ';',
+          detailStyle: 'font-size: 14px; font-weight: 400; line-height: 18px; color: ' + soft + ';' + (on ? ' opacity: 0.9;' : '') };
+      }),
+      tiles: list.map((x, k) => ({ num: String(k + 1).padStart(2, '0'), kicker: x.kicker, title: (x.kind === 'round' || x.kind === 'block') ? x.title : nameOf(k), state: stateOf(k),
+        style: 'display: block; text-align: left; min-height: 98px; padding: 12px; border: 0; border-radius: 16px; background: ' + tone(k) + ';'
+          + (k === i ? ' box-shadow: 0 0 0 2px var(--text);' : (st.done[k] && !st.skip[k] ? ' box-shadow: 0 0 0 2px var(--signal);' : '')),
+        go: () => this.setState({ i: k, sheet: null, open: false, dx: 0, dy: 0 }) })),
+      onDown: (e) => {
+        const t = e.target, ia = !!(t && t.closest && t.closest('button,input,textarea,label,a,.iaw'));
+        this.setState({ drag: !ia, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0 });
+      },
+      onMove: (e) => { if (this.state.drag && n > 1) this.setState(this.state.vert ? { dy: e.clientY - this.state.y0 } : { dx: e.clientX - this.state.x0 }); },
+      onUp: () => {
+        const s = this.state;
+        if (!s.drag) return;
+        const d = s.vert ? s.dy : s.dx;
+        if (Math.abs(d) < 6) {
+          const now = Date.now();
+          if (now - s.lastTap < 320) {
+            this.setState({ vert: !s.vert, drag: false, dx: 0, dy: 0, lastTap: 0 });
+          } else this.setState({ drag: false, dx: 0, dy: 0, lastTap: now });
+          return;
+        }
+        if (s.vert) {
+          if (d < -80) slide(1);
+          else if (d > 80) slide(-1);
+          else this.setState({ drag: false, dx: 0, dy: 0 });
+          return;
+        }
+        if (d < -80) go(s.i + 1);
+        else if (d > 80) go(s.i - 1);
+        else this.setState({ drag: false, dx: 0, dy: 0 });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

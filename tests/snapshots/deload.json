@@ -1,8 +1,8 @@
 {
   "D91 lattice counts": {
-    "zero-posterior weeks on the shipped card": 240,
-    "zero-posterior weeks that are not deload weeks": 240,
-    "zero-posterior deload weeks with the deload off": 0,
+    "zero-posterior weeks on the shipped card": 396,
+    "zero-posterior weeks that are not deload weeks": 396,
+    "zero-posterior deload weeks with the deload off": 36,
     "deload weeks byte-identical with the deload off": 17,
     "Leg superset B sections the regional cap removes": 18,
     "deload day builds that ship zero posterior where the deload-off arm ships some": 28,
@@ -14,6 +14,6 @@
     },
     "Leg isolation blocks the deload drops": 1275
   },
-  "half-manny deload-off digest": "795060523e672849",
+  "half-manny deload-off digest": "d30129f464b47586",
   "pull lattice positive-limb cards": 138
 }

@@ -30,12 +30,17 @@ the history before this file. Tests: `tests/integration/session-edits.test.ts`. 
   sheet and skips to the stub, stored for the day; a lowback/protect vertical pull main with an empty swap sheet carries
   the minus.
 
-## D249: P-CARDIOSKIP, the cardio card (open)
+## D249: P-CARDIOSKIP, the cardio card (ruled 2026-11-04, ships with the swipe deck)
 
 - **Date:** measured 2026-10-25, not ruled. **Mario's line:** open to a skip on cardio cards, and asked for ideas: moving
   a session to another day, with a warning when the move conflicts with the rest of the program.
 - **The finding (measure):** 48,440 cardio cards on the 865 programs, none with a control; 47,790 on a day that also
   lifts, 650 cardio only. Today the only way to drop the run is to skip the whole day, or to mark it Done without it.
+- **Ruled 2026-11-04 (Mario, "i concur with all", the main session's recommendation):** the run card gets Can't run?,
+  as the swipe deck canvas has it (P-DECK, `docs/decisions/swipe-deck.md`, call 12): move the run to a later day, each
+  day marked good, careful or bad for it (an easy run beside a hard day, a hard run on the eve of the long run), or skip
+  it. It ships with the deck's build, after the lattice measure and coach's read-ahead ruling that file names.
+  **Shipped:** not yet.
 
 ## D250: P-WILDEDIT, the Wildcard's swap and minus act on the Wildcard (v0.246.0)
 

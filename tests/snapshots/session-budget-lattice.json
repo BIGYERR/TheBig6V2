@@ -33,8 +33,8 @@
       },
       "tiers": {
         "bodyweight": {
-          "sections": 10503,
-          "items": 18004,
+          "sections": 10329,
+          "items": 17776,
           "coreSections": 692,
           "thinCore": 341,
           "prehab": 4014,
@@ -42,8 +42,8 @@
           "prehabOutsideD85Names": 336
         },
         "minimal": {
-          "sections": 10696,
-          "items": 18488,
+          "sections": 10480,
+          "items": 18218,
           "coreSections": 692,
           "thinCore": 376,
           "prehab": 4046,
@@ -51,8 +51,8 @@
           "prehabOutsideD85Names": 362
         },
         "home_basic": {
-          "sections": 10666,
-          "items": 18391,
+          "sections": 10450,
+          "items": 18121,
           "coreSections": 668,
           "thinCore": 356,
           "prehab": 4005,
@@ -60,8 +60,8 @@
           "prehabOutsideD85Names": 348
         },
         "home_full": {
-          "sections": 10726,
-          "items": 18474,
+          "sections": 10510,
+          "items": 18204,
           "coreSections": 672,
           "thinCore": 397,
           "prehab": 3994,
@@ -69,8 +69,8 @@
           "prehabOutsideD85Names": 337
         },
         "commercial": {
-          "sections": 10654,
-          "items": 18384,
+          "sections": 10438,
+          "items": 18114,
           "coreSections": 672,
           "thinCore": 434,
           "prehab": 3988,
@@ -78,8 +78,8 @@
           "prehabOutsideD85Names": 331
         },
         "crossfit": {
-          "sections": 10636,
-          "items": 18220,
+          "sections": 10420,
+          "items": 17950,
           "coreSections": 666,
           "thinCore": 416,
           "prehab": 3946,
@@ -91,48 +91,48 @@
         "perTier": {
           "bodyweight": {
             "opt": 54,
-            "non": 695,
-            "nonEx": 479,
-            "ruled": 216
+            "non": 587,
+            "nonEx": 425,
+            "ruled": 162
           },
           "minimal": {
             "opt": 77,
-            "non": 675,
-            "nonEx": 459,
-            "ruled": 216
+            "non": 567,
+            "nonEx": 405,
+            "ruled": 162
           },
           "home_basic": {
             "opt": 75,
-            "non": 686,
-            "nonEx": 470,
-            "ruled": 216
+            "non": 578,
+            "nonEx": 416,
+            "ruled": 162
           },
           "home_full": {
             "opt": 75,
-            "non": 727,
-            "nonEx": 511,
-            "ruled": 216
+            "non": 619,
+            "nonEx": 457,
+            "ruled": 162
           },
           "commercial": {
             "opt": 78,
-            "non": 732,
-            "nonEx": 516,
-            "ruled": 216
+            "non": 624,
+            "nonEx": 462,
+            "ruled": 162
           },
           "crossfit": {
             "opt": 78,
-            "non": 710,
-            "nonEx": 494,
-            "ruled": 216
+            "non": 602,
+            "nonEx": 440,
+            "ruled": 162
           }
         },
         "perClass": {
           "Arms finisher": 18,
           "Biceps": 329,
-          "Calves": 1134,
+          "Calves": 810,
           "Delts": 112,
           "Delts finisher": 36,
-          "Leg isolation": 1296,
+          "Leg isolation": 972,
           "Triceps": 647,
           "Trunk — anti-extension": 653
         }
@@ -141,8 +141,8 @@
     "narrow": {
       "tiers": {
         "bodyweight": {
-          "sections": 1008,
-          "items": 1864,
+          "sections": 944,
+          "items": 1800,
           "coreSections": 90,
           "thinCore": 0,
           "prehab": 425,
@@ -150,8 +150,8 @@
           "prehabOutsideD85Names": 0
         },
         "minimal": {
-          "sections": 1085,
-          "items": 2021,
+          "sections": 985,
+          "items": 1921,
           "coreSections": 90,
           "thinCore": 0,
           "prehab": 471,
@@ -159,8 +159,8 @@
           "prehabOutsideD85Names": 46
         },
         "home_basic": {
-          "sections": 1085,
-          "items": 2028,
+          "sections": 985,
+          "items": 1928,
           "coreSections": 90,
           "thinCore": 0,
           "prehab": 471,
@@ -168,8 +168,8 @@
           "prehabOutsideD85Names": 46
         },
         "home_full": {
-          "sections": 1089,
-          "items": 2029,
+          "sections": 989,
+          "items": 1929,
           "coreSections": 90,
           "thinCore": 15,
           "prehab": 457,
@@ -177,8 +177,8 @@
           "prehabOutsideD85Names": 32
         },
         "commercial": {
-          "sections": 1089,
-          "items": 2022,
+          "sections": 989,
+          "items": 1922,
           "coreSections": 90,
           "thinCore": 21,
           "prehab": 457,
@@ -186,8 +186,8 @@
           "prehabOutsideD85Names": 32
         },
         "crossfit": {
-          "sections": 1089,
-          "items": 2017,
+          "sections": 989,
+          "items": 1917,
           "coreSections": 90,
           "thinCore": 19,
           "prehab": 457,
@@ -238,9 +238,9 @@
   "costLens": {
     "configs": 650,
     "dayCells": 37240,
-    "budgetOffDiffers": 3540,
-    "changedByLens": 1874,
-    "itemsAdded": 2633,
+    "budgetOffDiffers": 3370,
+    "changedByLens": 1704,
+    "itemsAdded": 2347,
     "itemsRemoved": 0,
     "detailChanges": 1
   }
