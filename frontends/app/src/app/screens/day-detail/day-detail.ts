@@ -14,6 +14,7 @@ import { fieldReads } from './cardio-fields-reads';
 import { type ExSection, sectionsView } from './session-sections-model';
 import { type BridgeLike, sectionReads } from './session-sections-reads';
 import { sessionLog, type SessionLogData } from './session-log-model';
+import { DeckState } from '../deck/deck-state';
 
 /** A scheduled day, as far as the sheet reads it. */
 interface DetailDay {
@@ -98,6 +99,7 @@ export class DayDetail {
   private readonly bridge = inject(LegacyBridge);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly deck = inject(DeckState);
   private readonly view = signal<DetailView | null>(null);
   protected readonly views = computed(() => {
     const v = this.view();
@@ -109,6 +111,13 @@ export class DayDetail {
   constructor() {
     this.bridge.provide('openDetail', (dayKey: string, day: DetailDay) => this.open(dayKey, day));
     this.bridge.provide('renderStatusFoot', (dayKey: string, title: string) => this.renderFoot(dayKey, title));
+    // D275 (P-DECK): while the swipe deck is open the sheet is shut and empty, so no exercise card is on the page twice.
+    this.deck.clearSheet = () => {
+      this.view.set(null);
+      this.foot.set(null);
+      document.getElementById('detailOverlay')?.classList.remove('open');
+      this.cdr.detectChanges();
+    };
   }
 
   /** The legacy renderStatusFoot: the foot drawn again for the day's status, once the sheet has been drawn. */
@@ -168,6 +177,11 @@ export class DayDetail {
 
   /** The legacy openDetail: the sheet drawn anew, the legacy wiring run on it, then shown where the reader was. */
   private open(dayKey: string, day: DetailDay): void {
+    // D275 (P-DECK): an edit made on the deck (a skip, a swap, an undo) redraws the deck, not the sheet.
+    if (this.deck.isOpen() && this.deck.redraw) {
+      this.deck.redraw(dayKey, day);
+      return;
+    }
     const b = this.bridge;
     b.call('_setStaleWarnShown', false);
     b.call('_setStaleWarnSrc', '');

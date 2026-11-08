@@ -44,6 +44,8 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
    - **Log a session and relaunch** (8): log two exercises, the RPE card, the effort and a note, close the day out (the workout
      pop-up up, then its dismiss button), relaunch, and find all of it kept, in the session and in the Progress journal, then the 1RM estimator (a set
      typed, the lift switched).
+   The swipe deck (v0.257.0, D275) is the app's first screen the original does not have, so these journeys open a
+   day's session from the day strip, never by the hero's Start session; the deck waits for a one-target app journey.
    Every step is a real tap followed by an assertion. Native date and slider controls, which a user drives through
    the OS picker, are set directly and fire their events.
 5. Each pair of app screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a

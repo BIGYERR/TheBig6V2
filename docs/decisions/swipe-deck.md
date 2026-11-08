@@ -3,16 +3,17 @@
 A day's session as a deck of cards, one card per thing to do (the run, each lift, each round or block, Call it), swiped
 through while training. Designed with Mario on the Claude Design canvas "Swipe Deck Concepts" (private to Mario:
 https://claude.ai/artifact/Nh3ymF2Fh9TC8KY1oZ66uS), Version 74 the state he approved (Version 67 on 2026-11-04, then call 15). The boards' generator is saved in
-`docs/design/swipe-deck/` (its README says how to rebuild them). Not built in the app. Tests: none yet; the build
-writes them.
+`docs/design/swipe-deck/` (its README says how to rebuild them). Being built on the Angular day screen (D275, below).
+Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` and the app's own, written by the build.
 
-## P-DECK: the session as a swipe deck (design agreed, not built)
+## D275 P-DECK: the session as a swipe deck (design agreed, building)
 
 - **Date:** designed 2026-10-25 to 2026-11-03; Mario 2026-11-04, then his three answers the same day (below): "ok i like where were at! lets save this and we are
   going to need to roll this into our app so ill need to wrap up anothe chat before we can implement this".
-  **Ruled by:** Mario, call by call on the canvas (below). **D-code:** assigned from the registry when the build is
-  slotted. **Bump:** not picked (MINOR recommended: a new way to run a session, no program output moves).
-  **Shipped:** not yet.
+  **Ruled by:** Mario, call by call on the canvas (below). **D-code:** D275, issued Post-v0.256.0 (2026-11-08) when the
+  build was slotted. **Bump:** MINOR, v0.257.0 (Mario, 2026-11-08: a new way to run a session, no program output moves; it builds
+  before D274, which gave up the number).
+  **Shipped:** v0.257.0 (2026-11-08), on the Angular screens; "D275 as built", below.
 - **Where it came from:** Mario's 2026-10-25 report that the main lift and the cardio could not be skipped (D248 and
   D250 shipped in v0.246.0; D249, the cardio card, stayed open for ideas, `docs/decisions/session-edits.md`). He asked
   to see the ideas as mockups, then for the card swiping mockups he remembered, then for every feature working.
@@ -120,3 +121,82 @@ writes them.
   and does not wait on D272's open calls, which are about the recorder. The deck chat ("Swap/skip functionality for
   workouts") was merged into the This Week chat the same day, Mario's call; the build order is the deck first, then
   This Week's redesign with D272.
+
+## D275: coach's read-ahead ruling, no premise refuted (2026-11-08)
+
+- **Date:** 2026-11-08, Post-v0.256.0. **Ruled by:** the main session in the coach hat, on the measure below; it changes
+  nothing Mario ruled, so it did not go back to him first (standing ruling 7 applies only to a refuted premise).
+- **The question (carried from the first round):** the deck shows one card at a time, so does an athlete who meets a
+  hinge cold on card 4 or later break hard days hard?
+- **The measure:** `tests/measure/swipe-deck_read-ahead.js` on `index.html` at v0.256.0 (HALF_MANNY digest
+  `147f083be4e04e34`), the same sets and card rule as `tests/measure/swipe-deck_day-shapes.md`; its output is
+  `tests/measure/swipe-deck_read-ahead.md`.
+  - **HALF_MANNY:** 29 hinges, on card 1 (15), 2 (12) or 3 (2), never later. 12 are the Main card, 14 come after lower
+    body work, and the 3 others open the deck (a trap bar deadlift twice, a kettlebell swing once).
+  - **The lattice:** 18 of 15,134 hinges on card 4 or later (0.1%). Every one is a cable pull-through after a goblet
+    squat, a split squat round and a hip thrust; none is met cold.
+  - **The other goals:** 31 of 576 on card 4 or later; 21 after lower body work; 10 with none before, every one a
+    dumbbell or kettlebell hinge (a dumbbell Romanian deadlift, a double kettlebell deadlift, a kettlebell swing) closing a
+    Push (light) day on the 1.5 mile fat loss and marathon programs, after three cards of pressing. No barbell.
+  - **Not the Main card and no lower body card before it:** 2,253 on the lattice, on card 1 (1,661), 2 (520) or 3 (72);
+    105 in the other goals, 76 on card 1. A card 1 hinge is the first thing the deck shows, so no read ahead is involved.
+- **The coaching argument:** hard days hard is a rule about which day carries the hinge (heavy lower beside the speed
+  run, not the recovery run; D36 keeps it off the long run and its eve). The deck moves no lift between days and
+  reorders nothing inside one: its cards are the day's sections in the engine's order, so the deck cannot break it.
+  What a one card view could cost is preparation, a heavy pull met by a body that did not see it coming. The measure
+  says that never happens with a heavy pull: on Mario's program no hinge sits past card 3, on the lattice the late ones
+  are a cable pull-through after three lower body cards, and off it the cold late ones are light finishers. The deck
+  also reads ahead by design: the up and down pager (call 1) shows every card in order, the position numeral says how
+  far in the athlete is, and This Week names the session before Start lift.
+- **What changes:** nothing in P-DECK or Mario's three answers. Answer (1), blocks one card each, and answer (3), the
+  deck behind Start session, rest on nothing the measure moved; answer (2) went to This Week with D272.
+- **What the build must hold:** the deck's cards are the day's sections in the engine's order, never re-sorted, the
+  run left out (D272) and nothing else dropped; a test holds it on a hinge day.
+- **Seen, not ruled (the engine, not the deck):** the 10 cold late hinges sit on Push (light) days whose run is a
+  Recovery Run (marathon) or a long slow run (1.5 mile fat loss), a light hinge on an easy day; the 654 barbell hinges
+  that open a lattice deck without being the Main card carry no warm up cue. Both print the same in the day sheet
+  today. Handoff §12.
+
+## D275 as built (v0.257.0, 2026-11-08)
+
+- **Where:** the iOS app's Angular screens, `frontends/app/src/app/screens/deck/` (`deck-model.ts` the logic, `deck.ts`
+  and `deck.css` the screen, `deck-state.ts` what This Week and the session sheet share with it). The page Pages serves
+  changes only by its version: the deck is not in the legacy builders, as Mario asked.
+- **One writer.** Each card holds the app's own exercise cards (`SessionSections`): the set drawer, the Load box, the
+  last time pill, Fill every set, Log, a movement's swap and minus. Every set is logged by the session sheet's handlers
+  into the same stores (call 8, "What the build reuses"). While the deck is open the session sheet is shut and empty, so
+  no exercise card is on the page twice (the handlers find their inputs by id), and the redraw an edit asks of the sheet
+  (a skip, a swap, an undo) lands on the deck instead.
+- **Decisions the build made (siting and form, recorded here):**
+  1. Start session (today, not yet marked) opens the deck out of the hero card; Open session (a marked day, a day browsed
+     ahead) opens the session sheet for review and edits (answer 3). Start lift arrives with D272's redesign of This Week,
+     which calls the same opener (`DeckState.start`).
+  2. A long run day whose only lift card is its cool down opens the session sheet: the run is the day. Until D272's run
+     block lands, a run on a lift day is logged on the sheet, reached from the day strip.
+  3. Done, next one logs every movement on the card that is not yet logged, as the card shows it, through the same write
+     as each Log (`saveExWeight`, quietly); a card with nothing the app can log is marked done for that open only.
+  4. Call it writes the day's RPE (only once the slider is moved, D219) and notes into the day's log entry, every other
+     field kept, and marks the day complete (`markDayComplete`); then the rest clock stops, the deck closes into its card
+     and the completion pop-up shows, as the sheet's Done does (D179). It never calls `persistLogFields`, which rebuilds the
+     entry from the sheet's form and would blank a run logged that day.
+  5. Call it's slider speaks the canvas's words ("working, three left"), not the sheet's `RPE_LABELS` ("Very Hard"), so the
+     deck never names a 7 two ways (its RPE bubble calls 7 Hard).
+  6. The Main card's cue takes the reserve the engine's own line names (HALF_MANNY week 1's RPE 6.5 reads "leave ~4 reps in
+     reserve", so "Leave about four reps in reserve"), else what the RPE leaves; a half step with no words reads "three to
+     four", and the RPE bubble reads a half step as the step below, so the bubble and the card agree.
+  7. A cool down of one move reads "One easy move".
+  8. Up and down, a drag scrolls a tall card's body first and pages only past its edge; a double tap switches either way.
+  9. The deck sits over the session sheet and the tab bar and under the rest timer, the swap sheet, the toast and the
+     pop-ups, so the rest clock stays in reach between sets.
+  10. Past four sets a movement shows one set at a time behind pips (board P): `SessionSections` takes `pipAt`, which the
+      deck sets to `PIP_THRESHOLD` (4) and the sheet leaves unset.
+- **What does not change:** what any program prescribes (HALF_MANNY digest `147f083be4e04e34`, as v0.256.0); the page's
+  script; the session sheet, which still opens from the day strip, Open session and the deck's own fallbacks.
+- **Tests:** `tests/unit/swipe-deck.test.ts` (the card words, the pills, the RPE mark and bubble, the Main cue, the cool
+  down line, the numeral, the big button, Call it's write, call 16's numbers, the card rule on hand built days),
+  `tests/integration/swipe-deck.test.ts` (HALF_MANNY week 10 as the canvas drew it, Thursday as D273 trims it; the
+  engine's order kept and every movement on exactly one card; a skip, a round skip and a log flowing back into the cards),
+  `frontends/app/test/unit/deck.test.ts` (the app lane's own). Each fails on v0.256.0 (the deck does not exist there).
+- **Seen, not tested:** the motion, the swipes and the double tap, the pips, the punched hole and the glow, Call it's close
+  and the pop-up, in the Angular dev server at 375 px, day and night, driven through the hero's handler. Not yet on the
+  phone: TestFlight carries it once Mario merges.

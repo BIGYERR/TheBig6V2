@@ -1,0 +1,14 @@
+#!/bin/sh
+# Every commit on a chat branch (chat/<work>) carries the trailer `Chat: <work>` (CLAUDE.md Pipeline, "One chat per
+# worktree"; Mario, Post-v0.256.0), so a push of dev can tell whose commits it carries (tools/land.mjs --guard).
+# Enabled per clone with: git config core.hooksPath .githooks
+msg="$1"
+branch="$(git branch --show-current 2>/dev/null)"
+case "$branch" in
+  chat/*) ;;
+  *) exit 0 ;;
+esac
+grep -qE '^Chat:' "$msg" && exit 0
+work="${branch#chat/}"
+printf '\nChat: %s\n' "$work" >> "$msg"
+exit 0

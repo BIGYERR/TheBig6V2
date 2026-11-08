@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
@@ -68,8 +68,11 @@ import type { SectionView } from './session-sections-model';
                   <span class="exset-caret" [innerHTML]="icon('chevronDown', 20)"></span>
                 </button>
                 <div class="exset-rows" [id]="'exrows_' + x.exKey">
+                  @if (pipped(st.rows.length)) {
+                    <div class="exset-pips" role="group" aria-label="Sets">@for (row of st.rows; track row.s) {<button type="button" [attr.class]="'exset-pip' + (row.s === pipOf(x.exKey) ? ' on' : '')" [attr.aria-label]="'Set ' + (row.s + 1)" [attr.aria-pressed]="row.s === pipOf(x.exKey)" (click)="pick(x.exKey, row.s)">{{ row.s + 1 }}</button>}</div>
+                  }
                   @for (row of st.rows; track row.s) {
-                    <div class="exset-row" [id]="'exsetrow_' + x.exKey + '_' + row.s">
+                    <div class="exset-row" [id]="'exsetrow_' + x.exKey + '_' + row.s" [style.display]="pipped(st.rows.length) && row.s !== pipOf(x.exKey) ? 'none' : null">
                       <span class="exset-num">{{ row.s + 1 }}</span>
                       <div class="exset-ctl">
                         <button type="button" class="exset-btn" (click)="call('stepSet', row.rowId, -row.step)">−</button>
@@ -113,6 +116,23 @@ export class SessionSections {
   readonly sections = input.required<SectionView[]>();
   /** v0.246.0 D250 (P-WILDEDIT): 'wild' on Random Workout, whose swap, skip and undo address the Wildcard's own day. */
   readonly src = input<'wild' | undefined>(undefined);
+  /**
+   * D275 (P-DECK, board P): past this many sets a movement shows one set at a time behind a strip of pips. The swipe deck
+   * passes PIP_THRESHOLD; the session sheet passes nothing and shows every set. A hidden row keeps its inputs, so the
+   * legacy handlers read and log every set either way.
+   */
+  readonly pipAt = input<number | null>(null);
+  private readonly pips = signal<Record<string, number>>({});
+  protected pipped(rows: number): boolean {
+    const at = this.pipAt();
+    return at != null && rows > at;
+  }
+  protected pipOf(exKey: string): number {
+    return this.pips()[exKey] ?? 0;
+  }
+  protected pick(exKey: string, s: number): void {
+    this.pips.update((p) => ({ ...p, [exKey]: s }));
+  }
   private readonly safe = new Map<string, SafeHtml>();
 
   /** Markup from the program or a legacy helper, made ready for the page once per string. */

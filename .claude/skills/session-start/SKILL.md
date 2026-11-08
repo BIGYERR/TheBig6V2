@@ -6,6 +6,12 @@ description: Verify the canonical Iron Asylum artifact and handoff agree before 
 
 Run these, in order, and report the six lines. Do not begin design or edits until the first four agree.
 
+0. **Your own worktree first (One chat per worktree, Mario, Post-v0.256.0).** If this chat's folder is the main checkout
+   (`git rev-parse --git-dir` equals `git rev-parse --git-common-dir`) and the branch is `dev`, call `EnterWorktree` before
+   any edit, on a branch named `chat/<work>` for the work Mario has asked for. The main checkout holds `dev` and nothing
+   else; a chat never commits there (the pre-commit hook refuses). Report the branch in the GIT line. When Mario says push,
+   `node tools/land.mjs` from the worktree lands the branch on `dev` and pushes, as one step.
+
 1. Version on disk:
    `grep -oE '<meta name="ia-version" content="[^"]+"' index.html` (`MAJOR.MINOR.PATCH`; a bare integer N is a pre-semver build, 0.N.0)
    Also `ls *.html` — there must be exactly one HTML file in the repo root.

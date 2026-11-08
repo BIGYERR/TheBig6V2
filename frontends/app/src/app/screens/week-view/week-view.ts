@@ -4,6 +4,7 @@ import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy
 import { wildcardSub } from '../day-detail/sheet-marks-model';
 import { WildcardMark, WildcardTag } from '../marks/wildcard';
 import { type Overlay, type WeekDay, type WeekView as View, weekView } from './week-view-model';
+import { DeckState } from '../deck/deck-state';
 
 /** The screen before any program is drawn, as the legacy markup stood. */
 const BLANK: View = {
@@ -81,7 +82,7 @@ const BLANK: View = {
         }
         @case ('day') {
           @if (d.hero.kind === 'day') {
-            <div [class]="'wk-hero' + (d.hero.today ? ' is-today' : '')"><div class="wk-hero-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-hero-title">{{ d.hero.title }}</div><div class="wk-hero-tags"><span class="wk-tag wk-time">{{ d.hero.time }}</span>@for (t of d.hero.tags; track $index) {<span class="wk-tag" [attr.style]="t.style">{{ t.label }}</span>}@if (d.hero.travel) {<span class="wk-tag wk-travel" [innerHTML]="travelInner()"></span>}</div></div>@if (d.hero.summary) {<div class="wk-hero-summary" [innerHTML]="html(d.hero.summary)"></div>}@if (d.hero.status) {<div class="wk-hero-status">{{ d.hero.status }}</div>}<div class="wk-hero-cta-wrap"><button class="wk-hero-cta" (click)="call('openDayKey', d.hero.key)">{{ d.hero.cta }}</button></div></div>
+            <div [class]="'wk-hero' + (d.hero.today ? ' is-today' : '')"><div class="wk-hero-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-hero-title">{{ d.hero.title }}</div><div class="wk-hero-tags"><span class="wk-tag wk-time">{{ d.hero.time }}</span>@for (t of d.hero.tags; track $index) {<span class="wk-tag" [attr.style]="t.style">{{ t.label }}</span>}@if (d.hero.travel) {<span class="wk-tag wk-travel" [innerHTML]="travelInner()"></span>}</div></div>@if (d.hero.summary) {<div class="wk-hero-summary" [innerHTML]="html(d.hero.summary)"></div>}@if (d.hero.status) {<div class="wk-hero-status">{{ d.hero.status }}</div>}<div class="wk-hero-cta-wrap"><button class="wk-hero-cta" (click)="open(d.hero.key, d.hero.cta, $event)">{{ d.hero.cta }}</button></div></div>
           }
         }
         @default {
@@ -105,6 +106,7 @@ export class WeekView {
   private readonly bridge = inject(LegacyBridge);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly deck = inject(DeckState);
   protected readonly view = signal<View>(BLANK);
   /** A fresh object per render, so the strip and the days list are drawn anew, as the legacy innerHTML writes did. */
   protected readonly strips = computed(() => [{ weeks: this.view().weeks }]);
@@ -139,6 +141,19 @@ export class WeekView {
   /** The travel tag's backpack and word. */
   protected travelInner(): SafeHtml {
     return this.html(this.bridge.call('asyIcon', 'backpack', 11) + '<span>Travel</span>');
+  }
+
+  /**
+   * The hero's button. D275 (P-DECK, Mario's answer 3): Start session opens the day as the swipe deck, out of the
+   * hero card (call 16); Open session (a marked day, or a day browsed ahead) opens the session sheet for review and edits.
+   */
+  protected open(key: string, cta: string, ev: Event): void {
+    if (cta !== 'Start session') {
+      this.bridge.call('openDayKey', key);
+      return;
+    }
+    const btn = ev.currentTarget as HTMLElement | null;
+    this.deck.start(key, btn && btn.closest ? (btn.closest('.wk-hero') as HTMLElement | null) : null);
   }
 
   protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
