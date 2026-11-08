@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Half Manny Week screen, real program</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#0B0B0B}
+a{color:#FFFFFF}a:hover{color:#F26A1C}
+button{font-family:inherit}
+.wkstrip{scrollbar-width:none}
+.wkstrip::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="width: 390px; height: 960px; box-sizing: border-box; background: #0B0B0B; background-image: radial-gradient(120% 60% at 50% -10%, #3A1A08 0%, #0B0B0B 70%); color: #FFFFFF; font-family: -apple-system, 'SF Pro Display', system-ui, Inter, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative">
+
+  <sc-if value="{{ isWeek }}" hint-placeholder-val="{{ true }}">
+  <div style="padding: 28px 20px 0; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; min-height: 0">
+
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8E8E8E">The Half Manny</div>
+      <div style="position: relative; width: 390px; margin-left: -20px">
+        <div class="wkstrip" ref="{{ stripRef }}" onScroll="{{ onStripScroll }}" role="group" aria-label="Choose a week, swipe sideways" style="width: 390px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; display: flex; padding: 0 150px 0 0; box-sizing: border-box">
+          <sc-for list="{{ weeks }}" as="w" hint-placeholder-count="3">
+            <button type="button" onClick="{{ w.pick }}" aria-label="{{ w.label }}" style="flex: none; width: 240px; scroll-snap-align: start; border: 0; background: none; padding: 4px 0; text-align: left; padding-left: 20px; box-sizing: border-box; font-size: 56px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; cursor: pointer; white-space: nowrap; color: {{ w.color }}">{{ w.title }}</button>
+          </sc-for>
+        </div>
+        <div style="position: absolute; top: 0; right: 0; bottom: 0; width: 150px; background: linear-gradient(90deg, rgba(11,11,11,0), #0B0B0B 55%); pointer-events: none" aria-hidden="true"></div>
+        <button type="button" onClick="{{ openHurt }}" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #3A3A3A; background: #0B0B0B; color: #FFFFFF; font-size: 15px; font-weight: 600; cursor: pointer">Hurt?</button>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>
+        <div style="display: flex; flex-direction: column; gap: 1px">
+          <div style="font-size: 20px; font-weight: 700; line-height: 1.1">{{ daysOut }} days out</div>
+          <div style="font-size: 13px; color: #8E8E8E">Race day Sun, Dec 6</div>
+        </div>
+      </div>
+      <div style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1.5px solid {{ accent }}; color: {{ accent }}; font-size: 14px; font-weight: 700; display: flex; align-items: center; white-space: nowrap">{{ phase }}</div>
+    </div>
+
+    <div style="background: #161616; border-radius: 24px; padding: 16px 8px 14px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px">
+      <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+        <button type="button" onClick="{{ d.pick }}" aria-label="{{ d.label }}" style="border: 0; background: none; padding: 0; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; min-height: 44px; min-width: 0">
+          <div style="font-size: 13px; font-weight: 700; color: {{ d.letterColor }}">{{ d.letter }}</div>
+          <div style="width: 36px; height: 36px; border-radius: 50%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #FFFFFF; background: {{ d.circleBg }}; border: {{ d.circleBorder }}">
+            <sc-if value="{{ d.done }}" hint-placeholder-val="{{ false }}">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#7CC56A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>
+            </sc-if>
+            <sc-if value="{{ d.notDone }}" hint-placeholder-val="{{ true }}">
+              <span style="color: {{ d.numColor }}">{{ d.num }}</span>
+            </sc-if>
+          </div>
+          <div style="font-size: 9px; font-weight: 700; letter-spacing: 0.04em; color: {{ d.codeColor }}">{{ d.code }}</div>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="background: #161616; border-radius: 24px; padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 15px; font-weight: 600; color: #8E8E8E">{{ sel.when }}</div>
+      <div style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.02">{{ sel.title }}</div>
+      <div style="font-size: 15px; font-weight: 600; color: #FFFFFF">{{ sel.meta }}</div>
+      <div style="font-size: 14px; line-height: 1.4; color: #8E8E8E">{{ sel.blurb }}</div>
+      <sc-if value="{{ sel.hasLift }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top: 2px; background: #0B0B0B; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4M6 8v8M9 10v4M15 10v4M18 8v8M21 10v4M9 12h6"/></svg>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+            <div style="font-size: 14px; font-weight: 700">{{ sel.liftTitle }}</div>
+            <div style="font-size: 13px; color: #8E8E8E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ sel.liftSummary }}</div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sel.hasNote }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size: 13px; font-weight: 600; color: {{ accent }}">{{ sel.note }}</div>
+      </sc-if>
+      <sc-if value="{{ sel.showStart }}" hint-placeholder-val="{{ true }}">
+        <button type="button" onClick="{{ toggleDone }}" style="margin-top: 8px; height: 56px; border: 0; border-radius: 28px; background: {{ accent }}; color: #FFFFFF; font-size: 19px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>
+          {{ sel.btn }}
+        </button>
+      </sc-if>
+      <sc-if value="{{ sel.showUndo }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ toggleDone }}" style="margin-top: 8px; height: 48px; border: 1.5px solid #3A3A3A; border-radius: 24px; background: none; color: #FFFFFF; font-size: 16px; font-weight: 600; cursor: pointer">Reopen session</button>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ recent.show }}" hint-placeholder-val="{{ true }}">
+    <div style="background: #161616; border-radius: 20px; padding: 14px 18px; display: flex; align-items: center; gap: 12px">
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#7CC56A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+        <div style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ recent.title }}</div>
+        <div style="font-size: 13px; color: #8E8E8E">{{ recent.meta }}</div>
+      </div>
+      <button type="button" onClick="{{ recent.pick }}" style="border: 0; background: none; font-size: 15px; font-weight: 600; color: {{ accent }}; padding: 10px 0 10px 8px; min-height: 44px; cursor: pointer">Review</button>
+    </div>
+    </sc-if>
+
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isPrograms }}" hint-placeholder-val="{{ false }}">
+  <div style="padding: 28px 20px 0; display: flex; flex-direction: column; gap: 16px; flex-grow: 1">
+    <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8E8E8E">Your plans</div>
+    <div style="font-size: 44px; font-weight: 800; letter-spacing: -0.03em; line-height: 1">Programs</div>
+    <button type="button" onClick="{{ goWeek }}" style="text-align: left; border: 1.5px solid {{ accent }}; background: #161616; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 6px; color: #FFFFFF; cursor: pointer">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: {{ accent }}">Active · Week 11 of 14</div>
+      <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.02em">The Half Manny</div>
+      <div style="font-size: 14px; color: #8E8E8E">NRC half marathon plan with lifting. Race Dec 6.</div>
+    </button>
+    <div style="background: #161616; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8E8E8E">Saved</div>
+      <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em">The Big 6</div>
+      <div style="font-size: 14px; color: #8E8E8E">Strength block. Squat, bench, deadlift, press, row, pull.</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isProgress }}" hint-placeholder-val="{{ false }}">
+  <div style="padding: 28px 20px 0; display: flex; flex-direction: column; gap: 16px; flex-grow: 1">
+    <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8E8E8E">The Half Manny</div>
+    <div style="font-size: 44px; font-weight: 800; letter-spacing: -0.03em; line-height: 1">Progress</div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+      <div style="background: #161616; border-radius: 20px; padding: 16px 14px; display: flex; flex-direction: column; gap: 4px">
+        <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em">{{ stats.miles }}</div>
+        <div style="font-size: 12px; color: #8E8E8E">long run mi</div>
+      </div>
+      <div style="background: #161616; border-radius: 20px; padding: 16px 14px; display: flex; flex-direction: column; gap: 4px">
+        <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em">{{ stats.sessions }}</div>
+        <div style="font-size: 12px; color: #8E8E8E">sessions done</div>
+      </div>
+      <div style="background: #161616; border-radius: 20px; padding: 16px 14px; display: flex; flex-direction: column; gap: 4px">
+        <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em">{{ stats.lifts }}</div>
+        <div style="font-size: 12px; color: #8E8E8E">lift days</div>
+      </div>
+    </div>
+    <div style="background: #161616; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <div style="font-size: 15px; font-weight: 700">Long run by week</div>
+        <div style="font-size: 13px; color: #8E8E8E">tap a week to open it</div>
+      </div>
+      <div style="display: flex; align-items: flex-end; gap: 5px; height: 120px" role="img" aria-label="Long run distance across the 14 week build, peaking at 12.5 miles in week 11">
+        <sc-for list="{{ bars }}" as="b" hint-placeholder-count="14">
+          <button type="button" onClick="{{ b.pick }}" aria-label="{{ b.label }}" style="flex: 1; border: 0; padding: 0; background: {{ b.color }}; border-radius: 4px 4px 0 0; height: {{ b.h }}; cursor: pointer"></button>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #8E8E8E">
+        <span>Wk 1</span><span>Peak 20K</span><span>Race</span>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="padding: 12px 20px 20px">
+    <nav aria-label="Main" style="background: #161616; border-radius: 36px; padding: 8px; display: flex">
+      <button type="button" onClick="{{ goPrograms }}" style="flex: 1; height: 56px; border: 0; border-radius: 28px; background: {{ tabBg.programs }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: {{ tabColor.programs }}; font-size: 12px; font-weight: 600; cursor: pointer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+        Programs
+      </button>
+      <button type="button" onClick="{{ goWeek }}" style="flex: 1; height: 56px; border: 0; border-radius: 28px; background: {{ tabBg.week }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: {{ tabColor.week }}; font-size: 12px; font-weight: 600; cursor: pointer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        This Week
+      </button>
+      <button type="button" onClick="{{ goProgress }}" style="flex: 1; height: 56px; border: 0; border-radius: 28px; background: {{ tabBg.progress }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: {{ tabColor.progress }}; font-size: 12px; font-weight: 600; cursor: pointer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>
+        Progress
+      </button>
+    </nav>
+  </div>
+
+  <sc-if value="{{ hurtOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; justify-content: flex-end">
+      <div style="background: #161616; border-radius: 28px 28px 0 0; padding: 12px 20px 32px; display: flex; flex-direction: column; gap: 10px">
+        <div style="width: 40px; height: 4px; border-radius: 2px; background: #3A3A3A; align-self: center; margin-bottom: 6px" aria-hidden="true"></div>
+        <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Something hurt?</div>
+        <div style="font-size: 14px; color: #8E8E8E; margin-bottom: 6px">Adjusts {{ sel.shortWhen }}. Nothing else in the plan moves.</div>
+        <button type="button" onClick="{{ hurtEasy }}" style="height: 56px; border: 0; border-radius: 16px; background: #262626; color: #FFFFFF; font-size: 16px; font-weight: 600; text-align: left; padding: 0 18px; cursor: pointer">Swap the run for an easy 2 mi</button>
+        <button type="button" onClick="{{ hurtRest }}" style="height: 56px; border: 0; border-radius: 16px; background: #262626; color: #FFFFFF; font-size: 16px; font-weight: 600; text-align: left; padding: 0 18px; cursor: pointer">Make it a rest day</button>
+        <button type="button" onClick="{{ hurtFlag }}" style="height: 56px; border: 0; border-radius: 16px; background: #262626; color: #FFFFFF; font-size: 16px; font-weight: 600; text-align: left; padding: 0 18px; cursor: pointer">Flag an injury, keep the session</button>
+        <button type="button" onClick="{{ closeHurt }}" style="height: 48px; border: 0; background: none; color: #8E8E8E; font-size: 16px; font-weight: 600; cursor: pointer">Cancel</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F26A1C"},"$preview":{"width":390,"height":960}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'week', week: 11, selByWeek: { 11: 5 }, done: {}, notes: {}, hurtOpen: false };
+    this.ITEM = 240;
+    this.TODAY = { w: 11, d: 4 };
+    this.RACE = new Date(2026, 11, 6);
+    this.LETTERS = ['S','M','T','W','T','F','S'];
+    this.DAYNAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    this.MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    this._strip = null;
+    this._init = false;
+
+    this.NRC = [{"w":1,"long":"5K Run","lv":3.1,"lu":"mi","speed":"8 × 1:00 at 5K Pace — 8:00 of work","rec":"15–25 min"},{"w":2,"long":"4 Mile Run","lv":4.0,"lu":"mi","speed":"Mixed-pace ladder — 9:00 of work, 5 efforts","rec":"15–35 min"},{"w":3,"long":"5 Mile Run","lv":5.0,"lu":"mi","speed":"Hill workout — 5 rounds of 10K effort into Best effort","rec":"15–30 min"},{"w":4,"long":"10K Run","lv":6.2,"lu":"mi","speed":"Descending ladder of Mile and 5K reps — 18:00 of work, 12 efforts","rec":"15–40 min"},{"w":5,"long":"10K Run","lv":6.2,"lu":"mi","speed":"3 rounds of a 5K rep and three Mile-pace bursts — 11:15 of work","rec":"15–30 min"},{"w":6,"long":"8 Mile Run","lv":8.0,"lu":"mi","speed":"20 × 0:30 at Mile Pace — 10:00 of work","rec":"15–45 min"},{"w":7,"long":"15K Run","lv":9.5,"lu":"mi","speed":"Four blocks, each shifting straight into Mile Pace — 14:00 of work","rec":"15–31 min"},{"w":8,"long":"10 Mile Run","lv":10.0,"lu":"mi","speed":"10 × 2:00 at 5K Pace — 20:00 of work","rec":"15–35 min"},{"w":9,"long":"10 Mile Run","lv":10.0,"lu":"mi","speed":"Pyramid from 10K to Best and back — 18:00 of work, 8 efforts","rec":"15–35 min"},{"w":10,"long":"13.1K Dress Rehearsal","lv":8.0,"lu":"mi","speed":"3 rounds of 5K → 10K → Mile — 13:30 of work","rec":"15–45 min"},{"w":11,"long":"20K Run","lv":12.5,"lu":"mi","speed":"5 × 5:00 at 10K Pace — 25:00 of work","rec":"15–45 min"},{"w":12,"long":"One Hour Run","lv":60.0,"lu":"min","speed":"3 rounds of 10K → 5K → Mile — 42:00 of work","rec":"15–60 min"},{"w":13,"long":"7 Mile Run","lv":7.0,"lu":"mi","speed":"3 rounds of a 5K rep and four Mile-pace bursts — 15:00 of work","rec":"15 min + 5K"},{"w":14,"long":"THE RACE","lv":13.1,"lu":"mi","speed":"Race-week sharpener — 11:00 of work around 5:00 at race pace","rec":"15–25 min"}];
+
+    this.GRID = {"1":[["Posterior Chain","Speed Run — Fartlek",["Barbell Romanian deadlift","Barbell row","Weighted chinups","Dumbbell row","Ball slams"]],["Strength Support","Recovery Run",["Close-grip bench press","Dumbbell Arnold press","Dumbbell decline press","Kettlebell single-arm press","Spanish squat hold (KB)","Suitcase carry","Bird dogs"]],0,["Leg Strength + Mobility","",["Front squat","Dumbbell Bulgarian split squat","Spanish squat hold (KB)","Barbell Romanian deadlift","Single-leg hip thrust","Dumbbell seated calf raise","Seated banded hip flexion","Hip airplane (light KB)","Hip 90/90 stretch","Single-leg bent-knee soleus raise","Standing ankle CARs","Suitcase carry"]],["Recovery Lift","Recovery Run",["Dumbbell bench press","Kettlebell single-arm press","Diamond pushups","Overhead dumbbell extension","Medicine ball rotary toss","Landmine rotations"]],["Full Body Support","Long Run",["Kettlebell swing","Dips","Inverted rows (rings)"]],0],"2":[["Posterior Chain","Speed Run — Intervals",["Barbell Romanian deadlift","Barbell row","Weighted chinups","Dumbbell row","Ball slams"]],["Strength Support","Recovery Run",["Close-grip bench press","Dumbbell Arnold press","Dumbbell decline press","Kettlebell single-arm press","Spanish squat hold (KB)","Medicine ball rotary toss"]],0,["Leg Strength + Mobility","",["Front squat","Dumbbell Bulgarian split squat","Spanish squat hold (KB)","Barbell Romanian deadlift","Single-leg hip thrust","Dumbbell seated calf raise","Standing band hip abduction","Hip airplane (light KB)","Hip 90/90 stretch","Single-leg bent-knee soleus raise","Knee-to-wall ankle rocks","Suitcase carry"]],["Recovery Lift","Recovery Run",["Dumbbell bench press","Kettlebell single-arm press","Diamond pushups","Overhead dumbbell extension","Side plank","Plank shoulder taps"]],["Full Body Support","Long Run",["Dips","Inverted rows (rings)"]],0],"3":[["Posterior Chain","Speed Run — Intervals",["Trap bar deadlift","Pendlay row","Weighted chinups","Kettlebell single-arm row","Broad jumps"]],["Strength Support","Recovery Run",["Close-grip bench press","Barbell push press","Diamond pushups","Dumbbell Arnold press","Wall sit","Side plank","Plank shoulder taps"]],0,["Leg Strength + Mobility","",["Back squat","Dumbbell goblet side lunge","Wall sit","Kettlebell swing","Single-leg hip thrust","Dumbbell standing calf raise","Banded monster walks","Standing band hip abduction","Hip 90/90 stretch","Single-leg balance hold (eyes closed)","Single-leg bent-knee soleus raise","Suitcase carry"]],["Recovery Lift","Recovery Run",["Dumbbell bench press","Dumbbell Arnold press","Dips","Dumbbell skullcrushers","Standing torso rotations (slow)","Side plank thread-the-needle"]],["Full Body Support","Long Run",["Decline pushups","Feet-elevated inverted rows"]],0],"4":[["Posterior Chain","Speed Run — Tempo",["Trap bar deadlift","Pendlay row","Weighted chinups"]],["Strength Support","Recovery Run",["Close-grip bench press","Barbell push press","Diamond pushups","Dumbbell Arnold press"]],0,["Leg Strength + Mobility","",["Back squat","Dumbbell goblet side lunge","Wall sit","Kettlebell swing","Single-leg hip thrust","Banded side steps","Banded monster walks","Half-kneeling hip flexor stretch","Banded dorsiflexion","Towel scrunches"]],["Recovery Lift","Recovery Run",["Dumbbell bench press","Dumbbell Arnold press","Dips","Dumbbell skullcrushers"]],["Post-Run Mobility","Long Run",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"5":[["Posterior Chain","Speed Run — Tempo",["Sumo deadlift","Barbell row","L-sit chinups","Dumbbell row","Kettlebell swing"]],["Strength Support","Recovery Run",["Dumbbell bench press","Seated dumbbell shoulder press","Dumbbell decline press","Barbell push press","Spanish squat hold (KB)","Pallof press","Dumbbell renegade rows"]],0,["Leg Strength + Mobility","",["Front squat","Step-downs (KB)","Spanish squat hold (KB)","Kettlebell swing","Single-leg hip thrust","Dumbbell split-stance calf raise","Banded side steps","Glute bridge hold","Pigeon lift-offs","Standing ankle CARs","Banded dorsiflexion","Suitcase carry"]],["Recovery Lift","Recovery Run",["Pushups (slow tempo)","Barbell push press","Dumbbell incline press","Bench dips","Band woodchopper (door anchor)","Russian twist (heels down)"]],["Post-Run Mobility","Long Run",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"6":[["Posterior Chain","Speed Run — Intervals",["Sumo deadlift","Barbell row","L-sit chinups","Dumbbell row","Kettlebell swing"]],["Strength Support","Recovery Run",["Dumbbell bench press","Seated dumbbell shoulder press","Dumbbell decline press","Barbell push press","Spanish squat hold (KB)","Band woodchopper (door anchor)","Russian twist (heels down)"]],0,["Leg Strength + Mobility","",["Front squat","Step-downs (KB)","Spanish squat hold (KB)","Kettlebell swing","Single-leg hip thrust","Dumbbell split-stance calf raise","Banded side steps","Clamshells w/ band","Weighted 90/90 hip switch","Single-leg balance hold (eyes closed)","Single-leg KB pass-around","Suitcase carry"]],["Recovery Lift","Recovery Run",["Pushups (slow tempo)","Barbell push press","Dumbbell incline press","Bench dips","Farmer carry","Suitcase carry"]],["Post-Run Mobility","Long Run",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"7":[["Posterior Chain","Speed Run — Intervals",["Trap bar deadlift","Barbell row","L-sit chinups","Kettlebell single-arm row","Burpees"]],["Strength Support","Recovery Run",["Dumbbell bench press","Seated dumbbell shoulder press","Single-arm dumbbell bench press","Dumbbell lateral raise","Wall sit","Farmer carry","Suitcase carry"]],0,["Leg Strength + Mobility","",["Front squat","Step-downs (KB)","Wall sit","Kettlebell single-leg deadlift","Single-leg hip thrust","Dumbbell split-stance calf raise","Clamshells w/ band","Kettlebell hip flexor raise","Worlds greatest stretch","Single-leg balance hold (eyes closed)","Towel scrunches","Overhead carry"]],["Recovery Lift","Recovery Run",["Dumbbell incline press","Dumbbell lateral raise","Dumbbell decline press","Bench dips","Windshield wipers","Medicine ball rotary toss"]],["Post-Run Mobility","Long Run",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"8":[["Posterior Chain","Speed Run — Intervals",["Trap bar deadlift","Barbell row","L-sit chinups"]],["Strength Support","Recovery Run",["Dumbbell bench press","Seated dumbbell shoulder press","Single-arm dumbbell bench press","Dumbbell lateral raise"]],0,["Leg Strength + Mobility","",["Front squat","Step-downs (KB)","Wall sit","Kettlebell single-leg deadlift","Single-leg hip thrust","Clamshells w/ band","Copenhagen plank (bent knee)","Worlds greatest stretch","Standing ankle CARs","Knee-to-wall ankle rocks"]],["Recovery Lift","Recovery Run",["Dumbbell incline press","Dumbbell lateral raise","Dumbbell decline press","Bench dips"]],["Post-Run Mobility","Long Run",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"9":[["Posterior Chain","Speed Run — Tempo",["Deadlift","Barbell row","Chinups","Dumbbell row"]],["Strength Support","Recovery Run",["Incline barbell press","Barbell overhead press","Single-arm dumbbell bench press","Seated dumbbell shoulder press","Spanish squat hold (KB)","Bird dogs","Side plank"]],0,["Leg Strength + Mobility","",["Back squat","Dumbbell goblet side lunge","Spanish squat hold (KB)","Dumbbell split-stance deadlift","Single-leg hip thrust","Dumbbell standing calf raise","Clamshells w/ band","Banded monster walks","Cossack squat shift","Banded dorsiflexion","Split-squat heel-raise hold","Farmer carry"]],["Recovery Lift","Recovery Run",["Dumbbell bench press","Seated dumbbell shoulder press","Dumbbell incline press","Overhead dumbbell extension","Landmine rotations","Standing torso rotations (slow)"]],["Post-Run Mobility","Long Run",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"10":[["Posterior Chain","Speed Run — Intervals",["Deadlift","Barbell row","Chinups","Dumbbell row"]],["Strength Support","Recovery Run",["Incline barbell press","Barbell overhead press","Single-arm dumbbell bench press","Seated dumbbell shoulder press","Spanish squat hold (KB)","Landmine rotations","Standing torso rotations (slow)"]],0,["Leg Strength + Mobility","",["Back squat","Dumbbell goblet side lunge","Spanish squat hold (KB)","Dumbbell split-stance deadlift","Single-leg hip thrust","Dumbbell standing calf raise","Clamshells w/ band","Banded monster walks","IT band stretch","Standing ankle CARs","Towel scrunches","Farmer carry"]],["Recovery Lift","Recovery Run",["Dumbbell bench press","Seated dumbbell shoulder press","Dumbbell incline press","Overhead dumbbell extension","Plank shoulder taps","Pallof press"]],["Post-Run Mobility","Long Run — Dress Rehearsal",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"11":[["Posterior Chain","Speed Run — Intervals",["Barbell Romanian deadlift","Barbell row","Weighted chinups","Dumbbell row","Jump squats"]],["Strength Support","Recovery Run",["Incline barbell press","Dumbbell lateral raise","Diamond pushups","Seated dumbbell shoulder press","Single-arm dumbbell bench press","Wall sit","Plank shoulder taps","Pallof press"]],0,["Leg Strength + Mobility","",["Back squat","Goblet side lunge to knee drive","Wall sit","Kettlebell single-leg deadlift","Single-leg hip thrust","Dumbbell standing calf raise","Seated banded hip flexion","Hip airplane (light KB)","Weighted 90/90 hip switch","Knee-to-wall ankle rocks","Single-leg bent-knee soleus raise","Overhead carry"]],["Recovery Lift","Recovery Run",["Dumbbell incline press","Seated dumbbell shoulder press","Single-arm dumbbell bench press","Bench dips","Side plank thread-the-needle","Band woodchopper (door anchor)"]],["Post-Run Mobility","Long Run — Peak",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"12":[["Posterior Chain","Speed Run — Intervals",["Barbell Romanian deadlift","Barbell row","Weighted chinups"]],["Strength Support","Recovery Run",["Incline barbell press","Dumbbell lateral raise","Diamond pushups","Seated dumbbell shoulder press"]],0,["Leg Strength + Mobility","",["Back squat","Goblet side lunge to knee drive","Wall sit","Kettlebell single-leg deadlift","Single-leg hip thrust","Kettlebell hip flexor raise","Hip airplane (light KB)","Cossack squat shift","Single-leg bent-knee soleus raise","Split-squat heel-raise hold"]],["Recovery Lift","Recovery Run",["Dumbbell incline press","Seated dumbbell shoulder press","Single-arm dumbbell bench press","Bench dips"]],["Full Body Support","Long Run — Cutback",["Pushups (slow tempo)","Inverted rows (rings)"]],0],"13":[["Posterior Chain","Speed Run — Intervals",["Trap bar deadlift"]],["Strength Support","Recovery Run",["Dumbbell bench press"]],0,["Leg Strength + Mobility","",["Front squat","Split-squat heel-raise hold","Kettlebell tibialis raise (seated)"]],["Recovery Lift","Recovery Run",["Dumbbell bench press"]],["Post-Run Mobility","Long Run — Taper",["Standing calf stretch","Couch stretch","Hip 90/90 stretch","T-spine mobility","Foam roll"]],0],"14":[["Posterior Chain","Speed Run — Intervals",["Trap bar deadlift"]],["Strength Support","Recovery Run",["Dumbbell bench press"]],0,["Leg Strength + Mobility","",["Front squat","Standing ankle CARs","Toe yoga (splay + big-toe lifts)"]],0,["Shakeout","Recovery Run",[]],["Race Day","Long Run — RACE DAY",[]]]};
+  }
+
+  phase(w) { if (w === 15) return 'Race Day'; const f = (w - 1) / 14; return f < 0.30 ? 'Phase 1 — Base' : f < 0.60 ? 'Phase 2 — Build' : f < 0.82 ? 'Phase 3 — Peak' : 'Phase 4 — Taper'; }
+  // Calendar weeks run Sunday to Saturday. Week w's Sunday is the day before its Monday.
+  dateOf(w, d) { const t = new Date(2026, 10, 29); t.setDate(t.getDate() + (w - 14) * 7 + d); return t; }
+  // Map a calendar column (0 = Sunday) to the program's own day (0 = Monday .. 6 = Sunday).
+  progDay(w, d) {
+    if (d === 0) return w > 1 ? { pw: w - 1, pd: 6 } : null;
+    if (w === 15) return null;
+    return { pw: w, pd: d - 1 };
+  }
+  key(w, d) { const p = this.progDay(w, d); return p ? p.pw + '-' + p.pd : 'x-' + w + '-' + d; }
+  workMin(speed) { const m = speed.match(/(\d+):(\d+) of work/); return m ? parseInt(m[1], 10) : 0; }
+
+  session(w, d) {
+    const p = this.progDay(w, d);
+    const raw = p ? this.GRID[String(p.pw)][p.pd] : null;
+    const nrc = p ? this.NRC[p.pw - 1] : this.NRC[13];
+    const override = this.state.notes[this.key(w, d)];
+    let s = { kind: 'rest', title: 'Rest', code: 'REST', val: '·', meta: 'No session', blurb: 'Off your feet. Walk if you want, nothing with a heart rate.', lift: '', ex: [], note: '', btn: '' };
+    if (!p && w === 15) { s.code = ''; s.title = 'Done'; s.meta = 'Program complete'; s.blurb = 'You ran the race. Take the week, then pick the next block.'; }
+    if (raw) {
+      const lift = raw[0], run = raw[1], ex = raw[2];
+      const tag = run.indexOf(' — ') > 0 ? run.split(' — ')[1] : '';
+      if (run.indexOf('Speed Run') === 0) {
+        const wm = this.workMin(nrc.speed);
+        s = { kind: 'speed', title: 'Speed Run', code: 'SPEED', val: wm + ' min', meta: tag + ' · ' + nrc.speed.split(' — ')[1], blurb: nrc.speed.split(' — ')[0] + '. 5:00 warm up first, easy recovery between efforts.', lift: lift, ex: ex, note: '', btn: 'Start run' };
+      } else if (run.indexOf('Recovery Run') === 0) {
+        const isShake = lift === 'Shakeout';
+        s = { kind: 'rec', title: isShake ? 'Shakeout Run' : 'Recovery Run', code: isShake ? 'SHAKE' : 'RECOV', val: nrc.rec.replace(' min', 'm').replace(' + 5K', ''), meta: nrc.rec + ' · Recovery pace', blurb: isShake ? 'Fifteen easy minutes to loosen up. Nothing more. Lay out the race kit tonight.' : 'Easy pace, by feel. Then the lift.', lift: isShake ? '' : lift, ex: ex, note: '', btn: 'Start run' };
+      } else if (run.indexOf('Long Run') === 0) {
+        const isRace = tag === 'RACE DAY';
+        const dist = nrc.lu === 'min' ? nrc.lv + ' min' : nrc.lv + ' mi';
+        const blurbs = { 'Peak': 'Longest run of the build. Steady, relaxed, fuel like race day.', 'Dress Rehearsal': 'Rehearse the routine, not the race. Kit, breakfast, start time, pacing.', 'Cutback': 'Time on feet, no distance target. Let the legs absorb last week.', 'Taper': 'Shorter on purpose. Stay sharp, bank the rest.', 'RACE DAY': 'This is the one. Trust the 13 weeks.' };
+        s = { kind: isRace ? 'race' : 'long', title: isRace ? 'Race Day' : 'Long Run', code: isRace ? 'RACE' : 'LONG', val: dist, meta: nrc.long + ' · ' + dist + (tag && !isRace ? ' · ' + tag : ''), blurb: blurbs[tag] || 'Steady and relaxed. Last 2 miles can drift toward race pace if it feels free.', lift: isRace ? '' : lift, ex: ex, note: '', btn: isRace ? 'Start race' : 'Start run' };
+      } else {
+        s = { kind: 'lift', title: lift, code: 'LEGS', val: ex.length + ' ex', meta: '~50 min · ' + ex.length + ' movements · Hip + ankle after', blurb: 'Squat heavy, then the runner armor circuit. Carry finisher if the legs still have it.', lift: '', ex: ex, note: '', btn: 'Start session' };
+      }
+    }
+    if (override && override.type === 'easy' && s.kind !== 'rest' && s.kind !== 'lift') { s.title = 'Easy Run'; s.code = 'EASY'; s.val = '2 mi'; s.meta = '2 mi · Easy pace'; s.blurb = 'Swapped in from Hurt?. Two gentle miles, stop if anything sharpens.'; s.note = 'Swapped for an easy 2 mi'; s.kind = 'rec'; }
+    if (override && override.type === 'rest') { s = { kind: 'rest', title: 'Rest', code: 'REST', val: '·', meta: 'No session', blurb: 'Rest day from Hurt?. The plan picks back up tomorrow.', lift: '', ex: [], note: 'Changed to a rest day', btn: '' }; }
+    if (override && override.type === 'flag') { s.note = 'Injury flagged. Go by feel.'; }
+    return s;
+  }
+
+  isDone(w, d) {
+    const k = this.key(w, d);
+    if (k in this.state.done) return this.state.done[k];
+    if (this.session(w, d).kind === 'rest') return false;
+    const p = this.progDay(w, d);
+    if (!p) return false;
+    if (p.pw < 11) return true;
+    if (p.pw === 11) return p.pd === 0 || p.pd === 1 || p.pd === 3;
+    return false;
+  }
+
+  selectedDay(w) {
+    if (w in this.state.selByWeek) return this.state.selByWeek[w];
+    if (w === 15) return 0;
+    if (w < 11) return 6;
+    return 1;
+  }
+
+  whenText(w, d) {
+    const dt = this.dateOf(w, d);
+    const name = this.DAYNAMES[d];
+    if (w === this.TODAY.w && d === this.TODAY.d) return 'Today · ' + name;
+    if (w === this.TODAY.w && d === this.TODAY.d + 1) return 'Tomorrow · ' + name;
+    if (w === this.TODAY.w && d === this.TODAY.d - 1) return 'Yesterday · ' + name;
+    return name + ', ' + this.MONTHS[dt.getMonth()] + ' ' + dt.getDate();
+  }
+
+  scrollTo(w) { if (this._strip) this._strip.scrollTo({ left: (w - 1) * this.ITEM, behavior: 'smooth' }); }
+
+  renderVals() {
+    const accent = this.props.accent ?? '#F26A1C';
+    const st = this.state;
+    const w = st.week;
+    const d = this.selectedDay(w);
+
+    const today = this.dateOf(this.TODAY.w, this.TODAY.d);
+    const daysOut = Math.round((this.RACE - today) / 86400000);
+
+    const weeks = [];
+    for (let i = 1; i <= 15; i++) {
+      const title = i === 15 ? 'Race Day' : 'Week ' + i;
+      weeks.push({ n: i, title: title, label: title, color: i === w ? '#FFFFFF' : '#1C1C1C',
+        pick: () => { this.setState({ week: i }); this.scrollTo(i); } });
+    }
+
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const s = this.session(w, i);
+      const done = this.isDone(w, i);
+      const isSel = i === d;
+      const isToday = w === this.TODAY.w && i === this.TODAY.d;
+      const isPast = w < this.TODAY.w || (w === this.TODAY.w && i < this.TODAY.d);
+      const rest = s.kind === 'rest';
+      const dt = this.dateOf(w, i);
+      let codeColor = '#8E8E8E';
+      if (!rest && !isPast && !done) codeColor = (s.kind === 'lift') ? accent : '#7CC56A';
+      if (s.kind === 'lift' && done) codeColor = accent;
+      if (s.kind === 'race') codeColor = accent;
+      days.push({
+        letter: this.LETTERS[i], letterColor: isToday ? accent : (isSel ? '#FFFFFF' : '#8E8E8E'),
+        num: String(dt.getDate()), numColor: rest || isPast ? '#8E8E8E' : '#FFFFFF',
+        done: done, notDone: !done,
+        circleBg: (!done && !rest && !isPast) ? '#262626' : 'transparent',
+        circleBorder: isSel ? '2px solid #FFFFFF' : '2px solid transparent',
+        val: s.val, valColor: rest ? '#8E8E8E' : '#FFFFFF',
+        code: s.code, codeColor: codeColor,
+        label: this.DAYNAMES[i] + ' ' + dt.getDate() + ', ' + s.title + (s.lift ? ' plus ' + s.lift : '') + (done ? ', done' : ''),
+        pick: () => { const sb = Object.assign({}, st.selByWeek); sb[w] = i; this.setState({ selByWeek: sb }); }
+      });
+    }
+
+    const s = this.session(w, d);
+    const done = this.isDone(w, d);
+    const rest = s.kind === 'rest';
+    const hasLift = !!s.lift && s.ex.length > 0;
+    const sel = {
+      when: this.whenText(w, d), shortWhen: this.whenText(w, d).toLowerCase(),
+      title: s.title, meta: s.meta, blurb: s.blurb,
+      hasLift: hasLift, liftTitle: hasLift ? 'Then lift · ' + s.lift : '',
+      liftSummary: hasLift ? (s.ex[0] + (s.ex.length > 1 ? ' + ' + (s.ex.length - 1) + ' more' : '')) : '',
+      hasNote: !!s.note, note: s.note,
+      showStart: !rest && !done, showUndo: !rest && done, btn: s.btn
+    };
+
+    let recent = { show: false, title: '', meta: '', pick: () => {} };
+    for (let i = 6; i >= 0; i--) {
+      const rs = this.session(w, i);
+      if (rs.kind !== 'rest' && this.isDone(w, i) && i !== d) {
+        const dt = this.dateOf(w, i);
+        recent = { show: true, title: rs.title + (rs.lift ? ' + ' + rs.lift : ''),
+          meta: 'Done ' + this.DAYNAMES[i].slice(0, 3) + ' ' + dt.getDate() + ' · ' + (rs.kind === 'lift' ? rs.ex.length + ' movements' : rs.val),
+          pick: () => { const sb = Object.assign({}, st.selByWeek); sb[w] = i; this.setState({ selByWeek: sb }); } };
+        break;
+      }
+    }
+
+    let miles = 0, sessions = 0, lifts = 0;
+    const bars = [];
+    for (let i = 1; i <= 14; i++) {
+      const nrc = this.NRC[i - 1];
+      const lm = nrc.lu === 'min' ? 6 : nrc.lv;
+      for (let j = 1; j < 8; j++) {
+        // j = 1..6 are this calendar week's Mon..Sat; j = 7 is this program week's Sunday, shown at the start of the next calendar week.
+        const cw = j === 7 ? i + 1 : i, cd = j === 7 ? 0 : j;
+        const ss = this.session(cw, cd);
+        if (this.isDone(cw, cd)) { sessions++; if (ss.kind === 'long') miles += lm; if (ss.lift || ss.kind === 'lift') lifts++; }
+      }
+      bars.push({ h: Math.round(lm / 13.1 * 120) + 'px', color: i === 11 ? accent : (i < 11 ? '#8E8E8E' : '#333333'), label: 'Week ' + i + ', ' + nrc.long,
+        pick: () => { this.setState({ tab: 'week', week: i }); this._init = false; } });
+    }
+
+    const tab = st.tab;
+    const tabBg = { programs: tab === 'programs' ? '#262626' : 'transparent', week: tab === 'week' ? '#262626' : 'transparent', progress: tab === 'progress' ? '#262626' : 'transparent' };
+    const tabColor = { programs: tab === 'programs' ? accent : '#8E8E8E', week: tab === 'week' ? accent : '#8E8E8E', progress: tab === 'progress' ? accent : '#8E8E8E' };
+
+    const setNote = (type) => { const n = Object.assign({}, st.notes); n[this.key(w, d)] = { type: type }; const dn = Object.assign({}, st.done); if (type === 'rest') dn[this.key(w, d)] = false; this.setState({ notes: n, done: dn, hurtOpen: false }); };
+
+    return {
+      accent, daysOut: String(daysOut),
+      isWeek: tab === 'week', isPrograms: tab === 'programs', isProgress: tab === 'progress',
+      weeks, phase: this.phase(w), days, sel, recent, bars,
+      stats: { miles: String(Math.round(miles)), sessions: String(sessions), lifts: String(lifts) },
+      tabBg, tabColor, hurtOpen: st.hurtOpen,
+      stripRef: (el) => { this._strip = el; if (el && !this._init) { this._init = true; el.scrollLeft = (this.state.week - 1) * this.ITEM; } },
+      onStripScroll: (e) => { const i = Math.round(e.currentTarget.scrollLeft / this.ITEM) + 1; if (i >= 1 && i <= 15 && i !== this.state.week) this.setState({ week: i }); },
+      toggleDone: () => { const dn = Object.assign({}, st.done); dn[this.key(w, d)] = !done; this.setState({ done: dn }); },
+      openHurt: () => this.setState({ hurtOpen: true }),
+      closeHurt: () => this.setState({ hurtOpen: false }),
+      hurtEasy: () => setNote('easy'),
+      hurtRest: () => setNote('rest'),
+      hurtFlag: () => setNote('flag'),
+      goWeek: () => { this.setState({ tab: 'week' }); this._init = false; },
+      goPrograms: () => this.setState({ tab: 'programs' }),
+      goProgress: () => this.setState({ tab: 'progress' })
+    };
+  }
+}
+</script>
+</body>
+</html>
