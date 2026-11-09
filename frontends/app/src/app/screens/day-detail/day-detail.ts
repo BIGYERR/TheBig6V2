@@ -15,6 +15,8 @@ import { type ExSection, sectionsView } from './session-sections-model';
 import { type BridgeLike, sectionReads } from './session-sections-reads';
 import { sessionLog, type SessionLogData } from './session-log-model';
 import { DeckState } from '../deck/deck-state';
+import { SheetMode } from './sheet-mode';
+import { type CardioOnly, cardioSheet, liftOnDay } from './cardio-sheet-model';
 
 /** A scheduled day, as far as the sheet reads it. */
 interface DetailDay {
@@ -34,6 +36,10 @@ interface DetailView {
   tags: { chips: TagChip[]; travel: boolean };
   counter: string | null;
   body: BodyBlock[];
+  /** Drawn for one cardio alone (D278): no add button. */
+  cardio: boolean;
+  /** The day's Done and Skip at the foot; not on one cardio alone on a day that also holds lift work (D278). */
+  foot: boolean;
 }
 
 /** The fields the legacy sheet wired to save as they change. */
@@ -71,7 +77,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
       <div class="dh-title" id="detailDayTitle">{{ v.title }}</div>
       <div class="dh-tagrow">
         <div class="dh-tags" id="detailTags">@for (t of v.tags.chips; track $index) {<span class="wk-tag" [style.color]="t.color" [style.background]="t.bg">{{ t.label }}</span>}@if (v.tags.travel) {<span class="wk-tag wk-travel" [innerHTML]="travelInner()"></span>}</div>
-        <button class="dh-addbtn" id="detailAddBtn" (click)="call('openAddSheet')" aria-label="Add an exercise to this day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exercise</button>
+        @if (!v.cardio) {<button class="dh-addbtn" id="detailAddBtn" (click)="call('openAddSheet')" aria-label="Add an exercise to this day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exercise</button>}
       </div>
     </div>
     <div class="detail-body" id="detailBody">
@@ -100,6 +106,9 @@ export class DayDetail {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly deck = inject(DeckState);
+  private readonly mode = inject(SheetMode);
+  /** The cardio this open was asked for (D278), kept while the same day is drawn again (a log, a sport swap). */
+  private cardioOnly: CardioOnly | null = null;
   private readonly view = signal<DetailView | null>(null);
   protected readonly views = computed(() => {
     const v = this.view();
@@ -122,7 +131,13 @@ export class DayDetail {
 
   /** The legacy renderStatusFoot: the foot drawn again for the day's status, once the sheet has been drawn. */
   private renderFoot(dayKey: string, title: string): void {
-    if (!this.view()) return;
+    const v = this.view();
+    if (!v) return;
+    if (!v.foot) {
+      this.foot.set(null);
+      this.cdr.detectChanges();
+      return;
+    }
     this.foot.set({ dayKey, title: title || '', buttons: statusFoot(this.bridge.call('statusOf', this.bridge.global('currentWeek'), dayKey)) });
     this.cdr.detectChanges();
   }
@@ -190,6 +205,8 @@ export class DayDetail {
     const ov = document.getElementById('detailOverlay');
     const fresh = !(ov && ov.classList.contains('open') && b.global('currentDayKey') === dayKey);
     const keep = fresh ? 0 : ov!.scrollTop;
+    const asked = this.mode.take();
+    if (fresh || asked) this.cardioOnly = asked;
     b.call('_setCurrentDayKey', dayKey);
     const week = b.global('currentWeek');
     const comp = b.call('getCompleted')[b.call('completedKey', week, dayKey)];
@@ -220,13 +237,13 @@ export class DayDetail {
       logNudge: !status && hasLogged(le) ? logNudge(dayKey, day.title) : null,
       also: this.safeRead(() => alsoJog((b.global('DAY_FULL') as Record<string, string>)[dayKey] || dayKey, b.call('restLogLines', b.call('getLogs')[b.call('completedKey', week, dayKey)]?.restLog), week, dayKey), null),
     }, liftsFirst(secs.length > 0, prog?.primaryPath, prog?.liftingFocus), secs.length > 0);
-    this.view.set({
+    this.view.set(cardioSheet(this.cardioOnly, liftOnDay(secs as { items?: unknown[] }[]), {
       over: 'Week ' + week + ' · ' + (b.global('DAY_FULL') as Record<string, string>)[dayKey],
       title: (comp && comp.title) || day.title || 'Training',
       tags,
       counter: loggedCount(progress),
       body,
-    });
+    }, { chips: [], travel: false }));
     this.foot.set(null);
     this.cdr.detectChanges();
 

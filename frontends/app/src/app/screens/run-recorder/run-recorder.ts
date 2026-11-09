@@ -15,6 +15,8 @@ import {
   type GpsLine,
   type RecorderButton,
 } from './run-recorder-model';
+import { CardioCard } from '../day-detail/cardio-card';
+import type { CardioCardView } from '../day-detail/cardio-card-model';
 
 type Share = (fileName: string, text: string, done: () => void, fail: () => void) => void;
 
@@ -25,6 +27,7 @@ type Share = (fileName: string, text: string, done: () => void, fail: () => void
  */
 @Component({
   selector: 'ia-run-recorder',
+  imports: [CardioCard],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   <div [class]="embedded() ? 'rec-embed' : 'overlay open'" role="dialog" [attr.aria-label]="heading()?.title || copy.row" [style.z-index]="embedded() ? null : 320">
@@ -36,6 +39,7 @@ type Share = (fileName: string, text: string, done: () => void, fail: () => void
       </div>
     </div>
     <div class="detail-body">
+      @if (workout(); as w) {<div class="rec-workout"><ia-cardio-card [card]="w" /></div>}
       <div class="look-note" aria-live="polite">{{ view().gps }}</div>
       <div style="font-family:var(--font-display);font-size:56px;font-weight:700;letter-spacing:0;line-height:1;color:var(--text);font-variant-numeric:tabular-nums">{{ view().time }}</div>
       <div style="display:flex;gap:8px">
@@ -91,6 +95,8 @@ export class RunRecorder implements OnDestroy {
   readonly heading = input<{ over: string; title: string } | null>(null);
   /** Drawn inside This Week's grow frame instead of as its own overlay (D272 Amendment 2). */
   readonly embedded = input(false);
+  /** The run's workout, drawn above the clock when Record run opens it from a run card (Mario, 2026-11-08). */
+  readonly workout = input<CardioCardView | null>(null);
   /** Ran without the phone? (D272's open item): the day's hand log, offered before Start. */
   readonly handLog = output<void>();
 

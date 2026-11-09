@@ -137,7 +137,7 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   of under it); the chevron goes and the whole day is reached from Reopen only ("Yes, drop it"). He tapped the build
   through (served on the Mac, his Saturday seeded, a stand-in GPS plugin): "Looks right". **Amends** D276 items 5 and 7
   and D276 as built, decision 3; D272 Amendment 2's recorder gains the workout. **Bump:** PATCH, v0.258.1 (Mario,
-  2026-11-08). **Shipped:** not yet.
+  2026-11-08). **Shipped:** v0.258.1 (2026-11-08).
 - **Finding:** on v0.258.0 the run card's chevron and its Log the run both opened the whole session sheet (the lift
   sections, the run's cardio card, the log, the day's Done and Skip), and Record run opened the recorder with a clock,
   miles and pace and no workout. Once This Week split the day into a run card and a lift card, the run's workout (its
@@ -164,3 +164,15 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
 - **The strongest counter-argument, for Mario:** on a day with lift work, skipping the whole day, adding an exercise or
   writing the day's notes before training now has no door (the deck still swaps and skips each lift, and Reopen opens
   the whole day once a card is done). Mario: drop it.
+- **Where (as built, v0.258.1):** the routes, the sheet's frame and the recorder's workout are
+  `frontends/app/src/app/screens/day-detail/cardio-sheet-model.ts`; `day-detail/sheet-mode.ts` carries a card's ask to
+  the next open of the session sheet (`day-detail.ts`); This Week taps through `cardRoute` (`week-view.ts`, the chevron
+  and its style gone); the recorder takes `workout` (`run-recorder.ts`, `record-host.ts`). The page Pages serves changes
+  only by its version (`tools/same-script.mjs`: the same 172,655 script tokens).
+- **The e2e:** a card no longer opens a day's whole session sheet before it is done, so in the app the journeys pick the
+  day by a tap and open its whole sheet through the legacy `openDayKey` the chevron called (`tests/e2e/flow.ts`,
+  `openPicked`); the relaunch journey reopens the done lift card.
+- **Tests:** `frontends/app/test/unit/cardio-sheet.test.ts` (the routes for each button and each Reopen, the sheet for one
+  cardio alone and its foot, lift work by a section with a movement, the recorder's workout, and the three templates that
+  draw them, read as text). Its seven model tests cannot load on v0.258.0 (`cardio-sheet-model.ts` is not there); its
+  four template tests, run on v0.258.0's sources, each fail.
