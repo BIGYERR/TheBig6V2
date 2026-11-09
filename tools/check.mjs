@@ -14,6 +14,8 @@
 //   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint, the production build.
 //   backend  backend/, and the root's package.json, lock file and Procfile (Heroku's build, which its tests read):
 //            type checks, tests, lint.
+// In a chat's worktree, a missing node_modules of the app, the website or the backend is linked from the main checkout
+// when this branch's lockfile is the main checkout's (tools/worktree-deps.mjs); otherwise the lane names the npm ci to run.
 //
 //   node tools/check.mjs              every lane
 //   node tools/check.mjs --staged     only the lanes the staged files touch (what the pre-commit hook runs)
@@ -29,6 +31,7 @@ import { createRequire } from 'node:module';
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { REPO, attachRun, duration, startRun } from './runlog.mjs';
+import { linkDeps } from './worktree-deps.mjs';
 
 /** ia-version is read and compared only through tests/semver.js (CommonJS): MAJOR.MINOR.PATCH, a bare N reads as 0.N.0. */
 const SV = createRequire(import.meta.url)('../tests/semver.js');
@@ -194,12 +197,20 @@ async function buildLane() {
   await step('build', 'boots and builds HALF_MANNY, self-stable', process.execPath, ['tests/harness.js', 'dist-github-pages/index.html'], REPO);
 }
 
+/** A lane's node_modules: its own, or the main checkout's linked into a chat's worktree; false (and a failure) when neither. */
+function deps(lane, rel) {
+  const r = linkDeps(REPO, rel);
+  if (!r.ok) {
+    failures.push(`${lane}: ${r.why}`);
+    return false;
+  }
+  if (r.linked) note(lane, `${rel}/node_modules linked from the main checkout (${r.linked})`);
+  return true;
+}
+
 async function appLane() {
   const app = join(REPO, 'frontends', 'app');
-  if (!existsSync(join(app, 'node_modules'))) {
-    failures.push('app: frontends/app/node_modules is missing; run npm ci in frontends/app/');
-    return;
-  }
+  if (!deps('app', 'frontends/app')) return;
   const bin = (name) => join(app, 'node_modules', '.bin', name);
   if (!(await step('app', 'sync from the page (the build of src/legacy/src)', process.execPath, ['scripts/sync-legacy.mjs'], app))) return;
   // Independent once the sync is done, so they run together.
@@ -217,10 +228,7 @@ async function appLane() {
 /** The frontends workspace (frontends/: the website, the admin and common/); the app beside it has its own lane. */
 async function frontendsLane() {
   const fe = join(REPO, 'frontends');
-  if (!existsSync(join(fe, 'node_modules'))) {
-    failures.push('frontends: frontends/node_modules is missing; run npm ci in frontends/');
-    return;
-  }
+  if (!deps('frontends', 'frontends')) return;
   await Promise.all([
     step('frontends', 'typecheck', join(fe, 'node_modules', '.bin', 'tsc'), ['-p', 'tsconfig.json', '--noEmit'], fe),
     step('frontends', 'lint', join(fe, 'node_modules', '.bin', 'eslint'), ['.'], fe),
@@ -229,10 +237,7 @@ async function frontendsLane() {
 
 async function backendLane() {
   const be = join(REPO, 'backend');
-  if (!existsSync(join(be, 'node_modules'))) {
-    failures.push('backend: backend/node_modules is missing; run npm ci in backend/');
-    return;
-  }
+  if (!deps('backend', 'backend')) return;
   const tsc = join(be, 'node_modules', '.bin', 'tsc');
   await Promise.all([
     step('backend', 'typecheck (server)', tsc, ['-p', 'tsconfig.server.json', '--noEmit'], be),

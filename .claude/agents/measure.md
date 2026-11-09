@@ -20,7 +20,7 @@ CLAUDE.md is already in your context; do not Read it. Read §5 (engine behaviour
 
 You run in one of two modes. Say which one at the top of your report.
 
-**Mode A — prove a reported bug.** Mario reports from device, usually with a screenshot and a program name. Reproduce it at the reporter's seed and configuration BEFORE anything else. If you cannot reproduce it, that is the finding: say so, say what you tried, and stop. Never touch a hypothesis you have not first made print.
+**Mode A — prove a reported bug.** Mario reports from device, usually with a screenshot and a program name. Reproduce it at the reporter's seed and configuration BEFORE anything else. A bug on the phone's screen is reproduced on WebKit, which the VM harness and Chrome are not: the app's web bundle in the iOS simulator's Safari with the reporter's program seeded, its loading slowed where timing is the suspect (D279). If you cannot reproduce it, that is the finding: say so, say what you tried, and stop. Never touch a hypothesis you have not first made print.
 
 **Mode B — before-picture.** A design question is on the table. Print what the engine does today across the configs the question touches, so the ruling is written against numbers instead of a guess.
 

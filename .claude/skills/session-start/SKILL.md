@@ -25,7 +25,8 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
 5. Deploy picture: read local, GitHub, Pages, live, any native build version and TestFlight (`node frontends/app/scripts/testflight.mjs leg`), each from its own source, as CLAUDE.md Session rhythm step 7 sets out. A lagging deploy is reported, never a blocker.
 6. Feature tests (CLAUDE.md Test layout): `bash -c 'set -eo pipefail; cd tests && npx vitest run unit integration' 2>&1 | grep -E '^ *(Test Files|Tests) |FAIL'` (a few seconds; `npm ci` in `tests/` first if `tests/node_modules` is missing). A red test at session start is reported before any work, never worked around.
 
-Then print the before-picture for the live program so the session has a baseline in context:
+When the work touches the engine or what a program prescribes, print the before-picture for the live program so the
+session has a baseline in context (a screen or tooling bug skips it: the grid says nothing about either):
 `bash -c 'set -eo pipefail; node tests/harness.js index.html --grid' | head -40`
 
 Report:
