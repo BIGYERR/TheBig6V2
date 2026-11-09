@@ -126,3 +126,41 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   (HALF_MANNY's strips and cards through the legacy helpers), `frontends/app/test/unit/week-view.test.ts` (the screen's
   assembly on stubs), `frontends/app/test/unit/run-recorder.test.ts` (Ran without the phone?). Each fails on v0.257.0
   but the phase label test, carried over unchanged to guard what does not change.
+
+## D278 P-CARDIOSHEET: the run card carries its own workout, and the chevron goes (Mario, 2026-11-08)
+
+- **Date:** 2026-11-08, Post-v0.258.0. **Ruled by:** Mario, on the mile nudge's mockup inside the new This Week: "the
+  button for record the run should have the workout in it, since we got rid of the cardio cards, and we dont need the
+  arrow button that pulls up the whole workout now that we split it ... we gotta probably fix it for all the cardio
+  cards". His three picks the same hour, each asked with a recommendation: a cardio's button opens just that cardio
+  ("Just that cardio"); the workout sits above the clock on the recorder ("Above the clock", against the recommendation
+  of under it); the chevron goes and the whole day is reached from Reopen only ("Yes, drop it"). He tapped the build
+  through (served on the Mac, his Saturday seeded, a stand-in GPS plugin): "Looks right". **Amends** D276 items 5 and 7
+  and D276 as built, decision 3; D272 Amendment 2's recorder gains the workout. **Bump:** PATCH, v0.258.1 (Mario,
+  2026-11-08). **Shipped:** not yet.
+- **Finding:** on v0.258.0 the run card's chevron and its Log the run both opened the whole session sheet (the lift
+  sections, the run's cardio card, the log, the day's Done and Skip), and Record run opened the recorder with a clock,
+  miles and pace and no workout. Once This Week split the day into a run card and a lift card, the run's workout (its
+  steps, its paces, the coaching note: the session sheet's cardio card) was no longer on the screen you run with, only
+  behind the whole day.
+- **What changes (the iOS app's screens only):**
+  1. **No chevron.** A card's top no longer opens the day.
+  2. **Record run carries the workout.** The recorder draws the run's cardio card (the session sheet's own: the sport and
+     session, the detail, the note) above the GPS line and the clock.
+  3. **The cardio's own sheet.** Log the run, Log the ride, Log the swim, and the recorder's Ran without the phone? open the
+     session sheet for that cardio alone: the day's when line and the cardio's name over its cardio card and its hand log
+     (RPE, the wheels, Log, notes). No lift sections, no add button, no logged counter, no tags, and no Done and Skip on a
+     day that also holds lift work.
+  4. **Reopen splits.** A done run, ride or swim card reopens its own sheet, where the log is edited; a done lift card
+     reopens the whole day, where a closed day is undone (D179).
+- **Decisions the build made (siting and form):**
+  1. A day that is only cardio keeps the day's Done and Skip on its cardio's sheet: with the chevron gone it is the one
+     place left to skip or undo that day.
+  2. The cardio sheet's over line and the recorder's are the day's when line (`Today · Saturday`), on a second run card
+     too (it read `Then run` on the recorder before).
+  3. The recorder's workout is the session sheet's CardioCard component, without the benchmark strip.
+- **Does not change:** what any program prescribes (HALF_MANNY digest `147f083be4e04e34`); the stores; the deck; the lift
+  card and its Start lift; the rest day; the session sheet opened any other way; the page Pages serves (its version only).
+- **The strongest counter-argument, for Mario:** on a day with lift work, skipping the whole day, adding an exercise or
+  writing the day's notes before training now has no door (the deck still swaps and skips each lift, and Reopen opens
+  the whole day once a card is done). Mario: drop it.
