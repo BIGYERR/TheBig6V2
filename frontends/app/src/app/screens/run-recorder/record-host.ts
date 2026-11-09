@@ -3,17 +3,18 @@ import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { openMotion } from '../deck/deck-model';
 import { type GrowBox, type GrowStage, growBox, growCopy, growFx, growWeek } from '../deck/grow-motion';
 import { RunRecorder } from './run-recorder';
+import type { CardioCardView } from '../day-detail/cardio-card-model';
 
 /** The run a run card records: its day, and the words over the recorder. */
-export interface RecordFrom { week: number; key: string; over: string; title: string }
+export interface RecordFrom { week: number; key: string; over: string; title: string; workout: CardioCardView | null }
 
 /** Record run's shared state (D272, D276): This Week asks for the recorder, the host opens it. */
 @Injectable({ providedIn: 'root' })
 export class RecordState {
   /** The latest Record run, and the card it opens out of. */
   readonly request = signal<{ from: RecordFrom; card: HTMLElement | null } | null>(null);
-  /** Opens a day's session sheet the way This Week does, set by This Week (Ran without the phone?). */
-  openDay: ((week: number, key: string) => void) | null = null;
+  /** Opens the run's own sheet the way This Week does, set by This Week (Ran without the phone?). */
+  openDay: ((from: RecordFrom) => void) | null = null;
 
   start(from: RecordFrom, card: HTMLElement | null): void {
     this.request.set({ from, card });
@@ -38,7 +39,7 @@ export class RecordState {
       <div class="deck-ghost" #ghost aria-hidden="true" [attr.style]="fx().ghost"></div>
       <div class="deck-frame" [attr.style]="fx().frame">
         <div class="deck-content" [attr.style]="fx().content">
-          <ia-run-recorder [embedded]="true" [heading]="{ over: r.over, title: r.title }" (closed)="close()" (handLog)="close(r)" />
+          <ia-run-recorder [embedded]="true" [heading]="{ over: r.over, title: r.title }" [workout]="r.workout" (closed)="close()" (handLog)="close(r)" />
         </div>
       </div>
     </div>
@@ -118,7 +119,7 @@ export class RecordHost {
       this.state.request.set(null);
       growWeek('');
       this.bridge.call('renderWeekView');
-      if (then && this.state.openDay) this.state.openDay(then.week, then.key);
+      if (then && this.state.openDay) this.state.openDay(then);
     };
     if (this.calm || !this.origin) {
       done();

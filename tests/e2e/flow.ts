@@ -13,8 +13,9 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 export interface Helpers {
   /**
    * The Angular build, whose This Week is Mario's redesign (D276 P-WEEKSCREEN, v0.258.0): week titles in place of the
-   * week chips, a Sunday first day strip whose tap picks a day into the cards, and the session sheet behind the card's
-   * chevron. The page keeps its own This Week, so a journey reaches the same sheet by each build's own path.
+   * week chips, a Sunday first day strip whose tap picks a day into the cards, and since D278 P-CARDIOSHEET no card
+   * chevron: a day's whole session sheet opens from a done lift card's Reopen. The page keeps its own This Week, so a
+   * journey reaches the same sheet by each build's own path.
    */
   app: boolean;
   tap(selector: string): Promise<void>;
@@ -48,11 +49,11 @@ export interface Helpers {
   relaunchOn(iso: string): Promise<void>;
   /**
    * Opens a weekday ('fri') of the week in view: the page's strip cell, found by its label as the athlete reads it; in
-   * the app, the day picked from the strip (a Sunday from the next title, as the strip runs Sunday first), then the
-   * card's chevron.
+   * the app, the day picked from the strip (a Sunday from the next title, as the strip runs Sunday first), then its whole
+   * session sheet (no card opens it before it is done since D278, so through the legacy openDayKey).
    */
   tapDay(key: string): Promise<void>;
-  /** Opens today from the day strip, as tapDay does: the page's today cell, or the app's picked today and its chevron. */
+  /** Opens today from the day strip, as tapDay does: the page's today cell, or the app's picked today and its whole sheet. */
   tapToday(): Promise<void>;
   /** This Week's week buttons: the page's week chips, the app's week titles (one more: Race Day or Last day). */
   readonly weekBtn: string;
@@ -106,9 +107,21 @@ const THIS_WEEK = 'D276, This Week redesigned in the app';
 /** Helpers bound to one page. Every assertion throws with a message that names what was expected. */
 export function helpers(page: Page, app = false): Helpers {
   const DAYS_FULL: Record<string, string> = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
-  /** The app's card chevron opens the picked day's session sheet. */
-  const openPicked = async () => {
-    await h.tap('.tw-card.first .tw-open');
+  /**
+   * Opens the picked day's whole session sheet in the app. Since D278 P-CARDIOSHEET a card has no tap for it before it is
+   * done (the chevron went; a run, ride or swim opens its own sheet, a lift the deck), so the journeys, which hold the
+   * shared session sheet to the page, open it through the legacy openDayKey the chevron called, on the program week the
+   * column belongs to: the title's week, and the week before for its Sunday; the last title holds the last week's Sunday.
+   */
+  const openPicked = async (key: string) => {
+    await page.evaluate((k) => {
+      const g = globalThis as unknown as { activeProg: { totalWeeks: number }; _setCurrentWeek(w: number): void; openDayKey(d: string): void };
+      const m = /^Week (\d+)$/.exec((document.querySelector('.tw-title.on')?.textContent ?? '').trim());
+      const title = m ? Number(m[1]) : g.activeProg.totalWeeks + 1;
+      g._setCurrentWeek(k === 'sun' ? title - 1 : title);
+      g.openDayKey(k);
+    }, key);
+    await sleep(SETTLE_MS);
   };
   const h: Helpers = {
     app,
@@ -260,7 +273,7 @@ export function helpers(page: Page, app = false): Helpers {
         const col = await page.$$eval('.tw-week .tw-col', (cs, name) => cs.findIndex((c) => (c.getAttribute('aria-label') ?? '').startsWith(name as string)), DAYS_FULL[key]);
         if (col < 0) throw new Error(`This Week shows no ${DAYS_FULL[key]}`);
         await h.tapNth('.tw-week .tw-col', col);
-        await openPicked();
+        await openPicked(key);
         return;
       }
       const label = key.charAt(0).toUpperCase() + key.slice(1);
@@ -276,7 +289,10 @@ export function helpers(page: Page, app = false): Helpers {
     async tapToday() {
       if (!app) return h.tap('.wk-strip .wk-day.today');
       await h.tap('.tw-week .tw-col.today');
-      await openPicked();
+      const label = await page.$eval('.tw-week .tw-col.today', (e) => e.getAttribute('aria-label') ?? '');
+      const key = Object.keys(DAYS_FULL).find((k) => label.startsWith(DAYS_FULL[k]!));
+      if (!key) throw new Error(`today's column reads "${label}", no day name`);
+      await openPicked(key);
     },
     async tapCard(label) {
       const card = await wizardCard(page, label);
@@ -1316,7 +1332,8 @@ const LOG_SESSION: readonly Step[] = [
       // The app picks the next session on a relaunch; today's card, with its Reopen, is a tap on today (D276).
       if (t.app) await t.tap('.tw-week .tw-col.today');
       await t.expectText('#screenWeek', 'Closed out');
-      await t.tap(t.app ? '.tw-card.first .tw-reopen' : '.wk-hero-cta');
+      // A done lift card reopens the whole day (D278 item 4), where the sets and the note are.
+      await t.tap(t.app ? '.tw-card[data-card="lift"] .tw-reopen' : '.wk-hero-cta');
       await t.overlayOpen('detailOverlay');
       await t.expectMatch('#detailOverlay', /2 \/ \d+ logged/i);
       const notes = await page.$eval('#log_notes', (e) => (e as HTMLTextAreaElement).value);

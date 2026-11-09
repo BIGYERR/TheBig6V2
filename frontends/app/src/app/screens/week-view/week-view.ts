@@ -4,7 +4,10 @@ import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy
 import { wildcardSub } from '../day-detail/sheet-marks-model';
 import { WildcardMark, WildcardTag } from '../marks/wildcard';
 import { DeckState } from '../deck/deck-state';
-import { RecordState } from '../run-recorder/record-host';
+import { type RecordFrom, RecordState } from '../run-recorder/record-host';
+import { cardRoute, type CardioOnly, recordWorkout } from '../day-detail/cardio-sheet-model';
+import type { CardioRx } from '../day-detail/cardio-card-model';
+import { SheetMode } from '../day-detail/sheet-mode';
 import { recorderAvailable } from '../run-recorder/run-recorder-model';
 import { type DayCard, type Overlay, TITLE_W, type WeekDay, type WeekView as View, liveTitle, weekView } from './week-view-model';
 
@@ -82,7 +85,6 @@ const BLANK: View = {
           <div class="tw-head">
             @if (!k.first) {<span class="tw-ico" aria-hidden="true">@if (k.kind === 'lift') {<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4M6 8v8M9 10v4M15 10v4M18 8v8M21 10v4M9 12h6"/></svg>} @else {<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4.5" r="1.8"/><path d="M8 21l3-6 3 3v-6l-4-2-3 3M14 12l3 2h3"/></svg>}</span>}
             <span class="tw-label">{{ k.label }}</span>
-            @if (k.first) {<button type="button" class="tw-open" aria-label="Open the day" (click)="openDay(k.week, k.key)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>}
           </div>
           <div class="tw-name">{{ k.title }}</div>
           @if (k.meta) {<div class="tw-meta">{{ k.meta }}</div>}
@@ -91,11 +93,11 @@ const BLANK: View = {
             <div class="tw-done">
               <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="tw-chk" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>
               <span class="tw-done-txt"><span class="tw-done-title">{{ dn.title }}</span><span class="tw-done-line">{{ dn.line }}</span></span>
-              <button type="button" class="tw-reopen" (click)="openDay(k.week, k.key)">Reopen</button>
+              <button type="button" class="tw-reopen" (click)="tap(k, $event, d.cards[0]!.label, 'reopen')">Reopen</button>
             </div>
           }
           @if (k.button; as bt) {
-            <button type="button" [class]="'tw-btn' + (bt.glow ? ' glow' : '')" (click)="act(k, $event)">
+            <button type="button" [class]="'tw-btn' + (bt.glow ? ' glow' : '')" (click)="tap(k, $event, d.cards[0]!.label, 'button')">
               @if (bt.act === 'record') {<span class="tw-recdot" aria-hidden="true"></span>} @else if (bt.act === 'deck') {<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>}
               {{ bt.text }}
             </button>
@@ -137,6 +139,7 @@ export class WeekView {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly deck = inject(DeckState);
   private readonly recorder = inject(RecordState);
+  private readonly mode = inject(SheetMode);
   protected readonly view = signal<View>(BLANK);
   protected readonly pill = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.view().pill.html));
   private readonly strip = viewChild<ElementRef<HTMLElement>>('strip');
@@ -157,7 +160,7 @@ export class WeekView {
 
   constructor() {
     this.bridge.provide('renderWeekView', () => this.render());
-    this.recorder.openDay = (week, key) => this.openDay(week, key);
+    this.recorder.openDay = (r) => this.openCardio(r.week, r.key, { over: r.over, title: r.title });
   }
 
   protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
@@ -248,6 +251,7 @@ export class WeekView {
   }
   /** The day's session sheet: its hand log, its review and edits, its undo (P-DECK answer 3, D179). */
   protected openDay(week: number, key: string): void {
+    this.mode.ask(null);
     this.setLegacyWeek(week);
     this.bridge.call('openDayKey', key);
   }
@@ -256,22 +260,32 @@ export class WeekView {
     this.bridge.call('openRestSheet', week, key, mode);
   }
   /** A card's button: Record run, the hand log, or the deck out of the card (D275 call 16). */
-  protected act(k: DayCard, ev: Event): void {
-    const b = k.button;
-    if (!b) return;
+  /** One cardio alone (D278): the run, ride or swim's workout and its hand log, not the whole day. */
+  private openCardio(week: number, key: string, sheet: CardioOnly): void {
+    this.setLegacyWeek(week);
+    this.mode.ask(sheet);
+    this.bridge.call('openDayKey', key);
+  }
+  /** A card's button, or its done row's Reopen (D278 items 3 and 4); `when` is the day's when line. */
+  protected tap(k: DayCard, ev: Event, when: string, tap: 'button' | 'reopen'): void {
+    const r = cardRoute(k, when, tap);
+    if (!r) return;
     const btn = ev.currentTarget as HTMLElement | null;
     const card = btn && btn.closest ? (btn.closest('.tw-card') as HTMLElement | null) : null;
-    if (b.act === 'log') this.openDay(k.week, k.key);
-    else if (b.act === 'deck') {
+    if (r.to === 'cardio') this.openCardio(k.week, k.key, r.sheet);
+    else if (r.to === 'day') this.openDay(k.week, k.key);
+    else if (r.to === 'deck') {
       this.setLegacyWeek(k.week);
       this.deck.start(k.key, card);
-    } else this.record(k, card);
+    } else this.record(k, card, when);
   }
 
-  /** Record run: D267's recorder, grown out of the run card (D272 Amendment 2). */
-  private record(k: DayCard, card: HTMLElement | null): void {
-    const over = (card && card.querySelector('.tw-label')?.textContent) || k.label;
-    this.recorder.start({ week: k.week, key: k.key, over: over.trim(), title: k.title }, card);
+  /** Record run: D267's recorder, grown out of the run card (D272 Amendment 2), the run's workout above the clock (D278). */
+  private record(k: DayCard, card: HTMLElement | null, when: string): void {
+    const prog = this.bridge.global('activeProg');
+    const day = prog && prog.weeks && prog.weeks[k.week] ? (prog.weeks[k.week]![k.key] as { cardio?: CardioRx } | null) : null;
+    const from: RecordFrom = { week: k.week, key: k.key, over: when, title: k.title, workout: recordWorkout(day) };
+    this.recorder.start(from, card);
   }
 
   // ── The draw ─────────────────────────────────────────────────────────────────────────────────────────────────

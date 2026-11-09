@@ -47,10 +47,12 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
    The swipe deck (v0.257.0, D275) is the app's first screen the original does not have, so these journeys open a
    day's session from the day strip, never by the hero's Start session; the deck waits for a one-target app journey.
    This Week is Mario's redesign in the app since v0.258.0 (D276): week titles in place of the week chips, a Sunday
-   first day strip whose tap picks a day, and the session sheet behind the picked card's chevron. The page keeps its
-   own This Week, so each journey reaches the same sheets by each build's own path (`tapDay`, `tapToday` and `weekBtn`
-   in `flow.ts`, which ask `t.app`).
-   Every step is a real tap followed by an assertion. Native date and slider controls, which a user drives through
+   first day strip whose tap picks a day. Since v0.258.1 (D278) no card has a chevron and no card opens a day's whole
+   session sheet before it is done (a run, ride or swim opens its own sheet, a lift the deck), so in the app the journeys
+   pick the day by a tap, then open its whole sheet through the legacy `openDayKey` the chevron called. The page keeps
+   its own This Week, so each journey reaches the same sheets by each build's own path (`tapDay`, `tapToday` and
+   `weekBtn` in `flow.ts`, which ask `t.app`).
+   Every other step is a real tap followed by an assertion. Native date and slider controls, which a user drives through
    the OS picker, are set directly and fire their events.
 5. Each pair of app screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a
    planted 0.3% title change fails the four screens that show it.

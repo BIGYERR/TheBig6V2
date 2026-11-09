@@ -27,6 +27,7 @@ Procedure for every build:
 2. Save the baseline: `git show HEAD:index.html > <scratch>/base_v<previous>.html` (`<previous>` = the version HEAD carries) (`<scratch>` = the session scratch path your brief names; never bare `/tmp`) (or copy the current file before touching it).
 3. Edit the source files under `frontends/app/src/legacy/src/` directly and narrowly, never the root `index.html` (Mario, Post-v0.239.1: no edit scripts; the git diff is the record):
    - `grep -c` every text you replace first, in the source file you edit: it must occur exactly once in that file, or you widen it until it does
+   - a control you remove or rename is grepped for in `tests/e2e` too (its selector, its words): the Docker e2e taps it, and the 60-second check never runs the e2e; say what you found in your hand-off
    - literal bytes for em-dashes, `×`, `≥` (no escapes)
    - when a rename touches a map whose keys are the old names, that map is rewritten last or excluded
    - the version meta (in `html/head.html`) and `core/src/version.ts` are the last edit of the build, both the same `MAJOR.MINOR.PATCH` (a test is red when they differ)
