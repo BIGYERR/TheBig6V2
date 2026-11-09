@@ -20,8 +20,8 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
-import type { Browser, Page } from 'puppeteer';
-import { FROZEN_NOW, TIMEZONE, VIEWPORT, openPage } from './browser.ts';
+import type { Browser } from 'puppeteer';
+import { FROZEN_NOW, TIMEZONE, VIEWPORT, openPage, settle } from './browser.ts';
 import { renderCollage } from './collage.ts';
 import type { CollageBand } from './collage.ts';
 import { JOURNEYS, helpers } from './flow.ts';
@@ -64,24 +64,6 @@ const TARGETS: { id: TargetId; path: string }[] = [
 
 const message = (err: unknown): string => (err instanceof Error ? err.message : String(err));
 const notRun = (): TargetResult => ({ status: 'skipped', problems: [], warnings: [] });
-
-/**
- * Waits until the page is safe to photograph: web fonts loaded (a late font swap moves every glyph) and the layout
- * still across two consecutive frames (a scroll or reflow in flight would make two identical screens differ).
- */
-async function settle(page: Page): Promise<void> {
-  await page.evaluate(() => document.fonts.ready.then(() => undefined));
-  await page.waitForFunction(
-    () =>
-      new Promise<boolean>((resolve) => {
-        const snap = () =>
-          `${scrollY}|${[...document.querySelectorAll('.overlay.open, .rand-overlay.open')].map((e) => e.scrollTop).join(',')}|${document.body.scrollHeight}`;
-        const before = snap();
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve(snap() === before)));
-      }),
-    { timeout: 5000 },
-  );
-}
 
 /**
  * Runs one journey against one target in a fresh browser context (empty storage), filling in that target's half of
