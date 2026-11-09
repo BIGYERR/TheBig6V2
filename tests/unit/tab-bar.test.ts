@@ -95,6 +95,91 @@ test('at the top of the page the nudge goes down a point, then back to the top',
   assert.deepEqual(f.calls, [[0, 1], [0, 0]]);
 });
 
+// D280 P-ONERESYNC (amends D256): one resync at a time. This window's scrollTo moves the page, and its timers and its
+// animation frames run apart, so two resyncs can fire before one frame as they do behind a long task. Expected values
+// are typed from docs/decisions/tab-bar.md.
+interface Live {
+  win: Record<string, unknown> & { scrollY: number };
+  calls: [number, number][];
+  vv: { height: number };
+  doc: { activeElement: { tagName: string } | null };
+  fire: (target: 'vv' | 'doc', type: string) => void;
+  timers: () => void;
+  frame: () => void;
+}
+function liveWindow(y: number): Live {
+  const calls: [number, number][] = [];
+  const due: Listener[] = [];
+  const frames: Listener[] = [];
+  const on: Record<string, Listener> = {};
+  const vv = { height: 800, addEventListener: (t: string, f: Listener) => { on['vv:' + t] = f; } };
+  const doc = { activeElement: { tagName: 'BODY' } as { tagName: string } | null, addEventListener: (t: string, f: Listener) => { on['doc:' + t] = f; } };
+  const win = {
+    visualViewport: vv, document: doc, scrollX: 0, scrollY: y,
+    scrollTo: (x: number, to: number) => { calls.push([x, to]); win.scrollY = to; },
+    setTimeout: (f: Listener) => { due.push(f); return due.length; },
+    requestAnimationFrame: (f: Listener) => { frames.push(f); return frames.length; },
+  };
+  return {
+    win, calls, vv, doc,
+    fire: (target, type) => { const f = on[target + ':' + type]; assert.ok(f, 'no ' + target + ' ' + type + ' listener'); f(); },
+    // every timer that is due fires (each focusout's 350 ms, the viewport's 60 ms), and none of them waits for a frame
+    timers: () => { while (due.length) due.shift()!(); },
+    frame: () => { for (const f of frames.splice(0)) f(); },
+  };
+}
+
+test('two resyncs whose timers fire before the same frame scroll once, and the page rests where it was', () => {
+  const f = liveWindow(640);
+  install()(f.win);
+  f.fire('doc', 'focusout');
+  f.fire('doc', 'focusout');
+  f.timers();
+  f.frame();
+  f.frame();
+  assert.deepEqual(f.calls, [[0, 639], [0, 640]]);
+  assert.equal(f.win.scrollY, 640);
+});
+
+test('at the top of the page, two resyncs before one frame leave it at the top', () => {
+  const f = liveWindow(0);
+  install()(f.win);
+  f.fire('doc', 'focusout');
+  f.fire('doc', 'focusout');
+  f.timers();
+  f.frame();
+  f.frame();
+  assert.deepEqual(f.calls, [[0, 1], [0, 0]]);
+  assert.equal(f.win.scrollY, 0);
+});
+
+test('the keyboard closing and focus leaving before one frame resync once', () => {
+  const f = liveWindow(640);
+  install()(f.win);
+  f.vv.height = 500; f.fire('vv', 'resize');
+  f.vv.height = 800; f.fire('vv', 'resize');
+  f.fire('doc', 'focusout');
+  f.timers();
+  f.frame();
+  f.frame();
+  assert.deepEqual(f.calls, [[0, 639], [0, 640]]);
+  assert.equal(f.win.scrollY, 640);
+});
+
+// Guards what D280 keeps: once a resync's step back has run, the next one runs in full (passes before and after).
+test('two resyncs with a frame between them both run, each back where the page rested', () => {
+  const f = liveWindow(640);
+  install()(f.win);
+  f.fire('doc', 'focusout');
+  f.timers();
+  f.frame();
+  f.fire('doc', 'focusout');
+  f.timers();
+  f.frame();
+  assert.deepEqual(f.calls, [[0, 639], [0, 640], [0, 639], [0, 640]]);
+  assert.equal(f.win.scrollY, 640);
+});
+
 test('the page installs it at load, on the window', () => {
   const code = appScript().replace(/\/\/[^\n]*/g, '');
   assert.equal((code.match(/\binstallKeyboardResync\(window\);/g) || []).length, 1);

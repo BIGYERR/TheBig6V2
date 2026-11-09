@@ -394,7 +394,11 @@ function showToast(msg: any){const t=document.getElementById('toast');t!.innerHT
 function installKeyboardResync(win: any){
   const vv=win.visualViewport, doc=win.document;
   const isField=(el: any)=>!!el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName||'');
-  const resync=()=>{ const x=win.scrollX||0, y=win.scrollY||0; win.scrollTo(x,y>0?y-1:y+1); win.requestAnimationFrame(()=>win.scrollTo(x,y)); };
+  // v0.259.2 (D280): one resync at a time. Two whose timers fired before the same frame overlapped: the second read
+  // the first's nudge as home, and the page rested a point off where it was. One due while another is in flight is
+  // skipped; the one in flight already makes the real scroll WebKit needs, and steps back to where the page rested.
+  let busy=false;
+  const resync=()=>{ if(busy) return; busy=true; const x=win.scrollX||0, y=win.scrollY||0; win.scrollTo(x,y>0?y-1:y+1); win.requestAnimationFrame(()=>{ win.scrollTo(x,y); busy=false; }); };
   if(vv){
     let h=vv.height;
     vv.addEventListener('resize',()=>{ if(vv.height>h+100) win.setTimeout(resync,60); h=vv.height; });   // grew back: the keyboard closed

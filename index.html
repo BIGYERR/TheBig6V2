@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.259.1">
+<meta name="ia-version" content="0.259.2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1898,7 +1898,11 @@ function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg
 function installKeyboardResync(win){
   const vv=win.visualViewport, doc=win.document;
   const isField=(el)=>!!el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName||'');
-  const resync=()=>{ const x=win.scrollX||0, y=win.scrollY||0; win.scrollTo(x,y>0?y-1:y+1); win.requestAnimationFrame(()=>win.scrollTo(x,y)); };
+  
+  
+  
+  let busy=false;
+  const resync=()=>{ if(busy) return; busy=true; const x=win.scrollX||0, y=win.scrollY||0; win.scrollTo(x,y>0?y-1:y+1); win.requestAnimationFrame(()=>{ win.scrollTo(x,y); busy=false; }); };
   if(vv){
     let h=vv.height;
     vv.addEventListener('resize',()=>{ if(vv.height>h+100) win.setTimeout(resync,60); h=vv.height; });   

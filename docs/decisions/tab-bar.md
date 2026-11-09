@@ -111,7 +111,7 @@ The bottom tab bar (`nav.tabbar`, `frontends/app/src/legacy/src/css/shell.css`),
 - **Date:** found and ruled 2026-11-08. **Ruled by:** the main session (a defect in D256's workaround, no doctrine),
   Mario ("yes fix it here"). **Bump:** PATCH, v0.259.2 (Mario), after the week-snap chat's v0.259.1, which landed on
   `dev` while this was ruled; re-read against it, the ruling stands (v0.259.1 does not touch the resync).
-  **Shipped:** not yet.
+  **Shipped:** v0.259.2 (2026-11-08).
 - **The finding:** the Docker e2e's `log-session/log-progress` failed parity at 1.562% (20,920 px) with one build's
   Progress page scrolled one CSS pixel down and resting there, after the runner had already waited out each focus
   change's resync (Post-v0.259.0 tests pass). `installKeyboardResync` reads the page's y when its timer fires, nudges a
