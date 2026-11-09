@@ -176,3 +176,77 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   cardio alone and its foot, lift work by a section with a movement, the recorder's workout, and the three templates that
   draw them, read as text). Its seven model tests cannot load on v0.258.0 (`cardio-sheet-model.ts` is not there); its
   four template tests, run on v0.258.0's sources, each fail.
+
+## D279 P-WEEKSNAP: the week strip lands on the week in view, with a long glide when the app opens (Mario, 2026-11-08)
+
+- **Date:** 2026-11-08, Post-v0.259.0. **Ruled by:** Mario, on v0.258.1 from TestFlight (his screenshot at 21:05:
+  `Week 1` and the edge of `Week 2` both dim, the cards on today): "when the Ios app loads it doesnt load on the current
+  week or atleast it doesnt show it its like showing this weird in between thing, and im cool with adding the scrolly
+  animation we had before on the weeks". Asked with a prototype of four presets on his phone
+  (https://claude.ai/artifact/GnEY7dRhqMrMfvTYMsftoc, kept as `docs/design/week-scoot-prototype.html`), he picked
+  **Long glide** (against the recommendation of As before, the page's old numbers). **Amends** D276 item 1 and D276 as
+  built, decision 1. **Bump:** PATCH (Mario, 2026-11-08: "PATCH v0.258.2", which becomes v0.259.1 if the mile nudge
+  lands first; v0.259.0 reached `origin/dev` before this was built, so it is **v0.259.1**). **Shipped:** v0.259.1 (2026-11-08).
+- **The measure (2026-11-08, on v0.258.1, then v0.259.0's identical This Week):** HALF_MANNY seeded at today's clock
+  (start Mon Aug 31, week 10 of 14, today Sunday Nov 8, so the title in view is `Week 11`), the iOS app's web bundle
+  served to Safari on the iPhone 17 Pro simulator (iOS 26.5), with a probe on the strip's `scrollLeft`.
+  - Mario's screen came back on the first, uncached load: the cards on Sunday Nov 8 to Saturday Nov 14 (`Week 11`), the
+    strip at `Week 1`, no title in full ink. Five warm loads after it landed on `Week 11`, and so did a late web font
+    forced 1.5 s after boot.
+  - **With only the app's stylesheet held back 1.5 s it comes back on demand,** and the probe shows why: the first draw
+    writes `scrollLeft = 2400` at 275 ms into a strip that is not yet a scroller (`overflow-x: visible`, `scrollWidth` =
+    `clientWidth` = 386 px, the stylesheet not loaded), and WebKit clamps it to 0. The stylesheet lands at 1.5 s, the
+    strip becomes a scroller (`scrollWidth` 3,750 px) still at 0, no scroll event fires, so nothing settles: `Week 11`
+    stays the title in view, scrolled out of sight.
+  - **Root cause:** `WeekView.render` places the strip with one write, in the same task as the first draw, and counts it
+    placed whenever the strip has a width, never checking that the write took. WebKit runs the app's module scripts
+    before its stylesheet has applied (Chrome holds them, which is why the browser pane and the e2e never showed it); on
+    the phone a cold launch can lose the same race. Other readers of the placement: none. `toTitle`, `settle` and
+    `dragUp` act on a strip the athlete is touching, by then a scroller.
+- **What changes (the iOS app's This Week only):**
+  1. **The strip is placed once it can scroll.** It is placed only when it is wider inside than its box (its stylesheet
+     in), and counts as placed only when its scroll position is where it was sent; until then it tries again on each
+     frame, for up to 10 seconds. A hidden screen still waits for the first draw it shows on.
+  2. **The glide when the app opens.** Once per launch, on the first placement, the strip starts at `Week 1`, waits
+     **300 ms**, then travels to the title in view in **1,200 ms**: accelerating from rest (ease in and out, cubic) to a
+     peak **16 px** past the title in view (at most 5% of the distance, never past the strip's end) over the first 76% of
+     the time, then easing back onto it. The title at the strip's left edge is lit as it passes, counting up, never past
+     the title in view, which is lit at the end. The page's old scoot (V146, V147) had the same curve and split, with
+     260 ms, 550 ms and 12 px. Nothing glides when the title in view is `Week 1`, or when the phone asks for reduced
+     motion: the strip is placed at once.
+  3. **A touch ends the glide.** A touch on the strip during the glide puts it on the title in view at once, and the
+     swipe goes on from there. A scroll the glide makes never picks a week.
+  4. **Every later placement is instant,** as today: a program loaded, the week set from outside.
+- **Expected values (by hand, from the numbers above):** HALF_MANNY on Nov 8 on a 402 px strip: 15 titles, so
+  `scrollWidth` 15 × 240 + 150 = 3,750, the end 3,750 − 402 = 3,348; the target (11 − 1) × 240 = 2,400; the peak
+  2,400 + min(16, 120) = 2,416. Into the travel: 228 ms (p = 0.19) at 151 px, `Week 2` lit; 456 ms (p = 0.38) at
+  1,208 px, `Week 6` lit; 912 ms (p = 0.76) at the peak 2,416, `Week 11` lit; 1,056 ms (p = 0.88) at 2,408; 1,200 ms
+  at 2,400. `Race Day` in view: the target 14 × 240 = 3,360 is past the end, so 3,348, and the peak is the end (no
+  overshoot). `Week 2` in view: target 240, peak 240 + min(16, 12) = 252.
+- **Does not change:** what any program prescribes (HALF_MANNY digest `147f083be4e04e34`); the stores; which title is in
+  view (D276 as built, decision 1); taps, swipes and the settle rule; the page Pages serves, whose This Week keeps its
+  own scoot (its version only).
+
+## D279 as built (v0.259.1, 2026-11-08)
+
+- **Where:** the iOS app's Angular This Week. `frontends/app/src/app/screens/week-view/week-strip.ts` (the placer and the
+  glide, framework free: the strip and the clock are passed in); `week-view.ts` places through it on a draw that has not
+  placed the strip, lights the glide's title (`isOn`, the `lit` signal), ignores the glide's scrolls (`scrolled`) and
+  stops it on a touch (`dragDown`); `week-view.css` drops the title's colour fade while it glides (`.tw-strip.gliding`).
+  The page Pages serves changes only by its version.
+- **Decisions the build made (siting and form):**
+  1. The glide's title is lit by its own signal, and `aria-current` stays on the title in view throughout, so whatever
+     reads the week in view reads `aria-current`, never the ink.
+  2. A touch ends a glide only: a placement still waiting for the stylesheet keeps waiting.
+  3. A glide that ends off its title (WebKit refusing the last write) falls back to the instant placement and its checks.
+  4. The glide turns the strip's snapping off while it runs and back on at the end, as a mouse drag already did.
+- **The e2e:** the journeys read the title in view by `aria-current` (`tests/e2e/flow.ts`, `openPicked` and `tapDay`),
+  since during the launch's glide the lit title is the one passing.
+- **Proof on WebKit (the iPhone 17 Pro simulator, iOS 26.5, Safari, HALF_MANNY seeded at Nov 8, the app's stylesheet held
+  back 1.5 s):** v0.259.0 left the strip on `Week 1` with no title lit; this build writes nothing while the strip cannot
+  scroll, starts at `Week 1` when the stylesheet lands (1,562 ms), travels from 1,881 ms to 3,079 ms (1,200 ms) and
+  ends at 2,400 px on `Week 11`, still there at 4 s.
+- **Tests:** `frontends/app/test/unit/week-strip.test.ts` (12: the curve's values and lit titles, the strip's end, ready,
+  the placement after the stylesheet lands, a write that does not hold, the 10 second limit, the glide frame by frame,
+  later placements, reduced motion and Week 1, a touch mid glide, a touch before the stylesheet, and the screen's wiring
+  read as text). The file cannot load on v0.259.0: `week-strip.ts` is not there (`git cat-file -e` on it fails).

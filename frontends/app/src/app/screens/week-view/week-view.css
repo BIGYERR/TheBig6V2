@@ -13,6 +13,7 @@
   text-align:left;font-family:var(--font-display);font-size:56px;font-weight:800;letter-spacing:-0.03em;line-height:1;
   white-space:nowrap;cursor:pointer;color:rgba(var(--ink-rgb),0.11);transition:color .2s ease;}
 .tw-title.on{color:var(--text);}
+.tw-strip.gliding .tw-title{transition:none;}
 .tw-fade{position:absolute;top:0;right:0;bottom:0;width:150px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--bg) 55%);}
 .tw-hurt{position:absolute;right:20px;top:50%;transform:translateY(-50%);height:40px;padding:0 16px;border-radius:20px;
   border:1.5px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font-display);font-size:15px;font-weight:600;cursor:pointer;}

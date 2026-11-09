@@ -112,11 +112,13 @@ export function helpers(page: Page, app = false): Helpers {
    * done (the chevron went; a run, ride or swim opens its own sheet, a lift the deck), so the journeys, which hold the
    * shared session sheet to the page, open it through the legacy openDayKey the chevron called, on the program week the
    * column belongs to: the title's week, and the week before for its Sunday; the last title holds the last week's Sunday.
+   * The title in view is the one marked aria-current: while the launch's glide runs, the lit title is the one it is
+   * passing (D279 P-WEEKSNAP).
    */
   const openPicked = async (key: string) => {
     await page.evaluate((k) => {
       const g = globalThis as unknown as { activeProg: { totalWeeks: number }; _setCurrentWeek(w: number): void; openDayKey(d: string): void };
-      const m = /^Week (\d+)$/.exec((document.querySelector('.tw-title.on')?.textContent ?? '').trim());
+      const m = /^Week (\d+)$/.exec((document.querySelector('.tw-title[aria-current="true"]')?.textContent ?? '').trim());
       const title = m ? Number(m[1]) : g.activeProg.totalWeeks + 1;
       g._setCurrentWeek(k === 'sun' ? title - 1 : title);
       g.openDayKey(k);
@@ -267,7 +269,7 @@ export function helpers(page: Page, app = false): Helpers {
       if (app) {
         // Sunday first: a program week's Sunday is the first column of the next title.
         if (key === 'sun') {
-          const next = await page.$$eval('.tw-title', (ts) => ts.findIndex((e) => e.classList.contains('on')) + 1);
+          const next = await page.$$eval('.tw-title', (ts) => ts.findIndex((e) => e.getAttribute('aria-current') === 'true') + 1);
           await h.tapNth('.tw-title', next);
         }
         const col = await page.$$eval('.tw-week .tw-col', (cs, name) => cs.findIndex((c) => (c.getAttribute('aria-label') ?? '').startsWith(name as string)), DAYS_FULL[key]);

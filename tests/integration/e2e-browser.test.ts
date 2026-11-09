@@ -7,10 +7,12 @@ import { afterAll, beforeAll, describe, it } from 'vitest';
 import { pathToFileURL } from 'node:url';
 import puppeteer from 'puppeteer';
 import type { Browser } from 'puppeteer';
+import { openPage, settle } from '../e2e/browser.ts';
 import { BAND_H, LABEL_H, PAD, renderCollage } from '../e2e/collage.ts';
 import type { CollageBand, CollageTile } from '../e2e/collage.ts';
 import { pngSize } from '../e2e/parity.ts';
 import { renderReport } from '../e2e/report.ts';
+import { appFunction } from '../support/app.ts';
 import { fakeRun, fakeStep, pixels, solidPng } from '../support/e2e.ts';
 import type { Rgb } from '../support/e2e.ts';
 
@@ -128,3 +130,62 @@ describe('the written report in Chrome', () => {
   });
 });
 
+describe('settle in Chrome', () => {
+  // settle decides when a step is photographed, and both builds are held to 0% difference, so it must never return while
+  // the app is about to change the screen by itself on a timer. The pages here run the app's own code for each such
+  // timer, lifted from the built page, so a longer delay in the app turns these red.
+  let dir: string;
+  let file: string;
+  beforeAll(() => {
+    dir = mkdtempSync(join(tmpdir(), 'ia-settle-'));
+    file = join(dir, 'tall.html');
+    writeFileSync(
+      file,
+      '<!doctype html><meta charset="utf-8"><body style="margin:0;height:4000px"><button id="a">A</button><button id="b">B</button><div id="toast"></div>',
+    );
+  });
+  afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+  // The app answers every focus change with a one pixel scroll 350 ms later and steps back a frame after
+  // (installKeyboardResync, D256). strength/rest-timer and log-session/log-progress flaked on it (found v0.259.0).
+  it('returns only after the scroll the app makes on a focus change, and nothing moves after it', async () => {
+    const { context, page } = await openPage(browser);
+    try {
+      await page.goto(pathToFileURL(file).href, { waitUntil: 'load' });
+      const resync = appFunction('installKeyboardResync').toString();
+      await page.evaluate((src) => {
+        const w = window as unknown as { scrolls: number[] };
+        w.scrolls = [];
+        addEventListener('scroll', () => w.scrolls.push(scrollY));
+        (0, eval)(`(${src})`)(window);
+      }, resync);
+      await page.focus('#a');
+      await page.focus('#b');
+      await settle(page);
+      const scrolls = () => page.evaluate(() => [...(window as unknown as { scrolls: number[] }).scrolls, scrollY]);
+      // The app's scroll down one pixel and back, then where the page rests: all before settle returned.
+      assert.deepEqual(await scrolls(), [1, 0, 0]);
+      await new Promise((r) => setTimeout(r, 600));
+      assert.deepEqual(await scrolls(), [1, 0, 0]);
+    } finally {
+      await context.close();
+    }
+  });
+
+  // A toast stays up 2.2 s (showToast), so a photograph near its end shows it in one build and not the other:
+  // log-session/log-effort, two steps after the toast its Log taps raise.
+  it('returns only once the toast is down', async () => {
+    const { context, page } = await openPage(browser);
+    try {
+      await page.goto(pathToFileURL(file).href, { waitUntil: 'load' });
+      const showToast = appFunction('showToast').toString();
+      const toastUp = () => page.$eval('#toast', (e) => e.classList.contains('show'));
+      await page.evaluate((src) => (0, eval)(`(${src})`)('Logged ✓'), showToast);
+      assert.equal(await toastUp(), true);
+      await settle(page);
+      assert.equal(await toastUp(), false);
+    } finally {
+      await context.close();
+    }
+  });
+});

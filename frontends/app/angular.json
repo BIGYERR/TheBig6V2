@@ -62,7 +62,8 @@
               "src/legacy/generated/legacy.css",
               "src/styles.css",
               "src/app/screens/deck/deck.css",
-              "src/app/screens/week-view/week-view.css"
+              "src/app/screens/week-view/week-view.css",
+              "src/app/screens/mile-nudge/mile-nudge.css"
             ]
           },
           "configurations": {

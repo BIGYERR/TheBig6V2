@@ -10,6 +10,16 @@ import type { CardioRx } from '../day-detail/cardio-card-model';
 import { SheetMode } from '../day-detail/sheet-mode';
 import { recorderAvailable } from '../run-recorder/run-recorder-model';
 import { type DayCard, type Overlay, TITLE_W, type WeekDay, type WeekView as View, liveTitle, weekView } from './week-view-model';
+import { type StripClock, StripPlacer } from './week-strip';
+
+/** The window's frames and timers, for the strip's placer. */
+const CLOCK: StripClock = {
+  frame: (fn) => requestAnimationFrame(fn),
+  cancelFrame: (id) => cancelAnimationFrame(id),
+  after: (ms, fn) => window.setTimeout(fn, ms),
+  cancelAfter: (id) => window.clearTimeout(id),
+  now: () => performance.now(),
+};
 
 /** The screen before any program is drawn. */
 const BLANK: View = {
@@ -37,9 +47,9 @@ const BLANK: View = {
   <div class="wk-topbar tw-top">
     <div class="wk-overline tw-over" id="weekOverline">{{ v.overline }}</div>
     <div class="tw-titles">
-      <div class="tw-strip" #strip id="weekScroll" role="group" aria-label="Choose a week" (scroll)="scrolled()" (pointerdown)="dragDown($event)" (pointermove)="dragMove($event)" (pointerup)="dragUp()" (pointercancel)="dragUp()">
+      <div class="tw-strip" [class.gliding]="lit() !== null" #strip id="weekScroll" role="group" aria-label="Choose a week" (scroll)="scrolled()" (pointerdown)="dragDown($event)" (pointermove)="dragMove($event)" (pointerup)="dragUp()" (pointercancel)="dragUp()">
         @for (t of v.titles; track t.n) {
-          <button type="button" [class]="'tw-title' + (t.active ? ' on' : '')" [attr.aria-current]="t.active ? 'true' : null" (click)="pickTitle(t.n)">{{ t.title }}</button>
+          <button type="button" [class]="'tw-title' + (isOn(t) ? ' on' : '')" [attr.aria-current]="t.active ? 'true' : null" (click)="pickTitle(t.n)">{{ t.title }}</button>
         }
       </div>
       <div class="tw-fade" aria-hidden="true"></div>
@@ -157,6 +167,13 @@ export class WeekView {
   private settleTimer: ReturnType<typeof setTimeout> | null = null;
   private drag: { x: number; left: number; moved: boolean } | null = null;
   private dragAt = 0;
+  /** The title the launch's glide lights as it passes (D279), or null when the title in view is lit. */
+  protected readonly lit = signal<number | null>(null);
+  /** Puts the strip on the title in view once it can scroll, gliding there the first time (D279 P-WEEKSNAP). */
+  private readonly placer = new StripPlacer(CLOCK, (n) => {
+    this.lit.set(n);
+    this.cdr.detectChanges();
+  });
 
   constructor() {
     this.bridge.provide('renderWeekView', () => this.render());
@@ -171,6 +188,11 @@ export class WeekView {
   }
 
   // ── The week titles ──────────────────────────────────────────────────────────────────────────────────────────
+  /** A title in full ink: the one the glide is passing, else the title in view. */
+  protected isOn(t: { n: number; active: boolean }): boolean {
+    const l = this.lit();
+    return l === null ? t.active : l === t.n;
+  }
   /** A tap on a title picks it and brings it to the left. */
   protected pickTitle(n: number): void {
     if (this.drag && this.drag.moved) return;
@@ -197,7 +219,7 @@ export class WeekView {
   }
   /** Where the strip settles is the week: round(scrollLeft / 240) + 1, once the scroll has stopped. */
   protected scrolled(): void {
-    if (this.drag) return;
+    if (this.drag || this.placer.busy) return;
     if (this.settleTimer) clearTimeout(this.settleTimer);
     this.settleTimer = setTimeout(() => this.settle(), 120);
   }
@@ -210,6 +232,8 @@ export class WeekView {
   }
   /** A mouse drags the strip the way a finger swipes it (the browser and the dev server); touch keeps its own swipe. */
   protected dragDown(e: PointerEvent): void {
+    // A touch during the launch's glide lands it on the title in view, and the swipe goes on from there (D279).
+    this.placer.stop();
     const el = this.strip()?.nativeElement;
     if (e.pointerType !== 'mouse' || !el) return;
     this.drag = { x: e.clientX, left: el.scrollLeft, moved: false };
@@ -346,9 +370,10 @@ export class WeekView {
     this.cdr.detectChanges();
     document.getElementById('screenWeek')?.classList.toggle('is-injury-week', v.injuryWeek);
     if (!this.placed) {
-      // A hidden screen has no width and keeps no scroll: placed on the first draw it shows on.
+      // A hidden screen has no width and keeps no scroll: placed on the first draw it shows on. The placer waits until
+      // the strip can scroll (WebKit can draw this before the stylesheet applies) and glides the first time (D279).
       const el = this.strip()?.nativeElement;
-      this.scrollTo(this.shown(), false);
+      if (el) this.placer.place(el, this.shown(), this.calm);
       this.placed = !!el && el.clientWidth > 0;
     }
     b.call('updateRandCounter');

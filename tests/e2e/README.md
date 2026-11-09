@@ -84,7 +84,10 @@ server, and ask for reduced motion, so the site shows every section without scro
 - the clock frozen at Wed 2026-10-07 07:30 New York (a rest day, so the rest sheet is reachable), unless a step
   relaunches the app on a later moment (`relaunchOn`, which leaves it in the tab's sessionStorage for the reload);
 - seeded `Math.random`, animations off;
-- web fonts and layout settled before each screenshot;
+- web fonts and layout settled before each screenshot, no toast up (each stays 2.2 s, so a photograph near its end
+  shows it in one build only), and 400 ms passed since the last focus change: the app answers
+  every focusout with a one pixel scroll 350 ms later, stepped back a frame after (`installKeyboardResync`, D256), and
+  a photograph inside that window shows the whole screen one pixel off (`settle` and `FOCUS_QUIET_MS` in `browser.ts`);
 - Chrome flags for repeatable pixels (fixed sRGB colour, no LCD text, every compositor stage run before a capture),
   without which fixed layers like the rest timer tab can differ by a colour level between two renders;
 - the bug form's endpoint is blocked, so a run never files a real report.

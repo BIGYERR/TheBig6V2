@@ -1,0 +1,5 @@
+installKeyboardResync from dist-github-pages/index.html
+two focus changes 200 ms apart: scrollY after = 0, 0, 0, 0, 0
+the same, both timers held behind one 300 ms task: scrollY after = 1, 1, 1, 1, 1
+two focus changes 5 ms apart: scrollY after = 0, 0, 0, 0, 0
+two focus changes in one task: scrollY after = 1, 1, 1, 1, 1

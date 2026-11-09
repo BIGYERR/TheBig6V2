@@ -1,7 +1,7 @@
 # doctrine text is local reference for the coach agent; keep it out of GitHub Pages
 doctrine/*.txt
 # dependencies, caches and OS junk
-node_modules/
+node_modules
 __pycache__/
 *.pyc
 .DS_Store

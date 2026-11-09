@@ -22,8 +22,19 @@ const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 /** Console messages that are expected on every load and say nothing about the app under test. */
 const BENIGN_CONSOLE = [/apple-mobile-web-app-capable.*is deprecated/];
 
+/**
+ * How long after a focus change the page may still move by itself. The app answers every focusout with a scroll of one
+ * pixel 350 ms later and steps back a frame after (installKeyboardResync, D256: iOS leaves fixed elements adrift once
+ * the keyboard closes), so a photograph taken inside that window shows the whole screen one pixel off, and a 0% parity
+ * limit fails it (strength/rest-timer and log-session/log-progress, found v0.259.0). The window's own timer runs out
+ * after the app's, which the browser fires first by its earlier deadline. Two resyncs that fire before the same frame
+ * leave the page one pixel off for good, which no wait can undo: that one is the app's (handoff §12,
+ * tests/measure/keyboard-resync_latch.ts).
+ */
+export const FOCUS_QUIET_MS = 400;
+
 /** Runs inside the page before any of its scripts, so it must not reference anything from this module. */
-function installDeterminism(frozenIso: string | null): void {
+function installDeterminism(frozenIso: string | null, focusQuietMs: number): void {
   if (frozenIso !== null) {
     const later = Number(sessionStorage.getItem('e2e-now'));
     const fixed = later || new Date(frozenIso).getTime();
@@ -51,6 +62,41 @@ function installDeterminism(frozenIso: string | null): void {
   };
   if (document.head) freezeMotion();
   else document.addEventListener('DOMContentLoaded', freezeMotion, { once: true });
+  // Every focus change opens a window in which the app may still scroll by itself (FOCUS_QUIET_MS); settle waits until
+  // all of them have closed. Listening on the window's capture phase, before any page script, sees every focusout.
+  let focusWindows = 0;
+  window.addEventListener(
+    'focusout',
+    () => {
+      focusWindows++;
+      setTimeout(() => focusWindows--, focusQuietMs);
+    },
+    true,
+  );
+  Object.defineProperty(window, '__e2eFocusWindows', { get: () => focusWindows });
+}
+
+/**
+ * Waits until the page is safe to photograph: web fonts loaded (a late font swap moves every glyph), no toast up (the
+ * app takes each one down 2.2 s after it shows, so a photograph near that moment shows it in one build and not the
+ * other: log-session/log-effort, two steps after the toast its Log taps raise), no focus change still inside the window
+ * in which the app scrolls by itself (FOCUS_QUIET_MS), and the layout still across two consecutive frames (a scroll or
+ * reflow in flight would make two identical screens differ).
+ */
+export async function settle(page: Page): Promise<void> {
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+  await page.waitForFunction(() => !(window as unknown as { __e2eFocusWindows?: number }).__e2eFocusWindows, { timeout: 5000 });
+  await page.waitForFunction(
+    () =>
+      new Promise<boolean>((resolve) => {
+        const snap = () =>
+          `${scrollY}|${[...document.querySelectorAll('.overlay.open, .rand-overlay.open')].map((e) => e.scrollTop).join(',')}|${document.body.scrollHeight}`;
+        const before = snap();
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve(snap() === before)));
+      }),
+    { timeout: 5000 },
+  );
 }
 
 export interface OpenedPage {
@@ -91,7 +137,7 @@ export async function openPage(browser: Browser, options: PageOptions = {}): Pro
   const documents: { url: string; status: number }[] = [];
   await page.emulateTimezone(TIMEZONE);
   await page.setViewport(viewport);
-  await page.evaluateOnNewDocument(installDeterminism, freezeClock ? FROZEN_NOW : null);
+  await page.evaluateOnNewDocument(installDeterminism, freezeClock ? FROZEN_NOW : null, FOCUS_QUIET_MS);
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const host = new URL(req.url()).hostname;

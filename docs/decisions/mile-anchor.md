@@ -50,7 +50,7 @@ what the app does when the logged runs disagree with it. Measure: `tests/measure
   mile locks from week 12." Faster case (fixture anchor 10:30, recovery 13:20): logged 12:40 and 12:30 → implied 9:59 and
   9:50 → less extreme 9:59 → slower row 10:00 → offer 10:00. One row off at 15 s/mi: no fire. Two runs off in opposite
   directions: no fire. Week 12 of 14: no fire.
-- **Release:** not yet built. Bump: MINOR (Mario, 2026-11-08), its number set when it is slotted: v0.257.0, named here
+- **Release:** v0.259.0 (2026-11-08), with Amendment 1 (below). Bump: MINOR (Mario, 2026-11-08), its number set when it is slotted: v0.257.0, named here
   first, went to the swipe deck (D275), which builds before it (Mario, 2026-11-08). Build order (Mario): after his UI/UX pass merges
   into `main`; the loop mockup is then redone inside the new UI and he picks again before the build, so the sheet lands
   on the buttons as he leaves them.
@@ -59,3 +59,40 @@ what the app does when the logged runs disagree with it. Measure: `tests/measure
   speed card, in week 12; the offer arithmetic from the hand table above; the sheet's text; Update opens the pencil with
   9:00 in the fields; Keep records the pair and a third qualifying run does not reopen it until a fourth; a pencil commit
   clears the record. Each failing on v0.256.0 except the guards named as such.
+
+## D274 Amendment 1: the sheet rises over This Week's run card, and the offer comes from the slower run (Mario, 2026-11-08)
+
+- **Date:** 2026-11-08, Post-v0.258.1. **Ruled by:** Mario. The loop was redone inside the new This Week as two clickable
+  builds of the real app, his Saturday seeded (an 8:00 mile, last Saturday 11:01, today 11:03): A, the sheet over the
+  session sheet right after Log; B, the sheet over This Week once the run card is back on its done row. Seeing them, he
+  asked for D278 first (the run card carries its own workout, the cardio's own sheet; v0.258.1), then answered both
+  calls, each put with a recommendation: "For the nudge (v0.259.0): placement B and the slower-run offer?" "Yes, both".
+  **Bump:** MINOR, v0.259.0 (Mario, 2026-11-08, asked again when slotted).
+- **Amends item 3's placement.** The sheet no longer opens over the day after the toast: it rises over This Week 0.7 s
+  after the run card is back on screen with nothing over it (the cardio's sheet closed, the week screen showing), its
+  done row reading the run just logged. A log made with This Week already showing (the recorder's Save, when it lands)
+  raises it as soon as the card shows. Why: since D276 and D278 the run card is where every way of logging a run ends;
+  the recorder's Save closes into the card and never passes a sheet. The counter-argument Mario weighed: the sheet is
+  the moment the number is in hand, and with B the coach waits for Back (a run logged and the lift started from the
+  sheet waits until This Week shows).
+- **Amends item 2's wording.** "The less extreme of the two runs (the slower implied mile when the runs were faster than
+  the plan, the faster when slower)" contradicted the ruling's own hand example (8:31 and 8:33 → 8:33) and the measure
+  ("stated from the slower of the two runs"). Ruled: **the slower of the two runs' implied miles, in both directions,
+  rounded up to the slower 30-second row** (the safe error). The expected values stand: 9:00 for Mario's runs, 10:00 for
+  the faster fixture. The two readings differ only when the runs fall either side of a row line, by one row.
+- **Expected values corrected against the chart (the measure, while the tests were written).** The faster case's implied
+  miles were typed by hand and are 3 s off: PACE_CHART's recovery column reads 12:40 (760 s) as **9:56** (596) and 12:30
+  (750 s) as **9:47** (587), not 9:59 and 9:50 (the 10:00 row's recovery pace is 12:45). The offer stands at 10:00. Mario's
+  whole-second values stand (11:01 reads 8:31, 11:03 reads 8:33, the measure script's own figures); his logged 1:00:59
+  over 5.52 mi is 662.83 s a mile, printed 11:03 and read 8:32, and the offer stands at 9:00. No behaviour moves, so
+  the coach hat corrects the numbers here and reports them to Mario; the tests type the corrected values.
+- **Item 4 as built (siting, recorded here):** the record sits on the program (`ia_programs`) as `mileNudge: {cards,
+  anchor}`, the two cards judged and the mile they were judged against. A pencil commit moves the mile, so the record no
+  longer applies (item 4's "a commit through the pencil clears the record"); either answer records the pair, so the
+  sheet opens once for it.
+- **Tests (moved from the plan):** the judge lives in the iOS app's model (`frontends/app/src/app/screens/mile-nudge/`,
+  Angular only, as D276 and D278), so its tests are the app's: `frontends/app/test/unit/mile-nudge.test.ts`, in place
+  of `tests/integration/mile-anchor.test.ts`.
+- **Release:** v0.259.0 (2026-11-08). The page Pages serves changes only by its version (`tools/same-script.mjs`: the
+  same 172,655 script tokens); `frontends/app/test/unit/mile-nudge.test.ts` 16/16, its 14 judge and sheet tests unable to
+  load on v0.258.1 (`mile-nudge-model.ts` is new) and its two wiring tests, run on v0.258.1's sources, each failing.

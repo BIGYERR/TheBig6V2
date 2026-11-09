@@ -1,0 +1,128 @@
+<title>Week Strip Scoot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column, the app's This Week header on top, the presets under it. Track look (D263). */
+:root{
+  --bg:#F3F3F1; --surface:#FFFFFF; --ink:#141413; --ink-rgb:20,20,19; --muted:#6B6B66; --line:#D9D9D4; --signal:#CF4E1A; --on-signal:#FFFFFF;
+  --font:'Geist',-apple-system,'SF Pro Display',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#151514; --ink:#F3F3F1; --ink-rgb:243,243,241; --muted:#8E8E88; --line:#2E2E2B; --signal:#E2652F; --on-signal:#FFFFFF; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#151514; --ink:#F3F3F1; --ink-rgb:243,243,241; --muted:#8E8E88; --line:#2E2E2B; --signal:#E2652F; --on-signal:#FFFFFF; color-scheme:dark;}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);}
+.wrap{max-width:430px;margin:0 auto;padding-block:12px 32px;display:flex;flex-direction:column;gap:18px;}
+.pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));}
+.over{padding:0 20px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.titles{position:relative;}
+.strip{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;padding:0 150px 0 0;scrollbar-width:none;overscroll-behavior-x:contain;}
+.strip::-webkit-scrollbar{display:none;}
+.strip.run{scroll-snap-type:none;}
+.t{flex:none;width:240px;box-sizing:border-box;scroll-snap-align:start;padding:4px 0 4px 20px;font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1;white-space:nowrap;color:rgba(var(--ink-rgb),.11);transition:color .2s ease;}
+.strip.run .t{transition:none;}
+.t.on{color:var(--ink);}
+.fade{position:absolute;inset:0 0 0 auto;width:150px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--bg) 55%);}
+.hurt{position:absolute;right:20px;top:50%;transform:translateY(-50%);height:40px;padding:0 16px;border-radius:20px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:600 15px var(--font);display:flex;align-items:center;}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px;}
+.big{font-size:20px;font-weight:700;}
+.small{font-size:13px;color:var(--muted);}
+.panel{display:flex;flex-direction:column;gap:10px;}
+h2{margin:0;font-size:15px;font-weight:600;color:var(--muted);}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.p{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:16px;padding:12px 14px;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:0;}
+.p b{font-size:16px;font-weight:700;}
+.p span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;}
+.p[aria-pressed="true"]{border-color:var(--signal);box-shadow:inset 0 0 0 1px var(--signal);}
+.p:focus-visible,.go:focus-visible,.wk button:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+.go{height:52px;border:0;border-radius:26px;background:var(--signal);color:var(--on-signal);font:700 18px var(--font);cursor:pointer;}
+.wk{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border-radius:16px;padding:8px 8px 8px 16px;}
+.wk span{font-size:15px;font-weight:600;}
+.wk div{display:flex;gap:6px;align-items:center;}
+.wk output{min-width:72px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;}
+.wk button{width:40px;height:40px;border-radius:20px;border:1.5px solid var(--line);background:none;color:var(--ink);font:700 18px var(--font);cursor:pointer;}
+.note{font-size:13px;line-height:1.45;color:var(--muted);margin:0;}
+</style>
+
+<div class="wrap">
+  <div class="over">The Half Manny</div>
+  <div class="titles">
+    <div class="strip" id="strip" aria-label="Week titles"></div>
+    <div class="fade" aria-hidden="true"></div>
+    <div class="hurt" aria-hidden="true">Hurt?</div>
+  </div>
+  <div class="row"><div><div class="big">28 days out</div><div class="small">Race day Sun, Dec 6</div></div></div>
+
+  <div class="panel pad">
+    <h2>How the strip lands on your week when the app opens</h2>
+    <div class="presets" id="presets"></div>
+    <div class="wk"><span>Week in view</span><div><button type="button" id="minus" aria-label="Earlier week">&minus;</button><output id="wkOut">Week 11</output><button type="button" id="plus" aria-label="Later week">+</button></div></div>
+    <button type="button" class="go" id="go">Open the app again</button>
+    <p class="note">Every preset waits, then travels from Week 1 to the week in view, runs a little past it and settles back. The title passing the left edge lights up as it goes. On the old page the same motion moved small chips about 60 px apart; these titles sit 240 px apart, so the same time covers four times the distance.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TITLE_W = 240, LAST = 15;
+  var PRESETS = [
+    { id:'none', name:'No scoot', line:'Lands on the week at once', wait:0, ms:0, over:0 },
+    { id:'before', name:'As before', line:'260 ms wait · 550 ms travel · 12 px past', wait:260, ms:550, over:12 },
+    { id:'steady', name:'Steady', line:'260 ms wait · 850 ms travel · 12 px past', wait:260, ms:850, over:12 },
+    { id:'glide', name:'Long glide', line:'300 ms wait · 1200 ms travel · 16 px past', wait:300, ms:1200, over:16 }
+  ];
+  var strip = document.getElementById('strip');
+  for (var n = 1; n <= LAST; n++) {
+    var b = document.createElement('div');
+    b.className = 't'; b.textContent = n === LAST ? 'Race Day' : 'Week ' + n;
+    strip.appendChild(b);
+  }
+  var titles = strip.children;
+  var pick = PRESETS[1], week = 11, raf = 0, tmr = 0;
+  var box = document.getElementById('presets');
+  PRESETS.forEach(function(p){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'p'; b.id = 'preset-' + p.id;
+    b.innerHTML = '<b></b><span></span>';
+    b.firstChild.textContent = p.name; b.lastChild.textContent = p.line;
+    b.setAttribute('aria-pressed', String(p === pick));
+    b.addEventListener('click', function(){
+      pick = p;
+      Array.prototype.forEach.call(box.children, function(c){ c.setAttribute('aria-pressed', String(c === b)); });
+      play();
+    });
+    box.appendChild(b);
+  });
+  function light(n){ for (var i = 0; i < titles.length; i++) titles[i].classList.toggle('on', i + 1 === n); }
+  function ease(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2; }
+  function stop(){ if (raf) cancelAnimationFrame(raf); if (tmr) clearTimeout(tmr); raf = tmr = 0; strip.classList.remove('run'); }
+  function play(){
+    stop();
+    var max = Math.max(0, strip.scrollWidth - strip.clientWidth);
+    var to = Math.min(max, (week - 1) * TITLE_W);
+    if (!pick.ms || to <= 0) { strip.scrollLeft = to; light(week); return; }
+    var peak = Math.min(max, to + Math.min(pick.over, to * .05)), SPLIT = .76, t0 = null;
+    strip.classList.add('run'); strip.scrollLeft = 0; light(1);
+    var step = function(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / pick.ms), sl;
+      if (p < SPLIT) sl = peak * ease(p / SPLIT);
+      else sl = peak + (to - peak) * ease((p - SPLIT) / (1 - SPLIT));
+      strip.scrollLeft = sl;
+      light(Math.max(1, Math.min(week, Math.round(sl / TITLE_W) + 1)));
+      if (p < 1) raf = requestAnimationFrame(step);
+      else { raf = 0; strip.scrollLeft = to; light(week); strip.classList.remove('run'); }
+    };
+    tmr = setTimeout(function(){ tmr = 0; raf = requestAnimationFrame(step); }, pick.wait);
+  }
+  function setWeek(n){ week = Math.max(2, Math.min(LAST, n)); document.getElementById('wkOut').textContent = week === LAST ? 'Race Day' : 'Week ' + week; }
+  document.getElementById('minus').addEventListener('click', function(){ setWeek(week - 1); play(); });
+  document.getElementById('plus').addEventListener('click', function(){ setWeek(week + 1); play(); });
+  document.getElementById('go').addEventListener('click', play);
+  strip.addEventListener('pointerdown', stop);
+  setWeek(11);
+  strip.scrollLeft = (week - 1) * TITLE_W; light(week);
+  setTimeout(play, 400);
+})();
+</script>

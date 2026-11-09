@@ -156,7 +156,9 @@ issued D265 before the ruling was written, and it shipped as D266.
   `frontends/app/src/legacy/src/` into `dist-github-pages/`, its version meta, its inline script compiles, it boots and builds
   HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint, the production build with its budgets) and backend (type checks, tests, lint). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
-  slower belongs in CI.
+  slower belongs in CI. In a chat's worktree the check links the main checkout's `node_modules` of the app, the website
+  and the backend when this branch's lockfile is the main checkout's, and otherwise names the `npm ci` to run
+  (`tools/worktree-deps.mjs`, Post-v0.259.1).
 - **The full suite runs in CI** (`.github/workflows/pipeline.yml`) on every push to `dev`, and again on the pull request
   into `main`: the unit and integration job (the build check, the harness boot, the type check, then Vitest over
   `tests/unit`, `tests/integration` and `tests/sweeps`), the app and backend tests and lint, the Docker e2e, and the native job (the app built for the iOS simulator on a
@@ -332,7 +334,10 @@ which does reach him arrives with a recommendation.
 - A conditional write with no else branch is a latch. Move claims onto the item they describe, never onto a section label that a later filter can falsify.
 - Pool and post-filter must reason about a movement through the same lens; when one part of the build asserts something about a movement, grep for the other part that has to agree.
 - Strip comments before any "is this token gone" scan.
-- Prove a reported bug at the reporter's seed before touching anything.
+- Prove a reported bug at the reporter's seed before touching anything. A bug on the phone's screen is proved on WebKit,
+  which the VM harness and Chrome are not: the app's web bundle in the iOS simulator's Safari with the reporter's program
+  seeded, its loading slowed where timing is the suspect (Post-v0.259.1: WebKit drew This Week before its stylesheet
+  applied, D279).
 - `let`/`const` at top level do not land on the VM context; test-injectable globals are `var`. `navigator` needs `defineProperty`.
 - Python edit scripts use literal bytes (real em-dashes, real `×`), never escapes. Any `\uXXXX` text that must land in a file is built in code with `chr(92)`, never typed.
 - Temp files go under the session's own scratchpad, never bare `/tmp`.
