@@ -101,13 +101,13 @@
   1.3 s. On the simulator (iPhone 17 Pro, iOS 26.5, the debug build), a straight route played north at 4 m/s recorded
   through a screen lock: 84 fixes one a second, 4 m each, 4.006 m/s; the screen read the file back on unlock, finished at 1:42 and 0.25 mi, and shared `asylum-run-2026-11-01-0026.gpx` (101 points). Early in a run the average pace reads slow (85 s in, 6:51 against 6:42 played): the second before the first fix and the second since the last one count with no distance yet. The first runs against the watch decide whether that needs a ruling.
 
-## D272 P-RECORDRUN: This Week records the run, and the deck holds no run cards (PROPOSED)
+## D272 P-RECORDRUN: This Week records the run, and the deck holds no run cards (ruled 2026-11-08, Mario's answers at the end)
 
 - **Date:** 2026-11-05. **Ruled by:** the main session in the coach hat, on Mario's picks the same day: hero draft A
   ("i like A lets try that one out"), the recording screen as R2 with R3's splits underneath ("i concur"), and "we dont
   need any cardio cards if we are going with A since the cardio and lift blocks are seperate and we are placing the
   record button on it". Awaiting Mario on the calls at the end. **Bump:** Mario picks at the build (MINOR recommended:
-  a new capability, no program output moves). **Shipped:** not yet. This is D267's stage 2.
+  a new capability, no program output moves). **Shipped:** items 1, 2, 6 and 7 as Amendments 1 and 2 left them in v0.258.0 (2026-11-08, with D276: the run card and the lift card, Record run opening D267's recorder); items 3 to 5 (R2 over R3, Save, the gate) build next. This is D267's stage 2.
 - **The designs:** the canvas "This Week hero drafts" (https://claude.ai/artifact/1km7jKQuQTDrdVQ71roHaH), board A
   (clickable, the recorder inside it) and boards R2 and R3; week 10 Friday of HALF_MANNY.
 - **The measure (2026-11-05, on v0.255.2):**
@@ -194,7 +194,7 @@
 - **Date:** 2026-11-06. **Ruled by:** Mario, on the canvas board "Your design, wired" (his This Week redesign from another
   chat, `week-screen-mockup.dc.html` with `WEEK_SCREEN_REDESIGN.md`, wired to D272): "we are splitting the cardio from
   the run on the hero page lets make sure we do that, and take out the "log by hand" under the record"; and earlier the
-  same day, of the rest day's two actions, "Keep them as links". No new D-code. **Shipped:** not yet.
+  same day, of the rest day's two actions, "Keep them as links". No new D-code. **Shipped:** v0.258.0 (2026-11-08), but Can't run? (D249), which builds next.
 - **What changes in D272:**
   1. **Item 1: the run and the lift are two cards**, not two blocks in one card. The run card comes first: the day,
      the run's name, its dose and pace, the coaching line, Record run. The lift card follows: "Then lift" (or "After the
@@ -215,7 +215,7 @@
 
 - **Date:** 2026-11-08. **Ruled by:** Mario, on the canvas's THE MOCKUP (Version 54, four styles at four speeds, with
   Record run growing out of its card beside Start lift): "i like the lift first at 420 ms". No new D-code.
-  **Shipped:** not yet.
+  **Shipped:** v0.258.0 (2026-11-08), but the live bar, which comes with R2 over R3.
 - **What changes in D272:** the recorder no longer appears at once. Record run opens it out of the run card with the
   same motion as the deck, P-DECK call 16 (`docs/decisions/swipe-deck.md`), whose numbers are the ones to build: drawn
   at the card first under a copy of it, the card lifts for 168 ms, opens over 420 ms (588 ms in all), closes over
@@ -227,3 +227,23 @@
 - **The live bar** (a run still going, the recorder minimized) opens the recorder the same way from the bar itself,
   with no card copy.
 - **Does not change:** the recorder's screens, D267's track test gate, and D272's three open calls.
+
+## D272: Mario's answers to the three calls and the open item (2026-11-08)
+
+- **Date:** 2026-11-08, Post-v0.257.0. **Ruled by:** Mario, "Concur with all four", each the main session's
+  recommendation, after he asked for them in plain words. No new D-code. D272 is ruled with these answers.
+- **Call 1, the gate:** Save to the day appears only once the recorder has passed D267's track test at 2%: four laps of
+  a 400 m track in lane 1 within 32 m of 1,600 m, and one road run within 2% of the watch. Until then a recorded run is
+  kept on the phone and shared as a GPX file, and the run is logged by hand on the day sheet. (The case against: until
+  the track test is run, Record run cannot fill in the log.)
+- **Call 2, Speed Runs:** the recorder records a Speed Run's whole run (time, miles, average pace, mile splits) and shows
+  no pace guard until stage 4 (effort by effort, after D258). (The case against: interval paces are not checked live.)
+- **Call 3, rides, swims and rows:** no Record; their card's button opens the hand log for that sport (Amendment 1,
+  item 4). (The case against: a GPS ride could work, but only running has been checked.)
+- **The open item of Amendment 1, a run done without the phone:** a quiet **Ran without the phone?** link on the recorder
+  before Start, which opens the day's hand log. The day card's top also opens the day sheet (`docs/decisions/this-week.md`,
+  D276). (The case against: one tap more than a link on the run card.)
+- **How it builds:** v0.258.0 (D276, `docs/decisions/this-week.md`) puts the run card, the lift card and Record run on
+  This Week; Record run opens D267's recorder out of the run card with Ran without the phone? on it. The recording
+  screen as R2 over R3, Save behind the gate, the live bar and "Back to your run" build next, then Can't run? (D249),
+  in their own releases (Mario, 2026-11-08, "Screen now, rest next").

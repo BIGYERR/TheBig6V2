@@ -11,6 +11,12 @@ const SETTLE_MS = 150;
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export interface Helpers {
+  /**
+   * The Angular build, whose This Week is Mario's redesign (D276 P-WEEKSCREEN, v0.258.0): week titles in place of the
+   * week chips, a Sunday first day strip whose tap picks a day into the cards, and the session sheet behind the card's
+   * chevron. The page keeps its own This Week, so a journey reaches the same sheet by each build's own path.
+   */
+  app: boolean;
   tap(selector: string): Promise<void>;
   screen(id: string): Promise<void>;
   /** The ids of the sheets and overlays currently open, in document order. */
@@ -40,8 +46,16 @@ export interface Helpers {
   generate(): Promise<void>;
   /** Relaunches the app (storage kept) with the frozen clock moved to a later moment, as an athlete coming back days later. */
   relaunchOn(iso: string): Promise<void>;
-  /** Taps This Week's strip cell for a weekday ('fri'), found by its label as the athlete reads it. */
+  /**
+   * Opens a weekday ('fri') of the week in view: the page's strip cell, found by its label as the athlete reads it; in
+   * the app, the day picked from the strip (a Sunday from the next title, as the strip runs Sunday first), then the
+   * card's chevron.
+   */
   tapDay(key: string): Promise<void>;
+  /** Opens today from the day strip, as tapDay does: the page's today cell, or the app's picked today and its chevron. */
+  tapToday(): Promise<void>;
+  /** This Week's week buttons: the page's week chips, the app's week titles (one more: Race Day or Last day). */
+  readonly weekBtn: string;
   /** Taps the wizard card whose label reads `label`, as the athlete reads it. */
   tapCard(label: string): Promise<void>;
   /** Whether the wizard card whose label reads `label` is the one chosen. */
@@ -72,14 +86,33 @@ export interface Step {
   page: string;
   /** An element to scroll into view before the screenshot (default: the screen as the step left it). */
   shot?: string;
+  /**
+   * The app draws what the screenshot shows its own way by ruling, so the two builds' photographs differ on purpose:
+   * the ruling that says so. Both builds still pass the step's checks; the parity is shown, never judged.
+   */
+  own?: string;
   run(t: Helpers, page: Page, state: FlowState): Promise<void>;
   /** Runs after the screenshot, to leave the app where the next step expects it. */
   after?(t: Helpers, page: Page, state: FlowState): Promise<void>;
 }
 
+/**
+ * What a step whose photograph shows This Week says of it: the app draws This Week as Mario redesigned it (D276
+ * P-WEEKSCREEN, v0.258.0) and the page keeps its own, so the two photographs differ on purpose. Every other screen,
+ * every sheet over This Week included, is still held to the parity limit.
+ */
+const THIS_WEEK = 'D276, This Week redesigned in the app';
+
 /** Helpers bound to one page. Every assertion throws with a message that names what was expected. */
-export function helpers(page: Page): Helpers {
+export function helpers(page: Page, app = false): Helpers {
+  const DAYS_FULL: Record<string, string> = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
+  /** The app's card chevron opens the picked day's session sheet. */
+  const openPicked = async () => {
+    await h.tap('.tw-card.first .tw-open');
+  };
   const h: Helpers = {
+    app,
+    weekBtn: app ? '.tw-title' : '.week-btn',
     async tap(selector) {
       const el = await page.waitForSelector(selector, { visible: true, timeout: 5000 }).catch(() => null);
       if (!el) throw new Error(`nothing visible to tap at ${selector}`);
@@ -218,6 +251,18 @@ export function helpers(page: Page): Helpers {
       await h.restTimerSettled();
     },
     async tapDay(key) {
+      if (app) {
+        // Sunday first: a program week's Sunday is the first column of the next title.
+        if (key === 'sun') {
+          const next = await page.$$eval('.tw-title', (ts) => ts.findIndex((e) => e.classList.contains('on')) + 1);
+          await h.tapNth('.tw-title', next);
+        }
+        const col = await page.$$eval('.tw-week .tw-col', (cs, name) => cs.findIndex((c) => (c.getAttribute('aria-label') ?? '').startsWith(name as string)), DAYS_FULL[key]);
+        if (col < 0) throw new Error(`This Week shows no ${DAYS_FULL[key]}`);
+        await h.tapNth('.tw-week .tw-col', col);
+        await openPicked();
+        return;
+      }
       const label = key.charAt(0).toUpperCase() + key.slice(1);
       for (const cell of await page.$$('.wk-strip .wk-day')) {
         if ((await cell.$eval('.wk-day-lbl', (e) => (e.textContent ?? '').trim())) !== label) continue;
@@ -227,6 +272,11 @@ export function helpers(page: Page): Helpers {
         return;
       }
       throw new Error(`This Week shows no ${label} cell`);
+    },
+    async tapToday() {
+      if (!app) return h.tap('.wk-strip .wk-day.today');
+      await h.tap('.tw-week .tw-col.today');
+      await openPicked();
     },
     async tapCard(label) {
       const card = await wizardCard(page, label);
@@ -403,11 +453,12 @@ const STRENGTH: readonly Step[] = [
   {
     id: 'week',
     page: 'This Week',
+    own: THIS_WEEK,
     async run(t) {
       await t.tap('#wizardNext');
       await t.screen('screenGenerate');
       await t.screen('screenWeek');
-      if ((await t.count('.wk-day')) !== 7) throw new Error('the week strip does not show 7 days');
+      if ((await t.count(t.app ? '.tw-week .tw-col' : '.wk-day')) !== 7) throw new Error('the week strip does not show 7 days');
       await t.expectText('#screenWeek', PROGRAM_NAME);
       await t.expectText('#screenWeek', 'Week 1');
       await t.restTimerSettled();
@@ -419,7 +470,7 @@ const STRENGTH: readonly Step[] = [
     async run(t) {
       // The rest hero's second button logs cardio (This Week is an Angular component in the app since phase E's
       // eighteenth step, the legacy markup in the page).
-      const id = await t.tapOpensSheet('.wk-rest-acts .wk-rest-act:nth-child(2)');
+      const id = await t.tapOpensSheet(t.app ? '.tw-card.rest .tw-link:last-child' : '.wk-rest-acts .wk-rest-act:nth-child(2)');
       if (id !== 'restOverlay') throw new Error(`expected the rest sheet, opened #${id}`);
     },
     async after(t) {
@@ -628,7 +679,7 @@ const STRENGTH: readonly Step[] = [
     async run(t, _page, state) {
       // The sheet's body is an Angular component in the app since phase E's tenth step, the legacy script's in the
       // single-file page: both answer the same.
-      state['injurySheet'] = await t.tapOpensSheet('.hurt-btn');
+      state['injurySheet'] = await t.tapOpensSheet('#hurtBtn');
       await t.expectText('#changeOverlay', 'Train around it');
     },
   },
@@ -799,6 +850,7 @@ const STRENGTH: readonly Step[] = [
   {
     id: 'relaunch',
     page: 'This Week after a relaunch (storage kept)',
+    own: THIS_WEEK,
     async run(t, page) {
       await page.reload({ waitUntil: 'networkidle0' });
       // With an active program stored, launch reopens it on This Week.
@@ -875,14 +927,16 @@ const RACE: readonly Step[] = [
   {
     id: 'race-week-1',
     page: 'Race: This Week, week 1',
+    own: THIS_WEEK,
     async run(t) {
       await t.tap('#confirmGenBtn');
       await t.screen('screenGenerate');
       await t.screen('screenWeek');
       await t.restTimerSettled();
       await t.expectText('#screenWeek', 'E2E Race');
-      await t.expectText('#screenWeek', 'Nov 29, 2026');
-      if ((await t.count('.week-btn')) !== 8) throw new Error('the race plan does not show 8 weeks');
+      // The page's Race Day box prints the date with its year; the app's race row counts down to it (D276).
+      await t.expectText('#screenWeek', t.app ? 'Race day Sun, Nov 29' : 'Nov 29, 2026');
+      if ((await t.count(t.weekBtn)) !== (t.app ? 9 : 8)) throw new Error('the race plan does not show 8 weeks (and, in the app, Race Day)');
     },
   },
   {
@@ -899,8 +953,9 @@ const RACE: readonly Step[] = [
   {
     id: 'race-week-8',
     page: 'Race: race week',
+    own: THIS_WEEK,
     async run(t) {
-      await t.tapNth('.week-btn', 7);
+      await t.tapNth(t.weekBtn, 7);
       await t.expectText('#screenWeek', 'Week 8');
     },
   },
@@ -978,20 +1033,22 @@ const TEST: readonly Step[] = [
   {
     id: 'test-week-1',
     page: 'Test: This Week, week 1',
+    own: THIS_WEEK,
     async run(t) {
       await t.tap('#confirmGenBtn');
       await t.screen('screenGenerate');
       await t.screen('screenWeek');
       await t.restTimerSettled();
       await t.expectText('#screenWeek', 'E2E Test');
-      if ((await t.count('.week-btn')) !== 6) throw new Error('the test plan does not end on week 6');
+      if ((await t.count(t.weekBtn)) !== (t.app ? 7 : 6)) throw new Error('the test plan does not end on week 6 (and, in the app, Last day)');
     },
   },
   {
     id: 'test-week-6',
     page: 'Test: test week',
+    own: THIS_WEEK,
     async run(t) {
-      await t.tapNth('.week-btn', 5);
+      await t.tapNth(t.weekBtn, 5);
       await t.expectText('#screenWeek', 'Week 6');
     },
   },
@@ -1101,6 +1158,7 @@ const BODYWEIGHT_KNEE: readonly Step[] = [
   {
     id: 'bw-week',
     page: 'Bodyweight: This Week',
+    own: THIS_WEEK,
     async run(t) {
       await t.tap('#wizardNext');
       await t.tap('#wizardNext');
@@ -1126,7 +1184,7 @@ const BODYWEIGHT_KNEE: readonly Step[] = [
     id: 'bw-hurt-knee',
     page: 'Bodyweight: Hurt? with the knee chosen',
     async run(t, page) {
-      const id = await t.tapOpensSheet('.hurt-btn');
+      const id = await t.tapOpensSheet('#hurtBtn');
       if (id !== 'changeOverlay') throw new Error(`expected the Hurt? sheet, opened #${id}`);
       await tapNamed(page, '#changeOverlay .ov-eq', '.ov-eq-name', 'Knee');
       await t.expectText('#changeOverlay', 'Working around it');
@@ -1136,6 +1194,7 @@ const BODYWEIGHT_KNEE: readonly Step[] = [
   {
     id: 'bw-knee-week',
     page: 'Bodyweight: This Week with the knee injury',
+    own: THIS_WEEK,
     async run(t, page) {
       await t.tap('#changeOverlay .ov-apply');
       await page
@@ -1165,6 +1224,7 @@ const LOG_SESSION: readonly Step[] = [
   {
     id: 'log-week',
     page: 'Log: This Week',
+    own: THIS_WEEK,
     async run(t) {
       await t.tap('.new-prog-btn');
       for (let i = 0; i < 5; i++) await t.tap('#wizardNext');
@@ -1179,7 +1239,7 @@ const LOG_SESSION: readonly Step[] = [
     async run(t, page) {
       // Today's session from the day strip, which opens the session sheet in both builds. The hero's Start session opens
       // the swipe deck, which only the Angular build has (v0.257.0, D275), so a parity journey cannot tap it.
-      await t.tap('.wk-strip .wk-day.today');
+      await t.tapToday();
       await t.overlayOpen('detailOverlay');
       await t.tapNth('#detailOverlay .ex-logbtn', 0);
       await t.tapNth('#detailOverlay .ex-logbtn', 1);
@@ -1220,6 +1280,7 @@ const LOG_SESSION: readonly Step[] = [
   {
     id: 'log-done',
     page: 'Log: session closed out',
+    own: THIS_WEEK,
     async run(t, page) {
       await t.tap('#statusBtn_complete');
       await page
@@ -1252,8 +1313,10 @@ const LOG_SESSION: readonly Step[] = [
     async run(t, page) {
       await page.reload({ waitUntil: 'networkidle0' });
       await t.screen('screenWeek');
+      // The app picks the next session on a relaunch; today's card, with its Reopen, is a tap on today (D276).
+      if (t.app) await t.tap('.tw-week .tw-col.today');
       await t.expectText('#screenWeek', 'Closed out');
-      await t.tap('.wk-hero-cta');
+      await t.tap(t.app ? '.tw-card.first .tw-reopen' : '.wk-hero-cta');
       await t.overlayOpen('detailOverlay');
       await t.expectMatch('#detailOverlay', /2 \/ \d+ logged/i);
       const notes = await page.$eval('#log_notes', (e) => (e as HTMLTextAreaElement).value);

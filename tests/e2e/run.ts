@@ -89,7 +89,7 @@ async function settle(page: Page): Promise<void> {
  */
 async function runJourney(browser: Browser, target: (typeof TARGETS)[number], journey: Journey, results: StepResult[]): Promise<string[]> {
   const { context, page, problems, warnings, blocked } = await openPage(browser);
-  const t = helpers(page);
+  const t = helpers(page, target.id === 'angular');
   const state: FlowState = {};
   let broken: string | null = null;
   try {
@@ -215,6 +215,13 @@ function judge(steps: StepResult[]): number | null {
     const { angular: a, reference: b } = s;
     s.parity = a.status === 'pass' && b.status === 'pass' && a.png && b.png ? comparePngs(a.png, b.png) : null;
     const pct = s.parity && 'pct' in s.parity ? s.parity.pct : null;
+    // A screen the app draws its own way by ruling: both builds must pass the step, and its parity is shown, never judged.
+    if (s.own) {
+      s.ok = a.status === 'pass' && b.status === 'pass';
+      const why = a.error || b.error || '';
+      console.log(`  ${s.ok ? 'PASS' : 'FAIL'} #${stepLabel(s.n)} ${s.journeyId}/${s.id}  the app's own (${s.own})${pct !== null ? `, parity ${pct.toFixed(3)}%` : ''}${why ? `  ${why}` : ''}`);
+      continue;
+    }
     if (pct !== null) worst = Math.max(worst ?? 0, pct);
     s.ok = a.status === 'pass' && b.status === 'pass' && pct !== null && pct <= PARITY_MAX;
     const why = a.error || b.error || (s.parity && 'error' in s.parity ? s.parity.error : '') || '';
@@ -278,6 +285,7 @@ async function main(): Promise<number> {
         journey: journey.name,
         id: s.id,
         page: s.page,
+        ...(s.own ? { own: s.own } : {}),
         angular: notRun(),
         reference: notRun(),
         parity: null,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, output, signal, type OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal, type OnDestroy } from '@angular/core';
 import {
   BUTTON_LABEL,
   RECORDER_COPY,
@@ -27,12 +27,12 @@ type Share = (fileName: string, text: string, done: () => void, fail: () => void
   selector: 'ia-run-recorder',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div class="overlay open" role="dialog" aria-label="Run recorder" style="z-index:320">
+  <div [class]="embedded() ? 'rec-embed' : 'overlay open'" role="dialog" [attr.aria-label]="heading()?.title || copy.row" [style.z-index]="embedded() ? null : 320">
     <div class="detail-header">
       <button class="back-btn" (click)="back()">‹ Back</button>
       <div>
         <div class="detail-day-name">{{ subtitle() }}</div>
-        <div class="detail-day-title">{{ copy.row }}</div>
+        <div class="detail-day-title">{{ heading()?.title || copy.row }}</div>
       </div>
     </div>
     <div class="detail-body">
@@ -57,6 +57,9 @@ type Share = (fileName: string, text: string, done: () => void, fail: () => void
           <button class="look-opt" style="padding:14px;font-size:15px" (click)="press(b)">{{ label[b] }}</button>
         }
       </div>
+      @if (heading() && !live() && !runId()) {
+        <button type="button" class="rec-nophone" (click)="handLog.emit()">{{ copy.noPhone }}</button>
+      }
       @if (message()) {
         <div class="look-note" aria-live="polite">{{ message() }}</div>
       }
@@ -84,6 +87,12 @@ type Share = (fileName: string, text: string, done: () => void, fail: () => void
 })
 export class RunRecorder implements OnDestroy {
   readonly closed = output<void>();
+  /** Opened from a day's run card (D272, D276): its when line and the run's name, in place of the test bench's. */
+  readonly heading = input<{ over: string; title: string } | null>(null);
+  /** Drawn inside This Week's grow frame instead of as its own overlay (D272 Amendment 2). */
+  readonly embedded = input(false);
+  /** Ran without the phone? (D272's open item): the day's hand log, offered before Start. */
+  readonly handLog = output<void>();
 
   protected readonly copy = RECORDER_COPY;
   protected readonly label = BUTTON_LABEL;
@@ -104,7 +113,8 @@ export class RunRecorder implements OnDestroy {
   );
   protected readonly subtitle = computed(() => {
     const id = this.runId();
-    return id && !this.live() ? runLabel(id) : this.copy.rowNote;
+    const h = this.heading();
+    return id && !this.live() ? runLabel(id) : h ? h.over : this.copy.rowNote;
   });
 
   private readonly tick = setInterval(() => this.now.set(Date.now()), 1000);
