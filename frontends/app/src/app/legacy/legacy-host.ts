@@ -20,6 +20,7 @@ import { ProgressFrame } from '../screens/frames/progress-frame';
 import { TabBar } from '../screens/frames/tab-bar';
 import { GoalSheet } from '../screens/goal-sheet/goal-sheet';
 import { MileLock } from '../screens/mile-sheet/mile-lock';
+import { MileNudge } from '../screens/mile-nudge/mile-nudge';
 import { MileSheet } from '../screens/mile-sheet/mile-sheet';
 import { RpeInfo } from '../screens/rpe-info/rpe-info';
 import { SwapNudge } from '../screens/swap-nudge/swap-nudge';
@@ -47,7 +48,7 @@ import { Wizard } from '../screens/wizard/wizard';
   host: { style: 'display: contents' },
   imports: [
     BugReport, RestTimer, PopUp, RandomWorkout, SwapSheet, AddSheet, ChangeSheet, DayDetail, Deck, GeneratingScreen, HomeScreen,
-    ProgressFrame, RecordHost, TabBar, GoalSheet, MileLock, MileSheet, RpeInfo, SwapNudge, Toast, UpdateBanner, WeekView, Wizard,
+    ProgressFrame, RecordHost, TabBar, GoalSheet, MileLock, MileNudge, MileSheet, RpeInfo, SwapNudge, Toast, UpdateBanner, WeekView, Wizard,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -60,6 +61,7 @@ import { Wizard } from '../screens/wizard/wizard';
   <div class="overlay" id="detailOverlay">@if (booted()) {<ia-day-detail />}</div>
   @if (booted()) {<ia-deck />}
   @if (booted()) {<ia-record-host />}
+  @if (booted()) {<ia-mile-nudge />}
   <div class="overlay" id="swapOverlay">@if (booted()) {<ia-swap-sheet />}</div>
   <div class="overlay" id="addOverlay">@if (booted()) {<ia-add-sheet />}</div>
   <div class="pop-overlay" id="swapNudgeOverlay">@if (booted()) {<ia-swap-nudge />}</div>

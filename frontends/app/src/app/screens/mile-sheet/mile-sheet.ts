@@ -63,7 +63,10 @@ export class MileSheet {
 
   /** The legacy openMileSheet: the lock in a program's last three weeks, the edit sheet before them. */
   private open(progId: string): void {
-    const p = (this.bridge.call('getPrograms') as MileProgram[]).find((x) => x.id === progId);
+    // D274: the nudge's offer, when it opened the pencil, stands in the fields in place of the stored mile, once.
+    const pre = this.state.prefill();
+    this.state.prefill.set(null);
+    const p =(this.bridge.call('getPrograms') as MileProgram[]).find((x) => x.id === progId);
     if (!p) return;
     const tw = p.totalWeeks || 6;
     const week = this.bridge.call('_goalCurWeek', p);
@@ -79,8 +82,8 @@ export class MileSheet {
     }
     const g = p.cfg?.cardioGoals?.run || {};
     this.bridge.set('_mileDraft', { progId });
-    this.mins().nativeElement.value = mileField(g.mileBestMins);
-    this.secs().nativeElement.value = mileField(g.mileBestSecs);
+    this.mins().nativeElement.value = pre ? pre.mins : mileField(g.mileBestMins);
+    this.secs().nativeElement.value = pre ? pre.secs : mileField(g.mileBestSecs);
     this.opened.set(true);
     this.appRef.tick();
     this.show('mileOverlay');
