@@ -186,7 +186,7 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   (https://claude.ai/artifact/GnEY7dRhqMrMfvTYMsftoc, kept as `docs/design/week-scoot-prototype.html`), he picked
   **Long glide** (against the recommendation of As before, the page's old numbers). **Amends** D276 item 1 and D276 as
   built, decision 1. **Bump:** PATCH (Mario, 2026-11-08: "PATCH v0.258.2", which becomes v0.259.1 if the mile nudge
-  lands first; v0.259.0 reached `origin/dev` before this was built, so it is **v0.259.1**). **Shipped:** pending.
+  lands first; v0.259.0 reached `origin/dev` before this was built, so it is **v0.259.1**). **Shipped:** v0.259.1 (2026-11-08).
 - **The measure (2026-11-08, on v0.258.1, then v0.259.0's identical This Week):** HALF_MANNY seeded at today's clock
   (start Mon Aug 31, week 10 of 14, today Sunday Nov 8, so the title in view is `Week 11`), the iOS app's web bundle
   served to Safari on the iPhone 17 Pro simulator (iOS 26.5), with a probe on the strip's `scrollLeft`.
@@ -226,3 +226,27 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
 - **Does not change:** what any program prescribes (HALF_MANNY digest `147f083be4e04e34`); the stores; which title is in
   view (D276 as built, decision 1); taps, swipes and the settle rule; the page Pages serves, whose This Week keeps its
   own scoot (its version only).
+
+## D279 as built (v0.259.1, 2026-11-08)
+
+- **Where:** the iOS app's Angular This Week. `frontends/app/src/app/screens/week-view/week-strip.ts` (the placer and the
+  glide, framework free: the strip and the clock are passed in); `week-view.ts` places through it on a draw that has not
+  placed the strip, lights the glide's title (`isOn`, the `lit` signal), ignores the glide's scrolls (`scrolled`) and
+  stops it on a touch (`dragDown`); `week-view.css` drops the title's colour fade while it glides (`.tw-strip.gliding`).
+  The page Pages serves changes only by its version.
+- **Decisions the build made (siting and form):**
+  1. The glide's title is lit by its own signal, and `aria-current` stays on the title in view throughout, so whatever
+     reads the week in view reads `aria-current`, never the ink.
+  2. A touch ends a glide only: a placement still waiting for the stylesheet keeps waiting.
+  3. A glide that ends off its title (WebKit refusing the last write) falls back to the instant placement and its checks.
+  4. The glide turns the strip's snapping off while it runs and back on at the end, as a mouse drag already did.
+- **The e2e:** the journeys read the title in view by `aria-current` (`tests/e2e/flow.ts`, `openPicked` and `tapDay`),
+  since during the launch's glide the lit title is the one passing.
+- **Proof on WebKit (the iPhone 17 Pro simulator, iOS 26.5, Safari, HALF_MANNY seeded at Nov 8, the app's stylesheet held
+  back 1.5 s):** v0.259.0 left the strip on `Week 1` with no title lit; this build writes nothing while the strip cannot
+  scroll, starts at `Week 1` when the stylesheet lands (1,562 ms), travels from 1,881 ms to 3,079 ms (1,200 ms) and
+  ends at 2,400 px on `Week 11`, still there at 4 s.
+- **Tests:** `frontends/app/test/unit/week-strip.test.ts` (12: the curve's values and lit titles, the strip's end, ready,
+  the placement after the stylesheet lands, a write that does not hold, the 10 second limit, the glide frame by frame,
+  later placements, reduced motion and Week 1, a touch mid glide, a touch before the stylesheet, and the screen's wiring
+  read as text). The file cannot load on v0.259.0: `week-strip.ts` is not there (`git cat-file -e` on it fails).
