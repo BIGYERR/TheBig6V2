@@ -326,6 +326,7 @@ which does reach him arrives with a recommendation.
 - Run every new or changed test against the previous release first (`IA_APP`). A test that passes on both is not testing what it claims. A new file that cannot load there (its module is missing) fails by construction; `git cat-file -e` on the module is the proof (Post-v0.257.0).
 - Every hunk of the diff on `index.html` and `tests/snapshots/` is classified against the ruling before ship. A removal that was not ruled is a regression (a ruling that SELECTS is not a ruling that DELETES).
 - Pin `cfg.seed`, strip clock fields, and prove a program equals itself built twice before comparing anything.
+- A control a change removes or renames is grepped for in `tests/e2e` too (its selector, its words), beside its code consumers: the Docker e2e taps it, and the 60-second check never runs the e2e. When a journey changes, `cd tests && npm run e2e` runs locally in the background before the release commit, its output in a file, and the report names the run (Post-v0.258.1: D278 removed the card chevron every app journey opened its sheet through).
 - Any harness stub that accepts a callback must be able to run it. `requestAnimationFrame` that never fires deletes a code path from the test.
 - Rename passes: a map whose KEYS are old names is rewritten LAST, or excluded from the sweep. No alias row may self-map or chain.
 - A conditional write with no else branch is a latch. Move claims onto the item they describe, never onto a section label that a later filter can falsify.
