@@ -3,6 +3,9 @@
 // numbers, the RPE bubble's lines and bands, and the rule that Call it writes the RPE and notes and nothing else.
 import { describe, test } from 'vitest';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { REPO } from '../support/app.ts';
 import {
   CALL_IT_WORDS, callItLog, coolRx, ctaText, type DeckCard, deckCards, deckOpens, FINISH, mainRx, numeral, openMotion, PIP_THRESHOLD, restPill, rpeBubble, rpeOf,
   setsPill, stateOf,
@@ -214,5 +217,23 @@ describe('the cards', () => {
     assert.equal(deckOpens(deckCards(cool, [block([card('Couch stretch', '2×45 sec each side', 0, 0)])], () => null)), false);
     assert.equal(deckOpens(deckCards([], [], () => null)), false);
     assert.deepEqual(deckCards([], [], () => null), [], 'a day with no lift work has no deck, not a lone Call it');
+  });
+});
+
+describe('the set summary on a deck card (D281 P-SUMMARYFIT)', () => {
+  // The deck's stylesheet, its comments stripped, read as rule bodies keyed by selector.
+  const css = readFileSync(join(REPO, 'frontends/app/src/app/screens/deck/deck.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = (sel: string): Record<string, string> => {
+    const at = css.indexOf(sel + '{');
+    assert.ok(at >= 0, 'deck.css has no rule for ' + sel);
+    const body = css.slice(at + sel.length + 1, css.indexOf('}', at));
+    return Object.fromEntries(body.split(';').filter(Boolean).map((d) => d.split(':').map((s) => s.trim()) as [string, string]));
+  };
+
+  test('keeps the numbers whole ("2 × 15 /side", never "2 × 15 /si…") and lets the words beside them give way', () => {
+    const val = rule('.deck-work .exset-head-val'), sub = rule('.deck-work .exset-head-sub');
+    assert.equal(val['flex-shrink'], '0', 'the numbers never shrink');
+    assert.equal(val['font-size'], '17px');
+    assert.deepEqual([sub['flex'], sub['min-width'], sub['overflow'], sub['text-overflow'], sub['white-space']], ['0 1 auto', '0', 'hidden', 'ellipsis', 'nowrap']);
   });
 });

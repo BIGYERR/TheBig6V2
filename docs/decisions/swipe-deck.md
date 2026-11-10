@@ -204,7 +204,7 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
 ## D281 P-SUMMARYFIT: a deck card keeps its set summary's numbers whole (Mario, 2026-11-10)
 
 - **Date:** found 2026-11-08 in the week 11 mockup, ruled 2026-11-10. **Ruled by:** Mario, "Yes, v0.259.3", on the
-  main session's recommendation. **Bump:** PATCH, v0.259.3 (Mario). **Shipped:** not yet.
+  main session's recommendation. **Bump:** PATCH, v0.259.3 (Mario). **Shipped:** v0.259.3 (2026-11-10).
 - **Finding:** on Thursday of HALF_MANNY's week 11 the Hip stability card's set summaries read "2 × 15 /si…". A deck card
   is narrower than the session sheet, and the sheet's rule for the summary (`.exset-head-val`, `session-sheet.css`) lets
   the numbers shrink and clip while "as prescribed" beside them keeps its width. Every v0.257.0 to v0.259.2 build has it;

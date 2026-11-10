@@ -78,6 +78,9 @@
 .deck-work .superset-wrap,.deck-work .core-block{background:transparent;border:0;border-radius:0;overflow:visible;}
 .deck-work .superset-header,.deck-work .core-header,.deck-work .section-label{display:none;}
 .deck-work .ex-logbtn{border-radius:999px;min-height:40px;}
+/* A card is narrower than the sheet: the set summary keeps its numbers whole ("2 × 15 /side") and the words beside it give way. */
+.deck-work .exset-head-val{font-size:17px;flex-shrink:0;}
+.deck-work .exset-head-sub{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .deck-work .exset-ctl{border-radius:12px;}
 .deck-work .ex-winput{border-radius:12px;}
 .deck-work .ex-reuse{border-radius:999px;}
