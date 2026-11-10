@@ -1,0 +1,11 @@
+installKeyboardResync from base_v0.259.1.html, ia-version 0.259.1, iOS simulator Safari
+two focus changes 200 ms apart: scrollY after = 1, 0, 0, 0, 0
+the same, both timers held behind one 300 ms task: scrollY after = 1, 1, 1, 1, 1
+two focus changes 5 ms apart: scrollY after = 0, 0, 0, 1, 1
+two focus changes in one task: scrollY after = 1, 1, 1, 1, 1
+
+installKeyboardResync from dist-github-pages/index.html, ia-version 0.259.2, iOS simulator Safari
+two focus changes 200 ms apart: scrollY after = 0, 0, 0, 0, 0
+the same, both timers held behind one 300 ms task: scrollY after = 0, 0, 0, 0, 0
+two focus changes 5 ms apart: scrollY after = 0, 0, 0, 0, 0
+two focus changes in one task: scrollY after = 0, 0, 0, 0, 0

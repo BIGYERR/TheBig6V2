@@ -6,10 +6,12 @@
 // before the next frame (the same task, or both held behind one long task such as the Progress render) overlap: the
 // second reads the first's nudged y as home, and its step back lands on it.
 // Usage: node tests/measure/keyboard-resync_latch.ts (IA_APP=<page> for another body). Runs the resync lifted from the
-// built page in Puppeteer's Chrome, five trials per case, and prints scrollY 1.2 s after the second focus change.
+// built page in Puppeteer's Chrome, five trials per case, and prints scrollY 1.2 s after the second focus change. The
+// saved .out.txt holds v0.259.1 (the before-picture, the resync as D256 built it) and then v0.259.2's build (D280).
 // TypeScript for the harness imports; node runs it with its types stripped. Not in the tests' type check.
 import puppeteer from 'puppeteer';
-import { relative } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { basename, relative } from 'node:path';
 import { APP, REPO, appFunction } from '../support/app.ts';
 
 const src = appFunction('installKeyboardResync').toString();
@@ -22,7 +24,8 @@ const CASES: [string, number, number, number][] = [
 ];
 
 const browser = await puppeteer.launch({ headless: true });
-console.log(`installKeyboardResync from ${relative(REPO, APP)}`);
+const version = /name="ia-version" content="([^"]+)"/.exec(readFileSync(APP, 'utf8'))?.[1] ?? '?';
+console.log(`installKeyboardResync from ${APP.startsWith(REPO) ? relative(REPO, APP) : basename(APP)}, ia-version ${version}`);
 try {
   for (const [label, gap, from, to] of CASES) {
     const ys: number[] = [];

@@ -105,3 +105,37 @@ The bottom tab bar (`nav.tabbar`, `frontends/app/src/legacy/src/css/shell.css`),
   container's page (`localhost:3000/app/`, a 375 px viewport): a tap from This Week to Progress stretched the pill to
   1.28 tabs and it came to rest on Progress; a drag from This Week to Bugs marked the bar dragging, held the pill lifted
   under the finger and opened Bugs on release. WebKit's press state and the feel under a finger wait for the phone.
+
+## D280: P-ONERESYNC, one keyboard resync at a time (amends D256)
+
+- **Date:** found and ruled 2026-11-08. **Ruled by:** the main session (a defect in D256's workaround, no doctrine),
+  Mario ("yes fix it here"). **Bump:** PATCH, v0.259.2 (Mario), after the week-snap chat's v0.259.1, which landed on
+  `dev` while this was ruled; re-read against it, the ruling stands (v0.259.1 does not touch the resync).
+  **Shipped:** v0.259.2 (2026-11-08).
+- **The finding:** the Docker e2e's `log-session/log-progress` failed parity at 1.562% (20,920 px) with one build's
+  Progress page scrolled one CSS pixel down and resting there, after the runner had already waited out each focus
+  change's resync (Post-v0.259.0 tests pass). `installKeyboardResync` reads the page's y when its timer fires, nudges a
+  point, and steps back to that y a frame later. Two resyncs whose timers fire before the same frame (two focus changes
+  whose 350 ms timers are held behind one long task, such as the Progress render; or the keyboard closing and focus
+  leaving together) overlap: the second reads the first's nudged y as home, and its step back lands there. The page
+  then rests a point off where the athlete left it, for good. Measured in Chrome with the resync lifted from the
+  v0.259.0 page (`tests/measure/keyboard-resync_latch.ts`, saved `.out.txt`): two focus changes 200 ms apart rest at
+  0 in 5 of 5; held behind one 300 ms task, at 1 in 5 of 5; in one task, at 1 in 5 of 5; 5 ms apart, at 0 in 5 of 5.
+  One function holds the behaviour, installed once on the window; the iOS app runs the same script. Nothing else
+  nudges the window's scroll.
+- **What changes:** a resync that comes due while another is in flight (its nudge made, its step back waiting for the
+  frame) is skipped. The one in flight already makes the real scroll WebKit needs to recompute fixed elements, and it
+  steps back to where the page rested. Once its step back has run, the next resync runs as before.
+- **What deliberately does not change:** the two triggers (the visual viewport growing back by more than 100 points;
+  focus leaving a field for the page), their delays (60 ms and 350 ms), the one point nudge and its direction (up, or
+  down at the very top), the step back a frame later, and every call a single resync makes. The layout, the bar and
+  every screen's scrolling stay as D256 left them.
+- **Expected values (typed from the ruling):** at y=640, two resyncs before one frame call scrollTo (0, 639) then
+  (0, 640) and the page rests at 640 (today: (0, 639), (0, 638), (0, 640), (0, 639), resting at 639). At y=0: (0, 1)
+  then (0, 0), resting at 0 (today: resting at 1). Two resyncs with a frame between them both run: (0, 639), (0, 640),
+  (0, 639), (0, 640). The keyboard closing and focus leaving before one frame: one resync, (0, 639), (0, 640). In
+  Chrome, the measure's four cases all rest at 0. The e2e's `log-session/log-progress` at 0% in three runs in a row.
+- **Tests:** `tests/unit/tab-bar.test.ts`, the function lifted out of the page on a window whose scrollTo moves the page,
+  with its timers and its animation frames run apart.
+- **Proof that only the phone can give:** none new. A single resync is unchanged, so D256's check (type a load, close
+  the keyboard, open Progress, scroll up: the bar stays at the bottom) stands; Mario may repeat it on the build.
