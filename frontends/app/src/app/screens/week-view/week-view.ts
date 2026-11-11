@@ -11,6 +11,7 @@ import { SheetMode } from '../day-detail/sheet-mode';
 import { recorderAvailable } from '../run-recorder/run-recorder-model';
 import { type DayCard, type Overlay, TITLE_W, type WeekDay, type WeekView as View, liveTitle, weekView } from './week-view-model';
 import { type StripClock, StripPlacer } from './week-strip';
+import { CARD_MS, POP, SHRINK, bezier, buttonCurves, playCard, popEase, popFrames, shrinkFrames } from './skip-motion';
 
 /** The window's frames and timers, for the strip's placer. */
 const CLOCK: StripClock = {
@@ -91,9 +92,11 @@ const BLANK: View = {
         }
       </div>
       @for (k of d.cards; track k.kind) {
-        <div [class]="'tw-card' + (k.first ? ' first' : ' second')" [attr.data-card]="k.kind">
+        <div [class]="'tw-card' + (k.first ? ' first' : ' second') + (k.skip ? ' has-skip' : '') + (k.skip && k.skip.on ? ' off' : '')" [attr.data-card]="k.kind">
+          @if (k.skip; as sk) {<button type="button" [class]="'tw-skip' + (sk.on ? ' on' : '')" [attr.aria-pressed]="sk.on" [attr.aria-label]="sk.on ? 'Skipped. Tap to bring it back' : sk.label" (click)="skip(k, $event)">@if (sk.on) {<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>}{{ sk.on ? 'Skipped' : sk.label }}</button>}
+          <div class="tw-lit">
           <div class="tw-head">
-            @if (!k.first) {<span class="tw-ico" aria-hidden="true">@if (k.kind === 'lift') {<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4M6 8v8M9 10v4M15 10v4M18 8v8M21 10v4M9 12h6"/></svg>} @else {<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4.5" r="1.8"/><path d="M8 21l3-6 3 3v-6l-4-2-3 3M14 12l3 2h3"/></svg>}</span>}
+            @if (!k.first) {<span class="tw-ico" aria-hidden="true">@if (k.kind === 'lift') {<svg [class]="'tw-dbl' + (k.skip && k.skip.on ? ' broken' : '')" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g class="tw-dbl-l"><path d="M3 10v4M6 8v8M9 10v4M9 12h3"/></g><g class="tw-dbl-r"><path d="M15 10v4M18 8v8M21 10v4M15 12h-3"/></g></svg>} @else {<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4.5" r="1.8"/><path d="M8 21l3-6 3 3v-6l-4-2-3 3M14 12l3 2h3"/></svg>}</span>}
             <span class="tw-label">{{ k.label }}</span>
           </div>
           <div class="tw-name">{{ k.title }}</div>
@@ -107,11 +110,12 @@ const BLANK: View = {
             </div>
           }
           @if (k.button; as bt) {
-            <button type="button" [class]="'tw-btn' + (bt.glow ? ' glow' : '')" (click)="tap(k, $event, d.cards[0]!.label, 'button')">
+            <button type="button" [class]="'tw-btn' + (bt.glow ? ' glow' : '') + (bt.sunk ? ' sunk' : '')" [disabled]="bt.sunk" [attr.aria-disabled]="bt.sunk || null" (click)="tap(k, $event, d.cards[0]!.label, 'button')">
               @if (bt.act === 'record') {<span class="tw-recdot" aria-hidden="true"></span>} @else if (bt.act === 'deck') {<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>}
               {{ bt.text }}
             </button>
           }
+          </div>
         </div>
       }
       @if (d.rest; as r) {
@@ -304,6 +308,58 @@ export class WeekView {
     } else this.record(k, card, when);
   }
 
+  // ── The Skip pill (D284 P-SKIPPILL) ──────────────────────────────────────────────────────────────────────────────
+  /** Pills still pressing, and each card's running motion, by week, day and part. */
+  private readonly skipBusy = new Set<string>();
+  private readonly skipRunning = new Map<string, Animation[]>();
+  private skipEnd: ReturnType<typeof setTimeout> | null = null;
+  /**
+   * A card's Skip pill: the press at its own speed (Pop), then the part skipped or put back (the legacy skipPart) and,
+   * from the same moment, the card going dark or coming back in slow motion, its button sinking or rising, and the
+   * lift card's dumbbell breaking or mending (skip-motion). The same pill undoes it, everything played backwards.
+   */
+  protected skip(k: DayCard, ev: Event): void {
+    const id = k.week + ':' + k.key + ':' + k.kind;
+    if (this.skipBusy.has(id)) return;
+    const pill = ev.currentTarget as HTMLElement | null;
+    const skipping = !(k.skip && k.skip.on);
+    const write = () => {
+      this.bridge.call('skipPart', k.week, k.key, k.kind);
+      this.render();
+    };
+    if (this.calm || !pill || typeof pill.animate !== 'function') {
+      write();
+      return;
+    }
+    this.skipBusy.add(id);
+    window.setTimeout(() => this.skipBusy.delete(id), POP.inMs + POP.outMs + 150);
+    const shrink = pill.animate(shrinkFrames(), { duration: POP.inMs, easing: bezier(SHRINK), fill: 'forwards' });
+    // The write runs on a timer, not on the shrink's end, so the part is written even when no frame is drawn.
+    window.setTimeout(() => {
+      const days = document.getElementById('daysList');
+      if (days) {
+        const c = buttonCurves(skipping);
+        days.style.setProperty('--skip-ms', CARD_MS + 'ms');
+        days.style.setProperty('--skip-move', c.move);
+        days.style.setProperty('--skip-ease', c.ease);
+        days.classList.add('skipping');
+        if (this.skipEnd) clearTimeout(this.skipEnd);
+        this.skipEnd = setTimeout(() => days.classList.remove('skipping'), CARD_MS + 50);
+      }
+      write();
+      shrink.cancel();
+      const card = pill.isConnected ? (pill.closest('.tw-card') as HTMLElement | null) : null;
+      if (!card) return;
+      pill.animate(popFrames(), { duration: POP.outMs, easing: popEase });
+      const css = getComputedStyle(document.documentElement);
+      const halves = Array.from(card.querySelectorAll('.tw-dbl-l, .tw-dbl-r'));
+      this.skipRunning.set(id, playCard({ card, lit: card.querySelector<HTMLElement>('.tw-lit'), halves }, skipping, this.skipRunning.get(id) || [], {
+        lit: css.getPropertyValue('--surface').trim(),
+        off: css.getPropertyValue('--card-off').trim(),
+      }));
+    }, POP.inMs);
+  }
+
   /** Record run: D267's recorder, grown out of the run card (D272 Amendment 2), the run's workout above the clock (D278). */
   private record(k: DayCard, card: HTMLElement | null, when: string): void {
     const prog = this.bridge.global('activeProg');
@@ -341,6 +397,7 @@ export class WeekView {
       prog, shown: this.shown(), picked: this.picks.get(this.shown()) ?? null, actualWeek, today, weekMon,
       completed: b.call('getCompleted'),
       logs: b.call('getLogs'),
+      parts: b.call('getPartSkips'),
       dayFull: b.global('DAY_FULL'),
       gps: this.gps,
     }, {

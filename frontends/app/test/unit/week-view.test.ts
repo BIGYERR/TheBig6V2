@@ -28,7 +28,7 @@ const deps = (over: Partial<WeekDeps> = {}): WeekDeps => ({
   ...over,
 });
 const input = (over: Partial<WeekInput> = {}): WeekInput => ({
-  prog: PROG, shown: 1, picked: null, actualWeek: 1, today: new Date(2026, 9, 7), weekMon: new Date(2026, 9, 5), completed: {}, logs: {}, dayFull: DAY_FULL, gps: false, ...over,
+  prog: PROG, shown: 1, picked: null, actualWeek: 1, today: new Date(2026, 9, 7), weekMon: new Date(2026, 9, 5), completed: {}, logs: {}, parts: {}, dayFull: DAY_FULL, gps: false, ...over,
 });
 const live = (c: Column) => (c.empty ? null : c);
 
@@ -103,7 +103,7 @@ describe('This Week', () => {
     const fri = new Date(2026, 9, 9);
     const v = weekView(input({ today: fri }), deps());
     assert.equal(v.days!.picked, 5);
-    assert.deepEqual(v.days!.cards, [{ kind: 'lift', week: 1, key: 'fri', first: true, label: 'Today · Friday', title: 'Push', meta: '~45 min', blurb: 'Push', button: { text: 'Start session', act: 'deck', glow: true }, done: null }]);
+    assert.deepEqual(v.days!.cards, [{ kind: 'lift', week: 1, key: 'fri', first: true, label: 'Today · Friday', title: 'Push', meta: '~45 min', blurb: 'Push', button: { text: 'Start session', act: 'deck', glow: true, sunk: false }, done: null, skip: { label: 'Skip lift', on: false } }]);
     const closed = weekView(input({ today: fri }), deps({ statusOf: () => 'complete' })).days!.cards[0]!;
     assert.deepEqual([closed.button, closed.done], [null, { title: 'Push', line: 'Closed out' }]);
     assert.equal(weekView(input({ today: fri }), deps({ isTravel: (day) => !!day && day.title === 'Push' })).days!.cards[0]!.meta, '~45 min · Travel');
@@ -130,7 +130,7 @@ describe('This Week', () => {
     const event = weekView(input({ prog: { ...strength, primaryPath: 'event' }, today, gps: true }), deps()).days!.cards;
     assert.deepEqual(event.map((k) => [k.kind, k.label]), [['run', 'Today · Friday'], ['lift', 'Then lift']]);
     const ride: WeekProgram = { ...PROG, weeks: { 1: { ...PROG.weeks[1]!, fri: { title: 'Ride', cardio: { type: 'bike', subtype: 'Sweet Spot (CHI)' } } } } };
-    assert.deepEqual(weekView(input({ prog: ride, today, gps: true }), deps()).days!.cards[0]!.button, { text: 'Log the ride', act: 'log', glow: true });
+    assert.deepEqual(weekView(input({ prog: ride, today, gps: true }), deps()).days!.cards[0]!.button, { text: 'Log the ride', act: 'log', glow: true, sunk: false });
   });
 
   it('counts the training days done and the miles over the seven days the strip shows, the week before\'s Sunday jog included, and the streak', () => {

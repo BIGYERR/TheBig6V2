@@ -63,6 +63,11 @@ function saveExWeightsFor(pid: any,obj: any){localStorage.setItem('ia_exw_'+pid,
 function saveLogs(l: any){localStorage.setItem('ia_logs_'+activeProgId,JSON.stringify(l));}
 function getCompleted(){try{return JSON.parse(localStorage.getItem('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
 function saveCompleted(c: any){localStorage.setItem('ia_comp_'+activeProgId,JSON.stringify(c));}
+// v0.261.0 (D284, P-SKIPPILL): the parts of a day skipped on their own (its run, its lift), keyed w<N>_<day> like
+// ia_comp_. Never in ia_comp_, where a record with no status reads as done, nor in the log, which persistLogFields
+// rebuilds from the form on every write.
+function getPartSkips(){try{return JSON.parse(localStorage.getItem('ia_parts_'+activeProgId)||'{}');}catch{return{};}}
+function savePartSkips(p: any){localStorage.setItem('ia_parts_'+activeProgId,JSON.stringify(p));}
 function getWildcardDone(): any[]{try{return JSON.parse(localStorage.getItem('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
 function saveWildcardDone(a: any){localStorage.setItem('ia_wild_'+activeProgId,JSON.stringify(a));}
 function logKey(w: any,d: any){return 'w'+w+'_'+d;}
@@ -167,6 +172,7 @@ function snapshotDay(week: any,dayKey: any){
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
   clearSetDraft, completedKey, esc, getActiveProgId, getCompleted, getDayHist, getDayHistFor, getExWeightsFor, getLogs,
-  getLogsFor, getPrograms, getWildcardDone, logKey, readSetDraft, resnapshotDayEdit, saveCompleted, saveExWeightsFor,
-  saveLogs, savePrograms, saveWildcardDone, setActiveProgId, snapshotDay, writeSetDraft,
+  getLogsFor, getPartSkips, getPrograms, getWildcardDone, logKey, readSetDraft, resnapshotDayEdit, saveCompleted,
+  saveExWeightsFor, saveLogs, savePartSkips, savePrograms, saveWildcardDone, setActiveProgId, snapshotDay,
+  writeSetDraft,
 };

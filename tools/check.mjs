@@ -197,14 +197,17 @@ async function buildLane() {
   await step('build', 'boots and builds HALF_MANNY, self-stable', process.execPath, ['tests/harness.js', 'dist-github-pages/index.html'], REPO);
 }
 
-/** A lane's node_modules: its own, or the main checkout's linked into a chat's worktree; false (and a failure) when neither. */
+/** A lane's node_modules: its own, or the main checkout's borrowed into a chat's worktree; false (and a failure) when neither. */
 function deps(lane, rel) {
   const r = linkDeps(REPO, rel);
   if (!r.ok) {
     failures.push(`${lane}: ${r.why}`);
     return false;
   }
-  if (r.linked) note(lane, `${rel}/node_modules linked from the main checkout (${r.linked})`);
+  if (r.linked) {
+    const own = r.own && r.own.length ? `; ${r.own.join(', ')} from this worktree` : '';
+    note(lane, `${rel}/node_modules borrowed from the main checkout (${r.linked})${own}`);
+  }
   return true;
 }
 

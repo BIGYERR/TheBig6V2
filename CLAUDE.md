@@ -165,9 +165,12 @@ issued D265 before the ruling was written, and it shipped as D266.
   `frontends/app/src/legacy/src/` into `dist-github-pages/`, its version meta, its inline script compiles, it boots and builds
   HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint, the production build with its budgets) and backend (type checks, tests, lint). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
-  slower belongs in CI. In a chat's worktree the check links the main checkout's `node_modules` of the app, the website
+  slower belongs in CI. In a chat's worktree the check borrows the main checkout's `node_modules` of the app, the website
   and the backend when this branch's lockfile is the main checkout's, and otherwise names the `npm ci` to run
-  (`tools/worktree-deps.mjs`, Post-v0.259.1).
+  (`tools/worktree-deps.mjs`, Post-v0.259.1); it installs the tests' own with `npm ci`. It borrows package by package,
+  and a package installed from a `file:` spec (the app's two plugins; the tests' `@ia/core` when a session borrows that
+  folder by hand) is the worktree's own copy (Post-v0.261.0: borrowed whole, a worktree read the main checkout's core
+  and plugins).
 - **The full suite runs in CI** (`.github/workflows/pipeline.yml`) on every push to `dev`, and again on the pull request
   into `main`: the unit and integration job (the build check, the harness boot, the type check, then Vitest over
   `tests/unit`, `tests/integration` and `tests/sweeps`), the app and backend tests and lint, the Docker e2e, and the native job (the app built for the iOS simulator on a
@@ -232,7 +235,7 @@ issued D265 before the ruling was written, and it shipped as D266.
     had them, links the main checkout's node_modules and copies the changed test files over, then `npx vitest run` or
     `node --test` on them there (Post-v0.260.0: assembled by hand, the copy took four tries): a test written for a changed
     behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
-    must not change. A new test file that cannot load on the previous release (it imports a module that release does not have) fails there before its first test, by construction: `git cat-file -e <previous>:<that module>` failing is its proof, the report names it so, and no run is needed. A new file that loads there is run as usual, and each of its tests must fail (Post-v0.257.0).
+    must not change. A new test file that cannot load on the previous release (it imports a module that release does not have) fails there before its first test, by construction: `git cat-file -e <previous>:<that module>` failing is its proof, the report names it so, and no run is needed. A new file that loads there is run as usual, and each of its tests must fail (Post-v0.257.0). A changed test file whose wiring also changed (it calls a function the previous release does not have) fails there whole, which proves nothing about its changed assertions: prove each changed assertion on the previous release's own tree as well (`tools/tree-at.mjs`), and name both runs in the report (Post-v0.261.0: `this-week-hero.test.ts` read `getPartSkips`).
   - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
   - reads every hunk of the diff on the page (`git diff` on the root copy; after the Pages switch, `tools/app-at.mjs` of
     both commits) and on `tests/snapshots/`, and classifies each against the ruling. A release meant to change no

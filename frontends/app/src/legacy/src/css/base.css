@@ -23,6 +23,8 @@
   --ink-rgb:17,17,17;--accent-rgb:17,17,17;--scrim-rgb:17,17,17;--shadow-rgb:0,0,0;--muted-rgb:110,110,106;--mark-rgb:119,119,115;
   --on-band-rgb:255,255,255;--signal-rgb:207,78,26;--on-signal-rgb:251,246,238;
   --run-rgb:94,140,84;--bike-rgb:63,110,150;--lift-rgb:188,106,67;--hip-rgb:126,94,150;--swim-rgb:63,110,150;--core-rgb:166,130,47;--red-rgb:158,51,40;
+  /* D284: a skipped card's ground, a shade darker than the card, and the inset shadow of its sunk button */
+  --card-off:#E4E4E0;--sink-a:0.16;
   /* D263: the Track look. The glow behind each tab screen's top, the floating tab bar, hairlines, and the four corners */
   --glow:rgba(var(--signal-rgb),0.26);--line:rgba(0,0,0,0.07);
   --nav:rgba(255,255,255,0.92);--nav-edge:rgba(0,0,0,0.06);--nav-on:rgba(0,0,0,0.06);
@@ -55,6 +57,7 @@ html,body{background:var(--bg) !important;color:var(--text) !important;font-fami
   --on-band-rgb:255,255,255;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
   --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
   --glow:rgba(var(--signal-rgb),0.64);--line:rgba(255,255,255,0.08);
+  --card-off:#090909;--sink-a:0.7;
   --nav:rgba(28,28,28,0.92);--nav-edge:rgba(255,255,255,0.08);--nav-on:rgba(255,255,255,0.10);
 }
 }
@@ -79,6 +82,7 @@ html,body{background:var(--bg) !important;color:var(--text) !important;font-fami
   --on-band-rgb:255,255,255;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
   --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
   --glow:rgba(var(--signal-rgb),0.64);--line:rgba(255,255,255,0.08);
+  --card-off:#090909;--sink-a:0.7;
   --nav:rgba(28,28,28,0.92);--nav-edge:rgba(255,255,255,0.08);--nav-on:rgba(255,255,255,0.10);
 }
 .screen{display:none;flex-direction:column;min-height:100vh;max-width:430px;margin:0 auto;background:var(--bg) !important;}

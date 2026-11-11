@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.260.0">
+<meta name="ia-version" content="0.261.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -38,6 +38,8 @@
   --on-band-rgb:255,255,255;--signal-rgb:207,78,26;--on-signal-rgb:251,246,238;
   --run-rgb:94,140,84;--bike-rgb:63,110,150;--lift-rgb:188,106,67;--hip-rgb:126,94,150;--swim-rgb:63,110,150;--core-rgb:166,130,47;--red-rgb:158,51,40;
   
+  --card-off:#E4E4E0;--sink-a:0.16;
+  
   --glow:rgba(var(--signal-rgb),0.26);--line:rgba(0,0,0,0.07);
   --nav:rgba(255,255,255,0.92);--nav-edge:rgba(0,0,0,0.06);--nav-on:rgba(0,0,0,0.06);
   --r-card:24px;--r-tile:16px;--r-field:12px;--r-pill:999px;
@@ -68,6 +70,7 @@ html,body{background:var(--bg) !important;color:var(--text) !important;font-fami
   --on-band-rgb:255,255,255;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
   --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
   --glow:rgba(var(--signal-rgb),0.64);--line:rgba(255,255,255,0.08);
+  --card-off:#090909;--sink-a:0.7;
   --nav:rgba(28,28,28,0.92);--nav-edge:rgba(255,255,255,0.08);--nav-on:rgba(255,255,255,0.10);
 }
 }
@@ -92,6 +95,7 @@ html,body{background:var(--bg) !important;color:var(--text) !important;font-fami
   --on-band-rgb:255,255,255;--signal-rgb:226,98,43;--on-signal-rgb:18,17,13;
   --run-rgb:134,178,122;--bike-rgb:127,166,201;--lift-rgb:217,138,99;--hip-rgb:171,140,196;--swim-rgb:127,166,201;--core-rgb:207,167,82;--red-rgb:217,102,90;
   --glow:rgba(var(--signal-rgb),0.64);--line:rgba(255,255,255,0.08);
+  --card-off:#090909;--sink-a:0.7;
   --nav:rgba(28,28,28,0.92);--nav-edge:rgba(255,255,255,0.08);--nav-on:rgba(255,255,255,0.10);
 }
 .screen{display:none;flex-direction:column;min-height:100vh;max-width:430px;margin:0 auto;background:var(--bg) !important;}
@@ -1421,6 +1425,11 @@ function saveExWeightsFor(pid,obj){localStorage.setItem('ia_exw_'+pid,JSON.strin
 function saveLogs(l){localStorage.setItem('ia_logs_'+activeProgId,JSON.stringify(l));}
 function getCompleted(){try{return JSON.parse(localStorage.getItem('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
 function saveCompleted(c){localStorage.setItem('ia_comp_'+activeProgId,JSON.stringify(c));}
+
+
+
+function getPartSkips(){try{return JSON.parse(localStorage.getItem('ia_parts_'+activeProgId)||'{}');}catch{return{};}}
+function savePartSkips(p){localStorage.setItem('ia_parts_'+activeProgId,JSON.stringify(p));}
 function getWildcardDone(){try{return JSON.parse(localStorage.getItem('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
 function saveWildcardDone(a){localStorage.setItem('ia_wild_'+activeProgId,JSON.stringify(a));}
 function logKey(w,d){return 'w'+w+'_'+d;}
@@ -15561,11 +15570,15 @@ function handleDayStatus(dayKey,title,status){
   
   
   
-  const _commit=statusOf(currentWeek,dayKey)!==status;
+  
+  
+  const _was=statusOf(currentWeek,dayKey);
+  const _commit=_was!==status;
   if(_commit) iaWheelFlush(document.getElementById('detailOverlay'));
+  clearPartSkips(currentWeek,dayKey);
   persistLogFields(dayKey,_commit);
   const c=getCompleted();const k=completedKey(currentWeek,dayKey);
-  const wasSame=!!c[k]&&statusOf(currentWeek,dayKey)===status;
+  const wasSame=_was===status;
   if(wasSame){
     delete c[k];
     saveCompleted(c);renderWeekView();
@@ -15702,6 +15715,80 @@ function persistLogFields(dayKey, commit){
   }
   saveLogs(logs);
   cardioLive(dayKey);   
+  settleParts(currentWeek,dayKey);   
+}
+
+
+
+
+
+
+
+
+function dayPartsOf(week,dayKey){
+  const day=activeProg&&activeProg.weeks&&activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
+  if(!day||day.rest) return [];
+  const parts=[];
+  if(day.cardio&&String(day.cardio.type||'')) parts.push('run');
+  if((day.sections||[]).some(function(s){ return !!s&&(s.items||[]).length>0; })) parts.push('lift');
+  return parts;
+}
+
+
+function partRunLogged(e,type){
+  if(!e) return false;
+  const sport=String(e.swapTo||type||'run').toLowerCase();
+  return (CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ const v=e[f]; return v!==undefined&&v!==null&&v!==''&&v!==0&&v!=='0'; });
+}
+function settleParts(week,dayKey){
+  const k=completedKey(week,dayKey);
+  const mine=getPartSkips()[k]||{};
+  const c=getCompleted(), rec=c[k];
+  if(rec&&!rec.parts) return;
+  const parts=dayPartsOf(week,dayKey);
+  const left=parts.filter(function(p){ return !mine[p]; });
+  let want=null;
+  if(left.length<parts.length){
+    if(!left.length) want='skipped';
+    else{
+      const day=activeProg.weeks[week][dayKey];
+      const e=getLogs()[logKey(week,dayKey)];
+      
+      if(left.every(function(p){ return p==='run'&&partRunLogged(e,day.cardio&&day.cardio.type); })) want='complete';
+    }
+  }
+  if(want){
+    if(!rec||rec.status!==want){
+      const day=activeProg.weeks[week][dayKey];
+      c[k]={title:(day&&day.title)||null,ts:Date.now(),status:want,parts:1};
+      saveCompleted(c);
+    }
+  }else if(rec){ delete c[k]; saveCompleted(c); }
+}
+
+
+function skipPart(week,dayKey,part){
+  const parts=dayPartsOf(week,dayKey);
+  if(parts.indexOf(part)<0) return;
+  snapshotDay(week,dayKey);
+  const k=completedKey(week,dayKey);
+  const all=getPartSkips();
+  const mine=Object.assign({},all[k]||{});
+  const c=getCompleted(), rec=c[k];
+  if(rec&&!rec.parts&&rec.status==='skipped'){
+    parts.forEach(function(p){ mine[p]=1; });
+    delete c[k]; saveCompleted(c);
+  }
+  if(mine[part]) delete mine[part]; else mine[part]=1;
+  if(Object.keys(mine).length) all[k]=mine; else delete all[k];
+  savePartSkips(all);
+  settleParts(week,dayKey);
+}
+
+function clearPartSkips(week,dayKey){
+  const all=getPartSkips(), k=completedKey(week,dayKey);
+  if(!all[k]) return;
+  delete all[k]; savePartSkips(all);
 }
 
 
@@ -17160,7 +17247,7 @@ function commitRename(id){
   _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
-function purgeProgData(id){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
+function purgeProgData(id){['ia_logs_','ia_comp_','ia_parts_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
 
 
 
@@ -19353,6 +19440,7 @@ function maybeShowReminder(){
 }
 function resolveReminder(week,dayKey,title,status){
   snapshotDay(week,dayKey);
+  clearPartSkips(week,dayKey);   
   const c=getCompleted(); c[completedKey(week,dayKey)]={title:title||null,ts:Date.now(),status}; saveCompleted(c);
   markReminded(week,dayKey);
   popClose();
