@@ -216,3 +216,84 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   only).
 - **Test:** `tests/unit/swipe-deck.test.ts`, the deck's stylesheet holds the summary's numbers whole and lets the words
   give way; it fails on v0.259.2.
+
+## D283 P-DECKFIT: every deck card fits on one screen (Mario, 2026-11-10)
+
+- **Date:** 2026-11-10. **Ruled by:** Mario, on the "Deck Card Fit" board (private to Mario:
+  https://claude.ai/artifact/Y9HWE4aRiyixywiwvyMwf9, Version 3; kept as `docs/design/swipe-deck/card-fit.html`), on the
+  main session's measures and recommendations. His calls: sets open "in place, others fold" (over the floating panel he
+  first asked for, which the board also built), text size "Auto", "Deck drops it" for a dash in a card title, "Keep
+  them" for the hyphens inside exercise names. **Bump:** MINOR, v0.260.0 (Mario). **Shipped:** not yet.
+- **Finding:** Mario's two screenshots of the Leg circuit card (2026-11-10): the words are too big, dashes read as machine
+  writing, labels repeat ("Round" over the title, "2 rounds" and "90 sec rest" as chips and again as a sentence, "8–12
+  each @ RPE 7" and then "Sets 2 × 10 /side as prescribed"), and the card scrolls. His phone is 402 × 874 pt (the
+  screenshot's card edges), so a deck card is 362 × 624 pt; on an SE (375 × 667) it is 335 × 479. The board redraws
+  today's card to within a few points of the screenshot (its Leg circuit hides 392 pt; the screenshot is scrolled about
+  400) and measures each card's overflow in a browser: today 1 of the 6 tallest plan cards fits on his phone, and the
+  worst hides 467 pt. Card shapes on v0.259.4 (`tests/measure/swipe-deck_day-shapes.js`, 891 programs, 61,893 training
+  days): no round or block holds more than three moves; the five-move cool down is the tallest card. Words on v0.259.4
+  (`tests/measure/swipe-deck_prescriptions.md`, the 864-config lattice): 250 distinct prescriptions, 190 with an em or en
+  dash; 157 section labels, 122 with " — ", of which only "Leg circuit — runner armor" and "Foot & ankle — mobility only"
+  title a card (a round or a block); the rest label a single lift and print as its kicker.
+- **What changes** (the deck only, on the iOS app's Angular screens):
+  1. **The card's head.** The number shrinks to 30 pt (its "/06" 13 pt). A round or block keeps one Skip all; a single
+     lift keeps swap and minus. The title is 24 pt. One meta line (14 pt) replaces the kicker, the chips and the round
+     sentence: a round "2 rounds · 90 sec rest after each" (60 sec past two rounds, as today); a block "Straight through ·
+     60 to 90 sec rest", with "Core · " ahead of it on a core block; a single lift its rest and "between sets" ("2 to 3
+     min rest between sets", "3 min rest between sets", "60 to 90 sec rest between sets"); the cool down "5 easy moves ·
+     about 14 min". A round or block title, and a kicker on the session map's tiles, is the label up to its first " — "
+     ("Leg circuit", "Foot & ankle"). The deck's own words write a range with "to", never an en dash.
+  2. **Each move.** Name 17 pt bold with swap and minus. One prescription line (15 pt): the set summary the set steppers
+     already rewrite as you change a set ("2 × 10 /side"; the board's "10 each side" is not built, because the summary is
+     the live one), then "· RPE 7" when the prescription names an RPE ("RPE 6 to 7" for a range), and a caret that opens
+     the sets. Any cue the prescription carries prints under it as short sentences (13 pt), by the rule in the table
+     below. The labels Sets, Load and "as prescribed" go; the weight box carries its unit; the last weight pill is one
+     line ("12 lbs · 5 days ago"); Log (44 pt) ends the weight row, or the prescription line on a move with no weight.
+     On the cool down the line is the prescription's dose with the × spaced ("2 × 45 sec each side", "~3 min" reads
+     "About 3 min") and its cue under it.
+  3. **Sets open in place and the others fold** (Mario's pick). Opening a move's sets folds every other move on the card
+     to one line: its name, its set summary and a check once logged. Tapping a folded move opens it and folds the one
+     that was open; tapping the caret again unfolds them all. Past four sets the pips stay (D275, board P).
+  4. **Auto size** (Mario's pick). Roomy on a screen 700 pt tall or more (his phone): title 24, move 17, line 15,
+     buttons 44, card padding 18, move padding 12. Tight below 700 pt (an SE): title 20, move 15, line 13, buttons 34,
+     card padding 12, move padding 7. A card of four or more moves opens with only its first unlogged move unfolded; no
+     program builds one today (measured above), so this guards the rule rather than changing a card anyone sees.
+  5. **The main lift's cue** loses its rest, which moves to the meta line: "Leave about three reps in reserve. Two or three
+     warmup sets first." The RPE info mark stays beside the RPE.
+- **The prescription line rule** (expected values, typed by hand; the RPE part, then the cue):
+
+  | Prescription | Line adds | Cue |
+  |---|---|---|
+  | `8–12 each @ RPE 7` | `· RPE 7` | none |
+  | `25 sec` | nothing | none |
+  | `2×6 each, slow` | nothing | `Slow.` |
+  | `3×40 yards each, heavy` | nothing | `Heavy.` |
+  | `2×5 each direction, each leg` | nothing | `Each direction, each leg.` |
+  | `2 sets — RPE 7 (leave 3 or more in reserve)` | `· RPE 7` | none |
+  | `2×8 — hold RPE 7, three in the tank` | `· RPE 7` | none |
+  | `2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form` | `· RPE 6 to 7` | `Focus on form.` |
+  | `3×10 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest` | `· RPE 5 to 6` | `Primer. Light and crisp, well short of failure.` |
+  | `5×10 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest` | `· RPE 6` | `Recovery.` |
+  | `3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest` | `· RPE 6 to 7` | `Learn the movement.` |
+  | `4×10 — fast and crisp, 60s rest` | nothing | `Fast and crisp.` |
+  | `2×45 sec each side — hip flexors; squeeze the trailing glute` (cool down) | dose `2 × 45 sec each side` | `Hip flexors. Squeeze the trailing glute.` |
+  | `~3 min — calves, quads, glutes; slow passes` (cool down) | dose `About 3 min` | `Calves, quads, glutes. Slow passes.` |
+
+  The rule: the dose (the leading sets and reps) is the summary's to say; the RPE phrase goes to the line; reserve
+  phrases, "three in the tank", warmup phrases and rest phrases are said elsewhere on the card and drop; what is left
+  becomes sentences, a dash, a semicolon or a parenthesis ending one. No line or cue of any prescription on the lattice
+  carries an em dash, an en dash, a semicolon, a parenthesis or a tilde.
+- **What does not change:** what any program prescribes (the engine's labels and prescriptions are untouched, so the
+  golden files and the HALF_MANNY digest do not move); the session sheet, which the same exercise cards draw as today;
+  exercise names, hyphens kept (Mario); the finish card's Call it apart from the head's sizes; the deck's opening motion,
+  swipes, dots and Done, next one; the page Pages serves (its version only).
+- **Fit target:** no card scrolls at rest or with any move's sets open, on 402 × 874 and on 375 × 667, in the busiest
+  state (a swapped move and a logged one). The board, Version 3: 75 pt to spare at the tightest card on his phone and 27
+  pt on an SE at rest; 88 and 45 pt with sets open; 51 and 3 pt in the busiest state.
+- **Tests:** `tests/unit/swipe-deck.test.ts` (the title up to the dash, the meta lines, the main cue, the table above,
+  the four move fold guard, the stylesheet's two sizes); `tests/sweeps/swipe-deck.test.ts` (every prescription on the
+  lattice gives a line and cue with none of the five marks); the app's `test/unit/deck.test.ts` and
+  `test/unit/session-sections.test.ts` (the card draws the meta line and no kicker or chips; the RPE and cue on a deck
+  card, nothing new on the sheet; opening a move's sets folds the others, a folded move opens on a tap). The fit is
+  proved on WebKit: the built app in the iOS simulator at both sizes, HALF_MANNY's longest days, each card's overflow
+  read before and after.

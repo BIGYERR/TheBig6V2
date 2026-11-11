@@ -1,0 +1,750 @@
+<title>Deck Card Fit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one board. A dashed controls strip, a fit table, a card picker, then phones at real point size (scaled to fit): all of them on a desktop, the picked one on a phone. Track look: paper and ink, signal orange. */
+:root{
+  --paper:#F3F3F1; --ink:#111111; --ink2:#6E6E6A; --line:#CFCFCA; --tile:#FFFFFF; --signal:#CF4E1A; --good:#2E7A4D; --bad:#B4321B; --bezel:#1B1B1B; --hi:rgba(207,78,26,0.10);
+  /* The app's own palettes for the phones (D261 tokens): night as on Mario's phone, and day. */
+  --n-bg:#000000; --n-text:#FFFFFF; --n-glow:rgba(226,98,43,0.42); --n-dot:#3C3C3C; --n-signal:#E2622B; --n-onsignal:#12110D; --n-band:#242424;
+  --n-lift:rgb(130,83,59); --n-hip:rgb(103,84,118); --n-core:rgb(124,100,49);
+  --d-bg:#F3F3F1; --d-text:#111111; --d-glow:rgba(207,78,26,0.16); --d-dot:#CFCFCA; --d-signal:#CF4E1A; --d-onsignal:#FBF6EE; --d-band:#111111;
+  --d-lift:rgb(141,80,50); --d-hip:rgb(95,71,113); --d-core:rgb(125,98,35);
+  --on:#FFFFFF; --on-a:255,255,255; --battery:#34C759;
+  --font:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  --display:'Helvetica Now Text','Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#000000; --ink:#FFFFFF; --ink2:#A3A3A3; --line:#333333; --tile:#141414; --signal:#E2622B; --good:#62C98B; --bad:#FF7F61; --bezel:#2C2C2C; --hi:rgba(226,98,43,0.16);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#000000; --ink:#FFFFFF; --ink2:#A3A3A3; --line:#333333; --tile:#141414; --signal:#E2622B; --good:#62C98B; --bad:#FF7F61; --bezel:#2C2C2C; --hi:rgba(226,98,43,0.16);
+  color-scheme:dark;
+}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1420px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:22px 48px;}
+h1{font:800 28px/1.1 var(--display);letter-spacing:-0.03em;margin:0;text-wrap:balance;}
+.lede{font-size:15px;line-height:1.45;color:var(--ink2);max-width:66ch;margin:8px 0 0;}
+
+/* Controls strip: not in the app. */
+.controls{margin-top:18px;border:1.5px dashed var(--line);border-radius:16px;padding:12px 14px 14px;display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-start;}
+.controls .tag{width:100%;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink2);}
+.grp{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.grp-l{font-size:12px;font-weight:700;color:var(--ink2);}
+.grp.off{opacity:0.38;pointer-events:none;}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--tile);border:1px solid var(--line);border-radius:22px;padding:3px;gap:2px;}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px/1 var(--font);padding:9px 13px;border-radius:999px;cursor:pointer;}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);}
+.seg button:focus-visible,.fit td button:focus-visible,.picker button:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+.nums{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums;max-width:36ch;line-height:1.35;}
+
+/* Fit table. */
+.fitbox{margin-top:18px;overflow-x:auto;}
+.fit{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;min-width:460px;}
+.fit th,.fit td{padding:0;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+.fit thead th{font-size:12px;font-weight:700;color:var(--ink2);padding:8px 12px;}
+.fit tbody th{font-weight:700;padding:10px 12px;white-space:nowrap;}
+.fit td button{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 12px;cursor:pointer;border-radius:10px;}
+.fit td button.cur{background:var(--hi);}
+.fit .v{font-weight:700;}
+.fit .v.ok{color:var(--good);} .fit .v.no{color:var(--bad);}
+.fit .s{display:block;font-size:12px;color:var(--ink2);margin-top:2px;}
+.fitnote{font-size:12px;color:var(--ink2);margin-top:8px;max-width:70ch;line-height:1.4;}
+
+/* Card picker (on a phone, one card shows at a time). */
+.picker{margin-top:20px;display:flex;flex-wrap:wrap;gap:6px;}
+.picker button{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--tile);color:var(--ink);font:600 13px/1 var(--font);padding:9px 12px;border-radius:999px;cursor:pointer;}
+.picker button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);}
+.picker i{width:8px;height:8px;border-radius:999px;background:var(--good);}
+.picker i.no{background:var(--bad);}
+@media (min-width:700px){.picker{display:none;}}
+
+/* Phones. */
+.rail{margin-top:16px;display:flex;flex-wrap:wrap;gap:24px;}
+.slot{flex:0 0 auto;display:flex;flex-direction:column;gap:10px;max-width:100%;}
+.slot-h{font-size:14px;line-height:1.35;max-width:330px;}
+@media (min-width:700px){.slot-h{min-height:calc(3 * 1.35em);}}
+.slot-h b{font-weight:700;}
+.slot-h span{color:var(--ink2);}
+.frame{position:relative;}
+.frame > .screen{position:absolute;transform-origin:top left;}
+.badge{align-self:flex-start;font:700 13px/1 var(--font);padding:8px 11px;border-radius:999px;background:var(--tile);border:1px solid var(--line);font-variant-numeric:tabular-nums;}
+.badge.ok{color:var(--good);} .badge.no{color:var(--bad);}
+.scale{font-size:12px;color:var(--ink2);margin-top:6px;}
+
+/* Notes. */
+.notes{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px 32px;}
+.notes h2{font:800 17px/1.2 var(--display);margin:0 0 8px;letter-spacing:-0.01em;}
+.notes ul{margin:0;padding-left:18px;font-size:14px;line-height:1.5;}
+.notes li{margin-bottom:6px;}
+.notes li:last-child{margin-bottom:0;}
+
+/* ---------- The phone. Every size below is in points, as on the iPhone. ---------- */
+.screen{--W:402px;--H:874px;--st:62px;--sb:34px;width:var(--W);height:var(--H);box-sizing:border-box;padding:max(12px, var(--st)) 0 max(14px, var(--sb));
+  display:flex;flex-direction:column;color:var(--p-text);border-radius:52px;box-shadow:0 0 0 7px var(--bezel);overflow:hidden;
+  background:radial-gradient(150% 455px at 50% -130px, var(--p-glow), transparent 68%) no-repeat, var(--p-bg);
+  font-family:var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;text-align:left;}
+.screen.se{border-radius:8px;}
+.screen.night{--p-bg:var(--n-bg);--p-text:var(--n-text);--p-glow:var(--n-glow);--p-dot:var(--n-dot);--p-signal:var(--n-signal);--p-onsignal:var(--n-onsignal);--p-band:var(--n-band);--t-lift:var(--n-lift);--t-hip:var(--n-hip);--t-core:var(--n-core);}
+.screen.day{--p-bg:var(--d-bg);--p-text:var(--d-text);--p-glow:var(--d-glow);--p-dot:var(--d-dot);--p-signal:var(--d-signal);--p-onsignal:var(--d-onsignal);--p-band:var(--d-band);--t-lift:var(--d-lift);--t-hip:var(--d-hip);--t-core:var(--d-core);}
+.screen button{font-family:var(--font);-webkit-tap-highlight-color:transparent;cursor:pointer;}
+.sbar{position:absolute;top:0;left:0;right:0;height:var(--st);display:flex;align-items:center;justify-content:space-between;padding:4px 34px 0 46px;box-sizing:border-box;font:600 17px/1 var(--font);}
+.se .sbar{padding:0 8px;font-size:12px;}
+.bat{width:26px;height:13px;border-radius:4px;background:var(--battery);}
+.se .bat{width:22px;height:10px;border-radius:3px;}
+.home{position:absolute;bottom:8px;left:50%;width:140px;height:5px;margin-left:-70px;border-radius:3px;background:var(--p-text);opacity:0.85;}
+.se .home{display:none;}
+.hd{display:flex;align-items:center;gap:4px;padding:4px 14px 2px 10px;flex-shrink:0;}
+.hd .ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hd .t{flex:1;min-width:0;font:800 24px/1.1 var(--font);letter-spacing:-0.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stage{position:relative;flex:1;min-height:0;margin:16px 20px 0;}
+.peek{position:absolute;inset:0;border-radius:24px;}
+.peek.p1{transform:translate(9px,7px) rotate(1.3deg) scale(0.975);opacity:0.92;}
+.peek.p2{transform:translate(15px,13px) rotate(2.4deg) scale(0.95);opacity:0.55;}
+.card{position:absolute;inset:0;border-radius:24px;color:var(--on);display:flex;flex-direction:column;overflow:hidden;background:var(--tone);
+  box-shadow:0 10px 28px rgba(0,0,0,0.16),0 2px 6px rgba(0,0,0,0.08);}
+.card.logged{box-shadow:0 0 0 3px var(--p-signal),0 14px 38px rgba(226,98,43,0.38);}
+.cbody{position:relative;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+.cbody::-webkit-scrollbar{display:none;}
+.dots{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 20px 0;flex-shrink:0;}
+.dot{width:8px;height:8px;border-radius:999px;background:var(--p-dot);}
+.dot.on{width:22px;background:var(--p-text);}
+.foot{padding:12px 20px 0;flex-shrink:0;}
+.cta{height:54px;border-radius:999px;background:var(--p-signal);color:var(--p-onsignal);font:700 17px/54px var(--font);letter-spacing:-0.01em;text-align:center;box-shadow:0 10px 28px rgba(226,98,43,0.42);}
+
+/* ---------- Before: today's card, redrawn from the screenshot (D275 deck.css and the session sheet's exercise card). ---------- */
+.B .cbody{padding:20px;}
+.B-band{flex-shrink:0;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.22);padding:11px 20px;font:700 14px/1.3 var(--font);}
+.B-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.B-num{font:800 64px/0.82 var(--display);letter-spacing:-0.06em;}
+.B-num span{font-size:23px;font-weight:600;color:rgba(var(--on-a),0.7);letter-spacing:-0.04em;}
+.B-side{display:flex;flex-direction:column;gap:8px;align-items:flex-end;padding-top:2px;}
+.B-chips{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
+.B-chip{font:600 12px/1.3 var(--font);background:rgba(var(--on-a),0.16);border-radius:999px;padding:4px 10px;white-space:nowrap;}
+.B-acts{display:flex;gap:6px;}
+.B-act{width:40px;height:40px;border-radius:999px;background:rgba(var(--on-a),0.16);display:flex;align-items:center;justify-content:center;}
+.B-all{width:auto;padding:0 13px;gap:6px;font:700 15px/1 var(--font);}
+.B-rule{height:1px;background:rgba(var(--on-a),0.22);margin:16px 0 12px;}
+.B-kick{font:600 13px/1.3 var(--font);color:rgba(var(--on-a),0.78);}
+.B-name{font:800 40px/0.98 var(--font);letter-spacing:-0.04em;padding-top:6px;overflow-wrap:anywhere;}
+.B-name.m{font-size:32px;} .B-name.s{font-size:28px;}
+.B-rx{display:flex;align-items:flex-start;gap:4px;padding-top:10px;font:600 17px/1.3 var(--font);}
+.B-i{display:inline-flex;margin-top:2px;color:rgba(var(--on-a),0.85);}
+.B-cue{padding-top:10px;font:400 14px/1.4 var(--font);color:rgba(var(--on-a),0.84);}
+.B-from{display:flex;align-items:center;gap:8px;margin-top:10px;padding:6px 6px 6px 12px;background:rgba(var(--on-a),0.16);border-radius:999px;font-size:12px;}
+.B-from span{flex:1;color:rgba(var(--on-a),0.78);}
+.B-from i{width:32px;height:32px;border-radius:999px;background:var(--on);color:var(--p-band);display:flex;align-items:center;justify-content:center;}
+.B-work{margin-top:16px;}
+.B-item{padding:12px 14px;margin-bottom:8px;}
+.B-lift .B-item{padding:0;}
+.B-nrow{display:flex;align-items:flex-start;gap:8px;}
+.B-ename{flex:1;min-width:0;font:400 17px/1.3 var(--font);}
+.B-pill{width:30px;height:21px;border-radius:999px;border:1px solid rgba(var(--on-a),0.26);background:rgba(var(--on-a),0.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:4px;}
+.B-badge{width:20px;flex-shrink:0;text-align:center;font-weight:700;}
+.B-detail{padding-top:8px;font:700 16px/1.3 var(--display);}
+.B-swch{margin-top:8px;padding:7px 10px;border-radius:10px;background:rgba(var(--on-a),0.12);font:400 13px/1.3 var(--font);}
+.B-swch u{text-decoration:underline;opacity:0.8;}
+.B-log{margin-top:11px;}
+.B-sh{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;min-height:44px;border:0;border-top:1px solid rgba(var(--on-a),0.14);background:none;color:var(--on);padding:9px 0;text-align:left;}
+.B-shl{font:600 13px/1 var(--font);color:rgba(var(--on-a),0.72);}
+.B-shv{font:700 21px/1.1 var(--display);white-space:nowrap;}
+.B-shs{font:600 13px/1 var(--font);color:rgba(var(--on-a),0.72);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.B-car{margin-left:auto;display:flex;opacity:0.72;}
+.B-pips{display:flex;gap:6px;padding:8px 0;}
+.B-pips span{min-width:34px;height:30px;border-radius:999px;background:rgba(var(--on-a),0.16);display:flex;align-items:center;justify-content:center;font:700 13px/1 var(--display);}
+.B-pips span.on{background:var(--on);color:var(--p-band);}
+.B-srow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(var(--on-a),0.14);}
+.B-sn{width:16px;font:700 11px/1 var(--font);color:rgba(var(--on-a),0.72);text-align:center;}
+.B-ctl{flex:1;display:flex;align-items:stretch;height:40px;border:1px solid rgba(var(--on-a),0.26);border-radius:12px;overflow:hidden;}
+.B-ctl b{width:38px;display:flex;align-items:center;justify-content:center;background:rgba(var(--on-a),0.16);font:700 21px/1 var(--display);}
+.B-ctl span{flex:1;display:flex;align-items:center;justify-content:center;font:700 18px/1 var(--display);}
+.B-swt{width:82px;height:40px;border:1px solid rgba(var(--on-a),0.26);border-radius:12px;}
+.B-w{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.B-wl{font:600 14px/1 var(--font);color:rgba(var(--on-a),0.72);}
+.B-win{width:82px;height:40px;box-sizing:border-box;border-radius:12px;border:1px solid rgba(var(--on-a),0.26);background:rgba(var(--on-a),0.10);display:flex;align-items:center;justify-content:center;font:700 20px/1 var(--display);}
+.B-wu{font:600 14px/1 var(--font);color:rgba(var(--on-a),0.72);}
+.B-reuse{margin-left:auto;display:inline-flex;align-items:center;gap:8px;min-height:37px;box-sizing:border-box;padding:5px 14px 5px 12px;border-radius:999px;border:1px solid rgba(var(--on-a),0.26);background:rgba(var(--on-a),0.16);}
+.B-reuse b{display:block;font:700 14px/1.15 var(--display);}
+.B-reuse i{display:block;font:600 12px/1.15 var(--font);font-style:normal;color:rgba(var(--on-a),0.78);}
+.B-logbtn{display:block;width:100%;min-height:41px;margin-top:12px;border:0;border-radius:999px;background:var(--on);color:var(--p-band);font:700 17px/1 var(--font);}
+.B-cool .B-log{margin-top:8px;}
+
+/* ---------- After: the proposal. Every size a token, set per density. ---------- */
+.d-roomy{--t-num:30px;--t-title:24px;--t-meta:14px;--t-name:17px;--t-rx:15px;--t-cue:13px;--ctl:44px;--ic:36px;--mic:32px;--pad:18px;--item:12px;--lw:92px;}
+.d-bal{--t-num:26px;--t-title:22px;--t-meta:13px;--t-name:16px;--t-rx:14px;--t-cue:13px;--ctl:40px;--ic:34px;--mic:30px;--pad:16px;--item:10px;--lw:86px;}
+.d-tight{--t-num:22px;--t-title:20px;--t-meta:13px;--t-name:15px;--t-rx:13px;--t-cue:12px;--ctl:34px;--ic:30px;--mic:26px;--pad:12px;--item:7px;--lw:76px;}
+.A .cbody{padding:var(--pad) var(--pad) calc(var(--pad) - 2px);}
+.A-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--ic);}
+.A-num{display:flex;align-items:baseline;font:800 var(--t-num)/1 var(--display);letter-spacing:-0.04em;}
+.A-num span{font-size:13px;font-weight:600;letter-spacing:0;color:rgba(var(--on-a),0.62);margin-left:1px;}
+.A-done{align-self:center;display:inline-flex;align-items:center;gap:5px;margin-left:10px;padding:6px 9px;border-radius:999px;background:rgba(var(--on-a),0.2);font:700 12px/1 var(--font);letter-spacing:0;}
+.A-acts{display:flex;gap:6px;}
+.A-ic{width:var(--ic);height:var(--ic);padding:0;border:0;border-radius:999px;background:rgba(var(--on-a),0.16);color:var(--on);display:flex;align-items:center;justify-content:center;}
+.A-skip{height:var(--ic);padding:0 13px;border:0;border-radius:999px;background:rgba(var(--on-a),0.16);color:var(--on);font:700 13px/1 var(--font);}
+.A-title{margin-top:10px;font:800 var(--t-title)/1.12 var(--font);letter-spacing:-0.025em;text-wrap:balance;}
+.A-meta{margin-top:4px;font:600 var(--t-meta)/1.3 var(--font);color:rgba(var(--on-a),0.76);}
+.A-rule{height:1px;background:rgba(var(--on-a),0.2);margin-top:12px;}
+.A-mv{padding-block:var(--item);border-bottom:1px solid rgba(var(--on-a),0.14);}
+.A-mv:last-child{border-bottom:0;padding-bottom:0;}
+.A-mrow{display:flex;align-items:center;gap:6px;}
+.A-mn{flex:1;min-width:0;font:700 var(--t-name)/1.22 var(--font);letter-spacing:-0.01em;}
+.A-mic{width:var(--mic);height:var(--mic);padding:0;border:0;border-radius:999px;background:rgba(var(--on-a),0.14);color:var(--on);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.A-sw{display:flex;align-items:center;gap:6px;margin-top:2px;font:600 12px/1.3 var(--font);color:rgba(var(--on-a),0.76);}
+.A-swu{width:22px;height:22px;padding:0;border:0;border-radius:999px;background:rgba(var(--on-a),0.18);color:var(--on);display:flex;align-items:center;justify-content:center;}
+.A-rxline{display:flex;align-items:center;gap:6px;margin-top:3px;}
+.A-rxrow{display:flex;align-items:center;gap:8px;margin-top:3px;}
+.A-rxb{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 10px 0 0;border:0;background:none;color:var(--on);font:700 var(--t-rx)/1.25 var(--display);text-align:left;min-width:0;}
+.A-rxb .rpe{font-weight:600;color:rgba(var(--on-a),0.76);}
+.A-car{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:rgba(var(--on-a),0.16);flex-shrink:0;transition:transform 180ms ease;}
+.A-rxb.open .A-car{transform:rotate(180deg);background:var(--on);color:var(--p-band);}
+.A-info{display:inline-flex;padding:0;border:0;background:none;color:rgba(var(--on-a),0.85);}
+.A-cue{margin-top:4px;font:500 var(--t-cue)/1.35 var(--font);color:rgba(var(--on-a),0.8);}
+.A-lrow{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.A-load{display:flex;align-items:center;gap:4px;flex-shrink:0;width:var(--lw);height:var(--ctl);box-sizing:border-box;padding:0 10px;border-radius:12px;border:1px solid rgba(var(--on-a),0.26);background:rgba(var(--on-a),0.10);}
+.A-load input{width:100%;min-width:0;padding:0;border:0;background:none;color:var(--on);font:700 17px/1 var(--display);outline:none;}
+.A-load span{font:600 12px/1 var(--font);color:rgba(var(--on-a),0.7);}
+.A-load:focus-within{border-color:rgba(var(--on-a),0.7);}
+.A-reuse{display:inline-flex;align-items:center;gap:5px;flex:0 1 auto;min-width:0;height:calc(var(--ctl) - 6px);padding:0 10px;border:0;border-radius:999px;background:rgba(var(--on-a),0.16);color:var(--on);font:600 12px/1 var(--font);white-space:nowrap;overflow:hidden;}
+.A-reuse b{font-weight:700;flex-shrink:0;}
+.A-reuse span{color:rgba(var(--on-a),0.76);overflow:hidden;text-overflow:ellipsis;}
+.A-reuse svg{flex-shrink:0;}
+.A-log{margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;gap:5px;height:var(--ctl);min-width:64px;padding:0 16px;box-sizing:border-box;border:0;border-radius:999px;background:var(--on);color:var(--p-band);font:700 15px/1 var(--font);}
+.A-log.done{background:rgba(var(--on-a),0.2);color:var(--on);padding:0 13px;}
+.A-cool{display:flex;align-items:center;gap:10px;}
+.A-cool .txt{flex:1;min-width:0;}
+.A-crx{margin-top:2px;font:700 var(--t-rx)/1.25 var(--display);}
+.A-ccue{margin-top:1px;font:500 var(--t-cue)/1.3 var(--font);color:rgba(var(--on-a),0.76);}
+
+/* The set editor, riding on top of the card (Mario's idea). Its fill is see-through by the preset; the moves under it blur. */
+.A-scrim{position:absolute;inset:0;z-index:4;border:0;padding:0;background:rgba(0,0,0,var(--pop-dim,0.12));}
+.A-pop{position:absolute;left:10px;right:10px;z-index:5;border-radius:18px;padding:6px 12px 8px;
+  -webkit-backdrop-filter:blur(var(--pop-blur,10px));backdrop-filter:blur(var(--pop-blur,10px));
+  box-shadow:0 18px 40px rgba(0,0,0,0.42),0 2px 8px rgba(0,0,0,0.22),inset 0 0 0 1px rgba(var(--on-a),0.18);}
+.A-pop::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(rgba(0,0,0,0.30),rgba(0,0,0,0.30)),var(--tone);opacity:var(--pop-op,0.88);}
+.A-pop > *{position:relative;}
+.A-pop .notch{position:absolute;width:14px;height:14px;transform:rotate(45deg);left:var(--nx,40px);}
+.A-pop .notch::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,0.30),rgba(0,0,0,0.30)),var(--tone);opacity:var(--pop-op,0.88);}
+.A-pop[data-dir="down"] .notch{top:-6px;}
+.A-pop[data-dir="up"] .notch{bottom:-6px;}
+.A-srow{display:flex;align-items:center;gap:10px;padding:5px 0;}
+.A-srow + .A-srow{border-top:1px solid rgba(var(--on-a),0.12);}
+.A-sn{width:42px;flex-shrink:0;font:600 13px/1 var(--font);color:rgba(var(--on-a),0.78);}
+.A-step{display:flex;align-items:center;height:var(--ctl);border-radius:12px;background:rgba(var(--on-a),0.12);overflow:hidden;flex-shrink:0;}
+.A-step button{width:40px;height:100%;padding:0;border:0;background:rgba(var(--on-a),0.12);color:var(--on);font:700 19px/1 var(--display);}
+.A-step span{min-width:58px;text-align:center;font:700 16px/1 var(--display);}
+.A-srow .A-load{margin-left:auto;}
+.A-pips{display:flex;gap:6px;padding:6px 0 2px;}
+.A-pips button{min-width:36px;height:30px;padding:0;border:0;border-radius:999px;background:rgba(var(--on-a),0.16);color:var(--on);font:700 13px/1 var(--display);}
+.A-pips button.on{background:var(--on);color:var(--p-band);}
+.A-pfoot{display:flex;justify-content:flex-end;margin-top:2px;padding-top:8px;border-top:1px solid rgba(var(--on-a),0.12);}
+
+/* The other option: the move opens in place and the others fold to one line. */
+.A-fold{display:flex;align-items:center;gap:8px;width:100%;border:0;border-bottom:1px solid rgba(var(--on-a),0.14);background:none;color:var(--on);padding-block:calc(var(--item) - 2px);padding-inline:0;text-align:left;}
+.A-fold:last-child{border-bottom:0;}
+.A-fold .A-mn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.A-fsum{font:600 13px/1 var(--font);color:rgba(var(--on-a),0.72);white-space:nowrap;}
+.A-fchk{width:22px;height:22px;border-radius:999px;background:rgba(var(--on-a),0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.A-inrows{margin-top:6px;padding:2px 10px;border-radius:14px;background:rgba(0,0,0,0.16);}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important;}}
+</style>
+
+<main class="wrap">
+  <h1>Deck cards, one screen each</h1>
+  <p class="lede">Your picks: sets open in place and the other moves fold, and Auto text size. The longest cards in your plan at your phone's real size. Before is today's build, redrawn from your screenshot. Tap the small arrow by any prescription to open its sets. The badge under each phone measures the card. Weights and dates are examples.</p>
+
+  <section class="controls" aria-label="Mockup controls">
+    <div class="tag">Mockup controls · not in the app</div>
+    <div class="grp"><span class="grp-l">Card</span>
+      <div class="seg" id="segView"><button type="button" data-v="before">Before</button><button type="button" data-v="after">After</button></div></div>
+    <div class="grp"><span class="grp-l">Phone</span>
+      <div class="seg" id="segSize"><button type="button" data-v="pro">Yours 402 × 874</button><button type="button" data-v="se">SE 375 × 667</button></div></div>
+    <div class="grp"><span class="grp-l">Busiest state</span>
+      <div class="seg" id="segBusy"><button type="button" data-v="off">Off</button><button type="button" data-v="on">A swap and a log</button></div></div>
+    <div class="grp"><span class="grp-l">Phone theme</span>
+      <div class="seg" id="segTheme"><button type="button" data-v="night">Night</button><button type="button" data-v="day">Day</button></div></div>
+  </section>
+
+  <div class="fitbox"><table class="fit" id="fit" aria-label="Cards that fit without scrolling"></table></div>
+  <p class="fitnote">Measured on today's build: across 891 programs and 61,893 training days, no round or block holds more than three moves. The five-move cool down is the tallest card a program makes. The five-move Wildcard round is here as a stress test; Wildcards open on their own screen today, not in the deck.</p>
+
+  <div class="picker" id="picker" role="group" aria-label="Pick a card"></div>
+  <section class="rail" id="rail" aria-label="Cards"></section>
+  <div class="scale" id="scaleNote"></div>
+
+  <section class="notes">
+    <div>
+      <h2>What the After card changes</h2>
+      <ul>
+        <li>One line under the title gives the rounds or sets and the rest. The label above the title (Round, Prehab, Main, Core, After the run), the two chips and the sentence that repeated them are gone.</li>
+        <li>Each move gets one prescription line, "10 each side · RPE 7". Today it says it twice: "8–12 each @ RPE 7", then "Sets 2 × 10 /side as prescribed".</li>
+        <li>The labels Sets, Load and "as prescribed" are gone. The weight box carries lbs.</li>
+        <li>Log sits at the end of the weight row, not a full width bar under every move.</li>
+        <li>Opening a move's sets never makes the card scroll: the other moves fold to make room. The table's last row measures every move of every card opened.</li>
+        <li>No dashes in what you read. "Leg circuit — runner armor" reads "Leg circuit". Ranges read "60 to 90 sec".</li>
+      </ul>
+    </div>
+    <div>
+      <h2>What you picked</h2>
+      <ul>
+        <li><b>In place, others fold.</b> The move you tap opens where it is and the other moves shrink to one line each. Tap a folded move to open it instead. Tap the arrow again to close.</li>
+        <li>Past four sets a move shows one set at a time behind numbered buttons, as the app does today, so a five set move still fits.</li>
+        <li><b>Auto</b> is Roomy text. A card of four or more moves (only Wildcards have one) keeps the move you are on open and folds the rest to one line; tap one to open it. A short phone like the SE steps down to Tight.</li>
+      </ul>
+    </div>
+  </section>
+  <div id="probe" aria-hidden="true" style="position:absolute;left:-99999px;top:0;visibility:hidden;"></div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+  var svg = function (d, s, w) { return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; };
+  var IC = {
+    back: function (s) { return svg('<polyline points="15 5 8 12 15 19"/>', s, 2.4); },
+    grid: function (s) { return svg('<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>', s, 2); },
+    swap: function (s) { return svg('<path d="M4 8h15"/><path d="M15 4l4 4-4 4"/><path d="M20 16H5"/><path d="M9 12l-4 4 4 4"/>', s, 2); },
+    minus: function (s) { return svg('<line x1="5" y1="12" x2="19" y2="12"/>', s, 2.5); },
+    info: function (s) { return svg('<circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.6" fill="currentColor"/>', s, 2); },
+    caret: function (s) { return svg('<polyline points="6 9 12 15 18 9"/>', s, 2.6); },
+    check: function (s) { return svg('<polyline points="20 6 9 17 4 12"/>', s, 3); },
+    undo: function (s) { return svg('<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>', s, 2.4); },
+    reuse: function (s) { return svg('<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><polyline points="3.5 4 3.5 9 8.5 9"/>', s, 2.2); }
+  };
+
+  // The cards. Before strings are today's, word for word (deck-model.ts and the engine). After strings are the proposal.
+  var LEG_B = { kick: 'Round', title: 'Leg circuit — runner armor', rx: '2 rounds, no rest inside · 90 sec between rounds', chips: ['2 rounds', '90 sec rest'] };
+  var LEG_A = { title: 'Leg circuit', meta: '2 rounds · 90 sec rest after each' };
+  var DATA = [
+    { id: 'leg', label: 'Leg circuit', short: 'Leg circuit', note: 'your card, a round of three', day: 'Leg Strength + Mobility', n: 2, of: 6, tone: 'lift', next: 'hip', kind: 'round', b: LEG_B, a: LEG_A,
+      moves: [
+        { name: 'Goblet side lunge to knee drive', bd: '8–12 each @ RPE 7', bs: '2 × 10 /side', ar: '10 each side', rpe: 'RPE 7', reps: 10, n: 2, loaded: true, last: 12, ago: '5 days ago' },
+        { name: 'Wall sit', bd: '25 sec', bs: '2 × 25 sec', ar: '25 sec', reps: 25, suf: ' sec', n: 2, loaded: false },
+        { name: 'Kettlebell single-leg deadlift', bd: '6–10 @ RPE 7', bs: '2 × 8', ar: '8 reps', rpe: 'RPE 7', reps: 8, n: 2, loaded: true, last: 15, ago: '5 days ago', swapFor: 'Barbell Romanian deadlift' }
+      ] },
+    { id: 'hip', label: 'Hip stability', short: 'Hip stability', note: 'a block of three: two glute drills and one mobility piece, every time', day: 'Leg Strength + Mobility', n: 4, of: 6, tone: 'hip', next: 'lift', kind: 'block',
+      b: { kick: 'Prehab', title: 'Hip stability', rx: 'One block, straight through', chips: ['2 sets', '60–90 sec rest'] },
+      a: { title: 'Hip stability', meta: 'Straight through · 60 to 90 sec rest' },
+      moves: [
+        { name: 'Seated banded hip flexion', bd: '2×15 each', bs: '2 × 15 /side', ar: '2 × 15 each side', reps: 15, n: 2, loaded: false },
+        { name: 'Hip airplane (light KB)', bd: '2×6 each, slow', bs: '2 × 6 /side', ar: '2 × 6 each side', rpe: 'slow', reps: 6, n: 2, loaded: false, swapFor: 'Banded clamshell' },
+        { name: 'Hip 90/90 stretch', bd: '2×45 sec each', bs: '2 × 45 sec /side', ar: '2 × 45 sec each side', reps: 45, suf: ' sec', n: 2, loaded: false }
+      ] },
+    { id: 'worst', label: 'Leg circuit, plan version', short: 'Worst round', note: 'the tallest round a program makes: three moves, each with a weight', day: 'Leg Strength + Mobility', n: 2, of: 9, tone: 'lift', next: 'lift', kind: 'round', b: LEG_B, a: LEG_A,
+      moves: [
+        { name: 'Dumbbell Bulgarian split squat', bd: '8–12 each @ RPE 7', bs: '2 × 10 /side', ar: '10 each side', rpe: 'RPE 7', reps: 10, n: 2, loaded: true, last: 30, ago: '8 days ago' },
+        { name: 'Spanish squat hold (KB)', bd: '25 sec', bs: '2 × 25 sec', ar: '25 sec', reps: 25, suf: ' sec', n: 2, loaded: true, last: 35, ago: '8 days ago' },
+        { name: 'Barbell Romanian deadlift', bd: '6–10 @ RPE 7', bs: '2 × 8', ar: '8 reps', rpe: 'RPE 7', reps: 8, n: 2, loaded: true, last: 95, ago: '8 days ago', swapFor: 'Trap bar deadlift' }
+      ] },
+    { id: 'cool', label: 'Stretch and roll', short: 'Stretch and roll', note: 'the cool down, five moves, the tallest card a program makes', day: 'Leg Strength + Mobility', n: 6, of: 6, tone: 'hip', next: null, kind: 'cool',
+      b: { kick: 'After the run', title: 'Stretch and roll', rx: 'Five easy moves, about 14 minutes. Take your time.', chips: [] },
+      a: { title: 'Stretch and roll', meta: '5 easy moves · about 14 min' },
+      moves: [
+        { name: 'Standing calf stretch', bd: '2×45 sec each side — knee straight, then bent', ar: '2 × 45 sec each side', cue: 'Knee straight, then bent.' },
+        { name: 'Couch stretch', bd: '2×45 sec each side — hip flexors; squeeze the trailing glute', ar: '2 × 45 sec each side', cue: 'Hip flexors. Squeeze the back glute.' },
+        { name: 'Hip 90/90 stretch', bd: '2×45 sec each side', ar: '2 × 45 sec each side' },
+        { name: 'T-spine mobility', bd: '2×45 sec — thread the needle, reach long', ar: '2 × 45 sec', cue: 'Thread the needle. Reach long.' },
+        { name: 'Foam roll', bd: '~3 min — calves, quads, glutes; slow passes', ar: 'About 3 min', cue: 'Calves, quads, glutes. Slow passes.' }
+      ] },
+    { id: 'main', label: 'Front squat', short: 'Front squat', note: 'the main lift', day: 'Leg Strength + Mobility', n: 1, of: 6, tone: 'lift', next: 'lift', kind: 'lift',
+      b: { kick: 'Main', title: 'Front squat', rx: '3×12 — RPE 6.5', info: true, chips: ['3 sets', '2–3 min rest'],
+        cue: 'Leave about three to four reps in reserve. Ramp up with two or three warmup sets. Two to three minutes rest.' },
+      a: { title: 'Front squat', meta: '2 to 3 min rest between sets', cue: 'Leave three or four reps in reserve. Two or three warmup sets first.' },
+      moves: [{ name: 'Front squat', bs: '3 × 12', ar: '3 × 12', rpe: 'RPE 6.5', info: true, reps: 12, n: 3, loaded: true, last: 135, ago: '7 days ago', swapFor: 'Back squat' }] },
+    { id: 'core', label: 'Anti-rotation', short: 'Core block', note: 'a core block', day: 'Strength Support', n: 5, of: 6, tone: 'core', next: 'lift', kind: 'block',
+      b: { kick: 'Core', title: 'Anti-Rotation', rx: 'One block, straight through', chips: ['3 sets', '60–90 sec rest'] },
+      a: { title: 'Anti-rotation', meta: 'Core · straight through · 60 to 90 sec rest' },
+      moves: [
+        { name: 'Suitcase carry', bd: '3×40 yd each', bs: '3 × 40 yd /side', ar: '3 × 40 yd each side', reps: 40, suf: ' yd', n: 3, loaded: true, last: 53, ago: '6 days ago' },
+        { name: 'Bird dogs', bd: '3×12 each', bs: '3 × 12 /side', ar: '3 × 12 each side', reps: 12, n: 3, loaded: false, swapFor: 'Dead bugs' }
+      ] },
+    { id: 'wild', label: 'Barbell Circuit', short: 'Wildcard, 5 moves', note: 'a Wildcard round of five lifts, the stress test. Wildcards do not open in the deck today', day: 'Barbell Circuit', n: 1, of: 2, tone: 'lift', next: null, kind: 'round',
+      b: { kick: 'Round', title: '5 rounds 90s rest — same weight', rx: '5 rounds, no rest inside · 60 sec between rounds', chips: ['5 rounds', '60 sec rest'] },
+      a: { title: 'Barbell circuit', meta: '5 rounds · 90 sec rest after each · one weight throughout' },
+      moves: [
+        { name: 'Deadlift', bd: '8 reps', bs: '5 × 8', ar: '8 reps', reps: 8, n: 5, loaded: true, last: 135, ago: '3 weeks ago' },
+        { name: 'Barbell row', bd: '8 reps', bs: '5 × 8', ar: '8 reps', reps: 8, n: 5, loaded: true, last: 95, ago: '3 weeks ago' },
+        { name: 'Barbell bench press', bd: '8 reps', bs: '5 × 8', ar: '8 reps', reps: 8, n: 5, loaded: true, last: 115, ago: '3 weeks ago' },
+        { name: 'Barbell overhead press', bd: '8 reps', bs: '5 × 8', ar: '8 reps', reps: 8, n: 5, loaded: true, last: 75, ago: '3 weeks ago' },
+        { name: 'Back squat', bd: '8 reps', bs: '5 × 8', ar: '8 reps', reps: 8, n: 5, loaded: true, last: 135, ago: '3 weeks ago', swapFor: 'Front squat' }
+      ] }
+  ];
+  var SIZES = { pro: { W: 402, H: 874, st: 62, sb: 34, name: 'Your phone', dims: '402 × 874' }, se: { W: 375, H: 667, st: 20, sb: 0, name: 'iPhone SE', dims: '375 × 667' } };
+  var DENS = {
+    auto: { name: 'Auto', nums: 'Roomy. A card of 4 or more moves folds all but the move you are on. Tight on a short phone.' },
+    roomy: { name: 'Roomy', nums: 'Title 24 · move 17 · line 15 · buttons 44 pt' },
+    bal: { name: 'Balanced', nums: 'Title 22 · move 16 · line 14 · buttons 40 pt' },
+    tight: { name: 'Tight', nums: 'Title 20 · move 15 · line 13 · buttons 34 pt' }
+  };
+  var OPS = {
+    solid: { op: 1, blur: 0, dim: 0.22, nums: 'Fill 100% · no blur · card behind dimmed 22%' },
+    frost: { op: 0.88, blur: 10, dim: 0.12, nums: 'Fill 88% · blur 10 · card behind dimmed 12%' },
+    glass: { op: 0.72, blur: 16, dim: 0.06, nums: 'Fill 72% · blur 16 · card behind dimmed 6%' }
+  };
+  var TONE = { lift: 'var(--t-lift)', hip: 'var(--t-hip)', core: 'var(--t-core)' };
+
+  var state = { view: 'after', ed: 'fold', op: 'frost', dens: 'auto', size: 'pro', busy: false, theme: 'night', pick: 'leg' };
+  try { var saved = JSON.parse(localStorage.getItem('deckfit3') || 'null'); if (saved) { ['view', 'size', 'busy', 'theme', 'pick'].forEach(function (k) { if (k in saved) state[k] = saved[k]; }); } } catch (e) { /* storage off: defaults */ }
+  var UI = {};
+  var freshUi = function () { return { log: {}, loads: {}, open: {}, pop: null, fold: null, cur: null, reps: {}, pip: {} }; };
+  DATA.forEach(function (c) { UI[c.id] = freshUi(); });
+  UI.leg.fold = 0; // open on the first card, so the page shows the picked editor
+
+  function densFor(c, o) {
+    if (o.dens !== 'auto') return o.dens;
+    return o.size === 'se' ? 'tight' : 'roomy';
+  }
+  // Which move is open while the others fold to one line: the one tapped in the fold option, or, on a card of four or
+  // more moves under Auto, the move you are on (the first not logged). Null: every move shows in full.
+  function openIdx(c, o, ui) {
+    if (o.ed === 'fold' && ui.fold !== null) return ui.fold;
+    if (o.dens === 'auto' && c.kind !== 'cool' && c.moves.length >= 4) {
+      if (ui.cur !== null) return ui.cur;
+      for (var k = 0; k < c.moves.length; k++) if (!isLogged(c, k, o.busy, ui)) return k;
+      return 0;
+    }
+    return null;
+  }
+  function isLogged(c, i, busy, ui) {
+    if (i in ui.log) return ui.log[i];
+    return busy && (i === 0 || (c.kind === 'cool' && i === 1));
+  }
+  function repsOf(m, i, ui) { return ui.reps[i] || Array.apply(null, Array(m.n || 0)).map(function () { return m.reps; }); }
+  function rxText(m, i, ui) {
+    var r = ui.reps[i];
+    if (!r || r.every(function (x) { return x === m.reps; })) return m.ar;
+    return r.join(', ') + (m.suf || '') + (/each side/.test(m.ar) ? ' each side' : '');
+  }
+
+  // ---------- Before ----------
+  function beforeCard(c, busy, ui) {
+    var lift = c.kind === 'lift';
+    var cardLogged = lift && isLogged(c, 0, busy, ui);
+    var h = '<section class="card' + (cardLogged ? ' logged' : '') + '" style="--tone:' + TONE[c.tone] + '">';
+    if (cardLogged) h += '<div class="B-band">' + IC.check(16) + 'Logged</div>';
+    h += '<div class="cbody"><div class="cin">';
+    var chips = c.b.chips.map(function (x) { return '<span class="B-chip">' + esc(x) + '</span>'; }).join('');
+    var acts = lift ? '<span class="B-act">' + IC.swap(17) + '</span><span class="B-act">' + IC.minus(16) + '</span>'
+      : c.kind !== 'cool' ? '<span class="B-act B-all">' + IC.minus(14) + 'All</span>' : '';
+    h += '<div class="B-top"><div class="B-num">' + pad2(c.n) + '<span>/' + pad2(c.of) + '</span></div><div class="B-side">'
+      + (chips ? '<div class="B-chips">' + chips + '</div>' : '') + (acts ? '<div class="B-acts">' + acts + '</div>' : '') + '</div></div>';
+    var t = c.b.title;
+    h += '<div class="B-rule"></div><div class="B-kick">' + esc(c.b.kick) + '</div>'
+      + '<div class="B-name' + (t.length > 26 ? ' s' : t.length > 16 ? ' m' : '') + '">' + esc(t) + '</div>'
+      + '<div class="B-rx"><span>' + esc(c.b.rx) + '</span>' + (c.b.info ? '<span class="B-i">' + IC.info(16) + '</span>' : '') + '</div>';
+    if (c.b.cue) h += '<div class="B-cue">' + esc(c.b.cue) + '</div>';
+    if (lift && busy && c.moves[0].swapFor) h += '<div class="B-from"><b>Swapped in</b><span>for ' + esc(c.moves[0].swapFor) + '</span><i>' + IC.undo(15) + '</i></div>';
+    h += '<div class="B-work B-' + c.kind + '">' + c.moves.map(function (m, i) { return beforeItem(c, m, i, busy, ui); }).join('') + '</div>';
+    return h + '</div></div></section>';
+  }
+  function beforeItem(c, m, i, busy, ui) {
+    var lift = c.kind === 'lift', cool = c.kind === 'cool', lg = isLogged(c, i, busy, ui);
+    var h = '<div class="B-item">';
+    if (!lift) {
+      h += '<div class="B-nrow"><span class="B-ename">' + esc(m.name) + '</span>'
+        + (cool ? '' : '<span class="B-pill">' + IC.swap(14) + '</span><span class="B-pill">' + IC.minus(14) + '</span>')
+        + '<span class="B-badge">' + (lg ? '✓' : '') + '</span></div>'
+        + '<div class="B-detail">' + esc(m.bd) + '</div>';
+      if (busy && m.swapFor) h += '<div class="B-swch"><b>Swapped in</b> for ' + esc(m.swapFor) + ' · <u>put it back</u></div>';
+    }
+    h += '<div class="B-log">';
+    if (!cool) {
+      var open = !!ui.open[i];
+      h += '<button type="button" class="B-sh" data-act="drawer" data-i="' + i + '"><span class="B-shl">Sets</span><span class="B-shv">' + esc(m.bs)
+        + '</span><span class="B-shs">as prescribed</span><span class="B-car"' + (open ? ' style="transform:rotate(180deg)"' : '') + '>' + IC.caret(20) + '</span></button>';
+      if (open) {
+        var reps = repsOf(m, i, ui), pip = reps.length > 4;
+        if (pip) h += '<div class="B-pips">' + reps.map(function (r, s) { return '<span' + (s === 0 ? ' class="on"' : '') + '>' + (s + 1) + '</span>'; }).join('') + '</div>';
+        h += '<div class="B-rows">' + (pip ? reps.slice(0, 1) : reps).map(function (r, s) {
+          return '<div class="B-srow"><span class="B-sn">' + (s + 1) + '</span><span class="B-ctl"><b>−</b><span>' + r + (m.suf || '') + '</span><b>+</b></span>' + (m.loaded ? '<span class="B-swt"></span>' : '') + '</div>';
+        }).join('') + '</div>';
+      }
+      if (m.loaded) h += '<div class="B-w"><span class="B-wl">Load</span><span class="B-win">' + (lg ? (m.last || '') : '') + '</span><span class="B-wu">lbs</span>'
+        + (m.last ? '<span class="B-reuse">' + IC.reuse(16) + '<span><b>' + m.last + ' lbs</b><i>' + esc(m.ago) + '</i></span></span>' : '') + '</div>';
+    }
+    return h + '<button type="button" class="B-logbtn" data-act="log" data-i="' + i + '">Log</button></div></div>';
+  }
+
+  // ---------- After ----------
+  function logBtn(lg, i) {
+    return '<button type="button" class="A-log' + (lg ? ' done' : '') + '" data-act="log" data-i="' + i + '">' + (lg ? IC.check(13) + 'Logged' : 'Log') + '</button>';
+  }
+  function swappedLine(m) {
+    return '<div class="A-sw">Swapped in for ' + esc(m.swapFor) + '<button type="button" class="A-swu" aria-label="Put it back">' + IC.undo(12) + '</button></div>';
+  }
+  function editOpen(o, ui, i) { return o.ed === 'float' ? ui.pop === i : ui.fold === i; }
+  function rxButton(m, i, ui, o) {
+    var open = editOpen(o, ui, i);
+    return '<button type="button" class="A-rxb' + (open ? ' open' : '') + '" data-act="edit" data-i="' + i + '" data-anchor="' + i + '" aria-expanded="' + open + '" aria-label="Sets for ' + esc(m.name) + '"><span>' + esc(rxText(m, i, ui)) + '</span>'
+      + (m.rpe ? '<span class="rpe">· ' + esc(m.rpe) + '</span>' : '') + '<span class="A-car">' + IC.caret(13) + '</span></button>';
+  }
+  function setRows(m, i, ui) {
+    var all = repsOf(m, i, ui), pip = all.length > 4, at = ui.pip[i] || 0;
+    var strip = pip ? '<div class="A-pips">' + all.map(function (r, s) { return '<button type="button" class="' + (s === at ? 'on' : '') + '" data-act="pip" data-i="' + i + '" data-s="' + s + '" aria-label="Set ' + (s + 1) + '">' + (s + 1) + '</button>'; }).join('') + '</div>' : '';
+    return strip + all.map(function (r, s) {
+      if (pip && s !== at) return '';
+      return '<div class="A-srow"><span class="A-sn">Set ' + (s + 1) + '</span><span class="A-step"><button type="button" data-act="step" data-i="' + i + '" data-s="' + s + '" data-d="-1" aria-label="Fewer">−</button><span>' + r + (m.suf || '') + '</span><button type="button" data-act="step" data-i="' + i + '" data-s="' + s + '" data-d="1" aria-label="More">+</button></span>'
+        + (m.loaded ? '<label class="A-load"><input inputmode="decimal" data-i="' + i + '" value="' + esc((i in ui.loads) ? ui.loads[i] : '') + '" aria-label="Set ' + (s + 1) + ' load"><span>lbs</span></label>' : '') + '</div>';
+    }).join('');
+  }
+  function loadRow(c, m, i, busy, ui) {
+    var lg = isLogged(c, i, busy, ui);
+    var val = (i in ui.loads) ? ui.loads[i] : (lg ? (m.last || '') : '');
+    return '<div class="A-lrow"><label class="A-load"><input inputmode="decimal" data-i="' + i + '" value="' + esc(val) + '" aria-label="Load in pounds"><span>lbs</span></label>'
+      + (m.last && !lg ? '<button type="button" class="A-reuse" data-act="reuse" data-i="' + i + '">' + IC.reuse(13) + '<b>' + m.last + ' lbs</b><span>· ' + esc(m.ago) + '</span></button>' : '')
+      + logBtn(lg, i) + '</div>';
+  }
+  function afterMove(c, m, i, o, ui) {
+    var lg = isLogged(c, i, o.busy, ui);
+    if (c.kind === 'cool') {
+      return '<div class="A-mv A-cool"><div class="txt"><div class="A-mn">' + esc(m.name) + '</div><div class="A-crx">' + esc(m.ar) + '</div>'
+        + (m.cue ? '<div class="A-ccue">' + esc(m.cue) + '</div>' : '') + '</div>' + logBtn(lg, i) + '</div>';
+    }
+    var oi = openIdx(c, o, ui);
+    if (oi !== null && oi !== i) {
+      return '<button type="button" class="A-fold" data-act="' + (o.ed === 'fold' ? 'edit' : 'focus') + '" data-i="' + i + '"><span class="A-mn">' + esc(m.name) + '</span><span class="A-fsum">' + esc(rxText(m, i, ui)) + '</span>'
+        + (lg ? '<span class="A-fchk">' + IC.check(12) + '</span>' : '') + '</button>';
+    }
+    var h = '<div class="A-mv"><div class="A-mrow"><div class="A-mn">' + esc(m.name) + '</div>'
+      + '<button type="button" class="A-mic" aria-label="Swap ' + esc(m.name) + '">' + IC.swap(14) + '</button>'
+      + '<button type="button" class="A-mic" aria-label="Skip ' + esc(m.name) + '">' + IC.minus(14) + '</button></div>';
+    if (o.busy && m.swapFor) h += swappedLine(m);
+    var inrows = o.ed === 'fold' && ui.fold === i ? '<div class="A-inrows">' + setRows(m, i, ui) + '</div>' : '';
+    if (m.loaded) h += '<div class="A-rxline">' + rxButton(m, i, ui, o) + '</div>' + inrows + loadRow(c, m, i, o.busy, ui);
+    else h += '<div class="A-rxrow">' + rxButton(m, i, ui, o) + logBtn(lg, i) + '</div>' + inrows;
+    return h + '</div>';
+  }
+  function afterCard(c, o, ui) {
+    var lift = c.kind === 'lift';
+    var cardLogged = lift && isLogged(c, 0, o.busy, ui);
+    var P = OPS[o.op];
+    var h = '<section class="card' + (cardLogged ? ' logged' : '') + '" style="--tone:' + TONE[c.tone] + ';--pop-op:' + P.op + ';--pop-blur:' + P.blur + 'px;--pop-dim:' + P.dim + '"><div class="cbody"><div class="cin">';
+    var acts = lift ? '<button type="button" class="A-ic" aria-label="Swap this lift">' + IC.swap(16) + '</button><button type="button" class="A-ic" aria-label="Skip this lift">' + IC.minus(15) + '</button>'
+      : c.kind !== 'cool' ? '<button type="button" class="A-skip">Skip all</button>' : '';
+    h += '<div class="A-top"><div class="A-num">' + pad2(c.n) + '<span>/' + pad2(c.of) + '</span>' + (cardLogged ? '<span class="A-done">' + IC.check(11) + 'Logged</span>' : '') + '</div>'
+      + (acts ? '<div class="A-acts">' + acts + '</div>' : '') + '</div>'
+      + '<div class="A-title">' + esc(c.a.title) + '</div><div class="A-meta">' + esc(c.a.meta) + '</div><div class="A-rule"></div>';
+    if (lift) {
+      var m = c.moves[0];
+      h += '<div class="A-mv">';
+      if (o.busy && m.swapFor) h += swappedLine(m);
+      h += '<div class="A-rxline">' + rxButton(m, 0, ui, o) + (m.info ? '<button type="button" class="A-info" aria-label="What RPE means">' + IC.info(16) + '</button>' : '') + '</div>'
+        + (o.ed === 'fold' && ui.fold === 0 ? '<div class="A-inrows">' + setRows(m, 0, ui) + '</div>' : '')
+        + '<div class="A-cue">' + esc(c.a.cue) + '</div>' + loadRow(c, m, 0, o.busy, ui) + '</div>';
+    } else {
+      h += c.moves.map(function (m, i) { return afterMove(c, m, i, o, ui); }).join('');
+    }
+    h += '</div></div>';
+    if (o.ed === 'float' && ui.pop !== null) {
+      var pm = c.moves[ui.pop];
+      h += '<button type="button" class="A-scrim" data-act="close" aria-label="Close the sets"></button>'
+        + '<div class="A-pop" data-pop="' + ui.pop + '" role="dialog" aria-label="Sets for ' + esc(pm.name) + '" style="top:0"><span class="notch" aria-hidden="true"></span>' + setRows(pm, ui.pop, ui)
+          + '<div class="A-pfoot"><button type="button" class="A-log" data-act="poplog" data-i="' + ui.pop + '">Log</button></div></div>';
+    }
+    return h + '</section>';
+  }
+
+  // ---------- Phone ----------
+  function phone(c, o, ui) {
+    var S = SIZES[o.size], before = o.view === 'before';
+    var dots = '';
+    for (var k = 0; k < c.of; k++) dots += '<i class="dot' + (k === c.n - 1 ? ' on' : '') + '"></i>';
+    var peeks = c.next ? '<div class="peek p2" style="background:' + TONE[c.next] + '"></div><div class="peek p1" style="background:' + TONE[c.next] + '"></div>' : '';
+    return '<div class="screen ' + o.size + ' ' + o.theme + ' ' + (before ? 'B' : 'A d-' + densFor(c, o)) + '" data-card="' + c.id + '" style="--W:' + S.W + 'px;--H:' + S.H + 'px;--st:' + S.st + 'px;--sb:' + S.sb + 'px">'
+      + '<div class="sbar"><span>22:11</span><span class="bat"></span></div>'
+      + '<div class="hd"><span class="ib">' + IC.back(22) + '</span><span class="t">' + esc(c.day) + '</span><span class="ib">' + IC.grid(20) + '</span></div>'
+      + '<div class="stage">' + peeks + (before ? beforeCard(c, o.busy, ui) : afterCard(c, o, ui)) + '</div>'
+      + '<div class="dots">' + dots + '</div><div class="foot"><div class="cta">Done, next one</div></div><i class="home"></i></div>';
+  }
+  // Place the floating sets under the arrow that opened them, or above it when the card has no room below.
+  function offsetIn(el, root) { var y = 0; while (el && el !== root) { y += el.offsetTop; el = el.offsetParent; } return y; }
+  function placePops(root) {
+    Array.prototype.forEach.call(root.querySelectorAll('.A-pop'), function (pop) {
+      var card = pop.closest('.card'), body = card.querySelector('.cbody');
+      var a = card.querySelector('[data-anchor="' + pop.dataset.pop + '"]');
+      if (!a) return;
+      var top = offsetIn(a, card) - body.scrollTop, bottom = top + a.offsetHeight, h = pop.offsetHeight, ch = card.clientHeight;
+      var car = a.querySelector('.A-car');
+      var nx = car ? offsetLeftIn(car, card) + car.offsetWidth / 2 - 10 - 7 : 40;
+      pop.style.setProperty('--nx', Math.max(14, nx) + 'px');
+      if (bottom + 8 + h <= ch - 10) { pop.style.top = (bottom + 8) + 'px'; pop.dataset.dir = 'down'; }
+      else { pop.style.top = Math.max(10, top - 8 - h) + 'px'; pop.dataset.dir = 'up'; }
+    });
+  }
+  function offsetLeftIn(el, root) { var x = 0; while (el && el !== root) { x += el.offsetLeft; el = el.offsetParent; } return x; }
+  // Points of card content that do not fit: above zero, the card scrolls (or the floating sets spill) by that much.
+  function overflow(screen) {
+    var body = screen.querySelector('.cbody'), cin = body.firstElementChild, cs = getComputedStyle(body);
+    var over = Math.round(cin.offsetHeight + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) - body.clientHeight);
+    var pop = screen.querySelector('.A-pop');
+    if (pop) {
+      var ch = pop.closest('.card').clientHeight, t = parseFloat(pop.style.top) || 0;
+      over = Math.max(over, Math.round(t + pop.offsetHeight - ch), Math.round(-t));
+    }
+    return over;
+  }
+  function badgeText(over, open) {
+    var tail = open ? ' · sets open' : '';
+    return over > 0 ? { cls: 'no', t: 'Scrolls · ' + over + ' pt hidden' + tail } : { cls: 'ok', t: 'No scroll · ' + (-over) + ' pt to spare' + tail };
+  }
+
+  // ---------- Fit table: every card measured in every combination, at rest ----------
+  var probe = document.getElementById('probe');
+  var MODES = [['before', null, 'Before, today'], ['after', 'auto', 'After'], ['open', 'auto', 'After, sets open']];
+  var restOvers = {};
+  // With o.view 'open', each card is measured with every move opened in turn, and its worst case kept.
+  function measureSet(o) {
+    if (o.view === 'open') {
+      var oa = Object.assign({}, o, { view: 'after' });
+      return DATA.map(function (c) {
+        if (c.kind === 'cool') return measureOne(c, oa, freshUi());
+        return Math.max.apply(null, c.moves.map(function (m, i) { var u = freshUi(); u.fold = i; return measureOne(c, oa, u); }));
+      });
+    }
+    probe.innerHTML = DATA.map(function (c) { return phone(c, o, freshUi()); }).join('');
+    var r = Array.prototype.map.call(probe.querySelectorAll('.screen'), overflow);
+    probe.innerHTML = '';
+    return r;
+  }
+  function measureOne(c, o, u) {
+    probe.innerHTML = phone(c, o, u);
+    var r = overflow(probe.querySelector('.screen'));
+    probe.innerHTML = '';
+    return r;
+  }
+  function renderFit() {
+    var head = '<thead><tr><th></th>' + Object.keys(SIZES).map(function (k) { return '<th>' + SIZES[k].name + ' · ' + SIZES[k].dims + '</th>'; }).join('') + '</tr></thead>';
+    var rows = MODES.map(function (md) {
+      var cells = Object.keys(SIZES).map(function (sz) {
+        var o = { view: md[0], dens: md[1] || 'auto', size: sz, busy: state.busy, theme: state.theme, ed: state.ed, op: state.op };
+        var overs = measureSet(o);
+        var real = overs.slice(0, 6), wild = overs[6];
+        var fit = real.filter(function (x) { return x <= 0; }).length;
+        var worst = Math.max.apply(null, real);
+        var sub = (worst > 0 ? 'Worst card hides ' + worst + ' pt' : 'Tightest card has ' + (-worst) + ' pt to spare') + '. Wildcard round: ' + (wild > 0 ? 'hides ' + wild + ' pt' : 'fits');
+        var cur = state.view === (md[0] === 'open' ? 'after' : md[0]) && state.size === sz;
+        return '<td><button type="button" class="' + (cur ? 'cur' : '') + '" data-mode="' + md[0] + '" data-dens="' + (md[1] || '') + '" data-size="' + sz + '"><span class="v ' + (fit === real.length ? 'ok' : 'no') + '">'
+          + fit + ' of ' + real.length + ' plan cards fit</span><span class="s">' + sub + '</span></button></td>';
+      }).join('');
+      return '<tr><th scope="row">' + md[2] + '</th>' + cells + '</tr>';
+    }).join('');
+    document.getElementById('fit').innerHTML = head + '<tbody>' + rows + '</tbody>';
+  }
+  function renderPicker() {
+    var overs = measureSet(state);
+    DATA.forEach(function (c, k) { restOvers[c.id] = overs[k]; });
+    document.getElementById('picker').innerHTML = DATA.map(function (c) {
+      return '<button type="button" data-pick="' + c.id + '" aria-pressed="' + (state.pick === c.id) + '"><i class="' + (restOvers[c.id] > 0 ? 'no' : '') + '"></i>' + esc(c.short) + '</button>';
+    }).join('');
+  }
+
+  // ---------- Phones ----------
+  var rail = document.getElementById('rail');
+  var narrow = function () { return window.innerWidth < 700; };
+  function scaleFor() {
+    var S = SIZES[state.size];
+    return narrow() ? Math.min(1, (rail.clientWidth - 2) / (S.W + 14)) : 0.8;
+  }
+  function slotHtml(c, s) {
+    var S = SIZES[state.size];
+    return '<div class="slot-h"><b>' + esc(c.label) + '</b> <span>· ' + esc(c.note) + '</span></div>'
+      + '<div class="frame" style="width:' + ((S.W + 14) * s).toFixed(1) + 'px;height:' + ((S.H + 14) * s).toFixed(1) + 'px">'
+      + phone(c, state, UI[c.id]).replace('style="--W', 'style="left:' + (7 * s).toFixed(2) + 'px;top:' + (7 * s).toFixed(2) + 'px;transform:scale(' + s.toFixed(4) + ');--W')
+      + '</div><span class="badge"></span>';
+  }
+  function measureSlot(slot) {
+    placePops(slot);
+    var ui = UI[slot.dataset.slot];
+    var open = state.view === 'after' && (state.ed === 'float' ? ui.pop !== null : ui.fold !== null);
+    var b = badgeText(overflow(slot.querySelector('.screen')), open);
+    var el = slot.querySelector('.badge');
+    el.className = 'badge ' + b.cls; el.textContent = b.t;
+  }
+  function renderRail() {
+    var s = scaleFor();
+    var list = narrow() ? DATA.filter(function (c) { return c.id === state.pick; }) : DATA;
+    rail.innerHTML = list.map(function (c) { return '<div class="slot" data-slot="' + c.id + '">' + slotHtml(c, s) + '</div>'; }).join('');
+    Array.prototype.forEach.call(rail.querySelectorAll('.slot'), measureSlot);
+    document.getElementById('scaleNote').textContent = 'Phones shown at ' + Math.round(s * 100) + '% of real size. The measure is taken at full size.' + (narrow() ? ' Pick a card above to see the others.' : '');
+  }
+  function renderOne(id) {
+    var slot = rail.querySelector('[data-slot="' + id + '"]');
+    if (!slot) return;
+    var c = DATA.filter(function (x) { return x.id === id; })[0];
+    slot.innerHTML = slotHtml(c, scaleFor());
+    measureSlot(slot);
+  }
+  function syncControls() {
+    [['segView', 'view'], ['segSize', 'size'], ['segTheme', 'theme']].forEach(function (p) {
+      Array.prototype.forEach.call(document.getElementById(p[0]).querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === state[p[1]])); });
+    });
+    Array.prototype.forEach.call(document.getElementById('segBusy').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String((b.dataset.v === 'on') === state.busy)); });
+  }
+  function markFit() {
+    Array.prototype.forEach.call(document.querySelectorAll('#fit td button'), function (b) {
+      var cur = state.view === (b.dataset.mode === 'open' ? 'after' : b.dataset.mode) && state.size === b.dataset.size;
+      b.classList.toggle('cur', cur);
+    });
+  }
+  function renderAll(refit) {
+    try { localStorage.setItem('deckfit3', JSON.stringify(state)); } catch (e) { /* storage off */ }
+    syncControls();
+    if (refit) renderFit(); else markFit();
+    renderPicker();
+    renderRail();
+  }
+
+  function bindSeg(id, key, refit, map) {
+    document.getElementById(id).addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      state[key] = map ? map(b.dataset.v) : b.dataset.v;
+      if (key === 'ed') DATA.forEach(function (c) { UI[c.id].pop = null; UI[c.id].fold = null; });
+      renderAll(refit);
+    });
+  }
+  bindSeg('segView', 'view', false);
+  bindSeg('segSize', 'size', false);
+  bindSeg('segBusy', 'busy', true, function (v) { return v === 'on'; });
+  bindSeg('segTheme', 'theme', false);
+  document.getElementById('fit').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    state.view = b.dataset.mode === 'open' ? 'after' : b.dataset.mode; state.size = b.dataset.size;
+    renderAll(false);
+  });
+  document.getElementById('picker').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-pick]'); if (!b) return;
+    state.pick = b.dataset.pick;
+    renderAll(false);
+  });
+
+  // Taps on the phones.
+  rail.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var scr = b.closest('.screen'); if (!scr) return;
+    var c = DATA.filter(function (x) { return x.id === scr.dataset.card; })[0], ui = UI[c.id];
+    var i = +b.dataset.i, act = b.dataset.act;
+    if (act === 'log') ui.log[i] = !isLogged(c, i, state.busy, ui);
+    else if (act === 'reuse') ui.loads[i] = String(c.moves[i].last);
+    else if (act === 'drawer') ui.open[i] = !ui.open[i];
+    else if (act === 'edit') { if (state.ed === 'float') ui.pop = ui.pop === i ? null : i; else ui.fold = ui.fold === i ? null : i; }
+    else if (act === 'close') ui.pop = null;
+    else if (act === 'poplog') { ui.log[i] = true; ui.pop = null; }
+    else if (act === 'pip') { ui.pip[i] = +b.dataset.s; }
+    else if (act === 'focus') { ui.cur = i; ui.pop = null; }
+    else if (act === 'step') {
+      var m = c.moves[i], r = repsOf(m, i, ui).slice(), s = +b.dataset.s, step = m.suf === ' sec' ? 5 : m.suf === ' yd' ? 10 : 1;
+      r[s] = Math.max(step, r[s] + (+b.dataset.d) * step); ui.reps[i] = r;
+    }
+    renderOne(c.id);
+  });
+  rail.addEventListener('input', function (e) {
+    var inp = e.target; if (!inp.matches('input[data-i]')) return;
+    var scr = inp.closest('.screen'); UI[scr.dataset.card].loads[+inp.dataset.i] = inp.value;
+  });
+  var rt = null;
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(renderRail, 150); });
+
+  renderAll(true);
+})();
+</script>
