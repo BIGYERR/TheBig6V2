@@ -41,7 +41,8 @@ Each phase starts only on Mario's GO, one phase step per session.
   "a day's parts settle its status" puts that write in the records, and its break is red (14 in all, 2 open).
 - **Done, the fourth lift slice (v0.261.5):** the day history (`ia_hist_`) lives in
   `core/src/engine/state-day-history.ts`: one reader, one writer, the first touch's snapshot and the re-snapshot an
-  edit makes. The page's five functions are thin callers. Every golden record identical. Not narrowed. The freeze's
+  edit makes. The page's five functions are thin callers; one of them, `saveDayHist`, has no caller left and goes with the next
+  slice, under the rule written after this one (phase 1, step 3). Every golden record identical. Not narrowed. The freeze's
   own reads of the key and the purge wait for the freeze slice.
   - **The open break is settled: no tap can make it matter.** The guard (a day's first snapshot is never
     overwritten) decides only when a day is snapshotted again after it changed, and that does not happen: a launch
@@ -218,7 +219,9 @@ Mario's order is kept. Three changes, each with its reason:
    set logging rules; `swaps-edits.ts`; `overlays.ts` (`applyOverlays` only, its sheet stays); `data-backup.ts`
    (snapshot, read, load); `progress-data.ts` and `day-status.ts`; and last `program-manage.ts` (`refreshProgram` and
    the freeze), **after 2026-12-06.** Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
-   a thin caller, and it ships as the next PATCH (the migration bump policy, Mario 2026-10-12).
+   a thin caller, and it ships as the next PATCH (the migration bump policy, Mario 2026-10-12). A page function a move
+   leaves with no caller (legacy, Angular through the bridge, tests) is deleted with the move, not kept as a caller of
+   nothing (Mario, Post-v0.261.5).
 
 **Exit gate:** every golden record reproduced byte for byte by the lifted code, under V8 in CI. The 59 direct storage
 calls down to the one browser implementation. Every re-pointed test green and red on its named break (section 3.4).
