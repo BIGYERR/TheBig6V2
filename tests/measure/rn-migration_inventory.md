@@ -6,9 +6,9 @@ Written by `tests/measure/rn-migration_inventory.mjs`. Static counts over the wo
 
 | Area | Files | Lines | Size | In the move |
 |---|---|---|---|---|
-| The engine (`core/src/engine`) | 20 | 8965 | 671 KB | stays, unchanged |
+| The engine (`core/src/engine`) | 22 | 9204 | 687 KB | stays, unchanged |
 | The rest of core (`core/src`: domain, format, gps, semver, version) | 14 | 1438 | 58 KB | stays |
-| The legacy script (`frontends/app/src/legacy/src/js`) | 25 | 10332 | 691 KB | its logic lifts into core (phase 1); its screens are rewritten |
+| The legacy script (`frontends/app/src/legacy/src/js`) | 25 | 10223 | 685 KB | its logic lifts into core (phase 1); its screens are rewritten |
 | The legacy CSS (`.../legacy/src/css`) | 10 | 1115 | 105 KB | becomes React Native styles; the Track tokens carry over |
 | The legacy HTML (`.../legacy/src/html`) | 5 | 382 | 22 KB | rewritten as components |
 | The Angular app (`frontends/app/src/app`), TypeScript | 87 | 11759 | 583 KB | screens rewritten; pure models reused |
@@ -67,13 +67,13 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 | Key | Files that name it |
 |---|---|
 | `ia_active` | program-manage.ts, storage.ts |
-| `ia_comp_` | program-manage.ts, storage.ts |
+| `ia_comp_` | program-manage.ts, state-day-status.ts |
 | `ia_edits_` | program-manage.ts, swaps-edits.ts |
 | `ia_exw_` | program-manage.ts, state-lift-log.ts |
 | `ia_hist_` | program-manage.ts, storage.ts |
-| `ia_logs_` | program-manage.ts, storage.ts |
+| `ia_logs_` | program-manage.ts, state-day-log.ts |
 | `ia_moves_` | program-manage.ts, rest-day-shell.ts |
-| `ia_parts_` | program-manage.ts, storage.ts |
+| `ia_parts_` | program-manage.ts, state-day-status.ts |
 | `ia_pop_` | popups-streaks-reminders.ts, program-manage.ts |
 | `ia_programs` | data-backup.ts, storage.ts |
 | `ia_remind_` | popups-streaks-reminders.ts, program-manage.ts |
@@ -90,14 +90,14 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 
 | Suite | Runner | Files | Tests | Assertions | Lines |
 |---|---|---|---|---|---|
-| tests/unit | Vitest | 24 | 280 | 840 | 3777 |
+| tests/unit | Vitest | 24 | 299 | 930 | 4029 |
 | tests/integration | Vitest | 64 | 1098 | 3830 | 18410 |
 | tests/sweeps | Vitest (CI only) | 31 | 214 | 733 | 3371 |
 | tests/e2e | Docker, Puppeteer | 9 | 0 | 0 | 3248 |
 | frontends/app/test/unit | node:test | 41 | 323 | 980 | 4009 |
 | frontends/app/test/integration | node:test | 8 | 58 | 149 | 988 |
 | backend/test | node:test | 11 | 86 | 312 | 1401 |
-| **Total, without the e2e** |  | **179** | **2059** | **6844** |  |
+| **Total, without the e2e** |  | **179** | **2078** | **6934** |  |
 
 Golden files: **21** in `tests/snapshots/` (777 KB).
 
@@ -106,7 +106,7 @@ Golden files: **21** in `tests/snapshots/` (777 KB).
 | Plan | What it means | Files | Tests | Assertions |
 |---|---|---|---|---|
 | REPLACE | a React Native screen test takes its place; logic assertions move with the logic | 61 | 878 | 3044 |
-| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 47 | 561 | 1796 |
+| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 47 | 580 | 1886 |
 | KEEP | stays as it is (engine and core tests, pure models, the server, repo tools) | 62 | 513 | 1714 |
 | RETIRE | what it tests is gone at cutover (the web view, a stylesheet, Cordova tooling) | 9 | 107 | 290 |
 
@@ -120,12 +120,12 @@ Calls whose result can differ between JavaScript engines or device settings (V8 
 | `new Date(y, m, d…)` (local time, safe) | 0 | 0 | 0 | 0 |
 | `new Date()` (the clock) | 33 | 2 | 0 | 5 |
 | `Date.parse(` | 0 | 0 | 0 | 0 |
-| `Date.now(` | 32 | 3 | 0 | 7 |
+| `Date.now(` | 33 | 3 | 0 | 7 |
 | `toISOString(` | 3 | 0 | 1 | 1 |
 | `toLocaleDateString(` / `toLocaleTimeString(` / `toLocaleString(` | 9 | 0 | 0 | 5 |
 | `Intl.` | 0 | 0 | 0 | 0 |
 | `localeCompare(` | 2 | 1 | 0 | 0 |
-| `toLowerCase(` / `toUpperCase(` (locale-free, safe)  | 57 | 37 | 0 | 17 |
+| `toLowerCase(` / `toUpperCase(` (locale-free, safe)  | 56 | 38 | 0 | 17 |
 | `toLocaleLowerCase(` / `toLocaleUpperCase(` | 0 | 0 | 0 | 0 |
 | `getTimezoneOffset(` | 0 | 0 | 0 | 0 |
 | `.sort()` with no comparator | 2 | 0 | 0 | 0 |
@@ -134,7 +134,7 @@ Calls whose result can differ between JavaScript engines or device settings (V8 
 | `Math.random(` | 13 | 0 | 0 | 0 |
 | `parseFloat(` / `parseInt(` / `Number(` | 31 | 35 | 1 | 14 |
 | `structuredClone(` | 0 | 0 | 0 | 0 |
-| `JSON.stringify(` | 21 | 2 | 8 | 1 |
+| `JSON.stringify(` | 18 | 5 | 8 | 1 |
 | Regex lookbehind `(?<=` or `(?<!` | 0 | 0 | 0 | 1 |
 | `normalize(` (Unicode) | 0 | 0 | 0 | 0 |
 

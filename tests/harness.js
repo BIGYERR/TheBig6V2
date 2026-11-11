@@ -56,7 +56,8 @@ const EXPORT_NAMES = [
   'GOAL_RECOMMENDED_DAYS','SPORT_CEILINGS','TACTICAL_DELOAD_GOALS','DEFAULT_1RM',
   'WD','_applyWizardStart','doGenerate',
   'storageStore','memoryStore','iaStore',
-  'readLiftLog','writeLiftLog','recordLift'
+  'readLiftLog','writeLiftLog','recordLift',
+  'readDayLogs','writeDayLogs','readCompleted','readPartSkips','dayStoreKey'
 ];
 
 function makeContext(opts){

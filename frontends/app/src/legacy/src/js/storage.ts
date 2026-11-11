@@ -1,6 +1,12 @@
 import { storageStore } from '../../../../../../core/src/engine/state-store.ts';
 import { activeProg, activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { readLiftLog, writeLiftLog } from '../../../../../../core/src/engine/state-lift-log.ts';
+import {
+  dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, setDraftOf, writeDayLogs,
+} from '../../../../../../core/src/engine/state-day-log.ts';
+import {
+  readCompleted, readPartSkips, writeCompleted, writePartSkips,
+} from '../../../../../../core/src/engine/state-day-status.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
@@ -17,91 +23,37 @@ function getPrograms(): any[]{try{return JSON.parse(iaStore.get('ia_programs')||
 function savePrograms(p: any){iaStore.set('ia_programs',JSON.stringify(p));}
 function getActiveProgId(){return iaStore.get('ia_active')||null;}
 function setActiveProgId(id: any){iaStore.set('ia_active',id);}
-// V238 (D223 item 5, Amendment 1 A1): restNorm is the read lens for one ia_logs_ day entry, and
-// getLogs/getLogsFor, the one read of the store, pass every entry through it. An entry with a
-// restLog, or with no rest_cardio, comes back as is. A V237 rest entry (rest_cardio still on it,
-// so persistLogFields never rebuilt it, and those keys are the jog's) comes back in the V238 shape
-// derived from the entry alone: restLog[rest_type] = {mins:rest_mins, rpe}; run_dist and
-// swim_yards become the run and swim dist; bike_mins becomes the ride's mins (the sum wins over
-// rest_mins). The seven flat keys it read are cleared; every key it does not name (sets, parked,
-// notes, week, ts) is carried untouched. It invents nothing: no ts, no week, no mins for a type
-// that held none. Pure: it never mutates its argument and nothing writes on boot; a legacy entry
-// converts when a writer's saveLogs persists the map it read. The lens runs outside the parse
-// try, so a lens fault can never come back as {} for a writer to save over the store.
-function restNorm(e: any){
-  if(!e||typeof e!=='object'||e.restLog||!e.rest_cardio) return e;
-  const FLAT=['rest_cardio','rest_type','rest_mins','rpe','run_dist','bike_mins','swim_yards'];
-  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
-  const num=v=>(+v>0?+v:0), t=e.rest_type||'';
-  const M: Record<string, any>={}, D: Record<string, any>={}, R: Record<string, any>={};
-  if(t&&num(e.rest_mins)) M[t]=num(e.rest_mins);
-  if(t&&e.rpe!=null&&e.rpe!==''&&isFinite(+e.rpe)) R[t]=+e.rpe;
-  if(num(e.run_dist)) D.run=num(e.run_dist);
-  if(num(e.swim_yards)) D.swim=num(e.swim_yards);
-  if(num(e.bike_mins)) M.bike=num(e.bike_mins);
-  const rl: Record<string, any>={};
-  [t,'run','swim','bike'].forEach(function(s,i,a){
-    if(!s||a.indexOf(s)!==i) return;
-    const o: Record<string, any>={};
-    if(s in M) o.mins=M[s];
-    if(s in D) o.dist=D[s];
-    if(s in R) o.rpe=R[s];
-    if(Object.keys(o).length) rl[s]=o;
-  });
-  const out: Record<string, any>={restLog:rl};
-  Object.keys(e).forEach(function(k){ if(FLAT.indexOf(k)<0) out[k]=e[k]; });
-  return out;
-}
-function restNormAll(l: any){
-  if(l&&typeof l==='object') Object.keys(l).forEach(function(k){ l[k]=restNorm(l[k]); });
-  return l;
-}
-function getLogs(){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+activeProgId)||'{}');}catch{return{};}return restNormAll(l);}
+// v0.261.4 (docs/decisions/stored-state.md): the day's log (ia_logs_), completion (ia_comp_) and skipped parts
+// (ia_parts_) live in @ia/core, in core/src/engine/state-day-log.ts and state-day-status.ts: the readers and writers,
+// the read lens (restNorm), the day key and the set drafts. These are the page's callers: they name the store, the
+// active program and the page's week and day.
+function getLogs(): any{return readDayLogs(iaStore,activeProgId);}
 // V156: id-parameterized variants. The zero-arg accessors above stay untouched so every
 // existing call site is byte-identical; only the Progress selector and the wizard seed
 // read OTHER programs' stores, and they must say which one out loud.
 // V238 (D223 item 5): the same restNorm lens as getLogs.
-function getLogsFor(pid: any){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+pid)||'{}');}catch{return{};}return restNormAll(l);}
+function getLogsFor(pid: any): any{return readDayLogs(iaStore,pid);}
 function getDayHistFor(pid: any){try{return JSON.parse(iaStore.get('ia_hist_'+pid)||'{}');}catch{return{};}}
 function getExWeightsFor(pid: any): any{return readLiftLog(iaStore,pid);}
 function saveExWeightsFor(pid: any,obj: any){writeLiftLog(iaStore,pid,obj);}
-function saveLogs(l: any){iaStore.set('ia_logs_'+activeProgId,JSON.stringify(l));}
-function getCompleted(){try{return JSON.parse(iaStore.get('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
-function saveCompleted(c: any){iaStore.set('ia_comp_'+activeProgId,JSON.stringify(c));}
+function saveLogs(l: any){writeDayLogs(iaStore,activeProgId,l);}
+function getCompleted(): any{return readCompleted(iaStore,activeProgId);}
+function saveCompleted(c: any){writeCompleted(iaStore,activeProgId,c);}
 // v0.261.0 (D284, P-SKIPPILL): the parts of a day skipped on their own (its run, its lift), keyed w<N>_<day> like
 // ia_comp_. Never in ia_comp_, where a record with no status reads as done, nor in the log, which persistLogFields
 // rebuilds from the form on every write.
-function getPartSkips(){try{return JSON.parse(iaStore.get('ia_parts_'+activeProgId)||'{}');}catch{return{};}}
-function savePartSkips(p: any){iaStore.set('ia_parts_'+activeProgId,JSON.stringify(p));}
+function getPartSkips(): any{return readPartSkips(iaStore,activeProgId);}
+function savePartSkips(p: any){writePartSkips(iaStore,activeProgId,p);}
 function getWildcardDone(): any[]{try{return JSON.parse(iaStore.get('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
 function saveWildcardDone(a: any){iaStore.set('ia_wild_'+activeProgId,JSON.stringify(a));}
-function logKey(w: any,d: any){return 'w'+w+'_'+d;}
+function logKey(w: any,d: any){return dayStoreKey(w,d);}
 
 // ── SET DRAFTS (V131) ────────────────────────────────────────────────────────
-// A stepper tap is not a log. It is the athlete mid-session, and before V131 it
-// lived ONLY in the DOM: leaving the day and coming back redrew the card from
-// ia_exw_, found nothing, and reprinted the prescription over the edit.
-//
-// Drafts live INSIDE the existing ia_logs_ day entry as `sets`, deliberately.
-// ia_logs_ is already keyed week+day, already inside the freeze's "touched" test,
-// and already bounded by program length. A new ia_draft_ store would have been a
-// second re-apply store with no prune function, and ia_moves_ is already that one.
-//
-// A draft NEVER reaches ia_exw_. The tick, the X/Y LOGGED counter and every chart
-// read ia_exw_, so a draft cannot claim work is finished and cannot put a weight
-// the athlete never confirmed onto a progress chart.
-//
-// Values are stored as the RAW STRINGS the athlete entered, '' meaning untouched —
-// never a placeholder-derived number. Restoring a draft therefore cannot stamp a
-// zero into a load cell that was never filled.
-function readSetDraft(exKey: any){
-  if(!exKey) return null;
-  const e=getLogs()[logKey(currentWeek,currentDayKey)];
-  return (e&&e.sets&&e.sets[exKey])||null;
+// A stepper tap is not a log: it lives inside the ia_logs_ day entry as `sets` and never reaches ia_exw_
+// (state-day-log.ts has the rule and its reasons). The page names the day and snapshots it.
+function readSetDraft(exKey: any): any{
+  return setDraftOf(iaStore,activeProgId,currentWeek,currentDayKey,exKey);
 }
-// READ-MODIFY-WRITE, and it must stay that way. persistLogFields rebuilds the whole
-// day entry from the form fields, so these two writers each have to preserve the
-// other's half or whichever runs last silently destroys it.
 function writeSetDraft(exKey: any,r: any,w: any,L: any){
   if(!activeProgId||!currentDayKey||!exKey) return;
   // SNAPSHOT, same reasoning as persistLogFields. A draft lands in ia_logs_, and any
@@ -110,21 +62,12 @@ function writeSetDraft(exKey: any,r: any,w: any,L: any){
   // what it was frozen ON. snapshotDay is first-touch-wins, so this is a no-op after
   // the first write.
   snapshotDay(currentWeek,currentDayKey);
-  const logs=getLogs(), k=logKey(currentWeek,currentDayKey);
-  const e=logs[k]||{week:currentWeek};
-  const sets=e.sets||{};
-  sets[exKey]={r:r||[],w:w||[],L:L||''};
-  e.sets=sets; e.week=currentWeek; e.ts=Date.now();
-  logs[k]=e; saveLogs(logs);
+  recordSetDraft(iaStore,activeProgId,currentWeek,currentDayKey,exKey,{r:r,w:w,L:L},Date.now());
 }
 function clearSetDraft(exKey: any){
-  const logs=getLogs(), k=logKey(currentWeek,currentDayKey), e=logs[k];
-  if(!e||!e.sets||!(exKey in e.sets)) return;
-  delete e.sets[exKey];
-  if(!Object.keys(e.sets).length) delete e.sets;
-  logs[k]=e; saveLogs(logs);
+  dropSetDraft(iaStore,activeProgId,currentWeek,currentDayKey,exKey);
 }
-function completedKey(w: any,d: any){return 'w'+w+'_'+d;}
+function completedKey(w: any,d: any){return dayStoreKey(w,d);}
 // ── DAY HISTORY SNAPSHOTS (ia_hist_) ─────────────────────────────────────────
 // refreshProgram rebuilds from cfg on every boot and its OUTPUT IS NEVER PERSISTED —
 // prog.weeks in storage is the build from creation day. So the week freeze's
@@ -177,7 +120,6 @@ function snapshotDay(week: any,dayKey: any){
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
   clearSetDraft, completedKey, esc, getActiveProgId, getCompleted, getDayHist, getDayHistFor, getExWeightsFor, getLogs,
-  getLogsFor, getPartSkips, getPrograms, getWildcardDone, iaStore, logKey, readSetDraft, resnapshotDayEdit,
-  saveCompleted, saveExWeightsFor, saveLogs, savePartSkips, savePrograms, saveWildcardDone, setActiveProgId,
-  snapshotDay, writeSetDraft,
+  getLogsFor, getPrograms, getWildcardDone, iaStore, logKey, readSetDraft, resnapshotDayEdit, saveCompleted,
+  saveExWeightsFor, saveLogs, savePrograms, saveWildcardDone, setActiveProgId, snapshotDay, writeSetDraft,
 };

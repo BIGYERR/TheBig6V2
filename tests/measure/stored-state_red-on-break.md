@@ -16,16 +16,18 @@ must be green on all three and every break red.
 | set draft | a logged card leaves its draft in the log | red | the golden file | the fast file |
 | backup scan | the backup leaves out the last key | red | 1 | the fast file |
 | completion status | a skipped day is stored as complete | red | the golden file | the fast file |
+| part skip | a skipped part is not stored | red | 1 | the fast file |
 | seed write back | an old program's seed is not written back to its config | red | the golden file | the fast file |
 | purge | a deleted program keeps its logs | red | 1 | the fast file |
 | rest move key | a moved rest day is stored under the picked day | red | the golden file | the fast file |
 | week count | the current week is counted one day late | red | 4 | the fast file |
 
-**The page as built is green, and all 12 breaks turn the records red.**
+**The page as built is green, and all 13 breaks turn the records red.**
 
 ## Breaks that change no record
 
 | Break | What it does | Result | Why |
 |---|---|---|---|
+| parts settle | the parts of a day never write its completion | no record changed | A gap in the histories, found with v0.261.4: each skips one part of a two part day and never logs that day's run or skips its other part, so no golden record holds a completion the parts wrote. The rule is held elsewhere: on this break 4 of the 9 tests of `tests/integration/skip-pill.test.ts` go red (run 2026-11-11), and `tests/unit/stored-state.test.ts` types its records by hand. A history that skips the lift and logs the run would hold it in the records; it adds a golden record, so it is a tests pass of its own. |
 | freeze cut, the touched term | the current week, when touched, is not frozen a week further | no record changed | No effect is possible: the next line takes the larger of this and the highest touched week plus one, and a touched current week is at least that week. The term is redundant. |
 | history, first touch | a day's snapshot is overwritten on every touch | no record changed | Not shown either way. In every history here a touched day is restored from its snapshot at each launch, so a second snapshot writes the same bytes. Whether any tap can change a touched day before its next snapshot (a moved rest day, a sport swap) was not traced. To settle before the freeze slice. |

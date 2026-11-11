@@ -12,5 +12,15 @@ export type { StateStore, StorageLike } from './state-store.ts';
 // The lift log, ia_exw_<program> (v0.261.3).
 export { dedupeExDayEntries, entryDay, readLiftLog, recordLift, weeklyBest, writeLiftLog } from './state-lift-log.ts';
 export type { LiftEntry, LiftLog, LiftRecord, LiftRow } from './state-lift-log.ts';
+// The day's log, completion and skipped parts, ia_logs_, ia_comp_ and ia_parts_<program> (v0.261.4).
+export {
+  CARDIO_PARK_FIELDS, dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, runPartLogged, setDraftOf, writeDayLogs,
+} from './state-day-log.ts';
+export type { DayLogs, SetDraftInput, StoredDayEntry } from './state-day-log.ts';
+export {
+  clearDayParts, clearDayStatus, dayStatus, partsOfDay, readCompleted, readPartSkips, setDayStatus, settleDayParts, skipDayPart,
+  writeCompleted, writePartSkips,
+} from './state-day-status.ts';
+export type { Completed, DayStatusRecord, PartSkips } from './state-day-status.ts';
 export type { EngineCfg, CardioSchedule, PaceRow, RunAnchorInfo } from './cardio-progression.ts';
 export type { CardioSession } from './nsw-cardio.ts';
