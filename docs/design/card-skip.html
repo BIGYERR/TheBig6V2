@@ -1,0 +1,408 @@
+<title>Skip the Day</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column. A dashed controls strip (Before/After, how fast the card goes dark); under it,
+   This Week as the app draws it (D276), on the Half Manny's week 11 with today Tuesday. The Track look's tokens
+   (D263, night D261). Settled: the pill pops (Pop), the button sinks (Sunken), the card fades (Fade) to 50% (Dim). */
+:root{
+  --bg:#F3F3F1; --surface:#FFFFFF; --surface2:#EDEDEA; --border2:#CFCFCA; --card-off:#E4E4E0;
+  --text:#111111; --muted:#6E6E6A; --ink-rgb:17,17,17; --shadow-rgb:0,0,0; --sink-a:.16;
+  --signal:#CF4E1A; --signal-rgb:207,78,26; --on-signal:#FBF6EE;
+  --run:#5e8c54; --green:#5e8c54;
+  --font-display:'Helvetica Now Text','Helvetica Neue',Helvetica,'Geist',Arial,sans-serif;
+  --font-text:'Helvetica Neue',Helvetica,'Geist',Arial,sans-serif;
+  --r-card:24px; --btn-ms:320ms; --off-o:.5; --btn-move:cubic-bezier(.2,.8,.2,1); --btn-ease:cubic-bezier(.25,.1,.25,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#161616; --surface2:#242424; --border2:#3C3C3C; --card-off:#090909;
+  --text:#FFFFFF; --muted:#A3A3A3; --ink-rgb:255,255,255; --sink-a:.7;
+  --signal:#E2622B; --signal-rgb:226,98,43; --on-signal:#12110D;
+  --run:#86B27A; --green:#86B27A; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#161616; --surface2:#242424; --border2:#3C3C3C; --card-off:#090909;
+  --text:#FFFFFF; --muted:#A3A3A3; --ink-rgb:255,255,255; --sink-a:.7;
+  --signal:#E2622B; --signal-rgb:226,98,43; --on-signal:#12110D;
+  --run:#86B27A; --green:#86B27A; color-scheme:dark;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-text);font-variant-numeric:tabular-nums;}
+button{font:inherit;color:inherit;}
+button:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+.page{max-width:430px;margin:0 auto;padding-block:12px 40px;display:flex;flex-direction:column;gap:18px;}
+
+/* ── Mockup controls ── */
+.ctl{margin:0 max(12px,env(safe-area-inset-left,0px)) 0 max(12px,env(safe-area-inset-right,0px));border:1.5px dashed var(--border2);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.ctl-tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.opt{border:1.5px solid var(--border2);background:var(--surface);border-radius:14px;padding:8px 10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.opt b{font-family:var(--font-display);font-size:14px;font-weight:700;line-height:1.2;}
+.opt span{font-size:11px;color:var(--muted);line-height:1.3;}
+.opt .rec{color:var(--signal);font-weight:700;}
+.opt[aria-checked="true"]{border-color:var(--signal);box-shadow:inset 0 0 0 1px var(--signal);}
+.opt:disabled{opacity:.4;cursor:default;}
+.lbl{font-size:12px;font-weight:700;color:var(--muted);margin-top:4px;}
+.how{margin:2px 0 0;font-size:13px;line-height:1.45;}
+.ctl-foot{display:flex;justify-content:flex-end;align-items:center;gap:10px;}
+.slow{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer;}
+.slow input{width:18px;height:18px;accent-color:var(--signal);margin:0;}
+.reset{border:0;background:none;padding:8px 0;min-height:36px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+
+/* ── This Week: the header ── */
+.app{display:flex;flex-direction:column;}
+.tw-over{padding:0 20px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.tw-titles{position:relative;margin-top:4px;overflow:hidden;}
+.tw-strip{display:flex;}
+.tw-title{flex:none;width:240px;padding:4px 0 4px 20px;font-family:var(--font-display);font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1;white-space:nowrap;color:rgba(var(--ink-rgb),.11);}
+.tw-title.on{color:var(--text);}
+.tw-fade{position:absolute;top:0;right:0;bottom:0;width:150px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--bg) 55%);}
+.tw-hurt{position:absolute;right:20px;top:50%;transform:translateY(-50%);height:40px;padding:0 16px;border-radius:20px;border:1.5px solid var(--border2);background:var(--bg);font-family:var(--font-display);font-size:15px;font-weight:600;display:flex;align-items:center;}
+.tw-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px 6px;}
+.tw-race{display:flex;align-items:center;gap:12px;min-width:0;}
+.tw-race-stack{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.tw-race-big{font-family:var(--font-display);font-size:20px;font-weight:700;line-height:1.1;white-space:nowrap;}
+.tw-race-small{font-size:13px;color:var(--muted);white-space:nowrap;}
+.tw-pill{flex:0 0 auto;display:flex;align-items:center;height:34px;padding:0 14px;border:1.5px solid var(--signal);color:var(--signal);border-radius:999px;font-family:var(--font-display);font-size:14px;font-weight:700;white-space:nowrap;}
+
+/* ── The day strip ── */
+.tw-days{padding:10px 16px 0;display:flex;flex-direction:column;gap:12px;}
+.tw-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:16px 8px 14px;border-radius:var(--r-card);background:var(--surface);}
+.tw-col{border:0;background:none;padding:0;margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;min-height:44px;cursor:pointer;font-family:var(--font-display);touch-action:manipulation;}
+.tw-l{font-size:13px;font-weight:700;color:var(--muted);}
+.tw-col.picked .tw-l{color:var(--text);}
+.tw-col.today .tw-l{color:var(--signal);}
+.tw-c{width:36px;height:36px;border-radius:50%;border:2px solid transparent;display:flex;align-items:center;justify-content:center;}
+.tw-col.filled .tw-c{background:var(--surface2);}
+.tw-col.picked .tw-c{border-color:var(--text);}
+.tw-n{font-size:15px;font-weight:700;color:var(--muted);}
+.tw-col.filled .tw-n{color:var(--text);}
+.tw-chk{color:var(--green);}
+.tw-w{height:11px;font-size:9px;font-weight:700;letter-spacing:.04em;line-height:11px;white-space:nowrap;}
+
+/* ── The cards ── */
+.cards{display:flex;flex-direction:column;gap:12px;}
+.tw-card{position:relative;background:var(--surface);border-radius:var(--r-card);padding:20px 20px 18px;}
+.tw-card.second{padding:18px 20px;}
+.lit{display:flex;flex-direction:column;gap:10px;}
+.tw-card.second .lit{gap:8px;}
+/* Skipped: the lights go off. Everything but the pill dims, and the card itself goes a shade darker. */
+.tw-card.off{background:var(--card-off);}
+.tw-card.off .lit{opacity:var(--off-o);}
+.tw-head{display:flex;align-items:center;gap:8px;min-height:32px;}
+.has-pill .tw-head{padding-right:112px;}
+.tw-ico{display:flex;color:var(--signal);}
+/* The dumbbell in two halves that meet at the bar's middle. Broken: each half droops at the break into a V. */
+.dbl{overflow:visible;}
+.dbl g{transform-box:view-box;}
+.dbl-l{transform-origin:6px 12px;}
+.dbl-r{transform-origin:18px 12px;}
+.dbl.broken .dbl-l{transform:translate(-2px,1.2px) rotate(22deg);}
+.dbl.broken .dbl-r{transform:translate(2px,1.2px) rotate(-22deg);}
+.tw-label{flex:1;min-width:0;font-size:15px;font-weight:600;color:var(--muted);}
+.tw-name{font-family:var(--font-display);font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.02;text-wrap:balance;}
+.tw-card.second .tw-name{font-size:26px;line-height:1.05;}
+.tw-meta{font-size:15px;font-weight:600;}
+.tw-blurb{font-size:14px;line-height:1.4;color:var(--muted);}
+.tw-card.second .tw-blurb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tw-btn{margin-top:8px;height:48px;border-radius:24px;border:1.5px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-display);font-size:16px;font-weight:600;cursor:pointer;
+  transition:transform var(--btn-ms) var(--btn-move),background-color var(--btn-ms) var(--btn-ease),color var(--btn-ms) var(--btn-ease),box-shadow var(--btn-ms) var(--btn-ease),border-color var(--btn-ms) var(--btn-ease),height var(--btn-ms) var(--btn-move);}
+.tw-btn.glow{height:56px;border-color:transparent;border-radius:28px;background:var(--signal);color:var(--on-signal);font-size:19px;font-weight:700;box-shadow:0 10px 28px rgba(var(--signal-rgb),.35);}
+.tw-btn:active{transform:scale(.97);transition-duration:.12s;}
+.tw-recdot{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.tw-recdot::after{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;}
+/* Skipped: the button keeps its words, sinks, and stops taking taps (Sunken). */
+.tw-btn.sunk{cursor:default;pointer-events:none;transform:translateY(1px) scale(.985);border-color:transparent;background:var(--surface2);color:var(--muted);box-shadow:inset 0 2px 6px rgba(var(--shadow-rgb),var(--sink-a));}
+.tw-done{margin-top:2px;display:flex;align-items:center;gap:12px;padding:12px 8px 12px 14px;border-radius:14px;background:var(--bg);}
+.tw-done-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.tw-done-title{font-size:14px;font-weight:700;}
+.tw-done-line{font-size:13px;color:var(--muted);}
+.tw-reopen{flex:0 0 auto;border:0;background:none;padding:10px 6px;min-height:44px;font-size:15px;font-weight:600;color:var(--signal);cursor:pointer;}
+.tw-links{display:flex;gap:26px;margin-top:-2px;}
+.tw-link{border:0;background:none;padding:10px 0;min-height:44px;color:var(--muted);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border2);cursor:pointer;}
+
+/* The pill: top right of each card, outside the dimmed part, so the switch stays lit. */
+.skp{position:absolute;top:20px;right:20px;height:32px;padding:0 13px;border-radius:16px;border:1.5px solid var(--border2);background:var(--surface);display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transform-origin:center;white-space:nowrap;}
+.tw-card.second .skp{top:18px;}
+.skp.on{border-color:var(--text);background:var(--text);color:var(--bg);}
+.skp svg{flex:0 0 auto;}
+
+/* ── Below the cards ── */
+.wk-stats{position:relative;display:grid;grid-template-columns:repeat(3,1fr);padding:56px 20px 20px;background:var(--surface);border-radius:var(--r-card);}
+.wk-stats::before{content:"This week";position:absolute;left:20px;top:18px;font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-.02em;}
+.wk-stat{display:flex;flex-direction:column-reverse;justify-content:flex-end;}
+.wk-stat-lbl{font-size:13px;font-weight:500;color:var(--muted);margin:0 0 4px;}
+.wk-stat-num{font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-.04em;}
+.wk-stat-num .den{font-size:18px;color:var(--muted);letter-spacing:0;}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.act{height:48px;border-radius:24px;border:1.5px solid var(--border2);font-family:var(--font-display);font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+@media (prefers-reduced-motion: reduce){.tw-btn{transition:none;}}
+</style>
+
+<div class="page">
+  <section class="ctl" aria-label="Mockup controls">
+    <div class="ctl-tag">Mockup controls · not in the app</div>
+    <div class="seg" id="mode" role="radiogroup" aria-label="Before or after"></div>
+    <div class="lbl">How fast the card goes dark</div>
+    <div class="seg" id="speeds" role="radiogroup" aria-label="How fast the card goes dark"></div>
+    <div class="lbl">How the dumbbell breaks</div>
+    <div class="seg" id="breaks" role="radiogroup" aria-label="How the dumbbell breaks"></div>
+    <p class="how" id="how"></p>
+    <div class="ctl-foot">
+      <button type="button" class="reset" id="reset">Put the week back</button>
+    </div>
+  </section>
+
+  <main class="app" id="app">
+    <div class="tw-over">The Half Manny</div>
+    <div class="tw-titles" aria-hidden="true">
+      <div class="tw-strip"><div class="tw-title on">Week 11</div><div class="tw-title">Week 12</div></div>
+      <div class="tw-fade"></div>
+      <div class="tw-hurt">Hurt?</div>
+    </div>
+    <div class="tw-row">
+      <div class="tw-race">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>
+        <span class="tw-race-stack"><span class="tw-race-big">26 days out</span><span class="tw-race-small">Race day Sun, Dec 6</span></span>
+      </div>
+      <div class="tw-pill">Phase 3 — Peak</div>
+    </div>
+    <div class="tw-days">
+      <div class="tw-week" id="strip" role="group" aria-label="Pick a day"></div>
+      <div class="cards" id="day"></div>
+      <div class="wk-stats">
+        <div class="wk-stat"><div class="wk-stat-num">1<span class="den">/5</span></div><div class="wk-stat-lbl">Done</div></div>
+        <div class="wk-stat"><div class="wk-stat-num" style="color:var(--run)">3.2</div><div class="wk-stat-lbl">Miles</div></div>
+        <div class="wk-stat"><div class="wk-stat-num">9</div><div class="wk-stat-lbl">Day streak</div></div>
+      </div>
+      <div class="acts"><div class="act">Random Workout</div><div class="act">Traveling?</div></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  // Settled (Mario): the pill shrinks to 70% over 150 ms, turns dark while small, then comes back out over 320 ms,
+  // passing 112% at 55% of the way (Pop), always at normal speed.
+  var POP = { inMs:150, to:0.70, outMs:320, peak:1.12, at:0.55 };
+  // The card: everything on it but the pill fades to 50% (Dim) on an ease-out (Fade), the card goes a shade darker,
+  // and its button sinks over the same time (Sunken). Mario: the card in slow motion, three times as slow.
+  var FADE_MS = 350, DIM = .5;
+  var SPEEDS = [
+    { id:'x1', name:'Normal', line:'Dark in 350 ms. Undo runs it backwards.', k:1 },
+    { id:'x3', name:'Slow motion ×3', line:'Dark in 1,050 ms. Undo runs it backwards.', k:3, tag:'your pick' }
+  ];
+  // The dumbbell: it cracks, droops past 30 degrees and settles at 22 degrees in a V. Mending is the break played backwards.
+  var BREAK_MS = 520;
+  var BREAKS = [
+    { id:'snap', name:'Snap', line:'Breaks in 520 ms. Undo runs it backwards.', k:1, tag:'my pick' },
+    { id:'slow', name:'With the card ×3', line:'Breaks in 1,560 ms. Undo runs it backwards.', k:3 }
+  ];
+  // Undo is the skip played backwards: the same times, and each curve turned around (a curve's reverse is its mirror).
+  var MOVE = [.2, .8, .2, 1], EASE = [.25, .1, .25, 1];
+  var bez = function(b){ return 'cubic-bezier(' + b.join(',') + ')'; };
+  var rev = function(b){ return bez([b[2], b[3], b[0], b[1]].map(function(v){ return +(1 - v).toFixed(3); })); };
+
+  var RUN_ICO = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M4 22l4-7 3 2 2-5 4 3h3M9 9l3-2 3 3"/></svg>';
+  var liftIco = function(broken){
+    return '<svg class="dbl' + (broken ? ' broken' : '') + '" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+      + '<g class="dbl-l"><path d="M3 10v4M6 8v8M9 10v4M9 12h3"/></g><g class="dbl-r"><path d="M15 10v4M18 8v8M21 10v4M15 12h-3"/></g></svg>';
+  };
+  var CHECK = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="tw-chk" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+  var XS = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>';
+  var RECOV = 'Just as important as the hard days. Do not run faster than 12:40/mi.';
+
+  var DAYS = [
+    { k:'sun', L:'S', n:8, full:'Sunday', rest:true, past:true, word:'REST', when:'Sunday, Nov 8' },
+    { k:'mon', L:'M', n:9, full:'Monday', done:true, past:true, word:'SPEED', when:'Yesterday · Monday',
+      cards:[{kind:'run', title:'Speed Run'}, {kind:'lift', label:'Then lift', title:'Posterior Chain'}] },
+    { k:'tue', L:'T', n:10, full:'Tuesday', today:true, word:'RECOV', color:'var(--run)', when:'Today · Tuesday',
+      cards:[{kind:'run', noun:'run', title:'Recovery Run', meta:'15 min · 13:20/mi', blurb:RECOV, btn:'Record run', act:'record'},
+             {kind:'lift', noun:'lift', label:'Then lift', title:'Strength Support', blurb:'Incline barbell press + 6 more', btn:'Start lift', act:'deck'}] },
+    { k:'wed', L:'W', n:11, full:'Wednesday', rest:true, word:'REST', when:'Tomorrow · Wednesday' },
+    { k:'thu', L:'T', n:12, full:'Thursday', word:'LEGS', color:'var(--signal)', when:'Thursday, Nov 12',
+      cards:[{kind:'lift', noun:'lift', title:'Leg Strength + Mobility', meta:'~45 min', blurb:'Back squat + 8 more', btn:'Start session', act:'deck'}] },
+    { k:'fri', L:'F', n:13, full:'Friday', word:'RECOV', color:'var(--run)', when:'Friday, Nov 13',
+      cards:[{kind:'run', noun:'run', title:'Recovery Run', meta:'45 min · 13:20/mi', blurb:RECOV, btn:'Record run', act:'record'},
+             {kind:'lift', noun:'lift', label:'Then lift', title:'Recovery Lift', blurb:'Dumbbell bench press + 5 more', btn:'Start lift', act:'deck'}] },
+    { k:'sat', L:'S', n:14, full:'Saturday', word:'LONG', color:'var(--run)', when:'Saturday, Nov 14',
+      cards:[{kind:'run', noun:'run', title:'Long Run', meta:'Dress Rehearsal · 8 mi · 13:20/mi', blurb:'Run this at your race start time, in the shoes and kit you will race in. Average no faster than 12:40/mi.', btn:'Record run', act:'record'},
+             {kind:'lift', noun:'stretch', label:'After the run', title:'Stretch and roll', blurb:'Standing calf stretch + 4 more', btn:'Start the cool down', act:'deck'}] }
+  ];
+
+  var mode = 'after', speed = 'x3', brk = 'snap', pick = 2, skipped = {}, busy = {}, running = {};
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var key = function(d, c){ return d.k + ':' + c.kind; };
+  var isSkipped = function(d, c){ return !!skipped[key(d, c)]; };
+  var daySkipped = function(d){ return !!d.cards && d.cards.every(function(c){ return isSkipped(d, c); }); };
+  var reduce = function(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  var byId = function(list, id){ return list.filter(function(x){ return x.id === id; })[0]; };
+  // One glow (D263): the first card on the day that is not skipped.
+  function glowAt(d){ var g = -1; d.cards.some(function(c, n){ if (!isSkipped(d, c)) { g = n; return true; } return false; }); return g; }
+
+  // ── Colours for the flicker, read from the theme's own tokens ──
+  function token(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function rgb(hex){ var h = hex.replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); return [0, 2, 4].map(function(i){ return parseInt(h.substr(i, 2), 16); }); }
+  function mix(a, b, t){ return 'rgb(' + a.map(function(v, i){ return Math.round(v + (b[i] - v) * t); }).join(',') + ')'; }
+
+  // ── Controls ──
+  function radios(el, list, cur, attr, off){
+    el.innerHTML = list.map(function(o){
+      return '<button type="button" class="opt" role="radio" aria-checked="' + (o.id === cur) + '" data-' + attr + '="' + o.id + '"' + (off ? ' disabled' : '') + '>'
+        + '<b>' + o.name + (o.tag ? ' <span class="rec">' + o.tag + '</span>' : '') + '</b><span>' + o.line + '</span></button>';
+    }).join('');
+  }
+  function drawControls(){
+    radios($('mode'), [{id:'now', name:'Now', line:'The app as it is'}, {id:'after', name:'Skip pills', line:'On the run and the lift'}], mode, 'mode', false);
+    radios($('speeds'), SPEEDS, speed, 'speed', mode === 'now');
+    radios($('breaks'), BREAKS, brk, 'brk', mode === 'now');
+    $('how').textContent = mode === 'now'
+      ? 'What the app does today. A day with lift work has no way to skip the run or the lift from This Week.'
+      : 'Tap Skip run or Skip lift. The pill pops back dark at full speed. Then the card goes dark slowly: its button sinks and everything on it fades to half. On the lift card the dumbbell snaps in half. The pill stays lit. Tap it again to undo, and the whole thing plays backwards at the same speed. Skip both and the day is skipped.';
+    $('app').style.setProperty('--off-o', DIM);
+  }
+  $('mode').addEventListener('click', function(e){ var b = e.target.closest('[data-mode]'); if (!b) return; mode = b.getAttribute('data-mode'); drawControls(); drawStrip(); drawDay(); });
+  $('speeds').addEventListener('click', function(e){ var b = e.target.closest('[data-speed]'); if (!b || b.disabled) return; speed = b.getAttribute('data-speed'); drawControls(); });
+  $('breaks').addEventListener('click', function(e){ var b = e.target.closest('[data-brk]'); if (!b || b.disabled) return; brk = b.getAttribute('data-brk'); drawControls(); });
+  $('reset').addEventListener('click', function(){ skipped = {}; pick = 2; drawStrip(); drawDay(); });
+
+  // ── The strip ──
+  function drawStrip(){
+    $('strip').innerHTML = DAYS.map(function(d, i){
+      var sk = !d.rest && daySkipped(d);
+      var filled = !d.rest && !d.past && !d.done && !sk;
+      var mark = d.done ? CHECK : sk ? '<span class="tw-n">✕</span>' : '<span class="tw-n">' + d.n + '</span>';
+      var col = (d.rest || d.past || sk) ? 'var(--muted)' : (d.color || 'var(--muted)');
+      return '<button type="button" class="tw-col' + (d.today ? ' today' : '') + (i === pick ? ' picked' : '') + (filled ? ' filled' : '')
+        + '" data-i="' + i + '" aria-pressed="' + (i === pick) + '" aria-label="' + d.full + ' ' + d.n + (sk ? ', skipped' : d.done ? ', done' : d.rest ? ', rest' : '') + '">'
+        + '<span class="tw-l">' + d.L + '</span><span class="tw-c">' + mark + '</span>'
+        + '<span class="tw-w" style="color:' + col + '">' + d.word + '</span></button>';
+    }).join('');
+  }
+  $('strip').addEventListener('click', function(e){
+    var b = e.target.closest('[data-i]'); if (!b) return;
+    pick = +b.getAttribute('data-i'); drawStrip(); drawDay();
+  });
+
+  // ── The day ──
+  var pillInner = function(d, c){ return isSkipped(d, c) ? XS + 'Skipped' : 'Skip ' + c.noun; };
+  function cardHTML(d, c, n){
+    var first = n === 0, sk = mode === 'after' && isSkipped(d, c), hasPill = mode === 'after' && !d.done;
+    var label = first ? d.when : c.label;
+    var pill = hasPill ? '<button type="button" class="skp' + (sk ? ' on' : '') + '" data-pill="' + c.kind + '" aria-pressed="' + sk + '">' + pillInner(d, c) + '</button>' : '';
+    var head = '<div class="tw-head">'
+      + (!first ? '<span class="tw-ico" aria-hidden="true">' + (c.kind === 'lift' ? liftIco(sk) : RUN_ICO) + '</span>' : '')
+      + '<span class="tw-label">' + esc(label) + '</span></div>';
+    var body = '<div class="tw-name">' + esc(c.title) + '</div>';
+    if (!d.done) body += (c.meta ? '<div class="tw-meta">' + esc(c.meta) + '</div>' : '') + (c.blurb ? '<div class="tw-blurb">' + esc(c.blurb) + '</div>' : '');
+    var tail;
+    if (d.done) {
+      tail = '<div class="tw-done">' + CHECK.replace('width="16" height="16"', 'width="20" height="20"')
+        + '<span class="tw-done-txt"><span class="tw-done-title">' + esc(c.title) + '</span><span class="tw-done-line">Closed out</span></span>'
+        + '<button type="button" class="tw-reopen">Reopen</button></div>';
+    } else {
+      var glow = mode === 'now' ? n === 0 : glowAt(d) === n;
+      tail = '<button type="button" class="tw-btn' + (glow ? ' glow' : '') + (sk ? ' sunk' : '') + '" data-btn="' + c.kind + '"' + (sk ? ' disabled aria-disabled="true"' : '') + '>'
+        + (c.act === 'record' ? '<span class="tw-recdot" aria-hidden="true"></span>' : '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>')
+        + esc(c.btn) + '</button>';
+    }
+    return '<div class="tw-card ' + (first ? 'first' : 'second') + (hasPill ? ' has-pill' : '') + (sk ? ' off' : '') + '" data-card="' + c.kind + '">'
+      + pill + '<div class="lit">' + head + body + tail + '</div></div>';
+  }
+  function drawDay(){
+    var d = DAYS[pick];
+    if (d.rest) {
+      $('day').innerHTML = '<div class="tw-card first"><div class="lit"><div class="tw-head"><span class="tw-label">' + esc(d.when) + '</span></div>'
+        + '<div class="tw-name">Rest day</div><div class="tw-blurb">Recovery is where the work sets in. Move easy, refuel, sleep.</div>'
+        + '<div class="tw-links">' + (d.past ? '' : '<button type="button" class="tw-link">Training anyway?</button>') + '<button type="button" class="tw-link">Log cardio</button></div></div></div>';
+      return;
+    }
+    $('day').innerHTML = d.cards.map(function(c, n){ return cardHTML(d, c, n); }).join('');
+  }
+  // Bring the buttons in line with the state, in place, so the sink runs as a transition.
+  function settleButtons(d){
+    d.cards.forEach(function(c, n){
+      var b = $('day').querySelector('[data-btn="' + c.kind + '"]'), sk = isSkipped(d, c);
+      if (!b) return;
+      b.classList.toggle('glow', glowAt(d) === n); b.classList.toggle('sunk', sk);
+      b.disabled = sk; if (sk) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
+    });
+  }
+  // The lights: the card's class holds where it ends; the animation plays the way there.
+  function lights(card, off, ms){
+    var on = rgb(token('--surface')), dim = rgb(token('--card-off'));
+    // Back on is the fade played backwards: the same frames, the same time, direction reversed.
+    var opts = { duration:ms, easing:'ease-out', direction:off ? 'normal' : 'reverse' };
+    card.classList.toggle('off', off);
+    return [
+      card.querySelector('.lit').animate([{ opacity:1 }, { opacity:DIM }], opts),
+      card.animate([{ backgroundColor:mix(dim, on, 1) }, { backgroundColor:mix(dim, on, 0) }], opts)
+    ];
+  }
+  // The dumbbell: the class holds the broken pose; the animation plays the crack (or the mend) on the way there.
+  function breakBar(card, broken){
+    var ico = card.querySelector('.dbl'); if (!ico) return [];
+    var k = byId(BREAKS, brk).k;
+    ico.classList.toggle('broken', broken);
+    // s: -1 the left half, +1 the right. Each half turns about its middle plate, the break end going down.
+    var frames = function(s){
+      var t = function(x, y, a){ return 'translate(' + (s * x) + 'px,' + y + 'px) rotate(' + (-s * a) + 'deg)'; };
+      return [{ transform:t(0, 0, 0) }, { transform:t(0, 0, 7), offset:.16 }, { transform:t(0, 0, 2), offset:.28 }, { transform:t(2.8, 1.8, 30), offset:.68 }, { transform:t(2, 1.2, 22) }];
+    };
+    // Mending is the break played backwards: the same frames, the same time, direction reversed.
+    var opts = { duration:BREAK_MS * k, easing:'ease-out', direction:broken ? 'normal' : 'reverse' };
+    return [ico.querySelector('.dbl-l').animate(frames(-1), opts), ico.querySelector('.dbl-r').animate(frames(1), opts)];
+  }
+
+  // ── The shrink and pop, then the lights ──
+  function toggle(kind){
+    var d = DAYS[pick], c = d.cards.filter(function(x){ return x.kind === kind; })[0];
+    var bk = key(d, c);
+    if (busy[bk]) return;
+    var k = 1, out = POP.outMs, kc = byId(SPEEDS, speed).k;
+    var pill = $('day').querySelector('[data-pill="' + kind + '"]'), card = pill && pill.closest('.tw-card');
+    var flip = function(){ if (skipped[bk]) delete skipped[bk]; else skipped[bk] = true; };
+    if (!pill || reduce() || !pill.animate) { flip(); drawStrip(); drawDay(); return; }
+    busy[bk] = true;
+    var done = function(){ busy[bk] = false; };
+    setTimeout(done, (POP.inMs + POP.outMs) * k + 150);
+    if (navigator.vibrate) { try { navigator.vibrate(8); } catch (x) {} }
+    var shrink = pill.animate([{ transform:'scale(1)' }, { transform:'scale(' + POP.to + ')' }],
+      { duration:POP.inMs * k, easing:'cubic-bezier(.5,0,.75,0)', fill:'forwards' });
+    // The swap runs on a timer, not on the animation's end, so the state always changes even when no frames are drawn.
+    setTimeout(function(){
+      if (DAYS[pick] !== d || !pill.isConnected) { flip(); drawStrip(); if (DAYS[pick] === d) drawDay(); done(); return; }
+      flip();
+      var sk = isSkipped(d, c);
+      pill.classList.toggle('on', sk); pill.setAttribute('aria-pressed', sk); pill.innerHTML = pillInner(d, c);
+      drawStrip();
+      // The card runs at its own pace: the button sinks (or the orange moves) over the same time the card fades.
+      // Undo is the skip played backwards: the same times, each curve reversed.
+      var cardMs = FADE_MS * kc, app = $('app');
+      app.style.setProperty('--btn-ms', cardMs + 'ms');
+      app.style.setProperty('--btn-move', sk ? bez(MOVE) : rev(MOVE));
+      app.style.setProperty('--btn-ease', sk ? bez(EASE) : rev(EASE));
+      settleButtons(d);
+      var live = (running[bk] || []).filter(function(a){ return a.playState === 'running' && a.effect && a.effect.target && a.effect.target.isConnected; });
+      if (live.length) {
+        // Tapped again part way through: the motion turns around from where it is.
+        live.forEach(function(a){ a.reverse(); });
+        card.classList.toggle('off', sk);
+        var ico = card.querySelector('.dbl'); if (ico) ico.classList.toggle('broken', sk);
+      } else {
+        running[bk] = lights(card, sk, cardMs).concat(breakBar(card, sk));
+      }
+      var pop = pill.animate([{ transform:'scale(' + POP.to + ')', offset:0 }, { transform:'scale(' + POP.peak + ')', offset:POP.at, easing:'cubic-bezier(.3,0,.5,1)' }, { transform:'scale(1)', offset:1 }],
+        { duration:out, easing:'cubic-bezier(.2,.8,.3,1)' });
+      shrink.cancel();
+      pop.onfinish = done; pop.oncancel = done;
+    }, POP.inMs * k);
+  }
+  $('day').addEventListener('click', function(e){
+    var p = e.target.closest('[data-pill]'); if (p) toggle(p.getAttribute('data-pill'));
+  });
+
+  drawControls(); drawStrip(); drawDay();
+})();
+</script>

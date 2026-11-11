@@ -250,3 +250,83 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   the placement after the stylesheet lands, a write that does not hold, the 10 second limit, the glide frame by frame,
   later placements, reduced motion and Week 1, a touch mid glide, a touch before the stylesheet, and the screen's wiring
   read as text). The file cannot load on v0.259.0: `week-strip.ts` is not there (`git cat-file -e` on it fails).
+
+## D284 P-SKIPPILL: a Skip pill on each card, so the run or the lift can be skipped alone (Mario, 2026-11-11)
+
+- **Date:** 2026-11-10 and 11, Post-v0.260.0. **Ruled by:** Mario, on the Skip the Day mockup
+  (`docs/design/card-skip.html`, published as https://claude.ai/artifact/M9MRfQ8Xg3CNqkA49nhQ47), in his words:
+  "we need a skip button for the day"; "lets do the pill in the top corner and place it on both the cardio block on the
+  hero page and the lifting block so that way a user can skip just the cardio or just the lift. and when you hit the
+  button do a shrinking animation for the button and have it pop back out with it skipped"; "the pill goes dark and the
+  button for record run or start lift just gets depressed and unclickable but dont change the words on it"; "make the
+  block that got skipped dimmer"; "i like the fade and dim settings ... the skip button you click stays the normal speed
+  and the block goes dark with the settings above but lets go slow motion x3"; "the little dumbell next to the then
+  lift have it break in half when you hit skip, then come back together if you undo"; "when you undo skip its just
+  pressing the skip button again ... make sure the undo animation is the same timing and everything as the skip
+  animation just in reverse". His one doctrine call, asked with a recommendation: a day with one part skipped and the
+  other done "Counts as done" for the streak. **Amends** D276 item 7 (a skipped day drew a Skipped row on both cards)
+  and answers D278's counter-argument (a day with lift work had no door to skip before training). It is not D249
+  P-CARDIOSKIP (moving a run), which stays open. **Bump:** MINOR, v0.261.0 (Mario, 2026-11-11). **Shipped:** not yet.
+- **Finding (measure on v0.260.0, by reading the code; nothing in a program moves):**
+  1. A day's status lives in `ia_comp_<program>`, one record per day keyed `w<N>_<day>`, `complete` or `skipped`. A
+     record with no status reads as complete (`statusOf`, `completedCount`), so a part skip cannot sit there alone.
+  2. The run log cannot carry it either: `persistLogFields` rebuilds the day's `ia_logs_` entry from the form on every
+     write and keeps only `sets`, `parked` and `restLog`.
+  3. On This Week a day with lift work has no way to skip before training: the run card's button opens the cardio's own
+     sheet with no Done or Skip (D278), the lift card's opens the deck, which skips one movement at a time. A day that
+     is only cardio keeps Skip on its sheet; a day that is only lift work has none.
+  4. The status's readers: the streak (`computeStreak`: complete counts, a Wildcard counts, skipped breaks, pending is
+     passed over), `completedCount` and `skippedCount` (the pop-ups' numbers), the day-after reminder (any status ends
+     its walk), This Week's strip mark, Done tile and cards, the deck (`dayDone`), the mile nudge (a skipped day's run
+     never counts), the session sheet's foot. The backup copies every `ia_` key; deleting a program purges each key
+     family by name (`purgeProgData`).
+- **What changes (the iOS app's This Week, and one store):**
+  1. **The pill.** Top right of every card whose part is not done: `Skip run` on the run card (`Skip ride`, `Skip swim`
+     for those sports), `Skip lift` on the lift card, `Skip stretch` on the cool down card (After the run). A day that
+     is only run or only lift has one card and one pill. No pill on a rest day, or on a card that is done (it keeps its
+     done row and Reopen).
+  2. **The press (Pop), always at this speed.** The pill shrinks to 70% over 150 ms, turns dark while small (ink,
+     `✕ Skipped`), and comes back out over 320 ms, passing 112% at 55% of the way.
+  3. **The card goes dark in slow motion, ×3.** Everything on the card but the pill fades to 50% (Dim) over 1,050 ms,
+     ease-out (Fade, 350 ms, at ×3), and the card's ground goes a shade darker (`#E4E4E0` by day, `#090909` at night).
+     Its button keeps its words, sinks (grey, pressed in, 1 pt down at 98.5%) over the same 1,050 ms and takes no taps
+     (Sunken). The one orange (D263) moves to the next card not skipped at the same pace. The pill stays lit: it is the
+     switch.
+  4. **The dumbbell snaps (Snap).** The icon beside Then lift or After the run splits at the middle of the bar: each half
+     cracks to 7°, back to 2°, droops past 30° and settles at 22° in a V, 2 units apart, over 520 ms, starting as the
+     pill turns dark. It stays broken while the card is skipped.
+  5. **Undo is the same pill.** Tap the dark pill: the pill presses the same way, and the card, its button and the
+     dumbbell each play their skip backwards at the same speed (the same frames, the same time, each curve reversed).
+     A tap part way through turns the motion around where it is.
+  6. **The day follows its parts.** Every part skipped: the day is skipped (the strip's ✕, the streak breaks), as a
+     skipped day is today. One part skipped and every other part done: the day counts as done (Mario's call), so the
+     streak holds. One part skipped and another still to do: the day stays pending, as an untouched day is.
+  7. **A day skipped any other way** (the reminder's Skip, a cardio-only day's sheet) draws every card skipped, and its
+     pills undo one part at a time.
+- **The store:** `ia_parts_<program>`, keyed `w<N>_<day>`, holds the parts skipped (`{"run":1}`, `{"lift":1}`). One
+  writer in the legacy script toggles a part and settles the day: all parts skipped writes `skipped`; every part not
+  skipped done (the run logged for the sport it is credited to, D213) writes `complete`; otherwise no record. A record
+  the parts wrote carries `parts:1` and is rewritten or removed as the parts change; a status the athlete set (Done,
+  the deck, the reminder) is never overwritten, except that undoing one part of a plain skipped day turns it into part
+  skips first. Saving the run's log settles the day again, so skipping the lift and then logging the run closes the
+  day, and clearing that run opens it again (no latch). Deleting the program purges `ia_parts_`; the backup carries it
+  with every other `ia_` key.
+- **Expected values (the day's status, by hand):**
+
+  | Run | Lift | Status |
+  |---|---|---|
+  | skipped | still to do | none (pending) |
+  | skipped | done in the deck | `complete`, the deck's own |
+  | still to do | skipped | none (pending) |
+  | logged | skipped | `complete`, `parts:1` |
+  | skipped | skipped | `skipped`, `parts:1` |
+  | logged, then cleared | skipped | none again |
+
+  One part on a one card day: its pill skips the day (`skipped`, `parts:1`), and tapping it again leaves no record.
+- **Does not change:** what any program prescribes (HALF_MANNY digest `147f083be4e04e34`); the streak's rules, the
+  reminder, the pop-ups' counts and the Wildcard's rescue (they read the status as before); the deck, which still skips
+  one movement at a time; the session sheet and a cardio-only day's Done and Skip; the progress charts (a skipped run
+  is an unlogged run, as before); the page Pages serves, whose This Week has no pills (its script gains the writer and
+  the settle on a saved log, which find no parts there and do nothing).
+- **The strongest counter-argument, for Mario:** a one tap skip on the main screen invites a stray tap. The dark pill
+  undoes it in place, and the slow fade makes the change plain before anything is lost.
