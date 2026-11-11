@@ -200,3 +200,19 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
 - **Seen, not tested:** the motion, the swipes and the double tap, the pips, the punched hole and the glow, Call it's close
   and the pop-up, in the Angular dev server at 375 px, day and night, driven through the hero's handler. Not yet on the
   phone: TestFlight carries it once Mario merges.
+
+## D281 P-SUMMARYFIT: a deck card keeps its set summary's numbers whole (Mario, 2026-11-10)
+
+- **Date:** found 2026-11-08 in the week 11 mockup, ruled 2026-11-10. **Ruled by:** Mario, "Yes, v0.259.3", on the
+  main session's recommendation. **Bump:** PATCH, v0.259.3 (Mario). **Shipped:** v0.259.3 (2026-11-10).
+- **Finding:** on Thursday of HALF_MANNY's week 11 the Hip stability card's set summaries read "2 × 15 /si…". A deck card
+  is narrower than the session sheet, and the sheet's rule for the summary (`.exset-head-val`, `session-sheet.css`) lets
+  the numbers shrink and clip while "as prescribed" beside them keeps its width. Every v0.257.0 to v0.259.2 build has it;
+  the deck's stylesheet did not change in between.
+- **What changes:** inside a deck card the summary keeps its numbers whole at 17 px and the words beside it give way with
+  an ellipsis (`deck.css`, `.deck-work .exset-head-val` and `.deck-work .exset-head-sub`). Seen whole in the week 11
+  mockup: "2 × 15 /side", "2 × 6 /side".
+- **What does not change:** the session sheet's summary; what any program prescribes; the page Pages serves (its version
+  only).
+- **Test:** `tests/unit/swipe-deck.test.ts`, the deck's stylesheet holds the summary's numbers whole and lets the words
+  give way; it fails on v0.259.2.

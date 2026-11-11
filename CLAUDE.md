@@ -112,6 +112,12 @@ issued D265 before the ruling was written, and it shipped as D266.
    **Push only when Mario asks**, with `node tools/land.mjs` from the worktree (local `dev` fast-forwarded and pushed in one step; One chat per worktree), and never wait on CI (Mario, Post-v0.250.0): the push runs the full suite there and Mario
    reviews it himself; read a run (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) only when he asks. **Mario opens
    every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one (Mario, Post-V239).** When he has merged it, tag what merged: `git fetch origin && git tag v<version> origin/main && git push origin v<version>`.
+   **Every push ends with its pull request summary in chat** (Mario, Post-v0.259.3: "when i say push go ahead and throw the
+   summary in the chat too"). After `land.mjs` pushes, post one fenced Markdown block he copies into the pull request into
+   `main`, covering everything that pull request will carry (`git log origin/main..origin/dev`, not only this chat's
+   commits), one section per version or pass, in plain words: what changes for the athlete, the ruling and its decision
+   file, the files, what does not change (program output), the proof (the tests and whether each fails on the previous
+   release, the 60-second check), what is not yet seen (the phone), and the commits by hash and subject.
 7. **Report the deploy picture; a lagging deploy does not block** (Mario, Post-V239). A push or a merge is not a deploy:
    Pages can report `built` with no error while sitting several commits behind (it silently did not fire on V192 or
    V193). At session start and after every push or merge, read each of these from its own source, never inferring one
