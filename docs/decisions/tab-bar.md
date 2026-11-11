@@ -139,3 +139,54 @@ The bottom tab bar (`nav.tabbar`, `frontends/app/src/legacy/src/css/shell.css`),
   with its timers and its animation frames run apart.
 - **Proof that only the phone can give:** none new. A single resync is unchanged, so D256's check (type a load, close
   the keyboard, open Progress, scroll up: the bar stays at the bottom) stands; Mario may repeat it on the build.
+
+## D285: P-SHEETBLUR, a sheet that closes takes focus off its field (amends D256)
+
+- **Date:** asked and ruled 2026-11-11. **Ruled by:** Mario ("take focus off the field whenever a sheet closes. No
+  viewport numbers."). **Bump:** PATCH, v0.261.1 (Mario: "as its own PATCH"). **Shipped:** v0.261.1.
+- **The report:** Mario's, from the phone on 2026-11-11, with the fix already named. This session did not see the screen;
+  what follows is what the code shows.
+- **The finding (read 2026-11-11 on v0.261.0):**
+  - Nothing in the app ever takes focus off a field: 0 calls to `.blur()` in `frontends/app/src` and `core/src`.
+  - A sheet closes by losing its `open` class: 9 `classList.remove('open')` calls in the legacy script and 3 in the
+    Angular screens (the session sheet, the swap sheet, the add sheet). Nothing else happens to the field in it.
+  - A closed sheet is not removed from the page. It stays `display:block`, slides down over 0.36 s and only then turns
+    `visibility:hidden` (`css/motion.css`). On the phone a tap on a button does not move focus, so a field typed in keeps
+    focus through the close. The keyboard stays up over the page under the sheet, and `focusout` never comes.
+  - D256's two triggers both wait for the keyboard to go (the viewport growing back; focus leaving a field). With focus
+    held by a field in a closed sheet, neither runs when the sheet closes. The resync runs later, whenever the athlete
+    next taps something that takes focus, on whatever screen that is.
+  - The swipe deck (Angular only) carries no `open` class: it closes by a stage and removes its cards 420 ms later. Its
+    fields are the set inputs in a card and the day's RPE and notes.
+  - Not proved on WebKit: the iOS 26.5 simulator would not take a page in this session (it booted, then refused
+    `openurl` and a screenshot). The proof below is the code's and Chrome's; the phone is Mario's.
+- **What changes:**
+  1. One function, `blurFieldIn(el)`: when the focused element is an input, a textarea or a select inside `el`, it loses
+     focus.
+  2. One observer, `installSheetBlur`, installed at load beside `installKeyboardResync`, on the page and in the iOS app
+     (which runs the same script). It watches every element's class. When an element that carried `open` no longer does,
+     it calls `blurFieldIn` on that element. That covers every sheet (`.overlay`, `.rand-overlay`) from every close
+     path, legacy or Angular, and the two folding elements that use the same class (`.prog-card`, `.ease`): a field
+     folded out of sight loses focus too.
+  3. The swipe deck calls `blurFieldIn` on itself when it starts to close, Back and Mark the day done alike.
+  - Losing focus closes the keyboard as the sheet slides away, and it fires the two events the app already listens
+    for: `focusout`, which D256's resync answers 350 ms later, unchanged, and the field's own `change`, so what was
+    typed is stored at the close and not at some later tap.
+- **What deliberately does not change:** every number in D256 and D280 (the 100 points, the 60 ms and 350 ms waits, the
+  one point nudge, the step back a frame later, one resync at a time). The layout: the bar stays position fixed. A field
+  outside the sheet that closed keeps focus: the swap sheet closing over the session sheet leaves a set field there
+  alone. A sheet that closes with no field focused does nothing. Pop-ups and the RPE card (their class is `show`; they
+  hold no field). Screens: leaving a screen with a field focused (the Bugs tab's text box, a wizard step) is the same
+  case and is not ruled here.
+- **Expected values (typed from the ruling):** an element whose class goes from `overlay open` to `overlay` with the
+  focused INPUT inside it: one `blur()` on that input. The same for a TEXTAREA and a SELECT. The focused field outside
+  the element: no blur. The focused element a BUTTON inside it: no blur. A class that changes but never held `open`
+  (`overlay` to `overlay busy`), or still holds it (`overlay open` to `overlay open busy`): no blur. `reopen` and
+  `open-x` are not `open`. A window with no `MutationObserver`: installs nothing and does not throw. The observer
+  watches the document element, subtree, attribute `class` only, with the old value. The deck's `close()` calls
+  `blurFieldIn` with `#deckOverlay` before its stage changes.
+- **Tests:** `tests/unit/tab-bar.test.ts` (both functions lifted out of the page onto a hand-built window whose observer
+  the test fires; the page installs it at load) and `tests/unit/swipe-deck.test.ts` (the deck's close).
+- **Proof that only the phone can give:** Mario types a load in the session sheet, closes the sheet with the keyboard
+  still up, and the keyboard goes with it; the tab bar sits at the bottom on This Week and on Progress after a scroll.
+  The same out of the swipe deck.
