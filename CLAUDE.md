@@ -226,10 +226,11 @@ issued D265 before the ruling was written, and it shipped as D266.
   push to `dev`; the release is proved by the CI run on the commit Mario releases (Pipeline). Gatekeeper reads it, and also:
   - runs each new or changed test on the commit before the change (`node tools/app-at.mjs <previous>
     <scratch>/base_v<previous>.html`: that commit's root copy, or the build of its sources; then `cd tests && IA_APP=<that
-    file> npx vitest run <file>`; a test that reads source files instead of the page, the native app's
-    `frontends/app/test`, runs on a copy of the previous commit's sources: `git archive <previous> frontends/app core |
-    tar -x -C <scratch>/prev`, the main checkout's `frontends/app/node_modules` linked in, the changed test files copied
-    over, then `node --test` on them): a test written for a changed
+    file> npx vitest run <file>`; a test that reads source files instead of the page (the deck's tests, the native app's
+    `frontends/app/test`) runs on a copy of the previous commit's tree: `node tools/tree-at.mjs <previous>
+    <scratch>/prev <changed test files>` writes the app, core, the tests, the tools, the page and its icon as that commit
+    had them, links the main checkout's node_modules and copies the changed test files over, then `npx vitest run` or
+    `node --test` on them there (Post-v0.260.0: assembled by hand, the copy took four tries): a test written for a changed
     behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
     must not change. A new test file that cannot load on the previous release (it imports a module that release does not have) fails there before its first test, by construction: `git cat-file -e <previous>:<that module>` failing is its proof, the report names it so, and no run is needed. A new file that loads there is run as usual, and each of its tests must fail (Post-v0.257.0).
   - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
@@ -332,6 +333,9 @@ which does reach him arrives with a recommendation.
 - **Grep the file, never trust a label.** Filename, chat title, memory and handoff can all lag the artifact.
 
 ## Engineering invariants (from §10b — each one was paid for)
+- A script for an interpreter goes in a file in the scratchpad and runs by its path (`python3 <scratch>/edit.py`), never
+  piped in: in a chat's worktree the isolation guard refuses `python3 - <<'EOF'` or `node -e` after a `cd`, a command it
+  cannot read through (Post-v0.260.0, refused on every edit until the scripts moved to files).
 - Every shell pipeline that proves something is `bash -c 'set -eo pipefail; …'` with `;` separators. `set -e` alone lets a pipe swallow node's exit code. Delete artifacts before regenerating them, with `rm` on a literal path as a command of its own, never inside a `bash -c` string (Claude Code's safety check refuses an `rm` it cannot read through), or let `>` overwrite the file (Post-v0.259.0); an empty diff is a failure, not a clean result. In a chat's worktree, write every path out in full: the isolation guard refuses a command it cannot read through (a `bash -c "…"` string that expands a shell variable such as `$S`, a variable where an option may stand, git inside a loop), and `bash -c '…'` with literal paths runs as usual (Post-v0.257.0).
 - No process substitution `<(...)` — use temp files.
 - Oracles are independent: a test never asserts the engine equals its own output. Hand tables, the doctrine text, date arithmetic; a golden snapshot is the one deliberate exception.
@@ -462,6 +466,6 @@ before a merge into `main` touches the build).
   rulings). `core/` (`@ia/core`: the release version, semver, the domain types in `core/src/domain`).
   `docs/decisions/<feature>.md` (the rulings, one file per feature); `docs/test-migration.md` and
   `docs/test-migration/*.md` (how every legacy gate row was carried over or dropped); `docs/architecture-migration.md`.
-- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit and refuses a commit on `dev` in the main checkout; `.githooks/prepare-commit-msg` writes the `Chat: <work>` trailer on a `chat/<work>` branch; `.githooks/pre-push` lets only local `dev` and tags reach GitHub and a push of `dev` carry one chat (`git config core.hooksPath .githooks` once per clone; keep it relative). `tools/land.mjs` — how a chat's branch reaches `origin/dev` (One chat per worktree), its judges tested in `tests/unit/landing.test.ts`. `tools/claims.mjs` — the next free D-code and the highest version across `origin/dev`, `dev`, every chat branch and the working tree, tested in `tests/unit/claims.test.ts`. `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
+- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit and refuses a commit on `dev` in the main checkout; `.githooks/prepare-commit-msg` writes the `Chat: <work>` trailer on a `chat/<work>` branch; `.githooks/pre-push` lets only local `dev` and tags reach GitHub and a push of `dev` carry one chat (`git config core.hooksPath .githooks` once per clone; keep it relative). `tools/land.mjs` — how a chat's branch reaches `origin/dev` (One chat per worktree), its judges tested in `tests/unit/landing.test.ts`. `tools/claims.mjs` — the next free D-code and the highest version across `origin/dev`, `dev`, every chat branch and the working tree, tested in `tests/unit/claims.test.ts`. `tools/tree-at.mjs` — a past commit's tree for the previous-release proof of a test that reads source files (Proof for new work), tested in `tests/unit/tree-at.test.ts`. `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
 - `tools/` — the run log (`tools/README.md`): every test, build, deploy and server run is a folder under `temp/runs/` (gitignored) with a line in `temp/events.log`; `~/Library/Logs/IronAsylum/orchestration.log` has one line per top-level start on this Mac. When something went wrong, `node tools/logs.mjs` is the first place to look. `tools/deploy-check.mjs` is rhythm step 7 as one command.
 - `doctrine/*.txt` — page-ordered OCR of the NSW guide and the four NRC plans. Gitignored (not published by Pages); regenerate from the archives with `doctrine/README.md` if missing.

@@ -332,3 +332,7 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   and the gap above the weight row and Log 6 pt (Roomy keeps 12 and 8).
 - **Measured after** (spare points at the tightest card, card heights 624 and 479): his phone 58 at rest and with sets
   open; the SE 3 in the busiest state (the Leg circuit), every other card 30 or more.
+- **On WebKit (Post-v0.260.0, the friction report resolved):** the same measure ran in Safari 26.5 in the iOS simulator,
+  an iPhone 17 Pro (402 pt wide, Roomy) and an iPhone SE third generation (375 pt, Tight), the page printing each card's
+  need: his size 582 of 624 at the tightest (the Leg circuit with a swap), 42 to spare; the SE 474 of 479, 5 to spare;
+  every other card 510 or less and 447 or less. WebKit lays the cards out within a few points of Chrome.
