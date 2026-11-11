@@ -1,5 +1,26 @@
 # doctrine text is local reference for the coach agent; keep it out of GitHub Pages
 doctrine/*.txt
+# Secrets are never committed (CLAUDE.md, Security): this repo is public. Settings live in environment variables,
+# backend/.env locally (backend/.env.example lists them) and Heroku config vars in production. CI's signing files come
+# from GitHub repository secrets and are written to the runner's temp folder, never into the checkout.
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+*.pfx
+*.pem
+*.key
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.keystore
+*.jks
+*.keychain
+*.keychain-db
+.npmrc
+.netrc
+.git-credentials
 # dependencies, caches and OS junk
 node_modules
 __pycache__/
