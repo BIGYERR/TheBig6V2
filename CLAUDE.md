@@ -27,6 +27,32 @@ Mario has had to repeat this more than once; a session that makes him say it aga
   return is corrected to the dotted form before it is used or repeated, and the correction is reported. builder and
   gatekeeper do not load this file, so every agent file and skill carries this section at its top.
 
+## Security (Mario, Post-v0.261.3): this repo is PUBLIC, and bots clone it
+600+ clones from 120+ cloners in two weeks, with Mario the only human visitor. **Treat every commit as permanently
+public**: every branch, tag and pull request ref on GitHub, every commit message, every Actions log and artifact. Deleting
+a file does not take it out of history, and a secret that reached GitHub once is burned.
+- **Never hardcode** an API key, token, password, private key, connection string or database URL: not in code, tests,
+  scripts, docs, the handoff, a measure report, a decision file or a commit message. A test uses an obvious fake
+  (`'secret'`, a key it generates itself).
+- **Every secret is an environment variable.** Locally `backend/.env` (gitignored; `backend/.env.example` lists every
+  setting with placeholder values only), in production Heroku config vars (`backend/scripts/heroku.sh setup`), in CI
+  GitHub repository secrets, which only Mario enters (Native). A CI step writes one to disk under `$RUNNER_TEMP`, never
+  under the checkout, whose `temp/` is uploaded as a run-log artifact.
+- **Never commit `.env` or any file holding a secret** (`.env.*`, `*.p8`, `*.p12`, `*.pem`, `*.key`, `*.mobileprovision`,
+  a keychain, `frontends/app/build.json`, `.npmrc`). `.gitignore` covers them; never `git add -f` one.
+- **Before every commit, read the staged diff (`git diff --cached`, the sources; `index.html` is their build) for
+  anything that looks like a credential**: a long random string, a `key`/`token`/`secret`/`password` assignment, a URL
+  with `user:pass@`, a `BEGIN … PRIVATE KEY` block. If one is there, stop: unstage it, commit nothing, and tell Mario the
+  file and line. Never commit it "to fix in the next commit".
+- **The page and the iOS app cannot keep a secret.** Everything in `index.html` or the app bundle is public, whatever
+  environment variable it was built from. A key that must stay secret lives behind the backend.
+- **Known non-secrets, so no session churns on them:** the local dev login admin / asylum (local only: production refuses
+  `/admin` until `ADMIN_USER` and `ADMIN_PASSWORD` are Heroku config vars, and production's password is never that one);
+  the bug report's Web3Forms access key (a client key Web3Forms publishes for use in page source); the scratch-path UUIDs
+  in `tests/measure/`; the tests' fake keys.
+- **A secret found in git history** is rotated first, then reported to Mario with its file, commit and service.
+  Rewriting history and force-pushing are his call alone, never made without his yes in chat.
+
 ## What this is
 Vanilla HTML/CSS/JS PWA served as one page (`index.html`, ~1.3 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
@@ -404,7 +430,7 @@ No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declar
 Builder and gatekeeper agents do not load this file (`omitClaudeMd`). A brief to either carries the ruling verbatim (its
 decision file entries), the version Mario picked, the baseline path, the feature tests to write or check, every
 behaviour the ruling changes, whether `HALF_MANNY` may move and to what digest, and the Test layout, Proof for new
-work and PRIORITY 1 sections pasted, plus the standing lines: proving pipelines are `bash -c 'set -eo pipefail; …'`;
+work, PRIORITY 1 and Security sections pasted, plus the standing lines: proving pipelines are `bash -c 'set -eo pipefail; …'`;
 oracles never ask the engine; a test file that registers no tests is a failure; pin `cfg.seed` and prove a program
 equals itself before comparing; NRC sessions are verbatim; temp files only under the scratch path the brief names.
 
