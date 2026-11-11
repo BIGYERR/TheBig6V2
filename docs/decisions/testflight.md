@@ -29,3 +29,27 @@ after the deploy proof on `main`, `frontends/app/scripts/ios.mjs release` (the s
   so the first TestFlight build has a number of its own. The data backup build took 0.253.0 first, so this is 0.253.1.
 - **Expected:** `testflight.test.ts` holds the preference in `config.xml`'s iOS platform with `Orientation` portrait
   (red on v0.253.0). The proof of the fix itself is the next TestFlight run on `main`: `testflight 0.253.1 processed`.
+
+## D282: P-IOS15FLOOR, the native app runs on iOS 15 and later
+
+- **Date:** 2026-11-10. **Ruled by:** Mario ("we need to shift from the floor being iOS 13 to iOS 15").
+  **Bump:** PATCH (Mario). **Shipped:** (filled at ship time).
+- **The finding:** App Store Connect emails Mario after every TestFlight upload that the app's deployment target is
+  too low: ITMS-90068, first seen on 0.254.0 (run 41222630185), the app targets iOS 13.0 and from April 2027 an upload
+  must target 15.0 or later. `config.xml` never set `deployment-target`, so the App target inherits cordova-ios 8.1.1's template value:
+  the generated `App.xcodeproj` (main checkout, before this change) carries `IPHONEOS_DEPLOYMENT_TARGET = 13.0` on both
+  of the app's configurations and `16.2` on both of the RestTimerWidget extension's (set by the `ia-island` hook).
+- **What changes:** `config.xml` adds `<preference name="deployment-target" value="15.0" />` to the iOS platform.
+  Cordova's prepare writes it into every configuration; the `ia-island` after_prepare hook then sets the extension's
+  own 16.2 again, as it already did for `TARGETED_DEVICE_FAMILY`. The app's minimum iOS becomes 15.0.
+- **What deliberately does not change:** the widget extension stays at 16.2, and the Live Activity stays behind its
+  `#available(iOS 16.2, *)` checks, so a phone on 15.0 to 16.1 runs the app without the island as before. The GPS
+  plugin's `#available` checks for iOS 11 to 14 become always true and are left as written (a compiler note, not an
+  error; no behaviour moves). No screen, program or stored value changes; the page differs from v0.259.3 only in its
+  version. Phones on iOS 13 and 14 can no longer install new builds; Mario's phone is far past both.
+- **Not chosen:** handoff §12 had parked the line to ride in the next release with its own reason to go up (a version
+  goes up to TestFlight once). Mario chose a PATCH of its own: the warning arrives with every upload until it ships.
+- **Expected:** `testflight.test.ts` holds the preference in `config.xml`'s iOS platform (red on v0.259.3). A local
+  simulator build of the change shows `IPHONEOS_DEPLOYMENT_TARGET = 15.0` on the app's configurations and `16.2` on the
+  extension's, and the built app's `MinimumOSVersion` is 15.0. The proof of the fix itself is the next upload from
+  `main`: no deployment target email from App Store Connect.
