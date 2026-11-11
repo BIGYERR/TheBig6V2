@@ -30,6 +30,9 @@ const BREAKS = [
   ['completion status', 'a skipped day is stored as complete', "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,status,Date.now());", "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,'complete',Date.now());"],
   // v0.261.4: a break inside the rules that moved to core with the day's log, completion and parts.
   ['part skip', 'a skipped part is not stored', "  writePartSkips(store,programId,all);\n  settleDayParts(", "  settleDayParts("],
+  // Post-v0.261.4: open until the records gained the case "a day's parts settle its status" (no history before it let a
+  // day's parts write its completion).
+  ['parts settle', 'the parts of a day never write its completion', "c[k]={title:(day&&day.title)||null,ts:now,status:want,parts:1};", ''],
   ['seed write back', 'an old program\'s seed is not written back to its config', '    prog.cfg.seed = prog.seed;\n', '\n'],
   ['purge', 'a deleted program keeps its logs', "['ia_logs_','ia_comp_',", "['ia_comp_',"],
   ['rest move key', 'a moved rest day is stored under the picked day', 'moves[completedKey(w,day)]={from:pick,ts:Date.now()};', 'moves[completedKey(w,pick)]={from:pick,ts:Date.now()};'],
@@ -39,8 +42,6 @@ const BREAKS = [
 // Breaks that changed no record on 2026-11-11. They are run and printed, and they do not fail the script: each is
 // either dead weight in the code or a gap in the histories, and the note says which the session could show.
 const OPEN = [
-  ['parts settle', 'the parts of a day never write its completion', "c[k]={title:(day&&day.title)||null,ts:now,status:want,parts:1};", '',
-    'A gap in the histories, found with v0.261.4: each skips one part of a two part day and never logs that day\'s run or skips its other part, so no golden record holds a completion the parts wrote. The rule is held elsewhere: on this break 4 of the 9 tests of `tests/integration/skip-pill.test.ts` go red (run 2026-11-11), and `tests/unit/stored-state.test.ts` types its records by hand. A history that skips the lift and logs the run would hold it in the records; it adds a golden record, so it is a tests pass of its own.'],
   ['freeze cut, the touched term', 'the current week, when touched, is not frozen a week further', 'const _dateCut = _curWk + (_curTouched ? 1 : 0);', 'const _dateCut = _curWk;',
     'No effect is possible: the next line takes the larger of this and the highest touched week plus one, and a touched current week is at least that week. The term is redundant.'],
   ['history, first touch', 'a day\'s snapshot is overwritten on every touch', 'if(h[k]) return;', '',

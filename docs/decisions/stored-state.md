@@ -151,3 +151,22 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   goes red on it (4 of 9) and the unit tests above type those records by hand, so the rule is held; the records do not
   hold it. A history that skips the lift and logs the run adds a golden record, so it is a tests pass of its own
   (`tests/measure/stored-state_red-on-break.md`).
+
+## The records hold a completion a day's parts wrote (Post-v0.261.4, tests only)
+
+- **Date:** 2026-11-11. **Ruled by:** Mario (he concurred with closing the gap in a tests pass before the history
+  slice). No build: `ia-version` stays 0.261.4.
+- **The finding:** the entry above. A break inside `settleDayParts` changed no golden record, because no history let a
+  day's parts write a completion.
+- **What changes:** `tests/integration/stored-state.test.ts` gains the case "a day's parts settle its status" on
+  HALF_MANNY's week 1, whose Monday and Tuesday each carry a run and a lift. Monday's lift is skipped and its run
+  logged; both of Tuesday's parts are skipped; then Tuesday's run is put back and Monday's run cleared. Its two records
+  (`closed`, `reopened`) are new in `tests/snapshots/stored-state.json`: 154 lines added, none removed or changed.
+- **What does not change:** the standard history (`life`), so every other golden file and the backup corpus; the page;
+  the app.
+- **Expected values, typed by hand from D284 (`docs/decisions/this-week.md`):** one part of two skipped writes
+  no completion; the lift skipped and the run logged stores `status: 'complete', parts: 1`; both parts skipped stores
+  `status: 'skipped', parts: 1` and `{run: 1, lift: 1}` under the day; with the run put back and the logged run cleared
+  both completions are gone and each day keeps `{lift: 1}`.
+- **Proof:** the break "parts settle" (the parts never write a completion) now turns this file red, and it moved from
+  the open list to the breaks that must be red: 14 red, 2 open (`tests/measure/stored-state_red-on-break.md`).

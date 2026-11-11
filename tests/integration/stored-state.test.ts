@@ -223,6 +223,41 @@ test('a logged day with no history kept, in a week an injury then covers, takes 
   golden['a logged day with no history, then an injury'] = P.record();
 });
 
+test('a day\'s parts settle its status: a skipped lift with a logged run is done, both parts skipped is skipped, and neither latches', () => {
+  // The standard history skips one part of one day and stops there, so no record of it holds a completion the parts
+  // wrote (found by the break check, v0.261.4). Week 1 of HALF_MANNY: Monday and Tuesday each carry a run and a lift.
+  const P = new Phone().launch(CREATED);
+  const id = P.generate(HALF);
+  const comp = () => parsed(P, 'ia_comp_' + id) || {};
+  P.launch(at(START, 0));
+  for (const d of ['mon', 'tue']) assert.equal(P.ev(`JSON.stringify(dayPartsOf(1,'${d}'))`), '["run","lift"]', d + ' has both parts');
+
+  // Monday: the lift skipped on its own leaves the day open; the run logged then closes it.
+  P.open(1, 'mon');
+  P.ev("skipPart(1,'mon','lift')");
+  assert.deepStrictEqual(comp(), {}, 'one skipped part of two writes no completion');
+  P.type('log_run_dist', '3.1'); P.type('log_run_mins', '31');
+  P.ev("persistLogFields('mon',true)");
+  assert.deepStrictEqual([comp().w1_mon.status, comp().w1_mon.parts], ['complete', 1], 'the parts wrote the completion, and it says so');
+
+  // Tuesday: both parts skipped is a skipped day.
+  P.launch(at(START, 1));
+  P.open(1, 'tue');
+  P.ev("skipPart(1,'tue','run');skipPart(1,'tue','lift');");
+  assert.deepStrictEqual([comp().w1_tue.status, comp().w1_tue.parts], ['skipped', 1]);
+  assert.deepStrictEqual(parsed(P, 'ia_parts_' + id), { w1_mon: { lift: 1 }, w1_tue: { run: 1, lift: 1 } });
+  const closed = P.record();
+
+  // No latch: Tuesday's run put back, and Monday's run cleared, open both days again; the skipped lifts stay.
+  P.launch(at(START, 1, '21:00'));
+  P.ev("skipPart(1,'tue','run')");
+  P.open(1, 'mon');
+  P.ev("persistLogFields('mon',true)");
+  assert.deepStrictEqual(comp(), {}, 'a completion the parts wrote goes when the parts no longer earn it');
+  assert.deepStrictEqual(parsed(P, 'ia_parts_' + id), { w1_mon: { lift: 1 }, w1_tue: { lift: 1 } });
+  golden['a day\'s parts settle its status'] = { closed, reopened: P.record() };
+});
+
 afterAll(() => {
   // One file for the whole feature. A case that failed above left its entry out, and the comparison says so.
   matchSnapshot('stored-state', { zone: process.env['TZ'], created: CREATED, records: golden as Record<string, StateRecord> });

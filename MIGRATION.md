@@ -37,8 +37,8 @@ Each phase starts only on Mario's GO, one phase step per session.
   the form and stay in the page until the cardio dose moves; the freeze's own read of these keys waits for its slice.
   The break check gained a break inside the moved rules (13 in all, all red) and found a gap: no history lets a
   day's parts write its completion, so no golden record holds that write. The skip pill's own tests and the new unit
-  tests hold the rule (`tests/measure/stored-state_red-on-break.md`); a history that skips the lift and logs the run
-  would put it in the records, as a tests pass of its own.
+  tests hold the rule (`tests/measure/stored-state_red-on-break.md`). Closed by a tests pass, Post-v0.261.4: the case
+  "a day's parts settle its status" puts that write in the records, and its break is red (14 in all, 2 open).
 - **Next, on his GO:** history (`ia_hist_`, `snapshotDay` and its re-snapshot), with the open break (a day's first
   snapshot overwritten) settled in that slice.
 
