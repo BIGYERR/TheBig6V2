@@ -407,6 +407,24 @@ function installKeyboardResync(win: any){
 }
 installKeyboardResync(window);
 
+// v0.261.1 (D285): a sheet that closes takes focus off its field, so focusout, which the resync above waits for, comes
+// at the close. WebKit drops focus by itself only once a closed sheet is hidden, and a focused field removed from the
+// page (the swipe deck's way out) fires no focusout at all (tests/measure/tab-bar_sheet-focus.md). A sheet closes by
+// losing its open class, from every close path in the page and the iOS app alike, so one observer sees them all; the
+// swipe deck, which has no open class, calls blurFieldIn itself.
+function blurFieldIn(el: any){
+  const a=el&&el.ownerDocument&&el.ownerDocument.activeElement;
+  if(!a||!/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName||'')||!el.contains(a)) return false;
+  a.blur(); return true;
+}
+function installSheetBlur(win: any){
+  if(!win.MutationObserver) return;
+  const open=(s: any)=>/(^|\s)open(\s|$)/.test(s||'');
+  new win.MutationObserver((recs: any[])=>{ for(const r of recs){ if(open(r.oldValue)&&!open(r.target.getAttribute('class'))) blurFieldIn(r.target); } })
+    .observe(win.document.documentElement,{attributes:true,attributeFilter:['class'],attributeOldValue:true,subtree:true});
+}
+installSheetBlur(window);
+
 // v0.254.0 (D266): the tab highlight is one pill that glides from tab to tab like liquid, and the bar can be dragged.
 // Its two edges are separate springs (unit mass): the edge on the side it travels toward leads, the other trails, so the
 // pill stretches toward the new tab and its tail catches up, thinning as it stretches. Each tab's colour is signal by
