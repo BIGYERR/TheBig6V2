@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.4">
+<meta name="ia-version" content="0.261.5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1382,7 +1382,7 @@ function getLogs(){return readDayLogs(iaStore,activeProgId);}
 
 
 function getLogsFor(pid){return readDayLogs(iaStore,pid);}
-function getDayHistFor(pid){try{return JSON.parse(iaStore.get('ia_hist_'+pid)||'{}');}catch{return{};}}
+function getDayHistFor(pid){return readDayHistory(iaStore,pid);}
 function getExWeightsFor(pid){return readLiftLog(iaStore,pid);}
 function saveExWeightsFor(pid,obj){writeLiftLog(iaStore,pid,obj);}
 function saveLogs(l){writeDayLogs(iaStore,activeProgId,l);}
@@ -1422,47 +1422,19 @@ function completedKey(w,d){return dayStoreKey(w,d);}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-function getDayHist(){try{return JSON.parse(iaStore.get('ia_hist_'+activeProgId)||'{}');}catch{return{};}}
-function saveDayHist(h){try{iaStore.set('ia_hist_'+activeProgId,JSON.stringify(h));}catch(e){}}
-
-
-
-
-
-
+function getDayHist(){return readDayHistory(iaStore,activeProgId);}
+function saveDayHist(h){writeDayHistory(iaStore,activeProgId,h);}
 
 function resnapshotDayEdit(week,dayKey){
   try{
     if(!activeProg||!activeProg.weeks||!week||!dayKey) return;
-    const day=activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
-    if(!day) return;
-    const h=getDayHist(), k=completedKey(week,dayKey);
-    if(!h[k]) return;                                 
-    h[k]=JSON.parse(JSON.stringify(day));
-    saveDayHist(h);
+    refreshDaySnapshot(iaStore,activeProgId,week,dayKey,activeProg.weeks[week]&&activeProg.weeks[week][dayKey]);
   }catch(e){ console.error('day edit re-snapshot failed',week,dayKey,e); }
 }
 function snapshotDay(week,dayKey){
   try{
     if(!activeProg||!activeProg.weeks||!week||!dayKey) return;
-    const day=activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
-    if(!day) return;
-    const h=getDayHist(), k=completedKey(week,dayKey);
-    if(h[k]) return;                                  
-    h[k]=JSON.parse(JSON.stringify(day));
-    saveDayHist(h);
+    recordDaySnapshot(iaStore,activeProgId,week,dayKey,activeProg.weeks[week]&&activeProg.weeks[week][dayKey]);
   }catch(e){ console.error('day snapshot failed',week,dayKey,e); }
 }
 
@@ -2668,6 +2640,48 @@ function clearDayParts(store, programId, week, dayKey){
   const all=readPartSkips(store,programId), k=dayStoreKey(week,dayKey);
   if(!all[k]) return;
   delete all[k]; writePartSkips(store,programId,all);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+function readDayHistory(store, programId){try{return JSON.parse(store.get('ia_hist_'+programId)||'{}');}catch{return{};}}
+function writeDayHistory(store, programId, h){try{store.set('ia_hist_'+programId,JSON.stringify(h));}catch(e){}}
+
+
+
+function recordDaySnapshot(store, programId, week, dayKey, day){
+  if(!day) return;
+  const h=readDayHistory(store,programId), k=dayStoreKey(week,dayKey);
+  if(h[k]) return;                                  
+  h[k]=JSON.parse(JSON.stringify(day));
+  writeDayHistory(store,programId,h);
+}
+
+
+
+
+
+function refreshDaySnapshot(store, programId, week, dayKey, day){
+  if(!day) return;
+  const h=readDayHistory(store,programId), k=dayStoreKey(week,dayKey);
+  if(!h[k]) return;                                 
+  h[k]=JSON.parse(JSON.stringify(day));
+  writeDayHistory(store,programId,h);
 }
 
 

@@ -33,19 +33,24 @@ const BREAKS = [
   // Post-v0.261.4: open until the records gained the case "a day's parts settle its status" (no history before it let a
   // day's parts write its completion).
   ['parts settle', 'the parts of a day never write its completion', "c[k]={title:(day&&day.title)||null,ts:now,status:want,parts:1};", ''],
+  // v0.261.5: two breaks inside the rules that moved to core with the day history. The second was green until the
+  // records gained the case "a touched day edited, then its session moved" (no history before it edited a day after
+  // its first touch).
+  ['history, kept', 'a touched day is never snapshotted', 'if(h[k]) return;', 'return;'],
+  ['edit re-snapshot', 'an edit after the first touch is not folded into the day\'s snapshot', 'if(!h[k]) return;', 'return;'],
   ['seed write back', 'an old program\'s seed is not written back to its config', '    prog.cfg.seed = prog.seed;\n', '\n'],
   ['purge', 'a deleted program keeps its logs', "['ia_logs_','ia_comp_',", "['ia_comp_',"],
   ['rest move key', 'a moved rest day is stored under the picked day', 'moves[completedKey(w,day)]={from:pick,ts:Date.now()};', 'moves[completedKey(w,pick)]={from:pick,ts:Date.now()};'],
   ['week count', 'the current week is counted one day late', 'const diff=Math.floor((today-weekMon)/86400000);', 'const diff=Math.floor((today-weekMon)/86400000)-1;'],
 ];
 
-// Breaks that changed no record on 2026-11-11. They are run and printed, and they do not fail the script: each is
-// either dead weight in the code or a gap in the histories, and the note says which the session could show.
+// Breaks that change no record. They are run and printed, and they do not fail the script: each is a line no history
+// can reach an effect through, and the note says how that was shown.
 const OPEN = [
   ['freeze cut, the touched term', 'the current week, when touched, is not frozen a week further', 'const _dateCut = _curWk + (_curTouched ? 1 : 0);', 'const _dateCut = _curWk;',
     'No effect is possible: the next line takes the larger of this and the highest touched week plus one, and a touched current week is at least that week. The term is redundant.'],
   ['history, first touch', 'a day\'s snapshot is overwritten on every touch', 'if(h[k]) return;', '',
-    'Not shown either way. In every history here a touched day is restored from its snapshot at each launch, so a second snapshot writes the same bytes. Whether any tap can change a touched day before its next snapshot (a moved rest day, a sport swap) was not traced. To settle before the freeze slice.'],
+    'No reachable effect, settled in v0.261.5 (docs/decisions/stored-state.md). The guard decides only when a day is snapshotted again after it changed. A launch gives every snapshotted day back from its snapshot, and an edit is folded into the snapshot as it is made. One tap changes a snapshotted day and leaves its snapshot alone, the rest sheet\'s Move of a day with a logged lift, and it leaves a moved rest day that nothing snapshots (tests/measure/stored-state_first-touch.md). In 180 random histories, 0 of 4,481 repeat snapshots met a changed day (stored-state_first-touch-walks.md). The rule itself is held by the unit tests.'],
 ];
 
 const runFiles = (app, files) => {

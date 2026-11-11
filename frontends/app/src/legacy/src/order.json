@@ -21,6 +21,7 @@
   "engine/state-lift-log.ts",
   "engine/state-day-log.ts",
   "engine/state-day-status.ts",
+  "engine/state-day-history.ts",
   "engine/exercise-kinds.ts",
   "engine/calendar.ts",
   "engine/clock-format.ts",
