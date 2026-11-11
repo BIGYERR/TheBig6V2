@@ -11,7 +11,7 @@
  *   - compiles src/ios/widget/RestTimerWidget.swift (copied to platforms/ios/RestTimerWidget/) and the plugin's
  *     RestTimerAttributes.swift, the same file reference the App target compiles;
  *   - links WidgetKit and SwiftUI (ActivityKit is autolinked by its import);
- *   - IPHONEOS_DEPLOYMENT_TARGET 16.2 on its own configurations only; the App target keeps the project's 13.0;
+ *   - IPHONEOS_DEPLOYMENT_TARGET 16.2 on its own configurations only; the App target keeps config.xml's 15.0 (D282);
  *   - is embedded into the app's PlugIns, with a target dependency so building App builds it first.
  *
  * Cordova's prepare writes IPHONEOS_DEPLOYMENT_TARGET, SWIFT_VERSION and TARGETED_DEVICE_FAMILY with no target named

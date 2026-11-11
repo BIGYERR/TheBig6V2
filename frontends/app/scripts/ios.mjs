@@ -16,7 +16,8 @@
 //   npm run xcode-ios                           open the native project in Xcode
 //   add --no-web to skip the Angular build and reuse www/ as it is
 //
-// Build products go to ~/Library/Caches/iron-asylum-ios (IOS_BUILD_DIR to change it), never into the repo: when the
+// Build products go to ~/Library/Caches/iron-asylum-ios, a chat's worktree to worktrees/<name> inside it so two
+// checkouts never overwrite each other's (scripts/build-root.mjs; IOS_BUILD_DIR to change it), never into the repo: when the
 // repo lived in iCloud-synced ~/Desktop, iCloud stamped Finder metadata onto a fresh .app, which codesign refused
 // ("resource fork, Finder information, or similar detritus not allowed"). It lives in ~/Developer now; the builds stay out.
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -26,11 +27,12 @@ import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { attachRun } from '../../../tools/runlog.mjs';
+import { buildRoot } from './build-root.mjs';
 import { exportOptions, profileProblems, readProfile, signForRelease } from './signing.mjs';
 import { canonical, withNativeVersion } from './version.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BUILD_ROOT = process.env.IOS_BUILD_DIR || join(homedir(), 'Library', 'Caches', 'iron-asylum-ios');
+const BUILD_ROOT = buildRoot({ env: process.env, home: homedir(), app: APP });
 const DEFAULT_SIM = process.env.IOS_SIM || 'iPhone 17 Pro';
 const CONFIG_XML = join(APP, 'config.xml');
 

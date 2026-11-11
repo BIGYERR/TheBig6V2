@@ -3,6 +3,8 @@ import { describe, it } from 'vitest';
 import {
   BAND_GAP,
   BAND_H,
+  CAPTURE_LIMIT_MS,
+  CAPTURE_TRIES,
   COLOURS,
   EDGE,
   FLAG,
@@ -17,6 +19,7 @@ import {
   fitShot,
   headerHtml,
   labelsHtml,
+  withRetry,
 } from '../e2e/collage.ts';
 import type { CollageLayout, CollageTile, LayoutBand, Placement, Size } from '../e2e/collage.ts';
 import { pngSize } from '../e2e/parity.ts';
@@ -326,5 +329,59 @@ describe('composeCollage', () => {
   it('refuses tiles that do not match the layout', () => {
     assert.throws(() => composeCollage(layout, header, bars, labels, [bands[0]!, { tiles: bands[1]!.tiles.slice(0, 2) }]), RangeError);
     assert.throws(() => composeCollage(layout, header, bars, labels, [bands[0]!]), RangeError);
+  });
+});
+
+describe('withRetry: a capture that hangs is abandoned and tried again', () => {
+  // Twice a pull request run passed every step and then hung one collage capture for Puppeteer's 180 s protocol timeout
+  // (PR #10, Post-v0.254.0; v0.259.4's PR, Post-v0.259.4). Limits here are milliseconds; the real one is typed below.
+  const never = () => new Promise<never>(() => undefined);
+  const opts = { tries: 2, limitMs: 20, label: "the collage's header capture" };
+
+  it('limits each capture to 30 s and tries it twice', () => {
+    assert.equal(CAPTURE_LIMIT_MS, 30_000);
+    assert.equal(CAPTURE_TRIES, 2);
+  });
+
+  it('abandons a try that passes its limit, and the next try wins', async () => {
+    const tries: number[] = [];
+    const got = await withRetry((n) => {
+      tries.push(n);
+      return n === 1 ? never() : Promise.resolve('png');
+    }, opts);
+    assert.equal(got, 'png');
+    assert.deepEqual(tries, [1, 2]);
+  });
+
+  it('tries again after a try that throws', async () => {
+    const tries: number[] = [];
+    const got = await withRetry((n) => {
+      tries.push(n);
+      return n === 1 ? Promise.reject(new Error('Target closed')) : Promise.resolve('png');
+    }, opts);
+    assert.equal(got, 'png');
+    assert.deepEqual(tries, [1, 2]);
+  });
+
+  it('makes one try when the first succeeds', async () => {
+    const tries: number[] = [];
+    const got = await withRetry((n) => {
+      tries.push(n);
+      return Promise.resolve('png');
+    }, opts);
+    assert.equal(got, 'png');
+    assert.deepEqual(tries, [1]);
+  });
+
+  it('still fails, naming the capture, when every try hangs', async () => {
+    const tries: number[] = [];
+    await assert.rejects(
+      withRetry((n) => {
+        tries.push(n);
+        return never();
+      }, opts),
+      { message: "the collage's header capture took over 0.02 s (try 2 of 2)" },
+    );
+    assert.deepEqual(tries, [1, 2]);
   });
 });

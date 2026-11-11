@@ -2,7 +2,7 @@
 //   run   [startEpochMs]  running, counting up from that epoch
 //   stop  [elapsedMs]     stopped at that frozen value
 //   end   []              no activity
-// Display only (R5): no push type, no network, no intents. The app's deployment target stays 13.0, so every
+// Display only (R5): no push type, no network, no intents. The app's deployment target is 15.0 (D282), so every
 // ActivityKit path sits behind iOS 16.2, where ActivityContent and the content-based update/end/request exist.
 // One more call, not the island's (D264 P-BACKUP): the web view cannot save a file the page makes, so
 //   share [fileName, text]  writes the text to that file in the app's temporary folder and opens the share sheet;

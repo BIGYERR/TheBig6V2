@@ -373,8 +373,46 @@ export function composeCollage(
   return PNG.sync.write(out as unknown as PNG, { colorType: 2, inputColorType: 2, inputHasAlpha: false, deflateLevel: 6, filterType: 1 });
 }
 
-/** Renders one HTML page at exactly width × height (device scale 1) and returns it as PNG bytes. */
-async function capture(browser: Browser, html: string, width: number, height: number): Promise<Uint8Array> {
+/**
+ * Each of the three captures' limit, and how many times one is tried. A capture takes seconds; twice a pull request run
+ * (PR #10, Post-v0.254.0; v0.259.4's, Post-v0.259.4) passed every step and then hung one capture for Puppeteer's 180 s
+ * protocol timeout, so no collage was written and the job went red, while the push run on the same commit drew it in
+ * seconds. A try past its limit is abandoned and the next starts on a fresh page; the job still fails when every try does.
+ */
+export const CAPTURE_LIMIT_MS = 30_000;
+export const CAPTURE_TRIES = 2;
+
+/**
+ * Runs `attempt` up to `tries` times, each try limited to `limitMs`, and returns the first result. A try that throws or
+ * passes its limit is abandoned (its late result is ignored) and the next one starts; when every try fails, the last
+ * error is thrown.
+ */
+export async function withRetry<T>(
+  attempt: (n: number) => Promise<T>,
+  opts: { tries: number; limitMs: number; label: string },
+): Promise<T> {
+  let last: unknown = new Error(`${opts.label}: no try was made`);
+  for (let n = 1; n <= opts.tries; n++) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const limit = new Promise<never>((_, reject) => {
+      timer = setTimeout(
+        () => reject(new Error(`${opts.label} took over ${opts.limitMs / 1000} s (try ${n} of ${opts.tries})`)),
+        opts.limitMs,
+      );
+    });
+    try {
+      return await Promise.race([attempt(n), limit]);
+    } catch (err) {
+      last = err;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw last;
+}
+
+/** Renders one HTML page at exactly width × height (device scale 1) on a page of its own and returns it as PNG bytes. */
+async function captureOnce(browser: Browser, html: string, width: number, height: number): Promise<Uint8Array> {
   const page = await browser.newPage();
   try {
     await page.setViewport({ width, height, deviceScaleFactor: 1 });
@@ -384,6 +422,15 @@ async function capture(browser: Browser, html: string, width: number, height: nu
   } finally {
     await page.close();
   }
+}
+
+/** One capture, limited and retried (CAPTURE_LIMIT_MS, CAPTURE_TRIES); `what` names it in the error. */
+function capture(browser: Browser, what: string, html: string, width: number, height: number): Promise<Uint8Array> {
+  return withRetry(() => captureOnce(browser, html, width, height), {
+    tries: CAPTURE_TRIES,
+    limitMs: CAPTURE_LIMIT_MS,
+    label: `the collage's ${what} capture`,
+  });
 }
 
 /**
@@ -399,8 +446,8 @@ export async function renderCollage(
   const tiles = bands.flatMap((b) => b.tiles);
   const widths = layout.bands.flatMap((b) => b.placements.map((p) => p.cellWidth));
   const labelW = Math.max(...widths);
-  const header = await capture(browser, headerHtml(meta, layout.width), layout.width, HEADER_H);
-  const bars = await capture(browser, bandsHtml(bands, layout.contentWidth), layout.contentWidth, bands.length * BAND_H);
-  const labels = await capture(browser, labelsHtml(tiles, labelW, widths), labelW, tiles.length * LABEL_H);
+  const header = await capture(browser, 'header', headerHtml(meta, layout.width), layout.width, HEADER_H);
+  const bars = await capture(browser, 'band bars', bandsHtml(bands, layout.contentWidth), layout.contentWidth, bands.length * BAND_H);
+  const labels = await capture(browser, 'labels', labelsHtml(tiles, labelW, widths), labelW, tiles.length * LABEL_H);
   return { png: composeCollage(layout, header, bars, labels, bands), layout };
 }

@@ -99,13 +99,16 @@ registry line and the decision file it names together, at once, in a `docs:` com
 the line alone. A session that finds another's uncommitted registry text in its own commit says so in its report.
 v0.250.0 carried the D258/D259 line to `dev` while `docs/decisions/speed-work.md` stayed untracked.
 **Never name a D-code to Mario before it is in the registry (Mario, Post-v0.254.0).** Until the registry line that
-issues it is written, a ruling is "the next D-code" in chat, a brief and a report. The number is read from the registry
-in the same step that writes the decision file. v0.254.0's ruling was promised as D265 in chat; a concurrent session
+issues it is written, a ruling is "the next D-code" in chat, a brief and a report. The number is read with
+`node tools/claims.mjs` in the same step that writes the decision file: a chat's D-code and version sit on its own branch
+until it lands, so the tool reads the registry and the meta on `origin/dev`, local `dev`, every chat branch and the
+working tree (Post-v0.259.4: the iOS 15 chat read D280 on `dev` and wrote D281 and 0.259.3, which `chat/swipe-deck`
+already held; both were renumbered before any push). v0.254.0's ruling was promised as D265 in chat; a concurrent session
 issued D265 before the ruling was written, and it shipped as D266.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it, and print the deploy picture (step 7).
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `<feature>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience. The main session appends the ruling to its feature's decision file (Proof for new work).
-4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to the source files under `frontends/app/src/legacy/src/` (every text replaced occurs exactly once in the file it edits before it is replaced), `index.html` rebuilt from them (`npm run build:index`), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
+4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to the source files under `frontends/app/src/legacy/src/` (every text replaced occurs exactly once in the file it edits before it is replaced), `index.html` rebuilt from them (`npm run build:index`), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line, and run `node tools/claims.mjs`, which reads both on every chat branch too: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
 5. Gatekeeper proves it as **Pipeline** and **Proof for new work** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews. Green, or a NAMED failing test.
 6. `handoff-update` skill: the seven-element session entry, with the release line of each decision this version shipped filled in (`docs/decisions/<feature>.md`). Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
    `git add -A`**, Mario, Post-V238) and commit on the chat's branch in its worktree (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check; the Chat trailer is written for you).
@@ -312,7 +315,9 @@ which does reach him arrives with a recommendation.
   or MAJOR with `AskUserQuestion`: the recommended option first, every option naming the number it produces and one
   line on why. A bump is never inferred from the queue, the handoff or an earlier chat. If the build grows past the
   class he picked, ask again before the meta is written. Never out of order, never two sessions on one number;
-  builder writes the number Mario named and nothing else.
+  builder writes the number Mario named and nothing else. When another chat takes that number first
+  (`node tools/claims.mjs` names who holds it), the release takes the next number of the class he picked, and the
+  report says so (Post-v0.259.4: PATCH 0.259.3 shipped as 0.259.4).
 - **A version goes up to TestFlight once** (Mario, Post-v0.251.1). App Store Connect refuses a second build of one
   version, so a merge that carries a version it already holds skips the upload, and a fix is the next PATCH (Native).
 - Names from 0.239.1 on carry the dotted version with a lowercase v, and only where a version belongs (PRIORITY 1): the
@@ -424,7 +429,9 @@ before a merge into `main` touches the build).
 - **The compile proof is CI's.** The 60-second check cannot build iOS. The pipeline's `native (iOS simulator)` job runs
   `npm run build-ios` (`scripts/ios.mjs build`: the Angular app, the Cordova platform, an unsigned Xcode build for the
   simulator, nothing launched) on a macOS runner on every push to `dev` and every pull request; its Xcode log is the
-  `native-run-log` artifact. Locally the same command is the fastest native build, minutes, run in the background.
+  `native-run-log` artifact. Locally the same command is the fastest native build, minutes, run in the background. A
+  chat's worktree builds into `~/Library/Caches/iron-asylum-ios/worktrees/<name>`, so two checkouts never overwrite
+  each other's products (`scripts/build-root.mjs`, Post-v0.259.4); read the bundle's own version before trusting it.
 - **The phone: TestFlight from CI** (Mario, Post-v0.251.1). After the deploy proof on each push to `main` (and on a hand
   run of the pipeline on `main`), the TestFlight jobs archive the release (`npm run release-ios`, `scripts/ios.mjs
   release`), upload it and wait until App Store Connect has processed it; the phone's TestFlight app then offers it.
@@ -455,6 +462,6 @@ before a merge into `main` touches the build).
   rulings). `core/` (`@ia/core`: the release version, semver, the domain types in `core/src/domain`).
   `docs/decisions/<feature>.md` (the rulings, one file per feature); `docs/test-migration.md` and
   `docs/test-migration/*.md` (how every legacy gate row was carried over or dropped); `docs/architecture-migration.md`.
-- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit and refuses a commit on `dev` in the main checkout; `.githooks/prepare-commit-msg` writes the `Chat: <work>` trailer on a `chat/<work>` branch; `.githooks/pre-push` lets only local `dev` and tags reach GitHub and a push of `dev` carry one chat (`git config core.hooksPath .githooks` once per clone; keep it relative). `tools/land.mjs` — how a chat's branch reaches `origin/dev` (One chat per worktree), its judges tested in `tests/unit/landing.test.ts`. `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
+- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit and refuses a commit on `dev` in the main checkout; `.githooks/prepare-commit-msg` writes the `Chat: <work>` trailer on a `chat/<work>` branch; `.githooks/pre-push` lets only local `dev` and tags reach GitHub and a push of `dev` carry one chat (`git config core.hooksPath .githooks` once per clone; keep it relative). `tools/land.mjs` — how a chat's branch reaches `origin/dev` (One chat per worktree), its judges tested in `tests/unit/landing.test.ts`. `tools/claims.mjs` — the next free D-code and the highest version across `origin/dev`, `dev`, every chat branch and the working tree, tested in `tests/unit/claims.test.ts`. `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
 - `tools/` — the run log (`tools/README.md`): every test, build, deploy and server run is a folder under `temp/runs/` (gitignored) with a line in `temp/events.log`; `~/Library/Logs/IronAsylum/orchestration.log` has one line per top-level start on this Mac. When something went wrong, `node tools/logs.mjs` is the first place to look. `tools/deploy-check.mjs` is rhythm step 7 as one command.
 - `doctrine/*.txt` — page-ordered OCR of the NSW guide and the four NRC plans. Gitignored (not published by Pages); regenerate from the archives with `doctrine/README.md` if missing.
