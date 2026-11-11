@@ -490,7 +490,8 @@ Each with the session's pick first.
 2. **The web app: freeze or retire?** Pick: freeze it on 2026-12-07 (fixes only), retire the Cordova build when
    cutover holds, and take the Pages page down at the App Store launch. Against: Pages is free and is a way to show
    the app without TestFlight.
-3. **May phase 1 slices reach your phone before the race?** Pick: yes for the small ones, each behind a backup you
+3. **May phase 1 slices reach your phone before the race?** **Answered 2026-11-11: yes ("ok"), for v0.261.2, each
+   install behind a backup saved first (phase 1's numbered steps). The freeze slice still waits for 2026-12-07.** Pick: yes for the small ones, each behind a backup you
    save first, and the freeze slice only after 2026-12-06. Against: any change under your logs three weeks from a
    race is a risk you do not need; holding all of phase 1 off `main` until December 7 costs about two weeks.
 4. **The engine check on today's app.** Pick: yes, one line on the Bugs tab. It is the only way to learn what the

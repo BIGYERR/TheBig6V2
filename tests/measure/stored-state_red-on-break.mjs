@@ -14,7 +14,9 @@ if (!process.argv[2]) { console.error('usage: node tests/measure/stored-state_re
 mkdirSync(scratch, { recursive: true });
 const PAGE = join(ROOT, 'dist-' + 'github-pages', 'index.html');
 const page = readFileSync(PAGE, 'utf8');
-const FILES = ['integration/stored-state.test.ts', 'sweeps/stored-state.test.ts', 'sweeps/data-backup.test.ts'];
+// The fast file first (a few seconds); the sweeps only for a break the fast file lets through (half a minute each).
+const FAST = ['integration/stored-state.test.ts'];
+const SLOW = ['sweeps/stored-state.test.ts', 'sweeps/data-backup.test.ts'];
 
 // name, what the break does, the exact text (once in the page), its replacement.
 const BREAKS = [
@@ -41,9 +43,9 @@ const OPEN = [
     'Not shown either way. In every history here a touched day is restored from its snapshot at each launch, so a second snapshot writes the same bytes. Whether any tap can change a touched day before its next snapshot (a moved rest day, a sport swap) was not traced. To settle before the freeze slice.'],
 ];
 
-const run = (app) => {
+const runFiles = (app, files) => {
   try {
-    execFileSync('npx', ['vitest', 'run', ...FILES], { cwd: join(ROOT, 'tests'), env: { ...process.env, IA_APP: app, UPDATE_SNAPSHOTS: '' }, stdio: 'pipe' });
+    execFileSync('npx', ['vitest', 'run', ...files], { cwd: join(ROOT, 'tests'), env: { ...process.env, IA_APP: app, UPDATE_SNAPSHOTS: '' }, stdio: 'pipe' });
     return { red: false, failed: [] };
   } catch (e) {
     const out = String(e.stdout || '') + String(e.stderr || '');
@@ -51,20 +53,28 @@ const run = (app) => {
     return { red: true, failed, out };
   }
 };
+/** Fast first; the sweeps only when the fast file stays green. `by` says which caught it. */
+const run = (app, all = false) => {
+  const f = runFiles(app, FAST);
+  if (f.red && !all) return { ...f, by: 'the fast file' };
+  const s = runFiles(app, SLOW);
+  if (f.red) return { ...f, by: 'the fast file' };
+  return s.red ? { ...s, by: 'the sweeps' } : { red: false, failed: [], by: '' };
+};
 
 const rows = [];
-const clean = run(PAGE);
-rows.push(['(no break)', 'the page as built', clean.red ? 'RED' : 'green', clean.red ? clean.failed.length : 0]);
+const clean = run(PAGE, true);
+rows.push(['(no break)', 'the page as built', clean.red ? 'RED' : 'green', clean.red ? clean.failed.length : 0, 'all three files']);
 let bad = clean.red ? 1 : 0;
 for (const [name, what, from, to] of BREAKS) {
   const n = page.split(from).length - 1;
-  if (n !== 1) { rows.push([name, what, 'NOT RUN: the text occurs ' + n + ' times in the page', '']); bad++; continue; }
+  if (n !== 1) { rows.push([name, what, 'NOT RUN: the text occurs ' + n + ' times in the page', '', '']); bad++; continue; }
   const app = join(scratch, 'break-' + name.replace(/[^a-z]+/g, '-') + '.html');
   writeFileSync(app, page.replace(from, to));
   const r = run(app);
   if (!r.red) bad++;
   if (r.red && !r.failed.length) writeFileSync(app + '.out.txt', r.out);
-  rows.push([name, what, r.red ? 'red' : 'GREEN (the records miss it)', r.red ? (r.failed.length || (/differs from tests\/snapshots/.test(r.out) ? 'the golden file' : 'a file failed before its tests')) : 0]);
+  rows.push([name, what, r.red ? 'red' : 'GREEN (the records miss it)', r.red ? (r.failed.length || (/differs from tests\/snapshots/.test(r.out) ? 'the golden file' : 'a file failed before its tests')) : 0, r.by]);
 }
 
 const open = [];
@@ -82,10 +92,11 @@ L.push('# Stored state: do the golden records go red when the code is broken on 
 L.push('');
 L.push('Written by `tests/measure/stored-state_red-on-break.mjs`. Each break changes one line of a copy of the built page;');
 L.push('`tests/integration/stored-state.test.ts`, `tests/sweeps/stored-state.test.ts` and `tests/sweeps/data-backup.test.ts`');
-L.push('run against the copy (`IA_APP`). The page as built must be green and every break red.');
+L.push('run against the copy (`IA_APP`): the fast file first, the sweeps only for a break it lets through. The page as built');
+L.push('must be green on all three and every break red.');
 L.push('');
-L.push('| Break | What it does | Result | Tests red |');
-L.push('|---|---|---|---|');
+L.push('| Break | What it does | Result | Tests red | Caught by |');
+L.push('|---|---|---|---|---|');
 for (const r of rows) L.push('| ' + r.join(' | ') + ' |');
 L.push('');
 L.push(bad ? '**' + bad + ' row(s) not as required.**' : '**The page as built is green, and all ' + BREAKS.length + ' breaks turn the records red.**');
