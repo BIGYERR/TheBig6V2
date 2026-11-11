@@ -162,9 +162,10 @@ with an iOS Simulator runtime.
 - **Bundle** `com.bigyerr.ironasylum`, display name **The Asylum**, icon from the root `apple-touch-icon.png`.
 - **Version** follows `ia-version`: version and build are both its canonical `MAJOR.MINOR.PATCH` (legacy `239` ships as
   `0.239.0`, `0.239.1` as `0.239.1`; the app is pre-1.0). `scripts/ios.mjs` keeps `config.xml` in step.
-- **Build products go to `~/Library/Caches/iron-asylum-ios`** (`IOS_BUILD_DIR` to change), never into the repo. The repo
-  sits in an iCloud-synced Desktop, and iCloud stamps Finder metadata onto a fresh `.app`. codesign then refuses it
-  with "resource fork, Finder information, or similar detritus not allowed".
+- **Build products go to `~/Library/Caches/iron-asylum-ios`** (`IOS_BUILD_DIR` to change), never into the repo. A chat's
+  worktree builds into `worktrees/<name>` inside it, so two checkouts never overwrite each other's
+  (`scripts/build-root.mjs`). The repo sat in an iCloud-synced Desktop, and iCloud stamped Finder metadata onto a fresh
+  `.app`. codesign then refused it with "resource fork, Finder information, or similar detritus not allowed".
 - **Storage is separate.** The native app has its own `localStorage`, apart from Safari's home-screen app. A program
   made in one does not appear in the other. The app has no export yet.
 - **Updates come only from a rebuild.** The in-app update check reads the bundled file inside the native app, so it
