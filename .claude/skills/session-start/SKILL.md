@@ -8,7 +8,10 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
 
 0. **Your own worktree first (One chat per worktree, Mario, Post-v0.256.0).** If this chat's folder is the main checkout
    (`git rev-parse --git-dir` equals `git rev-parse --git-common-dir`) and the branch is `dev`, call `EnterWorktree` before
-   any edit, on a branch named `chat/<work>` for the work Mario has asked for. The main checkout holds `dev` and nothing
+   any edit, on a branch named `chat/<work>` for the work Mario has asked for. `EnterWorktree` cuts its branch from
+   `origin/main`, not `dev`, and names it `worktree-<name>` (seen Post-v0.261.4): before any edit, while the branch holds
+   no work, run `git branch -m chat/<work>` and `git reset --hard refs/heads/dev`, then read `git log -1` back as `dev`'s
+   HEAD. The main checkout holds `dev` and nothing
    else; a chat never commits there (the pre-commit hook refuses). Report the branch in the GIT line. When Mario says push,
    `node tools/land.mjs` from the worktree lands the branch on `dev` and pushes, as one step.
 
