@@ -5,7 +5,9 @@ Each phase starts only on Mario's GO, one phase per session.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is
-Mario's. The reason is feel: the WebKit viewport and tab bar bugs keep coming back (D256, D280, D285).
+Mario's. **Why (Mario, 2026-11-11):** React Native is the platform the product has to be on. A public app has to be a real
+iPhone app, and what comes next (app blocking through Screen Time, NFC unlock) is native work. The tab bar and viewport
+bugs (D256, D280, D285) set it off; they are not the reason, and fixing them would not change the decision.
 
 **What cannot break (Mario's six):**
 
