@@ -287,6 +287,8 @@ export class Deck {
   /** Back and Mark the day done close the same way: the opening played back into the card. */
   protected close(then?: () => void): void {
     if (this.stage() === null || this.stage() === 'out') return;
+    // D285: the deck takes focus off its field as it starts to close, so the keyboard goes with it.
+    this.bridge.call('blurFieldIn', document.getElementById('deckOverlay'));
     const done = () => {
       this.stage.set(null);
       this.cards.set([]);

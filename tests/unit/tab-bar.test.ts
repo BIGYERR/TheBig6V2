@@ -185,6 +185,105 @@ test('the page installs it at load, on the window', () => {
   assert.equal((code.match(/\binstallKeyboardResync\(window\);/g) || []).length, 1);
 });
 
+// A sheet that closes takes focus off its field: blurFieldIn and installSheetBlur (rest-day-shell.ts), D285
+// (docs/decisions/tab-bar.md). Both are lifted out of the page and run on a hand-built window: a document with one
+// focused element the test sets, elements that hold whichever nodes the test names, and a MutationObserver whose
+// callback the test fires with the records it types. Every expected blur is typed from the ruling. That the keyboard
+// goes with the sheet on WebKit is not in this file: only the phone shows it.
+interface Node { tagName: string; blurs: number; blur: () => void }
+interface Sheet { ownerDocument: { activeElement: Node | null }; cls: string; holds: Node[]; contains: (n: Node) => boolean; getAttribute: (n: string) => string | null }
+interface Rec { target: Sheet; oldValue: string | null }
+function sheetWindow(withObserver = true) {
+  const doc = { activeElement: null as Node | null, documentElement: { tag: 'html' } };
+  const node = (tagName: string): Node => { const n: Node = { tagName, blurs: 0, blur: () => { n.blurs++; } }; return n; };
+  const sheet = (cls: string, holds: Node[]): Sheet => {
+    const s: Sheet = { ownerDocument: doc, cls, holds, contains: (n) => s.holds.includes(n), getAttribute: (n) => (n === 'class' ? s.cls : null) };
+    return s;
+  };
+  const made: { cb: (recs: Rec[]) => void; target?: unknown; opts?: Record<string, unknown> }[] = [];
+  class Observer {
+    private readonly me: (typeof made)[number];
+    constructor(cb: (recs: Rec[]) => void) { this.me = { cb }; made.push(this.me); }
+    observe(target: unknown, opts: Record<string, unknown>) { this.me.target = target; this.me.opts = opts; }
+  }
+  const win: Record<string, unknown> = { document: doc };
+  if (withObserver) win.MutationObserver = Observer;
+  // The page's observer calls blurFieldIn by name, so the lifted installer gets the lifted function as its one global.
+  const install = appFunction('installSheetBlur', { blurFieldIn: appFunction('blurFieldIn') });
+  return { win, doc, node, sheet, made, install };
+}
+/** The class of `s` goes from `was` to `now`, as the observer would be told. */
+const closes = (w: ReturnType<typeof sheetWindow>, s: Sheet, was: string, now: string) => { s.cls = now; w.made[0]!.cb([{ target: s, oldValue: was }]); };
+
+test('a sheet that loses its open class takes focus off the input, the textarea or the select inside it', () => {
+  for (const tag of ['INPUT', 'TEXTAREA', 'SELECT']) {
+    const w = sheetWindow(); w.install(w.win);
+    const field = w.node(tag), s = w.sheet('overlay open', [field]);
+    w.doc.activeElement = field;
+    closes(w, s, 'overlay open', 'overlay');
+    assert.equal(field.blurs, 1, tag + ' is blurred once');
+  }
+});
+
+test('a field outside the sheet that closed keeps focus, and so does a button inside it', () => {
+  const w = sheetWindow(); w.install(w.win);
+  const outside = w.node('INPUT'), button = w.node('BUTTON'), s = w.sheet('rand-overlay open', [button]);
+  w.doc.activeElement = outside;
+  closes(w, s, 'rand-overlay open', 'rand-overlay');
+  assert.equal(outside.blurs, 0, 'the session sheet\'s field under a closing swap sheet is left alone');
+  w.doc.activeElement = button;
+  closes(w, s, 'rand-overlay open', 'rand-overlay');
+  assert.equal(button.blurs, 0, 'a button is not a field');
+  w.doc.activeElement = null;
+  closes(w, s, 'rand-overlay open', 'rand-overlay');   // nothing focused: nothing to do, and no throw
+});
+
+test('only losing the whole word open counts: a class that never held it, still holds it, or holds a longer word does nothing', () => {
+  const w = sheetWindow(); w.install(w.win);
+  const field = w.node('INPUT'), s = w.sheet('overlay', [field]);
+  w.doc.activeElement = field;
+  closes(w, s, 'overlay', 'overlay busy');
+  closes(w, s, 'overlay open', 'overlay open busy');
+  closes(w, s, 'overlay reopen', 'overlay');
+  closes(w, s, 'overlay open-x', 'overlay');
+  closes(w, s, 'overlay', 'overlay open');   // the sheet opening
+  assert.equal(field.blurs, 0);
+  closes(w, s, 'open', '');   // the class attribute emptied
+  assert.equal(field.blurs, 1);
+});
+
+test('one observer watches every element\'s class, with the old value', () => {
+  const w = sheetWindow(); w.install(w.win);
+  assert.equal(w.made.length, 1);
+  assert.equal(w.made[0]!.target, w.doc.documentElement);
+  // The options object is the lifted function's own (another realm), so it is copied before it is compared.
+  const opts = w.made[0]!.opts!;
+  assert.deepEqual({ ...opts, attributeFilter: [...(opts.attributeFilter as string[])] }, { attributes: true, attributeFilter: ['class'], attributeOldValue: true, subtree: true });
+});
+
+test('a window with no MutationObserver installs nothing and does not throw', () => {
+  const w = sheetWindow(false);
+  w.install(w.win);
+  assert.equal(w.made.length, 0);
+});
+
+test('blurFieldIn says whether it took focus off a field, and takes nothing for no element', () => {
+  const w = sheetWindow();
+  const blurFieldIn = appFunction('blurFieldIn');
+  const field = w.node('INPUT'), s = w.sheet('deck-ov', [field]);
+  w.doc.activeElement = field;
+  assert.equal(blurFieldIn(s), true);
+  assert.equal(field.blurs, 1);
+  w.doc.activeElement = w.node('DIV');
+  assert.equal(blurFieldIn(s), false);
+  assert.equal(blurFieldIn(null), false, 'the deck\'s overlay not in the page');
+});
+
+test('the page installs the sheet blur at load, on the window', () => {
+  const code = appScript().replace(/\/\/[^\n]*/g, '');
+  assert.equal((code.match(/\binstallSheetBlur\(window\);/g) || []).length, 1);
+});
+
 // The tab highlight glides like liquid and can be dragged, and every press shows on the phone: installTabGlide and
 // installPressFeel (rest-day-shell.ts), D266 (docs/decisions/tab-bar.md). Both are lifted out of the page and run on a
 // hand-built window: a bar 12px from the left with a 1px border, holding four 90px buttons whose left edges sit 6, 96,

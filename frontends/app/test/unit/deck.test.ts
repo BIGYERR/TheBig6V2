@@ -47,6 +47,20 @@ describe('a deck card (D283 P-DECKFIT)', () => {
   });
 });
 
+// D285 (P-SHEETBLUR, docs/decisions/tab-bar.md): the deck carries no open class, so it takes focus off its own field.
+describe('the swipe deck closing (D285 P-SHEETBLUR)', () => {
+  it('takes focus off a field inside it before its stage changes, on Back and on Mark the day done alike', () => {
+    const deck = src('deck/deck.ts').replace(/\/\/[^\n]*/g, '');
+    const close = deck.slice(deck.indexOf('protected close(then?: () => void): void {'));
+    const blur = close.indexOf("this.bridge.call('blurFieldIn', document.getElementById('deckOverlay'));");
+    assert.ok(blur > 0, 'close() calls blurFieldIn on the deck');
+    assert.ok(blur < close.indexOf('const done = () => {'), 'before anything is torn down');
+    assert.ok(blur < close.indexOf("this.stage.set('out')"), 'before the closing stage');
+    assert.equal(deck.split("this.bridge.call('blurFieldIn'").length - 1, 1, 'one call, in close(), which both ways out share');
+    assert.match(deck, /<div class="deck-ov" id="deckOverlay"/, 'the element it names is the deck');
+  });
+});
+
 describe('the swipe deck', () => {
   it('makes a main of two lifts two cards, an added block one card a lift, and ends on Call it', () => {
     const secs: ExSection[] = [

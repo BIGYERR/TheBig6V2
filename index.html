@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.0">
+<meta name="ia-version" content="0.261.1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1919,6 +1919,24 @@ function installKeyboardResync(win){
   doc.addEventListener('focusout',()=>{ win.setTimeout(()=>{ if(!isField(doc.activeElement)) resync(); },350); });
 }
 installKeyboardResync(window);
+
+
+
+
+
+
+function blurFieldIn(el){
+  const a=el&&el.ownerDocument&&el.ownerDocument.activeElement;
+  if(!a||!/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName||'')||!el.contains(a)) return false;
+  a.blur(); return true;
+}
+function installSheetBlur(win){
+  if(!win.MutationObserver) return;
+  const open=(s)=>/(^|\s)open(\s|$)/.test(s||'');
+  new win.MutationObserver((recs)=>{ for(const r of recs){ if(open(r.oldValue)&&!open(r.target.getAttribute('class'))) blurFieldIn(r.target); } })
+    .observe(win.document.documentElement,{attributes:true,attributeFilter:['class'],attributeOldValue:true,subtree:true});
+}
+installSheetBlur(window);
 
 
 
