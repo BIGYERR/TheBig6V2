@@ -7,6 +7,9 @@
  * a quarter of black, which deepens them to the canvas's shades and keeps white type readable; the finish is --band;
  * type and tints on a card are --on-band.
  */
+/* D283 (P-DECKFIT, Mario's "Auto"): a card's sizes, Roomy on a screen 700 pt tall or more, Tight below it (an SE). */
+.deck-ov{--dk-num:30px;--dk-title:24px;--dk-meta:14px;--dk-name:17px;--dk-line:15px;--dk-cue:13px;--dk-ctl:44px;--dk-ic:36px;--dk-mic:32px;--dk-pad:18px;--dk-item:12px;--dk-row:8px;--dk-load:76px;}
+@media (max-height:699px){.deck-ov{--dk-num:22px;--dk-title:20px;--dk-meta:13px;--dk-name:15px;--dk-line:13px;--dk-cue:12px;--dk-ctl:34px;--dk-ic:30px;--dk-mic:26px;--dk-pad:12px;--dk-item:6px;--dk-row:6px;--dk-load:66px;}}
 .deck-ov{position:fixed;inset:0;z-index:230;--deck-shade:linear-gradient(rgba(0,0,0,0.25),rgba(0,0,0,0.25));
   --deck-lift:var(--deck-shade),var(--lift);--deck-hip:var(--deck-shade),var(--hip);--deck-core:var(--deck-shade),var(--core);--deck-finish:var(--band);
   font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
@@ -37,49 +40,104 @@
 .deck-card.skipped{filter:grayscale(0.9);opacity:0.72;transition:filter 460ms ease,opacity 460ms ease;}
 .deck-card.skipped.hit{filter:none;opacity:1;}
 .deck-face{display:flex;flex-direction:column;flex:1;min-height:0;}
-.deck-band{flex-shrink:0;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.22);padding:11px 20px;font-size:14px;font-weight:700;}
-.deck-body{position:relative;flex:1;min-height:0;padding:20px;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+
+.deck-body{position:relative;flex:1;min-height:0;padding:var(--dk-pad) var(--dk-pad) calc(var(--dk-pad) - 2px);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-y;}
 .deck-body::-webkit-scrollbar{display:none;}
 .deck-stage.vert .deck-body{touch-action:none;}
 .deck-bigcheck{position:absolute;top:88px;right:-46px;opacity:0.18;pointer-events:none;}
-.deck-top{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0;}
-.deck-num{font-family:var(--font-display);font-size:64px;font-weight:800;line-height:0.82;letter-spacing:-0.06em;}
-.deck-num span{font-size:23px;font-weight:600;color:rgba(var(--on-band-rgb),0.7);}
-.deck-side{display:flex;flex-direction:column;gap:8px;align-items:flex-end;padding-top:2px;}
-.deck-chips{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
-.deck-chip{font-size:12px;font-weight:600;background:rgba(var(--on-band-rgb),0.16);border-radius:999px;padding:4px 10px;white-space:nowrap;}
+.deck-top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;min-height:var(--dk-ic);}
+.deck-num{font-family:var(--font-display);font-size:var(--dk-num);font-weight:800;line-height:1;letter-spacing:-0.04em;}
+.deck-num span{font-size:13px;font-weight:600;letter-spacing:0;color:rgba(var(--on-band-rgb),0.62);}
+/* D283: a logged card says so beside its number, where it takes no height (the board's chip), not in a band above the card. */
+.deck-num{display:flex;align-items:baseline;}
+.deck-done{align-self:center;display:inline-flex;align-items:center;gap:5px;margin-left:10px;padding:6px 9px;border-radius:999px;background:rgba(var(--on-band-rgb),0.2);font-family:var(--font-text, inherit);font-size:12px;font-weight:700;letter-spacing:0;line-height:1;}
+.deck-side{display:flex;align-items:center;}
 .deck-acts{display:flex;gap:6px;}
-.deck-act{width:40px;height:40px;border:0;border-radius:999px;background:rgba(var(--on-band-rgb),0.16);color:var(--on-band);display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.deck-act.deck-all{width:auto;padding:0 12px;gap:5px;font-size:13px;font-weight:700;}
+.deck-act{width:var(--dk-ic);height:var(--dk-ic);border:0;border-radius:999px;background:rgba(var(--on-band-rgb),0.16);color:var(--on-band);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.deck-act.deck-all{width:auto;padding:0 13px;font-size:13px;font-weight:700;}
 .deck-act.deck-undo{background:var(--on-band);color:var(--band);position:relative;z-index:6;}
-.deck-rule{position:relative;height:1px;background:rgba(var(--on-band-rgb),0.22);margin:16px 0 12px;flex-shrink:0;}
-.deck-kicker{position:relative;font-size:13px;font-weight:600;color:rgba(var(--on-band-rgb),0.78);flex-shrink:0;}
-.deck-name{position:relative;font-size:40px;font-weight:800;letter-spacing:-0.04em;line-height:0.98;padding-top:6px;flex-shrink:0;overflow-wrap:anywhere;}
-.deck-name.m{font-size:32px;}
-.deck-name.s{font-size:28px;}
+.deck-rule{position:relative;height:1px;background:rgba(var(--on-band-rgb),0.2);margin:12px 0 0;flex-shrink:0;}
+.deck-name{position:relative;margin-top:10px;font-size:var(--dk-title);font-weight:800;letter-spacing:-0.025em;line-height:1.12;flex-shrink:0;overflow-wrap:anywhere;text-wrap:balance;}
+.deck-meta{position:relative;margin-top:4px;font-size:var(--dk-meta);font-weight:600;line-height:1.3;color:rgba(var(--on-band-rgb),0.76);flex-shrink:0;}
 .deck-card.skipped .deck-name{text-decoration:line-through;text-decoration-color:rgba(var(--on-band-rgb),0.5);}
-.deck-rx{position:relative;display:flex;align-items:flex-start;gap:2px;padding-top:10px;flex-shrink:0;font-size:17px;font-weight:600;line-height:1.3;}
-.deck-rpemark{flex-shrink:0;margin:-5px 0 0 -2px;width:22px;height:22px;border:0;padding:0;background:transparent;color:rgba(var(--on-band-rgb),0.85);display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.deck-cue{position:relative;padding-top:10px;font-size:14px;line-height:1.4;color:rgba(var(--on-band-rgb),0.84);flex-shrink:0;}
-.deck-from{position:relative;display:flex;align-items:center;gap:8px;margin-top:10px;padding:6px 6px 6px 12px;background:rgba(var(--on-band-rgb),0.16);border-radius:999px;flex-shrink:0;font-size:12px;}
+.deck-cue{position:relative;padding-top:10px;font-size:var(--dk-cue);line-height:1.35;color:rgba(var(--on-band-rgb),0.8);flex-shrink:0;}
+.deck-from{position:relative;display:flex;align-items:center;gap:8px;margin-top:8px;padding:4px 4px 4px 12px;background:rgba(var(--on-band-rgb),0.16);border-radius:999px;flex-shrink:0;font-size:12px;}
 .deck-from b{font-weight:700;}
 .deck-from span{flex:1;color:rgba(var(--on-band-rgb),0.78);}
-.deck-from button{width:32px;height:32px;border:0;border-radius:999px;background:var(--on-band);color:var(--band);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.deck-from button{width:28px;height:28px;border:0;border-radius:999px;background:var(--on-band);color:var(--band);display:flex;align-items:center;justify-content:center;cursor:pointer;}
 
 /* The app's exercise cards, on a deck card. */
-.deck-work{position:relative;margin-top:16px;
+.deck-work{position:relative;margin-top:0;
   --surface:rgba(var(--on-band-rgb),0.10);--surface2:rgba(var(--on-band-rgb),0.16);--surface3:rgba(var(--on-band-rgb),0.22);
   --text:var(--on-band);--muted:rgba(var(--on-band-rgb),0.72);--accent:var(--on-band);--border:rgba(var(--on-band-rgb),0.14);--border2:rgba(var(--on-band-rgb),0.26);
   --signal:var(--on-band);--signal-rgb:var(--on-band-rgb);--on-signal:var(--band);--run:var(--on-band);--run-rgb:var(--on-band-rgb);
   --core:var(--on-band);--core-rgb:var(--on-band-rgb);--core-dim:transparent;--hip:var(--on-band);}
 .deck-work .section{margin-bottom:8px;gap:8px;}
-.deck-work .exercise-item{border-radius:16px !important;border:0 !important;padding:12px 14px;margin-bottom:8px;}
+/*
+ * D283: each move is one grid. Name with swap and minus; the set summary with its RPE (and a single lift's info mark);
+ * the cue; the sets when open; the weight row with Log at its end, or Log beside the summary on a move with no weight.
+ * The legacy log box is display:contents, so its pieces sit in the move's grid while the legacy handlers keep their ids.
+ */
+.deck-work .exercise-item.ex-deck{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;
+  grid-template-areas:"name name" "dose dose" "line line" "cue cue" "chip chip" "rows rows" "foot foot" "weight log" "warn warn" "fill fill";
+  background:transparent !important;border:0 !important;border-bottom:1px solid rgba(var(--on-band-rgb),0.14) !important;border-radius:0 !important;
+  padding:var(--dk-item) 0 !important;margin:0;}
+.deck-work .exercise-item.ex-deck:not(.ex-loaded){grid-template-areas:"name name" "dose dose" "line log" "cue cue" "chip chip" "rows rows" "foot foot" "warn warn" "fill fill";}
+.deck-work .section:last-child .exercise-item.ex-deck:last-child{border-bottom:0 !important;padding-bottom:0 !important;}
+.deck-work .ex-deck .ex-log{display:contents;}
+.deck-work .ex-deck .ex-namerow{grid-area:name;display:flex;align-items:center;gap:6px;}
+.deck-work .ex-deck .ex-name{flex:1;min-width:0;font-size:var(--dk-name);font-weight:700;line-height:1.22;letter-spacing:-0.01em;}
+.deck-work .ex-deck .ex-swapbtn,.deck-work .ex-deck .ex-skipbtn{width:var(--dk-mic);height:var(--dk-mic);padding:0;border:0 !important;border-radius:999px;background:rgba(var(--on-band-rgb),0.14);color:var(--on-band);display:flex;align-items:center;justify-content:center;line-height:0;}
+.deck-work .ex-deck .ex-badge{min-width:0;font-weight:800;}
+.deck-work .ex-deck .ex-badge:empty{display:none;}
+.deck-work .ex-deck .ex-dose{grid-area:dose;display:none !important;}
+.deck-work .ex-deck .ex-cue{grid-area:cue;margin-top:3px;font-size:var(--dk-cue);line-height:1.3;color:rgba(var(--on-band-rgb),0.76);}
+.deck-work .ex-deck .ex-swapchip{grid-area:chip;margin-top:2px;padding-top:0;border-top:0;font-size:12px;line-height:1.3;color:rgba(var(--on-band-rgb),0.76);flex-wrap:nowrap;gap:6px;}
+.deck-work .ex-deck .ex-swapchip-lbl{color:var(--on-band);}
+.deck-work .ex-deck .ex-swapundo{margin-left:4px;font-size:12px;line-height:1.3;color:var(--on-band);}
+.deck-work .ex-deck .exset-line{grid-area:line;display:flex;align-items:center;gap:6px;min-width:0;margin-top:3px;}
+.deck-work .ex-deck .exset-head{width:auto;min-width:0;min-height:28px;border:0;padding:0;gap:6px;justify-content:flex-start;}
+.deck-work .ex-deck .exset-head-lbl,.deck-work .ex-deck .exset-head-sub,.deck-work .ex-deck .exset-head-sp{display:none;}
+.deck-work .ex-deck .exset-head-val{font-size:var(--dk-line);font-weight:700;flex-shrink:0;}
+.deck-work .ex-deck .exset-head-rpe{font-size:var(--dk-line);font-weight:600;color:rgba(var(--on-band-rgb),0.76);white-space:nowrap;}
+.deck-work .ex-deck .exset-caret{width:22px;height:22px;border-radius:999px;background:rgba(var(--on-band-rgb),0.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.deck-work .ex-deck .exset-caret svg{width:14px;height:14px;}
+.deck-work .ex-deck .exset-open .exset-caret{background:var(--on-band);color:var(--band);}
+.deck-work .ex-deck .exset-rpeinfo{flex-shrink:0;width:22px;height:22px;padding:0;border:0;background:transparent;color:rgba(var(--on-band-rgb),0.85);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.deck-work .ex-deck .exset-rows{grid-area:rows;margin-top:6px;border-top:0;padding:0 10px;border-radius:14px;background:rgba(0,0,0,0.16);}
+.deck-work .ex-deck .exset-foot{grid-area:foot;}
+.deck-work .ex-deck .exset-foot-note{display:none;}
+.deck-work .ex-deck .ex-weight{grid-area:weight;display:flex;align-items:center;gap:8px;margin-top:var(--dk-row);min-width:0;flex-wrap:nowrap;}
+.deck-work .ex-deck.ex-loaded .exset-open ~ .ex-weight,.deck-work .ex-deck .exset-open .ex-weight{display:none;}
+.deck-work .ex-deck .ex-weight-lbl{display:none;}
+.deck-work .ex-deck .ex-winput{width:var(--dk-load);height:var(--dk-ctl);box-sizing:border-box;padding:0 34px 0 10px;text-align:left;font-size:17px;}
+.deck-work .ex-deck .ex-wunit{margin-left:-40px;width:32px;pointer-events:none;font-size:12px;}
+.deck-work .ex-deck .ex-reuse:not(.ex-reuse-fill){margin-left:0;min-width:0;flex:0 1 auto;height:calc(var(--dk-ctl) - 6px);box-sizing:border-box;padding:0 10px;gap:5px;border:0;overflow:hidden;white-space:nowrap;}
+.deck-work .ex-deck .ex-reuse:not(.ex-reuse-fill) .ex-reuse-txt{display:flex;align-items:baseline;gap:4px;min-width:0;line-height:1;}
+.deck-work .ex-deck .ex-reuse:not(.ex-reuse-fill) .ex-reuse-txt small{font-size:12px;font-weight:600;color:rgba(var(--on-band-rgb),0.76);overflow:hidden;text-overflow:ellipsis;}
+.deck-work .ex-deck .ex-reuse:not(.ex-reuse-fill) .ex-reuse-txt small::before{content:"· ";}
+.deck-work .ex-deck .ex-stale-warn{grid-area:warn;}
+.deck-work .ex-deck .ex-reuse-fill{grid-area:fill;}
+.deck-work .ex-deck .ex-logbtn{grid-area:log;align-self:end;justify-self:end;min-height:0;height:var(--dk-ctl);min-width:64px;padding:0 16px;margin-top:var(--dk-row);border-radius:999px;font-size:15px;}
+.deck-work .ex-deck:not(.ex-loaded) .ex-logbtn{align-self:center;margin-top:3px;}
+/* Sets open in place, the other moves fold to one line: the name, the set summary and the check (Mario's pick). */
+.deck-work .ex-deck.ex-folded{grid-template-areas:"name line";grid-template-columns:minmax(0,1fr) auto;align-items:center;cursor:pointer;padding:calc(var(--dk-item) - 2px) 0 !important;}
+.deck-work .ex-deck.ex-folded .ex-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(var(--dk-name) - 1px);}
+.deck-work .ex-deck.ex-folded :is(.ex-swapbtn,.ex-skipbtn,.ex-dose,.ex-cue,.ex-swapchip,.exset-rows,.exset-foot,.ex-weight,.ex-stale-warn,.ex-reuse-fill,.ex-logbtn,.exset-rpeinfo,.exset-head-rpe,.exset-caret,.exset-head-vary){display:none !important;}
+.deck-work .ex-deck.ex-folded{position:relative;}
+.deck-work .ex-deck.ex-folded .exset-line{margin-top:0;}
+.deck-work .ex-deck .ex-foldbtn{position:absolute;inset:0;z-index:1;width:100%;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;}
+.deck-work .ex-deck.ex-folded .exset-head-val{font-size:13px;font-weight:600;color:rgba(var(--on-band-rgb),0.72);}
+/* The cool down: each move's dose and cue, Log beside them (call 14: a tap each). */
+.deck-cool .exercise-item.ex-deck{grid-template-areas:"name log" "dose log" "cue log";align-items:center;}
+.deck-cool .ex-deck .ex-dose{display:block !important;margin-top:2px;font-family:var(--font-display) !important;font-size:var(--dk-line) !important;font-weight:700 !important;line-height:1.25;color:var(--on-band) !important;text-align:left !important;max-width:none !important;white-space:normal !important;}
+.deck-cool .ex-deck .ex-logbtn{align-self:center;margin-top:0;}
 .deck-work .superset-wrap,.deck-work .core-block{background:transparent;border:0;border-radius:0;overflow:visible;}
 .deck-work .superset-header,.deck-work .core-header,.deck-work .section-label{display:none;}
 .deck-work .ex-logbtn{border-radius:999px;min-height:40px;}
 /* A card is narrower than the sheet: the set summary keeps its numbers whole ("2 × 15 /side") and the words beside it give way. */
-.deck-work .exset-head-val{font-size:17px;flex-shrink:0;}
+.deck-work .exset-head-val{flex-shrink:0;}
 .deck-work .exset-head-sub{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .deck-work .exset-ctl{border-radius:12px;}
 .deck-work .ex-winput{border-radius:12px;}
@@ -88,12 +146,10 @@
 .deck-work .ex-skipped-name{text-decoration:line-through;text-decoration-color:rgba(var(--on-band-rgb),0.5);}
 /* A single lift's card is its name and prescription already: its exercise card starts at the drawer. */
 .deck-lift .ex-namerow,.deck-lift .ex-detail,.deck-lift .ex-swapchip{display:none !important;}
-.deck-lift .exercise-item{background:transparent;padding:0;}
-.deck-lift .ex-log{margin-top:0;}
+.deck-lift .exercise-item.ex-deck{padding-bottom:0 !important;border-bottom:0 !important;}
 /* The cool down: five easy moves with a tap each, no pills (call 14): no set drawer, Log is the tap. */
-.deck-cool .exset-head,.deck-cool .exset-rows,.deck-cool .exset-foot{display:none !important;}
-.deck-cool .ex-log{margin-top:8px;}
-.deck-cool .ex-skipbtn,.deck-cool .ex-swapbtn{display:none;}
+.deck-cool .exset-line,.deck-cool .exset-rows,.deck-cool .exset-foot{display:none !important;}
+.deck-cool .ex-skipbtn,.deck-cool .ex-swapbtn{display:none !important;}
 .exset-pips{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0;}
 .exset-pip{min-width:34px;height:30px;border:0;border-radius:999px;background:var(--surface2);color:var(--text);font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;}
 .exset-pip.on{background:var(--text);color:var(--bg);}

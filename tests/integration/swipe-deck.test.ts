@@ -24,10 +24,11 @@ IA.localStorage.setItem('ia_active', P.id);
 IA.eval('showToast=function(){};activeProgId=null;activeProg=null;init();currentWeek=10;');
 const bridge = { call: <T,>(n: string, ...a: unknown[]): T => W[n](...a) as T, global: <T,>(n: string): T => IA.eval(n) as T };
 
-/** The deck the iOS app builds for one day of week 10. */
-function deckOf(dayKey: string): DeckCard[] {
+/** The deck the iOS app builds for one day of a week, week 10 unless named. */
+function deckOf(dayKey: string, week = 10): DeckCard[] {
+  IA.eval('currentWeek=' + week + ';');
   W['_setCurrentDayKey'](dayKey);
-  const day = IA.eval('activeProg').weeks[10][dayKey] as { rest?: boolean; sections?: ExSection[] };
+  const day = IA.eval('activeProg').weeks[week][dayKey] as { rest?: boolean; sections?: ExSection[] };
   const secs = day.rest ? [] : day.sections || [];
   return deckCards(secs, sectionsView(secs, 0, sectionReads(bridge)), (s) => W['_secRounds'](s) as number | null);
 }
@@ -35,12 +36,12 @@ const shape = (cards: DeckCard[]) => cards.map((c) => [c.kind, c.kicker, c.title
 const FIN = ['finish', 'Finish', 'Call it'];
 
 describe('HALF_MANNY week 10 as decks', () => {
-  test('each day holds the cards the canvas drew, the run left on This Week (D272), Thursday trimmed by D273', () => {
+  test('each day holds the cards the canvas drew, the run left on This Week (D272), Thursday trimmed by D273, a title up to its dash (D283)', () => {
     assert.deepEqual(shape(deckOf('mon')), [['lift', 'Main', 'Deadlift'], ['round', 'Round', 'Pull superset A'], ['lift', 'Pull superset B', 'Dumbbell row'], FIN]);
     assert.deepEqual(shape(deckOf('tue')), [['lift', 'Main', 'Incline barbell press'], ['lift', 'Main, second lift', 'Barbell overhead press'], ['round', 'Round', 'Accessory'],
       ['lift', 'Chest + knee', 'Spanish squat hold (KB)'], ['block', 'Core', 'Rotational Power'], FIN]);
     assert.deepEqual(shape(deckOf('wed')), []);
-    assert.deepEqual(shape(deckOf('thu')), [['lift', 'Main', 'Back squat'], ['round', 'Round', 'Leg circuit — runner armor'], ['block', 'Prehab', 'Hip stability'],
+    assert.deepEqual(shape(deckOf('thu')), [['lift', 'Main', 'Back squat'], ['round', 'Round', 'Leg circuit'], ['block', 'Prehab', 'Hip stability'],
       ['block', 'Prehab', 'Foot & ankle'], FIN]);
     assert.deepEqual(shape(deckOf('fri')), [['lift', 'Main', 'Dumbbell bench press'], ['lift', 'Main, second lift', 'Seated dumbbell shoulder press'], ['round', 'Round', 'Pump'],
       ['block', 'Core', 'Anti-Rotation'], FIN]);
@@ -48,20 +49,18 @@ describe('HALF_MANNY week 10 as decks', () => {
     assert.deepEqual(shape(deckOf('sun')), []);
   });
 
-  test('the cards say what the canvas says: the prescription, the sets and rest pills, the Main\'s cue', () => {
+  test('the cards say one meta line under the title, and the Main\'s cue without its rest (D283)', () => {
     const mon = deckOf('mon'), tue = deckOf('tue'), fri = deckOf('fri'), sat = deckOf('sat');
-    assert.deepEqual([mon[0]!.rx, mon[0]!.chips], ['3×8 — RPE 7', ['3 sets', '3 min rest']]);
-    assert.equal(mon[0]!.cue, 'Leave about three reps in reserve. Ramp up with two or three warmup sets. Three minutes rest.');
-    assert.deepEqual([mon[1]!.rx, mon[1]!.chips], ['2 rounds, no rest inside · 90 sec between rounds', ['2 rounds', '90 sec rest']]);
-    assert.deepEqual([mon[2]!.rx, mon[2]!.chips], ['2×8–12 each @ RPE 7', ['2 sets', '60–90 sec rest']]);
-    assert.deepEqual([tue[0]!.rx, tue[0]!.chips, tue[0]!.cue], ['3×8 — RPE 7', ['3 sets', '2–3 min rest'],
-      'Leave about three reps in reserve. Ramp up with two or three warmup sets. Two to three minutes rest.']);
-    assert.deepEqual([tue[3]!.rx, tue[3]!.chips], ['3×25 sec', ['3 sets', '60–90 sec rest']]);
-    assert.deepEqual([tue[4]!.rx, tue[4]!.chips], ['One block, straight through', ['2 sets', '60–90 sec rest']]);
-    assert.deepEqual([fri[0]!.rx, fri[0]!.chips, fri[0]!.cue], ['3×12 — RPE 6–7, leave 3+ in reserve', ['3 sets', '2–3 min rest'],
-      'Leave about three reps in reserve. Ramp up with two or three warmup sets.']);
-    assert.deepEqual([fri[3]!.chips], [['3 sets', '60–90 sec rest']]);
-    assert.equal(sat[0]!.rx, 'Five easy moves, about 14 minutes. Take your time.');
+    const MAIN_CUE = 'Leave about three reps in reserve. Two or three warmup sets first.';
+    assert.deepEqual([mon[0]!.meta, mon[0]!.cue], ['3 min rest between sets', MAIN_CUE]);
+    assert.equal(mon[1]!.meta, '2 rounds · 90 sec rest after each');
+    assert.equal(mon[2]!.meta, '60 to 90 sec rest between sets');
+    assert.deepEqual([tue[0]!.meta, tue[0]!.cue], ['2 to 3 min rest between sets', MAIN_CUE]);
+    assert.equal(tue[3]!.meta, '60 to 90 sec rest between sets');
+    assert.equal(tue[4]!.meta, 'Core · Straight through · 60 to 90 sec rest');
+    assert.deepEqual([fri[0]!.meta, fri[0]!.cue], ['2 to 3 min rest between sets', MAIN_CUE]);
+    assert.equal(fri[3]!.meta, 'Core · Straight through · 60 to 90 sec rest');
+    assert.equal(sat[0]!.meta, '5 easy moves · about 14 min');
     assert.deepEqual(mon.map((c) => c.rpe), [7, null, 7, null], 'the RPE mark sits on single lifts only (call 7)');
   });
 
@@ -81,11 +80,20 @@ describe('HALF_MANNY week 10 as decks', () => {
 });
 
 describe('the deck follows the app\'s own records', () => {
+  test('in the taper and race week the note rides on the Primer card; no card is titled with its icon (D283 Amendment 1)', () => {
+    const t13 = deckOf('mon', 13), t14 = deckOf('mon', 14);
+    deckOf('mon');
+    assert.deepEqual(shape(t13), [['lift', 'Primer', 'Trap bar deadlift'], FIN]);
+    assert.equal(t13[0]!.cue, 'Taper. Volume and load pulled back so you arrive fresh.');
+    assert.deepEqual(shape(t14), [['lift', 'Primer', 'Trap bar deadlift'], FIN]);
+    assert.equal(t14[0]!.cue, 'Race week. Primer only. Movement quality, zero grind. The hay is in the barn.');
+  });
+
   test('a skip made through the session sheet\'s handler punches the card and offers the undo; the undo puts it back', () => {
     W['_setCurrentDayKey']('mon');
     W['skipExercise']('Dumbbell row');
     const off = deckOf('mon')[2]!;
-    assert.deepEqual([off.title, off.skipped, off.undo, off.chips], ['Dumbbell row', true, { kind: 'exercise', name: 'Dumbbell row' }, ['Skipped']]);
+    assert.deepEqual([off.title, off.skipped, off.undo, off.meta], ['Dumbbell row', true, { kind: 'exercise', name: 'Dumbbell row' }, 'Dumbbell row is off today.']);
     W['_setCurrentDayKey']('mon');
     W['unskipExercise']('Dumbbell row');
     assert.equal(deckOf('mon')[2]!.skipped, false);

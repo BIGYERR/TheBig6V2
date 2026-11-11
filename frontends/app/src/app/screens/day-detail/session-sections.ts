@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import type { SectionView } from './session-sections-model';
+import { type RxLine, rxLine } from '../deck/deck-model';
 
 /**
  * A day's sections and their exercise cards (architecture phase E, step 28), in place of the legacy buildSectionsHTML
@@ -46,27 +47,28 @@ import type { SectionView } from './session-sections-model';
       @if (x.kind === 'skipped') {
         <div class="ex-skipped"><span class="ex-skipped-lbl">Skipped</span><span class="ex-skipped-name">{{ x.name }}</span><button class="ex-skipped-undo" (click)="call('unskipExercise', x.name, src())">Put it back</button></div>
       } @else {
-        <div [attr.class]="'exercise-item' + (x.logged ? ' logged' : '')" [id]="'excard_' + x.exKey">
+        <div [attr.class]="'exercise-item' + (x.logged ? ' logged' : '') + (deck() ? deckClass(x) : '')" [id]="'excard_' + x.exKey">
           <div class="ex-namerow">
             <span class="ex-name" [innerHTML]="html(x.name)"></span>
             @if (x.swap; as sw) {<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" (click)="call('openSwapSheet', sw.secIdx, sw.itemIdx, src())" [innerHTML]="icon('swap', 16)"></button>}
             @if (x.skip) {<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" (click)="call('skipExercise', x.name, src())" [innerHTML]="icon('minus', 16)"></button>}
             <span class="ex-badge" [id]="'exbadge_' + x.exKey">@if (x.logged) {✓}</span>
           </div>
-          @if (x.detail) {<div class="ex-detail" [innerHTML]="html(x.detail)"></div>}
+          @if (deck()) {@if (line(x).dose; as dose) {<div class="ex-detail ex-dose">{{ dose }}</div>}@if (line(x).cue; as cue) {<div class="ex-cue">{{ cue }}</div>}} @else if (x.detail) {<div class="ex-detail" [innerHTML]="html(x.detail)"></div>}
           @if (x.added) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">You added this</span>{{ ' · not in the plan' }}<button type="button" class="ex-swapundo" (click)="call('removeAddedExercise', x.name)">remove</button></div>}
           @if (x.swappedFrom; as from) {<div class="ex-swapchip"><span class="ex-swapchip-lbl">Swapped in</span>{{ ' for ' + from }}<button type="button" class="ex-swapundo" (click)="call('undoSwap', from, src())">put it back</button></div>}
           @if (x.log; as lg) {
             <div class="ex-log" [id]="'exlog_' + x.exKey">
               @if (lg.sets; as st) {
-                <button type="button" class="exset-head" (click)="call('toggleSets', x.exKey)">
+                <div class="exset-line"><button type="button" class="exset-head" (click)="call('toggleSets', x.exKey); setsTap.emit(x.exKey)">
                   <span class="exset-head-lbl">Sets</span>
-                  <span class="exset-head-val" [id]="'exsum_' + x.exKey">{{ st.head }}</span>
+                  <span class="exset-head-val" [id]="'exsum_' + x.exKey">{{ st.head }}</span>@if (deck() && line(x).rpe; as rpe) {<span class="exset-head-rpe">{{ '· ' + rpe }}</span>}
                   <span class="exset-head-sub" [id]="'exsumsub_' + x.exKey">{{ st.sub }}</span>
                   <span class="exset-head-sp"></span>
                   <span class="exset-head-vary" [id]="'exvary_' + x.exKey" [style.display]="st.varied ? null : 'none'">Varied</span>
                   <span class="exset-caret" [innerHTML]="icon('chevronDown', 20)"></span>
                 </button>
+                @if (deck() && rpeInfo() && line(x).rpe) {<button type="button" class="exset-rpeinfo" aria-label="What RPE means" (click)="rpeTap.emit($event)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><circle cx="12" cy="7.6" r="0.6" fill="currentColor"></circle></svg></button>}</div>
                 <div class="exset-rows" [id]="'exrows_' + x.exKey">
                   @if (pipped(st.rows.length)) {
                     <div class="exset-pips" role="group" aria-label="Sets">@for (row of st.rows; track row.s) {<button type="button" [attr.class]="'exset-pip' + (row.s === pipOf(x.exKey) ? ' on' : '')" [attr.aria-label]="'Set ' + (row.s + 1)" [attr.aria-pressed]="row.s === pipOf(x.exKey)" (click)="pick(x.exKey, row.s)">{{ row.s + 1 }}</button>}</div>
@@ -102,6 +104,7 @@ import type { SectionView } from './session-sections-model';
                 @if (ld.fill; as fl) {<button type="button" [attr.class]="'ex-reuse ex-reuse-fill' + (fl.stale ? ' is-stale' : '')" (click)="call('fillAllSetWeights', x.exKey, fl.value)"><span class="ex-reuse-ico">↺</span><span class="ex-reuse-txt">{{ fl.text }}<small>{{ fl.rec }}</small></span></button>}
               }
               <button class="ex-logbtn" (click)="call('saveExWeight', x.exKey, x.name, x.rxDetail)">Log</button>
+              @if (deck() && folded(x)) {<button type="button" class="ex-foldbtn" [attr.aria-label]="'Open ' + x.name" (click)="foldTap.emit(x.exKey)"></button>}
             </div>
           }
         </div>
@@ -122,6 +125,38 @@ export class SessionSections {
    * legacy handlers read and log every set either way.
    */
   readonly pipAt = input<number | null>(null);
+  /**
+   * D283 (P-DECKFIT): the swipe deck draws its cards in deck mode: each prescription split by rxLine (the RPE beside the
+   * set summary, the cue as sentences under the name, the cool down's dose spaced), and the classes its stylesheet lays
+   * the card out by. The session sheet passes nothing and draws as before.
+   */
+  readonly deck = input(false);
+  /** D283: a single lift's card shows the RPE info mark beside its set summary, and says when it is tapped. */
+  readonly rpeInfo = input(false);
+  readonly rpeTap = output<MouseEvent>();
+  /** D283 (Mario's "in place, others fold"): the move whose sets are open, or the one a long card keeps open; the rest fold. */
+  readonly foldOthers = input<string | null>(null);
+  /** D283: a move's set summary was tapped (the legacy handler has opened or closed its sets), with the move's key. */
+  readonly setsTap = output<string>();
+  /** D283: a folded move was tapped, with its key, so the deck opens it in place of the one that was open. */
+  readonly foldTap = output<string>();
+  protected folded(x: { exKey: string }): boolean {
+    const open = this.foldOthers();
+    return open !== null && open !== x.exKey;
+  }
+  private readonly lines = new Map<string, RxLine>();
+  protected line(x: { rxDetail?: string; detail?: string }): RxLine {
+    const d = String(x.rxDetail || x.detail || '');
+    let l = this.lines.get(d);
+    if (!l) {
+      l = rxLine(d);
+      this.lines.set(d, l);
+    }
+    return l;
+  }
+  protected deckClass(x: { exKey: string; log?: { load?: unknown } | null }): string {
+    return ' ex-deck' + (x.log && x.log.load ? ' ex-loaded' : '') + (this.folded(x) ? ' ex-folded' : '');
+  }
   private readonly pips = signal<Record<string, number>>({});
   protected pipped(rows: number): boolean {
     const at = this.pipAt();
