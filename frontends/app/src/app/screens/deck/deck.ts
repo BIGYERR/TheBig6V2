@@ -4,7 +4,7 @@ import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy
 import { SessionSections } from '../day-detail/session-sections';
 import { type ExSection, sectionsView } from '../day-detail/session-sections-model';
 import { type BridgeLike, sectionReads } from '../day-detail/session-sections-reads';
-import { CALL_IT_WORDS, type CardAct, callItLog, ctaText, type DayLog, type DeckCard, deckCards, deckOpens, numeral, openMotion, PIP_THRESHOLD, rpeBubble, stateOf } from './deck-model';
+import { CALL_IT_WORDS, type CardAct, callItLog, ctaText, type DayLog, type DeckCard, deckCards, deckOpens, numeral, openAfterSetsTap, openMotion, PIP_THRESHOLD, restOpen, rpeBubble, stateOf } from './deck-model';
 import { DeckState } from './deck-state';
 import { type GrowBox, type GrowStage, growBox, growCopy, growFx, growWeek } from './grow-motion';
 
@@ -54,25 +54,22 @@ const TONE_RGB: Record<string, string> = { lift: 'var(--lift-rgb)', hip: 'var(--
           @for (c of cards(); track c.key; let k = $index) {
             <section [attr.class]="cardClass(c, k)" [attr.data-tone]="c.tone" [attr.style]="cardStyle(k)" [attr.inert]="k === i() ? null : ''" [attr.aria-hidden]="k === i() ? null : 'true'">
               <div class="deck-face" [attr.style]="faceStyle(k)">
-                @if (isLogged(c, k)) {<div class="deck-band"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Logged</div>}
                 <div class="deck-body">
                   @if (isLogged(c, k)) {<div class="deck-bigcheck" aria-hidden="true"><svg width="240" height="240" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>}
                   <div class="deck-top">
-                    <div class="deck-num">{{ num(k).num }}<span>{{ num(k).of }}</span></div>
+                    <div class="deck-num">{{ num(k).num }}<span>{{ num(k).of }}</span>@if (isLogged(c, k)) {<div class="deck-done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Logged</div>}</div>
                     <div class="deck-side">
-                      <div class="deck-chips">@for (ch of c.chips; track $index) {<span class="deck-chip">{{ ch }}</span>}</div>
                       <div class="deck-acts">
                         @if (c.swap; as sw) {<button type="button" class="deck-act" aria-label="Swap this exercise" (click)="call('openSwapSheet', sw.secIdx, sw.itemIdx)" [innerHTML]="icon('swap', 17)"></button>}
-                        @if (c.skip && c.kind !== 'lift') {<button type="button" class="deck-act deck-all" aria-label="Skip the whole card" (click)="skip(c, k)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>All</button>}
+                        @if (c.skip && c.kind !== 'lift') {<button type="button" class="deck-act deck-all" aria-label="Skip the whole card" (click)="skip(c, k)">Skip all</button>}
                         @if (c.undo; as u) {<button type="button" class="deck-act deck-undo" aria-label="Put it back" (click)="act(u, false)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>}
                         @if (c.skip && c.kind === 'lift') {<button type="button" class="deck-act" aria-label="Skip this card" (click)="skip(c, k)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>}
                       </div>
                     </div>
                   </div>
+                  <div class="deck-name">{{ c.title }}</div>
+                  <div class="deck-meta">{{ c.meta }}</div>
                   <div class="deck-rule"></div>
-                  <div class="deck-kicker">{{ c.kicker }}</div>
-                  <div [attr.class]="'deck-name' + (c.title.length > 26 ? ' s' : c.title.length > 16 ? ' m' : '')">{{ c.title }}</div>
-                  <div class="deck-rx"><span>{{ c.rx }}</span>@if (c.rpe !== null && !c.skipped) {<button type="button" class="deck-rpemark" aria-label="What RPE means" (click)="openRpe(c.rpe, $event)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><circle cx="12" cy="7.6" r="0.6" fill="currentColor"></circle></svg></button>}</div>
                   @if (c.cue && !c.skipped) {<div class="deck-cue">{{ c.cue }}</div>}
                   @if (c.swappedFrom; as from) {<div class="deck-from"><b>Swapped in</b><span>{{ 'for ' + from }}</span><button type="button" aria-label="Put it back" (click)="call('undoSwap', from)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button></div>}
                   @if (c.kind === 'finish') {
@@ -83,7 +80,7 @@ const TONE_RGB: Record<string, string> = { lift: 'var(--lift-rgb)', hip: 'var(--
                       <textarea id="deckNotes" class="deck-notes" rows="3" [value]="notes()" (input)="setNotes($event)"></textarea>
                     </div>
                   } @else if (!c.skipped) {
-                    <div [attr.class]="'deck-work deck-' + c.kind"><ia-session-sections [sections]="c.views" [pipAt]="pip" /></div>
+                    <div [attr.class]="'deck-work deck-' + c.kind"><ia-session-sections [sections]="c.views" [pipAt]="pip" [deck]="true" [rpeInfo]="c.kind === 'lift' && c.rpe !== null && !c.skipped" (rpeTap)="openRpe(c.rpe ?? 7, $event)" [foldOthers]="foldOf(c)" (setsTap)="setsTapped(c, $event)" (foldTap)="foldTapped(c, $event)" /></div>
                   }
                 </div>
               </div>
@@ -142,6 +139,8 @@ export class Deck {
   protected readonly sheet = signal<'map' | null>(null);
   protected readonly rpeSheet = signal<{ n: number; line: string; rows: ReturnType<typeof rpeBubble>['rows']; origin: string; closing: boolean } | null>(null);
   protected readonly hit = signal<string | null>(null);
+  /** D283 (Mario's "in place, others fold"): per card, the move whose sets are open (or a long card's chosen move). */
+  private readonly openMove = signal<Record<string, string | null>>({});
   /** Cards marked done with nothing on them the app can log; the deck's own, for this open. */
   private readonly doneLocal = signal<Record<string, boolean>>({});
   private readonly drag = signal<{ dx: number; dy: number; on: boolean }>({ dx: 0, dy: 0, on: false });
@@ -324,6 +323,7 @@ export class Deck {
   private redraw(dayKey: string, day: DeckDay): void {
     if (dayKey !== this.dayKey) return;
     const next = this.build(day);
+    this.openMove.set({});
     const key = (this.cards()[this.i()] || { key: '' }).key;
     this.cards.set(next);
     const at = next.findIndex((c) => c.key === key);
@@ -349,6 +349,29 @@ export class Deck {
         this.cdr.detectChanges();
       }
     }, 0);
+  }
+
+  // ── Sets open in place, the other moves fold (D283) ─────────────────────────────────────────────────────────
+  /** The move a card keeps whole while the others fold: the one whose sets are open, else a long card's move, else none. */
+  protected foldOf(c: DeckCard): string | null {
+    return this.openMove()[c.key] || restOpen(c);
+  }
+  private setsOpen(exKey: string): boolean {
+    const box = typeof document === 'undefined' ? null : document.getElementById('exlog_' + exKey);
+    return !!box && box.classList.contains('exset-open');
+  }
+  /** A move's set summary was tapped and the legacy handler opened or closed its sets: fold the others, or unfold them all. */
+  protected setsTapped(c: DeckCard, exKey: string): void {
+    this.openMove.update((m) => ({ ...m, [c.key]: openAfterSetsTap(c, exKey, this.setsOpen(exKey)) }));
+  }
+  /** A folded move was tapped: its sets open in place of the open move's (a long card with nothing open just shows it). */
+  protected foldTapped(c: DeckCard, exKey: string): void {
+    const was = this.foldOf(c);
+    if (was && this.setsOpen(was)) {
+      this.call('toggleSets', was);
+      this.call('toggleSets', exKey);
+    }
+    this.openMove.update((m) => ({ ...m, [c.key]: exKey }));
   }
 
   protected isLogged(c: DeckCard, k: number): boolean {

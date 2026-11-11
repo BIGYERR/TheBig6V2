@@ -223,7 +223,7 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   https://claude.ai/artifact/Y9HWE4aRiyixywiwvyMwf9, Version 3; kept as `docs/design/swipe-deck/card-fit.html`), on the
   main session's measures and recommendations. His calls: sets open "in place, others fold" (over the floating panel he
   first asked for, which the board also built), text size "Auto", "Deck drops it" for a dash in a card title, "Keep
-  them" for the hyphens inside exercise names. **Bump:** MINOR, v0.260.0 (Mario). **Shipped:** not yet.
+  them" for the hyphens inside exercise names. **Bump:** MINOR, v0.260.0 (Mario). **Shipped:** v0.260.0 (2026-11-11), with Amendments 1 and 2.
 - **Finding:** Mario's two screenshots of the Leg circuit card (2026-11-10): the words are too big, dashes read as machine
   writing, labels repeat ("Round" over the title, "2 rounds" and "90 sec rest" as chips and again as a sentence, "8–12
   each @ RPE 7" and then "Sets 2 × 10 /side as prescribed"), and the card scrolls. His phone is 402 × 874 pt (the
@@ -297,3 +297,38 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   card, nothing new on the sheet; opening a move's sets folds the others, a folded move opens on a tap). The fit is
   proved on WebKit: the built app in the iOS simulator at both sizes, HALF_MANNY's longest days, each card's overflow
   read before and after.
+
+### D283 Amendment 1: the taper note rides on the card before it (2026-11-10)
+
+- **Ruled by:** the main session in the coach hat, mid-build, under standing ruling 7; no new D-code. Mario is told in
+  the release report and may pull it out.
+- **Finding:** the lattice sweep written for D283 (`tests/sweeps/swipe-deck.test.ts`) found a card title with " — "
+  that the title rule cannot reach. In a taper or race week the engine adds a section `Taper` whose one item is a note,
+  not a move: its name is a flag icon's markup and "Taper — volume and load pulled back so you arrive fresh." (or "Race
+  week — primer only. Movement quality, zero grind. The hay is in the barn."), its prescription empty
+  (`core/src/engine/engine-c.ts`, the race taper). Since v0.257.0 the deck draws it as a lift card whose title is the raw
+  icon markup and the dash, with nothing to log. HALF_MANNY shows it on every lift day of weeks 13 and 14 (seven days).
+  The premise "no card title carries ' — '" did not survive, so the edit parked (its diff saved) and this amendment
+  rules it.
+- **What changes:** an item with no prescription whose name carries markup is a note. A section of notes is not a card:
+  its words, the icon dropped and each " — " ending a sentence, join the cue of the card before it (the day's Primer):
+  "Taper. Volume and load pulled back so you arrive fresh." and "Race week. Primer only. Movement quality, zero grind.
+  The hay is in the barn." A note with no card before it waits for the next card.
+- **What does not change:** the engine's note (program output unmoved); the session sheet, which draws it as before; the
+  rest of D283.
+- **Tests:** `tests/unit/swipe-deck.test.ts` (a note section joins the card before it, and waits for the next when it
+  comes first); `tests/integration/swipe-deck.test.ts` (HALF_MANNY week 13 Monday and week 14 Monday: one Primer card
+  carrying the note, then Call it); the sweep's title test.
+
+### D283 Amendment 2: what the built app needed to fit (2026-11-11)
+
+- **Ruled by:** the main session, on the built app measured at both sizes (Chrome in the browser pane, the iOS app's web
+  bundle with HALF_MANNY seeded, week 1 Thursday, every card at rest and with each move's sets opened in turn, a
+  "Swapped in" line added to the last move for the busiest state); no new D-code.
+- **Finding:** the built Leg circuit with a swapped move hid 18 pt on an SE, and a card logged whole put a "Logged" band
+  (about 40 pt) above its moves, which the board drew as a chip beside the number.
+- **What changes:** a logged card says "Logged" in a chip beside its number, where it takes no height, and the band above
+  the card goes; the "Swapped in for …" line is one compact line (12 pt, no rule above it); Tight's move padding is 6 pt
+  and the gap above the weight row and Log 6 pt (Roomy keeps 12 and 8).
+- **Measured after** (spare points at the tightest card, card heights 624 and 479): his phone 58 at rest and with sets
+  open; the SE 3 in the busiest state (the Leg circuit), every other card 30 or more.
