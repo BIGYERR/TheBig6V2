@@ -153,4 +153,11 @@ describe('the pipeline and config.xml agree with the gate', () => {
     assert.match(ios, /<preference name="target-device" value="handset" \/>/);
     assert.match(ios, /<preference name="Orientation" value="portrait" \/>/);
   });
+
+  it('config.xml sets the app to iOS 15 and later, so App Store Connect stops warning the target is too low', () => {
+    // Without the preference the App target keeps cordova-ios's template IPHONEOS_DEPLOYMENT_TARGET 13.0 (D282).
+    const ios = (config.match(/<platform name="ios">([\s\S]*?)<\/platform>/) || [])[1] || '';
+    const targets = [...ios.matchAll(/<preference name="deployment-target" value="([^"]*)" \/>/g)].map((m) => m[1]);
+    assert.deepEqual(targets, ['15.0']);
+  });
 });

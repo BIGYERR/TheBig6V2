@@ -33,7 +33,8 @@ after the deploy proof on `main`, `frontends/app/scripts/ios.mjs release` (the s
 ## D282: P-IOS15FLOOR, the native app runs on iOS 15 and later
 
 - **Date:** 2026-11-10. **Ruled by:** Mario ("we need to shift from the floor being iOS 13 to iOS 15").
-  **Bump:** PATCH (Mario). **Shipped:** (filled at ship time).
+  **Bump:** PATCH (Mario). **Shipped:** v0.259.4. First written as D281 and v0.259.3; the swipe-deck
+  chat landed its own D281 and 0.259.3 on `dev` first, so both were renumbered before any push.
 - **The finding:** App Store Connect emails Mario after every TestFlight upload that the app's deployment target is
   too low: ITMS-90068, first seen on 0.254.0 (run 41222630185), the app targets iOS 13.0 and from April 2027 an upload
   must target 15.0 or later. `config.xml` never set `deployment-target`, so the App target inherits cordova-ios 8.1.1's template value:
