@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and two lift slices have
-shipped (v0.261.2, v0.261.3) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and three lift slices have
+shipped (v0.261.2, v0.261.3, v0.261.4) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -30,7 +30,17 @@ Each phase starts only on Mario's GO, one phase step per session.
   reader, one writer, `recordLift` (the rule for recording a lift) and the three pure functions the screens call.
   Every golden record identical. Narrowed from the plan's "`log-entries.ts` and the set logging rules": the cardio
   dose half and the set display rules read the page and move with the screens that use them.
-- **Next, on his GO:** the day's log, completion and parts (`ia_logs_`, `ia_comp_`, `ia_parts_`).
+- **Done, the third lift slice (v0.261.4):** the day's log, completion and skipped parts (`ia_logs_`, `ia_comp_`,
+  `ia_parts_`) live in `core/src/engine/state-day-log.ts` and `state-day-status.ts`: a reader and a writer for each
+  store, the read lens, the one day key, the set drafts, and the rules for what a status and a skipped part store.
+  Every golden record identical. Narrowed: `persistLogFields`, the sport swap's parking and the rest day's log read
+  the form and stay in the page until the cardio dose moves; the freeze's own read of these keys waits for its slice.
+  The break check gained a break inside the moved rules (13 in all, all red) and found a gap: no history lets a
+  day's parts write its completion, so no golden record holds that write. The skip pill's own tests and the new unit
+  tests hold the rule (`tests/measure/stored-state_red-on-break.md`). Closed by a tests pass, Post-v0.261.4: the case
+  "a day's parts settle its status" puts that write in the records, and its break is red (14 in all, 2 open).
+- **Next, on his GO:** history (`ia_hist_`, `snapshotDay` and its re-snapshot), with the open break (a day's first
+  snapshot overwritten) settled in that slice.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is

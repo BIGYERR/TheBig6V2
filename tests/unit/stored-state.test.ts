@@ -1,13 +1,23 @@
 // Stored state, the logic in @ia/core (docs/decisions/stored-state.md), imported and run alone: the store the app's
 // state sits behind (core/src/engine/state-store.ts, v0.261.2) with the page's one use of the browser's storage, and
-// the lift log (core/src/engine/state-lift-log.ts, v0.261.3). Every expected value is typed from the ruling. What the app stores
-// through it is held by tests/integration/stored-state.test.ts and the sweeps.
+// the lift log (core/src/engine/state-lift-log.ts, v0.261.3), and the day's log, completion and skipped parts
+// (core/src/engine/state-day-log.ts and state-day-status.ts, v0.261.4). Every expected value is typed from the ruling.
+// What the app stores through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
 import { memoryStore, storageStore } from '@ia/core/engine/state-store.ts';
-import type { StorageLike } from '@ia/core/engine/state-store.ts';
+import type { StateStore, StorageLike } from '@ia/core/engine/state-store.ts';
 import { dedupeExDayEntries, entryDay, readLiftLog, recordLift, weeklyBest, writeLiftLog } from '@ia/core/engine/state-lift-log.ts';
 import type { LiftEntry, LiftLog, LiftRecord } from '@ia/core/engine/state-lift-log.ts';
+import {
+  CARDIO_PARK_FIELDS, dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, runPartLogged, setDraftOf, writeDayLogs,
+} from '@ia/core/engine/state-day-log.ts';
+import type { DayLogs } from '@ia/core/engine/state-day-log.ts';
+import {
+  clearDayParts, clearDayStatus, dayStatus, partsOfDay, readCompleted, readPartSkips, setDayStatus, settleDayParts, skipDayPart,
+  writeCompleted, writePartSkips,
+} from '@ia/core/engine/state-day-status.ts';
+import type { Day } from '@ia/core';
 import { appScript, loadApp } from '../support/app.ts';
 
 /** A stand-in for the browser's storage that records what was asked of it. */
@@ -198,4 +208,246 @@ test('the page logs a lift through core: one entryDay in the script, and logExer
   const { ts, ...rest } = stored.barbell_bench_press.entries[0];
   assert.deepEqual(rest, { weight: 135, setsReps: '3×5', setsDone: [5, 5, 5], setsW: [], week: 4, day: 'tue' }, 'the week and the day are the page\'s own when none is passed');
   assert.equal(typeof ts, 'number');
+});
+
+// ── The day's log, ia_logs_<program> (core/src/engine/state-day-log.ts, v0.261.4) ───────────────────────────────
+// Imported from @ia/core and run on a memory store. Every expected value is typed from the ruling.
+/** A memory store that counts its writes, to show a rule that must write nothing wrote nothing. */
+function countingStore(seed?: Record<string, string>): StateStore & { writes: string[] } {
+  const s = memoryStore(seed), writes: string[] = [];
+  return { writes, get: (k) => s.get(k), set: (k, v) => { writes.push(k); s.set(k, v); }, remove: (k) => s.remove(k), keys: () => s.keys() };
+}
+
+test('a day is stored under w<week>_<day>, in every store that holds a day', () => {
+  assert.equal(dayStoreKey(3, 'mon'), 'w3_mon');
+  assert.equal(dayStoreKey('11', 'sat'), 'w11_sat');
+});
+
+test('the day\'s log reads empty when nothing or something broken is stored, and reads back what was written', () => {
+  const s = memoryStore({ ia_logs_broken: '{"w1_mon":' });
+  assert.deepEqual(readDayLogs(s, 'p1'), {});
+  assert.deepEqual(readDayLogs(s, 'broken'), {});
+  const logs: DayLogs = { w1_mon: { rpe: '7', run_dist: '3.1', notes: 'steady', week: 1, ts: 9 } };
+  writeDayLogs(s, 'p1', logs);
+  assert.equal(s.get('ia_logs_p1'), '{"w1_mon":{"rpe":"7","run_dist":"3.1","notes":"steady","week":1,"ts":9}}', 'stored as its JSON, under ia_logs_<program>');
+  assert.deepEqual(readDayLogs(s, 'p1'), logs);
+  assert.deepEqual(s.keys(), ['ia_logs_broken', 'ia_logs_p1'], 'and nothing else is written');
+});
+
+test('an old rest day entry reads in today\'s shape, an entry of today\'s shape as it is, and the read writes nothing', () => {
+  const old = '{"w2_sun":{"rest_cardio":true,"rest_type":"run","rest_mins":"20","rpe":"4","run_dist":"2","notes":"easy","week":2,"ts":5},'
+    + '"w2_mon":{"rpe":"6","run_dist":"3","notes":"","week":2,"ts":6},'
+    + '"w2_sat":{"rest_cardio":true,"rest_type":"walk","rest_mins":"30","bike_mins":"15","swim_yards":"400","week":2}}';
+  const s = countingStore({ ia_logs_p1: old });
+  assert.equal(JSON.stringify(readDayLogs(s, 'p1')),
+    '{"w2_sun":{"restLog":{"run":{"mins":20,"dist":2,"rpe":4}},"notes":"easy","week":2,"ts":5},'
+    + '"w2_mon":{"rpe":"6","run_dist":"3","notes":"","week":2,"ts":6},'
+    + '"w2_sat":{"restLog":{"walk":{"mins":30},"swim":{"dist":400},"bike":{"mins":15}},"week":2}}',
+    'the seven flat fields become restLog; nothing is invented (no ts where there was none); a session entry is untouched');
+  assert.deepEqual(s.writes, []);
+  assert.equal(s.get('ia_logs_p1'), old);
+});
+
+test('a first set draft makes the day\'s entry: its week, its sets, the instant, in that order', () => {
+  const s = memoryStore();
+  recordSetDraft(s, 'p1', 2, 'mon', 'barbell_bench_press', { r: ['5', '5', ''], w: ['135', '', ''], L: 'lb' }, 1000);
+  assert.equal(s.get('ia_logs_p1'), '{"w2_mon":{"week":2,"sets":{"barbell_bench_press":{"r":["5","5",""],"w":["135","",""],"L":"lb"}},"ts":1000}}');
+  assert.deepEqual(setDraftOf(s, 'p1', 2, 'mon', 'barbell_bench_press'), { r: ['5', '5', ''], w: ['135', '', ''], L: 'lb' });
+  assert.equal(setDraftOf(s, 'p1', 2, 'mon', 'back_squat'), null, 'no draft for another movement');
+  assert.equal(setDraftOf(s, 'p1', 2, 'tue', 'barbell_bench_press'), null, 'nor on another day');
+  assert.equal(setDraftOf(s, 'p1', 2, 'mon', ''), null);
+});
+
+test('a draft on a day already logged keeps the entry\'s other fields and restamps its week and instant', () => {
+  const s = memoryStore({ ia_logs_p1: '{"w2_mon":{"rpe":"7","notes":"good","week":1,"ts":5}}' });
+  recordSetDraft(s, 'p1', 2, 'mon', 'back_squat', { r: null, w: undefined, L: null }, 2000);
+  assert.equal(s.get('ia_logs_p1'), '{"w2_mon":{"rpe":"7","notes":"good","week":2,"ts":2000,"sets":{"back_squat":{"r":[],"w":[],"L":""}}}}',
+    'a draft that brings nothing is stored as empty lists and an empty label');
+  recordSetDraft(s, 'p1', 2, 'mon', 'back_squat', { r: ['3'], w: ['225'], L: 'lb' }, 3000);
+  assert.equal(s.get('ia_logs_p1'), '{"w2_mon":{"rpe":"7","notes":"good","week":2,"ts":3000,"sets":{"back_squat":{"r":["3"],"w":["225"],"L":"lb"}}}}',
+    'a second draft of the movement replaces the first');
+});
+
+test('dropping a draft leaves the other drafts; dropping the last removes the sets and keeps the entry; dropping none writes nothing', () => {
+  const s = countingStore({ ia_logs_p1: '{"w2_mon":{"notes":"n","week":2,"ts":7,"sets":{"a":{"r":["1"],"w":[],"L":""},"b":{"r":["2"],"w":[],"L":""}}}}' });
+  dropSetDraft(s, 'p1', 2, 'mon', 'a');
+  assert.equal(s.get('ia_logs_p1'), '{"w2_mon":{"notes":"n","week":2,"ts":7,"sets":{"b":{"r":["2"],"w":[],"L":""}}}}');
+  dropSetDraft(s, 'p1', 2, 'mon', 'b');
+  assert.equal(s.get('ia_logs_p1'), '{"w2_mon":{"notes":"n","week":2,"ts":7}}', 'the instant is not restamped by a drop');
+  assert.deepEqual(s.writes, ['ia_logs_p1', 'ia_logs_p1']);
+  dropSetDraft(s, 'p1', 2, 'mon', 'b');     // no sets left
+  dropSetDraft(s, 'p1', 2, 'tue', 'a');     // no entry
+  dropSetDraft(s, 'p2', 2, 'mon', 'a');     // no log
+  assert.deepEqual(s.writes, ['ia_logs_p1', 'ia_logs_p1'], 'nothing more was written');
+});
+
+test('the fields a sport owns on an entry, and the test for a logged run', () => {
+  assert.deepEqual(CARDIO_PARK_FIELDS, { run: ['run_dist', 'run_pace', 'run_mins', 'run_reps', 'run_rep_time'], bike: ['bike_mins'], swim: ['swim_yards'] });
+  assert.equal(runPartLogged({ run_dist: '3' }, 'run'), true);
+  assert.equal(runPartLogged({ run_rep_time: '1:30' }, 'run'), true);
+  assert.equal(runPartLogged({ run_dist: '', run_mins: '' }, 'run'), false, 'untouched fields are not a log');
+  assert.equal(runPartLogged({ run_mins: '0' }, 'run'), false, 'a zero is not a log');
+  assert.equal(runPartLogged({ run_mins: 0 as unknown as string }, 'run'), false);
+  assert.equal(runPartLogged({ notes: 'felt fine', rpe: '6' }, 'run'), false, 'a note and an effort are not the run');
+  assert.equal(runPartLogged({ swapTo: 'bike', bike_mins: '30' }, 'run'), true, 'the sport it was swapped to is the one read');
+  assert.equal(runPartLogged({ swapTo: 'bike', run_dist: '3' }, 'run'), false);
+  assert.equal(runPartLogged({ swim_yards: '400' }, 'Swim'), true, 'the plan\'s sport, in any case');
+  assert.equal(runPartLogged({ run_dist: '3' }, undefined), true, 'a run when nothing names the sport');
+  assert.equal(runPartLogged(null, 'run'), false);
+});
+
+// ── Completion and skipped parts, ia_comp_ and ia_parts_<program> (core/src/engine/state-day-status.ts, v0.261.4) ──
+const liftAndRun = { title: 'Push + Tempo', dot: 'run', tags: [], cardio: { type: 'run' }, sections: [{ label: 'Main', items: [{ name: 'Barbell bench press' }] }] } as unknown as Day;
+const runOnly = { title: 'Long Run', dot: 'run', tags: [], cardio: { type: 'run' }, sections: [] } as unknown as Day;
+
+test('completion and parts read empty when nothing or something broken is stored, and are stored as their JSON', () => {
+  const s = memoryStore({ ia_comp_broken: '{', ia_parts_broken: 'x' });
+  assert.deepEqual([readCompleted(s, 'p1'), readCompleted(s, 'broken'), readPartSkips(s, 'p1'), readPartSkips(s, 'broken')], [{}, {}, {}, {}]);
+  writeCompleted(s, 'p1', { w1_mon: { title: 'Push', ts: 4, status: 'complete' } });
+  writePartSkips(s, 'p1', { w1_tue: { run: 1 } });
+  assert.equal(s.get('ia_comp_p1'), '{"w1_mon":{"title":"Push","ts":4,"status":"complete"}}');
+  assert.equal(s.get('ia_parts_p1'), '{"w1_tue":{"run":1}}');
+  assert.deepEqual(readCompleted(s, 'p1'), { w1_mon: { title: 'Push', ts: 4, status: 'complete' } });
+  assert.deepEqual(readPartSkips(s, 'p1'), { w1_tue: { run: 1 } });
+});
+
+test('a status set by hand is stored as title, instant, status, with the title as it was given', () => {
+  const s = memoryStore();
+  setDayStatus(s, 'p1', 1, 'mon', 'Push', 'complete', 1000);
+  assert.equal(s.get('ia_comp_p1'), '{"w1_mon":{"title":"Push","ts":1000,"status":"complete"}}');
+  setDayStatus(s, 'p1', 1, 'tue', null, 'skipped', 2000);
+  setDayStatus(s, 'p1', 1, 'wed', undefined, 'complete', 3000);
+  assert.equal(s.get('ia_comp_p1'),
+    '{"w1_mon":{"title":"Push","ts":1000,"status":"complete"},"w1_tue":{"title":null,"ts":2000,"status":"skipped"},"w1_wed":{"ts":3000,"status":"complete"}}',
+    'no title given is no title stored; a null title is stored as null');
+  setDayStatus(s, 'p1', 1, 'mon', 'Push', 'skipped', 4000);
+  assert.deepEqual(readCompleted(s, 'p1')['w1_mon'], { title: 'Push', ts: 4000, status: 'skipped' }, 'set again, the record is replaced whole');
+});
+
+test('a day reads as its status: none with no record, complete for a record with no status or a partial one', () => {
+  const s = memoryStore({ ia_comp_p1: '{"w1_mon":{"title":"A","ts":1},"w1_tue":{"ts":2,"status":"partial"},"w1_wed":{"ts":3,"status":"skipped"},"w1_thu":{"ts":4,"status":"complete"}}' });
+  assert.deepEqual(['mon', 'tue', 'wed', 'thu', 'fri'].map((d) => dayStatus(s, 'p1', 1, d)), ['complete', 'complete', 'skipped', 'complete', null]);
+  assert.equal(dayStatus(s, 'p1', 2, 'mon'), null, 'another week');
+  assert.equal(dayStatus(s, 'p2', 1, 'mon'), null, 'another program');
+});
+
+test('the undo tap removes the day\'s record, and writes the store even when none was there', () => {
+  const s = countingStore({ ia_comp_p1: '{"w1_mon":{"title":"A","ts":1,"status":"complete"},"w1_tue":{"title":"B","ts":2,"status":"skipped"}}' });
+  clearDayStatus(s, 'p1', 1, 'mon');
+  assert.equal(s.get('ia_comp_p1'), '{"w1_tue":{"title":"B","ts":2,"status":"skipped"}}');
+  clearDayStatus(s, 'p1', 1, 'mon');
+  assert.equal(s.get('ia_comp_p1'), '{"w1_tue":{"title":"B","ts":2,"status":"skipped"}}');
+  clearDayStatus(s, 'p2', 1, 'mon');
+  assert.equal(s.get('ia_comp_p2'), '{}');
+  assert.deepEqual(s.writes, ['ia_comp_p1', 'ia_comp_p1', 'ia_comp_p2']);
+});
+
+test('a day\'s parts are its run when the cardio has a sport and its lift when a section holds a movement', () => {
+  assert.deepEqual(partsOfDay(liftAndRun), ['run', 'lift']);
+  assert.deepEqual(partsOfDay(runOnly), ['run']);
+  assert.deepEqual(partsOfDay({ title: 'Pull', cardio: null, sections: [{ label: 'Main', items: [{ name: 'Pull-up' }] }] } as unknown as Day), ['lift']);
+  assert.deepEqual(partsOfDay({ title: 'Odd', cardio: { type: '' }, sections: [{ label: 'Empty', items: [] }] } as unknown as Day), [], 'a cardio with no sport and a section with no movement are not parts');
+  assert.deepEqual(partsOfDay({ title: 'Rest', rest: true, cardio: { type: 'run' } } as unknown as Day), [], 'a rest day has none');
+  assert.deepEqual([partsOfDay(null), partsOfDay(undefined)], [[], []]);
+});
+
+test('one part skipped of two is stored in the parts and leaves the day open; both skipped is a skipped day; one put back reopens it', () => {
+  const s = countingStore();
+  skipDayPart(s, 'p1', 1, 'mon', liftAndRun, 'run', 1000);
+  assert.equal(s.get('ia_parts_p1'), '{"w1_mon":{"run":1}}');
+  assert.equal(s.get('ia_comp_p1'), null, 'the lift is left, and only a status set by hand completes a lift: no record');
+  skipDayPart(s, 'p1', 1, 'mon', liftAndRun, 'lift', 2000);
+  assert.equal(s.get('ia_parts_p1'), '{"w1_mon":{"run":1,"lift":1}}');
+  assert.equal(s.get('ia_comp_p1'), '{"w1_mon":{"title":"Push + Tempo","ts":2000,"status":"skipped","parts":1}}');
+  settleDayParts(s, 'p1', 1, 'mon', liftAndRun, 9999);
+  assert.equal(s.get('ia_comp_p1'), '{"w1_mon":{"title":"Push + Tempo","ts":2000,"status":"skipped","parts":1}}', 'settled again with nothing changed, the record is not rewritten');
+  skipDayPart(s, 'p1', 1, 'mon', liftAndRun, 'lift', 3000);
+  assert.equal(s.get('ia_parts_p1'), '{"w1_mon":{"run":1}}', 'tapped again, the part is put back');
+  assert.equal(s.get('ia_comp_p1'), '{}', 'and the record the parts wrote is removed');
+  skipDayPart(s, 'p1', 1, 'mon', liftAndRun, 'run', 4000);
+  assert.equal(s.get('ia_parts_p1'), '{}', 'the last part put back removes the day from the parts');
+  assert.deepEqual(s.writes, ['ia_parts_p1', 'ia_parts_p1', 'ia_comp_p1', 'ia_parts_p1', 'ia_comp_p1', 'ia_parts_p1'], 'the parts are written before the completion they settle');
+});
+
+test('the lift skipped and the run logged is a done day; the run cleared reopens it', () => {
+  const s = memoryStore({ ia_logs_p1: '{"w1_mon":{"run_dist":"3","week":1,"ts":5}}' });
+  skipDayPart(s, 'p1', 1, 'mon', liftAndRun, 'lift', 1000);
+  assert.equal(s.get('ia_parts_p1'), '{"w1_mon":{"lift":1}}');
+  assert.equal(s.get('ia_comp_p1'), '{"w1_mon":{"title":"Push + Tempo","ts":1000,"status":"complete","parts":1}}');
+  s.set('ia_logs_p1', '{"w1_mon":{"run_dist":"","week":1,"ts":6}}');
+  settleDayParts(s, 'p1', 1, 'mon', liftAndRun, 2000);
+  assert.equal(s.get('ia_comp_p1'), '{}');
+  s.set('ia_logs_p1', '{"w1_mon":{"run_mins":"25","week":1,"ts":7}}');
+  settleDayParts(s, 'p1', 1, 'mon', liftAndRun, 3000);
+  assert.equal(s.get('ia_comp_p1'), '{"w1_mon":{"title":"Push + Tempo","ts":3000,"status":"complete","parts":1}}');
+});
+
+test('a day with one part, skipped, is a skipped day; a day with no title stores a null one; a part the day does not have is ignored', () => {
+  const s = countingStore();
+  skipDayPart(s, 'p1', 3, 'sat', runOnly, 'lift', 500);
+  assert.deepEqual(s.writes, [], 'a run day has no lift to skip: nothing is written');
+  skipDayPart(s, 'p1', 3, 'sat', runOnly, 'run', 1000);
+  assert.equal(s.get('ia_comp_p1'), '{"w3_sat":{"title":"Long Run","ts":1000,"status":"skipped","parts":1}}');
+  skipDayPart(s, 'p1', 3, 'sun', { cardio: { type: 'bike' }, sections: [] } as unknown as Day, 'run', 2000);
+  assert.deepEqual(readCompleted(s, 'p1')['w3_sun'], { title: null, ts: 2000, status: 'skipped', parts: 1 });
+  skipDayPart(s, 'p1', 3, 'mon', undefined, 'run', 3000);
+  assert.equal(s.get('ia_parts_p1'), '{"w3_sat":{"run":1},"w3_sun":{"run":1}}', 'a day the grid does not hold has no parts');
+});
+
+test('a status set by hand is never settled over; a day skipped whole turns into its parts when one is put back', () => {
+  const done = '{"w1_mon":{"title":"Push + Tempo","ts":1,"status":"complete"}}';
+  const s = memoryStore({ ia_comp_p1: done });
+  skipDayPart(s, 'p1', 1, 'mon', liftAndRun, 'run', 1000);
+  skipDayPart(s, 'p1', 1, 'mon', liftAndRun, 'lift', 2000);
+  assert.equal(s.get('ia_parts_p1'), '{"w1_mon":{"run":1,"lift":1}}');
+  assert.equal(s.get('ia_comp_p1'), done, 'Done by hand stands, whatever the parts say');
+  const t = memoryStore({ ia_comp_p1: '{"w1_mon":{"title":"Push + Tempo","ts":1,"status":"skipped"}}' });
+  skipDayPart(t, 'p1', 1, 'mon', liftAndRun, 'run', 1000);
+  assert.equal(t.get('ia_parts_p1'), '{"w1_mon":{"lift":1}}', 'skipped whole was both parts skipped; the run is put back, the lift stays skipped');
+  assert.equal(t.get('ia_comp_p1'), '{}', 'and the day is open again');
+});
+
+test('clearing a day\'s parts removes its key and leaves the other days; with none to clear it writes nothing', () => {
+  const s = countingStore({ ia_parts_p1: '{"w1_mon":{"run":1},"w1_tue":{"lift":1}}' });
+  clearDayParts(s, 'p1', 1, 'mon');
+  assert.equal(s.get('ia_parts_p1'), '{"w1_tue":{"lift":1}}');
+  clearDayParts(s, 'p1', 1, 'mon');
+  clearDayParts(s, 'p1', 2, 'tue');
+  clearDayParts(s, 'p2', 1, 'tue');
+  assert.deepEqual(s.writes, ['ia_parts_p1']);
+});
+
+test('the page reaches the day\'s log, completion and parts through core: each rule is in the script once', () => {
+  const code = appScript();
+  for (const name of ['restNorm', 'readDayLogs', 'recordSetDraft', 'runPartLogged', 'setDayStatus', 'settleDayParts', 'skipDayPart']) {
+    assert.equal(code.split('function ' + name + '(').length - 1, 1, name + ' is in the page once');
+  }
+  assert.equal(code.split('CARDIO_PARK_FIELDS=').length - 1, 1, 'moved, not copied');
+  for (const key of ["'ia_logs_'+", "'ia_comp_'+", "'ia_parts_'+"]) {
+    // One reader and one writer in core; the freeze still reads ia_logs_ and ia_comp_ itself (the freeze slice's).
+    assert.equal(code.split(key).length - 1, key === "'ia_parts_'+" ? 2 : 3, key + ' is built by its reader, its writer and, until its slice, the freeze');
+  }
+});
+
+// These guard behaviour the move must not change: they pass on the release before it too.
+test('the page\'s own names still answer as they did: the keys, the lens, a draft written and dropped, a status read', () => {
+  const IA = loadApp();
+  assert.deepEqual([IA.eval("logKey(3,'mon')"), IA.eval("completedKey(3,'mon')")], ['w3_mon', 'w3_mon']);
+  IA.localStorage.setItem('ia_logs_p9', '{"w4_sun":{"rest_cardio":true,"rest_type":"bike","rest_mins":"40","week":4}}');
+  IA.localStorage.setItem('ia_comp_p9', '{"w4_mon":{"title":"A","ts":1},"w4_wed":{"ts":3,"status":"skipped"}}');
+  IA.eval("activeProgId='p9';currentWeek=4;currentDayKey='tue';");
+  assert.equal(IA.eval('JSON.stringify(getLogs())'), '{"w4_sun":{"restLog":{"bike":{"mins":40}},"week":4}}');
+  assert.equal(IA.eval("JSON.stringify(getLogsFor('p9'))"), '{"w4_sun":{"restLog":{"bike":{"mins":40}},"week":4}}');
+  assert.deepEqual([IA.eval("statusOf(4,'mon')"), IA.eval("statusOf(4,'wed')"), IA.eval("statusOf(4,'thu')")], ['complete', 'skipped', null]);
+  IA.eval("writeSetDraft('back_squat',['5'],['225'],'lb')");
+  const stored = JSON.parse(IA.localStorage.getItem('ia_logs_p9')!);
+  const { ts, ...rest } = stored.w4_tue;
+  assert.deepEqual(rest, { week: 4, sets: { back_squat: { r: ['5'], w: ['225'], L: 'lb' } } }, 'the week and the day are the page\'s own');
+  assert.equal(typeof ts, 'number');
+  assert.deepEqual(stored.w4_sun, { restLog: { bike: { mins: 40 } }, week: 4 }, 'the old rest entry converts when a writer saves the map it read');
+  assert.equal(IA.eval("JSON.stringify(readSetDraft('back_squat'))"), '{"r":["5"],"w":["225"],"L":"lb"}');
+  IA.eval("clearSetDraft('back_squat')");
+  assert.deepEqual(Object.keys(JSON.parse(IA.localStorage.getItem('ia_logs_p9')!).w4_tue), ['week', 'ts']);
+  IA.eval("activeProgId='';writeSetDraft('back_squat',['5'],['225'],'lb')");
+  assert.equal(IA.localStorage.getItem('ia_logs_'), null, 'with no active program a draft is not written');
 });

@@ -1,14 +1,16 @@
 import {
-  completedKey, getCompleted, getLogs, getPartSkips, getPrograms, logKey, saveCompleted, saveLogs, savePartSkips,
-  savePrograms, snapshotDay,
+  completedKey, getCompleted, getLogs, getPrograms, iaStore, logKey, saveCompleted, saveLogs, savePrograms, snapshotDay,
 } from './storage.ts';
 import { _setActiveProg, activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
+import { CARDIO_PARK_FIELDS, runPartLogged } from '../../../../../../core/src/engine/state-day-log.ts';
+import {
+  clearDayParts, clearDayStatus, partsOfDay, setDayStatus, settleDayParts, skipDayPart,
+} from '../../../../../../core/src/engine/state-day-status.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { markSwapOffered } from './swaps-edits.ts';
 import { renderWeekView } from './week-view-sections.ts';
 import {
-  CARDIO_PARK_FIELDS, _curLogDose, _curLogDoseFull, _curLogSub, _setCurLogDose, cardioSwapNoteText, doseDerived,
-  updateDoseDerived,
+  _curLogDose, _curLogDoseFull, _curLogSub, _setCurLogDose, cardioSwapNoteText, doseDerived, updateDoseDerived,
 } from './log-entries.ts';
 import { cardioFieldHTML, iaWheelFlush, iaWheelInit } from './wheel-log.ts';
 import { ruReset } from './rest-timer.ts';
@@ -66,7 +68,7 @@ function toggleComplete(wk: any,dayKey: any,title: any){
 }
 function markDayComplete(wk: any,dayKey: any,title: any){
   snapshotDay(wk,dayKey);
-  const c=getCompleted();c[completedKey(wk,dayKey)]={title,ts:Date.now(),status:'complete'};saveCompleted(c);renderWeekView();
+  setDayStatus(iaStore,activeProgId,wk,dayKey,title,'complete',Date.now());renderWeekView();
 }
 // V181 (D1/D2): two states, both toggles. One tap = save the log fields AND set the
 // day's status. Tapping the ACTIVE state unmarks the day back to pending — the log entry
@@ -88,11 +90,9 @@ function handleDayStatus(dayKey: any,title: any,status: any){
   if(_commit) iaWheelFlush(document.getElementById('detailOverlay'));
   clearPartSkips(currentWeek,dayKey);
   persistLogFields(dayKey,_commit);
-  const c=getCompleted();const k=completedKey(currentWeek,dayKey);
   const wasSame=_was===status;
   if(wasSame){
-    delete c[k];
-    saveCompleted(c);renderWeekView();
+    clearDayStatus(iaStore,activeProgId,currentWeek,dayKey);renderWeekView();
     renderStatusFoot(dayKey,title);
     if(status==='complete'){
       const f=finalScheduledDay();
@@ -101,8 +101,7 @@ function handleDayStatus(dayKey: any,title: any,status: any){
     showToast('Unmarked');
     return;
   }
-  c[k]={title:title||null,ts:Date.now(),status};
-  saveCompleted(c);renderWeekView();
+  setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,status,Date.now());renderWeekView();
   renderStatusFoot(dayKey,title);
   const labels: Record<string, string>={complete:'Done ✓',skipped:'Skipped ✕ The week moves on'};
   // V221 (D179): setting a status closes the session. The rest clock stops and zeroes (‹ Back
@@ -232,77 +231,29 @@ function persistLogFields(dayKey: any, commit?: any){
   settleParts(currentWeek,dayKey);   // v0.261.0 (D284): a logged or cleared run can close or open a day with a skipped part
 }
 // ── SKIPPED PARTS (v0.261.0, D284 P-SKIPPILL) ────────────────────────────────
-// This Week's Skip pill skips a day's run or its lift on its own. The parts live in ia_parts_ (storage.ts), and the
-// day's status follows them: every part skipped is a skipped day; every part not skipped done is a done day (Mario: one
-// part skipped and the rest done counts as done); otherwise no record. A record the parts wrote carries parts:1 and is
-// rewritten or removed as they change, so nothing latches; a status the athlete set (Done, the deck, the reminder) is
-// never touched.
-// The day's parts, read as This Week reads them (week-view-model): a run when the day has a cardio with a sport, a lift
-// when a section holds a movement.
-function dayPartsOf(week: any,dayKey: any){
-  const day=activeProg&&activeProg.weeks&&activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
-  if(!day||day.rest) return [];
-  const parts: string[]=[];
-  if(day.cardio&&String(day.cardio.type||'')) parts.push('run');
-  if((day.sections||[]).some(function(s: any){ return !!s&&(s.items||[]).length>0; })) parts.push('lift');
-  return parts;
+// This Week's Skip pill skips a day's run or its lift on its own, and the day's status follows its parts. The rules
+// live in @ia/core (core/src/engine/state-day-status.ts, v0.261.4); the page names the day's grid entry and the store,
+// and snapshots the day before a part is skipped.
+function _partsDay(week: any,dayKey: any){
+  return activeProg&&activeProg.weeks&&activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
 }
-// The run part is done when the run is logged for the sport it is credited to (D213): This Week's own test
-// (week-view-model's cardioLogged), the same fields and the same zero rule, so the day and its run card agree.
+function dayPartsOf(week: any,dayKey: any){
+  return partsOfDay(_partsDay(week,dayKey));
+}
 function partRunLogged(e: any,type: any){
-  if(!e) return false;
-  const sport=String(e.swapTo||type||'run').toLowerCase();
-  return (CARDIO_PARK_FIELDS[sport]||[]).some(function(f: any){ const v=e[f]; return v!==undefined&&v!==null&&v!==''&&v!==0&&v!=='0'; });
+  return runPartLogged(e,type);
 }
 function settleParts(week: any,dayKey: any){
-  const k=completedKey(week,dayKey);
-  const mine=getPartSkips()[k]||{};
-  const c=getCompleted(), rec=c[k];
-  if(rec&&!rec.parts) return;
-  const parts=dayPartsOf(week,dayKey);
-  const left=parts.filter(function(p: string){ return !mine[p]; });
-  let want: string|null=null;
-  if(left.length<parts.length){
-    if(!left.length) want='skipped';
-    else{
-      const day=activeProg.weeks[week][dayKey];
-      const e=getLogs()[logKey(week,dayKey)];
-      // The lift part is done only by the deck or Done, a status the athlete sets, which ends the settle above.
-      if(left.every(function(p: string){ return p==='run'&&partRunLogged(e,day.cardio&&day.cardio.type); })) want='complete';
-    }
-  }
-  if(want){
-    if(!rec||rec.status!==want){
-      const day=activeProg.weeks[week][dayKey];
-      c[k]={title:(day&&day.title)||null,ts:Date.now(),status:want,parts:1};
-      saveCompleted(c);
-    }
-  }else if(rec){ delete c[k]; saveCompleted(c); }
+  settleDayParts(iaStore,activeProgId,week,dayKey,_partsDay(week,dayKey),Date.now());
 }
-// The pill: one part skipped, or put back. A day skipped the old way (the reminder, a cardio-only day's sheet) is every
-// part skipped, so putting one back turns it into part skips first.
 function skipPart(week: any,dayKey: any,part: any){
-  const parts=dayPartsOf(week,dayKey);
-  if(parts.indexOf(part)<0) return;
+  if(dayPartsOf(week,dayKey).indexOf(part)<0) return;
   snapshotDay(week,dayKey);
-  const k=completedKey(week,dayKey);
-  const all=getPartSkips();
-  const mine=Object.assign({},all[k]||{});
-  const c=getCompleted(), rec=c[k];
-  if(rec&&!rec.parts&&rec.status==='skipped'){
-    parts.forEach(function(p: string){ mine[p]=1; });
-    delete c[k]; saveCompleted(c);
-  }
-  if(mine[part]) delete mine[part]; else mine[part]=1;
-  if(Object.keys(mine).length) all[k]=mine; else delete all[k];
-  savePartSkips(all);
-  settleParts(week,dayKey);
+  skipDayPart(iaStore,activeProgId,week,dayKey,_partsDay(week,dayKey),part,Date.now());
 }
 // A status set by hand (the session sheet's Done or Skip, the reminder) takes the day whole.
 function clearPartSkips(week: any,dayKey: any){
-  const all=getPartSkips(), k=completedKey(week,dayKey);
-  if(!all[k]) return;
-  delete all[k]; savePartSkips(all);
+  clearDayParts(iaStore,activeProgId,week,dayKey);
 }
 // V236 (D218): the cardio card's Log tap, the commit for a DRAFT card. A wheel still inside its
 // settle window commits to its node first, as in handleDayStatus. An empty card (every field of

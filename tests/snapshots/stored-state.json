@@ -3386,6 +3386,160 @@
         "digest": "435cd291c6928c91",
         "weeksSha256": "2b78ec16d2762009986ca68ac793efe23bfd1469d848f4b57c3cdc060f5aa83f"
       }
+    },
+    "a day's parts settle its status": {
+      "closed": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 173,
+            "sha256": "54b7a73491dc43ed4299b818d9174db7d3ac607b3860e8732ac0d1cfb3593a35",
+            "value": {
+              "w1_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788213600000,
+                "status": "complete",
+                "parts": 1
+              },
+              "w1_tue": {
+                "title": "Strength Support",
+                "ts": 1788300000000,
+                "status": "skipped",
+                "parts": 1
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 2424,
+            "sha256": "649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 196,
+            "sha256": "c42cfe719f499317dfab2f837e5d12be8a5df2a812a71e9c9edc9cd06f2a104f",
+            "value": {
+              "w1_mon": {
+                "rpe": "",
+                "run_dist": "3.1",
+                "run_pace": "",
+                "run_mins": "31",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788213600000
+              }
+            }
+          },
+          "ia_parts_prog_1788008400000": {
+            "bytes": 49,
+            "sha256": "53896f5dfbf50b68170b6526555e75fc80b2bc59d95c5818a8e6c385eddb01a9",
+            "value": {
+              "w1_mon": {
+                "lift": 1
+              },
+              "w1_tue": {
+                "run": 1,
+                "lift": 1
+              }
+            }
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "reopened": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "value": {}
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 2424,
+            "sha256": "649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 191,
+            "sha256": "ed02c379d939a2e4de4953b31e6f3e4e4f88c99f17ecca1dd35b888ff3733cb5",
+            "value": {
+              "w1_mon": {
+                "rpe": "",
+                "run_dist": "",
+                "run_pace": "",
+                "run_mins": "",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788310800000
+              }
+            }
+          },
+          "ia_parts_prog_1788008400000": {
+            "bytes": 41,
+            "sha256": "17751057c1985f0fa7c98a28bb4457f4e0fc1ddd334e64fcaf48cb61c32fdf08",
+            "value": {
+              "w1_mon": {
+                "lift": 1
+              },
+              "w1_tue": {
+                "lift": 1
+              }
+            }
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      }
     }
   }
 }

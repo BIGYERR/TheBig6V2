@@ -20,14 +20,19 @@ const SLOW = ['sweeps/stored-state.test.ts', 'sweeps/data-backup.test.ts'];
 
 // name, what the break does, the exact text (once in the page), its replacement.
 const BREAKS = [
-  ['log key', 'a log is stored under w1-mon, not w1_mon', "function logKey(w,d){return 'w'+w+'_'+d;}", "function logKey(w,d){return 'w'+w+'-'+d;}"],
+  ['log key', 'a log is stored under w1-mon, not w1_mon', "function logKey(w,d){return dayStoreKey(w,d);}", "function logKey(w,d){return 'w'+w+'-'+d;}"],
   ['freeze, history', 'a touched day is not restored from its snapshot at launch', 'if(_snap){ _merged[d] = _snap; _histRestored.add(k); return; }', ''],
   ['freeze, piercing', 'an overlay no longer reaches the untouched days of the current week', 'const _pierce = w >= _curWk;', 'const _pierce = false;'],
   ['freeze, reach', 'the last frozen week is rebuilt instead', 'for(let w=1; w<_cut; w++){', 'for(let w=1; w<_cut-1; w++){'],
   ['freeze, injured week', 'a touched day in an injured week keeps its stored form', 'if(_injCovers(w) && _live[d]){ _merged[d] = _live[d]; return; }', ''],
   ['set draft', 'a logged card leaves its draft in the log', '  clearSetDraft(exKey);\n', '\n'],
   ['backup scan', 'the backup leaves out the last key', "iaStore.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});", "iaStore.keys().slice(0,-1).forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});"],
-  ['completion status', 'a skipped day is stored as complete', "c[k]={title:title||null,ts:Date.now(),status};", "c[k]={title:title||null,ts:Date.now(),status:'complete'};"],
+  ['completion status', 'a skipped day is stored as complete', "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,status,Date.now());", "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,'complete',Date.now());"],
+  // v0.261.4: a break inside the rules that moved to core with the day's log, completion and parts.
+  ['part skip', 'a skipped part is not stored', "  writePartSkips(store,programId,all);\n  settleDayParts(", "  settleDayParts("],
+  // Post-v0.261.4: open until the records gained the case "a day's parts settle its status" (no history before it let a
+  // day's parts write its completion).
+  ['parts settle', 'the parts of a day never write its completion', "c[k]={title:(day&&day.title)||null,ts:now,status:want,parts:1};", ''],
   ['seed write back', 'an old program\'s seed is not written back to its config', '    prog.cfg.seed = prog.seed;\n', '\n'],
   ['purge', 'a deleted program keeps its logs', "['ia_logs_','ia_comp_',", "['ia_comp_',"],
   ['rest move key', 'a moved rest day is stored under the picked day', 'moves[completedKey(w,day)]={from:pick,ts:Date.now()};', 'moves[completedKey(w,pick)]={from:pick,ts:Date.now()};'],

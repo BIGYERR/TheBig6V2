@@ -1,6 +1,7 @@
 import { esc, iaStore, snapshotDay } from './storage.ts';
 import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { readLiftLog, recordLift, writeLiftLog } from '../../../../../../core/src/engine/state-lift-log.ts';
+import { CARDIO_PARK_FIELDS } from '../../../../../../core/src/engine/state-day-log.ts';
 import { EQUIP_TOKENS } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { runSessionCode } from './week-view-sections.ts';
@@ -83,12 +84,8 @@ function updateRPEDisplay(val: any) {
   if(r) r.dataset.touched = '1';
 }
 const CARDIO_WORD: Record<string, string>={run:'Run',bike:'Bike',swim:'Swim'};
-// V234 (D213): the field set each sport owns at the top level of a log entry. Only the active
-// chip's set sits at top level, so only it is credited. A sport change through the picker moves
-// the leaving set whole into entry.parked[sport] and brings the arriving sport's parked set back.
-// `parked` is read by the form render (setCardioSwap, buildLogHTML's note) and carried by
-// persistLogFields; no other reader names it, so every other reader is blind to it.
-const CARDIO_PARK_FIELDS: Record<string, any>={run:['run_dist','run_pace','run_mins','run_reps','run_rep_time'],bike:['bike_mins'],swim:['swim_yards']};
+// V234 (D213): CARDIO_PARK_FIELDS, the field set each sport owns at the top level of a log entry, lives in
+// core/src/engine/state-day-log.ts (v0.261.4).
 // V234 (D214): the swap note, one source for both sites. The second sentence prints only when
 // the planned sport has a parked set holding a number.
 function cardioSwapNoteText(active: any, planned: any, e: any){
@@ -227,7 +224,7 @@ const _DOSE_INPUT_STYLE='width:100%;background:var(--surface2);border:1px solid 
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  CARDIO_PARK_FIELDS, CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogDoseFull, _curLogSub, _doseStripHTML, _fmtPaceMi,
-  _setCurLogDose, _setCurLogDoseFull, _setCurLogSub, cardioSwapNoteText, doseDerived, doseFromCardio, getExWeights,
-  isKBExercise, logExerciseWeight, saveExWeights, updateDoseDerived,
+  CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogDoseFull, _curLogSub, _doseStripHTML, _fmtPaceMi, _setCurLogDose,
+  _setCurLogDoseFull, _setCurLogSub, cardioSwapNoteText, doseDerived, doseFromCardio, getExWeights, isKBExercise,
+  logExerciseWeight, saveExWeights, updateDoseDerived,
 };

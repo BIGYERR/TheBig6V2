@@ -1,10 +1,10 @@
 import { completedKey, esc, getCompleted, getLogs, getPrograms, iaStore, saveLogs, savePrograms } from './storage.ts';
+import { CARDIO_PARK_FIELDS } from '../../../../../../core/src/engine/state-day-log.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _PATTERN_REGION } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { REST_WORD, dayBeforeStart, renderWeekView, restLogHead, restLogLines } from './week-view-sections.ts';
-import { CARDIO_PARK_FIELDS } from './log-entries.ts';
 import { iaWheelFlush, iaWheelHTML, iaWheelInit } from './wheel-log.ts';
 import { updateRestFloat } from './rest-timer.ts';
 import { openDetail } from './day-detail.ts';

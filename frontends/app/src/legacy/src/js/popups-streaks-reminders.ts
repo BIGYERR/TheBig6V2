@@ -1,6 +1,7 @@
-import { completedKey, getCompleted, iaStore, saveCompleted, snapshotDay } from './storage.ts';
+import { completedKey, getCompleted, iaStore, snapshotDay } from './storage.ts';
 import { ASY_ICON_PATHS, asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { activeProg, activeProgId, showToast } from './rest-day-shell.ts';
+import { dayStatus, setDayStatus } from '../../../../../../core/src/engine/state-day-status.ts';
 import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.ts';
 import { wildcardOn } from './random-wildcard.ts';
@@ -224,7 +225,7 @@ function scheduledDays(cutoff?: any){
   }
   out.sort((a,b)=>a.date-b.date); return out;
 }
-function statusOf(week: any,d: any){ const c=getCompleted()[completedKey(week,d)]; if(!c) return null; const s=c.status||'complete'; return s==='partial'?'complete':s; }   // V181 (D1): legacy partial → complete
+function statusOf(week: any,d: any): any{ return dayStatus(iaStore,activeProgId,week,d); }   // V181 (D1): legacy partial → complete (state-day-status.ts, v0.261.4)
 // Streak: trailing run of scheduled days. Precedence, highest first (V195 D71b):
 //   complete / partial -> counts (a day holding BOTH a completion and a Wildcard counts ONCE)
 //   Wildcard           -> counts, even when the day is marked skipped
@@ -357,7 +358,7 @@ function maybeShowReminder(){
 function resolveReminder(week: any,dayKey: any,title: any,status: any){
   snapshotDay(week,dayKey);
   clearPartSkips(week,dayKey);   // v0.261.0 (D284): the reminder's answer takes the day whole
-  const c=getCompleted(); c[completedKey(week,dayKey)]={title:title||null,ts:Date.now(),status}; saveCompleted(c);
+  setDayStatus(iaStore,activeProgId,week,dayKey,title||null,status,Date.now());
   markReminded(week,dayKey);
   popClose();
   renderWeekView();
