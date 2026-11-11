@@ -29,6 +29,11 @@ Mario's. **Why (Mario, 2026-11-11):** React Native is the platform the product h
 iPhone app, and what comes next (app blocking through Screen Time, NFC unlock) is native work. The tab bar and viewport
 bugs (D256, D280, D285) set it off; they are not the reason, and fixing them would not change the decision.
 
+**Out of scope (Mario, 2026-11-11):** the tab bar and every other web view bug. No more work goes into them; they end
+when the app leaves WebKit. Today's app is changed only for the migration itself (the phase 1 lift) or to protect
+Mario's data and training before cutover. Everything else found along the way is carried in this file and fixed
+inside the migration, in the code that replaces it.
+
 **What cannot break (Mario's six):**
 
 1. The engine in `core/` stays unchanged. The 864 config lattice and the HALF_MANNY digest stay green at every step, and
