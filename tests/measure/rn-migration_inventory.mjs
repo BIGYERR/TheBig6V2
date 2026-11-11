@@ -194,6 +194,7 @@ function classify(r) {
     else fate = 'REPLACE by a React Native screen test (phase 2 or 3): model assertions kept, template reads rewritten';
   }
   else if (/tests\/unit\/(landing|claims|tree-at|semver|e2e-|worktree|run-log|check|deploy|build-index|module-blocks|engine-move|same-script|app-at|logs)/.test(r.f)) fate = 'KEEP: repo tooling, while the tool exists';
+  else if (/stored-state|sweeps\/data-backup/.test(r.f)) fate = 'RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1)';
   else if (css || /tab-bar|keyboard|viewport|webkit/i.test(r.f)) fate = 'RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test';
   else if (dom || (vm && domWords) || (lift && domWords)) fate = 'REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core';
   else if (core || engMod) fate = 'KEEP: already runs on core alone';

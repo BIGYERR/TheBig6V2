@@ -1,0 +1,512 @@
+{
+  "v0.253.0": {
+    "file": "101325 e383be4331a73836ba48a99039be095269a57860aaa5ddff0951ef56fc6d2fb5",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "86641 343a18fa764e2c460e15d9366959beaa2fbfdd6cd99c0df83579973b1e3bbd78"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "c3fbd6dfcef7394a"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.253.1": {
+    "file": "101325 d8727e540dd549b68c242d749eb28b1be46bef6d10746cb66640b61696caaee0",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "86641 343a18fa764e2c460e15d9366959beaa2fbfdd6cd99c0df83579973b1e3bbd78"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "c3fbd6dfcef7394a"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.254.0": {
+    "file": "101325 ea57a7b8e490a4404840d0112da09c6bc7db4be95ccbeba933fc9987dd98d073",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "86641 343a18fa764e2c460e15d9366959beaa2fbfdd6cd99c0df83579973b1e3bbd78"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "c3fbd6dfcef7394a"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.255.0": {
+    "file": "101325 e5787d30b41ce9e5eddbab70f59dec8f6792a568758179740e9a842ca1b5d4bb",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "86641 343a18fa764e2c460e15d9366959beaa2fbfdd6cd99c0df83579973b1e3bbd78"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "c3fbd6dfcef7394a"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.255.1": {
+    "file": "101325 519ecb88cb74c1d920b6e105eeece80d0ad0a746a30b2f6fd62bff9a36e1c300",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "86641 343a18fa764e2c460e15d9366959beaa2fbfdd6cd99c0df83579973b1e3bbd78"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "c3fbd6dfcef7394a"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.255.2": {
+    "file": "101325 71af48728d3de5537e891922bc30561095ebd44a6a254280298d5981ab84a591",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "86641 343a18fa764e2c460e15d9366959beaa2fbfdd6cd99c0df83579973b1e3bbd78"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "c3fbd6dfcef7394a"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.256.0": {
+    "file": "98627 922527c4f5ad6b6824b2ef66f63dd8b32782545ed197eff0d01f840e6ebc6f0a",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.257.0": {
+    "file": "98627 50e7871308281cc2baa202d2a46fd9d2f65d04f06cf5ceff1f337a881f7768a8",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.258.0": {
+    "file": "98627 3fd63d2924e432fa3e3be6f4f3177981fb336733fa0220aad9f6ecc64cc21318",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.258.1": {
+    "file": "98627 e6dad220b1bd74e99922f6e32e11621ffd033bf7bbf85e5fa44ede7faad6c871",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.259.0": {
+    "file": "98627 cbf387b5eedb70dcd7501939d9c2ce507c33b7e8e37112a9750614a83462eab8",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.259.1": {
+    "file": "98627 c9fef4ab1a64cb73666c58f65fbfdd197b5fe3be1f1fd7bfa4b7a9c29b02446e",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.259.2": {
+    "file": "98627 2d6d447a859ea2a5327169e20191fe1a590dc506e5badb0dc28397b0cd40e2cf",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.259.3": {
+    "file": "98627 dfcb94f7530d695e469c0ee60f8ed673fe2b60f028c2624716810cbeb465dbd7",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.259.4": {
+    "file": "98627 0d4ef8d6ab5fa487fb9440ade651e39c1ba9347a9744f53fc4a2219b45d20fbc",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.260.0": {
+    "file": "98627 cd6ff87a3a48a889b1d35dd30320986b4d8e46cac7e43dee8bc84636e2f8f186",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  },
+  "v0.261.0": {
+    "file": "98627 56a2566524df319ccda8e781f5dfcf1f7af05ec6b9dbcb30751fe1b3dd218a6f",
+    "keys": 8,
+    "afterLaunch": {
+      "keys": {
+        "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+        "ia_comp_prog_1788008400000": "154 1c52c858dd9655609decb04f31955f9e94804a49f494ebcdcab5fafcb435a73a",
+        "ia_exw_prog_1788008400000": "914 4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+        "ia_hist_prog_1788008400000": "2424 649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2",
+        "ia_logs_prog_1788008400000": "427 4e2aeaef3afccfcc4bfa970dbae6101e08eccba978a6047369be7e780360239c",
+        "ia_pop_dismiss_prog_1788008400000": "27 00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+        "ia_pop_idx_prog_1788008400000": "14 451fa4995414a105cd02ab678a2a2b36ffb8e88c0574fd5ec74b50f94968a2fe",
+        "ia_programs": "84235 f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    }
+  }
+}

@@ -99,23 +99,23 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 | Suite | Runner | Files | Tests | Assertions | Lines |
 |---|---|---|---|---|---|
 | tests/unit | Vitest | 23 | 262 | 786 | 3575 |
-| tests/integration | Vitest | 63 | 1084 | 3789 | 18180 |
-| tests/sweeps | Vitest (CI only) | 29 | 208 | 709 | 3191 |
+| tests/integration | Vitest | 64 | 1098 | 3830 | 18410 |
+| tests/sweeps | Vitest (CI only) | 31 | 214 | 733 | 3371 |
 | tests/e2e | Docker, Puppeteer | 9 | 0 | 0 | 3248 |
 | frontends/app/test/unit | node:test | 41 | 323 | 980 | 4009 |
 | frontends/app/test/integration | node:test | 8 | 58 | 149 | 988 |
 | backend/test | node:test | 11 | 86 | 312 | 1401 |
-| **Total, without the e2e** |  | **175** | **2021** | **6725** |  |
+| **Total, without the e2e** |  | **178** | **2041** | **6790** |  |
 
-Golden files: **16** in `tests/snapshots/` (527 KB).
+Golden files: **21** in `tests/snapshots/` (777 KB).
 
 **What happens to them** (a first pass by rule, from what each file drives; the ledger has every file, and each row is confirmed by hand in the phase that touches it):
 
 | Plan | What it means | Files | Tests | Assertions |
 |---|---|---|---|---|
 | REPLACE | a React Native screen test takes its place; logic assertions move with the logic | 61 | 878 | 3044 |
+| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 46 | 543 | 1742 |
 | KEEP | stays as it is (engine and core tests, pure models, the server, repo tools) | 62 | 513 | 1714 |
-| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 43 | 523 | 1677 |
 | RETIRE | what it tests is gone at cutover (the web view, a stylesheet, Cordova tooling) | 9 | 107 | 290 |
 
 ## 5. Dates, locale and other engine-dependent calls
