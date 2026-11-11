@@ -2,8 +2,9 @@ import { getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsF
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setProgressViewId, activeProg, activeProgId, calcLift, progressViewId } from './rest-day-shell.ts';
 import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
+import { dedupeExDayEntries } from '../../../../../../core/src/engine/state-lift-log.ts';
 import { _partialWeek1, restLogLines } from './week-view-sections.ts';
-import { RPE_LABELS, dedupeExDayEntries } from './log-entries.ts';
+import { RPE_LABELS } from './log-entries.ts';
 import {
   EASY_MIN_RUNS, RACE_DIST_MI, _cutWeek, _progChipsHTML, buildPaceChart, easyEffortWeekly, ladderWeekly,
   plannedVsLogged, recoveryPaceWeekly, runsByClass,

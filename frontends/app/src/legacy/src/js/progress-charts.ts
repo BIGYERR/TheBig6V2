@@ -1,6 +1,6 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
+import { weeklyBest } from '../../../../../../core/src/engine/state-lift-log.ts';
 import { PACE_CHART } from '../../../../../../core/src/engine/cardio-progression.ts';
-import { weeklyBest } from './log-entries.ts';
 import {
   EASY_MIN_RUNS, EASY_RPE_HI, EASY_RPE_LO, RUN_CLASS_COLOR, RUN_CLASS_ORDER, _fmtPaceShort, _halfFromMileSec,
   _mileFromRecoverySec, _paceStrToSec, _runClass,

@@ -54,3 +54,38 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   `localStorage` once outside comments, where `iaStore` is made.
 - **Tests:** `tests/unit/stored-state.test.ts` (the two makers from `@ia/core/engine`; the page's one mention). The
   golden records and the backup corpus, unchanged.
+
+## Release scope: v0.261.3 moves the lift log into core
+
+- **Date:** 2026-11-11. **Ruled by:** Mario ("go" for the second slice); **bump:** PATCH, by his standing rule for
+  migration steps that change the page and no behaviour. **Shipped:** v0.261.3.
+- **Scope, narrowed from "`log-entries.ts` and the set logging rules":** this slice takes the half of
+  `log-entries.ts` that is stored data, the lift log under `ia_exw_`. The file's other half (the cardio dose and its
+  form) and `set-logging.ts`'s display rules read the page, the clock and names that are not in core yet; each is its
+  own slice.
+- **The finding (read on v0.261.2):** the lift log is read and written in four places that build the same key and
+  parse the same way (`getExWeights` and `saveExWeights` in `log-entries.ts`, `getExWeightsFor` and
+  `saveExWeightsFor` in `storage.ts`). `logExerciseWeight` holds the rule for recording a lift (one entry per week and
+  day, the later log replacing the earlier, a year of weeks kept) inside a function that also reads three page
+  globals, snapshots the day and saves. `entryDay`, `weeklyBest` and `dedupeExDayEntries` are pure and are called by
+  7 legacy files and 4 Angular screens.
+- **What changes:** `core/src/engine/state-lift-log.ts`:
+  1. `readLiftLog(store, programId)` and `writeLiftLog(store, programId, log)`: the one reader and the one writer of
+     `ia_exw_<program>`. The four legacy functions keep their names and call them with `iaStore`.
+  2. `recordLift(log, lift)`: the rule out of `logExerciseWeight`, on a log in hand, with the week, the day and the
+     instant passed in. `logExerciseWeight` keeps its guards, resolves the week and the day from the page as before,
+     snapshots the day, calls it and saves, in the order it always did.
+  3. `entryDay`, `weeklyBest` and `dedupeExDayEntries` move as they are, typed.
+- **What deliberately does not change:** the key, the stored shape, the order of an entry's fields, which entry wins,
+  the 52 week trim, the instant an entry carries (one `Date.now()` per log), every function name the Angular screens
+  call through the bridge, and every golden record.
+- **Expected values (typed from the ruling):** an empty or broken `ia_exw_p1` reads as `{}`; a written log reads back
+  equal and is stored as its `JSON.stringify`. A first lift makes the row `{name, entries: [{weight, setsReps,
+  setsDone, setsW, week, day, ts}]}` under `exStoreKey(name)`, fields in that order. A second log of the same week and
+  day replaces weight, setsReps and ts, keeps the earlier sets when it brings none, and adds no entry; another day of
+  the week adds one. An entry of week 60 drops every entry of week 8 or earlier (more than 52 weeks behind it) and
+  keeps week 9. `entryDay` gives the entry's `day`, else the weekday of its `ts`, else `''`. `weeklyBest` keeps the
+  heaviest entry of each week, the later of two equal ones, in week order. `dedupeExDayEntries` keeps the latest entry
+  of each week and day and says whether it changed anything.
+- **Tests:** `tests/unit/stored-state.test.ts` (the functions from `@ia/core`, on a memory store). The golden records
+  and the backup corpus, unchanged.

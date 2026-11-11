@@ -55,7 +55,8 @@ const EXPORT_NAMES = [
   'PACE_CHART','_steadyCeilingFor','_mileFromRecoverySec','_halfFromMileSec',
   'GOAL_RECOMMENDED_DAYS','SPORT_CEILINGS','TACTICAL_DELOAD_GOALS','DEFAULT_1RM',
   'WD','_applyWizardStart','doGenerate',
-  'storageStore','memoryStore','iaStore'
+  'storageStore','memoryStore','iaStore',
+  'readLiftLog','writeLiftLog','recordLift'
 ];
 
 function makeContext(opts){

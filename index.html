@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.2">
+<meta name="ia-version" content="0.261.3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1417,8 +1417,8 @@ function getLogs(){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+activeProgId)||
 
 function getLogsFor(pid){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+pid)||'{}');}catch{return{};}return restNormAll(l);}
 function getDayHistFor(pid){try{return JSON.parse(iaStore.get('ia_hist_'+pid)||'{}');}catch{return{};}}
-function getExWeightsFor(pid){try{return JSON.parse(iaStore.get('ia_exw_'+pid)||'{}');}catch{return{};}}
-function saveExWeightsFor(pid,obj){iaStore.set('ia_exw_'+pid,JSON.stringify(obj));}
+function getExWeightsFor(pid){return readLiftLog(iaStore,pid);}
+function saveExWeightsFor(pid,obj){writeLiftLog(iaStore,pid,obj);}
 function saveLogs(l){iaStore.set('ia_logs_'+activeProgId,JSON.stringify(l));}
 function getCompleted(){try{return JSON.parse(iaStore.get('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
 function saveCompleted(c){iaStore.set('ia_comp_'+activeProgId,JSON.stringify(c));}
@@ -2413,6 +2413,123 @@ const DEFAULT_1RM = {
   intermediate:{bench:135, squat:155, deadlift:185},  
   advanced:    {bench:225, squat:275, deadlift:315},  
 };
+
+
+
+
+ 
+ 
+ 
+
+
+function readLiftLog(store, programId){try{return JSON.parse(store.get('ia_exw_'+programId)||'{}');}catch{return{};}}
+function writeLiftLog(store, programId, log){store.set('ia_exw_'+programId,JSON.stringify(log));}
+
+
+
+
+
+
+
+
+
+
+
+
+const _ENTRY_DAY_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
+function entryDay(e){
+  if(!e) return '';
+  if(e.day) return e.day;
+  if(e.ts){ try{ return _ENTRY_DAY_ORDER[new Date(e.ts).getDay()]||''; }catch(_){ return ''; } }
+  return '';
+}
+
+
+
+
+function weeklyBest(entries){
+  const byWeek=Object.create(null);
+  (entries||[]).forEach(function(e){
+    if(!e) return;
+    const w=+e.week||0, prev=byWeek[w];
+    if(!prev) { byWeek[w]=e; return; }
+    const a=+e.weight||0, b=+prev.weight||0;
+    if(a>b || (a===b && (e.ts||0)>(prev.ts||0))) byWeek[w]=e;
+  });
+  return Object.keys(byWeek).map(Number).sort(function(a,b){return a-b;}).map(function(w){return byWeek[w];});
+}
+
+
+
+
+
+
+function recordLift(log, lift){
+  const key = exStoreKey(lift.name);
+  if(!log[key]) log[key] = {name:lift.name, entries:[]};
+  const w = lift.week, dk = lift.day, weight = lift.weight, setsReps = lift.setsReps, setsDone = lift.setsDone, setsW = lift.setsW;
+  const entries = log[key].entries;
+  
+  
+  
+  
+  
+  
+  const existing = entries.find(e => +e.week === +w && entryDay(e) === dk);
+  if(existing) {
+    existing.weight = +(weight);
+    existing.setsReps = setsReps||'';
+    existing.setsDone = (setsDone && setsDone.length) ? setsDone : (existing.setsDone||[]);
+    existing.setsW = (setsW && setsW.length) ? setsW : (existing.setsW||[]);
+    existing.ts = lift.now;
+    existing.day = dk;
+  } else {
+    entries.push({
+      weight: +(weight),
+      setsReps: setsReps||'',
+      setsDone: setsDone||[],
+      setsW: setsW||[],
+      week: w,
+      day: dk,
+      ts: lift.now
+    });
+  }
+  
+  
+  
+  
+  
+  const _wMax = entries.reduce(function(m,e){return Math.max(m, +e.week||0);}, 0);
+  if(_wMax > 52){
+    const _keep = entries.filter(function(e){ return (+e.week||0) > _wMax - 52; });
+    if(_keep.length !== entries.length) log[key].entries = _keep;
+  }
+}
+
+
+
+
+function dedupeExDayEntries(store){
+  
+  
+  
+  
+  
+  
+  let changed = false;
+  Object.values(store).forEach(ex => {
+    if(!ex.entries || ex.entries.length < 2) return;
+    const byKey = {};
+    ex.entries.forEach(e => {
+      const k = String(e.week) + '|' + entryDay(e);
+      const prev = byKey[k];
+      if(!prev || (e.ts||0) >= (prev.ts||0)) byKey[k] = e;
+    });
+    const merged = Object.values(byKey).sort((a,b) => (+a.week-+b.week) || ((a.ts||0)-(b.ts||0)));
+    if(merged.length !== ex.entries.length) { ex.entries = merged; changed = true; }
+  });
+  return changed;
+}
 
 
 
@@ -14142,55 +14259,16 @@ function isDBExercise(name) {
 }
 
 
-function getExWeights(){try{return JSON.parse(iaStore.get('ia_exw_'+activeProgId)||'{}');}catch{return{};}}
-function saveExWeights(obj){iaStore.set('ia_exw_'+activeProgId,JSON.stringify(obj));}
 
 
-
-
-
-
-
-
-
-
-
-
-
-const _ENTRY_DAY_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
-function entryDay(e){
-  if(!e) return '';
-  if(e.day) return e.day;
-  if(e.ts){ try{ return _ENTRY_DAY_ORDER[new Date(e.ts).getDay()]||''; }catch(_){ return ''; } }
-  return '';
-}
-
-
-
-
-function weeklyBest(entries){
-  const byWeek=Object.create(null);
-  (entries||[]).forEach(function(e){
-    if(!e) return;
-    const w=+e.week||0, prev=byWeek[w];
-    if(!prev) { byWeek[w]=e; return; }
-    const a=+e.weight||0, b=+prev.weight||0;
-    if(a>b || (a===b && (e.ts||0)>(prev.ts||0))) byWeek[w]=e;
-  });
-  return Object.keys(byWeek).map(Number).sort(function(a,b){return a-b;}).map(function(w){return byWeek[w];});
-}
-
-
-
-
+function getExWeights(){return readLiftLog(iaStore,activeProgId);}
+function saveExWeights(obj){writeLiftLog(iaStore,activeProgId,obj);}
 
 
 function logExerciseWeight(exName, weight, setsReps, week, setsDone, setsW, dayKey) {
   if(!exName) return;
   if(!weight && !(setsDone && setsDone.length)) return;
   const store = getExWeights();
-  const key = exStoreKey(exName);
-  if(!store[key]) store[key] = {name:exName, entries:[]};
   const w = week||currentWeek;
   const dk = dayKey||(typeof currentDayKey!=='undefined'?currentDayKey:'')||'';
   
@@ -14198,68 +14276,8 @@ function logExerciseWeight(exName, weight, setsReps, week, setsDone, setsW, dayK
   
   
   if(dk) snapshotDay(w, dk);
-  const entries = store[key].entries;
-  
-  
-  
-  
-  
-  
-  const existing = entries.find(e => +e.week === +w && entryDay(e) === dk);
-  if(existing) {
-    existing.weight = +weight;
-    existing.setsReps = setsReps||'';
-    existing.setsDone = (setsDone && setsDone.length) ? setsDone : (existing.setsDone||[]);
-    existing.setsW = (setsW && setsW.length) ? setsW : (existing.setsW||[]);
-    existing.ts = Date.now();
-    existing.day = dk;
-  } else {
-    entries.push({
-      weight: +weight,
-      setsReps: setsReps||'',
-      setsDone: setsDone||[],
-      setsW: setsW||[],
-      week: w,
-      day: dk,
-      ts: Date.now()
-    });
-  }
-  
-  
-  
-  
-  
-  const _wMax = entries.reduce(function(m,e){return Math.max(m, +e.week||0);}, 0);
-  if(_wMax > 52){
-    const _keep = entries.filter(function(e){ return (+e.week||0) > _wMax - 52; });
-    if(_keep.length !== entries.length) store[key].entries = _keep;
-  }
+  recordLift(store,{name:exName,weight:weight,setsReps:setsReps,week:w,day:dk,setsDone:setsDone,setsW:setsW,now:Date.now()});
   saveExWeights(store);
-}
-
-
-
-
-function dedupeExDayEntries(store) {
-  
-  
-  
-  
-  
-  
-  let changed = false;
-  Object.values(store).forEach(ex => {
-    if(!ex.entries || ex.entries.length < 2) return;
-    const byKey = {};
-    ex.entries.forEach(e => {
-      const k = String(e.week) + '|' + entryDay(e);
-      const prev = byKey[k];
-      if(!prev || (e.ts||0) >= (prev.ts||0)) byKey[k] = e;
-    });
-    const merged = Object.values(byKey).sort((a,b) => (a.week-b.week) || ((a.ts||0)-(b.ts||0)));
-    if(merged.length !== ex.entries.length) { ex.entries = merged; changed = true; }
-  });
-  return changed;
 }
 
 

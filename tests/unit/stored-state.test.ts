@@ -1,11 +1,13 @@
-// The store the app's stored state sits behind: StateStore, memoryStore and storageStore
-// (core/src/engine/state-store.ts, docs/decisions/stored-state.md, v0.261.2), imported from @ia/core and run alone,
-// and the page's one use of the browser's storage. Every expected value is typed from the ruling. What the app stores
+// Stored state, the logic in @ia/core (docs/decisions/stored-state.md), imported and run alone: the store the app's
+// state sits behind (core/src/engine/state-store.ts, v0.261.2) with the page's one use of the browser's storage, and
+// the lift log (core/src/engine/state-lift-log.ts, v0.261.3). Every expected value is typed from the ruling. What the app stores
 // through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
 import { memoryStore, storageStore } from '@ia/core/engine/state-store.ts';
 import type { StorageLike } from '@ia/core/engine/state-store.ts';
+import { dedupeExDayEntries, entryDay, readLiftLog, recordLift, weeklyBest, writeLiftLog } from '@ia/core/engine/state-lift-log.ts';
+import type { LiftEntry, LiftLog, LiftRecord } from '@ia/core/engine/state-lift-log.ts';
 import { appScript, loadApp } from '../support/app.ts';
 
 /** A stand-in for the browser's storage that records what was asked of it. */
@@ -113,4 +115,87 @@ test('the page\'s store is the harness\'s storage: a write through one is read t
   assert.deepEqual([...IA.eval('iaStore.keys()')], ['ia_theme', 'ia_active']);   // copied: the array is the page's own
   IA.eval("iaStore.remove('ia_theme')");
   assert.equal(IA.localStorage.getItem('ia_theme'), null);
+});
+
+// ── The lift log, ia_exw_<program> (core/src/engine/state-lift-log.ts, v0.261.3) ─────────────────────────────────
+// Imported from @ia/core and run on a memory store. Every expected value is typed from the ruling.
+const lift = (over: Partial<LiftRecord> = {}): LiftRecord => ({
+  name: 'Barbell bench press', weight: 135, setsReps: '3×5', week: 2, day: 'mon', setsDone: [5, 5, 5], setsW: [125, 130, 135], now: 1000, ...over,
+});
+
+test('the lift log reads empty when nothing or something broken is stored, and reads back what was written', () => {
+  const s = memoryStore({ ia_exw_broken: '{"barbell_bench_press":' });
+  assert.deepEqual(readLiftLog(s, 'p1'), {});
+  assert.deepEqual(readLiftLog(s, 'broken'), {});
+  const log: LiftLog = { barbell_bench_press: { name: 'Barbell bench press', entries: [{ weight: 135, setsReps: '3×5', setsDone: [5], setsW: [], week: 1, day: 'mon', ts: 7 }] } };
+  writeLiftLog(s, 'p1', log);
+  assert.equal(s.get('ia_exw_p1'), JSON.stringify(log), 'stored as its JSON, under ia_exw_<program>');
+  assert.deepEqual(readLiftLog(s, 'p1'), log);
+  assert.deepEqual(s.keys(), ['ia_exw_broken', 'ia_exw_p1'], 'and nothing else is written');
+});
+
+test('a first lift makes the row under the movement\'s key, its entry\'s fields in the stored order', () => {
+  const log: LiftLog = {};
+  recordLift(log, lift());
+  assert.equal(JSON.stringify(log),
+    '{"barbell_bench_press":{"name":"Barbell bench press","entries":[{"weight":135,"setsReps":"3×5","setsDone":[5,5,5],"setsW":[125,130,135],"week":2,"day":"mon","ts":1000}]}}');
+});
+
+test('the same week and day logged again replaces the entry; another day of the week adds one', () => {
+  const log: LiftLog = {};
+  recordLift(log, lift());
+  recordLift(log, lift({ weight: '140', setsReps: '3×5 heavy', setsDone: [], setsW: null, now: 2000 }));
+  const row = log['barbell_bench_press']!;
+  assert.equal(row.entries.length, 1, 'no second entry for the day');
+  assert.deepEqual(row.entries[0], { weight: 140, setsReps: '3×5 heavy', setsDone: [5, 5, 5], setsW: [125, 130, 135], week: 2, day: 'mon', ts: 2000 },
+    'the weight (as a number), the prescription and the instant are the later log\'s; the sets it did not bring are kept');
+  recordLift(log, lift({ day: 'thu', setsDone: [4], setsW: [], now: 3000 }));
+  assert.deepEqual(row.entries.map((e) => [e.week, e.day, e.ts]), [[2, 'mon', 2000], [2, 'thu', 3000]]);
+});
+
+test('a year of weeks is kept: an entry of week 60 drops week 8 and keeps week 9', () => {
+  const log: LiftLog = {};
+  for (const week of [8, 9, 30]) recordLift(log, lift({ week, now: week }));
+  assert.deepEqual(log['barbell_bench_press']!.entries.map((e) => e.week), [8, 9, 30], 'nothing is dropped up to week 52');
+  recordLift(log, lift({ week: 60, now: 60 }));
+  assert.deepEqual(log['barbell_bench_press']!.entries.map((e) => e.week), [9, 30, 60]);
+});
+
+test('an entry\'s day is its own day, else the weekday of its instant, else nothing', () => {
+  assert.equal(entryDay({ day: 'sat', ts: new Date(2026, 8, 3, 12).getTime() }), 'sat');
+  assert.equal(entryDay({ ts: new Date(2026, 8, 3, 12).getTime() }), 'thu', '3 September 2026 is a Thursday');
+  assert.equal(entryDay({ ts: new Date(2026, 8, 6, 12).getTime() }), 'sun');
+  assert.equal(entryDay({}), '');
+  assert.equal(entryDay(null), '');
+});
+
+test('the week\'s best is its heaviest entry, the later of two equal ones, weeks in order', () => {
+  const e = (week: number, weight: number, ts: number, day = 'mon'): LiftEntry => ({ weight, setsReps: '', setsDone: [], setsW: [], week, day, ts });
+  const best = weeklyBest([e(3, 100, 1), e(1, 90, 2), e(3, 110, 3, 'thu'), e(1, 90, 5, 'fri'), e(3, 105, 9, 'sat')]);
+  assert.deepEqual(best.map((x) => [x.week, x.weight, x.ts]), [[1, 90, 5], [3, 110, 3]]);
+  assert.deepEqual(weeklyBest(null), []);
+});
+
+test('duplicate entries of one week and day collapse to the latest, and the function says whether anything changed', () => {
+  const e = (week: number, day: string, ts: number, weight: number): LiftEntry => ({ weight, setsReps: '', setsDone: [], setsW: [], week, day, ts });
+  const log: LiftLog = {
+    a: { name: 'A', entries: [e(2, 'mon', 5, 100), e(1, 'mon', 1, 90), e(2, 'mon', 9, 105), e(2, 'thu', 7, 95)] },
+    b: { name: 'B', entries: [e(1, 'mon', 1, 50)] },
+  };
+  assert.equal(dedupeExDayEntries(log), true);
+  assert.deepEqual(log['a']!.entries.map((x) => [x.week, x.day, x.weight]), [[1, 'mon', 90], [2, 'thu', 95], [2, 'mon', 105]], 'by week, then by instant');
+  assert.equal(dedupeExDayEntries(log), false, 'a clean log is left alone');
+});
+
+test('the page logs a lift through core: one entryDay in the script, and logExerciseWeight writes what recordLift records', () => {
+  const code = appScript();
+  assert.equal(code.split('function entryDay(').length - 1, 1, 'moved, not copied');
+  assert.equal(code.split('function recordLift(').length - 1, 1);
+  const IA = loadApp();
+  IA.eval("activeProgId='p9';currentWeek=4;currentDayKey='tue';logExerciseWeight('Barbell bench press',135,'3×5',0,[5,5,5],[],'');");
+  const stored = JSON.parse(IA.localStorage.getItem('ia_exw_p9')!);
+  assert.deepEqual(Object.keys(stored), ['barbell_bench_press']);
+  const { ts, ...rest } = stored.barbell_bench_press.entries[0];
+  assert.deepEqual(rest, { weight: 135, setsReps: '3×5', setsDone: [5, 5, 5], setsW: [], week: 4, day: 'tue' }, 'the week and the day are the page\'s own when none is passed');
+  assert.equal(typeof ts, 'number');
 });

@@ -5,11 +5,12 @@ import {
   currentWeek,
 } from './rest-day-shell.ts';
 import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
+import { entryDay } from '../../../../../../core/src/engine/state-lift-log.ts';
 import { isRepExercise, isTimeExercise, isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { _auxFamily, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _stripLeadingSets, parseRx, rxSuffix } from './week-view-sections.ts';
-import { entryDay, getExWeights, isKBExercise } from './log-entries.ts';
+import { getExWeights, isKBExercise } from './log-entries.ts';
 import { saveExWeight } from './day-detail.ts';
 import { _editDay, swapOriginOf } from './swap-sheet.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

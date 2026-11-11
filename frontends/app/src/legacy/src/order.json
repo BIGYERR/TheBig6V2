@@ -18,6 +18,7 @@
   "engine/icons.ts",
   "js/rest-day-shell.ts",
   "engine/exercise-library.ts",
+  "engine/state-lift-log.ts",
   "engine/exercise-kinds.ts",
   "engine/calendar.ts",
   "engine/clock-format.ts",

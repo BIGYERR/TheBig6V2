@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and the first lift slice has
-shipped as v0.261.2 with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and two lift slices have
+shipped (v0.261.2, v0.261.3) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -26,7 +26,11 @@ Each phase starts only on Mario's GO, one phase step per session.
   (the page names `localStorage` once). Every golden record identical, no golden file touched. The lifted code sits in
   `core/src/engine` for now, the one core folder today's page build reads, and moves to `core/src/app-state` at
   cutover (`docs/decisions/stored-state.md`).
-- **Next, on his GO:** the second slice, `log-entries.ts` and the set logging rules, into core over the store.
+- **Done, the second lift slice (v0.261.3):** the lift log (`ia_exw_`) lives in `core/src/engine/state-lift-log.ts`: one
+  reader, one writer, `recordLift` (the rule for recording a lift) and the three pure functions the screens call.
+  Every golden record identical. Narrowed from the plan's "`log-entries.ts` and the set logging rules": the cardio
+  dose half and the set display rules read the page and move with the screens that use them.
+- **Next, on his GO:** the day's log, completion and parts (`ia_logs_`, `ia_comp_`, `ia_parts_`).
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is

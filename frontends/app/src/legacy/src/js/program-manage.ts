@@ -4,11 +4,11 @@ import {
   _setEditProgId, _setProgressViewId, activeProg, activeProgId, applyRestDayMoves, progressViewId, showScreen,
   showToast,
 } from './rest-day-shell.ts';
+import { entryDay } from '../../../../../../core/src/engine/state-lift-log.ts';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.ts';
 import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { calcCurrentWeek, renderWeekView } from './week-view-sections.ts';
-import { entryDay } from './log-entries.ts';
 import { progTestPin, renderProgList } from './programs.ts';
 import { _isoToday, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.ts';
 import { renderProgressScreen } from './lift-ledger-progress-screen.ts';

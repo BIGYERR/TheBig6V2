@@ -1,5 +1,6 @@
 import { storageStore } from '../../../../../../core/src/engine/state-store.ts';
 import { activeProg, activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
+import { readLiftLog, writeLiftLog } from '../../../../../../core/src/engine/state-lift-log.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
@@ -62,8 +63,8 @@ function getLogs(){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+activeProgId)||
 // V238 (D223 item 5): the same restNorm lens as getLogs.
 function getLogsFor(pid: any){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+pid)||'{}');}catch{return{};}return restNormAll(l);}
 function getDayHistFor(pid: any){try{return JSON.parse(iaStore.get('ia_hist_'+pid)||'{}');}catch{return{};}}
-function getExWeightsFor(pid: any){try{return JSON.parse(iaStore.get('ia_exw_'+pid)||'{}');}catch{return{};}}
-function saveExWeightsFor(pid: any,obj: any){iaStore.set('ia_exw_'+pid,JSON.stringify(obj));}
+function getExWeightsFor(pid: any): any{return readLiftLog(iaStore,pid);}
+function saveExWeightsFor(pid: any,obj: any){writeLiftLog(iaStore,pid,obj);}
 function saveLogs(l: any){iaStore.set('ia_logs_'+activeProgId,JSON.stringify(l));}
 function getCompleted(){try{return JSON.parse(iaStore.get('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
 function saveCompleted(c: any){iaStore.set('ia_comp_'+activeProgId,JSON.stringify(c));}
