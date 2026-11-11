@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 has begun (Mario's GO, 2026-11-11). Step 1, the golden records, is done; nothing in the app
-changed. No conversion code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and the first lift slice has
+shipped as v0.261.2 with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -21,7 +21,12 @@ Each phase starts only on Mario's GO, one phase step per session.
   right).
 - **Not done, waiting on Mario:** the engine check on today's app (decision 4), and whether lift slices may reach his
   phone before the race (decision 3).
-- **Next, on his GO:** the first lift slice, the storage interface under `storage.ts`.
+- **Done, the first lift slice (v0.261.2):** every storage call goes through one store. `core/src/engine/state-store.ts`
+  holds the interface and its two makers; `storage.ts` makes the page's store, `iaStore`; the 59 direct calls are gone
+  (the page names `localStorage` once). Every golden record identical, no golden file touched. The lifted code sits in
+  `core/src/engine` for now, the one core folder today's page build reads, and moves to `core/src/app-state` at
+  cutover (`docs/decisions/stored-state.md`).
+- **Next, on his GO:** the second slice, `log-entries.ts` and the set logging rules, into core over the store.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is

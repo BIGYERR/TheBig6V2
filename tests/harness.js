@@ -54,7 +54,8 @@ const EXPORT_NAMES = [
   'computeStreak','completedCount','statusOf','exControlFlags','_epley',
   'PACE_CHART','_steadyCeilingFor','_mileFromRecoverySec','_halfFromMileSec',
   'GOAL_RECOMMENDED_DAYS','SPORT_CEILINGS','TACTICAL_DELOAD_GOALS','DEFAULT_1RM',
-  'WD','_applyWizardStart','doGenerate'
+  'WD','_applyWizardStart','doGenerate',
+  'storageStore','memoryStore','iaStore'
 ];
 
 function makeContext(opts){

@@ -21,6 +21,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/unit/pace-delta.test.ts` | 8 | 20 | lifted fn, source read | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/unit/page-comments.test.ts` | 10 | 13 | source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/semver.test.ts` | 20 | 79 | @ia/core, source read | KEEP: repo tooling, while the tool exists | | |
+| `tests/unit/stored-state.test.ts` | 10 | 28 | page, script text, @ia/core | RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1) | | |
 | `tests/unit/swipe-deck.test.ts` | 31 | 130 | Angular source, source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/tab-bar.test.ts` | 31 | 74 | lifted fn, script text, source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/this-week-hero.test.ts` | 14 | 77 | Angular source | KEEP: drives no page | | |
@@ -183,4 +184,4 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `backend/test/site.test.ts` | 9 | 27 | source read | KEEP: the server, not the app | | |
 | `backend/test/versions.test.ts` | 9 | 33 | own code | KEEP: the server, not the app | | |
 
-**Total: 178 files, 2041 tests, 6790 assertions.**
+**Total: 179 files, 2051 tests, 6818 assertions.**

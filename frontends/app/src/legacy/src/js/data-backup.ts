@@ -1,3 +1,4 @@
+import { iaStore } from './storage.ts';
 import { showToast } from './rest-day-shell.ts';
 import { IA_VERSION } from './update-check.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
@@ -14,12 +15,12 @@ type BackupRead={ok:true,data:BackupData,programs:number,made:string}|{ok:false,
 
 function _backupKeys(): string[]{
   const keys: string[]=[];
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k!=null&&k.indexOf('ia_')===0) keys.push(k);}
+  iaStore.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});
   return keys.sort();
 }
 function backupSnapshot(){
   const data: BackupData={};
-  _backupKeys().forEach(k=>{const v=localStorage.getItem(k);if(v!=null) data[k]=v;});
+  _backupKeys().forEach(k=>{const v=iaStore.get(k);if(v!=null) data[k]=v;});
   return {kind:BACKUP_KIND,format:BACKUP_FORMAT,version:String(IA_VERSION),made:new Date().toISOString(),data};
 }
 // The phone's local date, so a backup made late at night carries the day the athlete saw.
@@ -56,14 +57,14 @@ function backupMessage(r: BackupRead){
 function loadBackupData(data: BackupData): boolean{
   const before: BackupData={};
   const keys=_backupKeys();
-  keys.forEach(k=>{const v=localStorage.getItem(k);if(v!=null) before[k]=v;});
+  keys.forEach(k=>{const v=iaStore.get(k);if(v!=null) before[k]=v;});
   try{
-    keys.forEach(k=>localStorage.removeItem(k));
-    Object.keys(data).forEach(k=>localStorage.setItem(k,data[k]!));
+    keys.forEach(k=>iaStore.remove(k));
+    Object.keys(data).forEach(k=>iaStore.set(k,data[k]!));
     return true;
   }catch{
-    _backupKeys().forEach(k=>{try{localStorage.removeItem(k);}catch{}});
-    Object.keys(before).forEach(k=>{try{localStorage.setItem(k,before[k]!);}catch{}});
+    _backupKeys().forEach(k=>{try{iaStore.remove(k);}catch{}});
+    Object.keys(before).forEach(k=>{try{iaStore.set(k,before[k]!);}catch{}});
     return false;
   }
 }

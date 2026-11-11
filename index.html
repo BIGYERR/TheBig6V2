@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.1">
+<meta name="ia-version" content="0.261.2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1336,45 +1336,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <script>
 
 
-const THEME_KEY='ia_theme';
-function getTheme(){
-  try{const v=localStorage.getItem(THEME_KEY);return v==='day'||v==='night'?v:'auto';}catch{return 'auto';}
-}
-
-function applyTheme(){
-  const t=getTheme();const root=document.documentElement;
-  if(t==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
-  const meta=document.querySelector('meta[name="theme-color"]');
-  let paper='';
-  try{paper=getComputedStyle(root).getPropertyValue('--bg').trim();}catch{paper='';}
-  if(meta&&paper) meta.setAttribute('content',paper);
-}
-function setTheme(t){
-  try{if(t==='day'||t==='night') localStorage.setItem(THEME_KEY,t); else localStorage.removeItem(THEME_KEY);}catch{}
-  applyTheme();
-}
-try{
-  const mq=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');
-  if(mq&&mq.addEventListener) mq.addEventListener('change',applyTheme);
-}catch{}
-applyTheme();
 
  
-const ASY_ICON_PATHS={"trash":"<path d=\"M3 6h18\"/><path d=\"M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2\"/><path d=\"M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6\"/><path d=\"M10 11v6M14 11v6\"/>","medal":"<path d=\"M7.5 3h9l-3 6h-3z\"/><path d=\"M12 9v2\"/><circle cx=\"12\" cy=\"16\" r=\"5\"/><path d=\"M12 14v4M10 16h4\"/>","growth":"<path d=\"M4.5 16a4.5 4.5 0 0 1 4.5 4.5\"/><path d=\"M4.5 11.75a8.75 8.75 0 0 1 8.75 8.75\"/><path d=\"M4.5 7.5a13 13 0 0 1 13 13\"/><path d=\"M13 11 19.5 4.5\"/><path d=\"M14.8 4.5h4.7v4.7\"/>","barbell":"<line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><rect x=\"5.5\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><rect x=\"15.9\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><line x1=\"2.5\" y1=\"9.5\" x2=\"2.5\" y2=\"14.5\"/><line x1=\"21.5\" y1=\"9.5\" x2=\"21.5\" y2=\"14.5\"/>","lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>","brain":"<path d=\"M12 5a3 3 0 0 0-5.5 1.7A3 3 0 0 0 5 12a3 3 0 0 0 1.7 5.3A3 3 0 0 0 12 19\"/><path d=\"M12 5a3 3 0 0 1 5.5 1.7A3 3 0 0 1 19 12a3 3 0 0 1-1.7 5.3A3 3 0 0 1 12 19\"/><path d=\"M12 5v14\"/>","scale":"<line x1=\"12\" y1=\"4\" x2=\"12\" y2=\"20\"/><line x1=\"7\" y1=\"20\" x2=\"17\" y2=\"20\"/><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><path d=\"M4 7 1.6 12.6a2.4 2.4 0 0 0 4.8 0z\"/><path d=\"M20 7l-2.4 5.6a2.4 2.4 0 0 0 4.8 0z\"/>","warning":"<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13.5\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","siren":"<path d=\"M8 13a4 4 0 0 1 8 0v1.5H8z\"/><rect x=\"6\" y=\"14.5\" width=\"12\" height=\"5\" rx=\"1\"/><line x1=\"12\" y1=\"14.5\" x2=\"12\" y2=\"19.5\"/><line x1=\"12\" y1=\"6\" x2=\"12\" y2=\"3\"/><line x1=\"18\" y1=\"8.3\" x2=\"20.2\" y2=\"6.1\"/><line x1=\"6\" y1=\"8.3\" x2=\"3.8\" y2=\"6.1\"/><line x1=\"20\" y1=\"13\" x2=\"22.5\" y2=\"13\"/><line x1=\"4\" y1=\"13\" x2=\"1.5\" y2=\"13\"/>","kettlebell":"<path d=\"M7.7 11.3C6.2 8.4 7.6 4.8 12 4.8s5.8 3.6 4.3 6.5\"/><path d=\"M10 10c-.9-1.6-.2-3.3 2-3.3s2.9 1.7 2 3.3\"/><path d=\"M7.7 11.3a5.4 5.4 0 1 0 8.6 0\"/>","flagFinish":"<line x1=\"5\" y1=\"21\" x2=\"5\" y2=\"3\"/><path d=\"M5 4h14v9H5z\"/><line x1=\"5\" y1=\"8.5\" x2=\"19\" y2=\"8.5\"/><line x1=\"9.66\" y1=\"4\" x2=\"9.66\" y2=\"13\"/><line x1=\"14.33\" y1=\"4\" x2=\"14.33\" y2=\"13\"/>","lock":"<rect x=\"4\" y=\"10.5\" width=\"16\" height=\"10.5\" rx=\"2\"/><path d=\"M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5\"/>","notebook":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\"/><line x1=\"12\" y1=\"8\" x2=\"16\" y2=\"8\"/><line x1=\"12\" y1=\"12\" x2=\"16\" y2=\"12\"/><line x1=\"12\" y1=\"16\" x2=\"16\" y2=\"16\"/>","calculator":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><rect x=\"8\" y=\"6\" width=\"8\" height=\"3\" rx=\"0.5\"/><line x1=\"8\" y1=\"13\" x2=\"8.01\" y2=\"13\"/><line x1=\"12\" y1=\"13\" x2=\"12.01\" y2=\"13\"/><line x1=\"16\" y1=\"13\" x2=\"16.01\" y2=\"13\"/><line x1=\"8\" y1=\"17\" x2=\"8.01\" y2=\"17\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/><line x1=\"16\" y1=\"17\" x2=\"16.01\" y2=\"17\"/>","home":"<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>","dumbbell":"<path d=\"M6.5 6.5v11\"/><path d=\"M3.5 8.5v7\"/><path d=\"M17.5 6.5v11\"/><path d=\"M20.5 8.5v7\"/><line x1=\"6.5\" y1=\"12\" x2=\"17.5\" y2=\"12\"/>","chart":"<line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"10\"/><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"16\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","play":"<polygon points=\"6 3 20 12 6 21 6 3\"/>","pause":"<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","plus":"<line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","minus":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","chevronRight":"<polyline points=\"9 18 15 12 9 6\"/>","chevronLeft":"<polyline points=\"15 18 9 12 15 6\"/>","chevronDown":"<polyline points=\"6 9 12 15 18 9\"/>","clock":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","flame":"<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>","trophy":"<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>","bell":"<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9\"/><path d=\"M13.73 21a2 2 0 0 1-3.46 0\"/>","arrowRight":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/><polyline points=\"12 5 19 12 12 19\"/>","more":"<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>","target":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/>","zap":"<polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/>","calendar":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>","history":"<path d=\"M3 3v5h5\"/><path d=\"M3.05 13A9 9 0 1 0 6 5.3L3 8\"/><polyline points=\"12 7 12 12 15 15\"/>","sliders":"<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"1\" y1=\"14\" x2=\"7\" y2=\"14\"/><line x1=\"9\" y1=\"8\" x2=\"15\" y2=\"8\"/><line x1=\"17\" y1=\"16\" x2=\"23\" y2=\"16\"/>","skip":"<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" y1=\"5\" x2=\"19\" y2=\"19\"/>","run":"<circle cx=\"15\" cy=\"5\" r=\"2\"/><path d=\"M14 7l-3 6\"/><path d=\"M14 9l4 1\"/><path d=\"M14 9l-4-1\"/><path d=\"M11 13l3 4-1 4\"/><path d=\"M11 13l-3 3 1 4\"/>","bike":"<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"15\" cy=\"5\" r=\"1\"/><path d=\"M12 17.5V14l-3-3 4-3 2 3h2\"/>","swim":"<circle cx=\"8\" cy=\"9\" r=\"2\"/><path d=\"M10 10l4-2 3 2\"/><path d=\"M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/><path d=\"M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/>","shield":"<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"/>","sprout":"<path d=\"M7 20h10\"/><path d=\"M10 20c5.5-2.5.8-6.4 3-10\"/><path d=\"M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z\"/><path d=\"M14.1 6c-.9 1-1.3 2.5-1.1 4 1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z\"/>","flag":"<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\"/><line x1=\"4\" y1=\"22\" x2=\"4\" y2=\"15\"/>","dice":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M16 8h.01\"/><path d=\"M8 8h.01\"/><path d=\"M8 16h.01\"/><path d=\"M16 16h.01\"/><path d=\"M12 12h.01\"/>","backpack":"<path d=\"M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z\"/><path d=\"M8 10V6a4 4 0 0 1 8 0v4\"/><path d=\"M8 18h8\"/><path d=\"M8 14h8\"/>","pencil":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","copy":"<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>","bandage":"<rect x=\"1.8\" y=\"7.6\" width=\"20.4\" height=\"8.8\" rx=\"4.4\" transform=\"rotate(-45 12 12)\"/><line x1=\"8.6\" y1=\"8.6\" x2=\"15.4\" y2=\"15.4\"/><line x1=\"15.4\" y1=\"8.6\" x2=\"8.6\" y2=\"15.4\"/>","swap":"<line x1=\"3\" y1=\"8.5\" x2=\"17\" y2=\"8.5\"/><polyline points=\"14 5.5 17 8.5 14 11.5\"/><line x1=\"21\" y1=\"15.5\" x2=\"7\" y2=\"15.5\"/><polyline points=\"10 12.5 7 15.5 10 18.5\"/>"};
-const ASY_EMOJI={"🏅":"medal","🏆":"trophy","💪":"growth","🏋":"barbell","🦾":"dumbbell","⚡":"zap","🔥":"flame","⚖":"scale","🛡":"shield","🌱":"sprout","🧠":"brain","💡":"lightbulb","🏠":"home","🎒":"backpack","🤸":"kettlebell","👤":"user","🎯":"target","🏁":"flagFinish","🔒":"lock","⚠":"warning","🚨":"siren","✅":"check","📓":"notebook","🧮":"calculator","🏃":"run","🚴":"bike","🏊":"swim","📅":"calendar","📈":"chart","📊":"chart","🎲":"dice","⏱":"clock"};
-function asyIcon(key,size){size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
+
+function storageStore(source){
+  return {
+    get: function(key){ return source().getItem(key); },
+    set: function(key,value){ source().setItem(key,value); },
+    remove: function(key){ source().removeItem(key); },
+    keys: function(){ const s=source(), out=[]; for(let i=0;i<s.length;i++){ const k=s.key(i); if(k!=null) out.push(k); } return out; },
+  };
+}
+function memoryStore(seed){
+  const m=new Map();
+  if(seed) Object.keys(seed).forEach(function(k){ m.set(k,String(seed[k])); });
+  return {
+    get: function(key){ const v=m.get(key); return v===undefined?null:v; },
+    set: function(key,value){ m.set(String(key),String(value)); },
+    remove: function(key){ m.delete(key); },
+    keys: function(){ return Array.from(m.keys()); },
+  };
+}
 
 
 
 
 
+
+
+const iaStore=storageStore(()=>localStorage);
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 
-function getPrograms(){try{return JSON.parse(localStorage.getItem('ia_programs')||'[]');}catch{return[];}}
-function savePrograms(p){localStorage.setItem('ia_programs',JSON.stringify(p));}
-function getActiveProgId(){return localStorage.getItem('ia_active')||null;}
-function setActiveProgId(id){localStorage.setItem('ia_active',id);}
+function getPrograms(){try{return JSON.parse(iaStore.get('ia_programs')||'[]');}catch{return[];}}
+function savePrograms(p){iaStore.set('ia_programs',JSON.stringify(p));}
+function getActiveProgId(){return iaStore.get('ia_active')||null;}
+function setActiveProgId(id){iaStore.set('ia_active',id);}
 
 
 
@@ -1413,25 +1410,25 @@ function restNormAll(l){
   if(l&&typeof l==='object') Object.keys(l).forEach(function(k){ l[k]=restNorm(l[k]); });
   return l;
 }
-function getLogs(){let l;try{l=JSON.parse(localStorage.getItem('ia_logs_'+activeProgId)||'{}');}catch{return{};}return restNormAll(l);}
+function getLogs(){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+activeProgId)||'{}');}catch{return{};}return restNormAll(l);}
 
 
 
 
-function getLogsFor(pid){let l;try{l=JSON.parse(localStorage.getItem('ia_logs_'+pid)||'{}');}catch{return{};}return restNormAll(l);}
-function getDayHistFor(pid){try{return JSON.parse(localStorage.getItem('ia_hist_'+pid)||'{}');}catch{return{};}}
-function getExWeightsFor(pid){try{return JSON.parse(localStorage.getItem('ia_exw_'+pid)||'{}');}catch{return{};}}
-function saveExWeightsFor(pid,obj){localStorage.setItem('ia_exw_'+pid,JSON.stringify(obj));}
-function saveLogs(l){localStorage.setItem('ia_logs_'+activeProgId,JSON.stringify(l));}
-function getCompleted(){try{return JSON.parse(localStorage.getItem('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
-function saveCompleted(c){localStorage.setItem('ia_comp_'+activeProgId,JSON.stringify(c));}
+function getLogsFor(pid){let l;try{l=JSON.parse(iaStore.get('ia_logs_'+pid)||'{}');}catch{return{};}return restNormAll(l);}
+function getDayHistFor(pid){try{return JSON.parse(iaStore.get('ia_hist_'+pid)||'{}');}catch{return{};}}
+function getExWeightsFor(pid){try{return JSON.parse(iaStore.get('ia_exw_'+pid)||'{}');}catch{return{};}}
+function saveExWeightsFor(pid,obj){iaStore.set('ia_exw_'+pid,JSON.stringify(obj));}
+function saveLogs(l){iaStore.set('ia_logs_'+activeProgId,JSON.stringify(l));}
+function getCompleted(){try{return JSON.parse(iaStore.get('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
+function saveCompleted(c){iaStore.set('ia_comp_'+activeProgId,JSON.stringify(c));}
 
 
 
-function getPartSkips(){try{return JSON.parse(localStorage.getItem('ia_parts_'+activeProgId)||'{}');}catch{return{};}}
-function savePartSkips(p){localStorage.setItem('ia_parts_'+activeProgId,JSON.stringify(p));}
-function getWildcardDone(){try{return JSON.parse(localStorage.getItem('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
-function saveWildcardDone(a){localStorage.setItem('ia_wild_'+activeProgId,JSON.stringify(a));}
+function getPartSkips(){try{return JSON.parse(iaStore.get('ia_parts_'+activeProgId)||'{}');}catch{return{};}}
+function savePartSkips(p){iaStore.set('ia_parts_'+activeProgId,JSON.stringify(p));}
+function getWildcardDone(){try{return JSON.parse(iaStore.get('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
+function saveWildcardDone(a){iaStore.set('ia_wild_'+activeProgId,JSON.stringify(a));}
 function logKey(w,d){return 'w'+w+'_'+d;}
 
 
@@ -1499,8 +1496,8 @@ function completedKey(w,d){return 'w'+w+'_'+d;}
 
 
 
-function getDayHist(){try{return JSON.parse(localStorage.getItem('ia_hist_'+activeProgId)||'{}');}catch{return{};}}
-function saveDayHist(h){try{localStorage.setItem('ia_hist_'+activeProgId,JSON.stringify(h));}catch(e){}}
+function getDayHist(){try{return JSON.parse(iaStore.get('ia_hist_'+activeProgId)||'{}');}catch{return{};}}
+function saveDayHist(h){try{iaStore.set('ia_hist_'+activeProgId,JSON.stringify(h));}catch(e){}}
 
 
 
@@ -1530,6 +1527,36 @@ function snapshotDay(week,dayKey){
     saveDayHist(h);
   }catch(e){ console.error('day snapshot failed',week,dayKey,e); }
 }
+
+
+
+const THEME_KEY='ia_theme';
+function getTheme(){
+  try{const v=iaStore.get(THEME_KEY);return v==='day'||v==='night'?v:'auto';}catch{return 'auto';}
+}
+
+function applyTheme(){
+  const t=getTheme();const root=document.documentElement;
+  if(t==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
+  const meta=document.querySelector('meta[name="theme-color"]');
+  let paper='';
+  try{paper=getComputedStyle(root).getPropertyValue('--bg').trim();}catch{paper='';}
+  if(meta&&paper) meta.setAttribute('content',paper);
+}
+function setTheme(t){
+  try{if(t==='day'||t==='night') iaStore.set(THEME_KEY,t); else iaStore.remove(THEME_KEY);}catch{}
+  applyTheme();
+}
+try{
+  const mq=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');
+  if(mq&&mq.addEventListener) mq.addEventListener('change',applyTheme);
+}catch{}
+applyTheme();
+
+ 
+const ASY_ICON_PATHS={"trash":"<path d=\"M3 6h18\"/><path d=\"M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2\"/><path d=\"M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6\"/><path d=\"M10 11v6M14 11v6\"/>","medal":"<path d=\"M7.5 3h9l-3 6h-3z\"/><path d=\"M12 9v2\"/><circle cx=\"12\" cy=\"16\" r=\"5\"/><path d=\"M12 14v4M10 16h4\"/>","growth":"<path d=\"M4.5 16a4.5 4.5 0 0 1 4.5 4.5\"/><path d=\"M4.5 11.75a8.75 8.75 0 0 1 8.75 8.75\"/><path d=\"M4.5 7.5a13 13 0 0 1 13 13\"/><path d=\"M13 11 19.5 4.5\"/><path d=\"M14.8 4.5h4.7v4.7\"/>","barbell":"<line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><rect x=\"5.5\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><rect x=\"15.9\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><line x1=\"2.5\" y1=\"9.5\" x2=\"2.5\" y2=\"14.5\"/><line x1=\"21.5\" y1=\"9.5\" x2=\"21.5\" y2=\"14.5\"/>","lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>","brain":"<path d=\"M12 5a3 3 0 0 0-5.5 1.7A3 3 0 0 0 5 12a3 3 0 0 0 1.7 5.3A3 3 0 0 0 12 19\"/><path d=\"M12 5a3 3 0 0 1 5.5 1.7A3 3 0 0 1 19 12a3 3 0 0 1-1.7 5.3A3 3 0 0 1 12 19\"/><path d=\"M12 5v14\"/>","scale":"<line x1=\"12\" y1=\"4\" x2=\"12\" y2=\"20\"/><line x1=\"7\" y1=\"20\" x2=\"17\" y2=\"20\"/><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><path d=\"M4 7 1.6 12.6a2.4 2.4 0 0 0 4.8 0z\"/><path d=\"M20 7l-2.4 5.6a2.4 2.4 0 0 0 4.8 0z\"/>","warning":"<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13.5\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","siren":"<path d=\"M8 13a4 4 0 0 1 8 0v1.5H8z\"/><rect x=\"6\" y=\"14.5\" width=\"12\" height=\"5\" rx=\"1\"/><line x1=\"12\" y1=\"14.5\" x2=\"12\" y2=\"19.5\"/><line x1=\"12\" y1=\"6\" x2=\"12\" y2=\"3\"/><line x1=\"18\" y1=\"8.3\" x2=\"20.2\" y2=\"6.1\"/><line x1=\"6\" y1=\"8.3\" x2=\"3.8\" y2=\"6.1\"/><line x1=\"20\" y1=\"13\" x2=\"22.5\" y2=\"13\"/><line x1=\"4\" y1=\"13\" x2=\"1.5\" y2=\"13\"/>","kettlebell":"<path d=\"M7.7 11.3C6.2 8.4 7.6 4.8 12 4.8s5.8 3.6 4.3 6.5\"/><path d=\"M10 10c-.9-1.6-.2-3.3 2-3.3s2.9 1.7 2 3.3\"/><path d=\"M7.7 11.3a5.4 5.4 0 1 0 8.6 0\"/>","flagFinish":"<line x1=\"5\" y1=\"21\" x2=\"5\" y2=\"3\"/><path d=\"M5 4h14v9H5z\"/><line x1=\"5\" y1=\"8.5\" x2=\"19\" y2=\"8.5\"/><line x1=\"9.66\" y1=\"4\" x2=\"9.66\" y2=\"13\"/><line x1=\"14.33\" y1=\"4\" x2=\"14.33\" y2=\"13\"/>","lock":"<rect x=\"4\" y=\"10.5\" width=\"16\" height=\"10.5\" rx=\"2\"/><path d=\"M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5\"/>","notebook":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\"/><line x1=\"12\" y1=\"8\" x2=\"16\" y2=\"8\"/><line x1=\"12\" y1=\"12\" x2=\"16\" y2=\"12\"/><line x1=\"12\" y1=\"16\" x2=\"16\" y2=\"16\"/>","calculator":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><rect x=\"8\" y=\"6\" width=\"8\" height=\"3\" rx=\"0.5\"/><line x1=\"8\" y1=\"13\" x2=\"8.01\" y2=\"13\"/><line x1=\"12\" y1=\"13\" x2=\"12.01\" y2=\"13\"/><line x1=\"16\" y1=\"13\" x2=\"16.01\" y2=\"13\"/><line x1=\"8\" y1=\"17\" x2=\"8.01\" y2=\"17\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/><line x1=\"16\" y1=\"17\" x2=\"16.01\" y2=\"17\"/>","home":"<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>","dumbbell":"<path d=\"M6.5 6.5v11\"/><path d=\"M3.5 8.5v7\"/><path d=\"M17.5 6.5v11\"/><path d=\"M20.5 8.5v7\"/><line x1=\"6.5\" y1=\"12\" x2=\"17.5\" y2=\"12\"/>","chart":"<line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"10\"/><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"16\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","play":"<polygon points=\"6 3 20 12 6 21 6 3\"/>","pause":"<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","plus":"<line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","minus":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","chevronRight":"<polyline points=\"9 18 15 12 9 6\"/>","chevronLeft":"<polyline points=\"15 18 9 12 15 6\"/>","chevronDown":"<polyline points=\"6 9 12 15 18 9\"/>","clock":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","flame":"<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>","trophy":"<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>","bell":"<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9\"/><path d=\"M13.73 21a2 2 0 0 1-3.46 0\"/>","arrowRight":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/><polyline points=\"12 5 19 12 12 19\"/>","more":"<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>","target":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/>","zap":"<polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/>","calendar":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>","history":"<path d=\"M3 3v5h5\"/><path d=\"M3.05 13A9 9 0 1 0 6 5.3L3 8\"/><polyline points=\"12 7 12 12 15 15\"/>","sliders":"<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"1\" y1=\"14\" x2=\"7\" y2=\"14\"/><line x1=\"9\" y1=\"8\" x2=\"15\" y2=\"8\"/><line x1=\"17\" y1=\"16\" x2=\"23\" y2=\"16\"/>","skip":"<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" y1=\"5\" x2=\"19\" y2=\"19\"/>","run":"<circle cx=\"15\" cy=\"5\" r=\"2\"/><path d=\"M14 7l-3 6\"/><path d=\"M14 9l4 1\"/><path d=\"M14 9l-4-1\"/><path d=\"M11 13l3 4-1 4\"/><path d=\"M11 13l-3 3 1 4\"/>","bike":"<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"15\" cy=\"5\" r=\"1\"/><path d=\"M12 17.5V14l-3-3 4-3 2 3h2\"/>","swim":"<circle cx=\"8\" cy=\"9\" r=\"2\"/><path d=\"M10 10l4-2 3 2\"/><path d=\"M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/><path d=\"M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/>","shield":"<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"/>","sprout":"<path d=\"M7 20h10\"/><path d=\"M10 20c5.5-2.5.8-6.4 3-10\"/><path d=\"M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z\"/><path d=\"M14.1 6c-.9 1-1.3 2.5-1.1 4 1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z\"/>","flag":"<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\"/><line x1=\"4\" y1=\"22\" x2=\"4\" y2=\"15\"/>","dice":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M16 8h.01\"/><path d=\"M8 8h.01\"/><path d=\"M8 16h.01\"/><path d=\"M16 16h.01\"/><path d=\"M12 12h.01\"/>","backpack":"<path d=\"M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z\"/><path d=\"M8 10V6a4 4 0 0 1 8 0v4\"/><path d=\"M8 18h8\"/><path d=\"M8 14h8\"/>","pencil":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","copy":"<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>","bandage":"<rect x=\"1.8\" y=\"7.6\" width=\"20.4\" height=\"8.8\" rx=\"4.4\" transform=\"rotate(-45 12 12)\"/><line x1=\"8.6\" y1=\"8.6\" x2=\"15.4\" y2=\"15.4\"/><line x1=\"15.4\" y1=\"8.6\" x2=\"8.6\" y2=\"15.4\"/>","swap":"<line x1=\"3\" y1=\"8.5\" x2=\"17\" y2=\"8.5\"/><polyline points=\"14 5.5 17 8.5 14 11.5\"/><line x1=\"21\" y1=\"15.5\" x2=\"7\" y2=\"15.5\"/><polyline points=\"10 12.5 7 15.5 10 18.5\"/>"};
+const ASY_EMOJI={"🏅":"medal","🏆":"trophy","💪":"growth","🏋":"barbell","🦾":"dumbbell","⚡":"zap","🔥":"flame","⚖":"scale","🛡":"shield","🌱":"sprout","🧠":"brain","💡":"lightbulb","🏠":"home","🎒":"backpack","🤸":"kettlebell","👤":"user","🎯":"target","🏁":"flagFinish","🔒":"lock","⚠":"warning","🚨":"siren","✅":"check","📓":"notebook","🧮":"calculator","🏃":"run","🚴":"bike","🏊":"swim","📅":"calendar","📈":"chart","📊":"chart","🎲":"dice","⏱":"clock"};
+function asyIcon(key,size){size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
 
 
 
@@ -1751,8 +1778,8 @@ function _restDetailRefresh(w,day){
 
 
 
-function getRestMoves(){try{return JSON.parse(localStorage.getItem('ia_moves_'+activeProgId)||'{}');}catch{return{};}}
-function saveRestMoves(m){localStorage.setItem('ia_moves_'+activeProgId,JSON.stringify(m));}
+function getRestMoves(){try{return JSON.parse(iaStore.get('ia_moves_'+activeProgId)||'{}');}catch{return{};}}
+function saveRestMoves(m){iaStore.set('ia_moves_'+activeProgId,JSON.stringify(m));}
 
 
 function applyRestDayMoves(prog,moves){
@@ -11120,8 +11147,8 @@ function swapLoadNote(outName,candName){
 
 
 function editStoreKey(pid){return 'ia_edits_'+pid;}
-function getDayEdits(pid){try{return JSON.parse(localStorage.getItem(editStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveDayEdits(pid,v){try{localStorage.setItem(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
+function getDayEdits(pid){try{return JSON.parse(iaStore.get(editStoreKey(pid))||'{}');}catch(e){return {};}}
+function saveDayEdits(pid,v){try{iaStore.set(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
 function _editEntry(s,k){const e=s[k]||{};if(!Array.isArray(e.add))e.add=[];if(!Array.isArray(e.skip))e.skip=[];s[k]=e;return e;}
 function recordSkip(pid,week,dayKey,name){
   const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
@@ -11203,8 +11230,8 @@ function pruneDayEdits(pid,cutWeek){
   if(changed) saveDayEdits(pid,s);
 }
 function swapStoreKey(pid){return 'ia_swaps_'+pid;}
-function getSwaps(pid){try{return JSON.parse(localStorage.getItem(swapStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveSwaps(pid,v){try{localStorage.setItem(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
+function getSwaps(pid){try{return JSON.parse(iaStore.get(swapStoreKey(pid))||'{}');}catch(e){return {};}}
+function saveSwaps(pid,v){try{iaStore.set(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
 function recordSwap(pid,week,dayKey,from,to,rx){
   const s=getSwaps(pid),k='w'+week+'_'+dayKey;
   
@@ -11263,8 +11290,8 @@ function applySessionSwaps(prog,store){
 
 const SWAP_NUDGE_AT=3;
 function swapCountKey(pid){return 'ia_swapct_'+pid;}
-function getSwapCounts(pid){try{return JSON.parse(localStorage.getItem(swapCountKey(pid))||'{}');}catch(e){return {};}}
-function saveSwapCounts(pid,v){try{localStorage.setItem(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
+function getSwapCounts(pid){try{return JSON.parse(iaStore.get(swapCountKey(pid))||'{}');}catch(e){return {};}}
+function saveSwapCounts(pid,v){try{iaStore.set(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
 function bumpSwapCount(pid,from,to){
   const c=getSwapCounts(pid);
   const cur=c[from];
@@ -14115,8 +14142,8 @@ function isDBExercise(name) {
 }
 
 
-function getExWeights(){try{return JSON.parse(localStorage.getItem('ia_exw_'+activeProgId)||'{}');}catch{return{};}}
-function saveExWeights(obj){localStorage.setItem('ia_exw_'+activeProgId,JSON.stringify(obj));}
+function getExWeights(){try{return JSON.parse(iaStore.get('ia_exw_'+activeProgId)||'{}');}catch{return{};}}
+function saveExWeights(obj){iaStore.set('ia_exw_'+activeProgId,JSON.stringify(obj));}
 
 
 
@@ -17085,11 +17112,11 @@ function refreshProgram(prog){
         
         
         const _touched = {};
-        try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_comp_'+prog.id)||'{}')); }catch(e){}
-        try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_logs_'+prog.id)||'{}')); }catch(e){}
-        try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_touched, JSON.parse(iaStore.get('ia_comp_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_touched, JSON.parse(iaStore.get('ia_logs_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_touched, JSON.parse(iaStore.get('ia_hist_'+prog.id)||'{}')); }catch(e){}
         try{
-          const _exw = JSON.parse(localStorage.getItem('ia_exw_'+prog.id)||'{}');
+          const _exw = JSON.parse(iaStore.get('ia_exw_'+prog.id)||'{}');
           Object.keys(_exw).forEach(_slug=>{
             const _ents = (_exw[_slug] && _exw[_slug].entries) || [];
             _ents.forEach(_e=>{
@@ -17153,7 +17180,7 @@ function refreshProgram(prog){
         
         
         const _hist = {};
-        try{ Object.assign(_hist, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_hist, JSON.parse(iaStore.get('ia_hist_'+prog.id)||'{}')); }catch(e){}
         const _dk = (w,d) => 'w'+w+'_'+d;
         for(let w=1; w<_cut; w++){
           if(!prog.weeks[w]) continue;
@@ -17205,7 +17232,7 @@ function refreshProgram(prog){
     
     
     try{
-      const _mv=JSON.parse(localStorage.getItem('ia_moves_'+prog.id)||'{}');
+      const _mv=JSON.parse(iaStore.get('ia_moves_'+prog.id)||'{}');
       if(_mv&&Object.keys(_mv).length) applyRestDayMoves(rebuilt,_mv);
     }catch(e){}
     
@@ -17245,7 +17272,7 @@ function refreshProgram(prog){
 
 
 
-function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
+function loadActiveProgram(id,beforeRefresh){if(id===null){iaStore.remove('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 
 
 function setActive(id){if(!loadActiveProgram(id))return;markPastAsked();renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
@@ -17265,7 +17292,7 @@ function commitRename(id){
   _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
-function purgeProgData(id){['ia_logs_','ia_comp_','ia_parts_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
+function purgeProgData(id){['ia_logs_','ia_comp_','ia_parts_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>iaStore.remove(p+id));}
 
 
 
@@ -18943,12 +18970,12 @@ const BACKUP_FORMAT=1;
 
 function _backupKeys(){
   const keys=[];
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k!=null&&k.indexOf('ia_')===0) keys.push(k);}
+  iaStore.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});
   return keys.sort();
 }
 function backupSnapshot(){
   const data={};
-  _backupKeys().forEach(k=>{const v=localStorage.getItem(k);if(v!=null) data[k]=v;});
+  _backupKeys().forEach(k=>{const v=iaStore.get(k);if(v!=null) data[k]=v;});
   return {kind:BACKUP_KIND,format:BACKUP_FORMAT,version:String(IA_VERSION),made:new Date().toISOString(),data};
 }
 
@@ -18985,14 +19012,14 @@ function backupMessage(r){
 function loadBackupData(data){
   const before={};
   const keys=_backupKeys();
-  keys.forEach(k=>{const v=localStorage.getItem(k);if(v!=null) before[k]=v;});
+  keys.forEach(k=>{const v=iaStore.get(k);if(v!=null) before[k]=v;});
   try{
-    keys.forEach(k=>localStorage.removeItem(k));
-    Object.keys(data).forEach(k=>localStorage.setItem(k,data[k]));
+    keys.forEach(k=>iaStore.remove(k));
+    Object.keys(data).forEach(k=>iaStore.set(k,data[k]));
     return true;
   }catch{
-    _backupKeys().forEach(k=>{try{localStorage.removeItem(k);}catch{}});
-    Object.keys(before).forEach(k=>{try{localStorage.setItem(k,before[k]);}catch{}});
+    _backupKeys().forEach(k=>{try{iaStore.remove(k);}catch{}});
+    Object.keys(before).forEach(k=>{try{iaStore.set(k,before[k]);}catch{}});
     return false;
   }
 }
@@ -19194,10 +19221,10 @@ const POP_DISMISS=[
 ];
 function popDismissText(){
   const key='ia_pop_dismiss_'+activeProgId; const today=_todayStamp();
-  let st={}; try{ st=JSON.parse(localStorage.getItem(key)||'{}'); }catch{}
+  let st={}; try{ st=JSON.parse(iaStore.get(key)||'{}'); }catch{}
   if(st.date===today && typeof st.idx==='number' && POP_DISMISS[st.idx]) return POP_DISMISS[st.idx];
   let i; do{ i=Math.floor(Math.random()*POP_DISMISS.length); }while(POP_DISMISS.length>1 && i===st.idx);
-  try{ localStorage.setItem(key,JSON.stringify({date:today,idx:i})); }catch{}
+  try{ iaStore.set(key,JSON.stringify({date:today,idx:i})); }catch{}
   return POP_DISMISS[i];
 }
 
@@ -19243,11 +19270,11 @@ function popPick(tier,week,dayKey){
   if(!elig.length) return popText(pool[0]);
   if(elig.length===1) return popText(pool[elig[0]]);
   const memKey='ia_pop_idx_'+activeProgId; let mem={};
-  try{ mem=JSON.parse(localStorage.getItem(memKey)||'{}'); }catch{}
+  try{ mem=JSON.parse(iaStore.get(memKey)||'{}'); }catch{}
   const last=(typeof mem[tier]==='number')?mem[tier]:-1;
   let choices=elig.filter(i=>i!==last); if(!choices.length) choices=elig;
   const i=choices[Math.floor(Math.random()*choices.length)];
-  mem[tier]=i; try{ localStorage.setItem(memKey,JSON.stringify(mem)); }catch{}
+  mem[tier]=i; try{ iaStore.set(memKey,JSON.stringify(mem)); }catch{}
   return popText(pool[i]);
 }
 function popFire(tier,opts){
@@ -19378,9 +19405,9 @@ function fireStreakPopup(streak){
 }
 
 function finalScheduledDay(){ const a=scheduledDays(); return a.length?a[a.length-1]:null; }
-function seasonShown(){ return localStorage.getItem('ia_season_shown_'+activeProgId)==='1'; }
-function markSeasonShown(){ try{localStorage.setItem('ia_season_shown_'+activeProgId,'1');}catch{} }
-function releaseSeasonShown(){ try{localStorage.removeItem('ia_season_shown_'+activeProgId);}catch{} }   
+function seasonShown(){ return iaStore.get('ia_season_shown_'+activeProgId)==='1'; }
+function markSeasonShown(){ try{iaStore.set('ia_season_shown_'+activeProgId,'1');}catch{} }
+function releaseSeasonShown(){ try{iaStore.remove('ia_season_shown_'+activeProgId);}catch{} }   
 function fireSeasonPopup(){
   popFire('season',{
     stats:[
@@ -19403,8 +19430,8 @@ function fireCompletionPopup(week,dayKey){
   fireWorkoutPopup(week,dayKey);
 }
 
-function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
-function markReminded(week,d){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
+function remindedSet(){ try{return JSON.parse(iaStore.get('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
+function markReminded(week,d){ const m=remindedSet(); m[completedKey(week,d)]=true; try{iaStore.set('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
 
 
 
@@ -19412,13 +19439,13 @@ function markPastAsked(){
   const today=new Date(); today.setHours(0,0,0,0);
   const m=remindedSet(); let n=0;
   scheduledDays(today).forEach(x=>{ if(x.date<today&&!statusOf(x.week,x.d)&&!m[completedKey(x.week,x.d)]){ m[completedKey(x.week,x.d)]=true; n++; } });
-  if(n) try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{}
+  if(n) try{iaStore.set('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{}
 }
 function _todayStamp(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
 function maybeShowReminder(){
   if(!activeProg?.startDate) return;
   const lastKey='ia_remind_last_'+activeProgId;
-  if(localStorage.getItem(lastKey)===_todayStamp()) return; 
+  if(iaStore.get(lastKey)===_todayStamp()) return; 
   const today=new Date(); today.setHours(0,0,0,0);
   const days=scheduledDays(today).filter(x=>x.date<today); 
   const rem=remindedSet(); let target=null;
@@ -19432,7 +19459,7 @@ function maybeShowReminder(){
   }
   if(!target) return;
   const day=activeProg.weeks[target.week]?.[target.d]; if(!day) return;
-  localStorage.setItem(lastKey,_todayStamp());
+  iaStore.set(lastKey,_todayStamp());
   markReminded(target.week,target.d);
   const esc=(day.title||'Workout').replace(/'/g,"\\'");
   

@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getLogs, logKey } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
 import { tagMeta } from './week-view-sections.ts';

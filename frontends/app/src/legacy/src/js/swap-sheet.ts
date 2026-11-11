@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { esc, resnapshotDayEdit } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
 import { _stripCapCue, applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY_LABEL, _auxFamily, _pattern } from '../../../../../../core/src/engine/region-caps.ts';

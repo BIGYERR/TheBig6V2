@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsFor } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setProgressViewId, activeProg, activeProgId, calcLift, progressViewId } from './rest-day-shell.ts';
 import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
 import { _partialWeek1, restLogLines } from './week-view-sections.ts';

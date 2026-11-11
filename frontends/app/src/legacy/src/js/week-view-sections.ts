@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setCurrentWeek, activeProg, currentWeek, openRestSheet, showToast } from './rest-day-shell.ts';
 import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL, _fmtStartDay } from './wizard.ts';

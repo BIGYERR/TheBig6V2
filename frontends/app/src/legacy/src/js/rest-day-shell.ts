@@ -1,4 +1,4 @@
-import { completedKey, esc, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.ts';
+import { completedKey, esc, getCompleted, getLogs, getPrograms, iaStore, saveLogs, savePrograms } from './storage.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
@@ -235,8 +235,8 @@ function _restDetailRefresh(w: any,day: any){
 // work on a rest day IS recovery (NSW active-recovery, Lydiard base), whereas an extra
 // lifting session is just unplanned volume. Written into the SAME ia_logs_ store the rest
 // of the app reads, so weekly mileage in Progress picks it up with no new plumbing.
-function getRestMoves(){try{return JSON.parse(localStorage.getItem('ia_moves_'+activeProgId)||'{}');}catch{return{};}}
-function saveRestMoves(m: any){localStorage.setItem('ia_moves_'+activeProgId,JSON.stringify(m));}
+function getRestMoves(){try{return JSON.parse(iaStore.get('ia_moves_'+activeProgId)||'{}');}catch{return{};}}
+function saveRestMoves(m: any){iaStore.set('ia_moves_'+activeProgId,JSON.stringify(m));}
 // Idempotent: safe to run on a freshly rebuilt week OR on a frozen week that already has
 // the move baked in, which is why it can sit at the tail of refreshProgram unconditionally.
 function applyRestDayMoves(prog: any,moves: any){

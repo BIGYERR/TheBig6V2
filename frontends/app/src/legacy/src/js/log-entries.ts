@@ -1,4 +1,4 @@
-import { esc, snapshotDay } from './storage.ts';
+import { esc, iaStore, snapshotDay } from './storage.ts';
 import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
 import { EQUIP_TOKENS } from '../../../../../../core/src/engine/exercise-kinds.ts';
@@ -34,8 +34,8 @@ function isDBExercise(name: any) {
 }
 
 // Get stored exercise weights for this program
-function getExWeights(){try{return JSON.parse(localStorage.getItem('ia_exw_'+activeProgId)||'{}');}catch{return{};}}
-function saveExWeights(obj: any){localStorage.setItem('ia_exw_'+activeProgId,JSON.stringify(obj));}
+function getExWeights(){try{return JSON.parse(iaStore.get('ia_exw_'+activeProgId)||'{}');}catch{return{};}}
+function saveExWeights(obj: any){iaStore.set('ia_exw_'+activeProgId,JSON.stringify(obj));}
 
 
 // ── DAY RESOLUTION FOR LOG ENTRIES (V117) ────────────────────────────────────

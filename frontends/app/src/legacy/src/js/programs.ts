@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getActiveProgId, getPrograms, savePrograms } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import {
   _setActiveProg, _setCurrentWeek, activeProg, activeProgId, confirmProgId, confirmTier, editProgId, openProgIds,
   showToast,

@@ -6,9 +6,9 @@ Written by `tests/measure/rn-migration_inventory.mjs`. Static counts over the wo
 
 | Area | Files | Lines | Size | In the move |
 |---|---|---|---|---|
-| The engine (`core/src/engine`) | 18 | 8784 | 661 KB | stays, unchanged |
+| The engine (`core/src/engine`) | 19 | 8831 | 663 KB | stays, unchanged |
 | The rest of core (`core/src`: domain, format, gps, semver, version) | 14 | 1438 | 58 KB | stays |
-| The legacy script (`frontends/app/src/legacy/src/js`) | 25 | 10423 | 696 KB | its logic lifts into core (phase 1); its screens are rewritten |
+| The legacy script (`frontends/app/src/legacy/src/js`) | 25 | 10431 | 696 KB | its logic lifts into core (phase 1); its screens are rewritten |
 | The legacy CSS (`.../legacy/src/css`) | 10 | 1115 | 105 KB | becomes React Native styles; the Track tokens carry over |
 | The legacy HTML (`.../legacy/src/html`) | 5 | 382 | 22 KB | rewritten as components |
 | The Angular app (`frontends/app/src/app`), TypeScript | 87 | 11759 | 583 KB | screens rewritten; pure models reused |
@@ -54,21 +54,13 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 
 | Where | getItem | setItem | removeItem | Other | Total |
 |---|---|---|---|---|---|
-| legacy script | 29 | 22 | 6 | 2 | 59 |
+| legacy script | 0 | 0 | 0 | 0 | 0 |
 | engine | 0 | 0 | 0 | 0 | 0 |
 | core (other) | 0 | 0 | 0 | 0 | 0 |
 | Angular app | 0 | 0 | 0 | 0 | 0 |
 
 | File | getItem | setItem | removeItem | Other |
 |---|---|---|---|---|
-| legacy/src/js/storage.ts | 10 | 8 | 0 | 0 |
-| legacy/src/js/popups-streaks-reminders.ts | 5 | 6 | 1 | 0 |
-| legacy/src/js/data-backup.ts | 2 | 2 | 2 | 2 |
-| legacy/src/js/program-manage.ts | 6 | 0 | 2 | 0 |
-| legacy/src/js/swaps-edits.ts | 3 | 3 | 0 | 0 |
-| legacy/src/js/theme.ts | 1 | 1 | 1 | 0 |
-| legacy/src/js/log-entries.ts | 1 | 1 | 0 | 0 |
-| legacy/src/js/rest-day-shell.ts | 1 | 1 | 0 | 0 |
 
 **The `ia_` key families: 17** (every string literal that starts `ia_`, with the files that name it). A trailing underscore is a per-program or per-item key.
 
@@ -98,14 +90,14 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 
 | Suite | Runner | Files | Tests | Assertions | Lines |
 |---|---|---|---|---|---|
-| tests/unit | Vitest | 23 | 262 | 786 | 3575 |
+| tests/unit | Vitest | 24 | 272 | 814 | 3692 |
 | tests/integration | Vitest | 64 | 1098 | 3830 | 18410 |
 | tests/sweeps | Vitest (CI only) | 31 | 214 | 733 | 3371 |
 | tests/e2e | Docker, Puppeteer | 9 | 0 | 0 | 3248 |
 | frontends/app/test/unit | node:test | 41 | 323 | 980 | 4009 |
 | frontends/app/test/integration | node:test | 8 | 58 | 149 | 988 |
 | backend/test | node:test | 11 | 86 | 312 | 1401 |
-| **Total, without the e2e** |  | **178** | **2041** | **6790** |  |
+| **Total, without the e2e** |  | **179** | **2051** | **6818** |  |
 
 Golden files: **21** in `tests/snapshots/` (777 KB).
 
@@ -114,7 +106,7 @@ Golden files: **21** in `tests/snapshots/` (777 KB).
 | Plan | What it means | Files | Tests | Assertions |
 |---|---|---|---|---|
 | REPLACE | a React Native screen test takes its place; logic assertions move with the logic | 61 | 878 | 3044 |
-| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 46 | 543 | 1742 |
+| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 47 | 553 | 1770 |
 | KEEP | stays as it is (engine and core tests, pure models, the server, repo tools) | 62 | 513 | 1714 |
 | RETIRE | what it tests is gone at cutover (the web view, a stylesheet, Cordova tooling) | 9 | 107 | 290 |
 

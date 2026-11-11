@@ -24,7 +24,7 @@ const BREAKS = [
   ['freeze, reach', 'the last frozen week is rebuilt instead', 'for(let w=1; w<_cut; w++){', 'for(let w=1; w<_cut-1; w++){'],
   ['freeze, injured week', 'a touched day in an injured week keeps its stored form', 'if(_injCovers(w) && _live[d]){ _merged[d] = _live[d]; return; }', ''],
   ['set draft', 'a logged card leaves its draft in the log', '  clearSetDraft(exKey);\n', '\n'],
-  ['backup scan', 'the backup leaves out the last key', "if(k!=null&&k.indexOf('ia_')===0) keys.push(k);}", "if(k!=null&&k.indexOf('ia_')===0&&i<localStorage.length-1) keys.push(k);}"],
+  ['backup scan', 'the backup leaves out the last key', "iaStore.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});", "iaStore.keys().slice(0,-1).forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});"],
   ['completion status', 'a skipped day is stored as complete', "c[k]={title:title||null,ts:Date.now(),status};", "c[k]={title:title||null,ts:Date.now(),status:'complete'};"],
   ['seed write back', 'an old program\'s seed is not written back to its config', '    prog.cfg.seed = prog.seed;\n', '\n'],
   ['purge', 'a deleted program keeps its logs', "['ia_logs_','ia_comp_',", "['ia_comp_',"],

@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey, savePrograms } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import {
   _setCurrentDayKey, _setStaleWarnShown, _setStaleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek,
   showToast,

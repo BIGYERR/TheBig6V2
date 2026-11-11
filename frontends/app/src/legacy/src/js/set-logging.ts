@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, writeSetDraft } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import {
   _setStaleWarnShown, _setStaleWarnSrc, _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey,
   currentWeek,

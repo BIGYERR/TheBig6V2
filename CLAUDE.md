@@ -32,7 +32,7 @@ Vanilla HTML/CSS/JS PWA served as one page (`index.html`, ~1.3 MB, one inline `<
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
 (Engine A → B → C → D inside `buildProgram(cfg)`). **The page is generated** (architecture phase B, Post-v0.239.1):
 `frontends/app/scripts/build-index.mjs` builds it from its source files under `frontends/app/src/legacy/src/` (joined in order, each piece's comments stripped, D268) (the app's files in `js/`, TypeScript in place since v0.239.44, their type debt marked by `tools/ts-expect.mjs`,
-its CSS files and HTML partials; `order.json` lists every one) and the engine's TypeScript under `core/src/engine/` (all 17 engine files, architecture phase D:
+its CSS files and HTML partials; `order.json` lists every one) and the engine's TypeScript under `core/src/engine/` (all 17 engine files, architecture phase D, and beside them from v0.261.2 the stored state's `state-*.ts` files as the React Native migration lifts them out of the page, `MIGRATION.md`:
 `order.json` names each `engine/<name>.ts`, and the build strips its types out, `tools/engine-move.mjs` keeping the page's text
 the JavaScript's), joined in the order `order.json` lists, into `dist-github-pages/` (gitignored: the page and
 its icon, what GitHub Pages deploys from the pipeline once its source is "GitHub Actions", what every test boots, what the
@@ -365,6 +365,7 @@ which does reach him arrives with a recommendation.
 - `prog.weeks` is rebuilt from `cfg + seed` on every boot AND persisted: `ia_programs` carries the whole grid (58,478 bytes for one 11-week program) and `refreshProgram` reads it back, load-bearing — strip the stored grid and 9 of 9 logged run sessions flip off target (measured V202). The persisted grid is the freeze's source; it holds no overlays, so anything that needs what the athlete actually SAW still reads `ia_hist_`.
 - Week freeze is per-DAY. Injury overlays pierce untrained days only; trained days stay byte-identical.
 - `exStoreKey()` / `EX_KEY_ALIAS` is the single writer of `ia_exw_` slug keys.
+- Stored state is read and written only through `iaStore` (`storage.ts`, a `StateStore` from `core/src/engine/state-store.ts`, v0.261.2). Nothing else names `localStorage`. A change to the code that reads or writes an `ia_` key leaves every golden record of stored state the same to the byte (`tests/integration/stored-state.test.ts`, the sweeps of that name, `tests/sweeps/data-backup.test.ts`), unless a ruling moves one; the React Native migration lifts that code into core a slice a release (`MIGRATION.md`, `docs/decisions/stored-state.md`).
 - `cfg` is never mutated by the engine; `buildProgram` is a pure function of `cfg`. Anything computed for one build (`cfg._racePin`) is deleted before the cfg is stored.
 - NRC session structures are verbatim from the source plans: every number, pace, segment and recovery is a hard invariant; verify against `doctrine/*.txt` page by page before calling any NRC value a defect. Session names are the app's own words (D269, `docs/decisions/run-names.md`), never the source's titles. No harness may assert taper monotonicity, volume ratios or rep ceilings on NRC-transcribed sessions.
 - Race goals route to NRC; test goals stay NSW. An NRC run goal pins program length. Race day is found by SUBTYPE, never by position.
