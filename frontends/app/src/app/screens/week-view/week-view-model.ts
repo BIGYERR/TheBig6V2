@@ -101,6 +101,8 @@ export interface WeekInput {
   weekMon: Date | null;
   completed: Record<string, { status?: string } | undefined>;
   logs: Record<string, DayLog | undefined>;
+  /** The parts of each day skipped on their own, keyed as `completed` (D284, the legacy `ia_parts_`). */
+  parts: Record<string, { run?: unknown; lift?: unknown } | undefined>;
   dayFull: Record<string, string>;
   /** Record run is offered: the iOS app with its GPS plugin (D272 item 6). */
   gps: boolean;
@@ -118,8 +120,11 @@ export type Column =
     word: string; wordColor: string; label: string;
   };
 
-/** A card's button: Record run, the hand log, or the deck. */
-export interface CardButton { text: string; act: 'record' | 'log' | 'deck'; glow: boolean }
+/** A card's button: Record run, the hand log, or the deck. Sunk on a skipped card: the same words, no taps (D284). */
+export interface CardButton { text: string; act: 'record' | 'log' | 'deck'; glow: boolean; sunk: boolean }
+
+/** A card's Skip pill (D284): its words, and whether its part is skipped (the pill is dark, and is the undo). */
+export interface SkipPill { label: string; on: boolean }
 
 /** A done card's row: what was done, and Reopen. */
 export interface DoneRow { title: string; line: string }
@@ -137,6 +142,8 @@ export interface DayCard {
   blurb: string;
   button: CardButton | null;
   done: DoneRow | null;
+  /** The Skip pill, on a card whose part is not done (D284). */
+  skip: SkipPill | null;
 }
 
 /** The picked rest day: today's words, a jog logged, and its two links. */
@@ -272,6 +279,11 @@ export function runLine(entry: DayLog | undefined | null): string {
 
 const isRace = (c: Cardio | null | undefined) => /RACE DAY/.test(String(c && c.subtype));
 const sportOf = (c: Cardio | null | undefined) => String((c && c.type) || '').toLowerCase();
+
+/** The run card's Skip pill, in the sport's own word (D284). */
+export function skipLabel(sport: string): string {
+  return sport === 'bike' ? 'Skip ride' : sport === 'swim' ? 'Skip swim' : sport === 'run' ? 'Skip run' : 'Skip it';
+}
 
 /**
  * The day's one word, never cut (D276, measure tests/measure/this-week_day-codes.md): a run day its run's, a ride or a
@@ -530,7 +542,6 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
     } else {
       const status = d.statusOf(s.week, s.key) || '';
       const closed = status === 'complete' || status === 'partial';
-      const skipped = status === 'skipped';
       const c = day.cardio || null;
       const hasRun = !!c && !!sportOf(c);
       const hasLift = (day.sections || []).some((x) => (x.items || []).length > 0);
@@ -538,10 +549,16 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
       const cool = day.title === 'Post-Run Mobility';
       const liftName = cool ? 'Stretch and roll' : day.title || 'Training';
       const travel = d.isTravel(day) ? ' · Travel' : '';
-      const runDone = hasRun && (cardioLogged(entry, c!.type) || closed);
-      const liftDone = closed;
+      // D284 P-SKIPPILL: a part is skipped on its own (ia_parts_), or with the whole day (a skipped status, however set).
+      // A skipped part is never done, whatever closed the day around it (the deck closing the lift after a skipped run).
+      const mine = i.parts[d.completedKey(s.week, s.key)] || {};
+      const runSkipped = hasRun && (status === 'skipped' || !!mine.run);
+      const liftSkipped = status === 'skipped' || !!mine.lift;
+      const runDone = hasRun && !runSkipped && (cardioLogged(entry, c!.type) || closed);
+      const liftDone = !liftSkipped && closed;
       const order: ('run' | 'lift')[] = hasRun && hasLift ? (liftGoesFirst(p) && !cool ? ['lift', 'run'] : ['run', 'lift']) : hasRun ? ['run'] : ['lift'];
-      const glowAt = skipped ? -1 : order.findIndex((k) => (k === 'run' ? !runDone : !liftDone));
+      // One glow (D263): the first card neither done nor skipped.
+      const glowAt = order.findIndex((k) => (k === 'run' ? !runDone && !runSkipped : !liftDone && !liftSkipped));
       cards = order.map((k, n): DayCard => {
         const first = n === 0;
         if (k === 'run') {
@@ -556,8 +573,9 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
             title: name,
             meta: runMeta(c!) + travel,
             blurb: runBlurb(c!),
-            button: runDone || skipped ? null : { text: rec ? (isRace(c) ? 'Record the race' : 'Record run') : logText, act: rec ? 'record' : 'log', glow: glowAt === n },
-            done: skipped ? { title: name, line: 'Skipped' } : runDone ? { title: name, line: (cardioLogged(entry, c!.type) && sport === 'run' ? runLine(entry) : '') || 'Closed out' } : null,
+            button: runDone ? null : { text: rec ? (isRace(c) ? 'Record the race' : 'Record run') : logText, act: rec ? 'record' : 'log', glow: glowAt === n, sunk: runSkipped },
+            done: runDone ? { title: name, line: (cardioLogged(entry, c!.type) && sport === 'run' ? runLine(entry) : '') || 'Closed out' } : null,
+            skip: runDone ? null : { label: skipLabel(sport), on: runSkipped },
           };
         }
         const solo = !hasRun;
@@ -567,8 +585,9 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
           title: liftName,
           meta: solo ? '~' + d.sessionTime(day) + ' min' + travel : '',
           blurb: summary,
-          button: liftDone || skipped ? null : { text: solo ? 'Start session' : cool ? 'Start the cool down' : 'Start lift', act: 'deck', glow: glowAt === n },
-          done: skipped ? { title: liftName, line: 'Skipped' } : liftDone ? { title: liftName, line: 'Closed out' } : null,
+          button: liftDone ? null : { text: solo ? 'Start session' : cool ? 'Start the cool down' : 'Start lift', act: 'deck', glow: glowAt === n, sunk: liftSkipped },
+          done: liftDone ? { title: liftName, line: 'Closed out' } : null,
+          skip: liftDone ? null : { label: cool ? 'Skip stretch' : 'Skip lift', on: liftSkipped },
         };
       });
     }

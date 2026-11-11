@@ -54,7 +54,7 @@ const deps: WeekDeps = {
 function screen(shown: number, picked: number | null = null, gps = true): WeekView {
   return weekView({
     prog, shown, picked, actualWeek: W['calcCurrentWeek'](), today: TODAY, weekMon: MON,
-    completed: W['getCompleted'](), logs: W['getLogs'](), dayFull: IA.eval('DAY_FULL'), gps,
+    completed: W['getCompleted'](), logs: W['getLogs'](), parts: W['getPartSkips'](), dayFull: IA.eval('DAY_FULL'), gps,
   }, deps);
 }
 const cols = (v: WeekView) => v.days!.strip.map((c: Column) => (c.empty ? c.letter + c.num + '·' : c.letter + c.num + ' ' + c.word));
@@ -137,7 +137,7 @@ describe('the run card and the lift card (D272 as amended)', () => {
     }
   });
 
-  test('a closed day shows both done rows and no button; a skipped day says so on each card', () => {
+  test('a closed day shows both done rows and no button; a skipped day keeps its cards, each button sunk under a dark pill', () => {
     mark('w11_fri', 'complete');
     try {
       assert.deepEqual(cards(screen(11, COL('fri'))).map((c) => [c[5], c[6]]), [[null, 'Recovery Run: Closed out'], [null, 'Recovery Lift: Closed out']]);
@@ -146,7 +146,12 @@ describe('the run card and the lift card (D272 as amended)', () => {
     }
     mark('w11_fri', 'skipped');
     try {
-      assert.deepEqual(cards(screen(11, COL('fri'))).map((c) => [c[5], c[6]]), [[null, 'Recovery Run: Skipped'], [null, 'Recovery Lift: Skipped']]);
+      // D284 P-SKIPPILL (amends D276 item 7): no Skipped rows; each card keeps its button's words, sunk, with no orange.
+      const k = screen(11, COL('fri')).days!.cards;
+      assert.deepEqual(k.map((c) => [c.button && c.button.text, c.button && c.button.glow, c.button && c.button.sunk, c.done, c.skip]), [
+        ['Record run', false, true, null, { label: 'Skip run', on: true }],
+        ['Start lift', false, true, null, { label: 'Skip lift', on: true }],
+      ]);
     } finally {
       mark('w11_fri', null);
     }
@@ -154,7 +159,7 @@ describe('the run card and the lift card (D272 as amended)', () => {
 
   test('without the GPS plugin there is no Record: the run card logs the run by hand (D272 item 6)', () => {
     const run = screen(11, COL('fri'), false).days!.cards[0]!;
-    assert.deepEqual(run.button, { text: 'Log the run', act: 'log', glow: true });
+    assert.deepEqual(run.button, { text: 'Log the run', act: 'log', glow: true, sunk: false });
   });
 
   test('a rest day keeps Training anyway? and Log cardio (D272 Amendment 1, item 3)', () => {

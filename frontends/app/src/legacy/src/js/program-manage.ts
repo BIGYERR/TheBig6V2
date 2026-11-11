@@ -325,7 +325,7 @@ function commitRename(id: any){
   _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
-function purgeProgData(id: any){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
+function purgeProgData(id: any){['ia_logs_','ia_comp_','ia_parts_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
 // ── V156: ARCHIVE vs DELETE (D1b ruling) ──────────────────────────────────
 // Archive = the program leaves the home list but every store survives; its history
 // stays viewable under Progress and feeds the wizard seed. purgeProgData fires ONLY

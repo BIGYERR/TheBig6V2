@@ -5,6 +5,7 @@ import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine
 import { DAY_FULL } from './wizard.ts';
 import { wildcardOn } from './random-wildcard.ts';
 import { dayBeforeStart, dayOffset, renderWeekView } from './week-view-sections.ts';
+import { clearPartSkips } from './day-status.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 /* ===== REINFORCEMENT POPUPS ===== */
 /* Pools are locked copy. workout + reminder are WIRED this batch; streak + season
@@ -355,6 +356,7 @@ function maybeShowReminder(){
 }
 function resolveReminder(week: any,dayKey: any,title: any,status: any){
   snapshotDay(week,dayKey);
+  clearPartSkips(week,dayKey);   // v0.261.0 (D284): the reminder's answer takes the day whole
   const c=getCompleted(); c[completedKey(week,dayKey)]={title:title||null,ts:Date.now(),status}; saveCompleted(c);
   markReminded(week,dayKey);
   popClose();

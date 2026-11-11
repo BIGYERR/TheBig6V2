@@ -79,9 +79,37 @@
 .tw-days .wk-tip{margin:0;}
 .tw-days .wk-stats{margin:0;}
 
+/* ── The Skip pill (D284 P-SKIPPILL): top right of a card whose part is not done, dark once skipped and the undo ── */
+.tw-card{position:relative;}
+.tw-lit{display:flex;flex-direction:column;gap:inherit;}
+.tw-card.has-skip .tw-head{min-height:32px;padding-right:118px;}
+.tw-skip{position:absolute;top:20px;right:20px;z-index:1;height:32px;padding:0 13px;border-radius:16px;border:1.5px solid var(--border2);
+  background:var(--surface);display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:14px;font-weight:600;
+  color:var(--muted);cursor:pointer;white-space:nowrap;transform-origin:center;}
+.tw-card.second .tw-skip{top:18px;}
+.tw-skip.on{border-color:var(--text);background:var(--text);color:var(--bg);}
+.tw-skip svg{flex:0 0 auto;}
+/* Skipped, the lights go off: everything but the pill fades to half (Dim) and the card's ground goes a shade darker. */
+.tw-card.off{background:var(--card-off);}
+.tw-card.off .tw-lit{opacity:.5;}
+/* Its button keeps its words, sinks and takes no taps (Sunken). */
+.tw-btn.sunk{cursor:default;pointer-events:none;opacity:1;transform:translateY(1px) scale(.985);border-color:transparent;
+  background:var(--surface2);color:var(--muted);box-shadow:inset 0 2px 6px rgba(var(--shadow-rgb),var(--sink-a));}
+/* While a skip plays, the buttons sink, rise and pass the orange over the card's slow time, on the curve its way runs. */
+.tw-days.skipping .tw-btn{transition:transform var(--skip-ms) var(--skip-move),background-color var(--skip-ms) var(--skip-ease),
+  color var(--skip-ms) var(--skip-ease),box-shadow var(--skip-ms) var(--skip-ease),border-color var(--skip-ms) var(--skip-ease),
+  height var(--skip-ms) var(--skip-move);}
+/* The lift card's dumbbell in two halves meeting at the bar's middle; broken, each droops at the break into a V. */
+.tw-dbl{overflow:visible;}
+.tw-dbl g{transform-box:view-box;}
+.tw-dbl-l{transform-origin:6px 12px;}
+.tw-dbl-r{transform-origin:18px 12px;}
+.tw-dbl.broken .tw-dbl-l{transform:translate(-2px,1.2px) rotate(22deg);}
+.tw-dbl.broken .tw-dbl-r{transform:translate(2px,1.2px) rotate(-22deg);}
+
 /* ── Record run: the recorder inside the grow frame ── */
 .tw-recov{z-index:240;}
 .rec-embed{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);}
 .rec-nophone{align-self:center;border:0;background:none;padding:10px 4px;min-height:44px;color:var(--muted);font-size:14px;font-weight:600;
   text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border2);cursor:pointer;}
-@media (prefers-reduced-motion: reduce){.tw-title{transition:none;}.tw-strip{scroll-behavior:auto;}}
+@media (prefers-reduced-motion: reduce){.tw-title{transition:none;}.tw-strip{scroll-behavior:auto;}.tw-days.skipping .tw-btn{transition:none;}}

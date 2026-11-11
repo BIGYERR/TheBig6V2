@@ -1,5 +1,6 @@
 import {
-  completedKey, getCompleted, getLogs, getPrograms, logKey, saveCompleted, saveLogs, savePrograms, snapshotDay,
+  completedKey, getCompleted, getLogs, getPartSkips, getPrograms, logKey, saveCompleted, saveLogs, savePartSkips,
+  savePrograms, snapshotDay,
 } from './storage.ts';
 import { _setActiveProg, activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
@@ -80,11 +81,15 @@ function handleDayStatus(dayKey: any,title: any,status: any){
   // V236 (D218): a status-setting tap is also a commit tap. The form is committed whatever the
   // card's regime, so Done on a rolled but unlogged card logs it. The undo tap is not a commit:
   // it saves regime-aware like any other write, so it never writes a draft number.
-  const _commit=statusOf(currentWeek,dayKey)!==status;
+  // v0.261.0 (D284): the status is read before the write, since saving the log now settles a day's skipped parts, and
+  // a status set by hand takes the day whole, so the day's parts go first.
+  const _was=statusOf(currentWeek,dayKey);
+  const _commit=_was!==status;
   if(_commit) iaWheelFlush(document.getElementById('detailOverlay'));
+  clearPartSkips(currentWeek,dayKey);
   persistLogFields(dayKey,_commit);
   const c=getCompleted();const k=completedKey(currentWeek,dayKey);
-  const wasSame=!!c[k]&&statusOf(currentWeek,dayKey)===status;
+  const wasSame=_was===status;
   if(wasSame){
     delete c[k];
     saveCompleted(c);renderWeekView();
@@ -224,6 +229,80 @@ function persistLogFields(dayKey: any, commit?: any){
   }
   saveLogs(logs);
   cardioLive(dayKey);   // V236 (D218): the regime is recomputed after every write
+  settleParts(currentWeek,dayKey);   // v0.261.0 (D284): a logged or cleared run can close or open a day with a skipped part
+}
+// ── SKIPPED PARTS (v0.261.0, D284 P-SKIPPILL) ────────────────────────────────
+// This Week's Skip pill skips a day's run or its lift on its own. The parts live in ia_parts_ (storage.ts), and the
+// day's status follows them: every part skipped is a skipped day; every part not skipped done is a done day (Mario: one
+// part skipped and the rest done counts as done); otherwise no record. A record the parts wrote carries parts:1 and is
+// rewritten or removed as they change, so nothing latches; a status the athlete set (Done, the deck, the reminder) is
+// never touched.
+// The day's parts, read as This Week reads them (week-view-model): a run when the day has a cardio with a sport, a lift
+// when a section holds a movement.
+function dayPartsOf(week: any,dayKey: any){
+  const day=activeProg&&activeProg.weeks&&activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
+  if(!day||day.rest) return [];
+  const parts: string[]=[];
+  if(day.cardio&&String(day.cardio.type||'')) parts.push('run');
+  if((day.sections||[]).some(function(s: any){ return !!s&&(s.items||[]).length>0; })) parts.push('lift');
+  return parts;
+}
+// The run part is done when the run is logged for the sport it is credited to (D213): This Week's own test
+// (week-view-model's cardioLogged), the same fields and the same zero rule, so the day and its run card agree.
+function partRunLogged(e: any,type: any){
+  if(!e) return false;
+  const sport=String(e.swapTo||type||'run').toLowerCase();
+  return (CARDIO_PARK_FIELDS[sport]||[]).some(function(f: any){ const v=e[f]; return v!==undefined&&v!==null&&v!==''&&v!==0&&v!=='0'; });
+}
+function settleParts(week: any,dayKey: any){
+  const k=completedKey(week,dayKey);
+  const mine=getPartSkips()[k]||{};
+  const c=getCompleted(), rec=c[k];
+  if(rec&&!rec.parts) return;
+  const parts=dayPartsOf(week,dayKey);
+  const left=parts.filter(function(p: string){ return !mine[p]; });
+  let want: string|null=null;
+  if(left.length<parts.length){
+    if(!left.length) want='skipped';
+    else{
+      const day=activeProg.weeks[week][dayKey];
+      const e=getLogs()[logKey(week,dayKey)];
+      // The lift part is done only by the deck or Done, a status the athlete sets, which ends the settle above.
+      if(left.every(function(p: string){ return p==='run'&&partRunLogged(e,day.cardio&&day.cardio.type); })) want='complete';
+    }
+  }
+  if(want){
+    if(!rec||rec.status!==want){
+      const day=activeProg.weeks[week][dayKey];
+      c[k]={title:(day&&day.title)||null,ts:Date.now(),status:want,parts:1};
+      saveCompleted(c);
+    }
+  }else if(rec){ delete c[k]; saveCompleted(c); }
+}
+// The pill: one part skipped, or put back. A day skipped the old way (the reminder, a cardio-only day's sheet) is every
+// part skipped, so putting one back turns it into part skips first.
+function skipPart(week: any,dayKey: any,part: any){
+  const parts=dayPartsOf(week,dayKey);
+  if(parts.indexOf(part)<0) return;
+  snapshotDay(week,dayKey);
+  const k=completedKey(week,dayKey);
+  const all=getPartSkips();
+  const mine=Object.assign({},all[k]||{});
+  const c=getCompleted(), rec=c[k];
+  if(rec&&!rec.parts&&rec.status==='skipped'){
+    parts.forEach(function(p: string){ mine[p]=1; });
+    delete c[k]; saveCompleted(c);
+  }
+  if(mine[part]) delete mine[part]; else mine[part]=1;
+  if(Object.keys(mine).length) all[k]=mine; else delete all[k];
+  savePartSkips(all);
+  settleParts(week,dayKey);
+}
+// A status set by hand (the session sheet's Done or Skip, the reminder) takes the day whole.
+function clearPartSkips(week: any,dayKey: any){
+  const all=getPartSkips(), k=completedKey(week,dayKey);
+  if(!all[k]) return;
+  delete all[k]; savePartSkips(all);
 }
 // V236 (D218): the cardio card's Log tap, the commit for a DRAFT card. A wheel still inside its
 // settle window commits to its node first, as in handleDayStatus. An empty card (every field of
@@ -313,4 +392,6 @@ function copyExport(){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { cardioEntryLive, cardioLive, cardioLogLabel, persistLogFields, renderStatusFoot, showSwapNudge };
+export {
+  cardioEntryLive, cardioLive, cardioLogLabel, clearPartSkips, persistLogFields, renderStatusFoot, showSwapNudge,
+};

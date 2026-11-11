@@ -266,7 +266,7 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   animation just in reverse". His one doctrine call, asked with a recommendation: a day with one part skipped and the
   other done "Counts as done" for the streak. **Amends** D276 item 7 (a skipped day drew a Skipped row on both cards)
   and answers D278's counter-argument (a day with lift work had no door to skip before training). It is not D249
-  P-CARDIOSKIP (moving a run), which stays open. **Bump:** MINOR, v0.261.0 (Mario, 2026-11-11). **Shipped:** not yet.
+  P-CARDIOSKIP (moving a run), which stays open. **Bump:** MINOR, v0.261.0 (Mario, 2026-11-11). **Shipped:** v0.261.0 (2026-11-11).
 - **Finding (measure on v0.260.0, by reading the code; nothing in a program moves):**
   1. A day's status lives in `ia_comp_<program>`, one record per day keyed `w<N>_<day>`, `complete` or `skipped`. A
      record with no status reads as complete (`statusOf`, `completedCount`), so a part skip cannot sit there alone.
@@ -330,3 +330,42 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   the settle on a saved log, which find no parts there and do nothing).
 - **The strongest counter-argument, for Mario:** a one tap skip on the main screen invites a stray tap. The dark pill
   undoes it in place, and the slow fade makes the change plain before anything is lost.
+
+## D284 as built (v0.261.0, 2026-11-11)
+
+- **Where:** the iOS app's Angular This Week and the shared script. `frontends/app/src/app/screens/week-view/skip-motion.ts`
+  (the motion, framework free: every number above, the frames, the reversed curves, and `playCard`, which turns a
+  running motion round instead of starting a new one); `week-view-model.ts` (each card's `skip` pill and its button's
+  `sunk`, the glow passing skipped cards, a skipped part never done); `week-view.ts` (the pill on the card outside the
+  `.tw-lit` wrapper that dims, the two-half dumbbell, the tap: the press, then on a 150 ms timer the write through the
+  legacy `skipPart`, the redraw and the card's motion); `week-view.css` (the pill, `.off`, `.sunk`, the slow transition
+  while a skip plays, the broken pose). The store and its writer are the legacy script's, so the web page carries them
+  unused: `storage.ts` (`getPartSkips`, `savePartSkips`), `day-status.ts` (`dayPartsOf`, `partRunLogged`, `settleParts`,
+  `skipPart`, `clearPartSkips`; `persistLogFields` settles after every save; `handleDayStatus` reads the status before
+  the save and clears the day's parts), `popups-streaks-reminders.ts` (the reminder clears them), `program-manage.ts`
+  (the purge), `base.css` (`--card-off`, `--sink-a`, day and both night blocks).
+- **Decisions the build made (siting and form):**
+  1. The run card's word follows its sport: `Skip run`, `Skip ride`, `Skip swim`, and `Skip it` for any other.
+  2. The deck closing a day (`markDayComplete`) keeps the day's parts, so a run skipped before the lift still shows
+     skipped; the session sheet's Done and Skip and the reminder's answer clear them, since each states the whole day.
+  3. A day the parts close raises no completion pop up: only Done and the deck raise it, as before.
+  4. While a skip plays, every button in the day takes the card's 1,050 ms on that way's curve (`.tw-days.skipping`),
+     so the orange passes at the same pace; at any other time the buttons keep their own quick press (D266).
+  5. A tap during the press (its first 620 ms) is ignored; after it, a tap turns the card's motion round where it is.
+- **Proof:** the 60-second check passed (29.1 s). On v0.260.0: `tests/integration/skip-pill.test.ts` fails all 9 tests
+  (no `skipPart`, no `ia_parts_`); `frontends/app/test/unit/skip-pill.test.ts` cannot load (`skip-motion.ts` is not
+  there, `git cat-file -e` fails); on v0.260.0's own sources `frontends/app/test/unit/week-view.test.ts` fails exactly its
+  two changed tests (the new card fields); `tests/integration/this-week-hero.test.ts` fails there since its wiring reads
+  `getPartSkips`. Program output does not move (the snapshot files are untouched). The page's diff is the version, the
+  two tokens, the store, its writer and settle, the two status writers that clear parts, and the purge.
+- **Tests:** `tests/integration/skip-pill.test.ts` (9: the day's parts read as This Week reads them; the ruling's status
+  table; a logged run closing a day whose lift is skipped and clearing it opening the day again; the athlete's status
+  never overwritten; an old style skipped day turning into part skips; a one card day; the reminder and the sheet taking
+  the day whole, with the sheet's undo tap; the run logged only for its credited sport and never at zero; the purge).
+  `frontends/app/test/unit/skip-pill.test.ts` (14: the pills and their words; a skipped run and a skipped lift; a day
+  skipped any way; a skipped part beside a done one either way round; the press, the slow fade, the snap, the reversed
+  curves and the turn round, by their numbers; the template, the write and the styles read as text). The changed
+  expectations in `tests/integration/this-week-hero.test.ts` (a skipped day draws sunk cards under dark pills, D276 item
+  7 amended) and `frontends/app/test/unit/week-view.test.ts` (the new fields).
+- **Not yet seen:** the motion on the phone. The pane runs no animation while hidden, so the feel is Mario's to judge.
+
