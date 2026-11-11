@@ -1,3 +1,4 @@
+import { iaStore } from './storage.ts';
 import { _ssLegal, _ssPartnerOf } from '../../../../../../core/src/engine/exercise-library.ts';
 import { _powerAllowed } from '../../../../../../core/src/engine/power-accessory.ts';
 import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
@@ -201,8 +202,8 @@ function swapLoadNote(outName: any,candName: any){
 // moves and swaps. Adding a lift on Tuesday therefore does NOT change next Tuesday —
 // that is the standing-preference feature, deliberately not built yet.
 function editStoreKey(pid: any){return 'ia_edits_'+pid;}
-function getDayEdits(pid: any){try{return JSON.parse(localStorage.getItem(editStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveDayEdits(pid: any,v: any){try{localStorage.setItem(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
+function getDayEdits(pid: any){try{return JSON.parse(iaStore.get(editStoreKey(pid))||'{}');}catch(e){return {};}}
+function saveDayEdits(pid: any,v: any){try{iaStore.set(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
 function _editEntry(s: any,k: any){const e=s[k]||{};if(!Array.isArray(e.add))e.add=[];if(!Array.isArray(e.skip))e.skip=[];s[k]=e;return e;}
 function recordSkip(pid: any,week: any,dayKey: any,name: any){
   const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
@@ -284,8 +285,8 @@ function pruneDayEdits(pid: any,cutWeek: any){
   if(changed) saveDayEdits(pid,s);
 }
 function swapStoreKey(pid: any){return 'ia_swaps_'+pid;}
-function getSwaps(pid: any){try{return JSON.parse(localStorage.getItem(swapStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveSwaps(pid: any,v: any){try{localStorage.setItem(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
+function getSwaps(pid: any){try{return JSON.parse(iaStore.get(swapStoreKey(pid))||'{}');}catch(e){return {};}}
+function saveSwaps(pid: any,v: any){try{iaStore.set(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
 function recordSwap(pid: any,week: any,dayKey: any,from: any,to: any,rx: any){
   const s=getSwaps(pid),k='w'+week+'_'+dayKey;
   // V221 D177 (R4). `rx` is optional: [{s,i,d}], section index, item index and detail of
@@ -351,8 +352,8 @@ function applySessionSwaps(prog: any,store: any){
 // swaps of the same lift TO the same replacement; any other choice resets it.
 const SWAP_NUDGE_AT=3;
 function swapCountKey(pid: any){return 'ia_swapct_'+pid;}
-function getSwapCounts(pid: any){try{return JSON.parse(localStorage.getItem(swapCountKey(pid))||'{}');}catch(e){return {};}}
-function saveSwapCounts(pid: any,v: any){try{localStorage.setItem(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
+function getSwapCounts(pid: any){try{return JSON.parse(iaStore.get(swapCountKey(pid))||'{}');}catch(e){return {};}}
+function saveSwapCounts(pid: any,v: any){try{iaStore.set(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
 function bumpSwapCount(pid: any,from: any,to: any){
   const c=getSwapCounts(pid);
   const cur=c[from];

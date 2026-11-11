@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setCurrentRandIdx, activeProg, showToast } from './rest-day-shell.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _setCurrentRandDayKey, _setLastRandIdx, lastRandIdx } from './wizard.ts';

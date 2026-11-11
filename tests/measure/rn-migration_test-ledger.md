@@ -21,6 +21,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/unit/pace-delta.test.ts` | 8 | 20 | lifted fn, source read | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/unit/page-comments.test.ts` | 10 | 13 | source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/semver.test.ts` | 20 | 79 | @ia/core, source read | KEEP: repo tooling, while the tool exists | | |
+| `tests/unit/stored-state.test.ts` | 18 | 54 | page, script text, @ia/core | RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1) | | |
 | `tests/unit/swipe-deck.test.ts` | 31 | 130 | Angular source, source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/tab-bar.test.ts` | 31 | 74 | lifted fn, script text, source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/this-week-hero.test.ts` | 14 | 77 | Angular source | KEEP: drives no page | | |
@@ -77,6 +78,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/integration/sheet-close.test.ts` | 2 | 7 | source read | KEEP: drives no page | | |
 | `tests/integration/skip-pill.test.ts` | 9 | 19 | page+DOM | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/integration/sport-swap.test.ts` | 18 | 76 | page, source read | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
+| `tests/integration/stored-state.test.ts` | 14 | 41 | page | RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1) | | |
 | `tests/integration/supersets.test.ts` | 24 | 56 | page | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/integration/swap-durability.test.ts` | 9 | 30 | page | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/integration/swaps.test.ts` | 39 | 145 | page, script text | RE-POINT at `@ia/core`: same assertions, no page booted | | |
@@ -93,6 +95,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/sweeps/adjacent-day-dedupe.test.ts` | 10 | 30 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/sweeps/cardio-sessions.test.ts` | 5 | 18 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/sweeps/core-trunk.test.ts` | 1 | 7 | page | RE-POINT at `@ia/core`: same assertions, no page booted | | |
+| `tests/sweeps/data-backup.test.ts` | 3 | 15 | page, @ia/core, source read | RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1) | | |
 | `tests/sweeps/deload.test.ts` | 11 | 48 | page, script text, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/sweeps/duplicate-movements.test.ts` | 15 | 44 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/sweeps/engine-modules.test.ts` | 1 | 2 | engine modules, source read | KEEP: already runs on core alone | | |
@@ -112,6 +115,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/sweeps/run-week-layout.test.ts` | 12 | 39 | page, script text | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/sweeps/runner-armor-circuit.test.ts` | 9 | 27 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/sweeps/session-budget.test.ts` | 16 | 45 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
+| `tests/sweeps/stored-state.test.ts` | 3 | 9 | page | RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1) | | |
 | `tests/sweeps/swaps.test.ts` | 18 | 47 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/sweeps/swim.test.ts` | 9 | 28 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/sweeps/swipe-deck.test.ts` | 3 | 6 | page, Angular source | RE-POINT at `@ia/core`: same assertions, no page booted | | |
@@ -180,4 +184,4 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `backend/test/site.test.ts` | 9 | 27 | source read | KEEP: the server, not the app | | |
 | `backend/test/versions.test.ts` | 9 | 33 | own code | KEEP: the server, not the app | | |
 
-**Total: 175 files, 2021 tests, 6725 assertions.**
+**Total: 179 files, 2059 tests, 6844 assertions.**

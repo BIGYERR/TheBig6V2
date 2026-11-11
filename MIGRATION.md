@@ -1,13 +1,47 @@
 # Iron Asylum: the move to React Native
 
-**Status: a plan. No conversion code is written.** Written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
-Each phase starts only on Mario's GO, one phase per session.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and two lift slices have
+shipped (v0.261.2, v0.261.3) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+Each phase starts only on Mario's GO, one phase step per session.
+
+**Where phase 1 stands:**
+
+- **Done, step 1: the golden records** (tests only, no build). `tests/support/stored-state.ts` drives whole histories
+  through today's page by the app's own entry points and holds every `ia_` key by size and sha256:
+  `tests/integration/stored-state.test.ts` (HALF_MANNY's history and 12 hostile cases, 14 tests),
+  `tests/sweeps/stored-state.test.ts` (the 10 seeded programs, three time zones, 24 lattice configs) and
+  `tests/sweeps/data-backup.test.ts` (one backup written by each of the 17 tagged releases since v0.253.0, each loaded
+  on today's page). Each history run twice stores the same bytes. Twelve deliberate one line breaks of the page each
+  turn the records red (`tests/measure/stored-state_red-on-break.md`). The first run of that check let two through
+  and earned its keep: one led to a new hostile case (a logged day with no history, then an injury), the other to a
+  finding (a term in the freeze that can never matter). One break is still open: overwriting a day's first snapshot
+  changes no record, and whether any tap can make it matter is to be settled before the freeze slice.
+- **Found by the records, not fixed:** on every Monday after the clocks go forward, the app reads the week before
+  (section 7). Mario's program is not touched by it (the clocks went back on 2026-11-01, and that direction reads
+  right).
+- **Not done, waiting on Mario:** the engine check on today's app (decision 4), and whether lift slices may reach his
+  phone before the race (decision 3).
+- **Done, the first lift slice (v0.261.2):** every storage call goes through one store. `core/src/engine/state-store.ts`
+  holds the interface and its two makers; `storage.ts` makes the page's store, `iaStore`; the 59 direct calls are gone
+  (the page names `localStorage` once). Every golden record identical, no golden file touched. The lifted code sits in
+  `core/src/engine` for now, the one core folder today's page build reads, and moves to `core/src/app-state` at
+  cutover (`docs/decisions/stored-state.md`).
+- **Done, the second lift slice (v0.261.3):** the lift log (`ia_exw_`) lives in `core/src/engine/state-lift-log.ts`: one
+  reader, one writer, `recordLift` (the rule for recording a lift) and the three pure functions the screens call.
+  Every golden record identical. Narrowed from the plan's "`log-entries.ts` and the set logging rules": the cardio
+  dose half and the set display rules read the page and move with the screens that use them.
+- **Next, on his GO:** the day's log, completion and parts (`ia_logs_`, `ia_comp_`, `ia_parts_`).
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is
 Mario's. **Why (Mario, 2026-11-11):** React Native is the platform the product has to be on. A public app has to be a real
 iPhone app, and what comes next (app blocking through Screen Time, NFC unlock) is native work. The tab bar and viewport
 bugs (D256, D280, D285) set it off; they are not the reason, and fixing them would not change the decision.
+
+**Out of scope (Mario, 2026-11-11):** the tab bar and every other web view bug. No more work goes into them; they end
+when the app leaves WebKit. Today's app is changed only for the migration itself (the phase 1 lift) or to protect
+Mario's data and training before cutover. Everything else found along the way is carried in this file and fixed
+inside the migration, in the code that replaces it.
 
 **What cannot break (Mario's six):**
 
@@ -73,6 +107,9 @@ again at the start of every phase: the numbers move as the app does.
   `popups-streaks-reminders.ts`. `exStoreKey` and `EX_KEY_ALIAS` are already in the engine (`exercise-library.ts`).
 
 ### 1.4 Tests
+
+(The baseline before phase 1. `tests/measure/rn-migration_inventory.md` and the ledger are regenerated as phases
+land, so their totals run ahead of this table.)
 
 | Suite | Runner | Files | Tests (static) | Assertions (static) | Tests at run time |
 |---|---|---|---|---|---|
@@ -437,7 +474,7 @@ only person moving, and it leaves a file he holds. The web view's copy stays whe
 | 4 | **The engine prescribes something else on the phone** (`Math.sin`, the language dependent sort, `Math.log`, `Math.pow`). | The engine check on today's app in phase 1 and on the new app in phases 2 and 5: 864 of 864 and HALF_MANNY's digest, once more with the phone's language changed. The `Math.sin` table. |
 | 5 | **Coverage quietly lost in the rewrite.** 61 files and 3,044 assertions touch the page's elements. | The ledger with counts before and after. No deletion before cutover holds. A named break for every replacement. |
 | 6 | **The native pieces do not survive the move:** the Live Activity, the widget, background GPS, three signed targets in CI. | The phase 2 spike. A real run and a real rest timer through TestFlight in phase 4. |
-| 7 | **Dates shift in the lifted freeze:** week boundaries across daylight saving, a time zone change, a year end. | Golden records under three time zones and across those dates. The freeze slice last, with the most scenarios. |
+| 7 | **Dates shift in the lifted freeze:** week boundaries across daylight saving, a time zone change, a year end. **One instance is confirmed** (section 7: the Monday after the clocks go forward). | Golden records under three time zones and across those dates, in place since phase 1 step 1. The freeze slice last, with the most scenarios. |
 | 8 | **Numbers and dates print differently** (the phone's region, Hermes's formatting). | Formatters in core that take nothing from the phone. The numbers check. |
 | 9 | **Two apps to maintain for months.** Every feature built on the old app is built twice. | Mario's decision on a feature freeze (section 6). |
 | 10 | **The ground moves:** an Expo SDK every two to four months, Hermes V1 new this year, Apple's yearly SDK deadline. | Pin SDK 58 until cutover. One upgrade, on purpose, before phase 6. |
@@ -457,7 +494,8 @@ Each with the session's pick first.
 2. **The web app: freeze or retire?** Pick: freeze it on 2026-12-07 (fixes only), retire the Cordova build when
    cutover holds, and take the Pages page down at the App Store launch. Against: Pages is free and is a way to show
    the app without TestFlight.
-3. **May phase 1 slices reach your phone before the race?** Pick: yes for the small ones, each behind a backup you
+3. **May phase 1 slices reach your phone before the race?** **Answered 2026-11-11: yes ("ok"), for v0.261.2, each
+   install behind a backup saved first (phase 1's numbered steps). The freeze slice still waits for 2026-12-07.** Pick: yes for the small ones, each behind a backup you
    save first, and the freeze slice only after 2026-12-06. Against: any change under your logs three weeks from a
    race is a risk you do not need; holding all of phase 1 off `main` until December 7 costs about two weeks.
 4. **The engine check on today's app.** Pick: yes, one line on the Bugs tab. It is the only way to learn what the
@@ -474,10 +512,25 @@ Each with the session's pick first.
 10. **The Family Controls entitlement.** Pick: ask Apple now for the main app. It is one form, approval can take
     weeks, and the bundle id will not change.
 11. **The old web view storage after cutover.** Pick: leave it untouched for 90 days, then delete on your word.
+12. **The clocks-forward defect (section 7).** Pick: rule it and fix it inside phase 1's freeze slice, after
+    2026-12-06, as its own D-code: that slice rewrites those lines anyway, and nothing reads wrong for you before
+    2027-03-14. Against: it is a real defect in the app today, and a southern hemisphere athlete would meet it in
+    October; but there is no such athlete until the public build.
 
 ---
 
 ## 7. Found along the way, and sources
+
+**Found by the golden records (2026-11-11), not ruled and not fixed:**
+
+- **The Monday after the clocks go forward reads as the week before.** `calcCurrentWeek` and `refreshProgram` count
+  days as milliseconds over 86,400,000. After a spring change a local midnight is an hour short of a whole day, so
+  from then on every Monday reads as the previous week; Tuesday to Sunday read right. Shown twice: New York on Monday
+  2027-03-15 (the app reads week two, the calendar says three), and Auckland on Monday 2026-10-05 (week five for six).
+  The autumn direction reads right, which is Mario's case this year. The golden record holds today's behaviour, so the
+  move into core reproduces it; the fix is its own ruling (decision 12).
+- **A seeded test config the wizard refuses.** The swim 500 config carries no timed 500, which the wizard has required
+  since it asked for one. The sweep gives it one. Nothing in the app is wrong.
 
 **Where the repo and the request differed:**
 

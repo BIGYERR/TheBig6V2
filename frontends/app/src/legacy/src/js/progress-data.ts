@@ -1,5 +1,5 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import {
   _setConfirmProgId, _setConfirmTier, _setProgressViewId, activeProgId, confirmProgId, confirmTier, showScreen,
 } from './rest-day-shell.ts';

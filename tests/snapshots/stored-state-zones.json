@@ -1,0 +1,200 @@
+{
+  "created": "2026-08-29T09:00:00",
+  "zones": {
+    "America/New_York": {
+      "0 generated": {
+        "keys": 2,
+        "all": "cbf09e215cfa6e1e011d0858c301576246dc625b84e9792834c292e362d820c1",
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "2b40b6573a753f1b8a7239b6a15e015fc0c37523a67d2794893f5c39d5201eef",
+        "live": {
+          "week": 1,
+          "digest": "0945d580ce929700",
+          "weeksSha256": "c2e836f5fc0ca2fba1854b75225c599528b815e15d7dc0c904975d181fb8d8a6"
+        }
+      },
+      "2 second week": {
+        "keys": 16,
+        "all": "053698589e47ce84237cc67fcb1c3fb552176b7e5586ea606972a0d3fc68f428",
+        "live": {
+          "week": 2,
+          "digest": "d0e99bbc587a173d",
+          "weeksSha256": "69a9206631c04b2b5e8d4ded1f1f4ab48ed4f74445e19ea589cfc02bc9865a16"
+        }
+      },
+      "3 third week": {
+        "keys": 16,
+        "all": "dbeffe1399f6bbbe0b338092e156d2268817d8514d89055cb35c5c9f9bdbc922",
+        "live": {
+          "week": 3,
+          "digest": "5ff5f6ed3dd73958",
+          "weeksSha256": "966e42d7b77b118a54001a68e69376598b24072c7ecf4abf2aae622b990c4a23"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 16,
+        "all": "dbeffe1399f6bbbe0b338092e156d2268817d8514d89055cb35c5c9f9bdbc922",
+        "live": {
+          "week": 6,
+          "digest": "63a9836f670c64a4",
+          "weeksSha256": "81325da15f7fdf474bf14b9c780b7f02dc8267e233b847430940a75fb9744a62"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "464 da18dbefe7d84cb83734b16d41e913e4217160aaeab79e5aa7d1f2b60790b031",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2148 6b58191b5dc0ef4fd35e4856cc01abb2893cdb12ae7a08f5db661a4017acbb4c",
+          "ia_hist_prog_1788008400000": "8578 3183e2b7be9aa39cba2be4b78596d0dbabd100336c15225431edd2a7ecd0c393",
+          "ia_logs_prog_1788008400000": "1217 1cba88fae28963cead5975b40b889ede9a1b3057d8bc53e36d3b86c1b715af84",
+          "ia_moves_prog_1788008400000": "44 047b325173332ed519cd8577725e1139435b9485202dc2a82a5970ebd24f84d4",
+          "ia_parts_prog_1788008400000": "21 2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659",
+          "ia_pop_dismiss_prog_1788008400000": "28 93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8",
+          "ia_pop_idx_prog_1788008400000": "38 6123aaef40cf5fba32dad1a54747693e8b34bc194ad3e8d3d57f3e81e0b674ce",
+          "ia_programs": "88252 d7bad4107cc3a810b3aff8904aa0f5ed0aa90eb634c53d380bf59e9d6ef9c667",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "43 1e174582fde357120de7e94eef43abc1e77717949a277235dd8db9d4e232846c",
+          "ia_swapct_prog_1788008400000": "77 77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae",
+          "ia_swaps_prog_1788008400000": "212 05fd198d08798ea88cad09351255665181bb57f55a622c74325e17c2d0d6ec96",
+          "ia_wild_prog_1788008400000": "79 39502deae788e4efaa7fcfd0ca08ca9793572acd5a9743634627828ef1aba028"
+        }
+      }
+    },
+    "Pacific/Auckland": {
+      "0 generated": {
+        "keys": 2,
+        "all": "8dd732ada7b071cdbbe1474122bb644338a372052bcda06d1d40e11751ab0397",
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "ba70258646036de6e1f5aff5f99821707fca2b78c275dadbdfded13b7e3b583c",
+        "live": {
+          "week": 1,
+          "digest": "0945d580ce929700",
+          "weeksSha256": "c2e836f5fc0ca2fba1854b75225c599528b815e15d7dc0c904975d181fb8d8a6"
+        }
+      },
+      "2 second week": {
+        "keys": 16,
+        "all": "12d17d92cf1238b16ce535749c27f9084ce601c6f8a7bb75f8f8749cd73d189e",
+        "live": {
+          "week": 2,
+          "digest": "d0e99bbc587a173d",
+          "weeksSha256": "69a9206631c04b2b5e8d4ded1f1f4ab48ed4f74445e19ea589cfc02bc9865a16"
+        }
+      },
+      "3 third week": {
+        "keys": 16,
+        "all": "d0f8bbf086aae3c7957fa5bac88c041f8c1ecc45841339a1f968847c359cb15f",
+        "live": {
+          "week": 3,
+          "digest": "5ff5f6ed3dd73958",
+          "weeksSha256": "966e42d7b77b118a54001a68e69376598b24072c7ecf4abf2aae622b990c4a23"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 16,
+        "all": "d0f8bbf086aae3c7957fa5bac88c041f8c1ecc45841339a1f968847c359cb15f",
+        "live": {
+          "week": 6,
+          "digest": "63a9836f670c64a4",
+          "weeksSha256": "81325da15f7fdf474bf14b9c780b7f02dc8267e233b847430940a75fb9744a62"
+        },
+        "each": {
+          "ia_active": "18 54c9b7f8b3e073342cc47fb49dec6833197bddd25e26119a6e09f39fcbfb2b58",
+          "ia_comp_prog_1787950800000": "464 d96b33d3cc0c48ea9607e5f9d894777e60f1efc49935d35d5df8b215ac993956",
+          "ia_edits_prog_1787950800000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1787950800000": "2148 39e5b9f7988bee24acecf838c92a984818194749be89f48d2aaaa46f594f36f2",
+          "ia_hist_prog_1787950800000": "8578 3183e2b7be9aa39cba2be4b78596d0dbabd100336c15225431edd2a7ecd0c393",
+          "ia_logs_prog_1787950800000": "1217 166729a17f8c6b0d2195dcb409c072b1254f1492968c39a742bc1db6a5f53ed8",
+          "ia_moves_prog_1787950800000": "44 83d458307704c2a468ecb7706d4748a15021e6ed5c393e322e8afe9223aaefc8",
+          "ia_parts_prog_1787950800000": "21 2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659",
+          "ia_pop_dismiss_prog_1787950800000": "28 93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8",
+          "ia_pop_idx_prog_1787950800000": "38 6123aaef40cf5fba32dad1a54747693e8b34bc194ad3e8d3d57f3e81e0b674ce",
+          "ia_programs": "88252 5e193f413c82075a4807b9cd7b9ea8f11d24de7342ec4fb23cfc92ff84e236e5",
+          "ia_remind_last_prog_1787950800000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1787950800000": "43 1e174582fde357120de7e94eef43abc1e77717949a277235dd8db9d4e232846c",
+          "ia_swapct_prog_1787950800000": "77 77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae",
+          "ia_swaps_prog_1787950800000": "212 b847bf4f633e78bdef4c100a89dee38b3306f79bbb1cbe7f03a2602e4316eeaf",
+          "ia_wild_prog_1787950800000": "79 a2c9957666a75b5e13f21dbf236db2f5e2c265960f8378db1ab1e48f611fe812"
+        }
+      }
+    },
+    "UTC": {
+      "0 generated": {
+        "keys": 2,
+        "all": "804cddc9e7c32f090f0a3b1aab28e7745bd1cd87f5e1fd2b52bb43effae9f24e",
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "335d6ede8f51281fd0de152b8a89d52f22e18b138cef2f8878a6b90ad30cf3f4",
+        "live": {
+          "week": 1,
+          "digest": "0945d580ce929700",
+          "weeksSha256": "c2e836f5fc0ca2fba1854b75225c599528b815e15d7dc0c904975d181fb8d8a6"
+        }
+      },
+      "2 second week": {
+        "keys": 16,
+        "all": "c243b4f6e0b37f70aa07047270ec01ac65b12afb0159f6e9f83d3c684a183c1e",
+        "live": {
+          "week": 2,
+          "digest": "d0e99bbc587a173d",
+          "weeksSha256": "69a9206631c04b2b5e8d4ded1f1f4ab48ed4f74445e19ea589cfc02bc9865a16"
+        }
+      },
+      "3 third week": {
+        "keys": 16,
+        "all": "be9a1f8c4a3ffb62dc1076709b06af950f9eda175ec78d9bd54ed3f1e700969e",
+        "live": {
+          "week": 3,
+          "digest": "5ff5f6ed3dd73958",
+          "weeksSha256": "966e42d7b77b118a54001a68e69376598b24072c7ecf4abf2aae622b990c4a23"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 16,
+        "all": "be9a1f8c4a3ffb62dc1076709b06af950f9eda175ec78d9bd54ed3f1e700969e",
+        "live": {
+          "week": 6,
+          "digest": "63a9836f670c64a4",
+          "weeksSha256": "81325da15f7fdf474bf14b9c780b7f02dc8267e233b847430940a75fb9744a62"
+        },
+        "each": {
+          "ia_active": "18 36e8f7ecdb34d285e8d7547c3a53ca56bbd3a98a8a95b9ca53a3209c4ba12122",
+          "ia_comp_prog_1787994000000": "464 00e07eb33d4e390802a3ee90b92c9bee6475a72b4c18af785d6e333551b18829",
+          "ia_edits_prog_1787994000000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1787994000000": "2148 1e72695e5a2df8c42ed446819a48c1715ac8553fe3b08599c96cbc6d5df4637a",
+          "ia_hist_prog_1787994000000": "8578 3183e2b7be9aa39cba2be4b78596d0dbabd100336c15225431edd2a7ecd0c393",
+          "ia_logs_prog_1787994000000": "1217 a243ed17f1b0d5b845d1786239e5892acee7cd9d5d172339746d588f688e200d",
+          "ia_moves_prog_1787994000000": "44 4482b82a855459cf6231b7e44cbc78c653fa05177c2fecc8a06b37afdf232461",
+          "ia_parts_prog_1787994000000": "21 2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659",
+          "ia_pop_dismiss_prog_1787994000000": "28 93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8",
+          "ia_pop_idx_prog_1787994000000": "38 6123aaef40cf5fba32dad1a54747693e8b34bc194ad3e8d3d57f3e81e0b674ce",
+          "ia_programs": "88252 b2a726068839c6f09618b560e012af338a37dbdd2b2da06efe4a7866546f45f4",
+          "ia_remind_last_prog_1787994000000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1787994000000": "43 1e174582fde357120de7e94eef43abc1e77717949a277235dd8db9d4e232846c",
+          "ia_swapct_prog_1787994000000": "77 77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae",
+          "ia_swaps_prog_1787994000000": "212 3ab01c9577f2ba0d80ea38773e0d9effcca205f11e02f39dc0ec072bb5dad759",
+          "ia_wild_prog_1787994000000": "79 92cb6ea2082006ebd147779ff77516e18927a97cd75750eef02ea933d911534f"
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
+import { completedKey, getCompleted, iaStore, saveCompleted, snapshotDay } from './storage.ts';
 import { ASY_ICON_PATHS, asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { completedKey, getCompleted, saveCompleted, snapshotDay } from './storage.ts';
 import { activeProg, activeProgId, showToast } from './rest-day-shell.ts';
 import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.ts';
@@ -86,10 +86,10 @@ const POP_DISMISS=[
 ];
 function popDismissText(){
   const key='ia_pop_dismiss_'+activeProgId; const today=_todayStamp();
-  let st: Record<string, any>={}; try{ st=JSON.parse(localStorage.getItem(key)||'{}'); }catch{}
+  let st: Record<string, any>={}; try{ st=JSON.parse(iaStore.get(key)||'{}'); }catch{}
   if(st.date===today && typeof st.idx==='number' && POP_DISMISS[st.idx]) return POP_DISMISS[st.idx];
   let i; do{ i=Math.floor(Math.random()*POP_DISMISS.length); }while(POP_DISMISS.length>1 && i===st.idx);
-  try{ localStorage.setItem(key,JSON.stringify({date:today,idx:i})); }catch{}
+  try{ iaStore.set(key,JSON.stringify({date:today,idx:i})); }catch{}
   return POP_DISMISS[i];
 }
 // Pool entries may be a plain string, or {t, when, type}; a tag gates eligibility on the
@@ -136,11 +136,11 @@ function popPick(tier: any,week: any,dayKey: any){
   if(!elig.length) return popText(pool[0]);
   if(elig.length===1) return popText(pool[elig[0]]);
   const memKey='ia_pop_idx_'+activeProgId; let mem: Record<string, any>={};
-  try{ mem=JSON.parse(localStorage.getItem(memKey)||'{}'); }catch{}
+  try{ mem=JSON.parse(iaStore.get(memKey)||'{}'); }catch{}
   const last=(typeof mem[tier]==='number')?mem[tier]:-1;
   let choices=elig.filter(i=>i!==last); if(!choices.length) choices=elig;
   const i=choices[Math.floor(Math.random()*choices.length)];
-  mem[tier]=i; try{ localStorage.setItem(memKey,JSON.stringify(mem)); }catch{}
+  mem[tier]=i; try{ iaStore.set(memKey,JSON.stringify(mem)); }catch{}
   return popText(pool[i]);
 }
 function popFire(tier: any,opts: any){
@@ -275,9 +275,9 @@ function fireStreakPopup(streak: any){
 }
 // Season = (A): fires when the final scheduled training day of the program is completed. Once ever.
 function finalScheduledDay(){ const a=scheduledDays(); return a.length?a[a.length-1]:null; }
-function seasonShown(){ return localStorage.getItem('ia_season_shown_'+activeProgId)==='1'; }
-function markSeasonShown(){ try{localStorage.setItem('ia_season_shown_'+activeProgId,'1');}catch{} }
-function releaseSeasonShown(){ try{localStorage.removeItem('ia_season_shown_'+activeProgId);}catch{} }   // V181 (D2): unmark on the final day re-arms the banner
+function seasonShown(){ return iaStore.get('ia_season_shown_'+activeProgId)==='1'; }
+function markSeasonShown(){ try{iaStore.set('ia_season_shown_'+activeProgId,'1');}catch{} }
+function releaseSeasonShown(){ try{iaStore.remove('ia_season_shown_'+activeProgId);}catch{} }   // V181 (D2): unmark on the final day re-arms the banner
 function fireSeasonPopup(){
   popFire('season',{
     stats:[
@@ -300,8 +300,8 @@ function fireCompletionPopup(week: any,dayKey: any){
   fireWorkoutPopup(week,dayKey);
 }
 // Day-after reminder: most recent strictly-past pending non-rest day not yet reminded, since the last marked day.
-function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
-function markReminded(week: any,d: any){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
+function remindedSet(){ try{return JSON.parse(iaStore.get('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
+function markReminded(week: any,d: any){ const m=remindedSet(); m[completedKey(week,d)]=true; try{iaStore.set('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
 // v0.240.1 (D238, P-REMINDSWITCH): nothing records when a program became active, so a program switched to would ask
 // about every day spent on another one. The switch marks each past unmarked training day as asked. The record is not
 // written: the days stay unmarked, and the streak reads them as transparent. Today and later are asked as before.
@@ -309,13 +309,13 @@ function markPastAsked(){
   const today=new Date(); today.setHours(0,0,0,0);
   const m=remindedSet(); let n=0;
   scheduledDays(today).forEach(x=>{ if(x.date<today&&!statusOf(x.week,x.d)&&!m[completedKey(x.week,x.d)]){ m[completedKey(x.week,x.d)]=true; n++; } });
-  if(n) try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{}
+  if(n) try{iaStore.set('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{}
 }
 function _todayStamp(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
 function maybeShowReminder(){
   if(!activeProg?.startDate) return;
   const lastKey='ia_remind_last_'+activeProgId;
-  if(localStorage.getItem(lastKey)===_todayStamp()) return; // once per calendar day
+  if(iaStore.get(lastKey)===_todayStamp()) return; // once per calendar day
   const today=new Date(); today.setHours(0,0,0,0);
   const days=scheduledDays(today).filter(x=>x.date<today); // strictly past
   const rem=remindedSet(); let target=null;
@@ -329,7 +329,7 @@ function maybeShowReminder(){
   }
   if(!target) return;
   const day=activeProg.weeks[target.week]?.[target.d]; if(!day) return;
-  localStorage.setItem(lastKey,_todayStamp());
+  iaStore.set(lastKey,_todayStamp());
   markReminded(target.week,target.d);
   const esc=(day.title||'Workout').replace(/'/g,"\\'");
   // V141 missed-session doctrine (RG Active harvest, copy-only): a missed session is

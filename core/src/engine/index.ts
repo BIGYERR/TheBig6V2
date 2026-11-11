@@ -6,5 +6,11 @@
  * face for the other consumers (the tests now, the Angular screens in phase E); it is never a piece of the page.
  */
 export { buildProgram } from './budget-engine-d.ts';
+// The stored state's store (docs/decisions/stored-state.md): beside the engine while the page is built from this folder.
+export { memoryStore, storageStore } from './state-store.ts';
+export type { StateStore, StorageLike } from './state-store.ts';
+// The lift log, ia_exw_<program> (v0.261.3).
+export { dedupeExDayEntries, entryDay, readLiftLog, recordLift, weeklyBest, writeLiftLog } from './state-lift-log.ts';
+export type { LiftEntry, LiftLog, LiftRecord, LiftRow } from './state-lift-log.ts';
 export type { EngineCfg, CardioSchedule, PaceRow, RunAnchorInfo } from './cardio-progression.ts';
 export type { CardioSession } from './nsw-cardio.ts';

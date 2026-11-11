@@ -1,6 +1,6 @@
-import { esc, snapshotDay } from './storage.ts';
+import { esc, iaStore, snapshotDay } from './storage.ts';
 import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
-import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
+import { readLiftLog, recordLift, writeLiftLog } from '../../../../../../core/src/engine/state-lift-log.ts';
 import { EQUIP_TOKENS } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { runSessionCode } from './week-view-sections.ts';
@@ -33,56 +33,17 @@ function isDBExercise(name: any) {
   return hasEquip(name,'dumbbell') && !isKBExercise(name);
 }
 
-// Get stored exercise weights for this program
-function getExWeights(){try{return JSON.parse(localStorage.getItem('ia_exw_'+activeProgId)||'{}');}catch{return{};}}
-function saveExWeights(obj: any){localStorage.setItem('ia_exw_'+activeProgId,JSON.stringify(obj));}
+// v0.261.3 (docs/decisions/stored-state.md): the lift log (ia_exw_<program>) lives in @ia/core, in
+// core/src/engine/state-lift-log.ts: its one reader and one writer, entryDay, weeklyBest, dedupeExDayEntries and the
+// rule for recording a lift (recordLift). These are the page's callers: they name the active program and the store.
+function getExWeights(): any{return readLiftLog(iaStore,activeProgId);}
+function saveExWeights(obj: any){writeLiftLog(iaStore,activeProgId,obj);}
 
-
-// ── DAY RESOLUTION FOR LOG ENTRIES (V117) ────────────────────────────────────
-// Entries used to carry only `week`. Every day-view reader asked "is there an entry
-// for THIS week", so an exercise appearing on two days inside one week rendered the
-// second day pre-checked, with the first day's set numbers restored into the rows,
-// and — worse — the second day's save OVERWROTE the first day's record. Two sessions
-// collapsed into one. `day` closes both halves.
-//
-// Storage is ADDITIVE. Pre-V117 entries have no `day` and are resolved from their own
-// `ts`, which is the only day-aware value those records ever carried. Nothing is
-// migrated or rewritten, so a rollback stays clean and existing history keeps its
-// place on the day view instead of vanishing.
-const _ENTRY_DAY_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
-function entryDay(e: any){
-  if(!e) return '';
-  if(e.day) return e.day;
-  if(e.ts){ try{ return _ENTRY_DAY_ORDER[new Date(e.ts).getDay()]||''; }catch(_){ return ''; } }
-  return '';
-}
-// Chart rule (Mario's call, V117): ONE point per week, the week's HEAVIEST across days.
-// The big-3 chart already did this via Math.max per week; the per-exercise history chart
-// plotted one dot per entry and would otherwise show two dots both labelled W5 the moment
-// day granularity landed. Ties break to the later timestamp.
-function weeklyBest(entries: any){
-  const byWeek=Object.create(null);
-  (entries||[]).forEach(function(e: any){
-    if(!e) return;
-    const w=+e.week||0, prev=byWeek[w];
-    if(!prev) { byWeek[w]=e; return; }
-    const a=+e.weight||0, b=+prev.weight||0;
-    if(a>b || (a===b && (e.ts||0)>(prev.ts||0))) byWeek[w]=e;
-  });
-  return Object.keys(byWeek).map(Number).sort(function(a,b){return a-b;}).map(function(w){return byWeek[w];});
-}
-
-// Log a weight entry for an exercise
-// setsW (V105) is the per-set load ladder in lbs, ADDITIVE to the existing shape.
-// `weight` remains the scalar every downstream consumer reads and is always
-// max(setsW) when a ladder is present. Pre-V105 entries simply have no setsW and
-// render as uniform — nothing is migrated or rewritten, so a rollback stays clean.
+// Log a weight entry for an exercise. The page resolves the week and the day and snapshots the day; core records it.
 function logExerciseWeight(exName: any, weight: any, setsReps: any, week: any, setsDone: any, setsW: any, dayKey: any) {
   if(!exName) return;
   if(!weight && !(setsDone && setsDone.length)) return;
   const store = getExWeights();
-  const key = exStoreKey(exName);
-  if(!store[key]) store[key] = {name:exName, entries:[]};
   const w = week||currentWeek;
   const dk = dayKey||(typeof currentDayKey!=='undefined'?currentDayKey:'')||'';
   // V222 D181 (R2). The per-exercise Log is a first touch. D108 counts this ia_exw_ write
@@ -90,72 +51,8 @@ function logExerciseWeight(exName: any, weight: any, setsReps: any, week: any, s
   // was frozen ON. snapshotDay is first-touch-wins, so this is a no-op on a day already
   // snapshotted, and it returns without writing when the day is not in the week.
   if(dk) snapshotDay(w, dk);
-  const entries = store[key].entries;
-  // ONE entry per exercise per week PER DAY (V117). Re-logging the same exercise on
-  // the same day (e.g. correcting a typo — clear the field, type a new number)
-  // OVERWRITES that day's value instead of appending a second point; a correction must
-  // not plot as a phantom duplicate dot. But two DIFFERENT days inside one week are two
-  // sessions and must stay two records — keying this on `week` alone silently destroyed
-  // the earlier one. Latest log for the day wins.
-  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
-  const existing = entries.find(e => +e.week === +w && entryDay(e) === dk);
-  if(existing) {
-    existing.weight = +weight;
-    existing.setsReps = setsReps||'';
-    existing.setsDone = (setsDone && setsDone.length) ? setsDone : (existing.setsDone||[]);
-    existing.setsW = (setsW && setsW.length) ? setsW : (existing.setsW||[]);
-    existing.ts = Date.now();
-    existing.day = dk;
-  } else {
-    entries.push({
-      weight: +weight,
-      setsReps: setsReps||'',
-      setsDone: setsDone||[],
-      setsW: setsW||[],
-      week: w,
-      day: dk,
-      ts: Date.now()
-    });
-  }
-  // Keep ~52 WEEKS of history, not 52 entries (V117). Counting entries was equivalent
-  // to counting weeks only while a lift could log once a week; with day granularity a
-  // 3x/week movement reached the old cap at week 18 and `shift()` dropped from the FRONT
-  // of the array — the baseline the whole chart is measured against. Capping on week span
-  // keeps the same one-year intent regardless of how often the movement recurs.
-  const _wMax = entries.reduce(function(m: any,e: any){return Math.max(m, +e.week||0);}, 0);
-  if(_wMax > 52){
-    const _keep = entries.filter(function(e: any){ return (+e.week||0) > _wMax - 52; });
-    if(_keep.length !== entries.length) store[key].entries = _keep;
-  }
+  recordLift(store,{name:exName,weight:weight,setsReps:setsReps,week:w,day:dk,setsDone:setsDone,setsW:setsW,now:Date.now()});
   saveExWeights(store);
-}
-
-// Collapse any legacy duplicate entries so each exercise keeps ONE entry per week
-// (most recently logged wins). Cleans up duplicate points created before the
-// per-week overwrite fix above. Returns true if anything actually changed.
-function dedupeExDayEntries(store: any) {
-  // KEYED ON WEEK + DAY (V117). This function WRITES BACK to localStorage, so while it
-  // keyed on `week` alone it was a third writer whose whole job was to destroy exactly
-  // the records day granularity creates — it would have eaten the earlier day's session
-  // on every visit to the progress screen, permanently. It still collapses genuine
-  // same-day duplicates (the pre-V105 push-every-save defect); it no longer collapses
-  // two different training days into one.
-  let changed = false;
-  Object.values(store).forEach(ex => {
-    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
-    if(!ex.entries || ex.entries.length < 2) return;
-    const byKey: Record<string, any> = {};
-    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
-    ex.entries.forEach(e => {
-      const k = String(e.week) + '|' + entryDay(e);
-      const prev = byKey[k];
-      if(!prev || (e.ts||0) >= (prev.ts||0)) byKey[k] = e;
-    });
-    const merged = Object.values(byKey).sort((a,b) => (a.week-b.week) || ((a.ts||0)-(b.ts||0)));
-    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
-    if(merged.length !== ex.entries.length) { ex.entries = merged; changed = true; }
-  });
-  return changed;
 }
 
 // Non-competition main-lift variants are performed lighter than the comp lift they're
@@ -331,6 +228,6 @@ const _DOSE_INPUT_STYLE='width:100%;background:var(--surface2);border:1px solid 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
   CARDIO_PARK_FIELDS, CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogDoseFull, _curLogSub, _doseStripHTML, _fmtPaceMi,
-  _setCurLogDose, _setCurLogDoseFull, _setCurLogSub, cardioSwapNoteText, dedupeExDayEntries, doseDerived,
-  doseFromCardio, entryDay, getExWeights, isKBExercise, logExerciseWeight, saveExWeights, updateDoseDerived, weeklyBest,
+  _setCurLogDose, _setCurLogDoseFull, _setCurLogSub, cardioSwapNoteText, doseDerived, doseFromCardio, getExWeights,
+  isKBExercise, logExerciseWeight, saveExWeights, updateDoseDerived,
 };

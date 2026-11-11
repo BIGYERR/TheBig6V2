@@ -1,0 +1,3391 @@
+{
+  "zone": "America/New_York",
+  "created": "2026-08-29T09:00:00",
+  "records": {
+    "half-manny, the standard history": {
+      "0 generated": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae"
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "1 first week": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 311,
+            "sha256": "b0024e183316b01498bd5662e1582729da79d24fe0d144a195aacc91029de9b0"
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 1375,
+            "sha256": "6d8130a9e51c3e3a1961f71658858c3f75f2080153c682184dc66617022f65b2"
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 6106,
+            "sha256": "26f1c9960185e7360ed194237f86e1e0c4c1154a6992d712729dbb2b1bfcf224"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 818,
+            "sha256": "565fa70ed15a7ef8a9600d9f0a0f3c039cce89f84806f3d41e7d563ea3af7f09"
+          },
+          "ia_parts_prog_1788008400000": {
+            "bytes": 21,
+            "sha256": "2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659"
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "787badccd37a10e508c1b279f28dd64624fcc2af0d0595292955fd0d0e61f06a"
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 25,
+            "sha256": "e2303de306c654ba09163d334d163e0ad4bbc2e3a0acb7a17df3f780d6e4c24b"
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae"
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 212,
+            "sha256": "05fd198d08798ea88cad09351255665181bb57f55a622c74325e17c2d0d6ec96"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "0945d580ce929700",
+          "weeksSha256": "c2e836f5fc0ca2fba1854b75225c599528b815e15d7dc0c904975d181fb8d8a6"
+        }
+      },
+      "2 second week": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 388,
+            "sha256": "878e5b48d4b70e26fb416095c3cebc955248fe3eb3f5209702e503aa78cb7b7c"
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 1772,
+            "sha256": "f9f4579918ebe5548a1c05c2ea30743e01ae0b68a97c6a0dfe44b8ef0e78597c"
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 7361,
+            "sha256": "80b6f197996c0dfb78650dfeea04d5cff726aa170acdca1a4a65914525a4ef2e"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 1021,
+            "sha256": "009442b5fa7ffaadc80b54f5801c3d1052b0246df15182af503264e64da65cdc"
+          },
+          "ia_moves_prog_1788008400000": {
+            "bytes": 44,
+            "sha256": "047b325173332ed519cd8577725e1139435b9485202dc2a82a5970ebd24f84d4"
+          },
+          "ia_parts_prog_1788008400000": {
+            "bytes": 21,
+            "sha256": "2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659"
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "b2eff78904078d5869de5c6010561afa1133981b5e30d92120ae2122fbe3b36b"
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 38,
+            "sha256": "1f384c221cca7f6ff6fa8862eff93d520f38b0426214604f74abe6d885ce0bd7"
+          },
+          "ia_programs": {
+            "bytes": 88043,
+            "sha256": "3f299b935b01f6a44871a25ca4b13077cce270791175f9e5d091155ade1c9397"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 8,
+            "sha256": "76fd9175565b48e5f0fdf2aae96c5bce1f764de4de40b60f763eac0674b5142d"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 29,
+            "sha256": "44e6cf6b66776f43eaf441ea5f0bd30ff69a72130aa546ffdf41de6adf527e17"
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae"
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 212,
+            "sha256": "05fd198d08798ea88cad09351255665181bb57f55a622c74325e17c2d0d6ec96"
+          },
+          "ia_wild_prog_1788008400000": {
+            "bytes": 79,
+            "sha256": "39502deae788e4efaa7fcfd0ca08ca9793572acd5a9743634627828ef1aba028"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 2,
+            "digest": "50cc1c6062675a4f"
+          }
+        ],
+        "live": {
+          "week": 2,
+          "digest": "d0e99bbc587a173d",
+          "weeksSha256": "69a9206631c04b2b5e8d4ded1f1f4ab48ed4f74445e19ea589cfc02bc9865a16"
+        }
+      },
+      "3 third week": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 464,
+            "sha256": "da18dbefe7d84cb83734b16d41e913e4217160aaeab79e5aa7d1f2b60790b031"
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 2148,
+            "sha256": "6b58191b5dc0ef4fd35e4856cc01abb2893cdb12ae7a08f5db661a4017acbb4c"
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 8578,
+            "sha256": "3183e2b7be9aa39cba2be4b78596d0dbabd100336c15225431edd2a7ecd0c393"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 1217,
+            "sha256": "1cba88fae28963cead5975b40b889ede9a1b3057d8bc53e36d3b86c1b715af84"
+          },
+          "ia_moves_prog_1788008400000": {
+            "bytes": 44,
+            "sha256": "047b325173332ed519cd8577725e1139435b9485202dc2a82a5970ebd24f84d4"
+          },
+          "ia_parts_prog_1788008400000": {
+            "bytes": 21,
+            "sha256": "2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659"
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 28,
+            "sha256": "93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8"
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 38,
+            "sha256": "6123aaef40cf5fba32dad1a54747693e8b34bc194ad3e8d3d57f3e81e0b674ce"
+          },
+          "ia_programs": {
+            "bytes": 88252,
+            "sha256": "d7bad4107cc3a810b3aff8904aa0f5ed0aa90eb634c53d380bf59e9d6ef9c667"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 9,
+            "sha256": "2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 43,
+            "sha256": "1e174582fde357120de7e94eef43abc1e77717949a277235dd8db9d4e232846c"
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae"
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 212,
+            "sha256": "05fd198d08798ea88cad09351255665181bb57f55a622c74325e17c2d0d6ec96"
+          },
+          "ia_wild_prog_1788008400000": {
+            "bytes": 79,
+            "sha256": "39502deae788e4efaa7fcfd0ca08ca9793572acd5a9743634627828ef1aba028"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 3,
+            "digest": "f35cc259b0b2e8f4"
+          }
+        ],
+        "live": {
+          "week": 3,
+          "digest": "5ff5f6ed3dd73958",
+          "weeksSha256": "966e42d7b77b118a54001a68e69376598b24072c7ecf4abf2aae622b990c4a23"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 464,
+            "sha256": "da18dbefe7d84cb83734b16d41e913e4217160aaeab79e5aa7d1f2b60790b031",
+            "value": {
+              "w1_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788213600000,
+                "status": "complete"
+              },
+              "w1_tue": {
+                "title": "Strength Support",
+                "ts": 1788300000000,
+                "status": "complete"
+              },
+              "w1_thu": {
+                "title": "Leg Strength + Mobility",
+                "ts": 1788472800000,
+                "status": "complete"
+              },
+              "w1_fri": {
+                "title": "Recovery Lift",
+                "ts": 1788559200000,
+                "status": "skipped"
+              },
+              "w2_mon": {
+                "title": "Strength Support",
+                "ts": 1788818400000,
+                "status": "complete"
+              },
+              "w3_mon": {
+                "title": "Posterior Chain",
+                "ts": 1789600500000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "value": {}
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 2148,
+            "sha256": "6b58191b5dc0ef4fd35e4856cc01abb2893cdb12ae7a08f5db661a4017acbb4c",
+            "value": {
+              "barbell_romanian_deadlift": {
+                "name": "Barbell Romanian deadlift",
+                "entries": [
+                  {
+                    "weight": 190,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      12,
+                      12
+                    ],
+                    "setsW": [
+                      185,
+                      190
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1789600500000
+                  }
+                ]
+              },
+              "barbell_row": {
+                "name": "Barbell row",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              },
+              "barbell_bench_press": {
+                "name": "Barbell bench press",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      100,
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              },
+              "dumbbell_arnold_press": {
+                "name": "Dumbbell Arnold press",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      110,
+                      115
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  },
+                  {
+                    "weight": 135,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      130,
+                      135
+                    ],
+                    "week": 2,
+                    "day": "mon",
+                    "ts": 1788818400000
+                  }
+                ]
+              },
+              "front_squat": {
+                "name": "Front squat",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      105,
+                      110,
+                      115
+                    ],
+                    "week": 1,
+                    "day": "thu",
+                    "ts": 1788472800000
+                  }
+                ]
+              },
+              "dumbbell_bulgarian_split_squat": {
+                "name": "Dumbbell Bulgarian split squat",
+                "entries": [
+                  {
+                    "weight": 120,
+                    "setsReps": "2×8–12 each @ RPE 7",
+                    "setsDone": [
+                      8,
+                      7
+                    ],
+                    "setsW": [
+                      115,
+                      120
+                    ],
+                    "week": 1,
+                    "day": "thu",
+                    "ts": 1788472800000
+                  }
+                ]
+              },
+              "close_grip_bench_press": {
+                "name": "Close-grip bench press",
+                "entries": [
+                  {
+                    "weight": 130,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      120,
+                      125,
+                      130
+                    ],
+                    "week": 2,
+                    "day": "mon",
+                    "ts": 1788818400000
+                  }
+                ]
+              },
+              "weighted_chinups": {
+                "name": "Weighted chinups",
+                "entries": [
+                  {
+                    "weight": 135,
+                    "setsReps": "2×5–6 @ RPE 7",
+                    "setsDone": [
+                      5,
+                      4
+                    ],
+                    "setsW": [
+                      130,
+                      135
+                    ],
+                    "week": 3,
+                    "day": "mon",
+                    "ts": 1789600500000
+                  }
+                ]
+              },
+              "kettlebell_single_arm_row": {
+                "name": "Kettlebell single-arm row",
+                "entries": [
+                  {
+                    "weight": 145,
+                    "setsReps": "2×8–12 each @ RPE 7",
+                    "setsDone": [
+                      8,
+                      7
+                    ],
+                    "setsW": [
+                      140,
+                      145
+                    ],
+                    "week": 3,
+                    "day": "mon",
+                    "ts": 1789600500000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 8578,
+            "sha256": "3183e2b7be9aa39cba2be4b78596d0dbabd100336c15225431edd2a7ecd0c393"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 1217,
+            "sha256": "1cba88fae28963cead5975b40b889ede9a1b3057d8bc53e36d3b86c1b715af84",
+            "value": {
+              "w1_mon": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1789600500000
+              },
+              "w1_tue": {
+                "rpe": "7",
+                "run_dist": "3.5",
+                "run_pace": "9:09/mi",
+                "run_mins": "32",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "Felt strong 💪, slept 7 h",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788300000000
+              },
+              "w1_thu": {
+                "rpe": "8",
+                "run_dist": "",
+                "run_pace": "",
+                "run_mins": "",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788472800000
+              },
+              "w1_fri": {
+                "rpe": "",
+                "run_dist": "",
+                "run_pace": "",
+                "run_mins": "",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "Travel day",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788559200000
+              },
+              "w2_mon": {
+                "rpe": "8",
+                "run_dist": "5.5",
+                "run_pace": "8:44/mi",
+                "run_mins": "48",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 2,
+                "ts": 1788818400000
+              },
+              "w3_mon": {
+                "rpe": "7",
+                "run_dist": "6.5",
+                "run_pace": "",
+                "run_mins": "56",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 3,
+                "ts": 1789600500000
+              }
+            }
+          },
+          "ia_moves_prog_1788008400000": {
+            "bytes": 44,
+            "sha256": "047b325173332ed519cd8577725e1139435b9485202dc2a82a5970ebd24f84d4",
+            "value": {
+              "w2_wed": {
+                "from": "sat",
+                "ts": 1788962400000
+              }
+            }
+          },
+          "ia_parts_prog_1788008400000": {
+            "bytes": 21,
+            "sha256": "2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659",
+            "value": {
+              "w1_sat": {
+                "lift": 1
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 28,
+            "sha256": "93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8",
+            "value": {
+              "date": "2026-9-16",
+              "idx": 5
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 38,
+            "sha256": "6123aaef40cf5fba32dad1a54747693e8b34bc194ad3e8d3d57f3e81e0b674ce",
+            "value": {
+              "workout": 10,
+              "streak": 1,
+              "reminder": 2
+            }
+          },
+          "ia_programs": {
+            "bytes": 88252,
+            "sha256": "d7bad4107cc3a810b3aff8904aa0f5ed0aa90eb634c53d380bf59e9d6ef9c667"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 9,
+            "sha256": "2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+            "value": "2026-9-16"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 43,
+            "sha256": "1e174582fde357120de7e94eef43abc1e77717949a277235dd8db9d4e232846c",
+            "value": {
+              "w1_sat": true,
+              "w2_tue": true,
+              "w3_tue": true
+            }
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae",
+            "value": {
+              "Close-grip bench press": {
+                "to": "Barbell bench press",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 212,
+            "sha256": "05fd198d08798ea88cad09351255665181bb57f55a622c74325e17c2d0d6ec96",
+            "value": {
+              "w1_tue": [
+                {
+                  "from": "Close-grip bench press",
+                  "to": "Barbell bench press",
+                  "ts": 1788300000000,
+                  "rx": [
+                    {
+                      "s": 0,
+                      "i": 0,
+                      "d": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "ia_wild_prog_1788008400000": {
+            "bytes": 79,
+            "sha256": "39502deae788e4efaa7fcfd0ca08ca9793572acd5a9743634627828ef1aba028",
+            "value": [
+              {
+                "title": "Golden record wildcard",
+                "ts": 1788962400000,
+                "week": 2,
+                "dayKey": "wed"
+              }
+            ]
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 3,
+            "digest": "f35cc259b0b2e8f4"
+          }
+        ],
+        "live": {
+          "week": 6,
+          "digest": "63a9836f670c64a4",
+          "weeksSha256": "81325da15f7fdf474bf14b9c780b7f02dc8267e233b847430940a75fb9744a62"
+        }
+      }
+    },
+    "a backup loaded on an empty phone": {
+      "backupBytes": 115407,
+      "after": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 464,
+            "sha256": "da18dbefe7d84cb83734b16d41e913e4217160aaeab79e5aa7d1f2b60790b031",
+            "value": {
+              "w1_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788213600000,
+                "status": "complete"
+              },
+              "w1_tue": {
+                "title": "Strength Support",
+                "ts": 1788300000000,
+                "status": "complete"
+              },
+              "w1_thu": {
+                "title": "Leg Strength + Mobility",
+                "ts": 1788472800000,
+                "status": "complete"
+              },
+              "w1_fri": {
+                "title": "Recovery Lift",
+                "ts": 1788559200000,
+                "status": "skipped"
+              },
+              "w2_mon": {
+                "title": "Strength Support",
+                "ts": 1788818400000,
+                "status": "complete"
+              },
+              "w3_mon": {
+                "title": "Posterior Chain",
+                "ts": 1789600500000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "value": {}
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 2148,
+            "sha256": "6b58191b5dc0ef4fd35e4856cc01abb2893cdb12ae7a08f5db661a4017acbb4c",
+            "value": {
+              "barbell_romanian_deadlift": {
+                "name": "Barbell Romanian deadlift",
+                "entries": [
+                  {
+                    "weight": 190,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      12,
+                      12
+                    ],
+                    "setsW": [
+                      185,
+                      190
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1789600500000
+                  }
+                ]
+              },
+              "barbell_row": {
+                "name": "Barbell row",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              },
+              "barbell_bench_press": {
+                "name": "Barbell bench press",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      100,
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              },
+              "dumbbell_arnold_press": {
+                "name": "Dumbbell Arnold press",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      110,
+                      115
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  },
+                  {
+                    "weight": 135,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      130,
+                      135
+                    ],
+                    "week": 2,
+                    "day": "mon",
+                    "ts": 1788818400000
+                  }
+                ]
+              },
+              "front_squat": {
+                "name": "Front squat",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      105,
+                      110,
+                      115
+                    ],
+                    "week": 1,
+                    "day": "thu",
+                    "ts": 1788472800000
+                  }
+                ]
+              },
+              "dumbbell_bulgarian_split_squat": {
+                "name": "Dumbbell Bulgarian split squat",
+                "entries": [
+                  {
+                    "weight": 120,
+                    "setsReps": "2×8–12 each @ RPE 7",
+                    "setsDone": [
+                      8,
+                      7
+                    ],
+                    "setsW": [
+                      115,
+                      120
+                    ],
+                    "week": 1,
+                    "day": "thu",
+                    "ts": 1788472800000
+                  }
+                ]
+              },
+              "close_grip_bench_press": {
+                "name": "Close-grip bench press",
+                "entries": [
+                  {
+                    "weight": 130,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      120,
+                      125,
+                      130
+                    ],
+                    "week": 2,
+                    "day": "mon",
+                    "ts": 1788818400000
+                  }
+                ]
+              },
+              "weighted_chinups": {
+                "name": "Weighted chinups",
+                "entries": [
+                  {
+                    "weight": 135,
+                    "setsReps": "2×5–6 @ RPE 7",
+                    "setsDone": [
+                      5,
+                      4
+                    ],
+                    "setsW": [
+                      130,
+                      135
+                    ],
+                    "week": 3,
+                    "day": "mon",
+                    "ts": 1789600500000
+                  }
+                ]
+              },
+              "kettlebell_single_arm_row": {
+                "name": "Kettlebell single-arm row",
+                "entries": [
+                  {
+                    "weight": 145,
+                    "setsReps": "2×8–12 each @ RPE 7",
+                    "setsDone": [
+                      8,
+                      7
+                    ],
+                    "setsW": [
+                      140,
+                      145
+                    ],
+                    "week": 3,
+                    "day": "mon",
+                    "ts": 1789600500000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 8578,
+            "sha256": "3183e2b7be9aa39cba2be4b78596d0dbabd100336c15225431edd2a7ecd0c393"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 1217,
+            "sha256": "1cba88fae28963cead5975b40b889ede9a1b3057d8bc53e36d3b86c1b715af84",
+            "value": {
+              "w1_mon": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1789600500000
+              },
+              "w1_tue": {
+                "rpe": "7",
+                "run_dist": "3.5",
+                "run_pace": "9:09/mi",
+                "run_mins": "32",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "Felt strong 💪, slept 7 h",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788300000000
+              },
+              "w1_thu": {
+                "rpe": "8",
+                "run_dist": "",
+                "run_pace": "",
+                "run_mins": "",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788472800000
+              },
+              "w1_fri": {
+                "rpe": "",
+                "run_dist": "",
+                "run_pace": "",
+                "run_mins": "",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "Travel day",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788559200000
+              },
+              "w2_mon": {
+                "rpe": "8",
+                "run_dist": "5.5",
+                "run_pace": "8:44/mi",
+                "run_mins": "48",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 2,
+                "ts": 1788818400000
+              },
+              "w3_mon": {
+                "rpe": "7",
+                "run_dist": "6.5",
+                "run_pace": "",
+                "run_mins": "56",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 3,
+                "ts": 1789600500000
+              }
+            }
+          },
+          "ia_moves_prog_1788008400000": {
+            "bytes": 44,
+            "sha256": "047b325173332ed519cd8577725e1139435b9485202dc2a82a5970ebd24f84d4",
+            "value": {
+              "w2_wed": {
+                "from": "sat",
+                "ts": 1788962400000
+              }
+            }
+          },
+          "ia_parts_prog_1788008400000": {
+            "bytes": 21,
+            "sha256": "2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659",
+            "value": {
+              "w1_sat": {
+                "lift": 1
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 28,
+            "sha256": "93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8",
+            "value": {
+              "date": "2026-9-16",
+              "idx": 5
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 38,
+            "sha256": "6123aaef40cf5fba32dad1a54747693e8b34bc194ad3e8d3d57f3e81e0b674ce",
+            "value": {
+              "workout": 10,
+              "streak": 1,
+              "reminder": 2
+            }
+          },
+          "ia_programs": {
+            "bytes": 88252,
+            "sha256": "d7bad4107cc3a810b3aff8904aa0f5ed0aa90eb634c53d380bf59e9d6ef9c667"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 9,
+            "sha256": "2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+            "value": "2026-9-16"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 43,
+            "sha256": "1e174582fde357120de7e94eef43abc1e77717949a277235dd8db9d4e232846c",
+            "value": {
+              "w1_sat": true,
+              "w2_tue": true,
+              "w3_tue": true
+            }
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae",
+            "value": {
+              "Close-grip bench press": {
+                "to": "Barbell bench press",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 212,
+            "sha256": "05fd198d08798ea88cad09351255665181bb57f55a622c74325e17c2d0d6ec96",
+            "value": {
+              "w1_tue": [
+                {
+                  "from": "Close-grip bench press",
+                  "to": "Barbell bench press",
+                  "ts": 1788300000000,
+                  "rx": [
+                    {
+                      "s": 0,
+                      "i": 0,
+                      "d": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "ia_wild_prog_1788008400000": {
+            "bytes": 79,
+            "sha256": "39502deae788e4efaa7fcfd0ca08ca9793572acd5a9743634627828ef1aba028",
+            "value": [
+              {
+                "title": "Golden record wildcard",
+                "ts": 1788962400000,
+                "week": 2,
+                "dayKey": "wed"
+              }
+            ]
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 3,
+            "digest": "f35cc259b0b2e8f4"
+          }
+        ],
+        "live": {
+          "week": 6,
+          "digest": "63a9836f670c64a4",
+          "weeksSha256": "81325da15f7fdf474bf14b9c780b7f02dc8267e233b847430940a75fb9744a62"
+        }
+      }
+    },
+    "eight weeks unopened": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 77,
+          "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+          "value": {
+            "w1_mon": {
+              "title": "Posterior Chain",
+              "ts": 1788213600000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 448,
+          "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1788008400000": {
+          "bytes": 1025,
+          "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 197,
+          "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+          "value": {
+            "w1_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788213600000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 28,
+          "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+          "value": {
+            "date": "2026-8-31",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 14,
+          "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+          "value": {
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84235,
+          "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 9,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "ten days after the race": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 77,
+          "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+          "value": {
+            "w1_mon": {
+              "title": "Posterior Chain",
+              "ts": 1788213600000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 448,
+          "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1788008400000": {
+          "bytes": 1025,
+          "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 197,
+          "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+          "value": {
+            "w1_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788213600000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 28,
+          "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+          "value": {
+            "date": "2026-8-31",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 14,
+          "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+          "value": {
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84235,
+          "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 14,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "the week the clocks go back": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "d246df994288be21eb3b2c303e38e28a7510667a3cac7d322bb38e558aed1d60",
+          "value": "prog_1792846800000"
+        },
+        "ia_comp_prog_1792846800000": {
+          "bytes": 154,
+          "sha256": "cbc7faf5bf13817595a13284fe44e9d73756485a2eb414f14eecfd58306f5e92",
+          "value": {
+            "w9_mon": {
+              "title": "Posterior Chain",
+              "ts": 1793052000000,
+              "status": "complete"
+            },
+            "w9_tue": {
+              "title": "Strength Support",
+              "ts": 1793138400000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1792846800000": {
+          "bytes": 868,
+          "sha256": "0e7502ca51ba87a8cc3a6e7c9ecbd2d087243824fb5948f3a6ab416fbcea43ae",
+          "value": {
+            "deadlift": {
+              "name": "Deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    8,
+                    8,
+                    7
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 9,
+                  "day": "mon",
+                  "ts": 1793052000000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 9,
+                  "day": "mon",
+                  "ts": 1793052000000
+                }
+              ]
+            },
+            "incline_barbell_press": {
+              "name": "Incline barbell press",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                  "setsDone": [
+                    8,
+                    8,
+                    7
+                  ],
+                  "setsW": [
+                    100,
+                    105,
+                    110
+                  ],
+                  "week": 9,
+                  "day": "tue",
+                  "ts": 1793138400000
+                }
+              ]
+            },
+            "barbell_overhead_press": {
+              "name": "Barbell overhead press",
+              "entries": [
+                {
+                  "weight": 115,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    110,
+                    115
+                  ],
+                  "week": 9,
+                  "day": "tue",
+                  "ts": 1793138400000
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1792846800000": {
+          "bytes": 2319,
+          "sha256": "6095fba1e95f31a9b9d96a737ea6d083bc7ee1745b01e04ca829ba32dba17b52"
+        },
+        "ia_logs_prog_1792846800000": {
+          "bytes": 427,
+          "sha256": "19a57e99dfc0a91fb8fd1ea22ac6b848bd063f5765ba30dd4acbc22b15a5988c",
+          "value": {
+            "w9_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 9,
+              "ts": 1793052000000
+            },
+            "w9_tue": {
+              "rpe": "7",
+              "run_dist": "3.5",
+              "run_pace": "9:09/mi",
+              "run_mins": "32",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "Felt strong 💪, slept 7 h",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 9,
+              "ts": 1793138400000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1792846800000": {
+          "bytes": 29,
+          "sha256": "cea1c511fd34df0615f997c813d6fbadc5f92e07c93b67a5d927a63221ee9ab3",
+          "value": {
+            "date": "2026-10-27",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1792846800000": {
+          "bytes": 27,
+          "sha256": "3d9bb1e597a5af30d75c990b9a3c1e62d4b9b77fa3634df9a451c264b499124a",
+          "value": {
+            "reminder": 2,
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84235,
+          "sha256": "9d3cf76ae4c01507aa0de7d98347efbaf1bac00d9a8b2567d4c45a588b1f2aa6"
+        },
+        "ia_remind_last_prog_1792846800000": {
+          "bytes": 10,
+          "sha256": "bf044a2c29d5517b948859ab76ed6188b3229b18cca50d6f512f47e34cefa2bc",
+          "value": "2026-10-26"
+        },
+        "ia_reminded_prog_1792846800000": {
+          "bytes": 15,
+          "sha256": "f23cc6c0f51340acb7e8a206b5517ab258e051477792f4f92b62a7277e9bc867",
+          "value": {
+            "w8_sat": true
+          }
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1792846800000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "7ce87b43fa8a2699"
+        }
+      ],
+      "live": {
+        "week": 10,
+        "digest": "cabd0c8af4d894d1",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "a year end": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "e383532020d1ee01f703acd36aa14a7fdd406c4cf5ef58e195c2ece4b4afa4a1",
+          "value": "prog_1797688800000"
+        },
+        "ia_comp_prog_1797688800000": {
+          "bytes": 261,
+          "sha256": "96a147d7b501a0a48d69a29aa7d9cfc6fb539215b6e1ca7f6a0e4d2ff6b3d717",
+          "value": {
+            "w2_mon": {
+              "title": "Pull",
+              "ts": 1797894000000,
+              "status": "complete"
+            },
+            "w2_tue": {
+              "title": "Push",
+              "ts": 1797980400000,
+              "status": "complete"
+            },
+            "w3_mon": {
+              "title": "Pull",
+              "ts": 1798498800000,
+              "status": "complete"
+            },
+            "w3_tue": {
+              "title": "Push",
+              "ts": 1798585200000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1797688800000": {
+          "bytes": 1728,
+          "sha256": "339c3f211b1d5f3ef510b52dd3a2f08a04f164299d86ff60e3db1d6e9d5a349a",
+          "value": {
+            "sumo_deadlift": {
+              "name": "Sumo deadlift",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    6,
+                    6,
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105,
+                    110
+                  ],
+                  "week": 2,
+                  "day": "mon",
+                  "ts": 1797894000000
+                }
+              ]
+            },
+            "pendlay_row": {
+              "name": "Pendlay row",
+              "entries": [
+                {
+                  "weight": 115,
+                  "setsReps": "3×6–10 @ RPE 8",
+                  "setsDone": [
+                    6,
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110,
+                    115
+                  ],
+                  "week": 2,
+                  "day": "mon",
+                  "ts": 1797894000000
+                },
+                {
+                  "weight": 115,
+                  "setsReps": "3×6–10 @ RPE 8",
+                  "setsDone": [
+                    6,
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110,
+                    115
+                  ],
+                  "week": 3,
+                  "day": "mon",
+                  "ts": 1798498800000
+                }
+              ]
+            },
+            "incline_barbell_press": {
+              "name": "Incline barbell press",
+              "entries": [
+                {
+                  "weight": 115,
+                  "setsReps": "4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                  "setsDone": [
+                    6,
+                    6,
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    100,
+                    105,
+                    110,
+                    115
+                  ],
+                  "week": 2,
+                  "day": "tue",
+                  "ts": 1797980400000
+                },
+                {
+                  "weight": 115,
+                  "setsReps": "4×5 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                  "setsDone": [
+                    5,
+                    5,
+                    5,
+                    4
+                  ],
+                  "setsW": [
+                    100,
+                    105,
+                    110,
+                    115
+                  ],
+                  "week": 3,
+                  "day": "tue",
+                  "ts": 1798585200000
+                }
+              ]
+            },
+            "seated_dumbbell_shoulder_press": {
+              "name": "Seated dumbbell shoulder press",
+              "entries": [
+                {
+                  "weight": 120,
+                  "setsReps": "3×6–10 @ RPE 8",
+                  "setsDone": [
+                    6,
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    110,
+                    115,
+                    120
+                  ],
+                  "week": 2,
+                  "day": "tue",
+                  "ts": 1797980400000
+                }
+              ]
+            },
+            "trap_bar_deadlift": {
+              "name": "Trap bar deadlift",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "4×5 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    5,
+                    5,
+                    5,
+                    4
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105,
+                    110
+                  ],
+                  "week": 3,
+                  "day": "mon",
+                  "ts": 1798498800000
+                }
+              ]
+            },
+            "kettlebell_single_arm_press": {
+              "name": "Kettlebell single-arm press",
+              "entries": [
+                {
+                  "weight": 120,
+                  "setsReps": "3×6–10 each @ RPE 8",
+                  "setsDone": [
+                    6,
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    110,
+                    115,
+                    120
+                  ],
+                  "week": 3,
+                  "day": "tue",
+                  "ts": 1798585200000
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1797688800000": {
+          "bytes": 4206,
+          "sha256": "cd939256999ced7944cdb14b30c869268a4cf54e1bb738fa974bd6fd53a37100"
+        },
+        "ia_logs_prog_1797688800000": {
+          "bytes": 829,
+          "sha256": "8803dd07e9e8b9f61a33388bae33420cfc601682f702b7c646edbd97a9b3449f",
+          "value": {
+            "w2_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 2,
+              "ts": 1797894000000
+            },
+            "w2_tue": {
+              "rpe": "7",
+              "run_dist": "",
+              "run_pace": "",
+              "run_mins": "",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "Felt strong 💪, slept 7 h",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 2,
+              "ts": 1797980400000
+            },
+            "w3_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 3,
+              "ts": 1798498800000
+            },
+            "w3_tue": {
+              "rpe": "7",
+              "run_dist": "",
+              "run_pace": "",
+              "run_mins": "",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "Felt strong 💪, slept 7 h",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 3,
+              "ts": 1798585200000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1797688800000": {
+          "bytes": 29,
+          "sha256": "a343cdd2d5ebb28f3b8361520446577dde66953b3a3e967b4a1faf9d330f1586",
+          "value": {
+            "date": "2026-12-29",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1797688800000": {
+          "bytes": 38,
+          "sha256": "5a9a56b55061dca871ce230ee2196d772b0e3d6a63f14e29982d413c6965a19c",
+          "value": {
+            "reminder": 1,
+            "workout": 13,
+            "streak": 1
+          }
+        },
+        "ia_programs": {
+          "bytes": 70617,
+          "sha256": "a76b44a3066030d4d0f32ad29aeba662f092cd79b61287fe9935acb20ac06f8d"
+        },
+        "ia_remind_last_prog_1797688800000": {
+          "bytes": 10,
+          "sha256": "949581c6a7eb23bf7439c52588dc57b43bc395cd52f06c13fb814ba93863cbc1",
+          "value": "2026-12-28"
+        },
+        "ia_reminded_prog_1797688800000": {
+          "bytes": 29,
+          "sha256": "7653784e24a186215971f0770154c117357933b9667934daeabc82509f698add",
+          "value": {
+            "w1_sat": true,
+            "w2_sat": true
+          }
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1797688800000",
+          "totalWeeks": 11,
+          "startDate": "2026-12-19",
+          "overlays": 0,
+          "digest": "84f27994da63beec"
+        }
+      ],
+      "live": {
+        "week": 4,
+        "digest": "7f1ac9d0976c1036",
+        "weeksSha256": "a46adbeadd2982516af7a75cfd5ce523a196e5dde21af25c2c7a6ca87e860b79"
+      }
+    },
+    "the week the clocks go forward": {
+      "mondayReads": 2,
+      "tuesdayReads": 3,
+      "after": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "b638d5fcf5391f30525dbe110cbca5f74d1b968ac5ae74c289b6c5c9e54be0d5",
+            "value": "prog_1804341600000"
+          },
+          "ia_comp_prog_1804341600000": {
+            "bytes": 131,
+            "sha256": "adf430a34ed2d4be004a3811151d9f44cd2c88a450b355259b719d7b77537ad8",
+            "value": {
+              "w2_mon": {
+                "title": "Pull",
+                "ts": 1804546800000,
+                "status": "complete"
+              },
+              "w2_tue": {
+                "title": "Push",
+                "ts": 1804633200000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1804341600000": {
+            "bytes": 918,
+            "sha256": "4ab20a1662dcf6be3dd59deaf41ad5597018ae232327332c9a208ea4c480b133",
+            "value": {
+              "sumo_deadlift": {
+                "name": "Sumo deadlift",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      6,
+                      6,
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      95,
+                      100,
+                      105,
+                      110
+                    ],
+                    "week": 2,
+                    "day": "mon",
+                    "ts": 1804546800000
+                  }
+                ]
+              },
+              "pendlay_row": {
+                "name": "Pendlay row",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "3×6–10 @ RPE 8",
+                    "setsDone": [
+                      6,
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      105,
+                      110,
+                      115
+                    ],
+                    "week": 2,
+                    "day": "mon",
+                    "ts": 1804546800000
+                  }
+                ]
+              },
+              "incline_barbell_press": {
+                "name": "Incline barbell press",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                    "setsDone": [
+                      6,
+                      6,
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      100,
+                      105,
+                      110,
+                      115
+                    ],
+                    "week": 2,
+                    "day": "tue",
+                    "ts": 1804633200000
+                  }
+                ]
+              },
+              "seated_dumbbell_shoulder_press": {
+                "name": "Seated dumbbell shoulder press",
+                "entries": [
+                  {
+                    "weight": 120,
+                    "setsReps": "3×6–10 @ RPE 8",
+                    "setsDone": [
+                      6,
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      110,
+                      115,
+                      120
+                    ],
+                    "week": 2,
+                    "day": "tue",
+                    "ts": 1804633200000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1804341600000": {
+            "bytes": 2088,
+            "sha256": "4be328e730377e075c81a8bd7a30d95c602e84a9b3cf3e0dc8bb2cd669fdc734"
+          },
+          "ia_logs_prog_1804341600000": {
+            "bytes": 415,
+            "sha256": "7b06eb8b95edec5a2626e3e81c55fe3aab08463cbe20153026080db9b986c27e",
+            "value": {
+              "w2_mon": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 2,
+                "ts": 1804546800000
+              },
+              "w2_tue": {
+                "rpe": "7",
+                "run_dist": "",
+                "run_pace": "",
+                "run_mins": "",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "Felt strong 💪, slept 7 h",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 2,
+                "ts": 1804633200000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1804341600000": {
+            "bytes": 27,
+            "sha256": "7f070c1f8d3010713489ee962443dd1ef64aebdfcf5efb6b3e1d8a953117bb79",
+            "value": {
+              "date": "2027-3-9",
+              "idx": 2
+            }
+          },
+          "ia_pop_idx_prog_1804341600000": {
+            "bytes": 27,
+            "sha256": "3d9bb1e597a5af30d75c990b9a3c1e62d4b9b77fa3634df9a451c264b499124a",
+            "value": {
+              "reminder": 2,
+              "workout": 14
+            }
+          },
+          "ia_programs": {
+            "bytes": 70617,
+            "sha256": "68ac556314c1f5228e2cf071e461e7b60b4c9764133b4bcff56f5379d4343e6d"
+          },
+          "ia_remind_last_prog_1804341600000": {
+            "bytes": 8,
+            "sha256": "7887f7e864a61e3700a33893037df97d6ba692abcb417c81cc8800a821280ae7",
+            "value": "2027-3-8"
+          },
+          "ia_reminded_prog_1804341600000": {
+            "bytes": 15,
+            "sha256": "24654a1cb410a9192195db81be582d747d1876da744c66f0408ef1740941705c",
+            "value": {
+              "w1_sat": true
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1804341600000",
+            "totalWeeks": 11,
+            "startDate": "2027-03-06",
+            "overlays": 0,
+            "digest": "ca22d0927d42c296"
+          }
+        ],
+        "live": {
+          "week": 3,
+          "digest": "ac6d3280308163cc",
+          "weeksSha256": "a46adbeadd2982516af7a75cfd5ce523a196e5dde21af25c2c7a6ca87e860b79"
+        }
+      }
+    },
+    "a log for a day the grid does not hold": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 77,
+          "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+          "value": {
+            "w1_mon": {
+              "title": "Posterior Chain",
+              "ts": 1788213600000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 448,
+          "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1788008400000": {
+          "bytes": 1025,
+          "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 264,
+          "sha256": "3c6e386cc8fbbad52d2f61b49c8129b1ef9fb570bfe4c1a3cb752c08e058d651",
+          "value": {
+            "w1_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788213600000
+            },
+            "w40_mon": {
+              "rpe": "7",
+              "notes": "from another life",
+              "week": 40,
+              "ts": 1
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 28,
+          "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+          "value": {
+            "date": "2026-8-31",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 14,
+          "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+          "value": {
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84235,
+          "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "an old lift key": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 77,
+          "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+          "value": {
+            "w1_mon": {
+              "title": "Posterior Chain",
+              "ts": 1788213600000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 601,
+          "sha256": "409e4f70a467cab82b4d0dff0e97583561e291d944a6749bd4a815a449241feb",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_push_press": {
+              "name": "Barbell push press",
+              "entries": [
+                {
+                  "weight": 95,
+                  "setsReps": "3×5",
+                  "setsDone": [
+                    5,
+                    5,
+                    5
+                  ],
+                  "setsW": [],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 2
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1788008400000": {
+          "bytes": 1025,
+          "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 197,
+          "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+          "value": {
+            "w1_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788213600000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 28,
+          "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+          "value": {
+            "date": "2026-8-31",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 14,
+          "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+          "value": {
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84235,
+          "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "an older program": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 77,
+          "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+          "value": {
+            "w1_mon": {
+              "title": "Posterior Chain",
+              "ts": 1788213600000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 448,
+          "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1788008400000": {
+          "bytes": 1025,
+          "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 197,
+          "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+          "value": {
+            "w1_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788213600000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 28,
+          "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+          "value": {
+            "date": "2026-8-31",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 14,
+          "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+          "value": {
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84210,
+          "sha256": "fc27beb4c87f16ea717040a4ad9063623e77d89d36bc678698c1d26749277cd2"
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f66086d097119301"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "b1670448e1e91d84",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "broken JSON in two keys": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 78,
+          "sha256": "96ae74ecd15e6ee08c9a5e84a0b690845c0be8eaf29bbbb04574105b64cd9d6b",
+          "value": {
+            "w1_tue": {
+              "title": "Strength Support",
+              "ts": 1788300000000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 914,
+          "sha256": "4d39a0f3f5e8d150746c42a6300b27d8ade3581f3619f669b0c035c911e1959b",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "close_grip_bench_press": {
+              "name": "Close-grip bench press",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    100,
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "tue",
+                  "ts": 1788300000000
+                }
+              ]
+            },
+            "dumbbell_arnold_press": {
+              "name": "Dumbbell Arnold press",
+              "entries": [
+                {
+                  "weight": 115,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    110,
+                    115
+                  ],
+                  "week": 1,
+                  "day": "tue",
+                  "ts": 1788300000000
+                }
+              ]
+            }
+          }
+        },
+        "ia_hist_prog_1788008400000": {
+          "bytes": 2424,
+          "sha256": "649033ce0f7d7a88d5d76eae6437f6f8caa09f4ee5c3f89194e885535f2f81b2"
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 231,
+          "sha256": "59ad23e80fb0fb54bd5fc8e3e4741e88e0acdeff490bf595e62aba2a367cf6c8",
+          "value": {
+            "w1_tue": {
+              "rpe": "7",
+              "run_dist": "3.5",
+              "run_pace": "9:09/mi",
+              "run_mins": "32",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "Felt strong 💪, slept 7 h",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788300000000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 27,
+          "sha256": "00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+          "value": {
+            "date": "2026-9-1",
+            "idx": 0
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 27,
+          "sha256": "1da60fb02383d33f3b065934e7ab8ae1cb1835c67b7f03ef69a08e00e458b833",
+          "value": {
+            "workout": 10,
+            "reminder": 2
+          }
+        },
+        "ia_programs": {
+          "bytes": 84235,
+          "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+        },
+        "ia_remind_last_prog_1788008400000": {
+          "bytes": 8,
+          "sha256": "3a04fa37debb86eadf33a8de2d98086dfdd376c8b150863170201725f3ff4d3e",
+          "value": "2026-9-1"
+        },
+        "ia_reminded_prog_1788008400000": {
+          "bytes": 15,
+          "sha256": "270c5686a3bebfd45b08c2ab993e6e0fb7f7e23ec00d5aee65daa18c008c6985",
+          "value": {
+            "w1_mon": true
+          }
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "storage refuses the history key": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 77,
+          "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+          "value": {
+            "w1_mon": {
+              "title": "Posterior Chain",
+              "ts": 1788213600000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 448,
+          "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            }
+          }
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 197,
+          "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+          "value": {
+            "w1_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788213600000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 28,
+          "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+          "value": {
+            "date": "2026-8-31",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 14,
+          "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+          "value": {
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84235,
+          "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 0,
+          "digest": "f7aa7211be95cd8c"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "e49f775679d78cf7",
+        "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+      }
+    },
+    "two programs: archived, then deleted": {
+      "archived": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+            "value": {
+              "w1_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788213600000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_comp_prog_1788260400000": {
+            "bytes": 66,
+            "sha256": "11381d363031a067753682e6f4b043fcfed0532aa73d436951f275da5bea47c4",
+            "value": {
+              "w1_mon": {
+                "title": "Pull",
+                "ts": 1788260400000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 448,
+            "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+            "value": {
+              "barbell_romanian_deadlift": {
+                "name": "Barbell Romanian deadlift",
+                "entries": [
+                  {
+                    "weight": 105,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      95,
+                      100,
+                      105
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              },
+              "barbell_row": {
+                "name": "Barbell row",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_exw_prog_1788260400000": {
+            "bytes": 419,
+            "sha256": "0cb8c5c92b491cb0d9d44ba67736b41170ba9e379f440be8057c1776fb12ae89",
+            "value": {
+              "sumo_deadlift": {
+                "name": "Sumo deadlift",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "3×8 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      8,
+                      8,
+                      7
+                    ],
+                    "setsW": [
+                      105,
+                      110,
+                      115
+                    ],
+                    "week": 1,
+                    "day": "",
+                    "ts": 1788260400000
+                  }
+                ]
+              },
+              "pendlay_row": {
+                "name": "Pendlay row",
+                "entries": [
+                  {
+                    "weight": 125,
+                    "setsReps": "3×6–10 @ RPE 8",
+                    "setsDone": [
+                      6,
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      115,
+                      120,
+                      125
+                    ],
+                    "week": 1,
+                    "day": "",
+                    "ts": 1788260400000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 1025,
+            "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+          },
+          "ia_hist_prog_1788260400000": {
+            "bytes": 1234,
+            "sha256": "5fa345e38faa7ec146187f936f803dfddb2678e6823509108df813b5a2440b3f"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 197,
+            "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+            "value": {
+              "w1_mon": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788213600000
+              }
+            }
+          },
+          "ia_logs_prog_1788260400000": {
+            "bytes": 197,
+            "sha256": "b46bb367a163818340fc7b1b0aea8dc500a44b24702aa0e19c88d35b30898732",
+            "value": {
+              "w1_mon": {
+                "rpe": "8",
+                "run_dist": "4.0",
+                "run_pace": "",
+                "run_mins": "36",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788260400000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 28,
+            "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+            "value": {
+              "date": "2026-8-31",
+              "idx": 2
+            }
+          },
+          "ia_pop_dismiss_prog_1788260400000": {
+            "bytes": 27,
+            "sha256": "c6eed7884d54de3a0ed898056601c5c526e9b9a66cfe878527760d55e89e4c2f",
+            "value": {
+              "date": "2026-9-1",
+              "idx": 2
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 14,
+            "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+            "value": {
+              "workout": 14
+            }
+          },
+          "ia_pop_idx_prog_1788260400000": {
+            "bytes": 14,
+            "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+            "value": {
+              "workout": 14
+            }
+          },
+          "ia_programs": {
+            "bytes": 154894,
+            "sha256": "ae9255c362c584cbb6d330f80495f70400f0981115340e61bb692eb8d0ba8c22"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          },
+          {
+            "id": "prog_1788260400000",
+            "totalWeeks": 11,
+            "startDate": "2026-09-01",
+            "overlays": 0,
+            "digest": "b6cac0f3dacd83e2"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "deleted": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+            "value": {
+              "w1_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788213600000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 448,
+            "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+            "value": {
+              "barbell_romanian_deadlift": {
+                "name": "Barbell Romanian deadlift",
+                "entries": [
+                  {
+                    "weight": 105,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      95,
+                      100,
+                      105
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              },
+              "barbell_row": {
+                "name": "Barbell row",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 1025,
+            "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 197,
+            "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+            "value": {
+              "w1_mon": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788213600000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 28,
+            "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+            "value": {
+              "date": "2026-8-31",
+              "idx": 2
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 14,
+            "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+            "value": {
+              "workout": 14
+            }
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      }
+    },
+    "a logged day with no history, then an injury": {
+      "keys": {
+        "ia_active": {
+          "bytes": 18,
+          "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "value": "prog_1788008400000"
+        },
+        "ia_comp_prog_1788008400000": {
+          "bytes": 77,
+          "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+          "value": {
+            "w1_mon": {
+              "title": "Posterior Chain",
+              "ts": 1788213600000,
+              "status": "complete"
+            }
+          }
+        },
+        "ia_exw_prog_1788008400000": {
+          "bytes": 448,
+          "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+          "value": {
+            "barbell_romanian_deadlift": {
+              "name": "Barbell Romanian deadlift",
+              "entries": [
+                {
+                  "weight": 105,
+                  "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                  "setsDone": [
+                    12,
+                    12,
+                    11
+                  ],
+                  "setsW": [
+                    95,
+                    100,
+                    105
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            },
+            "barbell_row": {
+              "name": "Barbell row",
+              "entries": [
+                {
+                  "weight": 110,
+                  "setsReps": "2×6–10 @ RPE 7",
+                  "setsDone": [
+                    6,
+                    5
+                  ],
+                  "setsW": [
+                    105,
+                    110
+                  ],
+                  "week": 1,
+                  "day": "mon",
+                  "ts": 1788213600000
+                }
+              ]
+            }
+          }
+        },
+        "ia_logs_prog_1788008400000": {
+          "bytes": 197,
+          "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+          "value": {
+            "w1_mon": {
+              "rpe": "6",
+              "run_dist": "3.0",
+              "run_pace": "",
+              "run_mins": "28",
+              "run_reps": "",
+              "run_rep_time": "",
+              "bike_mins": "",
+              "swim_yards": "",
+              "notes": "",
+              "swapFrom": "",
+              "swapTo": "",
+              "week": 1,
+              "ts": 1788213600000
+            }
+          }
+        },
+        "ia_pop_dismiss_prog_1788008400000": {
+          "bytes": 28,
+          "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+          "value": {
+            "date": "2026-8-31",
+            "idx": 2
+          }
+        },
+        "ia_pop_idx_prog_1788008400000": {
+          "bytes": 14,
+          "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+          "value": {
+            "workout": 14
+          }
+        },
+        "ia_programs": {
+          "bytes": 84414,
+          "sha256": "5d150bace183344a1a2114008e073be356e724f591e251a09b53d21c00a5461e"
+        }
+      },
+      "programs": [
+        {
+          "id": "prog_1788008400000",
+          "totalWeeks": 14,
+          "startDate": "2026-08-31",
+          "overlays": 1,
+          "digest": "5fbf4948d36207c6"
+        }
+      ],
+      "live": {
+        "week": 1,
+        "digest": "435cd291c6928c91",
+        "weeksSha256": "2b78ec16d2762009986ca68ac793efe23bfd1469d848f4b57c3cdc060f5aa83f"
+      }
+    }
+  }
+}

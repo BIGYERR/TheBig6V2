@@ -6,9 +6,9 @@ Written by `tests/measure/rn-migration_inventory.mjs`. Static counts over the wo
 
 | Area | Files | Lines | Size | In the move |
 |---|---|---|---|---|
-| The engine (`core/src/engine`) | 18 | 8784 | 661 KB | stays, unchanged |
+| The engine (`core/src/engine`) | 20 | 8965 | 671 KB | stays, unchanged |
 | The rest of core (`core/src`: domain, format, gps, semver, version) | 14 | 1438 | 58 KB | stays |
-| The legacy script (`frontends/app/src/legacy/src/js`) | 25 | 10423 | 696 KB | its logic lifts into core (phase 1); its screens are rewritten |
+| The legacy script (`frontends/app/src/legacy/src/js`) | 25 | 10332 | 691 KB | its logic lifts into core (phase 1); its screens are rewritten |
 | The legacy CSS (`.../legacy/src/css`) | 10 | 1115 | 105 KB | becomes React Native styles; the Track tokens carry over |
 | The legacy HTML (`.../legacy/src/html`) | 5 | 382 | 22 KB | rewritten as components |
 | The Angular app (`frontends/app/src/app`), TypeScript | 87 | 11759 | 583 KB | screens rewritten; pure models reused |
@@ -54,21 +54,13 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 
 | Where | getItem | setItem | removeItem | Other | Total |
 |---|---|---|---|---|---|
-| legacy script | 29 | 22 | 6 | 2 | 59 |
+| legacy script | 0 | 0 | 0 | 0 | 0 |
 | engine | 0 | 0 | 0 | 0 | 0 |
 | core (other) | 0 | 0 | 0 | 0 | 0 |
 | Angular app | 0 | 0 | 0 | 0 | 0 |
 
 | File | getItem | setItem | removeItem | Other |
 |---|---|---|---|---|
-| legacy/src/js/storage.ts | 10 | 8 | 0 | 0 |
-| legacy/src/js/popups-streaks-reminders.ts | 5 | 6 | 1 | 0 |
-| legacy/src/js/data-backup.ts | 2 | 2 | 2 | 2 |
-| legacy/src/js/program-manage.ts | 6 | 0 | 2 | 0 |
-| legacy/src/js/swaps-edits.ts | 3 | 3 | 0 | 0 |
-| legacy/src/js/theme.ts | 1 | 1 | 1 | 0 |
-| legacy/src/js/log-entries.ts | 1 | 1 | 0 | 0 |
-| legacy/src/js/rest-day-shell.ts | 1 | 1 | 0 | 0 |
 
 **The `ia_` key families: 17** (every string literal that starts `ia_`, with the files that name it). A trailing underscore is a per-program or per-item key.
 
@@ -77,7 +69,7 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 | `ia_active` | program-manage.ts, storage.ts |
 | `ia_comp_` | program-manage.ts, storage.ts |
 | `ia_edits_` | program-manage.ts, swaps-edits.ts |
-| `ia_exw_` | log-entries.ts, program-manage.ts, storage.ts |
+| `ia_exw_` | program-manage.ts, state-lift-log.ts |
 | `ia_hist_` | program-manage.ts, storage.ts |
 | `ia_logs_` | program-manage.ts, storage.ts |
 | `ia_moves_` | program-manage.ts, rest-day-shell.ts |
@@ -98,24 +90,24 @@ Direct `localStorage` calls (comments stripped). "Other" is `key`, `clear`, `len
 
 | Suite | Runner | Files | Tests | Assertions | Lines |
 |---|---|---|---|---|---|
-| tests/unit | Vitest | 23 | 262 | 786 | 3575 |
-| tests/integration | Vitest | 63 | 1084 | 3789 | 18180 |
-| tests/sweeps | Vitest (CI only) | 29 | 208 | 709 | 3191 |
+| tests/unit | Vitest | 24 | 280 | 840 | 3777 |
+| tests/integration | Vitest | 64 | 1098 | 3830 | 18410 |
+| tests/sweeps | Vitest (CI only) | 31 | 214 | 733 | 3371 |
 | tests/e2e | Docker, Puppeteer | 9 | 0 | 0 | 3248 |
 | frontends/app/test/unit | node:test | 41 | 323 | 980 | 4009 |
 | frontends/app/test/integration | node:test | 8 | 58 | 149 | 988 |
 | backend/test | node:test | 11 | 86 | 312 | 1401 |
-| **Total, without the e2e** |  | **175** | **2021** | **6725** |  |
+| **Total, without the e2e** |  | **179** | **2059** | **6844** |  |
 
-Golden files: **16** in `tests/snapshots/` (527 KB).
+Golden files: **21** in `tests/snapshots/` (777 KB).
 
 **What happens to them** (a first pass by rule, from what each file drives; the ledger has every file, and each row is confirmed by hand in the phase that touches it):
 
 | Plan | What it means | Files | Tests | Assertions |
 |---|---|---|---|---|
 | REPLACE | a React Native screen test takes its place; logic assertions move with the logic | 61 | 878 | 3044 |
+| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 47 | 561 | 1796 |
 | KEEP | stays as it is (engine and core tests, pure models, the server, repo tools) | 62 | 513 | 1714 |
-| RE-POINT | same assertions, the program built by `@ia/core` with no page booted | 43 | 523 | 1677 |
 | RETIRE | what it tests is gone at cutover (the web view, a stylesheet, Cordova tooling) | 9 | 107 | 290 |
 
 ## 5. Dates, locale and other engine-dependent calls
@@ -124,11 +116,11 @@ Calls whose result can differ between JavaScript engines or device settings (V8 
 
 | Call | legacy script | engine | core (other) | Angular app |
 |---|---|---|---|---|
-| `new Date("…")` or `new Date(x)` with one argument (parses a string or a number) | 18 | 3 | 1 | 4 |
+| `new Date("…")` or `new Date(x)` with one argument (parses a string or a number) | 17 | 4 | 1 | 4 |
 | `new Date(y, m, d…)` (local time, safe) | 0 | 0 | 0 | 0 |
 | `new Date()` (the clock) | 33 | 2 | 0 | 5 |
 | `Date.parse(` | 0 | 0 | 0 | 0 |
-| `Date.now(` | 33 | 3 | 0 | 7 |
+| `Date.now(` | 32 | 3 | 0 | 7 |
 | `toISOString(` | 3 | 0 | 1 | 1 |
 | `toLocaleDateString(` / `toLocaleTimeString(` / `toLocaleString(` | 9 | 0 | 0 | 5 |
 | `Intl.` | 0 | 0 | 0 | 0 |
@@ -137,12 +129,12 @@ Calls whose result can differ between JavaScript engines or device settings (V8 
 | `toLocaleLowerCase(` / `toLocaleUpperCase(` | 0 | 0 | 0 | 0 |
 | `getTimezoneOffset(` | 0 | 0 | 0 | 0 |
 | `.sort()` with no comparator | 2 | 0 | 0 | 0 |
-| `.sort(` with a comparator | 25 | 14 | 0 | 6 |
+| `.sort(` with a comparator | 23 | 16 | 0 | 6 |
 | `toFixed(` | 117 | 18 | 1 | 96 |
 | `Math.random(` | 13 | 0 | 0 | 0 |
 | `parseFloat(` / `parseInt(` / `Number(` | 31 | 35 | 1 | 14 |
 | `structuredClone(` | 0 | 0 | 0 | 0 |
-| `JSON.stringify(` | 23 | 1 | 8 | 1 |
+| `JSON.stringify(` | 21 | 2 | 8 | 1 |
 | Regex lookbehind `(?<=` or `(?<!` | 0 | 0 | 0 | 1 |
 | `normalize(` (Unicode) | 0 | 0 | 0 | 0 |
 
@@ -158,6 +150,7 @@ Every single-argument `new Date(…)`, `Date.parse(`, `toLocale…String(` and `
 | engine | calendar.ts | 2 | `new Date(parseInt(parts[0])`, `new Date(parseInt(p[0])` |
 | engine | core-legs.ts | 1 | `.localeCompare(` |
 | engine | nrc-race-bike-swim.ts | 1 | `new Date(raceMon)` |
+| engine | state-lift-log.ts | 1 | `new Date(e.ts)` |
 | legacy script | wizard.ts | 8 | `new Date(mon)` ×3, `.toLocaleDateString('en-US',{month:'short',day:'numeric'})` ×2, `new Date(m)` ×2, `.toLocaleDateString('en-US', withYear ? {weekday:'short',mon` |
 | legacy script | overlays.ts | 5 | `new Date(iso+'T00:00:00')` ×2, `new Date(mon.getTime()`, `.toLocaleDateString('en-US',{weekday:'short',month:'short',d`, `.toLocaleDateString('en-US',{month:'short',day:'numeric'})` |
 | legacy script | week-view-sections.ts | 4 | `new Date(mon)`, `new Date(activeProg.startDate+'T00:00:00')`, `.toLocaleDateString('en-US',{month:'short',day:'numeric',yea`, `new Date(weekMon)` |
@@ -166,7 +159,6 @@ Every single-argument `new Date(…)`, `Date.parse(`, `toLocale…String(` and `
 | legacy script | popups-streaks-reminders.ts | 2 | `new Date(now)`, `new Date(weekMon)` |
 | legacy script | rest-day-shell.ts | 2 | `new Date(mon)` ×2 |
 | legacy script | lift-ledger-progress-screen.ts | 1 | `.toLocaleString()` |
-| legacy script | log-entries.ts | 1 | `new Date(e.ts)` |
 | legacy script | random-wildcard.ts | 1 | `new Date(now\|\|new Date()` |
 | legacy script | set-logging.ts | 1 | `.toLocaleString()` |
 

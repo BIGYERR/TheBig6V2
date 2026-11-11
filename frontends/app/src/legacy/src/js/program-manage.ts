@@ -1,14 +1,14 @@
-import { getActiveProgId, getPrograms, savePrograms, setActiveProgId } from './storage.ts';
+import { getActiveProgId, getPrograms, iaStore, savePrograms, setActiveProgId } from './storage.ts';
 import {
   _setActiveProg, _setActiveProgId, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey, _setCurrentWeek,
   _setEditProgId, _setProgressViewId, activeProg, activeProgId, applyRestDayMoves, progressViewId, showScreen,
   showToast,
 } from './rest-day-shell.ts';
+import { entryDay } from '../../../../../../core/src/engine/state-lift-log.ts';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.ts';
 import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { calcCurrentWeek, renderWeekView } from './week-view-sections.ts';
-import { entryDay } from './log-entries.ts';
 import { progTestPin, renderProgList } from './programs.ts';
 import { _isoToday, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.ts';
 import { renderProgressScreen } from './lift-ledger-progress-screen.ts';
@@ -134,11 +134,11 @@ function refreshProgram(prog: any){
         // matches it) but can never equal a real _dk(w,d) key, so it moves the frontier
         // without ever falsely freezing a named day.
         const _touched: Record<string, any> = {};
-        try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_comp_'+prog.id)||'{}')); }catch(e){}
-        try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_logs_'+prog.id)||'{}')); }catch(e){}
-        try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_touched, JSON.parse(iaStore.get('ia_comp_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_touched, JSON.parse(iaStore.get('ia_logs_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_touched, JSON.parse(iaStore.get('ia_hist_'+prog.id)||'{}')); }catch(e){}
         try{
-          const _exw = JSON.parse(localStorage.getItem('ia_exw_'+prog.id)||'{}');
+          const _exw = JSON.parse(iaStore.get('ia_exw_'+prog.id)||'{}');
           Object.keys(_exw).forEach(_slug=>{
             const _ents = (_exw[_slug] && _exw[_slug].entries) || [];
             // @ts-expect-error TS7006 Parameter '_e' implicitly has an 'any' type.
@@ -206,7 +206,7 @@ function refreshProgram(prog: any){
         // record; prog.weeks is only the fallback for days touched before snapshots
         // shipped, and (below the pierce boundary) for untouched days in past weeks.
         const _hist: Record<string, any> = {};
-        try{ Object.assign(_hist, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_hist, JSON.parse(iaStore.get('ia_hist_'+prog.id)||'{}')); }catch(e){}
         const _dk = (w: any,d: any) => 'w'+w+'_'+d;
         for(let w=1; w<_cut; w++){
           if(!prog.weeks[w]) continue;
@@ -263,7 +263,7 @@ function refreshProgram(prog: any){
     // applyRestDayMoves is idempotent, so a frozen week that already has the move baked
     // in is left alone rather than double-applied.
     try{
-      const _mv=JSON.parse(localStorage.getItem('ia_moves_'+prog.id)||'{}');
+      const _mv=JSON.parse(iaStore.get('ia_moves_'+prog.id)||'{}');
       if(_mv&&Object.keys(_mv).length) applyRestDayMoves(rebuilt,_mv);
     }catch(e){}
     // Session swaps re-apply alongside the rest-day moves, for the same reason: they
@@ -303,7 +303,7 @@ function refreshProgram(prog: any){
 // no day). It is checked before the lookup, so the archived and unknown refusals cannot fire
 // on it. beforeRefresh, when given, runs once the globals name the new id and before
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
-function loadActiveProgram(id: any,beforeRefresh?: any){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
+function loadActiveProgram(id: any,beforeRefresh?: any){if(id===null){iaStore.remove('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
 // v0.240.1 (D238): a switch marks the new program's past unmarked days as asked (markPastAsked).
 function setActive(id: any){if(!loadActiveProgram(id))return;markPastAsked();renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
@@ -325,7 +325,7 @@ function commitRename(id: any){
   _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
-function purgeProgData(id: any){['ia_logs_','ia_comp_','ia_parts_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
+function purgeProgData(id: any){['ia_logs_','ia_comp_','ia_parts_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>iaStore.remove(p+id));}
 // ── V156: ARCHIVE vs DELETE (D1b ruling) ──────────────────────────────────
 // Archive = the program leaves the home list but every store survives; its history
 // stays viewable under Progress and feeds the wizard seed. purgeProgData fires ONLY

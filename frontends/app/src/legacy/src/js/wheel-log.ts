@@ -1,12 +1,13 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getLogs, logKey } from './storage.ts';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
+import { entryDay } from '../../../../../../core/src/engine/state-lift-log.ts';
 import { tagMeta } from './week-view-sections.ts';
 import { exLoggable } from './set-logging.ts';
 import {
   CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogSub, _doseStripHTML, _setCurLogDose, _setCurLogDoseFull, _setCurLogSub,
-  cardioSwapNoteText, doseFromCardio, entryDay, getExWeights,
+  cardioSwapNoteText, doseFromCardio, getExWeights,
 } from './log-entries.ts';
 import { cardioEntryLive, cardioLogLabel } from './day-status.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

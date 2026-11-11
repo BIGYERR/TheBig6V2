@@ -1,0 +1,646 @@
+{
+  "zone": "America/New_York",
+  "created": "2026-08-29T09:00:00",
+  "programs": {
+    "half-manny (Mario, NRC half, crossfit)": {
+      "0 generated": {
+        "keys": 2,
+        "all": "cbf09e215cfa6e1e011d0858c301576246dc625b84e9792834c292e362d820c1",
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "2b40b6573a753f1b8a7239b6a15e015fc0c37523a67d2794893f5c39d5201eef",
+        "live": {
+          "week": 1,
+          "digest": "0945d580ce929700",
+          "weeksSha256": "c2e836f5fc0ca2fba1854b75225c599528b815e15d7dc0c904975d181fb8d8a6"
+        }
+      },
+      "2 second week": {
+        "keys": 16,
+        "all": "053698589e47ce84237cc67fcb1c3fb552176b7e5586ea606972a0d3fc68f428",
+        "live": {
+          "week": 2,
+          "digest": "d0e99bbc587a173d",
+          "weeksSha256": "69a9206631c04b2b5e8d4ded1f1f4ab48ed4f74445e19ea589cfc02bc9865a16"
+        }
+      },
+      "3 third week": {
+        "keys": 16,
+        "all": "dbeffe1399f6bbbe0b338092e156d2268817d8514d89055cb35c5c9f9bdbc922",
+        "live": {
+          "week": 3,
+          "digest": "5ff5f6ed3dd73958",
+          "weeksSha256": "966e42d7b77b118a54001a68e69376598b24072c7ecf4abf2aae622b990c4a23"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 16,
+        "all": "dbeffe1399f6bbbe0b338092e156d2268817d8514d89055cb35c5c9f9bdbc922",
+        "live": {
+          "week": 6,
+          "digest": "63a9836f670c64a4",
+          "weeksSha256": "81325da15f7fdf474bf14b9c780b7f02dc8267e233b847430940a75fb9744a62"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "464 da18dbefe7d84cb83734b16d41e913e4217160aaeab79e5aa7d1f2b60790b031",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2148 6b58191b5dc0ef4fd35e4856cc01abb2893cdb12ae7a08f5db661a4017acbb4c",
+          "ia_hist_prog_1788008400000": "8578 3183e2b7be9aa39cba2be4b78596d0dbabd100336c15225431edd2a7ecd0c393",
+          "ia_logs_prog_1788008400000": "1217 1cba88fae28963cead5975b40b889ede9a1b3057d8bc53e36d3b86c1b715af84",
+          "ia_moves_prog_1788008400000": "44 047b325173332ed519cd8577725e1139435b9485202dc2a82a5970ebd24f84d4",
+          "ia_parts_prog_1788008400000": "21 2d78c82620c60c6beb61ac291c6d5dfc3c72b8ee57f7d3c67c062a5c8fe05659",
+          "ia_pop_dismiss_prog_1788008400000": "28 93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8",
+          "ia_pop_idx_prog_1788008400000": "38 6123aaef40cf5fba32dad1a54747693e8b34bc194ad3e8d3d57f3e81e0b674ce",
+          "ia_programs": "88252 d7bad4107cc3a810b3aff8904aa0f5ed0aa90eb634c53d380bf59e9d6ef9c667",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "43 1e174582fde357120de7e94eef43abc1e77717949a277235dd8db9d4e232846c",
+          "ia_swapct_prog_1788008400000": "77 77b22508728049a70fc1112c988daf52dbeca31ad00470bff923999bc73809ae",
+          "ia_swaps_prog_1788008400000": "212 05fd198d08798ea88cad09351255665181bb57f55a622c74325e17c2d0d6ec96",
+          "ia_wild_prog_1788008400000": "79 39502deae788e4efaa7fcfd0ca08ca9793572acd5a9743634627828ef1aba028"
+        }
+      }
+    },
+    "5k race, commercial, strength, beginner": {
+      "0 generated": {
+        "keys": 2,
+        "all": "d7706c3c4212012e95bc25761647f409edd569939872e07e17adb32dae3e44bb",
+        "live": {
+          "week": 1,
+          "digest": "82979a6687917480",
+          "weeksSha256": "c1d90421b8436762b333bf9fce953c03436625efbdd8869221a8a33b008c1290"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "4f1fe140fc41482116596acc3a7c4e83b5e368ff173465939e714e87f19f9d15",
+        "live": {
+          "week": 1,
+          "digest": "2e698e1a6fbabbeb",
+          "weeksSha256": "400bb1cc06278d16543f0b5e26f17f8fbcd4340b67cb1bf34d6ceb8b18af9dc0"
+        }
+      },
+      "2 second week": {
+        "keys": 15,
+        "all": "ed73a11c8dbd4c03b4f5e4b597091708fe777cb6cc172793fb3411e588b417a1",
+        "live": {
+          "week": 2,
+          "digest": "625ee8b85b683a1d",
+          "weeksSha256": "ab5d7055a8ee45000693958ec8f62c035db5b3f4aeadef4e34bfcefc13c3f42f"
+        }
+      },
+      "3 third week": {
+        "keys": 15,
+        "all": "7c34fe108738f79226316bd5aade78a4b6be0cd8e5eeb2264a19226f13d0cd3a",
+        "live": {
+          "week": 3,
+          "digest": "5b37d9e63559cbc5",
+          "weeksSha256": "a1a70846db5fe57f80524c3c8e92b64ee920becaf0bbf5f5cd9b9e8ed70a2026"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 15,
+        "all": "7c34fe108738f79226316bd5aade78a4b6be0cd8e5eeb2264a19226f13d0cd3a",
+        "live": {
+          "week": 6,
+          "digest": "9d9c63ee071b14d7",
+          "weeksSha256": "f73314767755a1ee4a95861c08c5a412d14071e63907497d748b7fed58ff32ac"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "405 57968c727523dd42b0252aecca59794e988bf42d4f4fe6ca6f4164f354751d05",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2001 5ccd6ca3101d3c18a3dcac21f3e9efe50948357057ec198a369ce24799f6a3bd",
+          "ia_hist_prog_1788008400000": "8618 be8c2b7e298178ee14afe3cb9985642e2331e3f2537facd8b1a941af365c9e31",
+          "ia_logs_prog_1788008400000": "1217 127bf905e5bad7bc7b6184b5e27061005b252867b2302eeaff803cc4bfe03051",
+          "ia_parts_prog_1788008400000": "21 cc277f12a26a968002ea476493ab8248ff37ae05b161527f89212a950194f16c",
+          "ia_pop_dismiss_prog_1788008400000": "28 42ccee56524244c6e2eb185261908fbaf447ce696a69454c2fe1f044b1c6b966",
+          "ia_pop_idx_prog_1788008400000": "38 5d2f0d8803e9d4e472b28f42aab3113a5616a5e513f2ca69236c31a0809c9569",
+          "ia_programs": "57226 3a104eb426fab5a34a870a2aa8b9572173e98a7f5d4ded76a6105388007ba881",
+          "ia_remind_last_prog_1788008400000": "9 caeccb8e10a95030195f4bf2ccd603bae4af505f092617a7b95079d8fac8dba2",
+          "ia_reminded_prog_1788008400000": "29 c6eb94847786d72ac9c9b476e0833eca0a1d3c84e15f30768ad4115a1e1a46c7",
+          "ia_swapct_prog_1788008400000": "88 3de620e5e79a71bd7b80bd59561577131a8bad9ff3384ee6b7e377b4bcd870f6",
+          "ia_swaps_prog_1788008400000": "157 a626e516aedc41c3962981b2cd81630c378a7de444f6a7b4ad868de8966d7603",
+          "ia_wild_prog_1788008400000": "79 b494c4efedc1f57e6c7def04f3c1c5171afe17b6a7e924e4153265b73fbf16ac"
+        }
+      }
+    },
+    "10k race, home basic, hypertrophy, advanced": {
+      "0 generated": {
+        "keys": 2,
+        "all": "81176f1456492e0f7b571594ecc685902a10f3c9279c445c3567945130ad3713",
+        "live": {
+          "week": 1,
+          "digest": "068a31c094bff5c6",
+          "weeksSha256": "6b5abf3cc7d655c129f9cc42d9c045059c4f3c353f0f7197686787fe99bd7c7b"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "fad7c0caf2cebc9253d74644f81eaa07a31a8f251da12543f72feb5e7a20c5e4",
+        "live": {
+          "week": 1,
+          "digest": "86e6aafd2f0385a4",
+          "weeksSha256": "0c1cfdf104710128500e3c86bc4967ddfaed5ab20e0ef99c382fb74cee324e59"
+        }
+      },
+      "2 second week": {
+        "keys": 15,
+        "all": "32e99ec8a8bc330e4ee77a72caf7e2b30d743ce31c7d6d77686da378a5f8919b",
+        "live": {
+          "week": 2,
+          "digest": "aceb4c4b8adaf91d",
+          "weeksSha256": "8912d965c0e7919338ccc070ff03dd91878428f09ad0df1d4a9887686c79a2a1"
+        }
+      },
+      "3 third week": {
+        "keys": 15,
+        "all": "981cd1662495a6f0d25f610a64ed68d49334e1322c915223d5179b288c7be21e",
+        "live": {
+          "week": 3,
+          "digest": "bd6fa39783f0b683",
+          "weeksSha256": "f93d739408a3d06170bde3f7a9367a3d37e9a62c74e2cfea549cb768defd9d24"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 15,
+        "all": "981cd1662495a6f0d25f610a64ed68d49334e1322c915223d5179b288c7be21e",
+        "live": {
+          "week": 6,
+          "digest": "0d4095349dcd2c5a",
+          "weeksSha256": "0519523bdc425f91d6b9457e70b97b840c78e7bdbff6d791447b33b23e4db676"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "398 e0f515556bc9a9a15690528610df946d7bdb7cf6eacb61452be298943fd892b7",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2072 bdcf769d7e0b58283dc099ccb59bfbf4bbec459a37d527ed0de01eee41cded19",
+          "ia_hist_prog_1788008400000": "9335 8c60c8338e0e5e1acccd3459fcc2d64d7cf82e8a05bdea9f7fc4270ba906fda6",
+          "ia_logs_prog_1788008400000": "1210 8350b6c554b5244e7104e30622cca53689caece27873948366605767b060c660",
+          "ia_parts_prog_1788008400000": "21 cc277f12a26a968002ea476493ab8248ff37ae05b161527f89212a950194f16c",
+          "ia_pop_dismiss_prog_1788008400000": "29 e1b04affb0457dfc4519e636b01c76c65eaf90a4cec22ccb48403c180a5be570",
+          "ia_pop_idx_prog_1788008400000": "37 4053e1f038c83b34d6a763a7ef97cb450e1aae2321e9be58a1911000e6c70a21",
+          "ia_programs": "49898 0c19d44ebcd31eed19db143f1204ddc256e0e6e4e51ca052ea545874371ddd8c",
+          "ia_remind_last_prog_1788008400000": "10 cb377837061e51a8a2c5bbf5a4df59256f6901ca120dad7e718c0d23ea5f70cc",
+          "ia_reminded_prog_1788008400000": "29 79d4e387a1bf648cb3cdfbbbbf551ee9835ff70451f2b635697283e9186a9464",
+          "ia_swapct_prog_1788008400000": "79 ab603d51d647f73677bdd8b9bd5fa0ed7101a2a5d7b543071ec7d6785c62deb9",
+          "ia_swaps_prog_1788008400000": "139 25d3a0d197fbccbc6b87021e1093b49dc18914ae890279d172b2ea95ff21d5bc",
+          "ia_wild_prog_1788008400000": "79 dae0e085b2450e8446fce55f0d9653522ba52dd73fea7ed697eca02db2075aa1"
+        }
+      }
+    },
+    "marathon, crossfit, athletic support, 36-45": {
+      "0 generated": {
+        "keys": 2,
+        "all": "b21b484b02cfe777c39744f576a20937b144bd2ffa08c27332434c28fa244688",
+        "live": {
+          "week": 1,
+          "digest": "f59c81e7df36a63f",
+          "weeksSha256": "ad645395cf19bb9af9d13f14f48c2a7f051f875daa7cdba2bcc36fcd1777a9f5"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "2e0a0174b0aabc963c2977cad2930a79f3f3b24dc3198fa59971e445bac4863b",
+        "live": {
+          "week": 1,
+          "digest": "e99d81149926cd79",
+          "weeksSha256": "867daf8930d368cbd7cae2bdabd0fa9c51931c32231330e71fce422f83488b60"
+        }
+      },
+      "2 second week": {
+        "keys": 16,
+        "all": "33e6df9792709b20b28cdf8a31a551eb77bca8566c40f3bb78207814cca16ad6",
+        "live": {
+          "week": 2,
+          "digest": "b309c3f6a59b6fe8",
+          "weeksSha256": "aebc99e9966cf2ef3d23389057b21c4e357f9bff2fa5631aba5d82b0fe4663df"
+        }
+      },
+      "3 third week": {
+        "keys": 16,
+        "all": "2cb772a43c4bf49f89ee7c1d54bca449fe7f97483db1b1ee679ff71319412564",
+        "live": {
+          "week": 3,
+          "digest": "91ded0a48a3c3b64",
+          "weeksSha256": "d987f04639ef7e3e36db4d96cb3437f00d64897a18c7f6c9de52492f075b1ce1"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 16,
+        "all": "2cb772a43c4bf49f89ee7c1d54bca449fe7f97483db1b1ee679ff71319412564",
+        "live": {
+          "week": 6,
+          "digest": "4d117d7523b2a036",
+          "weeksSha256": "eef99e402b037f896bafe4f502463cb14ae0d2b5e2690f9717b7d3d2ab441b04"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "403 feea3074a8c01120aacfa82d2053257930357e6152d0400e656c099246042d65",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2078 b5821b34f997635f261240979fe0c7507f0316b06e9b58fa15873071af513a4a",
+          "ia_hist_prog_1788008400000": "7707 bddb4f9e2bfe90766e812f088e48edf3f1fe30ab4bdd4601fa315da14473173e",
+          "ia_logs_prog_1788008400000": "1229 307fd4261ba093928431d9e75a4a87ced87df8df6d5ef5b0e4c5fadbb164456a",
+          "ia_moves_prog_1788008400000": "44 4b1145559e8782ad55a401a10afad87a7459563b369ad248a417e64fb21eac35",
+          "ia_parts_prog_1788008400000": "21 91772fc196e973c4d1341327f47d20d94a1c6b9d4e7b7db31def63c165a47752",
+          "ia_pop_dismiss_prog_1788008400000": "29 aff68525c0084c0421fd434d68d8e797be8f59b50ee26ee2c5004ff1ffa65ade",
+          "ia_pop_idx_prog_1788008400000": "38 3e4c299b3fcf6cc72196fae3d23bdbdfa4d9d9a25178e95b706d53e71f0ffcb2",
+          "ia_programs": "108391 ca3327b7151fbffa8e2b39add6fcc58f204bc0208eb5401a089faedbe717f5bd",
+          "ia_remind_last_prog_1788008400000": "10 4e9c38edd9fe3c0bdf16b4dad77c1241b1d98163621b9ba96a81c39308d39a58",
+          "ia_reminded_prog_1788008400000": "29 19e5653a9dd9fd5c2f951dec48487ab612384e10715f08b0473878b631ea7530",
+          "ia_swapct_prog_1788008400000": "78 bea003b670ee4357cdef53abc970ae2dd7b9e577db9a842ec11a227fd0517c26",
+          "ia_swaps_prog_1788008400000": "161 9c70b8f681fd1938a3c56a4efe13d4b46af9b528b0aea448a8a82a025e35cfaa",
+          "ia_wild_prog_1788008400000": "79 c1c74d53c5ee75bfe074bfa1b5a49b94253a6063dfcb0516101da9e35ecb1789"
+        }
+      }
+    },
+    "1.5 mile test goal, minimal, fat loss, beginner": {
+      "0 generated": {
+        "keys": 2,
+        "all": "dcc26a353230ce1d4087d34d9fd9543815ab5efd6bef49e64af35886ba42d4ac",
+        "live": {
+          "week": 1,
+          "digest": "f5cbda2e790d28f7",
+          "weeksSha256": "d32cf7b86cb0d5e1dea53faca5716c96997906b2c378fd14349ba0365fbc8aac"
+        }
+      },
+      "1 first week": {
+        "keys": 14,
+        "all": "5449b84bc9a9c09b3260f86d8eecc42a014a7d8a3bf7ced8e38cf8721b8d4527",
+        "live": {
+          "week": 2,
+          "digest": "680c4f1755477b47",
+          "weeksSha256": "433535832521ac2438f247714122b83321690fa1fcdd82569aa5a0d6101a542b"
+        }
+      },
+      "2 second week": {
+        "keys": 16,
+        "all": "5e900621170a4a87509427079a247989cd43605852a9f876328a01a208232edd",
+        "live": {
+          "week": 3,
+          "digest": "9892ea1bd5aabfcc",
+          "weeksSha256": "c6ae84b312af4a74a66fd60717097acc33bf7c164b2d4bc0cb497894df603661"
+        }
+      },
+      "3 third week": {
+        "keys": 16,
+        "all": "5576df85db2be02e5cd1aeef81824f793d0e4543c683cff29999b772aaa35570",
+        "live": {
+          "week": 4,
+          "digest": "e79a6557c3f7a719",
+          "weeksSha256": "1f24c6ddc97682db00c3b6e634f068921e3b9a0e3e9201eff464d081d855f098"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 16,
+        "all": "5576df85db2be02e5cd1aeef81824f793d0e4543c683cff29999b772aaa35570",
+        "live": {
+          "week": 7,
+          "digest": "8015dae761acdfeb",
+          "weeksSha256": "d943bcb6db587f53b7cf36768a837ef92139fd2554a4b82c8cf5807fe7c1d2d4"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "398 af4a447a67bfccb26e5bf3a02493712bd3a6d334b6bf86ee46b5ca3739e0764d",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "1611 503ff8d66b9036e571f5b468b1ad29c3c42b561632af50af8c08a5d8d2208c67",
+          "ia_hist_prog_1788008400000": "8506 9399c781ccdc999644b946ea29a73d367103c03e050f4ba075becfe2bb627fa4",
+          "ia_logs_prog_1788008400000": "1210 0c9b891d3892eb8e78af2d143a3d86637435eaabacf8382bab9de1bf709986ea",
+          "ia_moves_prog_1788008400000": "44 2d57f49778f11e3b45d80e98d0a68d4a944ac8c0906227c2a2a01b254d1627a1",
+          "ia_parts_prog_1788008400000": "21 f4ac501d12dae720bd998e5c501cbe6daa99ac9e2e050ad55081a2a9c8761a68",
+          "ia_pop_dismiss_prog_1788008400000": "28 1332328abfe38c15802fefc98c498d8c527f974680eed7c5ea9cc12048b27e2a",
+          "ia_pop_idx_prog_1788008400000": "38 b935895b21e479d92344f7677c7670890f578da4137c8b027c0c7a34f34af7f5",
+          "ia_programs": "66650 1c257228d761acb336223ddd53b2f2363d82dbac4b40bd70326acfd700b3a5c4",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "57 c7760c83ceb5706bf0b48d1f3735fdc855fd368728fce696ca598dafd92ae563",
+          "ia_swapct_prog_1788008400000": "93 e628b7e12024ee8328f81d2ee586ae0ef1afacccf7a6a1ec2dc55491dd9be2df",
+          "ia_swaps_prog_1788008400000": "162 9eb1575fb8abc0e4c3ed6d88f1f66010ab1653744a0a8838ab8f18e64634fe4c",
+          "ia_wild_prog_1788008400000": "79 b386c164cd07cabb07b9e0c4d8896e53b50b4d61a6364c47a5d6f3773fb2d4ab"
+        }
+      }
+    },
+    "1.5 mile test goal, commercial, balanced": {
+      "0 generated": {
+        "keys": 2,
+        "all": "73b7c45196c9768a2fd973ed9bd1140e1ac10b1876c58553febed558ea09d8d5",
+        "live": {
+          "week": 1,
+          "digest": "c5b07bb439287e9e",
+          "weeksSha256": "a46adbeadd2982516af7a75cfd5ce523a196e5dde21af25c2c7a6ca87e860b79"
+        }
+      },
+      "1 first week": {
+        "keys": 14,
+        "all": "b431e86a8a551b25fafcd0dfb8c759e11df87240808c816708844edf8e5de938",
+        "live": {
+          "week": 2,
+          "digest": "34d33f0ace12a374",
+          "weeksSha256": "98853b8056c634ac1026622640db36e2df47aebcd430225055a47302b6684b4a"
+        }
+      },
+      "2 second week": {
+        "keys": 15,
+        "all": "ee97c5d2cd237e94e191ae075bb5d4959d92eeef60bac0d87837d906891bb915",
+        "live": {
+          "week": 3,
+          "digest": "14e8a16aaf4b4aaf",
+          "weeksSha256": "fa1165fafb3fc3f8d3b5543ff38d405b447cd7472d0a5cbcdcf11fc2afc0857a"
+        }
+      },
+      "3 third week": {
+        "keys": 15,
+        "all": "888015c0032dc603e09c07c9b55533a50a6a0fd2c30e14699acdf1365823ccd2",
+        "live": {
+          "week": 4,
+          "digest": "c8a2807574ab3371",
+          "weeksSha256": "cbac67801460eb4162e28164c6ddcb89cc6f2da5188653144c1fa3f4595cfd90"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 15,
+        "all": "888015c0032dc603e09c07c9b55533a50a6a0fd2c30e14699acdf1365823ccd2",
+        "live": {
+          "week": 7,
+          "digest": "b6308e1faa3a2e6d",
+          "weeksSha256": "9c9768461e62815e3b7dd01765e45eac451caac5d67b366732e692bb174a6374"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "405 37b45acc101ebe5655423d880fb5a54fd2371811a3dd1c95038f424b8f4cd7d3",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "1739 25de19145eac66cfcb13ae528274de548c64460c10bb9ece5763269e439055e5",
+          "ia_hist_prog_1788008400000": "8042 491f22494aa0d960dc0f2410803f04fd30a982156a8d9872f92ff098c2b9f1c9",
+          "ia_logs_prog_1788008400000": "1210 b6101aace91908eeb3f09867a88c12161449b1cd489d50bc7161cd3e660f7b68",
+          "ia_parts_prog_1788008400000": "21 c51509349e7222dbdeb2fe2bf031712f93f428bf9a5530001545f7d89fb72593",
+          "ia_pop_dismiss_prog_1788008400000": "28 1332328abfe38c15802fefc98c498d8c527f974680eed7c5ea9cc12048b27e2a",
+          "ia_pop_idx_prog_1788008400000": "38 fdb09fe87fe2a08d6790fd7edc956ded17a64fc2add6256727cf78c39759cb92",
+          "ia_programs": "71152 26d820742ba18bf89dc180185eddd8f0d37c4cd11dfb6f4512ae6093949aec9f",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "43 1fe07a435e8b2d295df3a16db368a6103d264c76461dc7cc1b0123a7bf7d441d",
+          "ia_swapct_prog_1788008400000": "79 4ab35e6e70857265fa3137308cc90b0a9791b50ca2b767f0705c8c18663af440",
+          "ia_swaps_prog_1788008400000": "211 54e217c19582a873e359579b362e257a8c16f1b271cfec1b0e501a3f31ad9579",
+          "ia_wild_prog_1788008400000": "79 d7af0932bd335e53882139654550644af2ff12bafeca80bd0aa442dbbd351154"
+        }
+      }
+    },
+    "run base, bodyweight, balanced": {
+      "0 generated": {
+        "keys": 2,
+        "all": "94b4a6c83e315d33c6a113880de192e92aca546b3ad28a38a7169ce675ab5175",
+        "live": {
+          "week": 1,
+          "digest": "40c6f33d570e3f9e",
+          "weeksSha256": "e2255a9388b229e9f8058b226548a884130f0259d01c213477ad4aeb88376270"
+        }
+      },
+      "1 first week": {
+        "keys": 11,
+        "all": "62c5149b5d93cd2b174f6bc4c6fd4672db18fffd8ace9500285e47e5b20dc5ed",
+        "live": {
+          "week": 2,
+          "digest": "cc1a0e11aad58e20",
+          "weeksSha256": "069ed1c3744f9de484c37ae4b04e8645bc0e73a7d11f7f4268ad00a547f9ac3e"
+        }
+      },
+      "2 second week": {
+        "keys": 13,
+        "all": "9fc6c415689c3969084141f59237e8a489ded5cd74c3948cfffa234a7f94acfd",
+        "live": {
+          "week": 3,
+          "digest": "e4b588c8488e5027",
+          "weeksSha256": "89ca398d0df094f1dc4c5388845f377bdc03f7665f0930f43ca7cde74d0266c8"
+        }
+      },
+      "3 third week": {
+        "keys": 13,
+        "all": "86ca18893946e93f8b41dfef6dea5177ef025149ad4fc8367c42f1bba8747d2b",
+        "live": {
+          "week": 4,
+          "digest": "1c751ebe58b66aa8",
+          "weeksSha256": "e7dd60767d8e261c5856177e5a0f6b0dbf31909237151c49a4e38875bd97e1cf"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 13,
+        "all": "86ca18893946e93f8b41dfef6dea5177ef025149ad4fc8367c42f1bba8747d2b",
+        "live": {
+          "week": 7,
+          "digest": "80b6743e6bfe9100",
+          "weeksSha256": "612e96a95ec7ac75166c7fa4c6af4f85623345c2bbd5452a28eeb34abcb39d64"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "395 35b703b3e13510cc62e66a60adf1bf7e94313d482785fd09fa1ca9c7a343d4f2",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "1540 ea9df344aac4eefc38367acdbd3285597de6ecd6092eec3ba84f090f6d1b5a5d",
+          "ia_hist_prog_1788008400000": "8227 0150bc0eaddd40da022f44d45394b5b15e63453bfd26e2fa92d260233b2f3aca",
+          "ia_logs_prog_1788008400000": "1219 b067cc7f34c889522f04e3909d86d76e123cb6b99d0879ef4e2d7ee43d15f61b",
+          "ia_moves_prog_1788008400000": "44 d413d049c468bebca323df014d480243ef14667d9b10c14304edc4ff7012e0d8",
+          "ia_pop_dismiss_prog_1788008400000": "28 1332328abfe38c15802fefc98c498d8c527f974680eed7c5ea9cc12048b27e2a",
+          "ia_pop_idx_prog_1788008400000": "38 5a9a56b55061dca871ce230ee2196d772b0e3d6a63f14e29982d413c6965a19c",
+          "ia_programs": "49885 b0f6a4341cd73c2c1d2daf3aea61d6b481cbe838dd0d95761cdb0a5d4b1fe2af",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "29 aad360655693916c46761d91c9d7d888ae97e4ded18ad1b2659a0813ab90ecf1",
+          "ia_wild_prog_1788008400000": "79 50937c184aa6ad164b9e86574daeadcff0b7965e571e3ee60c7e044e2b2e1049"
+        }
+      }
+    },
+    "bike ftp, home full, strength support, advanced": {
+      "0 generated": {
+        "keys": 2,
+        "all": "e5c87c2b7129e6241e22ee4903c79492f5146f09acdc7e20e6c58a5db27fceca",
+        "live": {
+          "week": 1,
+          "digest": "6dc6cb73cc22ab30",
+          "weeksSha256": "e719eef667fe27167f4b89e19ea9b3393fc7d0b058ed252dd3fc1b8717a58155"
+        }
+      },
+      "1 first week": {
+        "keys": 13,
+        "all": "7c625fdd088f37ebdc88a4af70d1ff5b64db5ca826cb6e993c560adcbfff816d",
+        "live": {
+          "week": 2,
+          "digest": "c5d32f434840d19e",
+          "weeksSha256": "197670fc969b9dc85e4efb0f51241c5450e3c88a562011fd0e6e046125064351"
+        }
+      },
+      "2 second week": {
+        "keys": 14,
+        "all": "3c98facd913972f781c848c693571d834b9d04a6657961fb5137d5aeb0e705dd",
+        "live": {
+          "week": 3,
+          "digest": "d4311b6cc34efe58",
+          "weeksSha256": "c8f94c4cd65923db5f27322f0454a868d794df6f1b160e66aae1f58ee60d80f1"
+        }
+      },
+      "3 third week": {
+        "keys": 14,
+        "all": "865a0983670765e2186103267bade7d122d930234cf7ef40d9ab61f974665303",
+        "live": {
+          "week": 4,
+          "digest": "51d69ec6f9b679e5",
+          "weeksSha256": "653fcfa55876ebbb15118678fdaaf6aab2a10bef3fa3f1157199ab3f5ddb5c29"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 14,
+        "all": "865a0983670765e2186103267bade7d122d930234cf7ef40d9ab61f974665303",
+        "live": {
+          "week": 7,
+          "digest": "72def08e183e57c9",
+          "weeksSha256": "15fb8aae3c080649401068827d5b384ca778b654a2e2c651cee882e85a6d82f5"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "405 c3add2b6b4c326783f25afa0f4ab7a5baa6930b07be3b8ba985257b1a58cc9c4",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2215 ec90d35f75c38f5e034140f786e69833983c7d99a100bb811eca445a29c026ae",
+          "ia_hist_prog_1788008400000": "7015 178f3e2dbf0a37e40a2a9e285e32ed346e45e2f0f33c0ef2a43dbc544a4449ad",
+          "ia_logs_prog_1788008400000": "1189 82f5de4368f64cf7e9a95897ed84ace31fc1817b65efb9e58f9893ffdba417e0",
+          "ia_pop_dismiss_prog_1788008400000": "28 1332328abfe38c15802fefc98c498d8c527f974680eed7c5ea9cc12048b27e2a",
+          "ia_pop_idx_prog_1788008400000": "38 fdb09fe87fe2a08d6790fd7edc956ded17a64fc2add6256727cf78c39759cb92",
+          "ia_programs": "45307 bd74e9f62d560e961bd15302b6233e0b4a55583b6e0a47300a9c0e7b9eb67967",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "43 1fe07a435e8b2d295df3a16db368a6103d264c76461dc7cc1b0123a7bf7d441d",
+          "ia_swapct_prog_1788008400000": "69 9c142598fda63fc9b7eb80e46f93f928254812622d52a80e65c668dc27f9f017",
+          "ia_swaps_prog_1788008400000": "197 2ecb50bc7540a2d27318feb692b75a5c756154f441f8ace0ce73121066c9dc43",
+          "ia_wild_prog_1788008400000": "79 d7af0932bd335e53882139654550644af2ff12bafeca80bd0aa442dbbd351154"
+        }
+      }
+    },
+    "swim 500, commercial, prevention support": {
+      "0 generated": {
+        "keys": 2,
+        "all": "1c98338ce32d97aed6211e6e0741e48e64a81b5407505140f70a4747299df64b",
+        "live": {
+          "week": 1,
+          "digest": "de2f5c307b7d0db2",
+          "weeksSha256": "a785255af42731329812761ac480c4a40126f1e7dcae1fe7573900e570574674"
+        }
+      },
+      "1 first week": {
+        "keys": 12,
+        "all": "c9410c40f7f24f5331b9c7d76fa406b3b571490cfa4ce873311849fb71a40dd6",
+        "live": {
+          "week": 1,
+          "digest": "505463edaa4b84ad",
+          "weeksSha256": "1511574440911902c601af88d359697e315a1d865e4c13fd92d7e85c484d36b8"
+        }
+      },
+      "2 second week": {
+        "keys": 15,
+        "all": "b364e600f1d5d624551ebe60e304411be4b4ad1079c3d315a0bf1462ba5cc041",
+        "live": {
+          "week": 2,
+          "digest": "6560ba8b8c3a92a4",
+          "weeksSha256": "0c1b7245fc54fca7cf790ebd276a507a7a688ae030b4af84cde422b5d14c0447"
+        }
+      },
+      "3 third week": {
+        "keys": 15,
+        "all": "fc155155fdef25837f9a05ff00297e005427e1c750a4580328ec9287bfe15f3e",
+        "live": {
+          "week": 3,
+          "digest": "4bbc0289b9ba599e",
+          "weeksSha256": "6bf9067cee1727df0a125be9be63000796212c427a95c4da1a56926d1ec2ece3"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 15,
+        "all": "fc155155fdef25837f9a05ff00297e005427e1c750a4580328ec9287bfe15f3e",
+        "live": {
+          "week": 6,
+          "digest": "10529ac6d9ef08ad",
+          "weeksSha256": "11cae8f2f55341864230a948661fcd765b8813a3e81f9b9ac3a64e93a119d047"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "465 7e323e0128999d037a3844d82a160a7955ec7504ae0dac4efc816800d4ad8c0d",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2109 6206f022272e6e5f2ed3c780cdeb55ce8595ad3db284bf386fb8c4906a22892e",
+          "ia_hist_prog_1788008400000": "10161 06062e554d997b717b46f9b6dc2fcc74f8782dd681012c45ea4d96c606e5ad08",
+          "ia_logs_prog_1788008400000": "1198 4b74fde649893bcd1c608a1972ca0a695f4d119298830b9b1f0347a823800367",
+          "ia_parts_prog_1788008400000": "21 cc277f12a26a968002ea476493ab8248ff37ae05b161527f89212a950194f16c",
+          "ia_pop_dismiss_prog_1788008400000": "28 93a44649f314aee025d17df53a3cfa7cd7d632fc7ea5dd9e43661940120f89a8",
+          "ia_pop_idx_prog_1788008400000": "37 4053e1f038c83b34d6a763a7ef97cb450e1aae2321e9be58a1911000e6c70a21",
+          "ia_programs": "77000 407d73a2b9e80cbeb176a4c55e7f2c569f4196171d28f909c44d12a3f127fe3c",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "29 79d4e387a1bf648cb3cdfbbbbf551ee9835ff70451f2b635697283e9186a9464",
+          "ia_swapct_prog_1788008400000": "74 73f30e26586388c592ba429e86c03cc439c407d01f423fa7990032aa3579b724",
+          "ia_swaps_prog_1788008400000": "205 e50830aa43fd52752eece947a00fd8e3d990cf657f43332022d9237b937ee4cb",
+          "ia_wild_prog_1788008400000": "79 eb9e518d8086a1cb6774953695a18b826b29ef81b2d42290d4b07ee0977400aa"
+        }
+      }
+    },
+    "run base and bike base, crossfit, balanced": {
+      "0 generated": {
+        "keys": 2,
+        "all": "23743f561ad4b1e3123f64cd9716807ee602adc26b784fdd60e3714e29c731cb",
+        "live": {
+          "week": 1,
+          "digest": "ef992704feef05b6",
+          "weeksSha256": "187fba54f99d3b5bd7b5f00f3b70dc30f0ac6be74ee279d510fffc384c1a65c5"
+        }
+      },
+      "1 first week": {
+        "keys": 13,
+        "all": "1cac6546ad78d7f8a285c70f4c645a0a6863e148767af810ab151ade0a0e5530",
+        "live": {
+          "week": 2,
+          "digest": "aec15d9f0f3bdb4d",
+          "weeksSha256": "8008b8d4878719a79285437c4d6d549e77b5b61fe3de4d8310d1704adfc7327a"
+        }
+      },
+      "2 second week": {
+        "keys": 15,
+        "all": "f0e394729af04d80ee70700684dfd64a517d5f386a9740a0290c0362c61cee31",
+        "live": {
+          "week": 3,
+          "digest": "e5cb8771d0bd41e9",
+          "weeksSha256": "3a4a1c869008f1b3a015f1f86f91c91ad4c5ba92975dcd0a416f2c4113c3807b"
+        }
+      },
+      "3 third week": {
+        "keys": 15,
+        "all": "4923eda6ee6cc2cba5b479adcb28ecd35ed4b6d6a202f64e0fe5e7d06a0cb528",
+        "live": {
+          "week": 4,
+          "digest": "e0ee3a907542ed14",
+          "weeksSha256": "6bc2d65ce278d1bf9eb7b27af5cdf313f111f082ca1385eb920df277be208652"
+        }
+      },
+      "4 after two weeks away": {
+        "keys": 15,
+        "all": "4923eda6ee6cc2cba5b479adcb28ecd35ed4b6d6a202f64e0fe5e7d06a0cb528",
+        "live": {
+          "week": 7,
+          "digest": "168e092b2ae51a99",
+          "weeksSha256": "f25dd32173195918aa4d61885fdc58ffe37913baeafa9ad5d01696ddac3582c7"
+        },
+        "each": {
+          "ia_active": "18 f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+          "ia_comp_prog_1788008400000": "398 96990e09916837479d8e57dde9fe003990553301d408bca2302c77ed425a509e",
+          "ia_edits_prog_1788008400000": "2 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "ia_exw_prog_1788008400000": "2225 c2fd10be2e84b806988efda3cd4ec8b7aeca3c3c7df6f4edead2248f1a17a60d",
+          "ia_hist_prog_1788008400000": "7791 274e27afede41883d510835c055c5925ae840289a52769403746ef09f13d81c1",
+          "ia_logs_prog_1788008400000": "1219 9c8b1c7cd829fbf7930c56c1ff26ba8a2cac6d430514528dbef4c855fd85d504",
+          "ia_moves_prog_1788008400000": "44 2d57f49778f11e3b45d80e98d0a68d4a944ac8c0906227c2a2a01b254d1627a1",
+          "ia_pop_dismiss_prog_1788008400000": "28 1332328abfe38c15802fefc98c498d8c527f974680eed7c5ea9cc12048b27e2a",
+          "ia_pop_idx_prog_1788008400000": "38 b935895b21e479d92344f7677c7670890f578da4137c8b027c0c7a34f34af7f5",
+          "ia_programs": "52968 d6db4d0d587b5d28c85a0f96cb3e653bdd61f189b9dfed65a4be7c2d737b7575",
+          "ia_remind_last_prog_1788008400000": "9 2f2de5925e70b58e1fac1842d3a41931c169722116e96d64e4f1c86fdafdf69d",
+          "ia_reminded_prog_1788008400000": "57 c7760c83ceb5706bf0b48d1f3735fdc855fd368728fce696ca598dafd92ae563",
+          "ia_swapct_prog_1788008400000": "69 9c142598fda63fc9b7eb80e46f93f928254812622d52a80e65c668dc27f9f017",
+          "ia_swaps_prog_1788008400000": "197 b19f5324d3b76ab949c5334f83ce66758fe91a857c3226e7ed8ef0107c6ba4a7",
+          "ia_wild_prog_1788008400000": "79 b386c164cd07cabb07b9e0c4d8896e53b50b4d61a6364c47a5d6f3773fb2d4ab"
+        }
+      }
+    }
+  }
+}
