@@ -59,6 +59,26 @@ const BREAKS = [
   ['purge', 'a deleted program keeps its logs', "['ia_logs_','ia_comp_',", "['ia_comp_',"],
   ['rest move key', 'a moved rest day is stored under the picked day', 'moves[completedKey(w,day)]={from:pick,ts:Date.now()};', 'moves[completedKey(w,pick)]={from:pick,ts:Date.now()};'],
   ['week count', 'the current week is counted one day late', 'const diff=Math.floor((today-weekMon)/86400000);', 'const diff=Math.floor((today-weekMon)/86400000)-1;'],
+  // v0.261.7: a break inside each rule that moved to core with what Progress reads and computes, the run card's regime
+  // and the nudge's preference. All were green on v0.261.6's records (Progress writes nothing a key record can show, and
+  // no history logged an easy pace, took the nudge or made a second program) until the records gained the case "what
+  // Progress reads from three weeks of runs, the nudge taken, and a second program".
+  ['seed runs', 'the seed counts no run', 'paces.push(r.sec); if(e.ts>latest) latest=e.ts;', 'if(e.ts>latest) latest=e.ts;'],
+  ['delete warning', 'a program\'s lift log never warns', 'return Object.keys(readLiftLog(store,programId)||{}).length>0;', 'return false;'],
+  ['recovery run', 'any run counts as a recovery run', "if(!/recovery/i.test(c.subtype||'')) return null;", ''],
+  ['recovery target', 'the recovery pace has no target', 'if(r.tgt) tgts.push(r.tgt);', ''],
+  ['longest run', 'a week\'s runs are summed, not the longest taken', 'wk[w]=Math.max(wk[w]||0, top);', 'wk[w]=(wk[w]||0)+top;'],
+  ['runs by class', 'no run is placed in its class', 'out[cls].push({w, sec});', ''],
+  ['easy effort count', 'the easy effort counts no run', '(wk[w]=wk[w]||[]).push(sec); n++;', '(wk[w]=wk[w]||[]).push(sec);'],
+  ['logged miles', 'no logged mile is counted against the plan', 'wk[w].presc+=+dose.mi; wk[w].act+=act;', 'wk[w].presc+=+dose.mi;'],
+  ['program week', 'a program\'s week is counted one week early', 'return Math.min(p.totalWeeks||6, Math.floor(diff/7)+1);', 'return Math.min(p.totalWeeks||6, Math.floor(diff/7));'],
+  ['cut week', 'no week is held back', 'return (w>=(p.totalWeeks||6)) ? 0 : w;', 'return 0;'],
+  ['run class', 'a long run has no class', "if(/long|LSD/i.test(s)) return 'Long';", ''],
+  ['pace seconds', 'a pace reads its minutes only', 'return m ? (+m[1])*60+(+m[2]) : null;', 'return m ? (+m[1])*60 : null;'],
+  ['mile from recovery', 'the table is not read between its rows, recovery to mile', 'return a.mile+f*(b.mile-a.mile);', 'return a.mile;'],
+  ['half from mile', 'the table is not read between its rows, mile to half', 'return a.halfBest+f*(b.halfBest-a.halfBest);', 'return a.halfBest;'],
+  ['run card regime', 'a logged run card reads as a draft', 'return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ return !!e[f]; });', 'return false;'],
+  ['swap preference', 'the nudge taken stores no preference', 'p.cfg.exSwapPrefs[from]=to;', ''],
 ];
 
 // Breaks that change no record. They are run and printed, and they do not fail the script: each is a line no history

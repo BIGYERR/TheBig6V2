@@ -1,9 +1,9 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { weeklyBest } from '../../../../../../core/src/engine/state-lift-log.ts';
+import { EASY_RPE_HI, EASY_RPE_LO, RUN_CLASS_ORDER } from '../../../../../../core/src/engine/state-progress.ts';
 import { PACE_CHART } from '../../../../../../core/src/engine/cardio-progression.ts';
 import {
-  EASY_MIN_RUNS, EASY_RPE_HI, EASY_RPE_LO, RUN_CLASS_COLOR, RUN_CLASS_ORDER, _fmtPaceShort, _halfFromMileSec,
-  _mileFromRecoverySec, _paceStrToSec, _runClass,
+  EASY_MIN_RUNS, RUN_CLASS_COLOR, _fmtPaceShort, _halfFromMileSec, _mileFromRecoverySec, _paceStrToSec, _runClass,
 } from './progress-data.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 

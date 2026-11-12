@@ -332,3 +332,96 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   reaching them (each rule in the script once, each key built by its reader and its writer, the 9 deleted names gone),
   and the page's own names answering as they did. `tests/integration/stored-state.test.ts`, the new case. The other
   golden records and the backup corpus, unchanged.
+
+## Release scope: v0.261.7 moves what Progress reads and computes from the stored state into core
+
+- **Date:** 2026-11-11. **Ruled by:** Mario (the sixth slice, on his prompt); **bump:** PATCH, named in that prompt, by
+  his standing rule for migration steps that change the page and no behaviour. **Shipped:** v0.261.7.
+- **The finding (`tests/measure/stored-state_progress-callers.md`, read on v0.261.6):** `progress-data.ts` reads the
+  stores in two places. `seedFromPriorPrograms` (the wizard's seed, from `wizard.ts` and the Angular wizard) reads every
+  program's `ia_logs_` and `ia_hist_`; `_purgeWarnsCrossProg` (the delete bar's warning, from the page and the Angular
+  Progress screen) reads `ia_programs` and `ia_exw_`. The rest of what it computes is handed the stored values by its
+  caller (`lift-ledger-progress-screen.ts` and the Angular Progress screen, which call `getLogsFor`, `getDayHistFor`
+  and `getExWeightsFor` themselves): `recoveryPaceWeekly`, `ladderWeekly`, `runsByClass`, `easyEffortWeekly`,
+  `plannedVsLogged`, and under them `_recoveryPaceEntry`, `_runClass`, `_paceStrToSec`, `_mileFromRecoverySec`,
+  `_halfFromMileSec`, `_progWeekNow` and `_cutWeek`, with the constants `SEED_WINDOW_DAYS`, `SEED_MIN_RUNS`,
+  `EASY_RPE_LO`, `EASY_RPE_HI` and `RUN_CLASS_ORDER`. What is left of `day-status.ts`'s store logic: `cardioEntryLive`
+  (the run card's regime, a rule over a stored entry; `wheel-log.ts` and the Angular session sheet), the preference
+  `acceptSwapNudge` writes into the program's config (the Angular nudge, `overlays.html`), the sport swap's parking
+  and `persistLogFields` (v0.261.4 ruled they stay until the cardio dose moves), and `toggleComplete`, which has no
+  caller.
+- **The records were blind to all of it (`tests/measure/stored-state_progress-gaps.md`, on v0.261.6):** Progress reads
+  the stores and writes none, so a record of the keys cannot show what it computes. On HALF_MANNY's standard history
+  no log holds RPE 3 or 4 (the easy-effort reader comes back empty), one recovery run carries a pace, there is one
+  program (the seed is null, the warning false), and nothing takes the nudge. No test at all names `acceptSwapNudge`.
+  A break inside each of the 16 moved rules, run against v0.261.6's own records, left all 16 green; the control (the
+  log key break) went red.
+- **What changes:** one new file and two grown ones in `core/src/engine`, code as it was, with the store, the program
+  and the instant passed in where the page read its globals and the clock.
+  1. `state-progress.ts` (new, after `state-day-edits.ts` in `order.json`): the five constants, by their names;
+     `paceSeconds`, `mileFromRecoveryPace`, `halfFromMilePace` (the two walks of `PACE_CHART`), `runClassOf`,
+     `recoveryPaceEntry`, `recoveryPaceByWeek`, `longestRunByWeek`, `runPacesByClass`, `easyPaceByWeek`,
+     `plannedAndLoggedMiles`, `programWeekAt` and `progressCutWeek` (each taking the instant), `seedFromStoredPrograms`
+     (the store and the instant) and `liftLogFeedsOthers` (the store and the program).
+  2. `state-day-log.ts`: `cardioEntryLogged`, beside `CARDIO_PARK_FIELDS` and `runPartLogged`.
+  3. `state-programs.ts`: `recordSwapPreference`, the nudge's write: the program's config gains the pair, the list is
+     written, and the program comes back (null, writing nothing, when the program or its config is missing).
+  4. The page's functions keep their names and arguments and call these: `seedFromPriorPrograms` (it still takes an
+     optional instant, `Date.now()` when none), `_purgeWarnsCrossProg`, `recoveryPaceWeekly`, `ladderWeekly`,
+     `runsByClass`, `easyEffortWeekly`, `plannedVsLogged`, `_runClass`, `_paceStrToSec`, `_mileFromRecoverySec`,
+     `_halfFromMileSec` and `_cutWeek` (`Date.now()`) in `progress-data.ts`; `cardioEntryLive` in `day-status.ts`;
+     `acceptSwapNudge` calls `recordSwapPreference`, then marks the pair offered and rebuilds, as before.
+  5. **Deleted with the move, each with no caller left** (legacy, Angular through the bridge, tests): `_recoveryPaceEntry`
+     and `_progWeekNow`.
+  6. `tests/harness.js` lists `recoveryPaceEntry`, `programWeekAt` and `cardioEntryLogged` in `EXPORT_NAMES`: core
+     calls the first two itself, and the page no longer names them.
+- **Narrowed.** **Stays in the page:** everything that draws (`buildPaceChart`, `_fmtPaceShort`, the chips, the
+  restore and delete bars, `showProgressScreen`, `RACE_DIST_MI`, `EASY_MIN_RUNS`, `RUN_CLASS_COLOR`); the sport swap's
+  parking and `persistLogFields` (v0.261.4's narrowing stands: the cardio dose has not moved); `refreshProgram`, which
+  the nudge still calls. **Left as they are, with no caller:** V165's lift ledger (`ledgerRows`, `_entryBestE1RM`,
+  `_LEDGER_MAIN`, orphaned since V167) and `toggleComplete`. The move leaves no caller of them, it found them with
+  none; deleting them is a cleanup, not this move. The other readers Progress uses (`weeklySums`, `journalWeeks`,
+  `easyVsPrescribed` and the rest of `lift-ledger-progress-screen.ts` and `progress-charts.ts`) are not in
+  `progress-data.ts`, and wait for a slice of their own.
+- **What deliberately does not change:** every key and every stored byte; every value a reader hands back, its fields
+  and their order; the clock each reads (the page's `Date.now()`, where `_progWeekNow` read `new Date()`: one instant);
+  the order of the nudge's writes (the program list, then the count, then the rebuild); every function name the Angular
+  screens and the wizard call; every golden record.
+- **Found by the break check, closed in the slice:** the case "what Progress reads from three weeks of runs, the nudge
+  taken, and a second program" (`tests/integration/stored-state.test.ts`) on HALF_MANNY: every run of weeks 1 to 3
+  logged with a distance, a pace and an effort (RPE 3 on an easy or recovery run, 7 on any other), one recovery run
+  credited to the bike, one run tapped Done, undone and Done again (`undone`, the entry the undo tap stores: a logged
+  card keeps its numbers); on week 4's Wednesday the readers' values and the projection Progress draws from the easy
+  pace (`progress`), the first lift of week 4's first day traded three times running and the nudge taken
+  (`nudgeTaken`), then a lift logged and a second program made (`second`: the seed, the warning for each program, the
+  new program's readers and its record). Its records are new in `tests/snapshots/stored-state.json`: 901 lines added,
+  none removed or changed, written on v0.261.6's page and matched by v0.261.7's. The break check gains 16 breaks inside
+  the moved rules, every one red on the new case: 45 red in all, 2 open as before
+  (`tests/measure/stored-state_red-on-break.md`).
+- **Expected values (typed from the code's rules and `PACE_CHART`):** `paceSeconds` reads `10:26/mi` as 626, ` 7:30 `
+  as 450, and `7:3`, `abc` and an empty value as null. `mileFromRecoveryPace` gives 300 at 420 s and below, 315 at
+  437.5 (halfway from 420 to 455), 480 at 630, 720 at 870 and above, and null at 0. `halfFromMilePace` gives 4,680 at
+  300 s and below, 4,890 at 315, 11,100 at 720 and above, null at 0. `runClassOf`: empty and `Benchmark Run` none,
+  `Recovery Run` Recovery, `Long Interval (LI)` Tempo, `Speed Run — Intervals` and `Speed Run — Tempo` Interval,
+  `Tempo Run` Tempo, `Easy Run — Long` Long, `Easy Run` Easy, `Strides` none. A recovery run in week 2 at `10:00/mi`
+  with a target of 800 is `{w: 2, sec: 600, tgt: 800}`; swapped, past the program's weeks, with no snapshot, on a bike
+  or not a recovery run, it is none, and a target of 0 is null. Runs of 600 and 620 s in week 1 and 640 in week 2 with
+  targets 800, 800 and 770 give `{weekly: {1: 610, 2: 640}, tgt: 790, nWeeks: 2}`. The longest run of a week takes the
+  rest-day jog as one more run, never a sum (3.1, 5 and a jog of 6 make 6), and leaves out the cut week and, asked,
+  week 1. The easy effort reader keeps RPE 3 and 4 on recovery and easy runs only. Planned and logged miles pair each
+  distance-dosed run with its log: 3 and 2 miles written, 3.5 logged, make `{presc: 5, act: 3.5}`; a swapped day and a
+  timed run are out. A program starting 2026-08-31 is in week 4 at noon on 2026-09-23 and its cut week is 4; before
+  its start, week 0 and no cut; after its 14 weeks, week 14 and no cut; with no start, week 0. The seed takes the
+  program whose qualifying runs are latest, three or more inside 21 days and none after the instant: paces 600, 630
+  and 660 make `avgRecSec` 630 and `mileSec` 480; the longest run takes a jog of 6.2 over a run of 5; a program with
+  no name is `previous block`; no distance gives `maxDist` null; two runs give nothing. The warning is true only when
+  another program exists and this one's lift log holds a lift. The run card is logged for a sport when the entry holds
+  a value in one of its fields: `0.00` is a value, the number 0 is not, and no sport is never logged. The nudge's write
+  adds the pair to the preferences the program holds, keeps the others, and writes nothing for a missing program or a
+  program with no config.
+- **Tests:** `tests/unit/stored-state.test.ts`, 15 new (62 to 77): 13 on the functions from `@ia/core` on a memory
+  store and on hand-made values, the page reaching them (each rule in the script once, the two deleted names gone),
+  and the page's own names answering as they did. On v0.261.6: the 11 on `state-progress.ts` cannot load (`git
+  cat-file -e` exit 128); with that import stubbed on v0.261.6's own tree, the run card's regime, the nudge's write and
+  the page read fail; the page's own names pass, as a guard must. `tests/integration/stored-state.test.ts`, the new
+  case. The other golden records and the backup corpus, unchanged.

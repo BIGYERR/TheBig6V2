@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and five lift slices have
-shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5, v0.261.6) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and six lift slices have
+shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5, v0.261.6, v0.261.7) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -66,9 +66,22 @@ Each phase starts only on Mario's GO, one phase step per session.
     prunes a touched week's edits before any record is taken, and no history undid a swap or reached the nudge. The
     case "a day's swaps and edits, made and undone, and the nudge" adds four records (285 lines, none changed).
   - **Found, not fixed:** the swap nudge counts taps, not sessions (section 7).
-- **Next, on his GO:** what `progress-data.ts` reads and computes from the stored state, and what is left of
-  `day-status.ts`'s store logic if the measure says it fits. `applyOverlays` waits until after 2026-12-06 with the
-  freeze (Mario, Post-v0.261.6: it rewrites the grid on every launch).
+- **Done, the sixth lift slice (v0.261.7):** what Progress reads and computes from the stored state lives in
+  `core/src/engine/state-progress.ts`: the wizard's seed and the delete bar's warning (each reads the store), the five
+  readers the Progress screens hand the stored logs and history (recovery pace, longest run, runs by class, easy
+  effort, planned and logged miles), the week Progress holds back, the run class, the pace and the two walks of the
+  pace table. The run card's regime moved to `state-day-log.ts` and the nudge's preference write to
+  `state-programs.ts`. The page's 14 functions are thin callers; 2 with no caller left went with the move. Every golden
+  record identical. Narrowed: what draws stays, and so do the sport swap's parking and `persistLogFields` (v0.261.4's
+  narrowing stands). Two orphans with no caller before the move stay as they were: V165's lift ledger and
+  `toggleComplete`.
+  - **The break check found the records blind to all 16 moved rules, closed in the slice:** Progress writes no key a
+    record can show, and no history logged an easy pace, took the nudge or made a second program. The case "what
+    Progress reads from three weeks of runs, the nudge taken, and a second program" records what the readers hand
+    back (901 lines, none changed). The break check is at 45 breaks, all red, and 2 open as before.
+- **Next, on his GO:** the backup (`data-backup.ts`: snapshot, read, load). `applyOverlays` waits until after 2026-12-06
+  with the freeze (Mario, Post-v0.261.6: it rewrites the grid on every launch). The other readers the Progress screen
+  uses (`lift-ledger-progress-screen.ts`, `progress-charts.ts`) move with that screen.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is

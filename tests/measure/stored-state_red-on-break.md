@@ -8,7 +8,7 @@ must be green on all three and every break red.
 | Break | What it does | Result | Tests red | Caught by |
 |---|---|---|---|---|
 | (no break) | the page as built | green | 0 | all three files |
-| log key | a log is stored under w1-mon, not w1_mon | red | 3 | the fast file |
+| log key | a log is stored under w1-mon, not w1_mon | red | 4 | the fast file |
 | freeze, history | a touched day is not restored from its snapshot at launch | red | 1 | the fast file |
 | freeze, piercing | an overlay no longer reaches the untouched days of the current week | red | the golden file | the fast file |
 | freeze, reach | the last frozen week is rebuilt instead | red | 1 | the fast file |
@@ -18,27 +18,43 @@ must be green on all three and every break red.
 | completion status | a skipped day is stored as complete | red | the golden file | the fast file |
 | part skip | a skipped part is not stored | red | 2 | the fast file |
 | parts settle | the parts of a day never write its completion | red | 1 | the fast file |
-| history, kept | a touched day is never snapshotted | red | 2 | the fast file |
+| history, kept | a touched day is never snapshotted | red | 3 | the fast file |
 | edit re-snapshot | an edit after the first touch is not folded into the day's snapshot | red | 1 | the fast file |
 | swap record | a swap is not stored | red | 2 | the fast file |
 | swap places | a swap is stored without where the lift stood | red | 1 | the fast file |
 | swap places, merge | a pair swapped again forgets the places the earlier tap saw | red | 1 | the fast file |
 | swap undo | an undone swap keeps its record | red | 1 | the fast file |
-| swap count | a run of one swap never counts past one | red | 1 | the fast file |
-| nudge offered | a nudge turned down is not marked offered | red | 1 | the fast file |
+| swap count | a run of one swap never counts past one | red | 2 | the fast file |
+| nudge offered | a nudge turned down is not marked offered | red | 2 | the fast file |
 | skip record | a skipped movement is not stored | red | 1 | the fast file |
 | skip undo | a movement put back stays skipped in the store | red | 1 | the fast file |
 | add record | an added movement is not stored | red | 1 | the fast file |
 | add undo | a removed movement stays added in the store | red | 1 | the fast file |
 | edits prune | the edits of a frozen week are kept | red | the golden file | the fast file |
-| active id | the active program is not stored | red | 17 | the fast file |
+| active id | the active program is not stored | red | 18 | the fast file |
 | wildcard record | a Wildcard done is not stored | red | 1 | the fast file |
 | seed write back | an old program's seed is not written back to its config | red | the golden file | the fast file |
 | purge | a deleted program keeps its logs | red | 1 | the fast file |
 | rest move key | a moved rest day is stored under the picked day | red | 1 | the fast file |
 | week count | the current week is counted one day late | red | 4 | the fast file |
+| seed runs | the seed counts no run | red | 1 | the fast file |
+| delete warning | a program's lift log never warns | red | 1 | the fast file |
+| recovery run | any run counts as a recovery run | red | 1 | the fast file |
+| recovery target | the recovery pace has no target | red | the golden file | the fast file |
+| longest run | a week's runs are summed, not the longest taken | red | the golden file | the fast file |
+| runs by class | no run is placed in its class | red | 1 | the fast file |
+| easy effort count | the easy effort counts no run | red | the golden file | the fast file |
+| logged miles | no logged mile is counted against the plan | red | the golden file | the fast file |
+| program week | a program's week is counted one week early | red | 1 | the fast file |
+| cut week | no week is held back | red | 1 | the fast file |
+| run class | a long run has no class | red | the golden file | the fast file |
+| pace seconds | a pace reads its minutes only | red | the golden file | the fast file |
+| mile from recovery | the table is not read between its rows, recovery to mile | red | the golden file | the fast file |
+| half from mile | the table is not read between its rows, mile to half | red | the golden file | the fast file |
+| run card regime | a logged run card reads as a draft | red | 1 | the fast file |
+| swap preference | the nudge taken stores no preference | red | 1 | the fast file |
 
-**The page as built is green, and all 29 breaks turn the records red.**
+**The page as built is green, and all 45 breaks turn the records red.**
 
 ## Breaks that change no record
 

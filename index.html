@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.6">
+<meta name="ia-version" content="0.261.7">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2553,6 +2553,13 @@ function runPartLogged(e, type){
 
 
 
+function cardioEntryLogged(e, sport){
+  return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ return !!e[f]; });
+}
+
+
+
+
 
 
 
@@ -2701,6 +2708,19 @@ function readActiveProgramId(store){return store.get('ia_active')||null;}
 function writeActiveProgramId(store, id){store.set('ia_active',id);}
 
 
+
+
+function recordSwapPreference(store, programId, from, to){
+  const programs=readPrograms(store);
+  const p=programs.filter(x=>x&&x.id===programId)[0];
+  if(!p||!p.cfg) return null;
+  p.cfg.exSwapPrefs={...(p.cfg.exSwapPrefs||{})};
+  p.cfg.exSwapPrefs[from]=to;
+  writePrograms(store,programs);
+  return p;
+}
+
+
 function readWildcardDone(store, programId){try{return JSON.parse(store.get('ia_wild_'+programId)||'[]');}catch{return[];}}
 function writeWildcardDone(store, programId, a){store.set('ia_wild_'+programId,JSON.stringify(a));}
 
@@ -2832,6 +2852,280 @@ function pruneDayEditsBefore(store, programId, cutWeek){
   const s=readDayEdits(store,programId); let changed=false;
   Object.keys(s).forEach(function(k){const m=/^w(\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});
   if(changed) writeDayEdits(store,programId,s);
+}
+
+
+
+
+
+
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var SEED_WINDOW_DAYS = 21;
+var SEED_MIN_RUNS = 3;
+function mileFromRecoveryPace(recSec){
+  const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
+  if(!rows||!rows.length||!(recSec>0)) return null;
+  if(recSec<=rows[0].recovery) return rows[0].mile;
+  const last=rows[rows.length-1];
+  if(recSec>=last.recovery) return last.mile;
+  for(let i=1;i<rows.length;i++){
+    const a=rows[i-1], b=rows[i];
+    if(recSec<=b.recovery){
+      const f=(recSec-a.recovery)/(b.recovery-a.recovery);
+      return a.mile+f*(b.mile-a.mile);
+    }
+  }
+  return last.mile;
+}
+
+function seedFromStoredPrograms(store, now){
+  const cut = now - SEED_WINDOW_DAYS*86400000;
+  let best=null;
+  (readPrograms(store)||[]).forEach(p=>{
+    if(!p||!p.id) return;
+    const logs=readDayLogs(store,p.id), hist=readDayHistory(store,p.id);
+    const tw=p.totalWeeks||99;
+    const paces=[]; let latest=0, maxDist=0;
+    Object.entries(logs||{}).forEach(([key,e])=>{
+      if(!e||!(e.ts>0)||e.ts<cut||e.ts>now) return;   
+      if(e.run_dist&&+e.run_dist>0) maxDist=Math.max(maxDist,+e.run_dist);
+      
+      
+      
+      const _jd=+((e.restLog||{}).run||{}).dist; if(_jd>0) maxDist=Math.max(maxDist,_jd);
+      const r=recoveryPaceEntry(key,e,hist,tw);       
+      if(!r) return;
+      paces.push(r.sec); if(e.ts>latest) latest=e.ts;
+    });
+    if(paces.length<SEED_MIN_RUNS) return;             
+    if(best&&latest<=best.latest) return;               
+    const avg=paces.reduce((a,b)=>a+b,0)/paces.length;
+    best={progId:p.id,progName:p.name||'previous block',latest,n:paces.length,
+          avgRecSec:avg,mileSec:mileFromRecoveryPace(avg),
+          maxDist:maxDist>0?+maxDist.toFixed(1):null};
+  });
+  return best;
+}
+function paceSeconds(t){ 
+  if(!t) return null; const m=String(t).trim().match(/^(\d+):(\d{2})/);
+  return m ? (+m[1])*60+(+m[2]) : null;
+}
+
+
+
+function recoveryPaceEntry(key, e, hist, totalWeeks){
+  if(!e || !e.run_pace) return null;
+  if(e.swapTo) return null;                     
+  const m=key.match(/^w(\d+)_(.+)$/); if(!m) return null;
+  const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return null;
+  const snap=hist&&hist[key];                   
+  if(!snap || !snap.cardio) return null;        
+  const c=snap.cardio;
+  
+  
+  if(String(c.type||'').toLowerCase()!=='run') return null;
+  if(!/recovery/i.test(c.subtype||'')) return null;
+  const sec=paceSeconds(e.run_pace); if(!sec) return null;
+  return {w, sec, tgt:(c.dose && c.dose.tgt>0)?c.dose.tgt:null};
+}
+function recoveryPaceByWeek(logs, hist, totalWeeks){
+  const wk={}, tgts=[];
+  Object.entries(logs||{}).forEach(([key,e])=>{
+    const r=recoveryPaceEntry(key, e, hist, totalWeeks);
+    if(!r) return;
+    (wk[r.w]=wk[r.w]||[]).push(r.sec);
+    if(r.tgt) tgts.push(r.tgt);
+  });
+  const weekly={};
+  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a,b)=>a+b,0)/arr.length; });
+  const tgt=tgts.length?tgts.reduce((a,b)=>a+b,0)/tgts.length:null;
+  return {weekly, tgt, nWeeks:Object.keys(weekly).length};
+}
+
+
+
+function programWeekAt(p, now){
+  if(!p||!p.startDate) return 0;
+  const mon=getWeekMonday(p.startDate);
+  const today=new Date(now); today.setHours(0,0,0,0);
+  const diff=Math.floor((today-mon)/86400000);
+  if(diff<0) return 0;
+  return Math.min(p.totalWeeks||6, Math.floor(diff/7)+1);
+}
+
+
+
+
+function progressCutWeek(p, now){
+  const w=programWeekAt(p, now);
+  if(!(w>0)) return 0;
+  return (w>=(p.totalWeeks||6)) ? 0 : w;
+}
+
+
+
+
+function runClassOf(subtype){
+  const s=String(subtype||'');
+  if(!s) return null;
+  if(/benchmark/i.test(s)) return null;
+  if(/recovery/i.test(s)) return 'Recovery';
+  
+  
+  
+  
+  
+  if(/\(LI\)|long interval/i.test(s)) return 'Tempo';
+  if(/interval|\(INT\)|\(SI\)|short interval|speed/i.test(s)) return 'Interval';
+  if(/CHI|high intensity|tempo|threshold|steady/i.test(s)) return 'Tempo';
+  if(/long|LSD/i.test(s)) return 'Long';
+  if(/easy/i.test(s)) return 'Easy';
+  return null;
+}
+const RUN_CLASS_ORDER = ['Recovery','Easy','Long','Tempo','Interval'];
+var EASY_RPE_LO = 3, EASY_RPE_HI = 4;
+
+
+
+
+function longestRunByWeek(logs, totalWeeks, cut, skip1){
+  const wk={};
+  Object.entries(logs||{}).forEach(([key,e])=>{
+    if(!e) return;
+    const m=key.match(/^w(\d+)_/); if(!m) return;
+    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
+    if(cut&&w===cut) return;                       
+    if(skip1&&w===1) return;                       
+    
+    
+    
+    const d=+e.run_dist, j=+((e.restLog||{}).run||{}).dist;
+    const top=Math.max(d>0?d:0, j>0?j:0); if(!(top>0)) return;
+    wk[w]=Math.max(wk[w]||0, top);
+  });
+  return wk;
+}
+
+
+
+
+
+function runPacesByClass(logs, hist, totalWeeks){
+  const out={};
+  RUN_CLASS_ORDER.forEach(c=>out[c]=[]);
+  Object.entries(logs||{}).forEach(([key,e])=>{
+    if(!e||!e.run_pace||e.swapTo) return;
+    const m=key.match(/^w(\d+)_(.+)$/); if(!m) return;
+    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
+    const snap=hist&&hist[key];
+    if(!snap||!snap.cardio) return;                
+    if(String(snap.cardio.type||'').toLowerCase()!=='run') return;
+    const cls=runClassOf(snap.cardio.subtype); if(!cls) return;
+    const sec=paceSeconds(e.run_pace); if(!sec) return;
+    out[cls].push({w, sec});
+  });
+  return out;
+}
+
+
+
+
+
+
+function easyPaceByWeek(logs, hist, totalWeeks){
+  const wk={}; let n=0;
+  Object.entries(logs||{}).forEach(([key,e])=>{
+    if(!e||!e.run_pace||e.swapTo) return;
+    const rpe=+e.rpe; if(!(rpe>=EASY_RPE_LO&&rpe<=EASY_RPE_HI)) return;
+    const m=key.match(/^w(\d+)_(.+)$/); if(!m) return;
+    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
+    const snap=hist&&hist[key];
+    if(!snap||!snap.cardio) return;
+    if(String(snap.cardio.type||'').toLowerCase()!=='run') return;
+    const cls=runClassOf(snap.cardio.subtype);
+    if(cls!=='Recovery'&&cls!=='Easy') return;
+    const sec=paceSeconds(e.run_pace); if(!sec) return;
+    (wk[w]=wk[w]||[]).push(sec); n++;
+  });
+  const weekly={};
+  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a,b)=>a+b,0)/arr.length; });
+  return {weekly, nRuns:n, nWeeks:Object.keys(weekly).length};
+}
+
+
+
+
+
+
+function plannedAndLoggedMiles(logs, hist, totalWeeks, cut, skip1){
+  const wk={};
+  Object.entries(hist||{}).forEach(([key,snap])=>{
+    if(!snap||!snap.cardio) return;
+    const c=snap.cardio;
+    if(String(c.type||'').toLowerCase()!=='run') return;
+    const dose=c.dose; if(!dose||!(+dose.mi>0)) return;
+    const m=key.match(/^w(\d+)_/); if(!m) return;
+    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
+    if(cut&&w===cut) return;                       
+    if(skip1&&w===1) return;                       
+    const e=(logs||{})[key];
+    if(e&&e.swapTo) return;                        
+    const act=(e&&+e.run_dist>0)?+e.run_dist:0;
+    if(!wk[w]) wk[w]={presc:0, act:0};
+    wk[w].presc+=+dose.mi; wk[w].act+=act;
+  });
+  return wk;
+}
+
+
+
+
+function halfFromMilePace(mileSec){
+  const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
+  if(!rows||!rows.length||!(mileSec>0)) return null;
+  if(mileSec<=rows[0].mile) return rows[0].halfBest;
+  const last=rows[rows.length-1];
+  if(mileSec>=last.mile) return last.halfBest;
+  for(let i=1;i<rows.length;i++){
+    const a=rows[i-1], b=rows[i];
+    if(mileSec<=b.mile){
+      const f=(mileSec-a.mile)/(b.mile-a.mile);
+      return a.halfBest+f*(b.halfBest-a.halfBest);
+    }
+  }
+  return last.halfBest;
+}
+
+
+
+
+function liftLogFeedsOthers(store, programId){
+  try{
+    if(readPrograms(store).filter(function(x){return x.id!==programId;}).length===0) return false;
+    return Object.keys(readLiftLog(store,programId)||{}).length>0;
+  }catch(e){ return false; }
 }
 
 
@@ -15808,12 +16102,9 @@ function dismissSwapNudge(){
 function acceptSwapNudge(){
   if(!_nudgeCtx||!activeProgId){dismissSwapNudge();return;}
   const from=_nudgeCtx.from,to=_nudgeCtx.to;
-  const programs=getPrograms();
-  const p=programs.filter(x=>x&&x.id===activeProgId)[0];
-  if(p&&p.cfg){
-    p.cfg.exSwapPrefs={...(p.cfg.exSwapPrefs||{})};
-    p.cfg.exSwapPrefs[from]=to;
-    savePrograms(programs);
+  
+  const p=recordSwapPreference(iaStore,activeProgId,from,to);
+  if(p){
     markSwapOffered(activeProgId,from);
     
     
@@ -15916,7 +16207,7 @@ function renderStatusFoot(dayKey,title){
 
 
 function cardioEntryLive(e, sport){
-  return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ return !!e[f]; });
+  return cardioEntryLogged(e, sport);   
 }
 function cardioLogLabel(live){ return live?'Logged ✓':'Log'; }
 function cardioLive(dayKey){
@@ -17539,100 +17830,13 @@ function showProgressScreen() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-var SEED_WINDOW_DAYS = 21;
-var SEED_MIN_RUNS = 3;
-function _mileFromRecoverySec(recSec){
-  const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
-  if(!rows||!rows.length||!(recSec>0)) return null;
-  if(recSec<=rows[0].recovery) return rows[0].mile;
-  const last=rows[rows.length-1];
-  if(recSec>=last.recovery) return last.mile;
-  for(let i=1;i<rows.length;i++){
-    const a=rows[i-1], b=rows[i];
-    if(recSec<=b.recovery){
-      const f=(recSec-a.recovery)/(b.recovery-a.recovery);
-      return a.mile+f*(b.mile-a.mile);
-    }
-  }
-  return last.mile;
-}
 function seedFromPriorPrograms(now){
   now = (typeof now==='number'&&now>0) ? now : Date.now();
-  const cut = now - SEED_WINDOW_DAYS*86400000;
-  let best=null;
-  (getPrograms()||[]).forEach(p=>{
-    if(!p||!p.id) return;
-    const logs=getLogsFor(p.id), hist=getDayHistFor(p.id);
-    const tw=p.totalWeeks||99;
-    const paces=[]; let latest=0, maxDist=0;
-    Object.entries(logs||{}).forEach(([key,e])=>{
-      if(!e||!(e.ts>0)||e.ts<cut||e.ts>now) return;   
-      if(e.run_dist&&+e.run_dist>0) maxDist=Math.max(maxDist,+e.run_dist);
-      
-      
-      
-      const _jd=+((e.restLog||{}).run||{}).dist; if(_jd>0) maxDist=Math.max(maxDist,_jd);
-      const r=_recoveryPaceEntry(key,e,hist,tw);       
-      if(!r) return;
-      paces.push(r.sec); if(e.ts>latest) latest=e.ts;
-    });
-    if(paces.length<SEED_MIN_RUNS) return;             
-    if(best&&latest<=best.latest) return;               
-    const avg=paces.reduce((a,b)=>a+b,0)/paces.length;
-    best={progId:p.id,progName:p.name||'previous block',latest,n:paces.length,
-          avgRecSec:avg,mileSec:_mileFromRecoverySec(avg),
-          maxDist:maxDist>0?+maxDist.toFixed(1):null};
-  });
-  return best;
+  return seedFromStoredPrograms(iaStore, now);
 }
-function _paceStrToSec(t){ 
-  if(!t) return null; const m=String(t).trim().match(/^(\d+):(\d{2})/);
-  return m ? (+m[1])*60+(+m[2]) : null;
-}
-
-
-
-function _recoveryPaceEntry(key, e, hist, totalWeeks){
-  if(!e || !e.run_pace) return null;
-  if(e.swapTo) return null;                     
-  const m=key.match(/^w(\d+)_(.+)$/); if(!m) return null;
-  const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return null;
-  const snap=hist&&hist[key];                   
-  if(!snap || !snap.cardio) return null;        
-  const c=snap.cardio;
-  
-  
-  if(String(c.type||'').toLowerCase()!=='run') return null;
-  if(!/recovery/i.test(c.subtype||'')) return null;
-  const sec=_paceStrToSec(e.run_pace); if(!sec) return null;
-  return {w, sec, tgt:(c.dose && c.dose.tgt>0)?c.dose.tgt:null};
-}
-function recoveryPaceWeekly(logs, hist, totalWeeks){
-  const wk={}, tgts=[];
-  Object.entries(logs||{}).forEach(([key,e])=>{
-    const r=_recoveryPaceEntry(key, e, hist, totalWeeks);
-    if(!r) return;
-    (wk[r.w]=wk[r.w]||[]).push(r.sec);
-    if(r.tgt) tgts.push(r.tgt);
-  });
-  const weekly={};
-  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a,b)=>a+b,0)/arr.length; });
-  const tgt=tgts.length?tgts.reduce((a,b)=>a+b,0)/tgts.length:null;
-  return {weekly, tgt, nWeeks:Object.keys(weekly).length};
-}
+function _paceStrToSec(t){ return paceSeconds(t); }
+function recoveryPaceWeekly(logs, hist, totalWeeks){ return recoveryPaceByWeek(logs, hist, totalWeeks); }
+function _mileFromRecoverySec(recSec){ return mileFromRecoveryPace(recSec); }
 
 
 
@@ -17709,12 +17913,7 @@ function _progChipsHTML(programs, vid){
 
 function _purgeWarnsCrossProg(id){
   
-  
-  
-  try{
-    if(getPrograms().filter(function(x){return x.id!==id;}).length===0) return false;
-    return Object.keys(getExWeightsFor(id)||{}).length>0;
-  }catch(e){ return false; }
+  return liftLogFeedsOthers(iaStore, id);
 }
 function _restoreBarHTML(p){
   if(confirmProgId===p.id&&confirmTier===2){
@@ -17759,163 +17958,19 @@ function setProgressView(id){_setProgressViewId(id);renderProgressScreen();}
 
 
 const RACE_DIST_MI = {run_5k:3.1, run_10k:6.2, run_half:13.1, run_marathon:26.2};
-var EASY_RPE_LO = 3, EASY_RPE_HI = 4;
 var EASY_MIN_RUNS = 6;   
 
 
 
-
-function _halfFromMileSec(mileSec){
-  const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
-  if(!rows||!rows.length||!(mileSec>0)) return null;
-  if(mileSec<=rows[0].mile) return rows[0].halfBest;
-  const last=rows[rows.length-1];
-  if(mileSec>=last.mile) return last.halfBest;
-  for(let i=1;i<rows.length;i++){
-    const a=rows[i-1], b=rows[i];
-    if(mileSec<=b.mile){
-      const f=(mileSec-a.mile)/(b.mile-a.mile);
-      return a.halfBest+f*(b.halfBest-a.halfBest);
-    }
-  }
-  return last.halfBest;
-}
-
-
-
-function _progWeekNow(p){
-  if(!p||!p.startDate) return 0;
-  const mon=getWeekMonday(p.startDate);
-  const today=new Date(); today.setHours(0,0,0,0);
-  const diff=Math.floor((today-mon)/86400000);
-  if(diff<0) return 0;
-  return Math.min(p.totalWeeks||6, Math.floor(diff/7)+1);
-}
-
-
-
-
-function _cutWeek(p){
-  const w=_progWeekNow(p);
-  if(!(w>0)) return 0;
-  return (w>=(p.totalWeeks||6)) ? 0 : w;
-}
-
-
-
-
-function _runClass(subtype){
-  const s=String(subtype||'');
-  if(!s) return null;
-  if(/benchmark/i.test(s)) return null;
-  if(/recovery/i.test(s)) return 'Recovery';
-  
-  
-  
-  
-  
-  if(/\(LI\)|long interval/i.test(s)) return 'Tempo';
-  if(/interval|\(INT\)|\(SI\)|short interval|speed/i.test(s)) return 'Interval';
-  if(/CHI|high intensity|tempo|threshold|steady/i.test(s)) return 'Tempo';
-  if(/long|LSD/i.test(s)) return 'Long';
-  if(/easy/i.test(s)) return 'Easy';
-  return null;
-}
-const RUN_CLASS_ORDER = ['Recovery','Easy','Long','Tempo','Interval'];
+function _halfFromMileSec(mileSec){ return halfFromMilePace(mileSec); }
+function _cutWeek(p){ return progressCutWeek(p, Date.now()); }
+function _runClass(subtype){ return runClassOf(subtype); }
 const RUN_CLASS_COLOR = {Recovery:'var(--run)', Easy:'var(--run)', Long:'var(--bike)',
                          Tempo:'var(--lift)', Interval:'var(--red)'};
-
-
-
-
-function ladderWeekly(logs, totalWeeks, cut, skip1){
-  const wk={};
-  Object.entries(logs||{}).forEach(([key,e])=>{
-    if(!e) return;
-    const m=key.match(/^w(\d+)_/); if(!m) return;
-    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
-    if(cut&&w===cut) return;                       
-    if(skip1&&w===1) return;                       
-    
-    
-    
-    const d=+e.run_dist, j=+((e.restLog||{}).run||{}).dist;
-    const top=Math.max(d>0?d:0, j>0?j:0); if(!(top>0)) return;
-    wk[w]=Math.max(wk[w]||0, top);
-  });
-  return wk;
-}
-
-
-
-
-
-function runsByClass(logs, hist, totalWeeks){
-  const out={};
-  RUN_CLASS_ORDER.forEach(c=>out[c]=[]);
-  Object.entries(logs||{}).forEach(([key,e])=>{
-    if(!e||!e.run_pace||e.swapTo) return;
-    const m=key.match(/^w(\d+)_(.+)$/); if(!m) return;
-    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
-    const snap=hist&&hist[key];
-    if(!snap||!snap.cardio) return;                
-    if(String(snap.cardio.type||'').toLowerCase()!=='run') return;
-    const cls=_runClass(snap.cardio.subtype); if(!cls) return;
-    const sec=_paceStrToSec(e.run_pace); if(!sec) return;
-    out[cls].push({w, sec});
-  });
-  return out;
-}
-
-
-
-
-
-
-function easyEffortWeekly(logs, hist, totalWeeks){
-  const wk={}; let n=0;
-  Object.entries(logs||{}).forEach(([key,e])=>{
-    if(!e||!e.run_pace||e.swapTo) return;
-    const rpe=+e.rpe; if(!(rpe>=EASY_RPE_LO&&rpe<=EASY_RPE_HI)) return;
-    const m=key.match(/^w(\d+)_(.+)$/); if(!m) return;
-    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
-    const snap=hist&&hist[key];
-    if(!snap||!snap.cardio) return;
-    if(String(snap.cardio.type||'').toLowerCase()!=='run') return;
-    const cls=_runClass(snap.cardio.subtype);
-    if(cls!=='Recovery'&&cls!=='Easy') return;
-    const sec=_paceStrToSec(e.run_pace); if(!sec) return;
-    (wk[w]=wk[w]||[]).push(sec); n++;
-  });
-  const weekly={};
-  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a,b)=>a+b,0)/arr.length; });
-  return {weekly, nRuns:n, nWeeks:Object.keys(weekly).length};
-}
-
-
-
-
-
-
-function plannedVsLogged(logs, hist, totalWeeks, cut, skip1){
-  const wk={};
-  Object.entries(hist||{}).forEach(([key,snap])=>{
-    if(!snap||!snap.cardio) return;
-    const c=snap.cardio;
-    if(String(c.type||'').toLowerCase()!=='run') return;
-    const dose=c.dose; if(!dose||!(+dose.mi>0)) return;
-    const m=key.match(/^w(\d+)_/); if(!m) return;
-    const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
-    if(cut&&w===cut) return;                       
-    if(skip1&&w===1) return;                       
-    const e=(logs||{})[key];
-    if(e&&e.swapTo) return;                        
-    const act=(e&&+e.run_dist>0)?+e.run_dist:0;
-    if(!wk[w]) wk[w]={presc:0, act:0};
-    wk[w].presc+=+dose.mi; wk[w].act+=act;
-  });
-  return wk;
-}
+function ladderWeekly(logs, totalWeeks, cut, skip1){ return longestRunByWeek(logs, totalWeeks, cut, skip1); }
+function runsByClass(logs, hist, totalWeeks){ return runPacesByClass(logs, hist, totalWeeks); }
+function easyEffortWeekly(logs, hist, totalWeeks){ return easyPaceByWeek(logs, hist, totalWeeks); }
+function plannedVsLogged(logs, hist, totalWeeks, cut, skip1){ return plannedAndLoggedMiles(logs, hist, totalWeeks, cut, skip1); }
 
 
 

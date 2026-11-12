@@ -506,7 +506,6 @@ function renderProgressScreen() {
     } else {
       const _rp = recoveryPaceWeekly(logs, _hist, totalWeeks);
       if(_rp.nWeeks >= 2) {
-        // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
         const rpData = weeks.map(w => _rp.weekly[w] != null ? _rp.weekly[w] : null);
         html += buildPaceChart(asyIcon('🏃',15)+' Recovery Pace — Easy-Effort Trend', weeks, rpData, _rp.tgt, 'var(--run)');
       } else if(_ee.nRuns > 0) {

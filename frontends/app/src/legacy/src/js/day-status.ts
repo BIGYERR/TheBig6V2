@@ -1,11 +1,14 @@
 import {
-  completedKey, getCompleted, getLogs, getPrograms, iaStore, logKey, saveCompleted, saveLogs, savePrograms, snapshotDay,
+  completedKey, getCompleted, getLogs, iaStore, logKey, saveCompleted, saveLogs, snapshotDay,
 } from './storage.ts';
 import { _setActiveProg, activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
-import { CARDIO_PARK_FIELDS, runPartLogged } from '../../../../../../core/src/engine/state-day-log.ts';
+import {
+  CARDIO_PARK_FIELDS, cardioEntryLogged, runPartLogged,
+} from '../../../../../../core/src/engine/state-day-log.ts';
 import {
   clearDayParts, clearDayStatus, partsOfDay, setDayStatus, settleDayParts, skipDayPart,
 } from '../../../../../../core/src/engine/state-day-status.ts';
+import { recordSwapPreference } from '../../../../../../core/src/engine/state-programs.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { markSwapOffered } from './swaps-edits.ts';
 import { renderWeekView } from './week-view-sections.ts';
@@ -39,12 +42,9 @@ function dismissSwapNudge(){
 function acceptSwapNudge(){
   if(!_nudgeCtx||!activeProgId){dismissSwapNudge();return;}
   const from=_nudgeCtx.from,to=_nudgeCtx.to;
-  const programs=getPrograms();
-  const p=programs.filter(x=>x&&x.id===activeProgId)[0];
-  if(p&&p.cfg){
-    p.cfg.exSwapPrefs={...(p.cfg.exSwapPrefs||{})};
-    p.cfg.exSwapPrefs[from]=to;
-    savePrograms(programs);
+  // The preference is written to the program's config by @ia/core (recordSwapPreference, v0.261.7).
+  const p=recordSwapPreference(iaStore,activeProgId,from,to);
+  if(p){
     markSwapOffered(activeProgId,from);
     // Preference lives in cfg, so the rebuild below — and every rebuild after it —
     // reproduces the substitution without any patch store to re-apply.
@@ -148,7 +148,7 @@ function renderStatusFoot(dayKey: any,title: any){
 // (the chip re-renders #cardioFields only; the button sits outside it and setCardioSwap's last
 // write lands here). No wrap (a lift day) is never live, and has no cardio node to read either way.
 function cardioEntryLive(e: any, sport: any){
-  return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f: any){ return !!e[f]; });
+  return cardioEntryLogged(e, sport);   // the rule is in @ia/core (state-day-log.ts, v0.261.7)
 }
 function cardioLogLabel(live: any){ return live?'Logged ✓':'Log'; }
 function cardioLive(dayKey: any){
