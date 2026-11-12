@@ -52,6 +52,11 @@ describe('renderCollage in Chrome', () => {
     return own;
   };
   const draw = () => renderCollage(open, bands, { title: 't', subtitle: 's' });
+  // The three tests after the first read one drawing: the same bands draw the same collage, and each draw opens and
+  // shuts a Chrome of its own, the slowest thing in this file (Post-v0.261.6: four launches put the 60-second check
+  // at 56 s). The first test draws for itself, to watch its Chrome open and shut.
+  let first: ReturnType<typeof draw> | undefined;
+  const drawn = () => (first ??= draw());
 
   it('draws in a Chrome of its own and shuts it, leaving the one already open alone', async () => {
     const before = opened.length;
@@ -64,12 +69,12 @@ describe('renderCollage in Chrome', () => {
   });
 
   it('draws a PNG exactly the size of its layout', async () => {
-    const { png, layout } = await draw();
+    const { png, layout } = await drawn();
     assert.deepEqual(pngSize(png), { width: layout.width, height: layout.height });
   });
 
   it('places every screenshot pixel for pixel at its slot, unscaled, in its band', async () => {
-    const { png, layout } = await draw();
+    const { png, layout } = await drawn();
     const pixelAt = pixels(png);
     const web = layout.bands[0]!.placements[0]!;
     assert.deepEqual([web.shotWidth, web.shotHeight], [2 * W, 3 * H]);
@@ -83,7 +88,7 @@ describe('renderCollage in Chrome', () => {
   });
 
   it('draws each band a title bar, a label over each screen, and a placeholder where one is missing', async () => {
-    const { png, layout } = await draw();
+    const { png, layout } = await drawn();
     const pixelAt = pixels(png);
     for (const band of layout.bands) {
       // The bar is ink with bone text: dark at its left edge, and both dark and light inside.

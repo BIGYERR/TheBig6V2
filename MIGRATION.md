@@ -232,7 +232,10 @@ Mario's order is kept. Three changes, each with its reason:
    `applySessionSwaps` and `applyDayEdits` do, and those wait for the freeze slice. Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
    a thin caller, and it ships as the next PATCH (the migration bump policy, Mario 2026-10-12). A page function a move
    leaves with no caller (legacy, Angular through the bridge, tests) is deleted with the move, not kept as a caller of
-   nothing (Mario, Post-v0.261.5).
+   nothing (Mario, Post-v0.261.5). A core function only the tests call is listed in `tests/harness.js` `EXPORT_NAMES`:
+   the module blocks export only what a page file or that list names, so deleting its last page caller drops it from
+   core's exports and the tests that import it stop loading (Mario, Post-v0.261.6: `writeDayHistory`, when
+   `saveDayHist` went).
 
 **Exit gate:** every golden record reproduced byte for byte by the lifted code, under V8 in CI. The 59 direct storage
 calls down to the one browser implementation. Every re-pointed test green and red on its named break (section 3.4).
