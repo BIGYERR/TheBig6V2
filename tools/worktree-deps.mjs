@@ -3,9 +3,19 @@
 // borrows the main checkout's folder through a link, but only when this branch's lockfile is the main checkout's byte for
 // byte: then the packages installed there are the ones this branch would install. Anything else names the npm ci to run.
 // The judge is pure (tests/unit/worktree-deps.test.ts); linkDeps does the reading, the git call and the link.
+//
+// Run it on its own at the start of a chat, before the first build (the session-start skill, step 0; Post-v0.261.7: a
+// fresh worktree's `npm run build:index` failed on the app's missing node_modules, which only the check had linked):
+//   node tools/worktree-deps.mjs                     the app's, the website's and the backend's, in this checkout
+//   node tools/worktree-deps.mjs --repo <dir> <rel>  another checkout, or other folders (the tests use it)
+// One line per folder; exit 1, naming the npm ci to run, when any folder has none.
 import { execFileSync } from 'node:child_process';
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, unlinkSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+/** The folders whose node_modules the 60-second check's lanes need (tools/check.mjs): the app, the website, the backend. */
+export const LANE_DEPS = ['frontends/app', 'frontends', 'backend'];
 
 /**
  * What a lane uses for `<rel>/node_modules`.
@@ -120,4 +130,31 @@ export function linkDeps(repo, rel) {
     rmSync(mods, { recursive: true, force: true });
     return { ok: false, why: `${rel}/node_modules could not be borrowed from ${from} (${err.message}); run npm ci in ${rel}/` };
   }
+}
+
+/**
+ * linkDeps for each folder, and the line it prints: `<rel>: its own`, `<rel>: borrowed from <folder>` (with the
+ * packages that are the worktree's own copy), or `<rel>: <why>`.
+ * @param {string} repo @param {string[]} [rels]
+ * @returns {{ ok: boolean, lines: string[] }}
+ */
+export function linkAll(repo, rels = LANE_DEPS) {
+  let ok = true;
+  const lines = rels.map((rel) => {
+    const r = linkDeps(repo, rel);
+    if (!r.ok) { ok = false; return `${rel}: ${r.why}`; }
+    if (!r.linked) return `${rel}: its own`;
+    return `${rel}: borrowed from ${r.linked}` + (r.own && r.own.length ? ` (${r.own.join(', ')} from this worktree)` : '');
+  });
+  return { ok, lines };
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  const args = process.argv.slice(2);
+  const at = args.indexOf('--repo');
+  const repo = at >= 0 ? resolve(args[at + 1] || '.') : resolve(dirname(fileURLToPath(import.meta.url)), '..');
+  const rels = at < 0 ? args : args.filter((_, i) => i !== at && i !== at + 1);
+  const { ok, lines } = linkAll(repo, rels.length ? rels : LANE_DEPS);
+  for (const l of lines) console.log('worktree-deps: ' + l);
+  process.exit(ok ? 0 : 1);
 }

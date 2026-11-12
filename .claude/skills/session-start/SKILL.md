@@ -11,7 +11,9 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
    any edit, on a branch named `chat/<work>` for the work Mario has asked for. `EnterWorktree` cuts its branch from
    `origin/main`, not `dev`, and names it `worktree-<name>` (seen Post-v0.261.4): before any edit, while the branch holds
    no work, run `git branch -m chat/<work>` and `git reset --hard refs/heads/dev`, then read `git log -1` back as `dev`'s
-   HEAD. The main checkout holds `dev` and nothing
+   HEAD. Then run `node tools/worktree-deps.mjs` before the first build: a worktree is checked out without the app's,
+   the website's and the backend's `node_modules`, and `npm run build:index` fails without the app's (Post-v0.261.7). It
+   borrows each from the main checkout, or exits 1 naming the `npm ci` to run. The main checkout holds `dev` and nothing
    else; a chat never commits there (the pre-commit hook refuses). Report the branch in the GIT line. When Mario says push,
    `node tools/land.mjs` from the worktree lands the branch on `dev` and pushes, as one step.
 
