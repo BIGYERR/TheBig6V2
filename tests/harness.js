@@ -61,7 +61,8 @@ const EXPORT_NAMES = [
   'readDayHistory','writeDayHistory',
   'readSwaps','writeSwaps','readSwapCounts','writeSwapCounts','SWAP_NUDGE_AT','readDayEdits','writeDayEdits',
   'readPrograms','writePrograms','readActiveProgramId','writeActiveProgramId','readWildcardDone','writeWildcardDone',
-  'recoveryPaceEntry','programWeekAt','SEED_WINDOW_DAYS','SEED_MIN_RUNS'
+  'recoveryPaceEntry','programWeekAt','SEED_WINDOW_DAYS','SEED_MIN_RUNS',
+  'BACKUP_KIND','BACKUP_FORMAT','backupKeys'
 ];
 
 function makeContext(opts){

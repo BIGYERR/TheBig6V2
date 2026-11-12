@@ -425,3 +425,80 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   cat-file -e` exit 128); with that import stubbed on v0.261.6's own tree, the run card's regime, the nudge's write and
   the page read fail; the page's own names pass, as a guard must. `tests/integration/stored-state.test.ts`, the new
   case. The other golden records and the backup corpus, unchanged.
+
+## Release scope: v0.261.8 moves the backup's snapshot, reader and loader into core
+
+- **Date:** 2026-11-11. **Ruled by:** Mario (the seventh slice, on his prompt); **bump:** PATCH, named in that prompt, by
+  his standing rule for migration steps that change the page and no behaviour. **Shipped:** v0.261.8 (on the chat's
+  branch until Mario merges it).
+- **The finding (`tests/measure/stored-state_backup-callers.md`, read on v0.261.7):** `data-backup.ts` (D264,
+  `docs/decisions/data-backup.md`) holds the store's logic in five functions and two constants: `_backupKeys` (every
+  `ia_` key, sorted), `backupSnapshot` (every such key as stored, with the release and the instant; called by
+  `saveBackup`), `_programCount` (how many programs a stored list holds; `readBackup` and `saveBackup`), `readBackup`
+  (checks a file's text and touches nothing; `readBackupFile`) and `loadBackupData` (replaces every `ia_` key, all or
+  nothing; `applyBackup`), with `BACKUP_KIND` and `BACKUP_FORMAT`. The rest saves, reads a file or draws:
+  `saveBackup` (the plugin's share, the share sheet, a download), `readBackupFile` (the picked file's text),
+  `applyBackup` (the toast and the reload), `backupMessage` (the line the Bugs page shows), `backupFileName` (the share
+  sheet's name) and the Your data block's six. The Angular Bugs screen calls `saveBackup`, `readBackupFile`,
+  `backupMessage` and `applyBackup` through the bridge, none of the five.
+- **The records were blind to most of it (`tests/measure/stored-state_backup-gaps.md`, a break per rule on v0.261.7's
+  page, run against v0.261.7's own tree):** 15 of 21 breaks green: the scan's prefix and its name order, every check of
+  the reader (the kind, the newer format, the format, the data, the keys, the program list, the count, the time), a load
+  over keys the file does not hold, and a refused load's two halves of putting back and its result; and a key with no
+  value, which no store can hand the snapshot (listed open in the break check, with why). Red: the scan, the file's kind,
+  format, release and time (each changes the file the records load), and a load that writes nothing. The backup's own
+  feature tests (`tests/unit/data-backup.test.ts`, `tests/integration/data-backup.test.ts`) catch 19 of the 21: not the
+  key with no value, and not a refused load that keeps what it wrote (their refusal comes after one write, `ia_active`,
+  a key the phone also held, so putting back covers it). Every backup the records hold is good and is loaded onto an empty
+  phone, so no record held a refused file, a load over keys the file does not hold, a key that is not the app's, or a
+  refused write.
+- **What changes:** one new file in `core/src/engine`, code as it was, with the store, the release and the instant
+  passed in where the page read `iaStore`, `IA_VERSION` and the clock.
+  1. `state-backup.ts` (new, after `state-progress.ts` in `order.json`): `BACKUP_KIND` and `BACKUP_FORMAT`, by their
+     names; the types `BackupData`, `BackupRead` and `BackupFile`; `backupKeys` (the store), `takeBackup` (the store,
+     the release and the instant), `backupProgramCount`, `readBackupText` and `loadBackupInto` (the store and the file's
+     data).
+  2. The page's functions keep their names and arguments and call these: `backupSnapshot` (`iaStore`,
+     `String(IA_VERSION)`, `Date.now()`), `readBackup` and `loadBackupData` (`iaStore`). `saveBackup`'s empty check
+     calls `backupProgramCount`.
+  3. **Deleted with the move, each with no caller left** (legacy, Angular through the bridge, tests): `_backupKeys`,
+     and `_programCount`, whose one test caller lifted it only to hand it to `readBackup`.
+  4. `tests/unit/data-backup.test.ts` lifts core's `readBackupText` and `backupProgramCount` out of the page, where it
+     lifted `readBackup` and `_programCount`; its assertions do not change.
+  5. `tests/harness.js` lists `BACKUP_KIND`, `BACKUP_FORMAT` and `backupKeys` in `EXPORT_NAMES`: core reads them
+     itself, and no page file names them.
+- **Narrowed.** **Stays in the page:** `saveBackup`, `readBackupFile`, `applyBackup`, `backupMessage`,
+  `backupFileName` and the Your data block. They share, read a picked file, reload or draw; `backupFileName` and
+  `backupMessage` are the share sheet's and the Bugs page's words, and move with that screen.
+- **What deliberately does not change:** every key and every stored byte; the file's fields and their order (`kind`,
+  `format`, `version`, `made`, `data`), its keys in name order, and the text `saveBackup` writes; what a read hands back
+  for every file; a load's order of removes and writes, and what a refused write puts back; keys that are not the
+  app's; the clock (the page's `Date.now()`, where `backupSnapshot` read `new Date()`: one instant); every function
+  name the Angular Bugs screen calls; every golden record.
+- **Found by the break check, closed in the slice:** the case "backups refused, a load refused, and a backup loaded over
+  another program" (`tests/integration/stored-state.test.ts`) on HALF_MANNY with its first day trained and a key that
+  is not the app's: the backup's key list; what the reader hands back for the file as written and 14 variants of it
+  (cut short, another kind, a newer format, no format, the format as text, data a list, no data, a key not the app's,
+  a value not a string, no program list, a program list not a list, two programs, no time, a time not text); then a
+  second phone with the 1.5 mile test program made on another morning (its id is not the file's), a day trained and a
+  key of its own, whose storage refuses the file's last write once, after it has written keys the phone did not hold
+  (the load comes back false and the phone holds what it held), then the load (the phone holds the file's `ia_` keys and
+  its own key), and the next launch. Its records are new in `tests/snapshots/stored-state.json`: 336 lines added, none removed or changed, written on v0.261.7's page and matched by v0.261.8's. The break check gains 19 breaks inside the moved rules, and
+  the backup scan's text follows the code: 64 red in all, every one of the 19 on the new case; 3 open, the snapshot's
+  key with no value joining the two before (`tests/measure/stored-state_red-on-break.md`).
+- **Expected values (typed from D264 and the code's rules):** the kind is `asylum-backup` and the format 1. A store
+  holding `ia_logs_a`, `keep` and `ia_active`, in that order, backs up `ia_active` then `ia_logs_a`. Its backup at
+  2026-11-11 15:00 UTC by release 0.261.8 is the text
+  `{"kind":"asylum-backup","format":1,"version":"0.261.8","made":"2026-11-11T15:00:00.000Z","data":{"ia_active":"a","ia_logs_a":"{}"}}`.
+  A program list counts its length (`[]` 0, two programs 2); none, `{}` and text that is not JSON are -1. A file reads
+  with its data, its count and its time; another kind, no format, the format as text, data a list or missing, a key not
+  `ia_`, a value not a string, no list or a list that is not a list are refused as `bad`; format 2 as `newer`; no time
+  reads as `''`. A load over `ia_active`, `ia_logs_b` and `keep` leaves the file's keys and `keep`, and comes back true;
+  a store refusing the file's second write comes back false and holds what it held, `keep` included.
+- **Tests:** `tests/unit/stored-state.test.ts`, 7 new (78 to 84): 5 on the functions from `@ia/core` on a memory store
+  and on hand-made files, the page reaching them (each function once, three rules once, the two deleted names gone),
+  and the page's own names answering as they did. On v0.261.7: the 5 on `state-backup.ts` cannot load (`git cat-file
+  -e` exit 128); with that import stubbed on v0.261.7's own tree, those 5 and the page read fail, and the page's own
+  names pass, as a guard must. `tests/unit/data-backup.test.ts`: its wiring only, so it fails whole on v0.261.7 (the
+  names it lifts are not in that page) and no assertion changed. `tests/integration/stored-state.test.ts`, the new case. The other
+  golden records and the backup corpus, unchanged.

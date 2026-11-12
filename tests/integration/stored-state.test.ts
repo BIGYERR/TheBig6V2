@@ -486,6 +486,87 @@ test('what Progress reads from three weeks of runs, the nudge taken, and a secon
   };
 });
 
+test('backups the reader refuses, a load the phone refuses, and a backup loaded over another program and a key not the app\'s: what each reads and stores is in the records', () => {
+  const { P: src, id } = oneDayIn();
+  src.damage('keep', 'not the app\'s');
+  src.launch(at(START, 1, '07:30'));
+  const snap = src.ev('backupSnapshot()');
+  // Typed by hand from D264: the file's kind and format, the release that wrote it, and the instant (07:30 EDT).
+  assert.deepStrictEqual([snap.kind, snap.format, snap.version, snap.made], ['asylum-backup', 1, src.ev('String(IA_VERSION)'), '2026-09-01T11:30:00.000Z']);
+  assert.deepStrictEqual(Object.keys(snap.data), Object.keys(src.dump()), 'every ia_ key in name order, and no other key');
+  const good = JSON.stringify(snap);
+  const variant = (o: Record<string, unknown>): string => JSON.stringify({ ...snap, ...o });
+  const data = (o: Record<string, unknown>): Record<string, unknown> => ({ ...snap.data, ...o });
+  const files: Record<string, string> = {
+    'the file as written': good,
+    'text cut short': good.slice(0, -1),
+    'another kind': variant({ kind: 'other-backup' }),
+    'a newer format': variant({ format: 2 }),
+    'no format': variant({ format: undefined }),
+    'the format as text': variant({ format: '1' }),
+    'data that is a list': variant({ data: [] }),
+    'no data': variant({ data: null }),
+    'a key not the app\'s': variant({ data: data({ keep: '1' }) }),
+    'a value not a string': variant({ data: data({ ia_active: 7 }) }),
+    'no program list': variant({ data: data({ ia_programs: undefined }) }),
+    'a program list that is not a list': variant({ data: data({ ia_programs: '{}' }) }),
+    'two programs': variant({ data: data({ ia_programs: JSON.stringify([...JSON.parse(snap.data.ia_programs), { id: 'other' }]) }) }),
+    'no time': variant({ made: undefined }),
+    'a time that is not text': variant({ made: 5 }),
+  };
+  const reads: Record<string, unknown> = {};
+  for (const [what, text] of Object.entries(files)) {
+    src.IA.ctx['__text'] = text;
+    const r = src.ev('readBackup(__text)');
+    reads[what] = r.ok ? { ok: true, programs: r.programs, made: r.made, keys: Object.keys(r.data).length } : { ok: false, why: r.why };
+  }
+  const n = Object.keys(snap.data).length, made = '2026-09-01T11:30:00.000Z';
+  const bad = { ok: false, why: 'bad' };
+  assert.deepStrictEqual(reads, {
+    'the file as written': { ok: true, programs: 1, made, keys: n }, 'text cut short': bad, 'another kind': bad,
+    'a newer format': { ok: false, why: 'newer' }, 'no format': bad, 'the format as text': bad, 'data that is a list': bad, 'no data': bad,
+    'a key not the app\'s': bad, 'a value not a string': bad, 'no program list': bad, 'a program list that is not a list': bad,
+    'two programs': { ok: true, programs: 2, made, keys: n }, 'no time': { ok: true, programs: 1, made: '', keys: n },
+    'a time that is not text': { ok: true, programs: 1, made: '', keys: n },
+  }, 'typed from D264: only a good file reads, a newer format is told apart, and a missing time reads as none');
+
+  // A second phone with a program of its own, made on another morning (so its id is not the file's), a day trained on
+  // it, and a key that is not the app's.
+  const dst = new Phone().launch(at(START, 1, '06:00'));
+  const other = dst.generate(PACE);
+  assert.notEqual(other, id);
+  dst.launch(at(START, 1, '07:00'));
+  const d = training(dst, 1)[0];
+  if (d) trainDay(dst, 1, d, 2);
+  dst.damage('keep', 'the phone\'s own');
+  dst.launch(at(START, 1, '08:00'));
+  const held = dst.dump();
+  assert.ok(Object.keys(held).some((k) => k.endsWith(other) && !(k in snap.data)), 'the phone holds an ia_ key the file does not');
+  // The phone refuses the load's last write, once, after the file's other keys are written, one of them a key the phone
+  // did not hold: nothing changes.
+  const fileKeys = Object.keys(snap.data), last = fileKeys[fileKeys.length - 1]!;
+  assert.ok(fileKeys.slice(0, -1).some((k) => !(k in held)), 'the load writes a key the phone did not hold before the refused one');
+  const LS = dst.IA.localStorage;
+  const set = LS.setItem;
+  let refusals = 0;
+  LS.setItem = (k: string, v: string) => { if (k === last && !refusals) { refusals++; throw new Error('QuotaExceededError'); } set(k, v); };
+  dst.IA.ctx['__text'] = good;
+  const refusedLoad = dst.ev('loadBackupData(readBackup(__text).data)');
+  LS.setItem = set;
+  assert.equal(refusals, 1, 'the write was refused');
+  assert.equal(refusedLoad, false);
+  assert.deepStrictEqual(dst.dump(), held, 'a refused load puts back every ia_ key the phone held, and leaves none of the file\'s');
+  const refused = dst.record();
+  // Then the load goes through: the phone holds the file's ia_ keys and no other, and its own key stays.
+  assert.equal(dst.ev('loadBackupData(readBackup(__text).data)'), true);
+  assert.deepStrictEqual(dst.dump(), src.dump(), 'every ia_ key the file\'s, byte for byte');
+  assert.equal(dst.IA.localStorage.getItem('keep'), 'the phone\'s own', 'a key not the app\'s stays');
+  dst.launch(at(START, 1, '08:05'));
+  golden['backups refused, a load refused, and a backup loaded over another program'] = {
+    keys: Object.keys(snap.data), reads, refused, loaded: dst.record(),
+  };
+});
+
 afterAll(() => {
   // One file for the whole feature. A case that failed above left its entry out, and the comparison says so.
   matchSnapshot('stored-state', { zone: process.env['TZ'], created: CREATED, records: golden as Record<string, StateRecord> });

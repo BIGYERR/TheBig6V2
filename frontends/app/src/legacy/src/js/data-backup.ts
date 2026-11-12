@@ -1,5 +1,8 @@
 import { iaStore } from './storage.ts';
 import { showToast } from './rest-day-shell.ts';
+import {
+  backupProgramCount, loadBackupInto, readBackupText, takeBackup,
+} from '../../../../../../core/src/engine/state-backup.ts';
 import { IA_VERSION } from './update-check.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // D264 (data backup): every key the app stores starts ia_, and it all lives in this one address's browser storage, so
@@ -7,45 +10,18 @@ import { IA_VERSION } from './update-check.ts';
 // holding every ia_ key exactly as stored; loading one replaces this phone's ia_ keys and reloads, so the app boots on
 // it as it would on its own. Nothing is sent anywhere: the file goes only where the athlete shares it.
 // The Bugs page draws the "Your data" block (screens-late.html here, the bug report component in the Angular app);
-// both call the functions below.
-const BACKUP_KIND='asylum-backup';
-const BACKUP_FORMAT=1;   // the file's shape, a counter of its own; never a release version
-type BackupData=Record<string,string>;
-type BackupRead={ok:true,data:BackupData,programs:number,made:string}|{ok:false,why:'bad'|'newer'};
+// both call the functions below. The file's snapshot, its reader and its loader live in core
+// (core/src/engine/state-backup.ts, v0.261.8); the page hands them its store, its release and the clock.
+import type { BackupData, BackupRead } from '../../../../../../core/src/engine/state-backup.ts';
 
-function _backupKeys(): string[]{
-  const keys: string[]=[];
-  iaStore.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});
-  return keys.sort();
-}
-function backupSnapshot(){
-  const data: BackupData={};
-  _backupKeys().forEach(k=>{const v=iaStore.get(k);if(v!=null) data[k]=v;});
-  return {kind:BACKUP_KIND,format:BACKUP_FORMAT,version:String(IA_VERSION),made:new Date().toISOString(),data};
-}
+function backupSnapshot(){return takeBackup(iaStore,String(IA_VERSION),Date.now());}
 // The phone's local date, so a backup made late at night carries the day the athlete saw.
 function backupFileName(at?: Date){
   const t=at||new Date();const p=(n: number)=>String(n).padStart(2,'0');
   return 'asylum-backup-'+t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate())+'.json';
 }
-function _programCount(raw: string|undefined): number{
-  if(raw==null) return -1;
-  try{const a=JSON.parse(raw);return Array.isArray(a)?a.length:-1;}catch{return -1;}
-}
 // Checks a file's text and touches nothing. A newer format is told apart, so the athlete knows to update the app.
-function readBackup(text: string): BackupRead{
-  let f: any;
-  try{f=JSON.parse(text);}catch{return {ok:false,why:'bad'};}
-  if(!f||typeof f!=='object'||f.kind!==BACKUP_KIND) return {ok:false,why:'bad'};
-  if(typeof f.format==='number'&&f.format>BACKUP_FORMAT) return {ok:false,why:'newer'};
-  if(f.format!==BACKUP_FORMAT) return {ok:false,why:'bad'};
-  const d=f.data;
-  if(!d||typeof d!=='object'||Array.isArray(d)) return {ok:false,why:'bad'};
-  if(!Object.keys(d).every(k=>k.indexOf('ia_')===0&&typeof d[k]==='string')) return {ok:false,why:'bad'};
-  const programs=_programCount(d.ia_programs);
-  if(programs<0) return {ok:false,why:'bad'};
-  return {ok:true,data:d,programs,made:typeof f.made==='string'?f.made:''};
-}
+function readBackup(text: string): BackupRead{return readBackupText(text);}
 function backupMessage(r: BackupRead){
   if(!r.ok) return r.why==='newer'?'This backup is from a newer app. Update the app first.':'That file is not an Asylum backup.';
   const d=new Date(r.made);
@@ -54,20 +30,7 @@ function backupMessage(r: BackupRead){
 }
 // Replaces every ia_ key with the file's. A refused write (storage full) puts back what the phone held, so a load is
 // all or nothing. Keys that do not start ia_ are not the app's and stay.
-function loadBackupData(data: BackupData): boolean{
-  const before: BackupData={};
-  const keys=_backupKeys();
-  keys.forEach(k=>{const v=iaStore.get(k);if(v!=null) before[k]=v;});
-  try{
-    keys.forEach(k=>iaStore.remove(k));
-    Object.keys(data).forEach(k=>iaStore.set(k,data[k]!));
-    return true;
-  }catch{
-    _backupKeys().forEach(k=>{try{iaStore.remove(k);}catch{}});
-    Object.keys(before).forEach(k=>{try{iaStore.set(k,before[k]!);}catch{}});
-    return false;
-  }
-}
+function loadBackupData(data: BackupData): boolean{return loadBackupInto(iaStore,data);}
 function applyBackup(data: BackupData): boolean{
   if(!loadBackupData(data)){showToast('Loading failed. Nothing changed.');return false;}
   location.reload();
@@ -77,7 +40,7 @@ function applyBackup(data: BackupData): boolean{
 // file, else a download. The share sheet is its own confirmation, and a cancel is silent.
 function saveBackup(): string{
   const snap=backupSnapshot();
-  if(_programCount(snap.data['ia_programs'])<1){showToast('Nothing to back up yet.');return 'empty';}
+  if(backupProgramCount(snap.data['ia_programs'])<1){showToast('Nothing to back up yet.');return 'empty';}
   const name=backupFileName(),text=JSON.stringify(snap);
   const fail=()=>showToast('Backup failed. Try again.');
   const island=(window as any).iaIsland;
