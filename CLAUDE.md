@@ -142,6 +142,10 @@ issued D265 before the ruling was written, and it shipped as D266.
    **Push only when Mario asks**, with `node tools/land.mjs` from the worktree (local `dev` fast-forwarded and pushed in one step; One chat per worktree), and never wait on CI (Mario, Post-v0.250.0): the push runs the full suite there and Mario
    reviews it himself; read a run (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) only when he asks. **Mario opens
    every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one (Mario, Post-V239).** When he has merged it, tag what merged: `node tools/land.mjs --tag v<version>` from the chat's worktree (it fetches, makes the tag on `origin/main` when there is none, refuses unless the commit it names carries that version and is on `main`, and pushes the tag from the main checkout, the one place the push hook lets a tag through; Post-v0.261.5: a worktree chat could make the tag and not push it).
+   **The next chat's prompt waits for the merge** (Mario, Post-v0.261.7: "give me the prompt for the new chat once i tell
+   you its merged, so it improves the workflow"). At commit and at push, give the summary and say the prompt follows the
+   merge. When Mario says it is merged: tag it (above), read the deploy picture (step 7), then give the prompt, written
+   against what landed, its model and effort on top. Every prompt for a next chat carries the same closing.
    **Every push ends with its pull request summary in chat** (Mario, Post-v0.259.3: "when i say push go ahead and throw the
    summary in the chat too"). After `land.mjs` pushes, post one fenced Markdown block he copies into the pull request into
    `main`, covering everything that pull request will carry (`git log origin/main..origin/dev`, not only this chat's
