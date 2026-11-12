@@ -19,8 +19,14 @@ Each phase starts only on Mario's GO, one phase step per session.
 - **Found by the records, not fixed:** on every Monday after the clocks go forward, the app reads the week before
   (section 7). Mario's program is not touched by it (the clocks went back on 2026-11-01, and that direction reads
   right).
-- **Not done, waiting on Mario:** the engine check on today's app (decision 4), and whether lift slices may reach his
-  phone before the race (decision 3).
+- **Mario, 2026-11-12:** decision 4 is yes, and **GO for phase 2** once the engine check ships. **The December 6 holds
+  are lifted** ("dont worry about the december 6 race, lets get this moving"): the freeze slice, the phase 5 cutover
+  and moving his real data no longer wait for the race. What stays: a backup saved before each install (phase 1's
+  numbered steps), and his GO for each phase.
+- **Step 2, the engine check (D286, `docs/decisions/engine-check.md`):** an Engine row on the Bugs tab builds HALF_MANNY
+  and the 864 lattice configs on the phone and prints how many digests match the ones CI pins. Measured first: a
+  digest depends on neither the clock nor the time zone (24 runs, each 864 of 864), and the engine makes no storage
+  call (1,728 builds, 0 calls).
 - **Done, the first lift slice (v0.261.2):** every storage call goes through one store. `core/src/engine/state-store.ts`
   holds the interface and its two makers; `storage.ts` makes the page's store, `iaStore`; the 59 direct calls are gone
   (the page names `localStorage` once). Every golden record identical, no golden file touched. The lifted code sits in
@@ -89,8 +95,8 @@ Each phase starts only on Mario's GO, one phase step per session.
     was good and loaded onto an empty phone. The case "backups refused, a load refused, and a backup loaded over another program"
     adds its records (336 lines, none changed). The break check is at 64 breaks, all red, and 3 open: the two before, and a
     key with no value, which no store can hand the snapshot.
-- **Next, on his GO:** after 2026-12-06, `applyOverlays` with the freeze (Mario, Post-v0.261.6: it rewrites the grid on
-  every launch), then `refreshProgram` and the freeze. The other readers the Progress screen uses
+- **Next, on his GO:** `applyOverlays` with the freeze (Mario, Post-v0.261.6: it rewrites the grid on
+  every launch), then `refreshProgram` and the freeze. No longer held for 2026-12-06 (Mario, 2026-11-12). The other readers the Progress screen uses
   (`lift-ledger-progress-screen.ts`, `progress-charts.ts`) move with that screen, and the backup's saving and reading of
   a file with the Bugs screen.
 
@@ -110,8 +116,9 @@ inside the migration, in the code that replaces it.
 1. The engine in `core/` stays unchanged. The 864 config lattice and the HALF_MANNY digest stay green at every step, and
    before cutover they pass on the phone itself.
 2. The stored program grid comes across byte for byte (V202: 9 of 9 logged runs flipped off target when it did not).
-3. Mario's logs. Everything under the `ia_` keys is the only copy. Today's app keeps working through 2026-12-06, and
-   his real data does not move to the new app until after that date, on his GO.
+3. Mario's logs. Everything under the `ia_` keys is the only copy. Today's app keeps working until cutover, and his
+   real data moves to the new app only on his GO, behind a backup he saved first (the date hold was lifted, Mario
+   2026-11-12, section 6 decision 13).
 4. Every backup file the current app has ever written loads in the new app.
 5. No test is deleted until its replacement passes and has been shown to go red when the code is broken on purpose.
 6. No redesign. The Track look carries over as it is.
@@ -567,7 +574,9 @@ Each with the session's pick first.
    install behind a backup saved first (phase 1's numbered steps). The freeze slice still waits for 2026-12-07.** Pick: yes for the small ones, each behind a backup you
    save first, and the freeze slice only after 2026-12-06. Against: any change under your logs three weeks from a
    race is a risk you do not need; holding all of phase 1 off `main` until December 7 costs about two weeks.
-4. **The engine check on today's app.** Pick: yes, one line on the Bugs tab. It is the only way to learn what the
+4. **The engine check on today's app.** **Answered 2026-11-12: yes, one line on the Bugs tab that runs the lattice and
+   HALF_MANNY on the phone and prints how many digests match (D286, `docs/decisions/engine-check.md`). With it, GO for
+   phase 2 once it ships.** Pick: yes, one line on the Bugs tab. It is the only way to learn what the
    phone prescribes today. Against: it is a visible change in a phase that promised none.
 5. **Your real backup on the Mac for the rehearsal.** Pick: yes, in `temp/` (gitignored), deleted after. It never
    enters the repo or leaves the Mac.
@@ -585,6 +594,10 @@ Each with the session's pick first.
     2026-12-06, as its own D-code: that slice rewrites those lines anyway, and nothing reads wrong for you before
     2027-03-14. Against: it is a real defect in the app today, and a southern hemisphere athlete would meet it in
     October; but there is no such athlete until the public build.
+13. **The December 6 holds.** **Answered 2026-11-12: lifted** ("dont worry about the december 6 race, lets get this
+    moving"). The freeze slice (phase 1 step 3), the cutover (phase 5) and moving Mario's real data no longer wait for
+    2026-12-07. A backup saved before each install still guards his logs, and each phase still starts on his GO.
+    Decision 3's "the freeze slice still waits" and decision 12's "after 2026-12-06" are superseded by this one.
 
 ---
 
