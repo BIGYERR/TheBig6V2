@@ -4081,6 +4081,907 @@
           "weeksSha256": "adad276ee089a2079e0c14cad2f91e90143d7161a6bb65e6bf8a8818032d70de"
         }
       }
+    },
+    "what Progress reads from three weeks of runs, the nudge taken, and a second program": {
+      "progress": {
+        "cut": 4,
+        "recoveryPace": {
+          "weekly": {
+            "1": 610.5,
+            "2": 642,
+            "3": 666.5
+          },
+          "tgt": 800,
+          "nWeeks": 3
+        },
+        "ladder": {
+          "1": 4.2,
+          "2": 5.8,
+          "3": 7.4
+        },
+        "ladderNoFirst": {
+          "2": 5.8,
+          "3": 7.4
+        },
+        "byClass": {
+          "Recovery": [
+            {
+              "w": 1,
+              "sec": 607
+            },
+            {
+              "w": 1,
+              "sec": 614
+            },
+            {
+              "w": 2,
+              "sec": 642
+            },
+            {
+              "w": 3,
+              "sec": 663
+            },
+            {
+              "w": 3,
+              "sec": 670
+            }
+          ],
+          "Easy": [],
+          "Long": [
+            {
+              "w": 1,
+              "sec": 501
+            },
+            {
+              "w": 2,
+              "sec": 529
+            },
+            {
+              "w": 3,
+              "sec": 557
+            }
+          ],
+          "Tempo": [],
+          "Interval": [
+            {
+              "w": 1,
+              "sec": 480
+            },
+            {
+              "w": 2,
+              "sec": 508
+            },
+            {
+              "w": 3,
+              "sec": 536
+            }
+          ]
+        },
+        "easyEffort": {
+          "weekly": {
+            "1": 610.5,
+            "2": 642,
+            "3": 666.5
+          },
+          "nRuns": 5,
+          "nWeeks": 3
+        },
+        "planned": {
+          "1": {
+            "presc": 3.1,
+            "act": 4.2
+          },
+          "2": {
+            "presc": 4,
+            "act": 5.8
+          },
+          "3": {
+            "presc": 5,
+            "act": 7.4
+          }
+        },
+        "plannedNoFirst": {
+          "2": {
+            "presc": 4,
+            "act": 5.8
+          },
+          "3": {
+            "presc": 5,
+            "act": 7.4
+          }
+        },
+        "projection": {
+          "mile": 515.5714285714286,
+          "half": 7911.428571428571
+        }
+      },
+      "undone": {
+        "rpe": "7",
+        "run_dist": "4.6",
+        "run_pace": "8:28/mi",
+        "run_mins": "39",
+        "run_reps": "",
+        "run_rep_time": "",
+        "bike_mins": "",
+        "swim_yards": "",
+        "notes": "",
+        "swapFrom": "",
+        "swapTo": "",
+        "week": 2,
+        "ts": 1788818400000
+      },
+      "nudgeTaken": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 916,
+            "sha256": "b209b12745065fccf31c19c5976d924b784d85d68ca4cac3ee54b333894ca012",
+            "value": {
+              "w1_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788213600000,
+                "status": "complete"
+              },
+              "w1_tue": {
+                "title": "Strength Support",
+                "ts": 1788300000000,
+                "status": "complete"
+              },
+              "w1_fri": {
+                "title": "Recovery Lift",
+                "ts": 1788559200000,
+                "status": "complete"
+              },
+              "w1_sat": {
+                "title": "Full Body Support",
+                "ts": 1788645600000,
+                "status": "complete"
+              },
+              "w2_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788818400000,
+                "status": "complete"
+              },
+              "w2_tue": {
+                "title": "Strength Support",
+                "ts": 1788904800000,
+                "status": "complete"
+              },
+              "w2_fri": {
+                "title": "Recovery Lift",
+                "ts": 1789164000000,
+                "status": "complete"
+              },
+              "w2_sat": {
+                "title": "Full Body Support",
+                "ts": 1789250400000,
+                "status": "complete"
+              },
+              "w3_mon": {
+                "title": "Posterior Chain",
+                "ts": 1789423200000,
+                "status": "complete"
+              },
+              "w3_tue": {
+                "title": "Strength Support",
+                "ts": 1789509600000,
+                "status": "complete"
+              },
+              "w3_fri": {
+                "title": "Recovery Lift",
+                "ts": 1789768800000,
+                "status": "complete"
+              },
+              "w3_sat": {
+                "title": "Full Body Support",
+                "ts": 1789855200000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 14084,
+            "sha256": "7b37c1d2888e4428f5649cc3d9d6e66e9d70af1c70ae67f492ea52a6b45b8c73"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 2452,
+            "sha256": "130e80c1c59ae157adc5c3b1dc7cef925407607ebb951e2bf95e9d165a30b9d9",
+            "value": {
+              "w1_mon": {
+                "rpe": "7",
+                "run_dist": "3.0",
+                "run_pace": "8:00/mi",
+                "run_mins": "24",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788213600000
+              },
+              "w1_tue": {
+                "rpe": "3",
+                "run_dist": "3.4",
+                "run_pace": "10:07/mi",
+                "run_mins": "34",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788300000000
+              },
+              "w1_fri": {
+                "rpe": "3",
+                "run_dist": "3.8",
+                "run_pace": "10:14/mi",
+                "run_mins": "39",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788559200000
+              },
+              "w1_sat": {
+                "rpe": "7",
+                "run_dist": "4.2",
+                "run_pace": "8:21/mi",
+                "run_mins": "35",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788645600000
+              },
+              "w2_mon": {
+                "rpe": "7",
+                "run_dist": "4.6",
+                "run_pace": "8:28/mi",
+                "run_mins": "39",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 2,
+                "ts": 1788818400000
+              },
+              "w2_tue": {
+                "rpe": "3",
+                "run_dist": "5.0",
+                "run_pace": "10:35/mi",
+                "run_mins": "53",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "45",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "run",
+                "swapTo": "bike",
+                "week": 2,
+                "ts": 1788904800000
+              },
+              "w2_fri": {
+                "rpe": "3",
+                "run_dist": "5.4",
+                "run_pace": "10:42/mi",
+                "run_mins": "58",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 2,
+                "ts": 1789164000000
+              },
+              "w2_sat": {
+                "rpe": "7",
+                "run_dist": "5.8",
+                "run_pace": "8:49/mi",
+                "run_mins": "51",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 2,
+                "ts": 1789250400000
+              },
+              "w3_mon": {
+                "rpe": "7",
+                "run_dist": "6.2",
+                "run_pace": "8:56/mi",
+                "run_mins": "55",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 3,
+                "ts": 1789423200000
+              },
+              "w3_tue": {
+                "rpe": "3",
+                "run_dist": "6.6",
+                "run_pace": "11:03/mi",
+                "run_mins": "73",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 3,
+                "ts": 1789509600000
+              },
+              "w3_fri": {
+                "rpe": "3",
+                "run_dist": "7.0",
+                "run_pace": "11:10/mi",
+                "run_mins": "78",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 3,
+                "ts": 1789768800000
+              },
+              "w3_sat": {
+                "rpe": "7",
+                "run_dist": "7.4",
+                "run_pace": "9:17/mi",
+                "run_mins": "69",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 3,
+                "ts": 1789855200000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 28,
+            "sha256": "2e5ea66161a66732645c51f8929d7a45bd390d30176ede18aee23537044ed4c9",
+            "value": {
+              "date": "2026-9-19",
+              "idx": 0
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 38,
+            "sha256": "318c31865715cf33059974f5d1231873667fbc1290ccc8e16a261050889636df",
+            "value": {
+              "workout": 13,
+              "reminder": 1,
+              "streak": 2
+            }
+          },
+          "ia_programs": {
+            "bytes": 84299,
+            "sha256": "79fd04635436408656088c550012cfb2128cf7bf82d4c67bcbe8061511ba7141"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 9,
+            "sha256": "8f229dbcc67db4d5d6151beca41bb578e1bb6bf3a1baa8cd063dde107fe8b992",
+            "value": "2026-9-23"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 57,
+            "sha256": "219828e0042603505de74209ebe70aea79b0f3285daa6948a666d8e8ad2cddc0",
+            "value": {
+              "w1_thu": true,
+              "w2_thu": true,
+              "w3_thu": true,
+              "w4_tue": true
+            }
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "208eefac68e2c21f67e80d240a0662ff4ee9c323a520dbd3b975ded7a8d9d47d",
+            "value": {
+              "Trap bar deadlift": {
+                "to": "Barbell Romanian deadlift",
+                "n": 3,
+                "offered": true
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 221,
+            "sha256": "6e784bba5cff659f5f1c030af6773e88b30283d3636d92de559f1484222ecefa",
+            "value": {
+              "w4_mon": [
+                {
+                  "from": "Trap bar deadlift",
+                  "to": "Barbell Romanian deadlift",
+                  "ts": 1790164800000,
+                  "rx": [
+                    {
+                      "s": 0,
+                      "i": 0,
+                      "d": "3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 3 min rest"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "ce237c905a69b0a2"
+          }
+        ],
+        "live": {
+          "week": 4,
+          "digest": "c0083422f8ed8406",
+          "weeksSha256": "54802dec1efa72dbccc7202233cd417db987926e7450b38ec525228c5ab0b715"
+        }
+      },
+      "second": {
+        "seed": {
+          "progId": "prog_1788008400000",
+          "progName": "THE HALF MANNY",
+          "latest": 1789768800000,
+          "n": 4,
+          "avgRecSec": 647.25,
+          "mileSec": 497.25,
+          "maxDist": 7.4
+        },
+        "warns": {
+          "first": true,
+          "second": false
+        },
+        "progress": {
+          "cut": 1,
+          "recoveryPace": {
+            "weekly": {},
+            "tgt": null,
+            "nWeeks": 0
+          },
+          "ladder": {},
+          "ladderNoFirst": {},
+          "byClass": {
+            "Recovery": [],
+            "Easy": [],
+            "Long": [],
+            "Tempo": [],
+            "Interval": []
+          },
+          "easyEffort": {
+            "weekly": {},
+            "nRuns": 0,
+            "nWeeks": 0
+          },
+          "planned": {},
+          "plannedNoFirst": {},
+          "projection": {
+            "mile": null,
+            "half": null
+          }
+        },
+        "record": {
+          "keys": {
+            "ia_active": {
+              "bytes": 18,
+              "sha256": "11c29206408ba7b50c6da077fc52aef9591644a79e92fda2a2b70d2dd6c0a452",
+              "value": "prog_1790164800000"
+            },
+            "ia_comp_prog_1788008400000": {
+              "bytes": 916,
+              "sha256": "b209b12745065fccf31c19c5976d924b784d85d68ca4cac3ee54b333894ca012",
+              "value": {
+                "w1_mon": {
+                  "title": "Posterior Chain",
+                  "ts": 1788213600000,
+                  "status": "complete"
+                },
+                "w1_tue": {
+                  "title": "Strength Support",
+                  "ts": 1788300000000,
+                  "status": "complete"
+                },
+                "w1_fri": {
+                  "title": "Recovery Lift",
+                  "ts": 1788559200000,
+                  "status": "complete"
+                },
+                "w1_sat": {
+                  "title": "Full Body Support",
+                  "ts": 1788645600000,
+                  "status": "complete"
+                },
+                "w2_mon": {
+                  "title": "Posterior Chain",
+                  "ts": 1788818400000,
+                  "status": "complete"
+                },
+                "w2_tue": {
+                  "title": "Strength Support",
+                  "ts": 1788904800000,
+                  "status": "complete"
+                },
+                "w2_fri": {
+                  "title": "Recovery Lift",
+                  "ts": 1789164000000,
+                  "status": "complete"
+                },
+                "w2_sat": {
+                  "title": "Full Body Support",
+                  "ts": 1789250400000,
+                  "status": "complete"
+                },
+                "w3_mon": {
+                  "title": "Posterior Chain",
+                  "ts": 1789423200000,
+                  "status": "complete"
+                },
+                "w3_tue": {
+                  "title": "Strength Support",
+                  "ts": 1789509600000,
+                  "status": "complete"
+                },
+                "w3_fri": {
+                  "title": "Recovery Lift",
+                  "ts": 1789768800000,
+                  "status": "complete"
+                },
+                "w3_sat": {
+                  "title": "Full Body Support",
+                  "ts": 1789855200000,
+                  "status": "complete"
+                }
+              }
+            },
+            "ia_exw_prog_1788008400000": {
+              "bytes": 282,
+              "sha256": "e827b0f7d60d4be3e3302c0060d98a2df3d40276cc2a803db15b2a978a34a41c",
+              "value": {
+                "barbell_romanian_deadlift": {
+                  "name": "Barbell Romanian deadlift",
+                  "entries": [
+                    {
+                      "weight": 140,
+                      "setsReps": "3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 3 min rest",
+                      "setsDone": [
+                        5,
+                        5
+                      ],
+                      "setsW": [
+                        135,
+                        140
+                      ],
+                      "week": 4,
+                      "day": "mon",
+                      "ts": 1790164800000
+                    }
+                  ]
+                }
+              }
+            },
+            "ia_hist_prog_1788008400000": {
+              "bytes": 14870,
+              "sha256": "325665f3dfa7342074c2257a939168bad3daee05ba5b3398aedf80f2a210e050"
+            },
+            "ia_logs_prog_1788008400000": {
+              "bytes": 2491,
+              "sha256": "6b9dc15482c72f8082c4140afeac53fa274b99f1fcec0b9837114b9b0f1c92ea",
+              "value": {
+                "w1_mon": {
+                  "rpe": "7",
+                  "run_dist": "3.0",
+                  "run_pace": "8:00/mi",
+                  "run_mins": "24",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 1,
+                  "ts": 1788213600000
+                },
+                "w1_tue": {
+                  "rpe": "3",
+                  "run_dist": "3.4",
+                  "run_pace": "10:07/mi",
+                  "run_mins": "34",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 1,
+                  "ts": 1788300000000
+                },
+                "w1_fri": {
+                  "rpe": "3",
+                  "run_dist": "3.8",
+                  "run_pace": "10:14/mi",
+                  "run_mins": "39",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 1,
+                  "ts": 1788559200000
+                },
+                "w1_sat": {
+                  "rpe": "7",
+                  "run_dist": "4.2",
+                  "run_pace": "8:21/mi",
+                  "run_mins": "35",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 1,
+                  "ts": 1788645600000
+                },
+                "w2_mon": {
+                  "rpe": "7",
+                  "run_dist": "4.6",
+                  "run_pace": "8:28/mi",
+                  "run_mins": "39",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 2,
+                  "ts": 1788818400000
+                },
+                "w2_tue": {
+                  "rpe": "3",
+                  "run_dist": "5.0",
+                  "run_pace": "10:35/mi",
+                  "run_mins": "53",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "45",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "run",
+                  "swapTo": "bike",
+                  "week": 2,
+                  "ts": 1788904800000
+                },
+                "w2_fri": {
+                  "rpe": "3",
+                  "run_dist": "5.4",
+                  "run_pace": "10:42/mi",
+                  "run_mins": "58",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 2,
+                  "ts": 1789164000000
+                },
+                "w2_sat": {
+                  "rpe": "7",
+                  "run_dist": "5.8",
+                  "run_pace": "8:49/mi",
+                  "run_mins": "51",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 2,
+                  "ts": 1789250400000
+                },
+                "w3_mon": {
+                  "rpe": "7",
+                  "run_dist": "6.2",
+                  "run_pace": "8:56/mi",
+                  "run_mins": "55",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 3,
+                  "ts": 1789423200000
+                },
+                "w3_tue": {
+                  "rpe": "3",
+                  "run_dist": "6.6",
+                  "run_pace": "11:03/mi",
+                  "run_mins": "73",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 3,
+                  "ts": 1789509600000
+                },
+                "w3_fri": {
+                  "rpe": "3",
+                  "run_dist": "7.0",
+                  "run_pace": "11:10/mi",
+                  "run_mins": "78",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 3,
+                  "ts": 1789768800000
+                },
+                "w3_sat": {
+                  "rpe": "7",
+                  "run_dist": "7.4",
+                  "run_pace": "9:17/mi",
+                  "run_mins": "69",
+                  "run_reps": "",
+                  "run_rep_time": "",
+                  "bike_mins": "",
+                  "swim_yards": "",
+                  "notes": "",
+                  "swapFrom": "",
+                  "swapTo": "",
+                  "week": 3,
+                  "ts": 1789855200000
+                },
+                "w4_mon": {
+                  "week": 4,
+                  "ts": 1790164800000
+                }
+              }
+            },
+            "ia_pop_dismiss_prog_1788008400000": {
+              "bytes": 28,
+              "sha256": "2e5ea66161a66732645c51f8929d7a45bd390d30176ede18aee23537044ed4c9",
+              "value": {
+                "date": "2026-9-19",
+                "idx": 0
+              }
+            },
+            "ia_pop_idx_prog_1788008400000": {
+              "bytes": 38,
+              "sha256": "318c31865715cf33059974f5d1231873667fbc1290ccc8e16a261050889636df",
+              "value": {
+                "workout": 13,
+                "reminder": 1,
+                "streak": 2
+              }
+            },
+            "ia_programs": {
+              "bytes": 154915,
+              "sha256": "29dc7f993bf4c779150b33962aa80819abf1a3ab9d7387b24055ee4bdb7b56c8"
+            },
+            "ia_remind_last_prog_1788008400000": {
+              "bytes": 9,
+              "sha256": "8f229dbcc67db4d5d6151beca41bb578e1bb6bf3a1baa8cd063dde107fe8b992",
+              "value": "2026-9-23"
+            },
+            "ia_reminded_prog_1788008400000": {
+              "bytes": 57,
+              "sha256": "219828e0042603505de74209ebe70aea79b0f3285daa6948a666d8e8ad2cddc0",
+              "value": {
+                "w1_thu": true,
+                "w2_thu": true,
+                "w3_thu": true,
+                "w4_tue": true
+              }
+            },
+            "ia_swapct_prog_1788008400000": {
+              "bytes": 77,
+              "sha256": "208eefac68e2c21f67e80d240a0662ff4ee9c323a520dbd3b975ded7a8d9d47d",
+              "value": {
+                "Trap bar deadlift": {
+                  "to": "Barbell Romanian deadlift",
+                  "n": 3,
+                  "offered": true
+                }
+              }
+            },
+            "ia_swaps_prog_1788008400000": {
+              "bytes": 221,
+              "sha256": "6e784bba5cff659f5f1c030af6773e88b30283d3636d92de559f1484222ecefa",
+              "value": {
+                "w4_mon": [
+                  {
+                    "from": "Trap bar deadlift",
+                    "to": "Barbell Romanian deadlift",
+                    "ts": 1790164800000,
+                    "rx": [
+                      {
+                        "s": 0,
+                        "i": 0,
+                        "d": "3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 3 min rest"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "programs": [
+            {
+              "id": "prog_1788008400000",
+              "totalWeeks": 14,
+              "startDate": "2026-08-31",
+              "overlays": 0,
+              "digest": "ce237c905a69b0a2"
+            },
+            {
+              "id": "prog_1790164800000",
+              "totalWeeks": 11,
+              "startDate": "2026-09-23",
+              "overlays": 0,
+              "digest": "82228f70f757e0d1"
+            }
+          ],
+          "live": {
+            "week": 1,
+            "digest": "d4fd8cfedb26fa88",
+            "weeksSha256": "a46adbeadd2982516af7a75cfd5ce523a196e5dde21af25c2c7a6ca87e860b79"
+          }
+        }
+      }
     }
   }
 }

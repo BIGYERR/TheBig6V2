@@ -25,6 +25,7 @@
   "engine/state-programs.ts",
   "engine/state-swaps.ts",
   "engine/state-day-edits.ts",
+  "engine/state-progress.ts",
   "engine/exercise-kinds.ts",
   "engine/calendar.ts",
   "engine/clock-format.ts",

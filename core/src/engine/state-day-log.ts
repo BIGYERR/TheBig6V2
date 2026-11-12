@@ -114,8 +114,16 @@ function runPartLogged(e: StoredDayEntry | null | undefined, type: unknown): boo
   const sport=String(e.swapTo||type||'run').toLowerCase();
   return (CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ const v=e[f]; return v!==undefined&&v!==null&&v!==''&&v!==0&&v!=='0'; });
 }
+// V236 (D218): the cardio card's regime, derived from the store and never stored. LIVE when the stored entry holds a
+// value in the active sport's field set, the same truth test _hasLog makes minus the notes, so a legacy "0.00" is
+// live. Moved out of the page's day-status.ts (cardioEntryLive) in v0.261.7; the page reads the active sport off the
+// card and relabels the Log button.
+function cardioEntryLogged(e: StoredDayEntry | null | undefined, sport: string): boolean{
+  return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ return !!e[f]; });
+}
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  CARDIO_PARK_FIELDS, dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, runPartLogged, setDraftOf, writeDayLogs,
+  CARDIO_PARK_FIELDS, cardioEntryLogged, dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, runPartLogged,
+  setDraftOf, writeDayLogs,
 };

@@ -4,7 +4,9 @@
 // (core/src/engine/state-day-log.ts and state-day-status.ts, v0.261.4), the day history
 // (core/src/engine/state-day-history.ts, v0.261.5), and the swaps, the swap counts, the day edits, the program list,
 // the active program and the Wildcard's record (core/src/engine/state-swaps.ts, state-day-edits.ts and
-// state-programs.ts, v0.261.6). Every expected value is typed from the ruling.
+// state-programs.ts, v0.261.6), and what Progress reads and computes from the stored state, the run card's regime and
+// the nudge's preference (core/src/engine/state-progress.ts, state-day-log.ts and state-programs.ts, v0.261.7). Every
+// expected value is typed from the ruling.
 // What the app stores through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
@@ -13,14 +15,15 @@ import type { StateStore, StorageLike } from '@ia/core/engine/state-store.ts';
 import { dedupeExDayEntries, entryDay, readLiftLog, recordLift, weeklyBest, writeLiftLog } from '@ia/core/engine/state-lift-log.ts';
 import type { LiftEntry, LiftLog, LiftRecord } from '@ia/core/engine/state-lift-log.ts';
 import {
-  CARDIO_PARK_FIELDS, dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, runPartLogged, setDraftOf, writeDayLogs,
+  CARDIO_PARK_FIELDS, cardioEntryLogged, dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, runPartLogged, setDraftOf, writeDayLogs,
 } from '@ia/core/engine/state-day-log.ts';
-import type { DayLogs } from '@ia/core/engine/state-day-log.ts';
+import type { DayLogs, StoredDayEntry } from '@ia/core/engine/state-day-log.ts';
 import {
   clearDayParts, clearDayStatus, dayStatus, partsOfDay, readCompleted, readPartSkips, setDayStatus, settleDayParts, skipDayPart,
   writeCompleted, writePartSkips,
 } from '@ia/core/engine/state-day-status.ts';
 import { readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory } from '@ia/core/engine/state-day-history.ts';
+import type { DayHistory } from '@ia/core/engine/state-day-history.ts';
 import {
   SWAP_NUDGE_AT, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts, readSwaps, writeSwapCounts,
   writeSwaps,
@@ -29,8 +32,13 @@ import {
   addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits, writeDayEdits,
 } from '@ia/core/engine/state-day-edits.ts';
 import {
-  readActiveProgramId, readPrograms, readWildcardDone, writeActiveProgramId, writePrograms, writeWildcardDone,
+  readActiveProgramId, readPrograms, readWildcardDone, recordSwapPreference, writeActiveProgramId, writePrograms, writeWildcardDone,
 } from '@ia/core/engine/state-programs.ts';
+import {
+  EASY_RPE_HI, EASY_RPE_LO, RUN_CLASS_ORDER, SEED_MIN_RUNS, SEED_WINDOW_DAYS, easyPaceByWeek, halfFromMilePace, liftLogFeedsOthers,
+  longestRunByWeek, mileFromRecoveryPace, paceSeconds, plannedAndLoggedMiles, programWeekAt, progressCutWeek, recoveryPaceByWeek,
+  recoveryPaceEntry, runClassOf, runPacesByClass, seedFromStoredPrograms,
+} from '@ia/core/engine/state-progress.ts';
 import type { Day, Program } from '@ia/core';
 import { appScript, loadApp, pinClock } from '../support/app.ts';
 
@@ -798,4 +806,203 @@ test('the page\'s own names still answer as they did: a swap, its undo, the coun
   assert.deepEqual([get('ia_programs'), get('ia_active'), get('ia_wild_p9')], ['[{"id":"p9","name":"X"}]', 'p9', '[{"title":"Ruck","ts":1,"week":null,"dayKey":null}]']);
   assert.deepEqual([IA.eval('JSON.stringify(getPrograms())'), IA.eval('getActiveProgId()'), IA.eval('JSON.stringify(getWildcardDone())')],
     ['[{"id":"p9","name":"X"}]', 'p9', '[{"title":"Ruck","ts":1,"week":null,"dayKey":null}]']);
+});
+
+// ── What Progress reads and computes from the stored state (core/src/engine/state-progress.ts, v0.261.7), the run card's
+// regime (state-day-log.ts) and the nudge's preference (state-programs.ts). Every value is typed from the ruling and
+// PACE_CHART's rows. ──
+const DAY = 86_400_000;
+const hist = (h: Record<string, unknown>): DayHistory => h as unknown as DayHistory;
+const runDay = (subtype: string, dose?: Record<string, unknown>, type = 'run') => ({ cardio: { type, subtype, ...(dose ? { dose } : {}) } });
+
+test('the constants: a 21-day window, three runs, RPE 3 to 4, and the five classes in order', () => {
+  assert.deepEqual([SEED_WINDOW_DAYS, SEED_MIN_RUNS, EASY_RPE_LO, EASY_RPE_HI], [21, 3, 3, 4]);
+  assert.deepEqual(RUN_CLASS_ORDER, ['Recovery', 'Easy', 'Long', 'Tempo', 'Interval']);
+});
+
+test('a pace reads as seconds a mile, and the pace table walks both ways, clamped at its edges', () => {
+  assert.deepEqual(['10:26/mi', ' 7:30 ', '7:3', 'abc', '', null].map(paceSeconds), [626, 450, null, null, null, null]);
+  assert.deepEqual([400, 420, 437.5, 630, 870, 900, 0].map(mileFromRecoveryPace), [300, 300, 315, 480, 720, 720, null]);
+  assert.deepEqual([280, 300, 315, 720, 800, 0].map(halfFromMilePace), [4680, 4680, 4890, 11100, 11100, null]);
+});
+
+test('a run\'s class comes from its session name, long intervals as tempo and benchmarks as none', () => {
+  const names = ['', 'Benchmark Run', 'Recovery Run', 'Long Interval (LI)', 'Speed Run — Intervals', 'Speed Run — Tempo', 'Tempo Run',
+    'Easy Run — Long', 'Easy Run', 'Strides', null];
+  assert.deepEqual(names.map(runClassOf), [null, null, 'Recovery', 'Tempo', 'Interval', 'Interval', 'Tempo', 'Long', 'Easy', null, null]);
+});
+
+test('a recovery run counts with its week, pace and target; swapped, out of the program, unsnapshotted, on a bike or not recovery, it does not', () => {
+  const H = hist({
+    w2_tue: runDay('Recovery Run', { k: 'time', tgt: 800 }), w2_wed: runDay('Recovery Ride', undefined, 'bike'), w2_thu: runDay('Easy Run'),
+    w2_fri: runDay('Recovery Run', { k: 'time', tgt: 0 }), w15_tue: runDay('Recovery Run'),
+  });
+  const e = { run_pace: '10:00/mi' };
+  assert.deepEqual(recoveryPaceEntry('w2_tue', e, H, 14), { w: 2, sec: 600, tgt: 800 });
+  assert.deepEqual(recoveryPaceEntry('w2_fri', e, H, 14), { w: 2, sec: 600, tgt: null }, 'a target of 0 is none');
+  assert.equal(recoveryPaceEntry('w2_tue', { ...e, swapTo: 'bike' }, H, 14), null);
+  assert.equal(recoveryPaceEntry('w15_tue', e, H, 14), null, 'past the program\'s weeks');
+  assert.equal(recoveryPaceEntry('w2_mon', e, H, 14), null, 'no snapshot');
+  assert.equal(recoveryPaceEntry('w2_wed', e, H, 14), null, 'a ride');
+  assert.equal(recoveryPaceEntry('w2_thu', e, H, 14), null, 'an easy run');
+  assert.equal(recoveryPaceEntry('w2_tue', {}, H, 14), null, 'no pace');
+  assert.equal(recoveryPaceEntry('w2_tue', { run_pace: '0:00' }, H, 14), null, 'a zero pace');
+  assert.equal(recoveryPaceEntry('w2_tue', null, H, 14), null);
+  assert.equal(recoveryPaceEntry('notes', e, H, 14), null, 'a key that is not a day');
+});
+
+test('the recovery pace by week is each week\'s mean, the target the mean of the targets', () => {
+  const H = hist({ w1_tue: runDay('Recovery Run', { k: 'time', tgt: 800 }), w1_fri: runDay('Recovery Run', { k: 'time', tgt: 800 }), w2_tue: runDay('Recovery Run', { k: 'time', tgt: 770 }) });
+  const L = { w1_tue: { run_pace: '10:00/mi' }, w1_fri: { run_pace: '10:20/mi' }, w2_tue: { run_pace: '10:40/mi' } };
+  assert.deepEqual(recoveryPaceByWeek(L, H, 14), { weekly: { 1: 610, 2: 640 }, tgt: 790, nWeeks: 2 });
+  assert.deepEqual(recoveryPaceByWeek({}, H, 14), { weekly: {}, tgt: null, nWeeks: 0 });
+  assert.deepEqual(recoveryPaceByWeek(null, null, 14), { weekly: {}, tgt: null, nWeeks: 0 });
+});
+
+test('the longest run of a week takes a rest-day jog as one more run, never a sum, and leaves out the cut week and, asked, week 1', () => {
+  const L = {
+    w1_mon: { run_dist: '3.1' }, w1_wed: { run_dist: '5' }, w1_sat: { restLog: { run: { dist: 6 } } }, w2_tue: { run_dist: '4' },
+    w3_thu: { run_dist: '7.5' }, w3_fri: { run_dist: '0' }, w15_mon: { run_dist: '9' }, notes: { run_dist: '9' },
+  };
+  assert.deepEqual(longestRunByWeek(L, 14, 0, false), { 1: 6, 2: 4, 3: 7.5 });
+  assert.deepEqual(longestRunByWeek(L, 14, 2, false), { 1: 6, 3: 7.5 });
+  assert.deepEqual(longestRunByWeek(L, 14, 0, true), { 2: 4, 3: 7.5 });
+});
+
+test('runs by class: one dot per run with a pace and a class, swapped and unclassed runs left out; the easy effort keeps RPE 3 and 4 on recovery and easy runs', () => {
+  const H = hist({
+    w1_mon: runDay('Speed Run — Intervals'), w1_tue: runDay('Recovery Run'), w1_thu: runDay('Easy Run'), w1_fri: runDay('Recovery Run'),
+    w1_sat: runDay('Long Run'), w1_sun: runDay('Benchmark Run'), w2_tue: runDay('Recovery Run'), w2_thu: runDay('Easy Run'),
+  });
+  const L = {
+    w1_mon: { run_pace: '8:00' }, w1_tue: { run_pace: '10:00', rpe: '3' }, w1_thu: { run_pace: '9:40', rpe: '4' }, w1_fri: { run_pace: '9:00', rpe: '5' },
+    w1_sat: { run_pace: '9:10', rpe: '3' }, w1_sun: { run_pace: '8:30' }, w2_tue: { run_pace: '10:20', rpe: 3 }, w2_thu: { run_pace: '9:50', rpe: '' },
+    w2_mon: { run_pace: '9:40' }, w2_wed: { run_pace: '9:40', swapTo: 'bike' },
+  };
+  const by = runPacesByClass(L, H, 14);
+  assert.deepEqual(Object.keys(by), ['Recovery', 'Easy', 'Long', 'Tempo', 'Interval']);
+  assert.deepEqual(by, {
+    Recovery: [{ w: 1, sec: 600 }, { w: 1, sec: 540 }, { w: 2, sec: 620 }], Easy: [{ w: 1, sec: 580 }, { w: 2, sec: 590 }],
+    Long: [{ w: 1, sec: 550 }], Tempo: [], Interval: [{ w: 1, sec: 480 }],
+  });
+  assert.deepEqual(easyPaceByWeek(L, H, 14), { weekly: { 1: 590, 2: 620 }, nRuns: 3, nWeeks: 2 });
+});
+
+test('planned and logged miles pair each distance-dosed run with its log; a swapped day, a timed run and a ride are out', () => {
+  const H = hist({
+    w1_mon: runDay('Easy Run', { k: 'dist', mi: 3 }), w1_wed: runDay('Tempo Run', { k: 'dist', mi: 2 }), w1_fri: runDay('Long Run', { k: 'time', mins: 60 }),
+    w1_sat: runDay('Easy Run', { k: 'dist', mi: 4 }), w2_mon: runDay('Easy Run', { k: 'dist', mi: 3.5 }), w2_tue: runDay('Ride', { k: 'dist', mi: 10 }, 'bike'),
+  });
+  const L = { w1_mon: { run_dist: '3.5' }, w1_sat: { run_dist: '4', swapTo: 'bike' }, w2_mon: { run_dist: '3' } };
+  assert.deepEqual(plannedAndLoggedMiles(L, H, 14, 0, false), { 1: { presc: 5, act: 3.5 }, 2: { presc: 3.5, act: 3 } });
+  assert.deepEqual(plannedAndLoggedMiles(L, H, 14, 2, false), { 1: { presc: 5, act: 3.5 } });
+  assert.deepEqual(plannedAndLoggedMiles(L, H, 14, 0, true), { 2: { presc: 3.5, act: 3 } });
+});
+
+test('a program\'s week at an instant, and the week Progress holds back: the week in progress, never the last one', () => {
+  const p = { startDate: '2026-08-31', totalWeeks: 14 } as unknown as Program;
+  const at = (y: number, m: number, d: number, h = 12) => new Date(y, m - 1, d, h).getTime();
+  const both = (when: number) => [programWeekAt(p, when), progressCutWeek(p, when)];
+  assert.deepEqual(both(at(2026, 8, 30)), [0, 0], 'the day before the start');
+  assert.deepEqual(both(at(2026, 8, 31, 0)), [1, 1], 'the first Monday at midnight');
+  assert.deepEqual(both(at(2026, 9, 23)), [4, 4]);
+  assert.deepEqual(both(at(2026, 11, 25)), [13, 13]);
+  assert.deepEqual(both(at(2026, 12, 6)), [14, 0], 'race day: the last week, never cut');
+  assert.deepEqual(both(at(2026, 12, 10)), [14, 0], 'after the program: its last week');
+  assert.equal(programWeekAt({ startDate: '2026-08-31' } as unknown as Program, at(2026, 12, 10)), 6, 'a program with no length counts six weeks');
+  assert.deepEqual([programWeekAt({ startDate: null } as unknown as Program, at(2026, 9, 23)), programWeekAt(null, at(2026, 9, 23)), progressCutWeek(null, at(2026, 9, 23))], [0, 0, 0]);
+});
+
+test('the seed: the program whose qualifying runs are latest, three or more inside 21 days and none after the instant', () => {
+  const now = 1_800_000_000_000;
+  const rec = (ks: string[]) => JSON.stringify(Object.fromEntries(ks.map((k) => [k, runDay('Recovery Run')])));
+  const A = {
+    ia_logs_a: JSON.stringify({
+      w3_tue: { run_pace: '10:00/mi', run_dist: '4', ts: now - 20 * DAY }, w3_fri: { run_pace: '10:30/mi', run_dist: '5', ts: now - 10 * DAY },
+      w4_tue: { run_pace: '11:00/mi', run_dist: '3', ts: now - 2 * DAY, restLog: { run: { dist: 6.2 } } },
+      w1_tue: { run_pace: '9:00/mi', run_dist: '8', ts: now - 30 * DAY }, w5_tue: { run_pace: '9:00/mi', run_dist: '9', ts: now + DAY },
+    }),
+    ia_hist_a: rec(['w1_tue', 'w3_tue', 'w3_fri', 'w4_tue', 'w5_tue']),
+  };
+  const B = {
+    ia_logs_b: JSON.stringify({ w2_mon: { run_pace: '9:20', ts: now - 5 * DAY }, w2_wed: { run_pace: '9:20', ts: now - 3 * DAY }, w2_fri: { run_pace: '9:20', ts: now - DAY } }),
+    ia_hist_b: rec(['w2_mon', 'w2_wed', 'w2_fri']),
+  };
+  const C = { ia_logs_c: JSON.stringify({ w1_mon: { run_pace: '9:20', ts: now - DAY }, w1_wed: { run_pace: '9:20', ts: now - DAY } }), ia_hist_c: rec(['w1_mon', 'w1_wed']) };
+  const programs = (ids: [string, string?][]) => JSON.stringify(ids.map(([id, name]) => ({ id, ...(name ? { name } : {}), totalWeeks: 14 })));
+  assert.deepEqual(seedFromStoredPrograms(memoryStore({ ia_programs: programs([['a', 'Block A'], ['c', 'Block C']]), ...A, ...C }), now),
+    { progId: 'a', progName: 'Block A', latest: now - 2 * DAY, n: 3, avgRecSec: 630, mileSec: 480, maxDist: 6.2 });
+  assert.deepEqual(seedFromStoredPrograms(memoryStore({ ia_programs: programs([['a', 'Block A'], ['b'], ['c', 'Block C']]), ...A, ...B, ...C }), now),
+    { progId: 'b', progName: 'previous block', latest: now - DAY, n: 3, avgRecSec: 560, mileSec: 420, maxDist: null }, 'the latest wins, a program with no name is the previous block');
+  assert.equal(seedFromStoredPrograms(memoryStore({ ia_programs: programs([['c', 'Block C']]), ...C }), now), null, 'two runs seed nothing');
+  assert.equal(seedFromStoredPrograms(memoryStore(), now), null);
+  assert.equal(seedFromStoredPrograms(memoryStore({ ia_programs: '[{' }), now), null);
+});
+
+test('the delete warning: only when another program exists and this one\'s lift log holds a lift', () => {
+  const lifted = '{"back_squat":{"name":"Back squat","entries":[]}}';
+  assert.equal(liftLogFeedsOthers(memoryStore({ ia_programs: '[{"id":"a"}]', ia_exw_a: lifted }), 'a'), false, 'no other program');
+  const two = (exw: string) => memoryStore({ ia_programs: '[{"id":"a"},{"id":"b"}]', ia_exw_a: exw });
+  assert.deepEqual([liftLogFeedsOthers(two(lifted), 'a'), liftLogFeedsOthers(two(lifted), 'b'), liftLogFeedsOthers(two('{}'), 'a'), liftLogFeedsOthers(two('{'), 'a')],
+    [true, false, false, false]);
+  assert.equal(liftLogFeedsOthers(memoryStore(), 'a'), false);
+});
+
+test('the run card is logged for a sport when the entry holds a value in one of its fields; "0.00" is a value, the number 0 is not', () => {
+  assert.deepEqual([
+    cardioEntryLogged({ run_pace: '9:00' }, 'run'), cardioEntryLogged({ run_dist: '0.00' }, 'run'), cardioEntryLogged({ bike_mins: '40' }, 'bike'),
+    cardioEntryLogged({ swim_yards: '800' }, 'swim'), cardioEntryLogged({ bike_mins: '40' }, 'run'), cardioEntryLogged({ run_dist: 0 } as unknown as StoredDayEntry, 'run'),
+    cardioEntryLogged({ notes: 'easy' }, 'run'), cardioEntryLogged({ run_pace: '9:00' }, ''), cardioEntryLogged(null, 'run'),
+  ], [true, true, true, true, false, false, false, false, false]);
+});
+
+test('the nudge taken: the pair joins the program\'s preferences and the list is written; a missing program or one with no config writes nothing', () => {
+  const s = countingStore({ ia_programs: '[{"id":"a","cfg":{"seed":1,"exSwapPrefs":{"Bench press":"Floor press"}}},{"id":"b","cfg":{"seed":2}},{"id":"c"}]' });
+  const p = recordSwapPreference(s, 'a', 'Back squat', 'Front squat');
+  assert.deepEqual(p && p.cfg.exSwapPrefs, { 'Bench press': 'Floor press', 'Back squat': 'Front squat' });
+  assert.equal(s.get('ia_programs'), '[{"id":"a","cfg":{"seed":1,"exSwapPrefs":{"Bench press":"Floor press","Back squat":"Front squat"}}},{"id":"b","cfg":{"seed":2}},{"id":"c"}]');
+  assert.equal(recordSwapPreference(s, 'z', 'Back squat', 'Front squat'), null);
+  assert.equal(recordSwapPreference(s, 'c', 'Back squat', 'Front squat'), null);
+  assert.deepEqual(s.writes, ['ia_programs'], 'one write, the first');
+  assert.deepEqual(recordSwapPreference(countingStore({ ia_programs: '[{"id":"b","cfg":{"seed":2}}]' }), 'b', 'Row', 'Pull-up')!.cfg.exSwapPrefs, { Row: 'Pull-up' });
+});
+
+test('the page reaches what Progress reads, the run card\'s regime and the nudge\'s write through core: each rule is in the script once', () => {
+  const code = appScript();
+  for (const name of ['seedFromStoredPrograms', 'liftLogFeedsOthers', 'recoveryPaceEntry', 'recoveryPaceByWeek', 'longestRunByWeek', 'runPacesByClass',
+    'easyPaceByWeek', 'plannedAndLoggedMiles', 'programWeekAt', 'progressCutWeek', 'runClassOf', 'paceSeconds', 'mileFromRecoveryPace',
+    'halfFromMilePace', 'cardioEntryLogged', 'recordSwapPreference']) {
+    assert.equal(code.split('function ' + name + '(').length - 1, 1, name + ' is in the page once');
+  }
+  for (const rule of ['SEED_WINDOW_DAYS*86400000', "if(/\\(LI\\)|long interval/i.test(s)) return 'Tempo';", 'p.cfg.exSwapPrefs[from]=to;', 'return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(']) {
+    assert.equal(code.split(rule).length - 1, 1, rule + ' is in the page once');
+  }
+  // The two the move left with no caller are gone, not kept as callers of nothing.
+  for (const name of ['_recoveryPaceEntry', '_progWeekNow']) assert.equal(code.split(name + '(').length - 1, 0, name + ' is gone');
+});
+
+// These guard behaviour the move must not change: they pass on the release before it too.
+test('the page\'s own names still answer as they did: the seed, the warning, the five readers, the week held back, the class, the pace and the table, the run card', () => {
+  const IA = loadApp();
+  const now = pinClock(IA, new Date(2026, 8, 23, 12));
+  const set = (k: string, v: unknown) => IA.localStorage.setItem(k, JSON.stringify(v));
+  set('ia_programs', [{ id: 'p1', name: 'Block', totalWeeks: 14, startDate: '2026-08-31' }, { id: 'p2', totalWeeks: 8 }]);
+  set('ia_logs_p1', { w1_tue: { run_pace: '10:10/mi', run_dist: '3', rpe: '3', ts: now - 8 * DAY }, w1_fri: { run_pace: '10:30/mi', run_dist: '3.5', rpe: '4', ts: now - 5 * DAY },
+    w2_tue: { run_pace: '10:50/mi', run_dist: '4', rpe: '3', ts: now - DAY } });
+  set('ia_hist_p1', { w1_tue: runDay('Recovery Run', { k: 'time', tgt: 800 }), w1_fri: runDay('Recovery Run', { k: 'dist', mi: 3, tgt: 800 }), w2_tue: runDay('Recovery Run', { k: 'time', tgt: 770 }) });
+  set('ia_exw_p1', { back_squat: { name: 'Back squat', entries: [] } });
+  const J = (code: string) => JSON.parse(IA.eval('JSON.stringify(' + code + ')'));
+  assert.deepEqual(J('seedFromPriorPrograms(' + now + ')'), { progId: 'p1', progName: 'Block', latest: now - DAY, n: 3, avgRecSec: 630, mileSec: 480, maxDist: 4 });
+  assert.deepEqual(J('seedFromPriorPrograms()'), J('seedFromPriorPrograms(' + now + ')'), 'no instant reads the clock');
+  assert.deepEqual([IA.eval("_purgeWarnsCrossProg('p1')"), IA.eval("_purgeWarnsCrossProg('p2')")], [true, false]);
+  const L = "getLogsFor('p1')", H = "getDayHistFor('p1')";
+  assert.deepEqual(J(`recoveryPaceWeekly(${L},${H},14)`), { weekly: { 1: 620, 2: 650 }, tgt: 790, nWeeks: 2 });
+  assert.deepEqual(J(`ladderWeekly(${L},14,2,false)`), { 1: 3.5 });
+  assert.deepEqual(J(`runsByClass(${L},${H},14)`).Recovery, [{ w: 1, sec: 610 }, { w: 1, sec: 630 }, { w: 2, sec: 650 }]);
+  assert.deepEqual(J(`easyEffortWeekly(${L},${H},14)`), { weekly: { 1: 620, 2: 650 }, nRuns: 3, nWeeks: 2 });
+  assert.deepEqual(J(`plannedVsLogged(${L},${H},14,0,false)`), { 1: { presc: 3, act: 3.5 } });
+  assert.equal(IA.eval('_cutWeek(getPrograms()[0])'), 4);
+  assert.deepEqual([IA.eval("_runClass('Easy Run — Long')"), IA.eval("_paceStrToSec('10:26/mi')"), IA.eval('_mileFromRecoverySec(630)'), IA.eval('_halfFromMileSec(315)')],
+    ['Long', 626, 480, 4890]);
+  assert.deepEqual([IA.eval("cardioEntryLive({run_dist:'0.00'},'run')"), IA.eval("cardioEntryLive({bike_mins:'40'},'run')")], [true, false]);
 });

@@ -386,6 +386,106 @@ test('a day\'s swaps and edits made and undone before the next launch, and the n
   golden['a day\'s swaps and edits, made and undone, and the nudge'] = { edited, undone, nudged, merged: P.record() };
 });
 
+test('what Progress reads from three weeks of runs, the nudge taken, and a second program: the readers, the seed and the purge warning are in the records', () => {
+  // Progress reads the stores and writes none, so no key-by-key record shows what it computes; and no other history
+  // logs a pace at an easy effort, takes the nudge, or makes a second program to seed from (found by the break check,
+  // v0.261.7). This case records what the page's readers hand back. HALF_MANNY, every run of weeks 1 to 3 logged with a
+  // distance, a pace and an effort: an easy or recovery run at RPE 3, any other at RPE 7, one recovery run credited
+  // to the bike, and one run tapped Done, undone and Done again.
+  const P = new Phone().launch(CREATED);
+  const id = P.generate(HALF);
+  const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+  const runs: { w: number; d: string; sub: string; pace: number; dist: number; rpe: number; bike: boolean }[] = [];
+  let n = 0, bikeDone = false, undoDone = false, undone: any = null;
+  for (const w of [1, 2, 3]) {
+    for (const d of training(P.launch(at(START, 7 * (w - 1), '06:30')), w)) {
+      const day = P.day(w, d);
+      if (!day.cardio || String(day.cardio.type).toLowerCase() !== 'run') continue;
+      P.launch(at(START, 7 * (w - 1) + DAYS.indexOf(d)));
+      P.open(w, d);
+      const sub = String(day.cardio.subtype);
+      const easy = /recovery|easy/i.test(sub);
+      const bike = !bikeDone && w === 2 && /recovery/i.test(sub);
+      const pace = (easy ? 600 : 480) + 7 * n, dist = +(3 + 0.4 * n).toFixed(1), rpe = easy ? 3 : 7;
+      P.type('cardioSwapWrap', '');
+      P.ev(`(function(){var x=document.getElementById('cardioSwapWrap').dataset;x.planned='run';x.active=${JSON.stringify(bike ? 'bike' : 'run')};})()`);
+      P.type('log_run_dist', dist.toFixed(1));
+      P.type('log_run_pace', Math.floor(pace / 60) + ':' + String(pace % 60).padStart(2, '0') + '/mi');
+      P.type('log_run_mins', String(Math.round(dist * pace / 60)));
+      if (bike) P.type('log_bike_mins', '45');
+      P.type('log_rpe', String(rpe), true);
+      P.mark(d as any, 'complete');
+      if (!undoDone && !bike && w === 2) {
+        // The undo tap saves the card without committing it: a card already logged keeps its numbers.
+        P.mark(d as any, 'complete');
+        undone = parsed(P, 'ia_logs_' + id)[`w${w}_${d}`];
+        assert.equal(undone.run_dist, dist.toFixed(1), 'the undone run keeps its distance');
+        P.mark(d as any, 'complete');
+        undoDone = true;
+      }
+      runs.push({ w, d, sub, pace, dist, rpe, bike });
+      if (bike) bikeDone = true;
+      n++;
+    }
+  }
+  assert.ok(bikeDone && undoDone, 'one recovery run went to the bike, and one run was undone and done again');
+  const readers = (pid: string): any => {
+    P.IA.ctx['__p'] = pid;
+    return P.ev(`(function(){var p=getPrograms().filter(function(x){return x.id===__p;})[0];var L=getLogsFor(__p),H=getDayHistFor(__p),tw=p.totalWeeks,cut=_cutWeek(p);
+      return {cut:cut,recoveryPace:recoveryPaceWeekly(L,H,tw),ladder:ladderWeekly(L,tw,cut,false),ladderNoFirst:ladderWeekly(L,tw,0,true),
+        byClass:runsByClass(L,H,tw),easyEffort:easyEffortWeekly(L,H,tw),planned:plannedVsLogged(L,H,tw,cut,false),plannedNoFirst:plannedVsLogged(L,H,tw,0,true),
+        projection:(function(){var ee=easyEffortWeekly(L,H,tw),ws=Object.keys(ee.weekly),mile=_mileFromRecoverySec(ws.length?ee.weekly[ws[ws.length-1]]:0);return {mile:mile,half:_halfFromMileSec(mile)};})()};})()`);
+  };
+  // The fourth week's Wednesday: weeks 1 to 3 are behind.
+  P.launch(at(START, 23, '08:00'));
+  const progress = readers(id);
+  assert.equal(progress.cut, 4, '2026-09-23 is in the fourth week from 2026-08-31, and the in-progress week is the one held back');
+  const logs = parsed(P, 'ia_logs_' + id);
+  const bikeRun = runs.find((r) => r.bike)!;
+  assert.equal(logs[`w${bikeRun.w}_${bikeRun.d}`].swapTo, 'bike', 'the recovery run credited to the bike is stored as swapped');
+  assert.deepStrictEqual(Object.keys(progress.ladder).map(Number), [1, 2, 3], 'a longest run in each of the three weeks');
+  assert.deepStrictEqual(Object.keys(progress.ladderNoFirst).map(Number), [2, 3], 'and the short first week left out when asked');
+  const recov = runs.filter((r) => /recovery/i.test(r.sub) && !r.bike);
+  assert.equal(progress.byClass.Recovery.length, recov.length, 'every recovery run with a pace, the swapped one left out');
+  // The wizard's seed is read from every program; one program alone can seed the next.
+  const now: number = P.ev('Date.now()');
+  const inWindow = recov.filter((r) => Date.parse(at(START, 7 * (r.w - 1) + DAYS.indexOf(r.d as any)) + '') >= now - 21 * 86400000);
+  // The nudge taken: the first lift of the week's first training day traded for one replacement three times running.
+  const d4 = training(P, 4)[0]!;
+  P.open(4, d4);
+  const out = cards(P.day(4, d4))[0]!;
+  P.IA.ctx['__c'] = { secIdx: out.secIdx, itemIdx: out.itemIdx, name: out.name, detail: out.detail };
+  const to: string = P.ev(`(function(){var r=swapCandidates(__c.name,activeProg.weeks[4][${JSON.stringify(d4)}],4,activeProg);var x=[].concat(r.tier1||[],r.tier2||[])[0];return x?(x.name||x):null;})()`);
+  assert.ok(to, 'the swap sheet offers a move');
+  for (let i = 0; i < 3; i++) {
+    P.ev(`_swapCtx=__c;applySwapChoice(${JSON.stringify(to)});`); P.settle();
+    if (i < 2) { P.ev(`undoSwap(${JSON.stringify(out.name)});`); P.settle(); }
+  }
+  assert.equal(P.ev('_nudgeCtx&&_nudgeCtx.from'), out.name, 'the nudge is up');
+  P.ev('acceptSwapNudge();'); P.settle();
+  const stored = JSON.parse(P.dump()['ia_programs']!).filter((p: any) => p.id === id)[0];
+  assert.deepStrictEqual(stored.cfg.exSwapPrefs, { [out.name]: to }, 'the preference is stored in the program\'s config');
+  assert.deepStrictEqual(parsed(P, 'ia_swapct_' + id)[out.name], { to, n: 3, offered: true });
+  const nudgeTaken = P.record();
+  // One lift logged, then a second program made the same morning: the first program's lift log now feeds another
+  // program's loads.
+  P.open(4, d4);
+  const lift = cards(P.day(4, d4))[0]!;
+  P.logLift(lift.name, lift.detail, [5, 5], [135, 140]);
+  P.generate(PACE);
+  const id2: string = P.ev('activeProgId');
+  assert.notEqual(id2, id);
+  const seed = P.ev(`seedFromPriorPrograms(${now})`);
+  assert.equal(seed && seed.progId, id, 'the seed comes from the first program');
+  assert.equal(seed.n, inWindow.length, 'every recovery run of the last 21 days, the swapped one left out');
+  P.IA.ctx['__id'] = id; P.IA.ctx['__id2'] = id2;
+  const warns = { first: P.ev('_purgeWarnsCrossProg(__id)'), second: P.ev('_purgeWarnsCrossProg(__id2)') };
+  assert.deepStrictEqual(warns, { first: true, second: false }, 'only the program with lifts logged warns that its loads feed another');
+  golden['what Progress reads from three weeks of runs, the nudge taken, and a second program'] = {
+    progress, undone, nudgeTaken, second: { seed, warns, progress: readers(id2), record: P.record() },
+  };
+});
+
 afterAll(() => {
   // One file for the whole feature. A case that failed above left its entry out, and the comparison says so.
   matchSnapshot('stored-state', { zone: process.env['TZ'], created: CREATED, records: golden as Record<string, StateRecord> });
