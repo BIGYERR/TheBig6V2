@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and six lift slices have
-shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5, v0.261.6, v0.261.7) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and seven lift slices have
+shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5, v0.261.6, v0.261.7, v0.261.8) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -79,9 +79,20 @@ Each phase starts only on Mario's GO, one phase step per session.
     record can show, and no history logged an easy pace, took the nudge or made a second program. The case "what
     Progress reads from three weeks of runs, the nudge taken, and a second program" records what the readers hand
     back (901 lines, none changed). The break check is at 45 breaks, all red, and 2 open as before.
-- **Next, on his GO:** the backup (`data-backup.ts`: snapshot, read, load). `applyOverlays` waits until after 2026-12-06
-  with the freeze (Mario, Post-v0.261.6: it rewrites the grid on every launch). The other readers the Progress screen
-  uses (`lift-ledger-progress-screen.ts`, `progress-charts.ts`) move with that screen.
+- **Done, the seventh lift slice (v0.261.8):** the backup's snapshot, reader and loader live in
+  `core/src/engine/state-backup.ts`: every `ia_` key in name order, the file with its release and its instant, the
+  reader's checks, the program count, and the all or nothing load. The page's `backupSnapshot`, `readBackup` and
+  `loadBackupData` are thin callers; `_backupKeys` and `_programCount`, with no caller left, went with the move. Every
+  golden record identical, and every backup in the corpus loads to the same bytes. Narrowed: saving the file (the share
+  sheet), reading the picked file, the Bugs page's line, the file's name and the block stay in the page.
+  - **The break check found the records blind to 15 of 21 backup breaks, closed in the slice:** every backup they held
+    was good and loaded onto an empty phone. The case "backups refused, a load refused, and a backup loaded over another program"
+    adds its records (336 lines, none changed). The break check is at 64 breaks, all red, and 3 open: the two before, and a
+    key with no value, which no store can hand the snapshot.
+- **Next, on his GO:** after 2026-12-06, `applyOverlays` with the freeze (Mario, Post-v0.261.6: it rewrites the grid on
+  every launch), then `refreshProgram` and the freeze. The other readers the Progress screen uses
+  (`lift-ledger-progress-screen.ts`, `progress-charts.ts`) move with that screen, and the backup's saving and reading of
+  a file with the Bugs screen.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is

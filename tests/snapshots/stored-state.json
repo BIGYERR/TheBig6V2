@@ -4982,6 +4982,342 @@
           }
         }
       }
+    },
+    "backups refused, a load refused, and a backup loaded over another program": {
+      "keys": [
+        "ia_active",
+        "ia_comp_prog_1788008400000",
+        "ia_exw_prog_1788008400000",
+        "ia_hist_prog_1788008400000",
+        "ia_logs_prog_1788008400000",
+        "ia_pop_dismiss_prog_1788008400000",
+        "ia_pop_idx_prog_1788008400000",
+        "ia_programs"
+      ],
+      "reads": {
+        "the file as written": {
+          "ok": true,
+          "programs": 1,
+          "made": "2026-09-01T11:30:00.000Z",
+          "keys": 8
+        },
+        "text cut short": {
+          "ok": false,
+          "why": "bad"
+        },
+        "another kind": {
+          "ok": false,
+          "why": "bad"
+        },
+        "a newer format": {
+          "ok": false,
+          "why": "newer"
+        },
+        "no format": {
+          "ok": false,
+          "why": "bad"
+        },
+        "the format as text": {
+          "ok": false,
+          "why": "bad"
+        },
+        "data that is a list": {
+          "ok": false,
+          "why": "bad"
+        },
+        "no data": {
+          "ok": false,
+          "why": "bad"
+        },
+        "a key not the app's": {
+          "ok": false,
+          "why": "bad"
+        },
+        "a value not a string": {
+          "ok": false,
+          "why": "bad"
+        },
+        "no program list": {
+          "ok": false,
+          "why": "bad"
+        },
+        "a program list that is not a list": {
+          "ok": false,
+          "why": "bad"
+        },
+        "two programs": {
+          "ok": true,
+          "programs": 2,
+          "made": "2026-09-01T11:30:00.000Z",
+          "keys": 8
+        },
+        "no time": {
+          "ok": true,
+          "programs": 1,
+          "made": "",
+          "keys": 8
+        },
+        "a time that is not text": {
+          "ok": true,
+          "programs": 1,
+          "made": "",
+          "keys": 8
+        }
+      },
+      "refused": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "3635a8e217adba9e85cf045183f5d655a8861062f397126527162042ee2ca690",
+            "value": "prog_1788256800000"
+          },
+          "ia_comp_prog_1788256800000": {
+            "bytes": 66,
+            "sha256": "11381d363031a067753682e6f4b043fcfed0532aa73d436951f275da5bea47c4",
+            "value": {
+              "w1_mon": {
+                "title": "Pull",
+                "ts": 1788260400000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1788256800000": {
+            "bytes": 419,
+            "sha256": "0cb8c5c92b491cb0d9d44ba67736b41170ba9e379f440be8057c1776fb12ae89",
+            "value": {
+              "sumo_deadlift": {
+                "name": "Sumo deadlift",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "3×8 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      8,
+                      8,
+                      7
+                    ],
+                    "setsW": [
+                      105,
+                      110,
+                      115
+                    ],
+                    "week": 1,
+                    "day": "",
+                    "ts": 1788260400000
+                  }
+                ]
+              },
+              "pendlay_row": {
+                "name": "Pendlay row",
+                "entries": [
+                  {
+                    "weight": 125,
+                    "setsReps": "3×6–10 @ RPE 8",
+                    "setsDone": [
+                      6,
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      115,
+                      120,
+                      125
+                    ],
+                    "week": 1,
+                    "day": "",
+                    "ts": 1788260400000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788256800000": {
+            "bytes": 1234,
+            "sha256": "5fa345e38faa7ec146187f936f803dfddb2678e6823509108df813b5a2440b3f"
+          },
+          "ia_logs_prog_1788256800000": {
+            "bytes": 197,
+            "sha256": "b46bb367a163818340fc7b1b0aea8dc500a44b24702aa0e19c88d35b30898732",
+            "value": {
+              "w1_mon": {
+                "rpe": "8",
+                "run_dist": "4.0",
+                "run_pace": "",
+                "run_mins": "36",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788260400000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788256800000": {
+            "bytes": 27,
+            "sha256": "c6eed7884d54de3a0ed898056601c5c526e9b9a66cfe878527760d55e89e4c2f",
+            "value": {
+              "date": "2026-9-1",
+              "idx": 2
+            }
+          },
+          "ia_pop_idx_prog_1788256800000": {
+            "bytes": 14,
+            "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+            "value": {
+              "workout": 14
+            }
+          },
+          "ia_programs": {
+            "bytes": 70617,
+            "sha256": "1e521fad61e0c225f72380ef6aaeb4026ad7b975898a6f641484367177ff4cc9"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788256800000",
+            "totalWeeks": 11,
+            "startDate": "2026-09-01",
+            "overlays": 0,
+            "digest": "368f34c8f99b82d6"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "a7d44868b4a626aa",
+          "weeksSha256": "a46adbeadd2982516af7a75cfd5ce523a196e5dde21af25c2c7a6ca87e860b79"
+        }
+      },
+      "loaded": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 77,
+            "sha256": "ab713c4b345f55841a665d1386367d73392d5a2358e3c06311c3a149d6b7df99",
+            "value": {
+              "w1_mon": {
+                "title": "Posterior Chain",
+                "ts": 1788213600000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 448,
+            "sha256": "7064e9bf51dfb939468d1f6a0823260e82921572244a24d8262feb67d0837773",
+            "value": {
+              "barbell_romanian_deadlift": {
+                "name": "Barbell Romanian deadlift",
+                "entries": [
+                  {
+                    "weight": 105,
+                    "setsReps": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest",
+                    "setsDone": [
+                      12,
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      95,
+                      100,
+                      105
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              },
+              "barbell_row": {
+                "name": "Barbell row",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×6–10 @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "mon",
+                    "ts": 1788213600000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 1025,
+            "sha256": "994013d29e6e169f3bb5888510b94992875243079d7efd9b682340604055741e"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 197,
+            "sha256": "e07655210a20ed104a2262c0911b6cbad2b8728ef45f1e19b3501f2caa3f0d7c",
+            "value": {
+              "w1_mon": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788213600000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 28,
+            "sha256": "c3284576abf5be8748abe5d62129d0a7128954c53390df29908cf0d4ee633981",
+            "value": {
+              "date": "2026-8-31",
+              "idx": 2
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 14,
+            "sha256": "9b3c5e66b6f7741ece5cf85dc3e3a69db48f4310b3a6f326c746c24a67261b2c",
+            "value": {
+              "workout": 14
+            }
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      }
     }
   }
 }

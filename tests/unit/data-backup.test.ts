@@ -2,8 +2,9 @@
 // phone, the line the Bugs page shows for it, the file's name, and the Your data block's copy on the page, on the native
 // app's Angular screen, and the native share call that saves it.
 //
-// Oracles are the ruling's words and its hand table. readBackup, backupMessage and backupFileName are lifted out of the
-// page and run alone; the two constants readBackup reads are the ruling's, typed here. The last tests read the Angular
+// Oracles are the ruling's words and its hand table. The reader, backupMessage and backupFileName are lifted out of the
+// page and run alone; the two constants the reader reads are the ruling's, typed here. The reader is core's
+// readBackupText (core/src/engine/state-backup.ts, built into the page), which the page's readBackup calls since v0.261.8. The last tests read the Angular
 // screen and the plugin's sources in the working tree, not the page under test, so IA_APP does not change what they see.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,8 +12,8 @@ import { join } from 'node:path';
 import { describe, test } from 'vitest';
 import { APP, REPO, appFunction } from '../support/app.ts';
 
-const programCount = appFunction('_programCount');
-const readBackup = appFunction('readBackup', { BACKUP_KIND: 'asylum-backup', BACKUP_FORMAT: 1, _programCount: programCount });
+const programCount = appFunction('backupProgramCount');
+const readBackup = appFunction('readBackupText', { BACKUP_KIND: 'asylum-backup', BACKUP_FORMAT: 1, backupProgramCount: programCount });
 const backupMessage = appFunction('backupMessage');
 const backupFileName = appFunction('backupFileName');
 

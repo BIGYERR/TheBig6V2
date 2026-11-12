@@ -26,7 +26,7 @@ const BREAKS = [
   ['freeze, reach', 'the last frozen week is rebuilt instead', 'for(let w=1; w<_cut; w++){', 'for(let w=1; w<_cut-1; w++){'],
   ['freeze, injured week', 'a touched day in an injured week keeps its stored form', 'if(_injCovers(w) && _live[d]){ _merged[d] = _live[d]; return; }', ''],
   ['set draft', 'a logged card leaves its draft in the log', '  clearSetDraft(exKey);\n', '\n'],
-  ['backup scan', 'the backup leaves out the last key', "iaStore.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});", "iaStore.keys().slice(0,-1).forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});"],
+  ['backup scan', 'the backup leaves out the last key', "store.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});", "store.keys().slice(0,-1).forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});"],
   ['completion status', 'a skipped day is stored as complete', "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,status,Date.now());", "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,'complete',Date.now());"],
   // v0.261.4: a break inside the rules that moved to core with the day's log, completion and parts.
   ['part skip', 'a skipped part is not stored', "  writePartSkips(store,programId,all);\n  settleDayParts(", "  settleDayParts("],
@@ -79,6 +79,28 @@ const BREAKS = [
   ['half from mile', 'the table is not read between its rows, mile to half', 'return a.halfBest+f*(b.halfBest-a.halfBest);', 'return a.halfBest;'],
   ['run card regime', 'a logged run card reads as a draft', 'return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ return !!e[f]; });', 'return false;'],
   ['swap preference', 'the nudge taken stores no preference', 'p.cfg.exSwapPrefs[from]=to;', ''],
+  // v0.261.8: a break inside each rule that moved to core with the backup's snapshot, reader and loader. Most were green
+  // on v0.261.7's records (every backup they held was good and loaded onto an empty phone) until the records gained the
+  // case "backups refused, a load refused, and a backup loaded over another program" (stored-state_backup-gaps.md).
+  ['backup scan, prefix', 'the backup takes every key, not only the app\'s', "store.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});", "store.keys().forEach(k=>{keys.push(k);});"],
+  ['backup order', 'the backup keeps storage order', 'return keys.sort();', 'return keys;'],
+  ['snapshot kind', 'the file is not marked as a backup', 'return {kind:BACKUP_KIND,format:BACKUP_FORMAT,', "return {kind:'x',format:BACKUP_FORMAT,"],
+  ['snapshot format', 'the file carries no format', 'return {kind:BACKUP_KIND,format:BACKUP_FORMAT,', 'return {kind:BACKUP_KIND,format:0,'],
+  ['snapshot version', 'the file does not name its release', 'takeBackup(iaStore,String(IA_VERSION),Date.now())', "takeBackup(iaStore,'0',Date.now())"],
+  ['snapshot made', 'the file does not carry when it was made', 'version,made:new Date(now).toISOString(),data};', "version,made:'',data};"],
+  ['reader kind', 'a file of another kind is read', 'f.kind!==BACKUP_KIND) return', 'false) return'],
+  ['reader newer', 'a newer file reads as not a backup', "return {ok:false,why:'newer'};", "return {ok:false,why:'bad'};"],
+  ['reader format', 'a file with no format is read', "if(f.format!==BACKUP_FORMAT) return {ok:false,why:'bad'};", ''],
+  ['reader data', 'a file whose data is not an object is read', "if(!d||typeof d!=='object'||Array.isArray(d)) return {ok:false,why:'bad'};", ''],
+  ['reader keys', 'a file with a key not the app\'s, or a value not a string, is read', "if(!Object.keys(d).every(k=>k.indexOf('ia_')===0&&typeof d[k]==='string')) return {ok:false,why:'bad'};", ''],
+  ['reader programs', 'a file with no program list is read', "if(programs<0) return {ok:false,why:'bad'};", ''],
+  ['program count', 'every program list counts one', 'return Array.isArray(a)?a.length:-1;', 'return Array.isArray(a)?1:-1;'],
+  ['reader made', 'the file\'s time is not read', "made:typeof f.made==='string'?f.made:''}", "made:''}"],
+  ['load clears', 'a load keeps the phone\'s keys the file does not hold', 'keys.forEach(k=>store.remove(k));', ''],
+  ['load writes', 'a load writes nothing', 'Object.keys(data).forEach(k=>store.set(k,data[k]));', ''],
+  ['load rollback, clear', 'a refused load keeps what it wrote', 'backupKeys(store).forEach(k=>{try{store.remove(k);}catch{}});', ''],
+  ['load rollback, restore', 'a refused load does not put back what the phone held', 'Object.keys(before).forEach(k=>{try{store.set(k,before[k]);}catch{}});', ''],
+  ['load result', 'a refused load reports success', 'catch{}});\n    return false;', 'catch{}});\n    return true;'],
 ];
 
 // Breaks that change no record. They are run and printed, and they do not fail the script: each is a line no history
@@ -88,6 +110,8 @@ const OPEN = [
     'No effect is possible: the next line takes the larger of this and the highest touched week plus one, and a touched current week is at least that week. The term is redundant.'],
   ['history, first touch', 'a day\'s snapshot is overwritten on every touch', 'if(h[k]) return;', '',
     'No reachable effect, settled in v0.261.5 (docs/decisions/stored-state.md). The guard decides only when a day is snapshotted again after it changed. A launch gives every snapshotted day back from its snapshot, and an edit is folded into the snapshot as it is made. One tap changes a snapshotted day and leaves its snapshot alone, the rest sheet\'s Move of a day with a logged lift, and it leaves a moved rest day that nothing snapshots (tests/measure/stored-state_first-touch.md). In 180 random histories, 0 of 4,481 repeat snapshots met a changed day (stored-state_first-touch-walks.md). The rule itself is held by the unit tests.'],
+  ['snapshot, a key with no value', 'a listed key with no value goes into the backup', 'if(v!=null) data[k]=v;', 'data[k]=v;',
+    'No reachable effect, found in v0.261.8 (tests/measure/stored-state_backup-gaps.md): the snapshot asks the store for a key the store has just listed, and both stores, the browser\'s storage and the memory store, give a string for every key they list. The guard moved as written; the unit tests hold the snapshot.'],
 ];
 
 const runFiles = (app, files) => {

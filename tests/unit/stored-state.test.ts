@@ -5,8 +5,9 @@
 // (core/src/engine/state-day-history.ts, v0.261.5), and the swaps, the swap counts, the day edits, the program list,
 // the active program and the Wildcard's record (core/src/engine/state-swaps.ts, state-day-edits.ts and
 // state-programs.ts, v0.261.6), and what Progress reads and computes from the stored state, the run card's regime and
-// the nudge's preference (core/src/engine/state-progress.ts, state-day-log.ts and state-programs.ts, v0.261.7). Every
-// expected value is typed from the ruling.
+// the nudge's preference (core/src/engine/state-progress.ts, state-day-log.ts and state-programs.ts, v0.261.7), and the
+// backup's snapshot, reader and loader (core/src/engine/state-backup.ts, v0.261.8). Every expected value is typed from
+// the ruling.
 // What the app stores through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
@@ -39,6 +40,9 @@ import {
   longestRunByWeek, mileFromRecoveryPace, paceSeconds, plannedAndLoggedMiles, programWeekAt, progressCutWeek, recoveryPaceByWeek,
   recoveryPaceEntry, runClassOf, runPacesByClass, seedFromStoredPrograms,
 } from '@ia/core/engine/state-progress.ts';
+import {
+  BACKUP_FORMAT, BACKUP_KIND, backupKeys, backupProgramCount, loadBackupInto, readBackupText, takeBackup,
+} from '@ia/core/engine/state-backup.ts';
 import type { Day, Program } from '@ia/core';
 import { appScript, loadApp, pinClock } from '../support/app.ts';
 
@@ -1005,4 +1009,75 @@ test('the page\'s own names still answer as they did: the seed, the warning, the
   assert.deepEqual([IA.eval("_runClass('Easy Run — Long')"), IA.eval("_paceStrToSec('10:26/mi')"), IA.eval('_mileFromRecoverySec(630)'), IA.eval('_halfFromMileSec(315)')],
     ['Long', 626, 480, 4890]);
   assert.deepEqual([IA.eval("cardioEntryLive({run_dist:'0.00'},'run')"), IA.eval("cardioEntryLive({bike_mins:'40'},'run')")], [true, false]);
+});
+
+// The backup (v0.261.8): its snapshot, its reader and its loader, from core, on a memory store.
+test('the backup\'s kind and format: asylum-backup, format 1', () => {
+  assert.deepEqual([BACKUP_KIND, BACKUP_FORMAT], ['asylum-backup', 1]);
+});
+
+test('a backup holds every ia_ key in name order and no other key, as stored, with its release and its instant', () => {
+  const s = countingStore({ ia_logs_a: '{}', keep: 'x', ia_active: 'a' });
+  assert.deepEqual(backupKeys(s), ['ia_active', 'ia_logs_a']);
+  assert.equal(JSON.stringify(takeBackup(s, '0.261.8', Date.UTC(2026, 10, 11, 15))),
+    '{"kind":"asylum-backup","format":1,"version":"0.261.8","made":"2026-11-11T15:00:00.000Z","data":{"ia_active":"a","ia_logs_a":"{}"}}');
+  assert.deepEqual(s.writes, [], 'a backup writes nothing');
+  assert.deepEqual(takeBackup(memoryStore({ keep: 'x' }), '0.261.8', 0).data, {}, 'a phone with none of the app\'s keys backs up none');
+});
+
+test('a stored program list counts its programs; none, an object and broken text count -1', () => {
+  assert.deepEqual([backupProgramCount('[]'), backupProgramCount('[{"id":"a"},{"id":"b"}]'), backupProgramCount(undefined), backupProgramCount('{}'), backupProgramCount('[')],
+    [0, 2, -1, -1, -1]);
+});
+
+test('a file reads with its data, its count and its time; a newer format is told apart; anything else is refused as not a backup', () => {
+  const data = { ia_active: 'a', ia_programs: '[{"id":"a"}]' };
+  const file = (o: Record<string, unknown>) => JSON.stringify({ kind: 'asylum-backup', format: 1, version: '0.253.0', made: '2026-10-30T12:00:00.000Z', data, ...o });
+  assert.deepEqual(readBackupText(file({})), { ok: true, data, programs: 1, made: '2026-10-30T12:00:00.000Z' });
+  assert.deepEqual(readBackupText(file({ made: undefined })), { ok: true, data, programs: 1, made: '' });
+  assert.deepEqual(readBackupText(file({ format: 2 })), { ok: false, why: 'newer' });
+  for (const text of [file({}).slice(1), file({ kind: 'other' }), file({ format: undefined }), file({ format: '1' }), file({ data: [] }), file({ data: undefined }),
+    file({ data: { ...data, keep: '1' } }), file({ data: { ...data, ia_active: 7 } }), file({ data: { ia_active: 'a' } }), file({ data: { ...data, ia_programs: '{}' } }), 'null']) {
+    assert.deepEqual(readBackupText(text), { ok: false, why: 'bad' }, text);
+  }
+});
+
+test('a load replaces every ia_ key with the file\'s and keeps the rest; a refused write puts back what the store held', () => {
+  const s = memoryStore({ ia_active: 'b', ia_logs_b: '{}', keep: 'x' });
+  assert.equal(loadBackupInto(s, { ia_active: 'a', ia_programs: '[]' }), true);
+  assert.deepEqual(s.keys().sort().map((k) => [k, s.get(k)]), [['ia_active', 'a'], ['ia_programs', '[]'], ['keep', 'x']]);
+  const held = memoryStore({ ia_active: 'b', ia_logs_b: '{}', keep: 'x' });
+  let n = 0;
+  const refusing: StateStore = { ...held, set: (k, v) => { if (++n === 2) throw new Error('QuotaExceededError'); held.set(k, v); } };
+  assert.equal(loadBackupInto(refusing, { ia_active: 'a', ia_programs: '[]' }), false);
+  assert.deepEqual(held.keys().sort().map((k) => [k, held.get(k)]), [['ia_active', 'b'], ['ia_logs_b', '{}'], ['keep', 'x']]);
+});
+
+test('the page reaches the backup\'s snapshot, reader and loader through core: each rule is in the script once', () => {
+  const code = appScript();
+  for (const name of ['backupKeys', 'takeBackup', 'backupProgramCount', 'readBackupText', 'loadBackupInto']) {
+    assert.equal(code.split('function ' + name + '(').length - 1, 1, name + ' is in the page once');
+  }
+  for (const rule of ["const BACKUP_KIND='asylum-backup';", "if(typeof f.format==='number'&&f.format>BACKUP_FORMAT) return {ok:false,why:'newer'};", "keys.forEach(k=>store.remove(k));"]) {
+    assert.equal(code.split(rule).length - 1, 1, rule + ' is in the page once');
+  }
+  // The two the move left with no caller are gone, not kept as callers of nothing.
+  for (const name of ['_backupKeys', '_programCount']) assert.equal(code.split(name + '(').length - 1, 0, name + ' is gone');
+});
+
+// This guards behaviour the move must not change: it passes on the release before it too.
+test('the page\'s own names still answer as they did: the snapshot, the reader, the loader', () => {
+  const IA = loadApp();
+  pinClock(IA, '2026-11-11T10:00:00Z');
+  IA.localStorage.clear();
+  IA.localStorage.setItem('ia_programs', '[{"id":"a"}]');
+  IA.localStorage.setItem('keep', 'x');
+  IA.localStorage.setItem('ia_active', 'a');
+  const text = IA.eval('JSON.stringify(backupSnapshot())');
+  assert.equal(text, '{"kind":"asylum-backup","format":1,"version":"' + IA.eval('String(IA_VERSION)') + '","made":"2026-11-11T10:00:00.000Z","data":{"ia_active":"a","ia_programs":"[{\\"id\\":\\"a\\"}]"}}');
+  IA.ctx['__text'] = text;
+  assert.equal(IA.eval('JSON.stringify(readBackup(__text))'), '{"ok":true,"data":{"ia_active":"a","ia_programs":"[{\\"id\\":\\"a\\"}]"},"programs":1,"made":"2026-11-11T10:00:00.000Z"}');
+  assert.equal(IA.eval('readBackup("{}").why'), 'bad');
+  assert.equal(IA.eval('loadBackupData({ia_active:"b",ia_programs:"[]"})'), true);
+  assert.deepEqual([IA.localStorage.getItem('ia_active'), IA.localStorage.getItem('ia_programs'), IA.localStorage.getItem('keep')], ['b', '[]', 'x']);
 });

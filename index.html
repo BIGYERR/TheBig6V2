@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.7">
+<meta name="ia-version" content="0.261.8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -3126,6 +3126,64 @@ function liftLogFeedsOthers(store, programId){
     if(readPrograms(store).filter(function(x){return x.id!==programId;}).length===0) return false;
     return Object.keys(readLiftLog(store,programId)||{}).length>0;
   }catch(e){ return false; }
+}
+
+
+
+
+
+
+const BACKUP_KIND='asylum-backup';
+const BACKUP_FORMAT=1;   
+ 
+
+
+
+function backupKeys(store){
+  const keys=[];
+  store.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});
+  return keys.sort();
+}
+
+function takeBackup(store, version, now){
+  const data={};
+  backupKeys(store).forEach(k=>{const v=store.get(k);if(v!=null) data[k]=v;});
+  return {kind:BACKUP_KIND,format:BACKUP_FORMAT,version,made:new Date(now).toISOString(),data};
+}
+
+function backupProgramCount(raw){
+  if(raw==null) return -1;
+  try{const a=JSON.parse(raw);return Array.isArray(a)?a.length:-1;}catch{return -1;}
+}
+
+function readBackupText(text){
+  let f;
+  try{f=JSON.parse(text);}catch{return {ok:false,why:'bad'};}
+  if(!f||typeof f!=='object'||f.kind!==BACKUP_KIND) return {ok:false,why:'bad'};
+  if(typeof f.format==='number'&&f.format>BACKUP_FORMAT) return {ok:false,why:'newer'};
+  if(f.format!==BACKUP_FORMAT) return {ok:false,why:'bad'};
+  const d=f.data;
+  if(!d||typeof d!=='object'||Array.isArray(d)) return {ok:false,why:'bad'};
+  if(!Object.keys(d).every(k=>k.indexOf('ia_')===0&&typeof d[k]==='string')) return {ok:false,why:'bad'};
+  const programs=backupProgramCount(d.ia_programs);
+  if(programs<0) return {ok:false,why:'bad'};
+  return {ok:true,data:d,programs,made:typeof f.made==='string'?f.made:''};
+}
+
+
+function loadBackupInto(store, data){
+  const before={};
+  const keys=backupKeys(store);
+  keys.forEach(k=>{const v=store.get(k);if(v!=null) before[k]=v;});
+  try{
+    keys.forEach(k=>store.remove(k));
+    Object.keys(data).forEach(k=>store.set(k,data[k]));
+    return true;
+  }catch{
+    backupKeys(store).forEach(k=>{try{store.remove(k);}catch{}});
+    Object.keys(before).forEach(k=>{try{store.set(k,before[k]);}catch{}});
+    return false;
+  }
 }
 
 
@@ -19206,42 +19264,16 @@ function buildMultiDotChart(title, weeks, series) {
 
 
 
-const BACKUP_KIND='asylum-backup';
-const BACKUP_FORMAT=1;   
 
-function _backupKeys(){
-  const keys=[];
-  iaStore.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});
-  return keys.sort();
-}
-function backupSnapshot(){
-  const data={};
-  _backupKeys().forEach(k=>{const v=iaStore.get(k);if(v!=null) data[k]=v;});
-  return {kind:BACKUP_KIND,format:BACKUP_FORMAT,version:String(IA_VERSION),made:new Date().toISOString(),data};
-}
+
+function backupSnapshot(){return takeBackup(iaStore,String(IA_VERSION),Date.now());}
 
 function backupFileName(at){
   const t=at||new Date();const p=(n)=>String(n).padStart(2,'0');
   return 'asylum-backup-'+t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate())+'.json';
 }
-function _programCount(raw){
-  if(raw==null) return -1;
-  try{const a=JSON.parse(raw);return Array.isArray(a)?a.length:-1;}catch{return -1;}
-}
 
-function readBackup(text){
-  let f;
-  try{f=JSON.parse(text);}catch{return {ok:false,why:'bad'};}
-  if(!f||typeof f!=='object'||f.kind!==BACKUP_KIND) return {ok:false,why:'bad'};
-  if(typeof f.format==='number'&&f.format>BACKUP_FORMAT) return {ok:false,why:'newer'};
-  if(f.format!==BACKUP_FORMAT) return {ok:false,why:'bad'};
-  const d=f.data;
-  if(!d||typeof d!=='object'||Array.isArray(d)) return {ok:false,why:'bad'};
-  if(!Object.keys(d).every(k=>k.indexOf('ia_')===0&&typeof d[k]==='string')) return {ok:false,why:'bad'};
-  const programs=_programCount(d.ia_programs);
-  if(programs<0) return {ok:false,why:'bad'};
-  return {ok:true,data:d,programs,made:typeof f.made==='string'?f.made:''};
-}
+function readBackup(text){return readBackupText(text);}
 function backupMessage(r){
   if(!r.ok) return r.why==='newer'?'This backup is from a newer app. Update the app first.':'That file is not an Asylum backup.';
   const d=new Date(r.made);
@@ -19250,20 +19282,7 @@ function backupMessage(r){
 }
 
 
-function loadBackupData(data){
-  const before={};
-  const keys=_backupKeys();
-  keys.forEach(k=>{const v=iaStore.get(k);if(v!=null) before[k]=v;});
-  try{
-    keys.forEach(k=>iaStore.remove(k));
-    Object.keys(data).forEach(k=>iaStore.set(k,data[k]));
-    return true;
-  }catch{
-    _backupKeys().forEach(k=>{try{iaStore.remove(k);}catch{}});
-    Object.keys(before).forEach(k=>{try{iaStore.set(k,before[k]);}catch{}});
-    return false;
-  }
-}
+function loadBackupData(data){return loadBackupInto(iaStore,data);}
 function applyBackup(data){
   if(!loadBackupData(data)){showToast('Loading failed. Nothing changed.');return false;}
   location.reload();
@@ -19273,7 +19292,7 @@ function applyBackup(data){
 
 function saveBackup(){
   const snap=backupSnapshot();
-  if(_programCount(snap.data['ia_programs'])<1){showToast('Nothing to back up yet.');return 'empty';}
+  if(backupProgramCount(snap.data['ia_programs'])<1){showToast('Nothing to back up yet.');return 'empty';}
   const name=backupFileName(),text=JSON.stringify(snap);
   const fail=()=>showToast('Backup failed. Try again.');
   const island=(window).iaIsland;
