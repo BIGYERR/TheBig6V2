@@ -249,3 +249,86 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
 - **Tests:** `tests/unit/stored-state.test.ts` (the functions from `@ia/core`, on a memory store, and the page's
   callers); `tests/integration/stored-state.test.ts`, the new case, whose two records are new in
   `tests/snapshots/stored-state.json` and change none. The other golden records and the backup corpus, unchanged.
+
+## Release scope: v0.261.6 moves the swaps, the swap counts, the day edits and the rest of storage.ts into core
+
+- **Date:** 2026-11-11. **Ruled by:** Mario (the fifth slice, on his prompt); **bump:** PATCH, named in that prompt, by
+  his standing rule for migration steps that change the page and no behaviour. **Shipped:** v0.261.6.
+- **The finding (`tests/measure/stored-state_swaps-edits-callers.md`, read on v0.261.5):** `ia_swaps_`, `ia_swapct_`
+  and `ia_edits_` are read and written by `swaps-edits.ts` alone: three key builders, three readers, three writers,
+  `_editEntry`, and the rules `recordSwap`, `clearSwap`, `bumpSwapCount` (with `SWAP_NUDGE_AT`), `markSwapOffered`,
+  `recordSkip`, `clearSkip`, `recordAdd`, `clearAdd` and `pruneDayEdits`. Their callers: `swap-sheet.ts` (the swap, its
+  undo, the count, the skips and the adds), `day-status.ts` (the nudge's two answers) and `refreshProgram`
+  (`getSwaps`, `getDayEdits`, `pruneDayEdits`). No Angular file names one: the Angular swap sheet reaches them through
+  the page's `applySwapChoice`. What is left of `storage.ts`: `getPrograms` (12 legacy files, 7 Angular),
+  `savePrograms` (7, 2), `getActiveProgId` (3, 1), `setActiveProgId` (1), `getWildcardDone` and `saveWildcardDone`
+  (`random-wildcard.ts` and the Angular Wildcard screen). None is taken over by Angular (`provide`). `saveDayHist` has
+  no caller.
+- **The records were blind to most of it (`tests/measure/stored-state_swaps-edits-gaps.md`, a break per rule on
+  v0.261.5's page):** 8 of 12 green. The next launch freezes a touched week and prunes its edits, so the standard
+  history's skip and add are gone from `ia_edits_` before any record is taken; no history undid a swap, ran one pair
+  three times, or swapped a pair again while its record stood.
+- **What changes:** three files in `core/src/engine`, code as it was, with the store, the program, the week, the day
+  and the instant passed in.
+  1. `state-swaps.ts`: `readSwaps` and `writeSwaps`, `readSwapCounts` and `writeSwapCounts` (a missing or broken value
+     reads as empty, a refused write is swallowed, as before); `addSwapRecord`, the swap tapped, with its undo places
+     and the merge of a pair swapped again (V221 D177 R4); `dropSwapRecord`, the undo; `SWAP_NUDGE_AT`, `countSwap`
+     and `markSwapNudged`, the nudge.
+  2. `state-day-edits.ts`: `readDayEdits` and `writeDayEdits` (as the swaps); `dayEditEntry`; `addSkipEdit`,
+     `dropSkipEdit`, `addAddEdit` and `dropAddEdit`; `pruneDayEditsBefore`, the prune below the freeze cut.
+  3. `state-programs.ts`: `readPrograms` and `writePrograms`, `readActiveProgramId` and `writeActiveProgramId`,
+     `readWildcardDone` and `writeWildcardDone` (a missing or broken value reads as empty; a refused write throws to
+     the caller, as before).
+  4. The page's functions keep their names and arguments and call these with `iaStore`: `getSwaps`, `recordSwap`,
+     `clearSwap`, `bumpSwapCount`, `markSwapOffered`, `getDayEdits`, `recordSkip`, `clearSkip`, `recordAdd`,
+     `clearAdd` and `pruneDayEdits` in `swaps-edits.ts`; the six in `storage.ts`, the last two with the page's
+     `activeProgId`. `recordSwap` and `recordAdd` pass `Date.now()`. Return types stay loose (`any`) where they were.
+  5. **Deleted with the move, each with no caller left** (legacy, Angular through the bridge, tests): `saveSwaps`,
+     `getSwapCounts`, `saveSwapCounts`, `saveDayEdits`, `swapStoreKey`, `swapCountKey`, `editStoreKey`, `_editEntry`,
+     and `saveDayHist`, which v0.261.5 left (phase 1, step 3).
+  6. `tests/harness.js` lists the new readers and writers (and `writeDayHistory`) in `EXPORT_NAMES`: the module blocks
+     export only what a page file or the tests use, and a writer the page no longer calls would drop out of core's
+     exports.
+- **Not narrowed.** The prompt's scope fits one session: 17 functions moved, 9 deleted, no caller rewritten. **Stays in
+  the page:** `applySessionSwaps` and `applyDayEdits` (they rewrite the grid at every launch, the freeze slice's, after
+  2026-12-06) with `ssSkipToken`, the token `applyDayEdits` reads; `refreshProgram`'s reads; `loadActiveProgram`'s
+  clear of `ia_active` and the purge (`program-manage.ts`, the freeze slice's); the backup's read of `ia_programs` (the
+  backup slice's); the Wildcard's once-by-title rule in `completeWildcard` (`random-wildcard.ts`, it draws).
+- **What deliberately does not change:** every key and every stored byte; the order of a record's fields (`from`,
+  `to`, `ts`, `rx`; `to`, `n`, `offered`; `add`, `skip`; `name`, `detail`, `ts`); which reads catch (all of them) and
+  which writes are swallowed (swaps, counts, edits) or throw (the program list, the active id, the Wildcard's record);
+  the order of reads and writes within a tap; every function name the Angular screens call; every golden record. One
+  thing moves that no record can show: the instant of a swap or an add is read by the page before the rule runs, where
+  `recordSwap` read the clock after reading the store and `recordAdd` only when it added. It is the same tap's clock.
+- **Found by the break check, closed in the slice:** the case "a day's swaps and edits, made and undone, and the
+  nudge" (`tests/integration/stored-state.test.ts`) on HALF_MANNY's week 1 Monday, with no launch between the taps:
+  a swap, a skip and an add (`edited`); each undone (`undone`); the same pair twice more, the nudge up and turned down
+  (`nudged`); then the replacement swapped on, the first lift added back from the add sheet and swapped for the first
+  replacement again (`merged`). Its four records are new in `tests/snapshots/stored-state.json`: 285 lines added, none
+  removed or changed, and v0.261.5's page stores the same bytes. The merge was first measured as unreachable through a
+  day holding one lift twice (0 of 60,550 built days, `tests/measure/stored-state_swap-places.md`); these four taps
+  reach it. The break check gains 13 breaks inside the moved rules, every one red on the new case or the standard
+  history: 29 red in all, 2 open as before (`tests/measure/stored-state_red-on-break.md`).
+- **Found, not fixed (today's app, not this move):** the nudge counts taps, not sessions. Its comment says three
+  sessions running make a preference; swap a lift, undo it and swap it again, three times on one day, and the nudge
+  comes up (the new case's `nudged` record). Nothing stored is at risk. A fix is its own ruling (`MIGRATION.md`,
+  section 7).
+- **Expected values (typed from the ruling):** an empty or broken `ia_swaps_p1`, `ia_swapct_p1` or `ia_edits_p1` reads
+  as `{}`, an empty or broken `ia_programs` or `ia_wild_p1` as `[]`, and `ia_active` empty or missing as `null`; each is
+  stored as its `JSON.stringify` (the active id as given). A swap of Back squat for Front squat in week 2 on Monday at
+  instant 100 stores `{"w2_mon":[{"from":"Back squat","to":"Front squat","ts":100}]}`, and with places their `rx` after
+  `ts` (`ph` only on a place that has it). A lift swapped again on its day replaces its record at the end of the list;
+  the same pair keeps the earlier places this tap did not see, this tap's detail for a place seen again; another
+  replacement keeps none. An undo removes that lift's record and the day's key with its last; a day with none writes
+  nothing. The count: one, two, then the third swap of a pair hands back `{to, n: 3, offered: false}`, and the fourth
+  `n: 4` until it is answered; another replacement starts at one; an answered pair starts at one, stays offered and is
+  never due again, while another pair still can be; answering a lift never counted writes nothing. A skip is stored once
+  as `{"w3_tue":{"add":[],"skip":["Hammer curl"]}}`, a superset as `__ss:<section>`, and an old entry missing a list
+  gains it after the ones it has; an add once by name as `{name, detail, ts}`, the first kept. Putting back or removing
+  the last edit of a day removes its key. The prune at cut 3 drops weeks 1 and 2, keeps week 3, week 12 and a key that
+  is not a week, and writes only when something went. A refused write of a swap, a count or an edit stops nothing; of
+  the program list or the Wildcard's record, it throws.
+- **Tests:** `tests/unit/stored-state.test.ts`, 17 new: 15 on the functions from `@ia/core` on a memory store, the page
+  reaching them (each rule in the script once, each key built by its reader and its writer, the 9 deleted names gone),
+  and the page's own names answering as they did. `tests/integration/stored-state.test.ts`, the new case. The other
+  golden records and the backup corpus, unchanged.

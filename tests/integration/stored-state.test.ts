@@ -309,6 +309,83 @@ test('a touched day edited, then its session moved: the edit is in the day\'s sn
   golden['a touched day edited, then its session moved'] = { edited: afterEdit, moved: P.record() };
 });
 
+test('a day\'s swaps and edits made and undone before the next launch, and the nudge: what each tap stores is in the records', () => {
+  // No other history holds what a skip, an add, an undo or the nudge stores: the next launch freezes the touched week
+  // and prunes its edits, and the standard history swaps once and undoes nothing (found by the break check,
+  // v0.261.6). Week 1 of HALF_MANNY, Monday, before anything is logged and with no launch between the taps.
+  const P = new Phone().launch(CREATED);
+  const id = P.generate(HALF);
+  P.launch(at(START, 0));
+  P.open(1, 'mon');
+  const cs = cards(P.day(1, 'mon'));
+  assert.ok(cs.length >= 3, 'Monday holds three movements to work with');
+  const out = cs[0]!, gone = cs[1]!;
+  P.IA.ctx['__c'] = { secIdx: out.secIdx, itemIdx: out.itemIdx, name: out.name, detail: out.detail };
+  const to: string | null = P.ev("(function(){var r=swapCandidates(__c.name,activeProg.weeks[1].mon,1,activeProg);var x=[].concat(r.tier1||[],r.tier2||[])[0];return x?(x.name||x):null;})()");
+  assert.ok(to && to !== out.name, 'the swap sheet offers a move for the first card');
+  const swap = () => { P.ev(`_swapCtx=__c;applySwapChoice(${JSON.stringify(to)});`); P.settle(); };
+  const undo = () => { P.ev(`undoSwap(${JSON.stringify(out.name)});`); P.settle(); };
+  const add: string | null = P.ev("(function(){var c=addCandidates(activeProg.weeks[1].mon,1,activeProg);return (c.more||[])[0]||(c.gap||[])[0]||null;})()");
+  assert.ok(add, 'the add sheet offers a movement');
+
+  // A swap, a skip and an add.
+  swap();
+  P.ev(`skipExercise(${JSON.stringify(gone.name)});`);
+  P.ev(`applyAddChoice(${JSON.stringify(add)});`);
+  const swaps = parsed(P, 'ia_swaps_' + id), edits = parsed(P, 'ia_edits_' + id);
+  assert.deepStrictEqual(swaps.w1_mon.map((r: any) => [r.from, r.to, Array.isArray(r.rx)]), [[out.name, to, true]], 'one record, with where the lift stood');
+  assert.deepStrictEqual(parsed(P, 'ia_swapct_' + id), { [out.name]: { to, n: 1, offered: false } });
+  assert.deepStrictEqual([Object.keys(edits), edits.w1_mon.skip, edits.w1_mon.add.map((a: any) => a.name)], [['w1_mon'], [gone.name], [add]]);
+  const edited = P.record();
+
+  // Each undone: the skip put back, the add removed, the swap undone. The day's keys go with their last record.
+  P.ev(`unskipExercise(${JSON.stringify(gone.name)});`);
+  P.ev(`removeAddedExercise(${JSON.stringify(add)});`);
+  undo();
+  assert.deepStrictEqual([parsed(P, 'ia_swaps_' + id), parsed(P, 'ia_edits_' + id)], [{}, {}]);
+  assert.deepStrictEqual(parsed(P, 'ia_swapct_' + id), { [out.name]: { to, n: 1, offered: false } }, 'an undo leaves the count');
+  const undone = P.record();
+
+  // The same pair twice more: the third swap running brings the nudge up, and turning it down marks the lift offered.
+  swap(); undo(); swap();
+  assert.equal(P.ev('_nudgeCtx&&_nudgeCtx.from'), out.name, 'the nudge is up');
+  P.ev('dismissSwapNudge();');
+  assert.deepStrictEqual(parsed(P, 'ia_swapct_' + id), { [out.name]: { to, n: 3, offered: true } });
+  const nudged = P.record();
+
+  // The same pair recorded again while its record stands: the lift traded in is traded on, the lift traded off comes
+  // back from the add sheet, and that one is swapped for the first replacement again. The record keeps both places
+  // the lift stood, the earlier tap's and this one's (V221 D177 R4).
+  type Place = { secIdx: number; itemIdx: number; name: string; detail: string };
+  const place = (n: string): Place | null => {
+    let r: Place | null = null;
+    (P.day(1, 'mon').sections || []).forEach((s: any, si: number) => (s.items || []).forEach((it: any, ii: number) => {
+      if (!r && it && it.name === n) r = { secIdx: si, itemIdx: ii, name: n, detail: it.detail };
+    }));
+    return r;
+  };
+  const offered = (n: string): string[] => {
+    P.IA.ctx['__n'] = n;
+    return P.ev("(function(){var r=swapCandidates(__n,activeProg.weeks[1].mon,1,activeProg);return [].concat(r.tier1||[],r.tier2||[]).map(function(x){return x.name||x;});})()");
+  };
+  const swapAt = (n: string, t: string) => { P.IA.ctx['__c'] = place(n); P.ev(`_swapCtx=__c;applySwapChoice(${JSON.stringify(t)});`); P.settle(); };
+  const onward = offered(to!).find((n) => n !== out.name);
+  assert.ok(onward, 'the swap sheet offers a move for the replacement');
+  swapAt(to!, onward!);
+  const adds: string[] = P.ev("(function(){var c=addCandidates(activeProg.weeks[1].mon,1,activeProg);return [].concat(c.gap||[],c.more||[],c.off||[]);})()");
+  assert.ok(adds.includes(out.name), 'the add sheet offers the lift traded off');
+  P.ev(`applyAddChoice(${JSON.stringify(out.name)});`);
+  const again = place(out.name)!;
+  assert.ok(offered(out.name).includes(to!), 'and the swap sheet offers it the first replacement again');
+  swapAt(out.name, to!);
+  const rec = parsed(P, 'ia_swaps_' + id).w1_mon;
+  assert.deepStrictEqual(rec.map((r: any) => [r.from, r.to]), [[to, onward], [out.name, to]], 'one record per lift traded off, the latest last');
+  assert.deepStrictEqual(rec[1].rx.map((p: any) => [p.s, p.i]), [[out.secIdx, out.itemIdx], [again.secIdx, again.itemIdx]], 'both places');
+  assert.deepStrictEqual(parsed(P, 'ia_swapct_' + id), { [out.name]: { to, n: 1, offered: true }, [to!]: { to: onward, n: 1, offered: false } },
+    'a pair offered once starts again at one and stays offered');
+  golden['a day\'s swaps and edits, made and undone, and the nudge'] = { edited, undone, nudged, merged: P.record() };
+});
+
 afterAll(() => {
   // One file for the whole feature. A case that failed above left its entry out, and the comparison says so.
   matchSnapshot('stored-state', { zone: process.env['TZ'], created: CREATED, records: golden as Record<string, StateRecord> });

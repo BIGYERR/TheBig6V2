@@ -3796,6 +3796,291 @@
           "weeksSha256": "0719a053692f7e4b536035deeb45d2d05f9a3aa05d13025f8a1b439a812fbb6e"
         }
       }
+    },
+    "a day's swaps and edits, made and undone, and the nudge": {
+      "edited": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 128,
+            "sha256": "9ef4843fc8e60ee83bc28147662542d9a563c15723be2d573028d07398f7b4ce",
+            "value": {
+              "w1_mon": {
+                "add": [
+                  {
+                    "name": "Deadlift",
+                    "detail": "4×10 — fast and crisp, 60s rest",
+                    "ts": 1788213600000
+                  }
+                ],
+                "skip": [
+                  "Barbell row"
+                ]
+              }
+            }
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 69,
+            "sha256": "9c142598fda63fc9b7eb80e46f93f928254812622d52a80e65c668dc27f9f017",
+            "value": {
+              "Barbell Romanian deadlift": {
+                "to": "Deadlift",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 200,
+            "sha256": "e170a29e3325a88eb0f6a4c75e48723e61890a2cbea416847531dd39a4aadc16",
+            "value": {
+              "w1_mon": [
+                {
+                  "from": "Barbell Romanian deadlift",
+                  "to": "Deadlift",
+                  "ts": 1788213600000,
+                  "rx": [
+                    {
+                      "s": 0,
+                      "i": 0,
+                      "d": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "4ef0d62475d42645",
+          "weeksSha256": "d72a1055ad66ff23e30bbf931b2e4aa0180987cf658bfbeb19405d49055cb6d7"
+        }
+      },
+      "undone": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "value": {}
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 69,
+            "sha256": "9c142598fda63fc9b7eb80e46f93f928254812622d52a80e65c668dc27f9f017",
+            "value": {
+              "Barbell Romanian deadlift": {
+                "to": "Deadlift",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "value": {}
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "e49f775679d78cf7",
+          "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
+        }
+      },
+      "nudged": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "value": {}
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 68,
+            "sha256": "3addce5b06230e1c7d63b837399390c96a8934431b09ce55ccd914e1b68229ff",
+            "value": {
+              "Barbell Romanian deadlift": {
+                "to": "Deadlift",
+                "n": 3,
+                "offered": true
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 200,
+            "sha256": "e170a29e3325a88eb0f6a4c75e48723e61890a2cbea416847531dd39a4aadc16",
+            "value": {
+              "w1_mon": [
+                {
+                  "from": "Barbell Romanian deadlift",
+                  "to": "Deadlift",
+                  "ts": 1788213600000,
+                  "rx": [
+                    {
+                      "s": 0,
+                      "i": 0,
+                      "d": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "9de05fe8dc101316",
+          "weeksSha256": "128eef34966ec5b32a72f8df6860d180736761f8860b08e834f91a63f36eadb1"
+        }
+      },
+      "merged": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_edits_prog_1788008400000": {
+            "bytes": 132,
+            "sha256": "7c8ffbad6619a2fff4b82a7ef47658e6321a312cf981117c0a3bac2614b5ad66",
+            "value": {
+              "w1_mon": {
+                "add": [
+                  {
+                    "name": "Barbell Romanian deadlift",
+                    "detail": "4×10 — fast and crisp, 60s rest",
+                    "ts": 1788213600000
+                  }
+                ],
+                "skip": []
+              }
+            }
+          },
+          "ia_programs": {
+            "bytes": 84235,
+            "sha256": "f9d9f822e05aed3b919595228b00790a8674676e3bc1baa1ca39ace42499bbcb"
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 124,
+            "sha256": "b4460f338fc1f9bbcdcd3ed0e42442bf711d7e1396314be5ed197f0bca8405e3",
+            "value": {
+              "Barbell Romanian deadlift": {
+                "to": "Deadlift",
+                "n": 1,
+                "offered": true
+              },
+              "Deadlift": {
+                "to": "Sumo deadlift",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 431,
+            "sha256": "a8abc8bb79db4b031ad897fa0dcb297dca3ff1b90e4f896d9262048d77644e18",
+            "value": {
+              "w1_mon": [
+                {
+                  "from": "Deadlift",
+                  "to": "Sumo deadlift",
+                  "ts": 1788213600000,
+                  "rx": [
+                    {
+                      "s": 0,
+                      "i": 0,
+                      "d": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest"
+                    }
+                  ]
+                },
+                {
+                  "from": "Barbell Romanian deadlift",
+                  "to": "Deadlift",
+                  "ts": 1788213600000,
+                  "rx": [
+                    {
+                      "s": 0,
+                      "i": 0,
+                      "d": "3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest"
+                    },
+                    {
+                      "s": 3,
+                      "i": 0,
+                      "d": "4×10 — fast and crisp, 60s rest"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 0,
+            "digest": "f7aa7211be95cd8c"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "aacda2a16c73313a",
+          "weeksSha256": "adad276ee089a2079e0c14cad2f91e90143d7161a6bb65e6bf8a8818032d70de"
+        }
+      }
     }
   }
 }

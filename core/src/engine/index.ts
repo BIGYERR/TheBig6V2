@@ -25,5 +25,20 @@ export type { Completed, DayStatusRecord, PartSkips } from './state-day-status.t
 // The day history, ia_hist_<program> (v0.261.5).
 export { readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory } from './state-day-history.ts';
 export type { DayHistory } from './state-day-history.ts';
+// The session swaps, the swap counts and the day edits, ia_swaps_, ia_swapct_ and ia_edits_<program>, and the program
+// list, the active program and the Wildcard's record, ia_programs, ia_active and ia_wild_<program> (v0.261.6).
+export {
+  SWAP_NUDGE_AT, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts, readSwaps, writeSwapCounts,
+  writeSwaps,
+} from './state-swaps.ts';
+export type { SwapCount, SwapCounts, SwapPlace, SwapRecord, Swaps } from './state-swaps.ts';
+export {
+  addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits, writeDayEdits,
+} from './state-day-edits.ts';
+export type { AddedMove, DayEdit, DayEdits } from './state-day-edits.ts';
+export {
+  readActiveProgramId, readPrograms, readWildcardDone, writeActiveProgramId, writePrograms, writeWildcardDone,
+} from './state-programs.ts';
+export type { WildcardDone } from './state-programs.ts';
 export type { EngineCfg, CardioSchedule, PaceRow, RunAnchorInfo } from './cardio-progression.ts';
 export type { CardioSession } from './nsw-cardio.ts';

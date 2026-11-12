@@ -38,7 +38,24 @@ const BREAKS = [
   // its first touch).
   ['history, kept', 'a touched day is never snapshotted', 'if(h[k]) return;', 'return;'],
   ['edit re-snapshot', 'an edit after the first touch is not folded into the day\'s snapshot', 'if(!h[k]) return;', 'return;'],
-  ['seed write back', 'an old program\'s seed is not written back to its config', '    prog.cfg.seed = prog.seed;\n', '\n'],
+  // v0.261.6: a break inside each rule that moved to core with the swaps, the swap counts, the day edits, the program
+  // list, the active program and the Wildcard's record. Seven of them were green on v0.261.5's records (the next launch
+  // prunes a touched week's edits, and no history undid a swap or reached the nudge) until the records gained the case
+  // "a day's swaps and edits, made and undone, and the nudge".
+  ['swap record', 'a swap is not stored', 's[k]=list; writeSwaps(store,programId,s); return s;', 'return s;'],
+  ['swap places', 'a swap is stored without where the lift stood', 'if(Array.isArray(rx)&&rx.length) ent.rx=', 'if(false) ent.rx='],
+  ['swap places, merge', 'a pair swapped again forgets the places the earlier tap saw', 'ent.rx=(was?', 'ent.rx=(false?'],
+  ['swap undo', 'an undone swap keeps its record', 's[k]=s[k].filter(e=>e&&e.from!==from);', ''],
+  ['swap count', 'a run of one swap never counts past one', 'cur.n=(cur.n||0)+1', 'cur.n=1'],
+  ['nudge offered', 'a nudge turned down is not marked offered', 'if(c[from]){c[from].offered=true;writeSwapCounts', 'if(c[from]){writeSwapCounts'],
+  ['skip record', 'a skipped movement is not stored', 'if(e.skip.indexOf(name)<0) e.skip.push(name);', ''],
+  ['skip undo', 'a movement put back stays skipped in the store', 's[k].skip=(s[k].skip||[]).filter(function(x){return x!==name;});', ''],
+  ['add record', 'an added movement is not stored', 'e.add.push({name:name,detail:detail,ts:now})', '0'],
+  ['add undo', 'a removed movement stays added in the store', 's[k].add=(s[k].add||[]).filter(function(a){return a&&a.name!==name;});', ''],
+  ['edits prune', 'the edits of a frozen week are kept', 'if(m&&+m[1]<cutWeek){delete s[k];changed=true;}', ''],
+  ['active id', 'the active program is not stored', "function writeActiveProgramId(store, id){store.set('ia_active',id);}", 'function writeActiveProgramId(store, id){}'],
+  ['wildcard record', 'a Wildcard done is not stored', 'function writeWildcardDone(store, programId, a){store.set(', 'function writeWildcardDone(store, programId, a){return;store.set('],
+  ['seed write back','an old program\'s seed is not written back to its config', '    prog.cfg.seed = prog.seed;\n', '\n'],
   ['purge', 'a deleted program keeps its logs', "['ia_logs_','ia_comp_',", "['ia_comp_',"],
   ['rest move key', 'a moved rest day is stored under the picked day', 'moves[completedKey(w,day)]={from:pick,ts:Date.now()};', 'moves[completedKey(w,pick)]={from:pick,ts:Date.now()};'],
   ['week count', 'the current week is counted one day late', 'const diff=Math.floor((today-weekMon)/86400000);', 'const diff=Math.floor((today-weekMon)/86400000)-1;'],
