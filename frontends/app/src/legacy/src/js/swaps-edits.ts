@@ -1,5 +1,11 @@
 import { iaStore } from './storage.ts';
 import { _ssLegal, _ssPartnerOf } from '../../../../../../core/src/engine/exercise-library.ts';
+import {
+  addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwaps,
+} from '../../../../../../core/src/engine/state-swaps.ts';
+import {
+  addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits,
+} from '../../../../../../core/src/engine/state-day-edits.ts';
 import { _powerAllowed } from '../../../../../../core/src/engine/power-accessory.ts';
 import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY, _auxFamily, _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
@@ -184,49 +190,16 @@ function swapLoadNote(outName: any,candName: any){
   if(d<2) return '';
   return 'Much lighter than '+outName.toLowerCase()+'. Volume holds, top-end strength does not.';
 }
-// ── SESSION SWAP STORE ───────────────────────────────────────────────────────
-// Keyed w<N>_<day> exactly like ia_logs_ and ia_comp_, so the freeze's "touched"
-// scan and every other week-keyed reader stay in one key shape.
-//
-// Why this needs to persist at all, given swaps are session-only: refreshProgram
-// rebuilds from cfg on every boot, and the week freeze only protects weeks that
-// have already been touched. Swap a lift, walk to the rack, and iOS evicts the PWA
-// out of your pocket — reopening between sets would rebuild and show the old lift
-// while you are standing over the new one. A record lives until the athlete undoes it
-// (V222 D181); it is replayed in recording order on days the freeze did not restore
-// from ia_hist_ and left alone on days it did.
-// ── DAY EDITS: ADD / SKIP (V109) ─────────────────────────────────────────────
-// Session-scoped edits to a single day, stored per program and keyed the same way as
-// swaps. Nothing here touches cfg, goal or periodization: a program stays deterministic
-// from cfg+seed, and edits are re-applied ON TOP of the rebuild, exactly like rest-day
-// moves and swaps. Adding a lift on Tuesday therefore does NOT change next Tuesday —
-// that is the standing-preference feature, deliberately not built yet.
-function editStoreKey(pid: any){return 'ia_edits_'+pid;}
-function getDayEdits(pid: any){try{return JSON.parse(iaStore.get(editStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveDayEdits(pid: any,v: any){try{iaStore.set(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
-function _editEntry(s: any,k: any){const e=s[k]||{};if(!Array.isArray(e.add))e.add=[];if(!Array.isArray(e.skip))e.skip=[];s[k]=e;return e;}
-function recordSkip(pid: any,week: any,dayKey: any,name: any){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
-  if(e.skip.indexOf(name)<0) e.skip.push(name);
-  saveDayEdits(pid,s); return s;
-}
-function clearSkip(pid: any,week: any,dayKey: any,name: any){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey; if(!s[k]) return s;
-  s[k].skip=(s[k].skip||[]).filter(function(x: any){return x!==name;});
-  if(!s[k].skip.length&&!(s[k].add||[]).length) delete s[k];
-  saveDayEdits(pid,s); return s;
-}
-function recordAdd(pid: any,week: any,dayKey: any,name: any,detail: any){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
-  if(!e.add.some(function(a: any){return a&&a.name===name;})) e.add.push({name:name,detail:detail,ts:Date.now()});
-  saveDayEdits(pid,s); return s;
-}
-function clearAdd(pid: any,week: any,dayKey: any,name: any){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey; if(!s[k]) return s;
-  s[k].add=(s[k].add||[]).filter(function(a: any){return a&&a.name!==name;});
-  if(!s[k].add.length&&!(s[k].skip||[]).length) delete s[k];
-  saveDayEdits(pid,s); return s;
-}
+// ── SESSION SWAPS, SWAP COUNTS AND DAY EDITS (ia_swaps_, ia_swapct_, ia_edits_) ──
+// v0.261.6 (docs/decisions/stored-state.md): what a swap, an add, a skip and the nudge store lives in @ia/core, in
+// core/src/engine/state-swaps.ts and state-day-edits.ts, with the reasons each store exists. These are the page's
+// callers: the swap sheet passes the program, the week and the day, and they pass the store and the tap's instant.
+// Laying the records onto a rebuilt grid (applySessionSwaps, applyDayEdits) stays here with refreshProgram.
+function getDayEdits(pid: any): any{return readDayEdits(iaStore,pid);}
+function recordSkip(pid: any,week: any,dayKey: any,name: any): any{return addSkipEdit(iaStore,pid,week,dayKey,name);}
+function clearSkip(pid: any,week: any,dayKey: any,name: any): any{return dropSkipEdit(iaStore,pid,week,dayKey,name);}
+function recordAdd(pid: any,week: any,dayKey: any,name: any,detail: any): any{return addAddEdit(iaStore,pid,week,dayKey,name,detail,Date.now());}
+function clearAdd(pid: any,week: any,dayKey: any,name: any): any{return dropAddEdit(iaStore,pid,week,dayKey,name);}
 // A skipped superset is stored as '__ss:<sectionIndex>' rather than by name, because the
 // whole block goes: its items are interdependent (rounds with no rest between them), so
 // pulling one movement changes the work:rest ratio, which IS the prescription.
@@ -272,45 +245,11 @@ function applyDayEdits(prog: any,store: any){
     }
   });
 }
-// Session swaps are never applied to a day restored from ia_hist_ (V222 D181 R5), because
-// the snapshot carries the athlete's swaps by construction (R1) and re-applying a record
-// onto it rewrites the day whenever one record's `to` is another's `from`. applyDayEdits
-// has no such exclusion and is not idempotent (it rewrites every item's _skipped from the
-// store and pushes adds deduped by name only), so on a touched week this prune is what
-// keeps the store from arguing with a record resnapshotDayEdit has already folded the
-// edit into.
-function pruneDayEdits(pid: any,cutWeek: any){
-  const s=getDayEdits(pid); let changed=false;
-  Object.keys(s).forEach(function(k){const m=/^w(\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});
-  if(changed) saveDayEdits(pid,s);
-}
-function swapStoreKey(pid: any){return 'ia_swaps_'+pid;}
-function getSwaps(pid: any){try{return JSON.parse(iaStore.get(swapStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveSwaps(pid: any,v: any){try{iaStore.set(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
-function recordSwap(pid: any,week: any,dayKey: any,from: any,to: any,rx: any){
-  const s=getSwaps(pid),k='w'+week+'_'+dayKey;
-  // V221 D177 (R4). `rx` is optional: [{s,i,d}], section index, item index and detail of
-  // every item named `from` before the rename. It is for undoSwap and nothing else; every
-  // other reader takes .from/.to only, and a record without it is read exactly as before.
-  // Re-tapping the same pair on the same day keeps the earlier tap's items it did not see.
-  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
-  const was=(s[k]||[]).filter(e=>e&&e.from===from&&e.to===to&&Array.isArray(e.rx))[0];
-  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
-  const list=(s[k]||[]).filter(e=>e&&e.from!==from);
-  const ent={from:from,to:to,ts:Date.now()};
-  // @ts-expect-error TS2339 Property 'rx' does not exist on type '{ from: any; to: any; ts: number; }'.
-  if(Array.isArray(rx)&&rx.length) ent.rx=(was?was.rx.filter(p=>!rx.some(q=>q.s===p.s&&q.i===p.i)):[]).concat(rx);
-  list.push(ent);
-  s[k]=list; saveSwaps(pid,s); return s;
-}
-function clearSwap(pid: any,week: any,dayKey: any,from: any){
-  const s=getSwaps(pid),k='w'+week+'_'+dayKey;
-  if(!s[k]) return s;
-  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
-  s[k]=s[k].filter(e=>e&&e.from!==from);
-  if(!s[k].length) delete s[k];
-  saveSwaps(pid,s); return s;
-}
+// Every week below the freeze cut gives up its edits (state-day-edits.ts has why). refreshProgram calls it.
+function pruneDayEdits(pid: any,cutWeek: any){pruneDayEditsBefore(iaStore,pid,cutWeek);}
+function getSwaps(pid: any): any{return readSwaps(iaStore,pid);}
+function recordSwap(pid: any,week: any,dayKey: any,from: any,to: any,rx: any): any{return addSwapRecord(iaStore,pid,week,dayKey,from,to,rx,Date.now());}
+function clearSwap(pid: any,week: any,dayKey: any,from: any): any{return dropSwapRecord(iaStore,pid,week,dayKey,from);}
 // Re-applied at the very end of refreshProgram, after the freeze, alongside rest-day
 // moves — both are the athlete's own edits, so nothing the engine does should undo
 // them. V222 D181 (R4'): a day's records replay in recording order (array order, which
@@ -346,27 +285,10 @@ function applySessionSwaps(prog: any,store: any){
   });
 }
 // ── COACH NUDGE ──────────────────────────────────────────────────────────────
-// Trading the same lift off once is a bad night's sleep. Three sessions running is
-// a preference, and at that point the app should say so rather than making the
-// athlete re-swap it every week for the rest of the block. Counts consecutive
-// swaps of the same lift TO the same replacement; any other choice resets it.
-const SWAP_NUDGE_AT=3;
-function swapCountKey(pid: any){return 'ia_swapct_'+pid;}
-function getSwapCounts(pid: any){try{return JSON.parse(iaStore.get(swapCountKey(pid))||'{}');}catch(e){return {};}}
-function saveSwapCounts(pid: any,v: any){try{iaStore.set(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
-function bumpSwapCount(pid: any,from: any,to: any){
-  const c=getSwapCounts(pid);
-  const cur=c[from];
-  if(cur&&cur.to===to&&!cur.offered) cur.n=(cur.n||0)+1;
-  else c[from]={to:to,n:1,offered:(cur&&cur.to===to&&cur.offered)||false};
-  saveSwapCounts(pid,c);
-  const e=c[from];
-  return (e&&!e.offered&&e.n>=SWAP_NUDGE_AT)?e:null;
-}
-function markSwapOffered(pid: any,from: any){
-  const c=getSwapCounts(pid);
-  if(c[from]){c[from].offered=true;saveSwapCounts(pid,c);}
-}
+// Three swaps running of one lift to one replacement is a preference, and the app says so (state-swaps.ts has the
+// count and its reasons). The swap sheet counts each swap; the nudge marks a lift offered when it is answered.
+function bumpSwapCount(pid: any,from: any,to: any): any{return countSwap(iaStore,pid,from,to);}
+function markSwapOffered(pid: any,from: any){markSwapNudged(iaStore,pid,from);}
 // Candidates for a null-pattern swap: same family, not already on the card, gear-legal,
 // injury-legal through the REAL filter (no second copy of the drop rules), and — for the
 // power family — through _powerAllowed, so age/experience power doctrine cannot be

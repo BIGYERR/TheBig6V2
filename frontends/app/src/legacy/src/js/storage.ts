@@ -8,8 +8,11 @@ import {
   readCompleted, readPartSkips, writeCompleted, writePartSkips,
 } from '../../../../../../core/src/engine/state-day-status.ts';
 import {
-  readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory,
+  readDayHistory, recordDaySnapshot, refreshDaySnapshot,
 } from '../../../../../../core/src/engine/state-day-history.ts';
+import {
+  readActiveProgramId, readPrograms, readWildcardDone, writeActiveProgramId, writePrograms, writeWildcardDone,
+} from '../../../../../../core/src/engine/state-programs.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
@@ -22,10 +25,12 @@ const iaStore=storageStore(()=>localStorage);
 function esc(s: any){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 // STORAGE
-function getPrograms(): any[]{try{return JSON.parse(iaStore.get('ia_programs')||'[]');}catch{return[];}}
-function savePrograms(p: any){iaStore.set('ia_programs',JSON.stringify(p));}
-function getActiveProgId(){return iaStore.get('ia_active')||null;}
-function setActiveProgId(id: any){iaStore.set('ia_active',id);}
+// v0.261.6 (docs/decisions/stored-state.md): the program list (ia_programs), the active program (ia_active) and the
+// Wildcard's record (ia_wild_) live in @ia/core, in core/src/engine/state-programs.ts. These are the page's callers.
+function getPrograms(): any[]{return readPrograms(iaStore);}
+function savePrograms(p: any){writePrograms(iaStore,p);}
+function getActiveProgId(){return readActiveProgramId(iaStore);}
+function setActiveProgId(id: any){writeActiveProgramId(iaStore,id);}
 // v0.261.4 (docs/decisions/stored-state.md): the day's log (ia_logs_), completion (ia_comp_) and skipped parts
 // (ia_parts_) live in @ia/core, in core/src/engine/state-day-log.ts and state-day-status.ts: the readers and writers,
 // the read lens (restNorm), the day key and the set drafts. These are the page's callers: they name the store, the
@@ -47,8 +52,8 @@ function saveCompleted(c: any){writeCompleted(iaStore,activeProgId,c);}
 // rebuilds from the form on every write.
 function getPartSkips(): any{return readPartSkips(iaStore,activeProgId);}
 function savePartSkips(p: any){writePartSkips(iaStore,activeProgId,p);}
-function getWildcardDone(): any[]{try{return JSON.parse(iaStore.get('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
-function saveWildcardDone(a: any){iaStore.set('ia_wild_'+activeProgId,JSON.stringify(a));}
+function getWildcardDone(): any[]{return readWildcardDone(iaStore,activeProgId);}
+function saveWildcardDone(a: any){writeWildcardDone(iaStore,activeProgId,a);}
 function logKey(w: any,d: any){return dayStoreKey(w,d);}
 
 // ── SET DRAFTS (V131) ────────────────────────────────────────────────────────
@@ -77,7 +82,6 @@ function completedKey(w: any,d: any){return dayStoreKey(w,d);}
 // their reasons. These are the page's callers: they name the store, the active program and the day's grid entry, and
 // they catch a fault so a tap goes on.
 function getDayHist(): any{return readDayHistory(iaStore,activeProgId);}
-function saveDayHist(h: any){writeDayHistory(iaStore,activeProgId,h);}
 // Called only from the athlete's own edit handlers (add, skip, swap, undo): the snapshot absorbs the edit.
 function resnapshotDayEdit(week: any,dayKey: any){
   try{

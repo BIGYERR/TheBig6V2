@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.5">
+<meta name="ia-version" content="0.261.6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1368,10 +1368,12 @@ const iaStore=storageStore(()=>localStorage);
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 
-function getPrograms(){try{return JSON.parse(iaStore.get('ia_programs')||'[]');}catch{return[];}}
-function savePrograms(p){iaStore.set('ia_programs',JSON.stringify(p));}
-function getActiveProgId(){return iaStore.get('ia_active')||null;}
-function setActiveProgId(id){iaStore.set('ia_active',id);}
+
+
+function getPrograms(){return readPrograms(iaStore);}
+function savePrograms(p){writePrograms(iaStore,p);}
+function getActiveProgId(){return readActiveProgramId(iaStore);}
+function setActiveProgId(id){writeActiveProgramId(iaStore,id);}
 
 
 
@@ -1393,8 +1395,8 @@ function saveCompleted(c){writeCompleted(iaStore,activeProgId,c);}
 
 function getPartSkips(){return readPartSkips(iaStore,activeProgId);}
 function savePartSkips(p){writePartSkips(iaStore,activeProgId,p);}
-function getWildcardDone(){try{return JSON.parse(iaStore.get('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
-function saveWildcardDone(a){iaStore.set('ia_wild_'+activeProgId,JSON.stringify(a));}
+function getWildcardDone(){return readWildcardDone(iaStore,activeProgId);}
+function saveWildcardDone(a){writeWildcardDone(iaStore,activeProgId,a);}
 function logKey(w,d){return dayStoreKey(w,d);}
 
 
@@ -1423,7 +1425,6 @@ function completedKey(w,d){return dayStoreKey(w,d);}
 
 
 function getDayHist(){return readDayHistory(iaStore,activeProgId);}
-function saveDayHist(h){writeDayHistory(iaStore,activeProgId,h);}
 
 function resnapshotDayEdit(week,dayKey){
   try{
@@ -2682,6 +2683,155 @@ function refreshDaySnapshot(store, programId, week, dayKey, day){
   if(!h[k]) return;                                 
   h[k]=JSON.parse(JSON.stringify(day));
   writeDayHistory(store,programId,h);
+}
+
+
+
+
+
+
+ 
+
+
+
+function readPrograms(store){try{return JSON.parse(store.get('ia_programs')||'[]');}catch{return[];}}
+function writePrograms(store, p){store.set('ia_programs',JSON.stringify(p));}
+
+function readActiveProgramId(store){return store.get('ia_active')||null;}
+function writeActiveProgramId(store, id){store.set('ia_active',id);}
+
+
+function readWildcardDone(store, programId){try{return JSON.parse(store.get('ia_wild_'+programId)||'[]');}catch{return[];}}
+function writeWildcardDone(store, programId, a){store.set('ia_wild_'+programId,JSON.stringify(a));}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+
+
+
+function readSwaps(store, programId){try{return JSON.parse(store.get('ia_swaps_'+programId)||'{}');}catch(e){return {};}}
+function writeSwaps(store, programId, v){try{store.set('ia_swaps_'+programId,JSON.stringify(v));}catch(e){}}
+function readSwapCounts(store, programId){try{return JSON.parse(store.get('ia_swapct_'+programId)||'{}');}catch(e){return {};}}
+function writeSwapCounts(store, programId, v){try{store.set('ia_swapct_'+programId,JSON.stringify(v));}catch(e){}}
+
+
+
+
+
+function addSwapRecord(store, programId, week, dayKey, from, to, rx, now){
+  const s=readSwaps(store,programId),k=dayStoreKey(week,dayKey);
+  const was=(s[k]||[]).filter(e=>e&&e.from===from&&e.to===to&&Array.isArray(e.rx))[0];
+  const list=(s[k]||[]).filter(e=>e&&e.from!==from);
+  const ent={from:from,to:to,ts:now};
+  if(Array.isArray(rx)&&rx.length) ent.rx=(was?was.rx.filter(p=>!rx.some(q=>q.s===p.s&&q.i===p.i)):[]).concat(rx);
+  list.push(ent);
+  s[k]=list; writeSwaps(store,programId,s); return s;
+}
+
+
+function dropSwapRecord(store, programId, week, dayKey, from){
+  const s=readSwaps(store,programId),k=dayStoreKey(week,dayKey);
+  if(!s[k]) return s;
+  s[k]=s[k].filter(e=>e&&e.from!==from);
+  if(!s[k].length) delete s[k];
+  writeSwaps(store,programId,s); return s;
+}
+
+
+
+
+
+
+const SWAP_NUDGE_AT=3;
+
+function countSwap(store, programId, from, to){
+  const c=readSwapCounts(store,programId);
+  const cur=c[from];
+  if(cur&&cur.to===to&&!cur.offered) cur.n=(cur.n||0)+1;
+  else c[from]={to:to,n:1,offered:(cur&&cur.to===to&&cur.offered)||false};
+  writeSwapCounts(store,programId,c);
+  const e=c[from];
+  return (e&&!e.offered&&e.n>=SWAP_NUDGE_AT)?e:null;
+}
+
+function markSwapNudged(store, programId, from){
+  const c=readSwapCounts(store,programId);
+  if(c[from]){c[from].offered=true;writeSwapCounts(store,programId,c);}
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+
+
+
+function readDayEdits(store, programId){try{return JSON.parse(store.get('ia_edits_'+programId)||'{}');}catch(e){return {};}}
+function writeDayEdits(store, programId, v){try{store.set('ia_edits_'+programId,JSON.stringify(v));}catch(e){}}
+
+function dayEditEntry(s, k){const e=s[k]||{};if(!Array.isArray(e.add))e.add=[];if(!Array.isArray(e.skip))e.skip=[];s[k]=e;return e;}
+
+
+function addSkipEdit(store, programId, week, dayKey, name){
+  const s=readDayEdits(store,programId),k=dayStoreKey(week,dayKey),e=dayEditEntry(s,k);
+  if(e.skip.indexOf(name)<0) e.skip.push(name);
+  writeDayEdits(store,programId,s); return s;
+}
+
+
+function dropSkipEdit(store, programId, week, dayKey, name){
+  const s=readDayEdits(store,programId),k=dayStoreKey(week,dayKey); if(!s[k]) return s;
+  s[k].skip=(s[k].skip||[]).filter(function(x){return x!==name;});
+  if(!s[k].skip.length&&!(s[k].add||[]).length) delete s[k];
+  writeDayEdits(store,programId,s); return s;
+}
+
+function addAddEdit(store, programId, week, dayKey, name, detail, now){
+  const s=readDayEdits(store,programId),k=dayStoreKey(week,dayKey),e=dayEditEntry(s,k);
+  if(!e.add.some(function(a){return a&&a.name===name;})) e.add.push({name:name,detail:detail,ts:now});
+  writeDayEdits(store,programId,s); return s;
+}
+
+
+function dropAddEdit(store, programId, week, dayKey, name){
+  const s=readDayEdits(store,programId),k=dayStoreKey(week,dayKey); if(!s[k]) return s;
+  s[k].add=(s[k].add||[]).filter(function(a){return a&&a.name!==name;});
+  if(!s[k].add.length&&!(s[k].skip||[]).length) delete s[k];
+  writeDayEdits(store,programId,s); return s;
+}
+
+
+
+
+
+function pruneDayEditsBefore(store, programId, cutWeek){
+  const s=readDayEdits(store,programId); let changed=false;
+  Object.keys(s).forEach(function(k){const m=/^w(\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});
+  if(changed) writeDayEdits(store,programId,s);
 }
 
 
@@ -11404,44 +11554,11 @@ function swapLoadNote(outName,candName){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-function editStoreKey(pid){return 'ia_edits_'+pid;}
-function getDayEdits(pid){try{return JSON.parse(iaStore.get(editStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveDayEdits(pid,v){try{iaStore.set(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
-function _editEntry(s,k){const e=s[k]||{};if(!Array.isArray(e.add))e.add=[];if(!Array.isArray(e.skip))e.skip=[];s[k]=e;return e;}
-function recordSkip(pid,week,dayKey,name){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
-  if(e.skip.indexOf(name)<0) e.skip.push(name);
-  saveDayEdits(pid,s); return s;
-}
-function clearSkip(pid,week,dayKey,name){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey; if(!s[k]) return s;
-  s[k].skip=(s[k].skip||[]).filter(function(x){return x!==name;});
-  if(!s[k].skip.length&&!(s[k].add||[]).length) delete s[k];
-  saveDayEdits(pid,s); return s;
-}
-function recordAdd(pid,week,dayKey,name,detail){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
-  if(!e.add.some(function(a){return a&&a.name===name;})) e.add.push({name:name,detail:detail,ts:Date.now()});
-  saveDayEdits(pid,s); return s;
-}
-function clearAdd(pid,week,dayKey,name){
-  const s=getDayEdits(pid),k='w'+week+'_'+dayKey; if(!s[k]) return s;
-  s[k].add=(s[k].add||[]).filter(function(a){return a&&a.name!==name;});
-  if(!s[k].add.length&&!(s[k].skip||[]).length) delete s[k];
-  saveDayEdits(pid,s); return s;
-}
+function getDayEdits(pid){return readDayEdits(iaStore,pid);}
+function recordSkip(pid,week,dayKey,name){return addSkipEdit(iaStore,pid,week,dayKey,name);}
+function clearSkip(pid,week,dayKey,name){return dropSkipEdit(iaStore,pid,week,dayKey,name);}
+function recordAdd(pid,week,dayKey,name,detail){return addAddEdit(iaStore,pid,week,dayKey,name,detail,Date.now());}
+function clearAdd(pid,week,dayKey,name){return dropAddEdit(iaStore,pid,week,dayKey,name);}
 
 
 
@@ -11488,40 +11605,10 @@ function applyDayEdits(prog,store){
   });
 }
 
-
-
-
-
-
-
-function pruneDayEdits(pid,cutWeek){
-  const s=getDayEdits(pid); let changed=false;
-  Object.keys(s).forEach(function(k){const m=/^w(\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});
-  if(changed) saveDayEdits(pid,s);
-}
-function swapStoreKey(pid){return 'ia_swaps_'+pid;}
-function getSwaps(pid){try{return JSON.parse(iaStore.get(swapStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveSwaps(pid,v){try{iaStore.set(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
-function recordSwap(pid,week,dayKey,from,to,rx){
-  const s=getSwaps(pid),k='w'+week+'_'+dayKey;
-  
-  
-  
-  
-  const was=(s[k]||[]).filter(e=>e&&e.from===from&&e.to===to&&Array.isArray(e.rx))[0];
-  const list=(s[k]||[]).filter(e=>e&&e.from!==from);
-  const ent={from:from,to:to,ts:Date.now()};
-  if(Array.isArray(rx)&&rx.length) ent.rx=(was?was.rx.filter(p=>!rx.some(q=>q.s===p.s&&q.i===p.i)):[]).concat(rx);
-  list.push(ent);
-  s[k]=list; saveSwaps(pid,s); return s;
-}
-function clearSwap(pid,week,dayKey,from){
-  const s=getSwaps(pid),k='w'+week+'_'+dayKey;
-  if(!s[k]) return s;
-  s[k]=s[k].filter(e=>e&&e.from!==from);
-  if(!s[k].length) delete s[k];
-  saveSwaps(pid,s); return s;
-}
+function pruneDayEdits(pid,cutWeek){pruneDayEditsBefore(iaStore,pid,cutWeek);}
+function getSwaps(pid){return readSwaps(iaStore,pid);}
+function recordSwap(pid,week,dayKey,from,to,rx){return addSwapRecord(iaStore,pid,week,dayKey,from,to,rx,Date.now());}
+function clearSwap(pid,week,dayKey,from){return dropSwapRecord(iaStore,pid,week,dayKey,from);}
 
 
 
@@ -11556,25 +11643,8 @@ function applySessionSwaps(prog,store){
 
 
 
-
-
-const SWAP_NUDGE_AT=3;
-function swapCountKey(pid){return 'ia_swapct_'+pid;}
-function getSwapCounts(pid){try{return JSON.parse(iaStore.get(swapCountKey(pid))||'{}');}catch(e){return {};}}
-function saveSwapCounts(pid,v){try{iaStore.set(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
-function bumpSwapCount(pid,from,to){
-  const c=getSwapCounts(pid);
-  const cur=c[from];
-  if(cur&&cur.to===to&&!cur.offered) cur.n=(cur.n||0)+1;
-  else c[from]={to:to,n:1,offered:(cur&&cur.to===to&&cur.offered)||false};
-  saveSwapCounts(pid,c);
-  const e=c[from];
-  return (e&&!e.offered&&e.n>=SWAP_NUDGE_AT)?e:null;
-}
-function markSwapOffered(pid,from){
-  const c=getSwapCounts(pid);
-  if(c[from]){c[from].offered=true;saveSwapCounts(pid,c);}
-}
+function bumpSwapCount(pid,from,to){return countSwap(iaStore,pid,from,to);}
+function markSwapOffered(pid,from){markSwapNudged(iaStore,pid,from);}
 
 
 

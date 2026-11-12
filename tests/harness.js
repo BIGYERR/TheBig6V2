@@ -57,7 +57,10 @@ const EXPORT_NAMES = [
   'WD','_applyWizardStart','doGenerate',
   'storageStore','memoryStore','iaStore',
   'readLiftLog','writeLiftLog','recordLift',
-  'readDayLogs','writeDayLogs','readCompleted','readPartSkips','dayStoreKey'
+  'readDayLogs','writeDayLogs','readCompleted','readPartSkips','dayStoreKey',
+  'readDayHistory','writeDayHistory',
+  'readSwaps','writeSwaps','readSwapCounts','writeSwapCounts','SWAP_NUDGE_AT','readDayEdits','writeDayEdits',
+  'readPrograms','writePrograms','readActiveProgramId','writeActiveProgramId','readWildcardDone','writeWildcardDone'
 ];
 
 function makeContext(opts){

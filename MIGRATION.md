@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and four lift slices have
-shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and five lift slices have
+shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5, v0.261.6) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -57,9 +57,18 @@ Each phase starts only on Mario's GO, one phase step per session.
     re-snapshot that did nothing changed no record. The case "a touched day edited, then its session moved" adds two
     records (256 lines, none changed), and that break is red (16 in all, 2 open).
   - **Found, not fixed:** a session moved off a day that has a logged lift comes back on that day (section 7).
-- **Next, on his GO:** the swap and edit stores (`swaps-edits.ts`: `ia_swaps_`, `ia_swapct_`, `ia_edits_`), measured
-  first; what is left of `storage.ts` (the program list, the active id, the Wildcard's record) rides with it if the
-  measure says it fits.
+- **Done, the fifth lift slice (v0.261.6):** the swaps, the swap counts and the day edits (`ia_swaps_`, `ia_swapct_`,
+  `ia_edits_`) live in `core/src/engine/state-swaps.ts` and `state-day-edits.ts`, and what was left of `storage.ts`
+  (`ia_programs`, `ia_active`, `ia_wild_`) in `state-programs.ts`. The page's 17 functions are thin callers; 9 with no
+  caller left went with the move, `saveDayHist` among them. Every golden record identical. Not narrowed.
+  `applySessionSwaps` and `applyDayEdits` stay with the freeze slice.
+  - **The break check found the records blind to 8 of the 12 moved rules, closed in the slice:** the next launch
+    prunes a touched week's edits before any record is taken, and no history undid a swap or reached the nudge. The
+    case "a day's swaps and edits, made and undone, and the nudge" adds four records (285 lines, none changed).
+  - **Found, not fixed:** the swap nudge counts taps, not sessions (section 7).
+- **Next, on his GO:** what `progress-data.ts` reads and computes from the stored state, and what is left of
+  `day-status.ts`'s store logic if the measure says it fits. `applyOverlays` waits until after 2026-12-06 with the
+  freeze (Mario, Post-v0.261.6: it rewrites the grid on every launch).
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is
@@ -216,9 +225,11 @@ Mario's order is kept. Three changes, each with its reason:
 3. **The lift, a slice a session (4 to 5 sessions).** A storage interface in `core/` (`get`, `set`, `remove`, `keys`,
    all synchronous, strings in and out) with two implementations: the browser's `localStorage`, and a plain map for
    tests. Then, in this order: `storage.ts` (programs, logs, history, completion, parts); `log-entries.ts` and the
-   set logging rules; `swaps-edits.ts`; `overlays.ts` (`applyOverlays` only, its sheet stays); `data-backup.ts`
-   (snapshot, read, load); `progress-data.ts` and `day-status.ts`; and last `program-manage.ts` (`refreshProgram` and
-   the freeze), **after 2026-12-06.** Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
+   set logging rules; `swaps-edits.ts`; `progress-data.ts` and `day-status.ts`; `data-backup.ts` (snapshot, read,
+   load); then, **after 2026-12-06,** `overlays.ts` (`applyOverlays` only, its sheet stays) and last
+   `program-manage.ts` (`refreshProgram` and the freeze). `applyOverlays` moved behind the race (Mario,
+   Post-v0.261.6): `refreshProgram` runs it on every launch, before the freeze, so it rewrites the grid the way
+   `applySessionSwaps` and `applyDayEdits` do, and those wait for the freeze slice. Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
    a thin caller, and it ships as the next PATCH (the migration bump policy, Mario 2026-10-12). A page function a move
    leaves with no caller (legacy, Angular through the bridge, tests) is deleted with the move, not kept as a caller of
    nothing (Mario, Post-v0.261.5).
@@ -575,6 +586,16 @@ Each with the session's pick first.
   its session moved" holds today's bytes, so the freeze slice reproduces them and a fix shows as a reviewed diff.
   The fix is its own ruling and belongs with the freeze slice (it touches the freeze, the move and what the rest
   sheet offers). Until then: a session with anything logged on it is better finished where it is than moved.
+
+**Found by the fifth lift slice's break check (2026-11-11), not ruled and not fixed:**
+
+- **The swap nudge counts taps, not sessions.** Its comment says three sessions running of one lift traded for one
+  replacement make a preference, and the app should offer to make it standing. The count goes up on every swap tap,
+  and an undo does not take one off: swap a lift, undo it, and swap it again, three times on one day, and the nudge
+  comes up. Shown on HALF_MANNY, week 1 Monday (the golden case "a day's swaps and edits, made and undone, and the
+  nudge", its `nudged` record). Nothing stored is lost or wrong; the nudge only asks, and turning it down marks the
+  pair offered for good. The golden record holds today's count, so a fix shows as a reviewed diff. The fix is its own
+  ruling (coach: what counts as a session), after cutover or on Mario's word.
 
 **Where the repo and the request differed:**
 

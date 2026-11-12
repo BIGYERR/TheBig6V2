@@ -1,8 +1,10 @@
 // Stored state, the logic in @ia/core (docs/decisions/stored-state.md), imported and run alone: the store the app's
 // state sits behind (core/src/engine/state-store.ts, v0.261.2) with the page's one use of the browser's storage, and
 // the lift log (core/src/engine/state-lift-log.ts, v0.261.3), the day's log, completion and skipped parts
-// (core/src/engine/state-day-log.ts and state-day-status.ts, v0.261.4), and the day history
-// (core/src/engine/state-day-history.ts, v0.261.5). Every expected value is typed from the ruling.
+// (core/src/engine/state-day-log.ts and state-day-status.ts, v0.261.4), the day history
+// (core/src/engine/state-day-history.ts, v0.261.5), and the swaps, the swap counts, the day edits, the program list,
+// the active program and the Wildcard's record (core/src/engine/state-swaps.ts, state-day-edits.ts and
+// state-programs.ts, v0.261.6). Every expected value is typed from the ruling.
 // What the app stores through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
@@ -19,8 +21,18 @@ import {
   writeCompleted, writePartSkips,
 } from '@ia/core/engine/state-day-status.ts';
 import { readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory } from '@ia/core/engine/state-day-history.ts';
-import type { Day } from '@ia/core';
-import { appScript, loadApp } from '../support/app.ts';
+import {
+  SWAP_NUDGE_AT, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts, readSwaps, writeSwapCounts,
+  writeSwaps,
+} from '@ia/core/engine/state-swaps.ts';
+import {
+  addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits, writeDayEdits,
+} from '@ia/core/engine/state-day-edits.ts';
+import {
+  readActiveProgramId, readPrograms, readWildcardDone, writeActiveProgramId, writePrograms, writeWildcardDone,
+} from '@ia/core/engine/state-programs.ts';
+import type { Day, Program } from '@ia/core';
+import { appScript, loadApp, pinClock } from '../support/app.ts';
 
 /** A stand-in for the browser's storage that records what was asked of it. */
 function fakeStorage(start: [string, string][] = []): StorageLike & { calls: string[]; rows: (readonly [string, string] | null)[] } {
@@ -559,4 +571,231 @@ test('the page\'s own names still answer as they did: a first touch, a second, a
   assert.deepEqual(said.map((a) => a[0]), ['day snapshot failed', 'day edit re-snapshot failed']);
   IA.eval("activeProg=null;snapshotDay(2,'wed');resnapshotDayEdit(2,'wed');");
   assert.equal(stored(), 'null', 'with no active program nothing is read or written');
+});
+
+// ── The swaps and the swap counts, ia_swaps_ and ia_swapct_<program> (core/src/engine/state-swaps.ts, v0.261.6) ──
+// Imported from @ia/core and run on a memory store. Every expected value is typed from the ruling.
+const refusing = (): StateStore => ({ get: () => null, set: () => { throw new Error('QuotaExceededError'); }, remove: () => {}, keys: () => [] });
+
+test('the swaps and the swap counts read empty when nothing or something broken is stored, and are stored as their JSON', () => {
+  assert.deepEqual(readSwaps(memoryStore(), 'p1'), {});
+  assert.deepEqual(readSwapCounts(memoryStore(), 'p1'), {});
+  assert.deepEqual(readSwaps(memoryStore({ ia_swaps_p1: '{"w1_mon":[' }), 'p1'), {}, 'broken JSON reads as empty');
+  assert.deepEqual(readSwapCounts(memoryStore({ ia_swapct_p1: 'nope' }), 'p1'), {});
+  const s = memoryStore();
+  writeSwaps(s, 'p1', { w1_mon: [{ from: 'Back squat', to: 'Front squat', ts: 5 }] });
+  writeSwapCounts(s, 'p1', { 'Back squat': { to: 'Front squat', n: 1, offered: false } });
+  assert.equal(s.get('ia_swaps_p1'), '{"w1_mon":[{"from":"Back squat","to":"Front squat","ts":5}]}');
+  assert.equal(s.get('ia_swapct_p1'), '{"Back squat":{"to":"Front squat","n":1,"offered":false}}');
+  assert.deepEqual(readSwaps(s, 'p1'), { w1_mon: [{ from: 'Back squat', to: 'Front squat', ts: 5 }] });
+  assert.deepEqual(readSwaps(s, 'p2'), {}, 'another program has its own key');
+});
+
+test('a store that refuses a swap or a count stops nothing: the write is swallowed', () => {
+  writeSwaps(refusing(), 'p1', {});
+  writeSwapCounts(refusing(), 'p1', {});
+  assert.deepEqual(addSwapRecord(refusing(), 'p1', 1, 'mon', 'Back squat', 'Front squat', null, 5),
+    { w1_mon: [{ from: 'Back squat', to: 'Front squat', ts: 5 }] }, 'the tap still hands back what it would have stored');
+  assert.equal(countSwap(refusing(), 'p1', 'Back squat', 'Front squat'), null);
+});
+
+test('a swap is stored under its day as from, to, the instant, and where the lift stood when the tap brings it', () => {
+  const s = memoryStore();
+  addSwapRecord(s, 'p1', 2, 'mon', 'Back squat', 'Front squat', null, 100);
+  assert.equal(s.get('ia_swaps_p1'), '{"w2_mon":[{"from":"Back squat","to":"Front squat","ts":100}]}');
+  addSwapRecord(s, 'p1', 2, 'tue', 'Barbell row', 'Seal row', [], 101);
+  assert.equal(JSON.stringify(readSwaps(s, 'p1').w2_tue), '[{"from":"Barbell row","to":"Seal row","ts":101}]', 'no places, no rx');
+  addSwapRecord(s, 'p1', 2, 'wed', 'Bench press', 'Floor press', [{ s: 0, i: 1, d: '4×5' }, { s: 2, i: 0, d: '3×8', ph: '3×8 RPE 8' }], 102);
+  assert.equal(JSON.stringify(readSwaps(s, 'p1').w2_wed),
+    '[{"from":"Bench press","to":"Floor press","ts":102,"rx":[{"s":0,"i":1,"d":"4×5"},{"s":2,"i":0,"d":"3×8","ph":"3×8 RPE 8"}]}]');
+  assert.deepEqual(Object.keys(readSwaps(s, 'p1')), ['w2_mon', 'w2_tue', 'w2_wed'], 'each day its own key, in the order made');
+});
+
+test('a lift swapped again on its day replaces its record at the end of the list, and the same pair keeps the places the earlier tap saw', () => {
+  const s = memoryStore();
+  addSwapRecord(s, 'p1', 1, 'mon', 'A', 'B', [{ s: 0, i: 0, d: '5×5' }], 1);
+  addSwapRecord(s, 'p1', 1, 'mon', 'C', 'D', null, 2);
+  addSwapRecord(s, 'p1', 1, 'mon', 'A', 'B', [{ s: 3, i: 0, d: '3×10' }], 3);
+  assert.equal(JSON.stringify(readSwaps(s, 'p1').w1_mon),
+    '[{"from":"C","to":"D","ts":2},{"from":"A","to":"B","ts":3,"rx":[{"s":0,"i":0,"d":"5×5"},{"s":3,"i":0,"d":"3×10"}]}]');
+  addSwapRecord(s, 'p1', 1, 'mon', 'A', 'B', [{ s: 3, i: 0, d: '3×12' }], 4);
+  assert.equal(JSON.stringify(readSwaps(s, 'p1').w1_mon[1]!.rx), '[{"s":0,"i":0,"d":"5×5"},{"s":3,"i":0,"d":"3×12"}]', 'a place seen again takes this tap\'s detail');
+  addSwapRecord(s, 'p1', 1, 'mon', 'A', 'E', [{ s: 3, i: 0, d: '3×12' }], 5);
+  assert.equal(JSON.stringify(readSwaps(s, 'p1').w1_mon), '[{"from":"C","to":"D","ts":2},{"from":"A","to":"E","ts":5,"rx":[{"s":3,"i":0,"d":"3×12"}]}]',
+    'another replacement keeps nothing of the earlier record');
+  addSwapRecord(s, 'p1', 1, 'mon', 'A', 'E', null, 6);
+  assert.equal(JSON.stringify(readSwaps(s, 'p1').w1_mon[1]), '{"from":"A","to":"E","ts":6}', 'a tap with no places stores none');
+});
+
+test('undoing a swap removes that lift\'s record, and the day\'s key with its last one; a day with none writes nothing', () => {
+  const s = countingStore({ ia_swaps_p1: '{"w1_mon":[{"from":"A","to":"B","ts":1},{"from":"C","to":"D","ts":2}],"w1_tue":[{"from":"E","to":"F","ts":3}]}' });
+  assert.deepEqual(dropSwapRecord(s, 'p1', 1, 'wed', 'A'), readSwaps(s, 'p1'));
+  assert.deepEqual(s.writes, [], 'no record on the day, nothing written');
+  dropSwapRecord(s, 'p1', 1, 'mon', 'A');
+  assert.equal(s.get('ia_swaps_p1'), '{"w1_mon":[{"from":"C","to":"D","ts":2}],"w1_tue":[{"from":"E","to":"F","ts":3}]}');
+  dropSwapRecord(s, 'p1', 1, 'mon', 'Z');
+  assert.equal(s.get('ia_swaps_p1'), '{"w1_mon":[{"from":"C","to":"D","ts":2}],"w1_tue":[{"from":"E","to":"F","ts":3}]}', 'a lift with no record changes nothing');
+  dropSwapRecord(s, 'p1', 1, 'mon', 'C');
+  assert.equal(s.get('ia_swaps_p1'), '{"w1_tue":[{"from":"E","to":"F","ts":3}]}');
+});
+
+test('the nudge comes at the third swap running of one lift to one replacement; another choice starts again; once offered, that pair never again', () => {
+  assert.equal(SWAP_NUDGE_AT, 3);
+  const s = memoryStore();
+  assert.equal(countSwap(s, 'p1', 'Back squat', 'Front squat'), null);
+  assert.equal(s.get('ia_swapct_p1'), '{"Back squat":{"to":"Front squat","n":1,"offered":false}}');
+  assert.equal(countSwap(s, 'p1', 'Back squat', 'Front squat'), null);
+  assert.deepEqual(countSwap(s, 'p1', 'Back squat', 'Front squat'), { to: 'Front squat', n: 3, offered: false });
+  assert.deepEqual(countSwap(s, 'p1', 'Back squat', 'Front squat'), { to: 'Front squat', n: 4, offered: false }, 'still due until it is answered');
+  assert.equal(countSwap(s, 'p1', 'Back squat', 'Goblet squat'), null);
+  assert.equal(s.get('ia_swapct_p1'), '{"Back squat":{"to":"Goblet squat","n":1,"offered":false}}', 'another replacement starts the run again');
+  countSwap(s, 'p1', 'Back squat', 'Goblet squat'); countSwap(s, 'p1', 'Back squat', 'Goblet squat');
+  markSwapNudged(s, 'p1', 'Back squat');
+  assert.equal(s.get('ia_swapct_p1'), '{"Back squat":{"to":"Goblet squat","n":3,"offered":true}}');
+  assert.equal(countSwap(s, 'p1', 'Back squat', 'Goblet squat'), null);
+  assert.equal(countSwap(s, 'p1', 'Back squat', 'Goblet squat'), null);
+  assert.equal(countSwap(s, 'p1', 'Back squat', 'Goblet squat'), null);
+  assert.equal(s.get('ia_swapct_p1'), '{"Back squat":{"to":"Goblet squat","n":1,"offered":true}}', 'the pair offered starts at one and stays offered');
+  countSwap(s, 'p1', 'Back squat', 'Front squat'); countSwap(s, 'p1', 'Back squat', 'Front squat');
+  assert.deepEqual(countSwap(s, 'p1', 'Back squat', 'Front squat'), { to: 'Front squat', n: 3, offered: false }, 'another pair can still be offered');
+});
+
+test('answering the nudge marks the lift offered; a lift never counted writes nothing', () => {
+  const s = countingStore({ ia_swapct_p1: '{"A":{"to":"B","n":3,"offered":false},"C":{"to":"D","n":1,"offered":false}}' });
+  markSwapNudged(s, 'p1', 'Z');
+  assert.deepEqual(s.writes, []);
+  markSwapNudged(s, 'p1', 'A');
+  assert.equal(s.get('ia_swapct_p1'), '{"A":{"to":"B","n":3,"offered":true},"C":{"to":"D","n":1,"offered":false}}');
+});
+
+// ── The day edits, ia_edits_<program> (core/src/engine/state-day-edits.ts, v0.261.6) ──
+test('the day edits read empty when nothing or something broken is stored, are stored as their JSON, and a refused write stops nothing', () => {
+  assert.deepEqual(readDayEdits(memoryStore(), 'p1'), {});
+  assert.deepEqual(readDayEdits(memoryStore({ ia_edits_p1: '{"w1' }), 'p1'), {});
+  const s = memoryStore();
+  writeDayEdits(s, 'p1', { w1_mon: { add: [], skip: ['Curl'] } });
+  assert.equal(s.get('ia_edits_p1'), '{"w1_mon":{"add":[],"skip":["Curl"]}}');
+  writeDayEdits(refusing(), 'p1', {});
+  assert.deepEqual(addSkipEdit(refusing(), 'p1', 1, 'mon', 'Curl'), { w1_mon: { add: [], skip: ['Curl'] } });
+});
+
+test('a movement taken off is stored once under its day, after an empty add list; a superset by its token', () => {
+  const s = memoryStore();
+  addSkipEdit(s, 'p1', 3, 'tue', 'Hammer curl');
+  assert.equal(s.get('ia_edits_p1'), '{"w3_tue":{"add":[],"skip":["Hammer curl"]}}');
+  addSkipEdit(s, 'p1', 3, 'tue', 'Hammer curl');
+  addSkipEdit(s, 'p1', 3, 'tue', '__ss:2');
+  assert.equal(s.get('ia_edits_p1'), '{"w3_tue":{"add":[],"skip":["Hammer curl","__ss:2"]}}');
+  const old = memoryStore({ ia_edits_p1: '{"w3_tue":{"skip":["Plank"]}}' });
+  addSkipEdit(old, 'p1', 3, 'tue', 'Hammer curl');
+  assert.equal(old.get('ia_edits_p1'), '{"w3_tue":{"skip":["Plank","Hammer curl"],"add":[]}}', 'an entry missing a list gains it after the ones it has');
+});
+
+test('put back: the name leaves the day\'s skips, and the day\'s key goes with its last edit; a day with none writes nothing', () => {
+  const s = countingStore({ ia_edits_p1: '{"w1_mon":{"add":[],"skip":["A","B"]},"w1_tue":{"add":[{"name":"C","detail":"3×10","ts":1}],"skip":["D"]}}' });
+  dropSkipEdit(s, 'p1', 1, 'wed', 'A');
+  assert.deepEqual(s.writes, []);
+  dropSkipEdit(s, 'p1', 1, 'mon', 'A');
+  assert.equal(s.get('ia_edits_p1'), '{"w1_mon":{"add":[],"skip":["B"]},"w1_tue":{"add":[{"name":"C","detail":"3×10","ts":1}],"skip":["D"]}}');
+  dropSkipEdit(s, 'p1', 1, 'mon', 'B');
+  dropSkipEdit(s, 'p1', 1, 'tue', 'D');
+  assert.equal(s.get('ia_edits_p1'), '{"w1_tue":{"add":[{"name":"C","detail":"3×10","ts":1}],"skip":[]}}', 'a day keeps its key while an add stands');
+});
+
+test('a movement added is stored once by name with its dose and the instant, the first add kept', () => {
+  const s = memoryStore();
+  addAddEdit(s, 'p1', 1, 'thu', 'Barbell hip thrust', '3×10', 50);
+  assert.equal(s.get('ia_edits_p1'), '{"w1_thu":{"add":[{"name":"Barbell hip thrust","detail":"3×10","ts":50}],"skip":[]}}');
+  addAddEdit(s, 'p1', 1, 'thu', 'Barbell hip thrust', '4×8', 60);
+  addAddEdit(s, 'p1', 1, 'thu', 'Nordic curl', '3×5', 70);
+  assert.equal(s.get('ia_edits_p1'),
+    '{"w1_thu":{"add":[{"name":"Barbell hip thrust","detail":"3×10","ts":50},{"name":"Nordic curl","detail":"3×5","ts":70}],"skip":[]}}');
+});
+
+test('an added movement removed leaves the day\'s adds, and the day\'s key goes with its last edit; a day with none writes nothing', () => {
+  const s = countingStore({ ia_edits_p1: '{"w1_thu":{"add":[{"name":"A","detail":"3×10","ts":1},{"name":"B","detail":"3×5","ts":2}],"skip":[]},"w1_fri":{"add":[{"name":"C","detail":"3×8","ts":3}],"skip":["D"]}}' });
+  dropAddEdit(s, 'p1', 1, 'sat', 'A');
+  assert.deepEqual(s.writes, []);
+  dropAddEdit(s, 'p1', 1, 'thu', 'A');
+  dropAddEdit(s, 'p1', 1, 'fri', 'C');
+  assert.equal(s.get('ia_edits_p1'), '{"w1_thu":{"add":[{"name":"B","detail":"3×5","ts":2}],"skip":[]},"w1_fri":{"add":[],"skip":["D"]}}');
+  dropAddEdit(s, 'p1', 1, 'thu', 'B');
+  assert.equal(s.get('ia_edits_p1'), '{"w1_fri":{"add":[],"skip":["D"]}}');
+});
+
+test('the prune drops every week below the cut, keeps the rest and any other key, and writes only when something went', () => {
+  const s = countingStore({ ia_edits_p1: '{"w1_mon":{"add":[],"skip":["A"]},"w2_tue":{"add":[],"skip":["B"]},"w3_wed":{"add":[],"skip":["C"]},"w12_thu":{"add":[],"skip":["D"]},"x":{}}' });
+  pruneDayEditsBefore(s, 'p1', 3);
+  assert.equal(s.get('ia_edits_p1'), '{"w3_wed":{"add":[],"skip":["C"]},"w12_thu":{"add":[],"skip":["D"]},"x":{}}');
+  pruneDayEditsBefore(s, 'p1', 3);
+  pruneDayEditsBefore(s, 'p1', 1);
+  assert.deepEqual(s.writes, ['ia_edits_p1'], 'one write, the one that dropped something');
+});
+
+// ── The program list, the active program and the Wildcard's record (core/src/engine/state-programs.ts, v0.261.6) ──
+test('the program list and the Wildcard\'s record read empty when nothing or something broken is stored; the active id reads null for none or an empty one', () => {
+  assert.deepEqual(readPrograms(memoryStore()), []);
+  assert.deepEqual(readPrograms(memoryStore({ ia_programs: '[{"id"' })), []);
+  assert.deepEqual(readWildcardDone(memoryStore(), 'p1'), []);
+  assert.deepEqual(readWildcardDone(memoryStore({ ia_wild_p1: '[' }), 'p1'), []);
+  assert.equal(readActiveProgramId(memoryStore()), null);
+  assert.equal(readActiveProgramId(memoryStore({ ia_active: '' })), null);
+  assert.equal(readActiveProgramId(memoryStore({ ia_active: 'prog_1' })), 'prog_1');
+});
+
+test('a program list, an active id and a Wildcard record are stored as given; a store that refuses the list or the record throws to the caller', () => {
+  const s = memoryStore();
+  writePrograms(s, [{ id: 'prog_1', name: 'THE HALF MANNY' }] as unknown as Program[]);
+  writeActiveProgramId(s, 'prog_1');
+  writeWildcardDone(s, 'prog_1', [{ title: 'Hill sprints', ts: 9, week: 2, dayKey: 'sat' }, { title: 'Ruck', ts: 10, week: null, dayKey: null }]);
+  assert.equal(s.get('ia_programs'), '[{"id":"prog_1","name":"THE HALF MANNY"}]');
+  assert.equal(s.get('ia_active'), 'prog_1');
+  assert.equal(s.get('ia_wild_prog_1'), '[{"title":"Hill sprints","ts":9,"week":2,"dayKey":"sat"},{"title":"Ruck","ts":10,"week":null,"dayKey":null}]');
+  assert.deepEqual(readPrograms(s), [{ id: 'prog_1', name: 'THE HALF MANNY' }]);
+  assert.deepEqual(readWildcardDone(s, 'prog_2'), [], 'another program has its own record');
+  assert.throws(() => writePrograms(refusing(), []), /QuotaExceededError/);
+  assert.throws(() => writeWildcardDone(refusing(), 'p1', []), /QuotaExceededError/);
+});
+
+test('the page reaches the swaps, the counts, the edits and the program list through core: each rule is in the script once', () => {
+  const code = appScript();
+  for (const name of ['readSwaps', 'addSwapRecord', 'dropSwapRecord', 'countSwap', 'markSwapNudged', 'readDayEdits', 'addSkipEdit',
+    'dropSkipEdit', 'addAddEdit', 'dropAddEdit', 'pruneDayEditsBefore', 'readPrograms', 'readActiveProgramId', 'readWildcardDone']) {
+    assert.equal(code.split('function ' + name + '(').length - 1, 1, name + ' is in the page once');
+  }
+  // One reader and one writer in core. The purge names each key's prefix in its list, without the +.
+  for (const key of ["'ia_swaps_'+", "'ia_swapct_'+", "'ia_edits_'+", "'ia_wild_'+"]) {
+    assert.equal(code.split(key).length - 1, 2, key + ' is built by its reader and its writer');
+  }
+  // The moved helpers and the writer the fourth slice left with no caller are gone, not kept as callers of nothing.
+  for (const name of ['editStoreKey', 'saveDayEdits', '_editEntry', 'swapStoreKey', 'saveSwaps', 'swapCountKey', 'getSwapCounts', 'saveSwapCounts', 'saveDayHist']) {
+    assert.equal(code.split(name + '(').length - 1, 0, name + ' is gone');
+  }
+});
+
+// These guard behaviour the move must not change: they pass on the release before it too.
+test('the page\'s own names still answer as they did: a swap, its undo, the count and the nudge, a skip and an add put back, the prune, the program list, the active id, the Wildcard', () => {
+  const IA = loadApp();
+  pinClock(IA, 1_800_000_000_000);
+  const get = (k: string) => IA.localStorage.getItem(k);
+  assert.equal(IA.eval("JSON.stringify(recordSwap('p9',2,'mon','A','B',[{s:0,i:1,d:'4×5'}]))"), '{"w2_mon":[{"from":"A","to":"B","ts":1800000000000,"rx":[{"s":0,"i":1,"d":"4×5"}]}]}');
+  assert.equal(get('ia_swaps_p9'), '{"w2_mon":[{"from":"A","to":"B","ts":1800000000000,"rx":[{"s":0,"i":1,"d":"4×5"}]}]}');
+  assert.equal(IA.eval("JSON.stringify(getSwaps('p9'))"), get('ia_swaps_p9'));
+  IA.eval("clearSwap('p9',2,'mon','A')");
+  assert.equal(get('ia_swaps_p9'), '{}');
+  assert.deepEqual([IA.eval("bumpSwapCount('p9','A','B')"), IA.eval("bumpSwapCount('p9','A','B')")], [null, null]);
+  assert.equal(IA.eval("JSON.stringify(bumpSwapCount('p9','A','B'))"), '{"to":"B","n":3,"offered":false}');
+  IA.eval("markSwapOffered('p9','A')");
+  assert.equal(get('ia_swapct_p9'), '{"A":{"to":"B","n":3,"offered":true}}');
+  IA.eval("recordSkip('p9',2,'mon','Curl');recordAdd('p9',2,'mon','Hip thrust','3×10');recordSkip('p9',4,'tue','Row');");
+  assert.equal(get('ia_edits_p9'), '{"w2_mon":{"add":[{"name":"Hip thrust","detail":"3×10","ts":1800000000000}],"skip":["Curl"]},"w4_tue":{"add":[],"skip":["Row"]}}');
+  assert.equal(IA.eval("JSON.stringify(getDayEdits('p9'))"), get('ia_edits_p9'));
+  IA.eval("clearSkip('p9',2,'mon','Curl');clearAdd('p9',2,'mon','Hip thrust');");
+  assert.equal(get('ia_edits_p9'), '{"w4_tue":{"add":[],"skip":["Row"]}}');
+  IA.eval("pruneDayEdits('p9',5)");
+  assert.equal(get('ia_edits_p9'), '{}');
+  IA.eval("savePrograms([{id:'p9',name:'X'}]);setActiveProgId('p9');activeProgId='p9';saveWildcardDone([{title:'Ruck',ts:1,week:null,dayKey:null}]);");
+  assert.deepEqual([get('ia_programs'), get('ia_active'), get('ia_wild_p9')], ['[{"id":"p9","name":"X"}]', 'p9', '[{"title":"Ruck","ts":1,"week":null,"dayKey":null}]']);
+  assert.deepEqual([IA.eval('JSON.stringify(getPrograms())'), IA.eval('getActiveProgId()'), IA.eval('JSON.stringify(getWildcardDone())')],
+    ['[{"id":"p9","name":"X"}]', 'p9', '[{"title":"Ruck","ts":1,"week":null,"dayKey":null}]']);
 });

@@ -20,12 +20,25 @@ must be green on all three and every break red.
 | parts settle | the parts of a day never write its completion | red | 1 | the fast file |
 | history, kept | a touched day is never snapshotted | red | 2 | the fast file |
 | edit re-snapshot | an edit after the first touch is not folded into the day's snapshot | red | 1 | the fast file |
+| swap record | a swap is not stored | red | 2 | the fast file |
+| swap places | a swap is stored without where the lift stood | red | 1 | the fast file |
+| swap places, merge | a pair swapped again forgets the places the earlier tap saw | red | 1 | the fast file |
+| swap undo | an undone swap keeps its record | red | 1 | the fast file |
+| swap count | a run of one swap never counts past one | red | 1 | the fast file |
+| nudge offered | a nudge turned down is not marked offered | red | 1 | the fast file |
+| skip record | a skipped movement is not stored | red | 1 | the fast file |
+| skip undo | a movement put back stays skipped in the store | red | 1 | the fast file |
+| add record | an added movement is not stored | red | 1 | the fast file |
+| add undo | a removed movement stays added in the store | red | 1 | the fast file |
+| edits prune | the edits of a frozen week are kept | red | the golden file | the fast file |
+| active id | the active program is not stored | red | 17 | the fast file |
+| wildcard record | a Wildcard done is not stored | red | 1 | the fast file |
 | seed write back | an old program's seed is not written back to its config | red | the golden file | the fast file |
 | purge | a deleted program keeps its logs | red | 1 | the fast file |
 | rest move key | a moved rest day is stored under the picked day | red | 1 | the fast file |
 | week count | the current week is counted one day late | red | 4 | the fast file |
 
-**The page as built is green, and all 16 breaks turn the records red.**
+**The page as built is green, and all 29 breaks turn the records red.**
 
 ## Breaks that change no record
 
