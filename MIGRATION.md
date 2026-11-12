@@ -66,7 +66,9 @@ Each phase starts only on Mario's GO, one phase step per session.
     prunes a touched week's edits before any record is taken, and no history undid a swap or reached the nudge. The
     case "a day's swaps and edits, made and undone, and the nudge" adds four records (285 lines, none changed).
   - **Found, not fixed:** the swap nudge counts taps, not sessions (section 7).
-- **Next, on his GO:** the overlays (`overlays.ts`: `applyOverlays` only, its sheet stays), measured first.
+- **Next, on his GO:** what `progress-data.ts` reads and computes from the stored state, and what is left of
+  `day-status.ts`'s store logic if the measure says it fits. `applyOverlays` waits until after 2026-12-06 with the
+  freeze (Mario, Post-v0.261.6: it rewrites the grid on every launch).
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is
@@ -223,9 +225,11 @@ Mario's order is kept. Three changes, each with its reason:
 3. **The lift, a slice a session (4 to 5 sessions).** A storage interface in `core/` (`get`, `set`, `remove`, `keys`,
    all synchronous, strings in and out) with two implementations: the browser's `localStorage`, and a plain map for
    tests. Then, in this order: `storage.ts` (programs, logs, history, completion, parts); `log-entries.ts` and the
-   set logging rules; `swaps-edits.ts`; `overlays.ts` (`applyOverlays` only, its sheet stays); `data-backup.ts`
-   (snapshot, read, load); `progress-data.ts` and `day-status.ts`; and last `program-manage.ts` (`refreshProgram` and
-   the freeze), **after 2026-12-06.** Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
+   set logging rules; `swaps-edits.ts`; `progress-data.ts` and `day-status.ts`; `data-backup.ts` (snapshot, read,
+   load); then, **after 2026-12-06,** `overlays.ts` (`applyOverlays` only, its sheet stays) and last
+   `program-manage.ts` (`refreshProgram` and the freeze). `applyOverlays` moved behind the race (Mario,
+   Post-v0.261.6): `refreshProgram` runs it on every launch, before the freeze, so it rewrites the grid the way
+   `applySessionSwaps` and `applyDayEdits` do, and those wait for the freeze slice. Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
    a thin caller, and it ships as the next PATCH (the migration bump policy, Mario 2026-10-12). A page function a move
    leaves with no caller (legacy, Angular through the bridge, tests) is deleted with the move, not kept as a caller of
    nothing (Mario, Post-v0.261.5).
