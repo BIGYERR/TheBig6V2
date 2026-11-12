@@ -7,6 +7,9 @@ import {
 import {
   readCompleted, readPartSkips, writeCompleted, writePartSkips,
 } from '../../../../../../core/src/engine/state-day-status.ts';
+import {
+  readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory,
+} from '../../../../../../core/src/engine/state-day-history.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
@@ -33,7 +36,7 @@ function getLogs(): any{return readDayLogs(iaStore,activeProgId);}
 // read OTHER programs' stores, and they must say which one out loud.
 // V238 (D223 item 5): the same restNorm lens as getLogs.
 function getLogsFor(pid: any): any{return readDayLogs(iaStore,pid);}
-function getDayHistFor(pid: any){try{return JSON.parse(iaStore.get('ia_hist_'+pid)||'{}');}catch{return{};}}
+function getDayHistFor(pid: any): any{return readDayHistory(iaStore,pid);}
 function getExWeightsFor(pid: any): any{return readLiftLog(iaStore,pid);}
 function saveExWeightsFor(pid: any,obj: any){writeLiftLog(iaStore,pid,obj);}
 function saveLogs(l: any){writeDayLogs(iaStore,activeProgId,l);}
@@ -69,51 +72,23 @@ function clearSetDraft(exKey: any){
 }
 function completedKey(w: any,d: any){return dayStoreKey(w,d);}
 // ── DAY HISTORY SNAPSHOTS (ia_hist_) ─────────────────────────────────────────
-// refreshProgram rebuilds from cfg on every boot and its OUTPUT IS NEVER PERSISTED —
-// prog.weeks in storage is the build from creation day. So the week freeze's
-// "trained → history stands" branch was restoring a version the athlete may never
-// have been shown: report an injury, train Thursday, mark it, and next boot the day
-// snapped back to the pre-injury prescription (all-out intervals on a protected
-// week). Same failure for travel: train a hotel week, mark it, get the commercial-gym
-// version back.
-//
-// Fix: the moment a day is touched, snapshot the day object AS RENDERED — overlays,
-// swaps, rest-day moves and all — keyed w<N>_<day> like every other week-keyed store.
-// The freeze then restores from the snapshot and only falls back to prog.weeks when
-// none exists. This is what makes "history records what was actually prescribed"
-// literally true, and it survives engine changes, date edits and overlay removal.
-//
-// FIRST TOUCH WINS: never overwritten. The prescription that was on screen when the
-// athlete started working is the record; re-tapping a status later must not rewrite it.
-function getDayHist(){try{return JSON.parse(iaStore.get('ia_hist_'+activeProgId)||'{}');}catch{return{};}}
-function saveDayHist(h: any){try{iaStore.set('ia_hist_'+activeProgId,JSON.stringify(h));}catch(e){}}
-// FIRST TOUCH WINS applies to the ENGINE's prescription, not to the athlete's own
-// edits. If the day is edited after first touch, the snapshot must absorb that edit or
-// the freeze will restore a day missing it — the exact shape of the V103→V104 bug, since
-// ia_hist_ is the record and prog.weeks is only a build. This re-snapshots the day while
-// preserving nothing else: it is
-// called only from the athlete's own edit handlers: add, skip, swap, undo, never from the
-// five normal hook points, so an untouched prescription can still never be rewritten.
+// v0.261.5 (docs/decisions/stored-state.md): the day history lives in @ia/core, in core/src/engine/state-day-history.ts:
+// the reader and the writer, the first touch's snapshot (first touch wins) and the re-snapshot an edit makes, with
+// their reasons. These are the page's callers: they name the store, the active program and the day's grid entry, and
+// they catch a fault so a tap goes on.
+function getDayHist(): any{return readDayHistory(iaStore,activeProgId);}
+function saveDayHist(h: any){writeDayHistory(iaStore,activeProgId,h);}
+// Called only from the athlete's own edit handlers (add, skip, swap, undo): the snapshot absorbs the edit.
 function resnapshotDayEdit(week: any,dayKey: any){
   try{
     if(!activeProg||!activeProg.weeks||!week||!dayKey) return;
-    const day=activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
-    if(!day) return;
-    const h=getDayHist(), k=completedKey(week,dayKey);
-    if(!h[k]) return;                                 // no snapshot yet: nothing to patch
-    h[k]=JSON.parse(JSON.stringify(day));
-    saveDayHist(h);
+    refreshDaySnapshot(iaStore,activeProgId,week,dayKey,activeProg.weeks[week]&&activeProg.weeks[week][dayKey]);
   }catch(e){ console.error('day edit re-snapshot failed',week,dayKey,e); }
 }
 function snapshotDay(week: any,dayKey: any){
   try{
     if(!activeProg||!activeProg.weeks||!week||!dayKey) return;
-    const day=activeProg.weeks[week]&&activeProg.weeks[week][dayKey];
-    if(!day) return;
-    const h=getDayHist(), k=completedKey(week,dayKey);
-    if(h[k]) return;                                  // first touch wins
-    h[k]=JSON.parse(JSON.stringify(day));
-    saveDayHist(h);
+    recordDaySnapshot(iaStore,activeProgId,week,dayKey,activeProg.weeks[week]&&activeProg.weeks[week][dayKey]);
   }catch(e){ console.error('day snapshot failed',week,dayKey,e); }
 }
 

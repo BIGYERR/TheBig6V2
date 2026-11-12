@@ -9,25 +9,27 @@ must be green on all three and every break red.
 |---|---|---|---|---|
 | (no break) | the page as built | green | 0 | all three files |
 | log key | a log is stored under w1-mon, not w1_mon | red | 3 | the fast file |
-| freeze, history | a touched day is not restored from its snapshot at launch | red | the golden file | the fast file |
+| freeze, history | a touched day is not restored from its snapshot at launch | red | 1 | the fast file |
 | freeze, piercing | an overlay no longer reaches the untouched days of the current week | red | the golden file | the fast file |
-| freeze, reach | the last frozen week is rebuilt instead | red | the golden file | the fast file |
+| freeze, reach | the last frozen week is rebuilt instead | red | 1 | the fast file |
 | freeze, injured week | a touched day in an injured week keeps its stored form | red | 1 | the fast file |
 | set draft | a logged card leaves its draft in the log | red | the golden file | the fast file |
 | backup scan | the backup leaves out the last key | red | 1 | the fast file |
 | completion status | a skipped day is stored as complete | red | the golden file | the fast file |
 | part skip | a skipped part is not stored | red | 2 | the fast file |
 | parts settle | the parts of a day never write its completion | red | 1 | the fast file |
+| history, kept | a touched day is never snapshotted | red | 2 | the fast file |
+| edit re-snapshot | an edit after the first touch is not folded into the day's snapshot | red | 1 | the fast file |
 | seed write back | an old program's seed is not written back to its config | red | the golden file | the fast file |
 | purge | a deleted program keeps its logs | red | 1 | the fast file |
-| rest move key | a moved rest day is stored under the picked day | red | the golden file | the fast file |
+| rest move key | a moved rest day is stored under the picked day | red | 1 | the fast file |
 | week count | the current week is counted one day late | red | 4 | the fast file |
 
-**The page as built is green, and all 14 breaks turn the records red.**
+**The page as built is green, and all 16 breaks turn the records red.**
 
 ## Breaks that change no record
 
 | Break | What it does | Result | Why |
 |---|---|---|---|
 | freeze cut, the touched term | the current week, when touched, is not frozen a week further | no record changed | No effect is possible: the next line takes the larger of this and the highest touched week plus one, and a touched current week is at least that week. The term is redundant. |
-| history, first touch | a day's snapshot is overwritten on every touch | no record changed | Not shown either way. In every history here a touched day is restored from its snapshot at each launch, so a second snapshot writes the same bytes. Whether any tap can change a touched day before its next snapshot (a moved rest day, a sport swap) was not traced. To settle before the freeze slice. |
+| history, first touch | a day's snapshot is overwritten on every touch | no record changed | No reachable effect, settled in v0.261.5 (docs/decisions/stored-state.md). The guard decides only when a day is snapshotted again after it changed. A launch gives every snapshotted day back from its snapshot, and an edit is folded into the snapshot as it is made. One tap changes a snapshotted day and leaves its snapshot alone, the rest sheet's Move of a day with a logged lift, and it leaves a moved rest day that nothing snapshots (tests/measure/stored-state_first-touch.md). In 180 random histories, 0 of 4,481 repeat snapshots met a changed day (stored-state_first-touch-walks.md). The rule itself is held by the unit tests. |

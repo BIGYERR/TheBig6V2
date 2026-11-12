@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and three lift slices have
-shipped (v0.261.2, v0.261.3, v0.261.4) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and four lift slices have
+shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -14,8 +14,8 @@ Each phase starts only on Mario's GO, one phase step per session.
   on today's page). Each history run twice stores the same bytes. Twelve deliberate one line breaks of the page each
   turn the records red (`tests/measure/stored-state_red-on-break.md`). The first run of that check let two through
   and earned its keep: one led to a new hostile case (a logged day with no history, then an injury), the other to a
-  finding (a term in the freeze that can never matter). One break is still open: overwriting a day's first snapshot
-  changes no record, and whether any tap can make it matter is to be settled before the freeze slice.
+  finding (a term in the freeze that can never matter). The other open break, overwriting a day's first snapshot,
+  was settled in the fourth slice: no tap can make it matter (below).
 - **Found by the records, not fixed:** on every Monday after the clocks go forward, the app reads the week before
   (section 7). Mario's program is not touched by it (the clocks went back on 2026-11-01, and that direction reads
   right).
@@ -39,8 +39,27 @@ Each phase starts only on Mario's GO, one phase step per session.
   day's parts write its completion, so no golden record holds that write. The skip pill's own tests and the new unit
   tests hold the rule (`tests/measure/stored-state_red-on-break.md`). Closed by a tests pass, Post-v0.261.4: the case
   "a day's parts settle its status" puts that write in the records, and its break is red (14 in all, 2 open).
-- **Next, on his GO:** history (`ia_hist_`, `snapshotDay` and its re-snapshot), with the open break (a day's first
-  snapshot overwritten) settled in that slice.
+- **Done, the fourth lift slice (v0.261.5):** the day history (`ia_hist_`) lives in
+  `core/src/engine/state-day-history.ts`: one reader, one writer, the first touch's snapshot and the re-snapshot an
+  edit makes. The page's five functions are thin callers; one of them, `saveDayHist`, has no caller left and goes with the next
+  slice, under the rule written after this one (phase 1, step 3). Every golden record identical. Not narrowed. The freeze's
+  own reads of the key and the purge wait for the freeze slice.
+  - **The open break is settled: no tap can make it matter.** The guard (a day's first snapshot is never
+    overwritten) decides only when a day is snapshotted again after it changed, and that does not happen: a launch
+    gives every snapshotted day back from its snapshot, an edit is folded into the snapshot as it is made, and the one
+    tap that changes a snapshotted day without its snapshot (the rest sheet's Move of a day with a logged lift) leaves
+    a moved rest day nothing snapshots. Measured three ways: that history on a page with the guard removed stores the
+    same bytes; the whole suite on a page that throws at such a call, none red of 1,863 tests; 180 random histories,
+    0 of 4,481 repeat snapshots on a changed day (`tests/measure/stored-state_first-touch.md`,
+    `stored-state_first-touch-walks.md`). The break stays listed as one no history can reach; the unit tests hold
+    the rule.
+  - **The break check found a gap, closed in the slice:** no history edited a day after its first touch, so a
+    re-snapshot that did nothing changed no record. The case "a touched day edited, then its session moved" adds two
+    records (256 lines, none changed), and that break is red (16 in all, 2 open).
+  - **Found, not fixed:** a session moved off a day that has a logged lift comes back on that day (section 7).
+- **Next, on his GO:** the swap and edit stores (`swaps-edits.ts`: `ia_swaps_`, `ia_swapct_`, `ia_edits_`), measured
+  first; what is left of `storage.ts` (the program list, the active id, the Wildcard's record) rides with it if the
+  measure says it fits.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is
@@ -200,7 +219,9 @@ Mario's order is kept. Three changes, each with its reason:
    set logging rules; `swaps-edits.ts`; `overlays.ts` (`applyOverlays` only, its sheet stays); `data-backup.ts`
    (snapshot, read, load); `progress-data.ts` and `day-status.ts`; and last `program-manage.ts` (`refreshProgram` and
    the freeze), **after 2026-12-06.** Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
-   a thin caller, and it ships as the next PATCH (the migration bump policy, Mario 2026-10-12).
+   a thin caller, and it ships as the next PATCH (the migration bump policy, Mario 2026-10-12). A page function a move
+   leaves with no caller (legacy, Angular through the bridge, tests) is deleted with the move, not kept as a caller of
+   nothing (Mario, Post-v0.261.5).
 
 **Exit gate:** every golden record reproduced byte for byte by the lifted code, under V8 in CI. The 59 direct storage
 calls down to the one browser implementation. Every re-pointed test green and red on its named break (section 3.4).
@@ -541,6 +562,19 @@ Each with the session's pick first.
   move into core reproduces it; the fix is its own ruling (decision 12).
 - **A seeded test config the wizard refuses.** The swim 500 config carries no timed 500, which the wizard has required
   since it asked for one. The sweep gives it one. Nothing in the app is wrong.
+
+**Found by the fourth lift slice's measure (2026-11-11), not ruled and not fixed:**
+
+- **A session moved off a day that already has a logged lift comes back on that day.** The rest sheet's Move offers
+  any day with no completion and no logged field. A logged lift, a set draft and a part skipped alone are none of
+  those, though each snapshots the day. Move such a day's session onto a rest day and train it there, and both days
+  hold a snapshot; the next launch restores both and reads the move as already applied, so the session shows on the
+  old day (open, with its logged lift) and on the new one (trained). Shown on HALF_MANNY, week 1: Monday with one
+  lift logged, moved to Wednesday (`tests/measure/stored-state_first-touch.md`). Nothing stored is lost or
+  rewritten: both snapshots, the lift log and the move are as written. The golden case "a touched day edited, then
+  its session moved" holds today's bytes, so the freeze slice reproduces them and a fix shows as a reviewed diff.
+  The fix is its own ruling and belongs with the freeze slice (it touches the freeze, the move and what the rest
+  sheet offers). Until then: a session with anything logged on it is better finished where it is than moved.
 
 **Where the repo and the request differed:**
 

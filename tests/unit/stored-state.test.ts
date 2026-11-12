@@ -1,7 +1,8 @@
 // Stored state, the logic in @ia/core (docs/decisions/stored-state.md), imported and run alone: the store the app's
 // state sits behind (core/src/engine/state-store.ts, v0.261.2) with the page's one use of the browser's storage, and
-// the lift log (core/src/engine/state-lift-log.ts, v0.261.3), and the day's log, completion and skipped parts
-// (core/src/engine/state-day-log.ts and state-day-status.ts, v0.261.4). Every expected value is typed from the ruling.
+// the lift log (core/src/engine/state-lift-log.ts, v0.261.3), the day's log, completion and skipped parts
+// (core/src/engine/state-day-log.ts and state-day-status.ts, v0.261.4), and the day history
+// (core/src/engine/state-day-history.ts, v0.261.5). Every expected value is typed from the ruling.
 // What the app stores through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
@@ -17,6 +18,7 @@ import {
   clearDayParts, clearDayStatus, dayStatus, partsOfDay, readCompleted, readPartSkips, setDayStatus, settleDayParts, skipDayPart,
   writeCompleted, writePartSkips,
 } from '@ia/core/engine/state-day-status.ts';
+import { readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory } from '@ia/core/engine/state-day-history.ts';
 import type { Day } from '@ia/core';
 import { appScript, loadApp } from '../support/app.ts';
 
@@ -450,4 +452,111 @@ test('the page\'s own names still answer as they did: the keys, the lens, a draf
   assert.deepEqual(Object.keys(JSON.parse(IA.localStorage.getItem('ia_logs_p9')!).w4_tue), ['week', 'ts']);
   IA.eval("activeProgId='';writeSetDraft('back_squat',['5'],['225'],'lb')");
   assert.equal(IA.localStorage.getItem('ia_logs_'), null, 'with no active program a draft is not written');
+});
+
+// ── The day history, ia_hist_<program> (core/src/engine/state-day-history.ts, v0.261.5) ──
+// Imported from @ia/core and run on a memory store. Every expected value is typed from the ruling.
+const pushDay = () => ({ title: 'Push', sections: [{ label: 'Main', items: [{ name: 'Barbell bench press', detail: '4×5' }] }] }) as unknown as Day;
+const PUSH = '{"title":"Push","sections":[{"label":"Main","items":[{"name":"Barbell bench press","detail":"4×5"}]}]}';
+const PULL = '{"title":"Pull","sections":[]}';
+
+test('the day history reads empty when nothing or something broken is stored, and is stored as its JSON', () => {
+  assert.deepEqual(readDayHistory(memoryStore(), 'p1'), {});
+  assert.deepEqual(readDayHistory(memoryStore({ ia_hist_p1: '{"w1_mon":' }), 'p1'), {}, 'broken JSON reads as empty');
+  const s = memoryStore();
+  writeDayHistory(s, 'p1', { w1_mon: pushDay() });
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH + '}');
+  assert.deepEqual(readDayHistory(s, 'p1'), { w1_mon: pushDay() });
+  assert.equal(s.get('ia_hist_p2'), null, 'another program has its own key');
+});
+
+test('a store that refuses the history stops nothing: the write is swallowed, the snapshot too', () => {
+  const full: StateStore = { get: () => null, set: () => { throw new Error('QuotaExceededError'); }, remove: () => {}, keys: () => [] };
+  writeDayHistory(full, 'p1', { w1_mon: pushDay() });
+  recordDaySnapshot(full, 'p1', 1, 'mon', pushDay());
+  refreshDaySnapshot(full, 'p1', 1, 'mon', pushDay());
+});
+
+test('a day\'s first touch stores the day whole under w<week>_<day>, and the copy does not follow the day', () => {
+  const s = memoryStore();
+  const day = pushDay();
+  recordDaySnapshot(s, 'p1', 1, 'mon', day);
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH + '}');
+  (day as any).title = 'Changed';
+  (day as any).sections[0].items[0].name = 'Dumbbell bench press';
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH + '}', 'a copy, not the day itself');
+});
+
+test('first touch wins: a second touch of a day writes nothing, changed or not; another day adds its key after the first', () => {
+  const s = countingStore();
+  recordDaySnapshot(s, 'p1', 1, 'mon', pushDay());
+  recordDaySnapshot(s, 'p1', 1, 'mon', pushDay());
+  recordDaySnapshot(s, 'p1', 1, 'mon', { title: 'Pull', sections: [] } as unknown as Day);
+  assert.deepEqual(s.writes, ['ia_hist_p1'], 'one write, the first');
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH + '}');
+  recordDaySnapshot(s, 'p1', 2, 'tue', { title: 'Pull', sections: [] } as unknown as Day);
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH + ',"w2_tue":' + PULL + '}');
+  recordDaySnapshot(s, 'p2', 1, 'mon', { title: 'Pull', sections: [] } as unknown as Day);
+  assert.equal(s.get('ia_hist_p2'), '{"w1_mon":' + PULL + '}', 'another program has its own history');
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH + ',"w2_tue":' + PULL + '}');
+});
+
+test('no day, no snapshot: nothing is written for a day the week does not hold', () => {
+  const s = countingStore({ ia_hist_p1: '{"w1_mon":' + PUSH + '}' });
+  recordDaySnapshot(s, 'p1', 1, 'tue', null);
+  recordDaySnapshot(s, 'p1', 1, 'tue', undefined);
+  refreshDaySnapshot(s, 'p1', 1, 'mon', null);
+  refreshDaySnapshot(s, 'p1', 1, 'mon', undefined);
+  assert.deepEqual(s.writes, []);
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH + '}');
+});
+
+test('an edit after the first touch replaces that day\'s snapshot and leaves the others; with no snapshot it writes nothing', () => {
+  const s = countingStore({ ia_hist_p1: '{"w1_mon":' + PUSH + ',"w1_tue":' + PULL + '}' });
+  const edited = pushDay();
+  (edited as any).sections[0].items[0].name = 'Dumbbell bench press';
+  refreshDaySnapshot(s, 'p1', 1, 'wed', edited);
+  refreshDaySnapshot(s, 'p2', 1, 'mon', edited);
+  assert.deepEqual(s.writes, [], 'a day never touched has no snapshot to bring up to date');
+  refreshDaySnapshot(s, 'p1', 1, 'mon', edited);
+  assert.equal(s.get('ia_hist_p1'), '{"w1_mon":' + PUSH.replace('Barbell bench press', 'Dumbbell bench press') + ',"w1_tue":' + PULL + '}');
+  assert.deepEqual(s.writes, ['ia_hist_p1']);
+});
+
+test('the page reaches the day history through core: each rule is in the script once', () => {
+  const code = appScript();
+  for (const name of ['readDayHistory', 'writeDayHistory', 'recordDaySnapshot', 'refreshDaySnapshot']) {
+    assert.equal(code.split('function ' + name + '(').length - 1, 1, name + ' is in the page once');
+  }
+  // One reader and one writer in core; the freeze still reads ia_hist_ itself, twice (the freeze slice's).
+  assert.equal(code.split("'ia_hist_'+").length - 1, 4, 'the key is built by its reader, its writer and, until its slice, the freeze');
+});
+
+// These guard behaviour the move must not change: they pass on the release before it too.
+test('the page\'s own names still answer as they did: a first touch, a second, an edit, the two reads, and the taps that write nothing', () => {
+  const IA = loadApp();
+  const stored = () => IA.localStorage.getItem('ia_hist_p9');
+  IA.eval("activeProgId='p9';activeProg={id:'p9',weeks:{2:{tue:{title:'A',sections:[]},wed:{title:'W',sections:[]}}}};");
+  IA.eval("snapshotDay(2,'tue')");
+  assert.equal(stored(), '{"w2_tue":{"title":"A","sections":[]}}');
+  IA.eval("activeProg.weeks[2].tue.title='B';snapshotDay(2,'tue')");
+  assert.equal(stored(), '{"w2_tue":{"title":"A","sections":[]}}', 'first touch wins');
+  IA.eval("resnapshotDayEdit(2,'wed')");
+  assert.equal(stored(), '{"w2_tue":{"title":"A","sections":[]}}', 'an edit to a day never touched snapshots nothing');
+  IA.eval("resnapshotDayEdit(2,'tue')");
+  assert.equal(stored(), '{"w2_tue":{"title":"B","sections":[]}}', 'the athlete\'s edit is folded into the snapshot');
+  assert.equal(IA.eval('JSON.stringify(getDayHist())'), '{"w2_tue":{"title":"B","sections":[]}}');
+  assert.equal(IA.eval("JSON.stringify(getDayHistFor('p9'))"), '{"w2_tue":{"title":"B","sections":[]}}');
+  assert.equal(IA.eval("JSON.stringify(getDayHistFor('nobody'))"), '{}');
+  // Nothing is written for week 0, an empty day, a day the week does not hold, or a week the program does not hold.
+  IA.eval("snapshotDay(0,'wed');snapshotDay(2,'');snapshotDay(2,'fri');snapshotDay(9,'wed');resnapshotDayEdit(0,'tue');resnapshotDayEdit(2,'');");
+  assert.equal(stored(), '{"w2_tue":{"title":"B","sections":[]}}');
+  // A stored null is a fault inside the snapshot: it is logged and the tap goes on, the store as it was.
+  IA.localStorage.setItem('ia_hist_p9', 'null');
+  const err = console.error; const said: unknown[][] = []; console.error = (...a: unknown[]) => { said.push(a); };
+  try { IA.eval("snapshotDay(2,'wed');resnapshotDayEdit(2,'wed');"); } finally { console.error = err; }
+  assert.equal(stored(), 'null');
+  assert.deepEqual(said.map((a) => a[0]), ['day snapshot failed', 'day edit re-snapshot failed']);
+  IA.eval("activeProg=null;snapshotDay(2,'wed');resnapshotDayEdit(2,'wed');");
+  assert.equal(stored(), 'null', 'with no active program nothing is read or written');
 });

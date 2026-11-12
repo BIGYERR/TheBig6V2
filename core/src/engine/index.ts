@@ -22,5 +22,8 @@ export {
   writeCompleted, writePartSkips,
 } from './state-day-status.ts';
 export type { Completed, DayStatusRecord, PartSkips } from './state-day-status.ts';
+// The day history, ia_hist_<program> (v0.261.5).
+export { readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory } from './state-day-history.ts';
+export type { DayHistory } from './state-day-history.ts';
 export type { EngineCfg, CardioSchedule, PaceRow, RunAnchorInfo } from './cardio-progression.ts';
 export type { CardioSession } from './nsw-cardio.ts';

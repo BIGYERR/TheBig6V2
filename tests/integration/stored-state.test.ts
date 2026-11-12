@@ -18,7 +18,7 @@ import { afterAll, test } from 'vitest';
 import { fixtures } from '../support/app.ts';
 import { PROGRAMS } from '../support/programs.ts';
 import { matchSnapshot } from '../support/snapshot.ts';
-import { Phone, at, firstWeek, life, slim, trainDay, training } from '../support/stored-state.ts';
+import { Phone, at, cards, firstWeek, life, slim, trainDay, training } from '../support/stored-state.ts';
 import type { StateRecord } from '../support/stored-state.ts';
 
 const HALF = fixtures.HALF_MANNY;                                   // race 2026-12-06, 14 weeks, first Monday 2026-08-31
@@ -256,6 +256,57 @@ test('a day\'s parts settle its status: a skipped lift with a logged run is done
   assert.deepStrictEqual(comp(), {}, 'a completion the parts wrote goes when the parts no longer earn it');
   assert.deepStrictEqual(parsed(P, 'ia_parts_' + id), { w1_mon: { lift: 1 }, w1_tue: { lift: 1 } });
   golden['a day\'s parts settle its status'] = { closed, reopened: P.record() };
+});
+
+test('a touched day edited, then its session moved: the edit is in the day\'s snapshot, and the move leaves the snapshot as it was', () => {
+  // No other history edits a day after its first touch: the standard one swaps, skips and adds before the day is
+  // logged, so a re-snapshot that did nothing changed no record (found by the break check, v0.261.5). Week 1 of
+  // HALF_MANNY: Monday trains, Wednesday rests.
+  const P = new Phone().launch(CREATED);
+  const id = P.generate(HALF);
+  const hist = () => parsed(P, 'ia_hist_' + id) || {};
+  const items = (day: any): any[] => (day.sections || []).flatMap((s: any) => s.items || []);
+  const names = (day: any): string[] => items(day).map((i) => i.name);
+  P.launch(at(START, 0));
+  assert.deepStrictEqual([!!P.day(1, 'mon').rest, !!P.day(1, 'wed').rest], [false, true], 'Monday trains, Wednesday rests');
+
+  // Monday: one lift logged, the first touch. Then another card swapped, and a third skipped.
+  P.open(1, 'mon');
+  const cs = cards(P.day(1, 'mon'));
+  P.logLift(cs[0]!.name, cs[0]!.detail, [cs[0]!.reps, cs[0]!.reps], [135, 140]);
+  assert.deepStrictEqual(Object.keys(hist()), ['w1_mon'], 'the logged lift snapshots the day');
+  assert.deepStrictEqual(parsed(P, 'ia_comp_' + id), null, 'and marks nothing');
+  const out = cs[1]!, gone = cs[2]!;
+  P.IA.ctx['__c'] = { secIdx: out.secIdx, itemIdx: out.itemIdx, name: out.name, detail: out.detail };
+  const to: string | null = P.ev("(function(){var r=swapCandidates(__c.name,activeProg.weeks[1].mon,1,activeProg);var x=[].concat(r.tier1||[],r.tier2||[])[0];return x?(x.name||x):null;})()");
+  assert.ok(to && to !== out.name, 'the swap sheet offers a move for the second card');
+  P.ev(`_swapCtx=__c;applySwapChoice(${JSON.stringify(to)});`);
+  P.ev(`skipExercise(${JSON.stringify(gone.name)});`);
+  const edited = (day: any): unknown[] => [names(day).includes(to!), names(day).includes(out.name), items(day).some((i) => i.name === gone.name && i._skipped === true)];
+  assert.deepStrictEqual(edited(hist().w1_mon), [true, false, true], 'the snapshot holds the move swapped in and the skipped one, edits made after its first touch');
+
+  // The next launch gives Monday back from its snapshot, edits and all.
+  P.launch(at(START, 1, '07:00'));
+  assert.deepStrictEqual(edited(P.day(1, 'mon')), [true, false, true], 'the card in hand is the card the athlete left');
+  const afterEdit = P.record();
+
+  // Wednesday: Monday's session, a lift already logged on it, is still offered to the rest sheet's Move.
+  P.launch(at(START, 2, '10:00'));
+  const before = JSON.stringify(hist().w1_mon);
+  P.ev("openRestSheet(1,'wed','move');_rdSet('pick','mon');applyRestMove();");
+  P.settle();
+  assert.deepStrictEqual([P.day(1, 'wed').movedFrom, !!P.day(1, 'mon').rest], ['mon', true], 'the session is on Wednesday and Monday rests');
+  assert.equal(JSON.stringify(hist().w1_mon), before, 'the move does not rewrite Monday\'s snapshot: first touch stands');
+  P.open(1, 'wed');
+  const c = cards(P.day(1, 'wed'))[0]!;
+  P.logLift(c.name, c.detail, [c.reps, c.reps], [145, 150]);
+  assert.deepStrictEqual(Object.keys(hist()), ['w1_mon', 'w1_wed'], 'the moved session is snapshotted where it was trained');
+  assert.equal(hist().w1_wed.movedFrom, 'mon');
+  assert.equal(JSON.stringify(hist().w1_mon), before);
+  // The launch after: the record holds what today's app does here. Each day has a snapshot, so the session shows on
+  // both (found, not fixed: docs/decisions/stored-state.md, v0.261.5).
+  P.launch(at(START, 3, '07:00'));
+  golden['a touched day edited, then its session moved'] = { edited: afterEdit, moved: P.record() };
 });
 
 afterAll(() => {

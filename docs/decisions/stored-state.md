@@ -170,3 +170,82 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   both completions are gone and each day keeps `{lift: 1}`.
 - **Proof:** the break "parts settle" (the parts never write a completion) now turns this file red, and it moved from
   the open list to the breaks that must be red: 14 red, 2 open (`tests/measure/stored-state_red-on-break.md`).
+
+## Release scope: v0.261.5 moves the day history into core
+
+- **Date:** 2026-11-11. **Ruled by:** Mario (the fourth slice, on his prompt); **bump:** PATCH, by his standing rule for
+  migration steps that change the page and no behaviour. **Shipped:** v0.261.5.
+- **The finding (`tests/measure/stored-state_history-callers.md`, read on v0.261.4):** `ia_hist_` is read and written
+  by five functions in `storage.ts`, each naming the page's `activeProgId` and, for the two that snapshot, `activeProg`.
+  `getDayHist` and `getDayHistFor` are the same read. `snapshotDay` is called 8 times from 4 legacy files and once by
+  the Angular deck through the bridge; `resnapshotDayEdit` 3 times from `swap-sheet.ts`; `getDayHist` by
+  `set-logging.ts` and the mile nudge; `getDayHistFor` by `progress-data.ts`, the lift ledger and the Progress screen;
+  `saveDayHist` by the two snapshot functions and nothing else. None is taken over by Angular (`provide`). The freeze
+  reads the key itself, twice, and the purge names it once (`program-manage.ts`).
+- **What changes:** one file in `core/src/engine`, `state-day-history.ts`, the day history (`ia_hist_<program>`).
+  1. `readDayHistory(store, programId)` and `writeDayHistory(store, programId, history)`: the one reader (a missing or
+     broken value reads as empty) and the one writer (a refused write is swallowed, as `saveDayHist` swallowed it:
+     the log that follows must still land).
+  2. `recordDaySnapshot(store, programId, week, dayKey, day)`: the first touch. The day's grid entry, copied whole,
+     under `dayStoreKey(week, dayKey)`; nothing when there is no day, nothing when the day already has a snapshot.
+  3. `refreshDaySnapshot(store, programId, week, dayKey, day)`: the athlete's own edit after the first touch. It
+     replaces the day's snapshot with the day in hand, and writes nothing when the day has none.
+  4. The page's five functions keep their names and arguments and call these with `iaStore`, the active program and
+     `activeProg.weeks[week][dayKey]`. `snapshotDay` and `resnapshotDayEdit` keep their guards on the page's globals
+     and their `catch`, which logs and goes on. `getDayHist` and `getDayHistFor` stay loose (`any`): the Angular
+     screens read them through the bridge's generated types. `saveDayHist` has no caller left and stays as a thin
+     caller: it goes with the page.
+- **Not narrowed.** The prompt's scope is the whole slice: five functions, one file. Their callers are not rewritten,
+  because each already calls the page's function by name, and those names stay.
+- **What deliberately does not change:** the key and every stored byte; first touch wins; the copy is a JSON round
+  trip of the day as rendered; a broken value reads as empty and a refused write is swallowed; the order of the read
+  and the write inside a touch, and the snapshot before the first write of a touch (the callers' order, untouched);
+  the freeze's own reads of `ia_hist_` and the purge (`program-manage.ts`, the freeze slice's, after 2026-12-06);
+  every function name the Angular screens call; every golden record.
+- **The open break, settled (history, first touch: a day's snapshot overwritten on every touch changes no record).**
+  The guard decides what is stored only when `snapshotDay` is called on a day that has a snapshot while the day in
+  hand differs from it. Measured, that call does not happen:
+  - *Read from the code.* A launch gives every snapshotted day back from its snapshot (the freeze's first rule, in
+    every week below the cut, and the cut sits above every snapshotted week). The athlete's edits (swap, undo, add,
+    skip, put back, remove) fold into the snapshot as they are made (`resnapshotDayEdit`). The sport swap writes the
+    log, not the day. An injury, travel, the swap nudge and a program edit all go through `refreshProgram`. One tap
+    changes a snapshotted day and leaves its snapshot alone: the rest sheet's Move.
+  - *The Move, measured (`tests/measure/stored-state_first-touch.ts`, its `.md`).* `restMoveCandidates` offers a day
+    with no completion and no logged field, and a logged lift, a set draft and a part skipped alone are none of those,
+    though each snapshots the day. On HALF_MANNY's week 1, Monday with one lift logged is offered on Wednesday. After
+    the move Monday in hand is a moved rest day and its snapshot is still the session. Nothing that snapshots can
+    reach a moved rest day (its sheet offers cardio only, it has no parts, the reminder asks about training days
+    only), so the changed day is never snapshotted again. The same history on a page with the guard removed stores
+    the same bytes.
+  - *The suite on an instrumented page* (a copy of v0.261.4's page whose `snapshotDay` throws when called on a
+    snapshotted day that has changed; the copy that throws on every repeat touch turns 14 of the 15 integration
+    tests red, so the signal arrives): all 119 unit, integration and sweep files, 1,863 tests, none red.
+  - *Random histories (`tests/measure/stored-state_first-touch-walks.ts`, its `.md`):* 180 histories of 60 taps over
+    9 of the 10 seeded programs (the wizard refuses the tenth, the swim 500 config, as `MIGRATION.md` section 7
+    notes), 10,800 taps: 5,711 calls of `snapshotDay`, 4,481 of them on a day that already had a snapshot, **0** of
+    those with the day in hand changed. A tap left a snapshotted day different from its snapshot 840 times, every
+    one a rest day its session was moved away from.
+  - **So the break stays open, as a guard no reachable history exercises**, and its note now says why. The first
+    touch rule is held by the new unit tests, typed by hand. Not covered by this answer: the freeze's own gaps (a
+    snapshotted week the stored grid does not hold is skipped by the freeze, `if(!prog.weeks[w]) continue`), which
+    is the freeze slice's to measure.
+- **Found by the break check, and closed here:** a re-snapshot that does nothing changed no golden record, because
+  no history edited a day after its first touch (the standard history swaps, skips and adds before the day is
+  logged). The new case "a touched day edited, then its session moved" puts an edit after the first touch in the
+  records, and the break "edit re-snapshot" is red on it.
+- **Found, not fixed (today's app, not this move):** a session moved off a day that already has a snapshot comes
+  back on that day once the day it moved to is trained. Each of the two days then has a snapshot, a launch restores
+  both, and the move is read as already applied, so the session shows on both days: the old day as an open session
+  with its logged lift, the new day as trained. Nothing stored is lost or rewritten. It starts from the rest sheet
+  offering a day that has a logged lift (D219 item 2 counted the log's own fields only). The new case holds today's
+  bytes; the fix is its own ruling, and it touches the freeze and the move (`MIGRATION.md`, section 7).
+- **Expected values (typed from the ruling):** an empty or broken `ia_hist_p1` reads as `{}`; a written history is
+  stored as its `JSON.stringify` and reads back equal; a store that refuses the write stops nothing. A first touch
+  of Monday in week 1 stores `{"w1_mon":<the day>}`; the stored copy does not follow a later change to the day; a
+  second touch of a changed day writes nothing; another day adds its key after the first; another program has its
+  own key; no day writes nothing. An edit's re-snapshot replaces that day's copy and leaves the other days; with no
+  snapshot it writes nothing. In the page: `snapshotDay` with no active program, week 0, an empty day or a day the
+  week does not hold writes nothing; a stored `null` is logged and goes on.
+- **Tests:** `tests/unit/stored-state.test.ts` (the functions from `@ia/core`, on a memory store, and the page's
+  callers); `tests/integration/stored-state.test.ts`, the new case, whose two records are new in
+  `tests/snapshots/stored-state.json` and change none. The other golden records and the backup corpus, unchanged.
