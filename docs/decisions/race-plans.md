@@ -92,6 +92,45 @@ Tests: `tests/integration/race-plans.test.ts`, `tests/integration/run-names.test
   length is pinned at eight weeks and a 10% ramp would need ten or eleven; the week 4 cutback is the safety valve. The
   peak long run is nearer a third of a beginner's four run week than the 20 to 25% Daniels is quoted at; unavoidable at
   four runs of this size, and the source's 4 mile peak sat in the same place.
+- **Backing for the 10K, half and marathon rules (coach, 2026-11-11, on Mario's "does the science and research support
+  coach's call for the rest of the run changes").** Graded honestly: *supported by trials or reviews*, *the mainstream
+  convention*, or *contested*.
+  - *Long runs in miles, a mile a week (supported, and the mainstream shape).* Hal Higdon's novice plans open where
+    coach's do: a 6 mile long run in week 1 of the 18 week marathon plan, 3 to 4 mile runs in week 1 of the half, and a
+    20 mile longest run done once; his intermediate 10K's long runs run 4 to 8 miles, coach's 10K arc to the mile. On how
+    fast volume may rise, Damsted et al. 2019 (J Orthop Sports Phys Ther, 261 half marathon entrants over 14 weeks) found
+    more injuries by day 21 among runners who raised weekly distance 20 to 60% than under 20%, and no difference later;
+    coach's half rises 12 to 18% a week by time on feet through weeks 1 to 4, under that line, where the source's half
+    moved 3.1 → 4 → 5 → 6.2 miles with a 15 minute jog pinned beside it.
+  - *A cutback every fourth week at two thirds (convention).* Higdon's step back weeks, Pfitzinger's recovery weeks and
+    every periodised plan carry one; the cadence and the two thirds are coaching practice with no trial behind the exact
+    numbers, and the source's own cutbacks (the half's hour, the marathon's 15K and 90 minutes) were the same idea on odd
+    weeks.
+  - *The peak three weeks out, 20 miles on the marathon (convention, and contested at the margin).* Twenty miles once,
+    then the taper, is the novice marathon convention (Higdon) and sat inside the source's own 18 to 22 mile range.
+    Against it: Daniels caps the long run at about 2.5 hours or 25 to 30% of the week, and a 10:00 per mile runner needs
+    3 hours 20 for 20 miles; Hansons stop at 16. Coach keeps 20 because the plan's runner has built 17 and 18 the two
+    weeks before and the engine's minute branch stays for a time cap ruling if Mario wants one; the cost is stated.
+  - *The taper (supported).* Bosquet et al. 2007 (27 studies): two weeks, volume cut 41 to 60%, intensity and frequency
+    kept; Mujika and Padilla 2003 (Med Sci Sports Exerc 35:1182): 4 to 28 days, volume down 60 to 90% by the race,
+    progressive and nonlinear, frequency cut no more than 20%, about 3% faster. Coach's marathon runs 20 → 14 → 10 → race
+    week, about 37% less time on feet two weeks out and 80% less in race week, every speed session kept to the sharpener;
+    the half 12 → 9 → 7 → race week on the same shape. Both sit inside the two reviews' ranges; the source's marathon had
+    an 80 minute recovery run in a taper week.
+  - *The half's dress rehearsal two weeks out at 9 miles (convention).* The rehearsal (kit, fuelling, start time, the
+    pace in the progression tempo) is standard practice (Galloway, Higdon); two weeks out is where it still leaves a
+    taper. No trial; the source placed it four weeks out at 8 miles under a 13.1K label.
+  - *Speed by block, general to specific (convention with a physiological case).* Daniels' phases (base, early
+    quality, transition, final race specific quality) and Lydiard's build are the practice; Issurin's 2010 review backs
+    block periodisation, Kiely's 2012 critique finds the trial evidence for any periodisation scheme in trained runners
+    thin. Coach's ordering changes which week a session sits in, never a session, so the cost of being wrong is small.
+  - *Most running easy (supported).* Stöggl and Sperlich 2014 (Frontiers in Physiology 5:33): among four intensity
+    distributions in well trained endurance athletes, the polarised one improved the most key variables; their 2015
+    review finds world class athletes polarised rather than threshold heavy; Esteve Lanao 2007 in recreational runners.
+    One speed run in four (D243) or two in five keeps the week there.
+  - *Recovery runs grow with the long run (convention).* Daniels' easy runs of 30 to 60 minutes and every mainstream plan
+    scale the easy days with the week; the source's half pinned 15 minutes beside every long run from 3 to 20K, which no
+    plan does.
 - **What changes in the engine:** the 48 rows of the four tables, and nothing else in `nrc-race-bike-swim.ts`. The
   `detailIfHalfSlow` variant (D31) travels with the session that carries it (the 23:00 progression tempo, now half
   week 6 and marathon week 13). The After tables:
