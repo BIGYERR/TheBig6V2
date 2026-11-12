@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-interface Landing { chatOf(m: string): string | null; distinctChats(m: string[]): string[]; judgePush(m: string[], o?: { all?: boolean }): { ok: boolean; chats: string[]; reason?: string }; judgeLanding(s: Record<string, unknown>, o?: { all?: boolean }): { ok: boolean; reason?: string; chats?: string[]; n?: number } }
+interface Landing { chatOf(m: string): string | null; distinctChats(m: string[]): string[]; judgePush(m: string[], o?: { all?: boolean }): { ok: boolean; chats: string[]; reason?: string }; judgeLanding(s: Record<string, unknown>, o?: { all?: boolean }): { ok: boolean; reason?: string; chats?: string[]; n?: number }; isReleaseTag(name: unknown): boolean; judgeTag(s: Record<string, unknown>): { ok: boolean; action?: string; sha?: string; reason?: string } }
 const L = (await import(pathToFileURL(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'tools', 'land.mjs')).href)) as Landing;
 
 const A = 'v0.256.0: the leg day before a tier A long run is a maintenance day\n\nBody.\n\nChat: leg-day-volume';
@@ -61,4 +61,45 @@ test('landing refuses: not a chat branch; dev holds unpushed commits; the branch
 test('IA_PUSH_ALL=1 is the one deliberate exception: unpushed dev commits and a second chat ride along, but a stale branch still rebases first', () => {
   assert.equal(L.judgeLanding(S({ originDevSha: 'bbb', devAhead: 3, devBehind: 0, newMessages: [A, B] }), { all: true }).ok, true);
   assert.equal(L.judgeLanding(S({ branchHasDev: false }), { all: true }).ok, false);
+});
+
+// The release tag (Mario, Post-v0.261.5): after his merge, `land.mjs --tag v<version>` tags what merged and pushes the tag
+// from the main checkout. Shas here are made up; the versions are the ones a head.html would carry.
+const MAIN = 'a'.repeat(40);
+const OLD = 'b'.repeat(40);
+const T = (over: Record<string, unknown> = {}) => ({ name: 'v0.261.5', mainSha: MAIN, mainVersion: '0.261.5', local: null, remoteSha: null, ...over });
+
+test('a release tag is a lowercase v and three dotted integers, nothing else', () => {
+  for (const ok of ['v0.261.5', 'v1.0.0', 'v0.240.0', 'v10.20.30']) assert.equal(L.isReleaseTag(ok), true, ok);
+  for (const bad of ['V240', 'v240', '0.261.5', 'V0.261.5', 'v0.261', 'v0.261.5.1', 'v0.261.5-rc1', 'v01.2.3', '--force', 'v0.261.5 ', '', undefined]) {
+    assert.equal(L.isReleaseTag(bad), false, String(bad));
+  }
+});
+
+test('tag: with no tag anywhere and main carrying the version, the tag is made on origin/main', () => {
+  assert.deepEqual(L.judgeTag(T()), { ok: true, action: 'create', sha: MAIN });
+});
+
+test('tag: a tag already made here on main, carrying its version, is pushed where it is', () => {
+  assert.deepEqual(L.judgeTag(T({ local: { sha: MAIN, version: '0.261.5', onMain: true } })), { ok: true, action: 'push', sha: MAIN });
+  // Main has moved on by a docs merge since: the tag still names the merge that carried the release.
+  assert.deepEqual(L.judgeTag(T({ mainVersion: '0.261.6', local: { sha: OLD, version: '0.261.5', onMain: true } })), { ok: true, action: 'push', sha: OLD });
+});
+
+test('tag: one GitHub already holds at the same commit needs nothing', () => {
+  assert.deepEqual(L.judgeTag(T({ local: { sha: MAIN, version: '0.261.5', onMain: true }, remoteSha: MAIN })), { ok: true, action: 'none', sha: MAIN });
+});
+
+test('tag refuses: before the merge; a name that is not a release tag; a tag off main; a tag on another version; a pushed tag that would move', () => {
+  const unmerged = L.judgeTag(T({ mainVersion: '0.261.4' }));
+  assert.equal(unmerged.ok, false);
+  assert.match(String(unmerged.reason), /origin\/main \(aaaaaaa\) carries ia-version 0\.261\.4, not 0\.261\.5/);
+  assert.match(String(L.judgeTag(T({ mainVersion: null })).reason), /carries ia-version none/);
+  assert.match(String(L.judgeTag(T({ name: 'V262' })).reason), /V262 is not a release tag/);
+  assert.match(String(L.judgeTag(T({ local: { sha: OLD, version: '0.261.5', onMain: false } })).reason), /bbbbbbb, which is not on origin\/main/);
+  assert.match(String(L.judgeTag(T({ local: { sha: OLD, version: '0.261.4', onMain: true } })).reason), /bbbbbbb, which carries ia-version 0\.261\.4/);
+  const moved = L.judgeTag(T({ local: { sha: MAIN, version: '0.261.5', onMain: true }, remoteSha: OLD }));
+  assert.equal(moved.ok, false);
+  assert.match(String(moved.reason), /GitHub already holds v0\.261\.5 at bbbbbbb.*a pushed tag is never moved/);
+  assert.match(String(L.judgeTag(T({ remoteSha: OLD })).reason), /there is no such tag here/);
 });

@@ -44,7 +44,24 @@ describe('renderCollage in Chrome', () => {
     { title: 'WEBSITE', subtitle: 'the site', box: { width: 2 * W, height: 3 * H }, missing: { width: 2 * W, height: H }, tiles: [page] },
     { title: 'APP', subtitle: 'the app', box: { width: W, height: H }, missing: { width: W, height: H }, tiles },
   ];
-  const draw = () => renderCollage(browser, bands, { title: 't', subtitle: 's' });
+  // The collage draws in a Chrome it opens for itself; `opened` keeps each one so a test can see what became of it.
+  const opened: Browser[] = [];
+  const open = async (): Promise<Browser> => {
+    const own = await puppeteer.launch({ headless: true });
+    opened.push(own);
+    return own;
+  };
+  const draw = () => renderCollage(open, bands, { title: 't', subtitle: 's' });
+
+  it('draws in a Chrome of its own and shuts it, leaving the one already open alone', async () => {
+    const before = opened.length;
+    const pagesBefore = (await browser.pages()).length;
+    await draw();
+    assert.equal(opened.length, before + 1, 'one Chrome opened for the collage');
+    assert.equal(opened[before]!.connected, false, 'and shut when the collage was drawn');
+    assert.equal(browser.connected, true, 'the Chrome already open is still open');
+    assert.equal((await browser.pages()).length, pagesBefore, 'and the collage opened no page in it');
+  });
 
   it('draws a PNG exactly the size of its layout', async () => {
     const { png, layout } = await draw();

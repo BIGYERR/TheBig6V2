@@ -98,6 +98,8 @@ lacks fall back to the image's DejaVu, Liberation and Noto Color Emoji fonts.
 
 A full run takes about 2.5 minutes once the images are cached (the first build downloads Chrome and takes longer).
 A failed step stops only its own journey, and the run exits 1 if any step fails or the collage cannot be written.
+The collage is drawn in a Chrome of its own, opened after the journeys' Chrome has closed: each of its three captures
+has 30 seconds, a capture past that ends the try, and the next of three tries opens another Chrome.
 
 Options: `E2E_ONLY=race-10k,log-session` runs just those journeys (`website-desktop`, `website-phone` and `admin`
 name the others; step numbers stay the full suite's), `E2E_KEEP=1` leaves nginx and the backend up afterwards and

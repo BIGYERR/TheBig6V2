@@ -10,11 +10,21 @@
 //   node tools/land.mjs --guard <remote_sha> <local_sha>
 //                                  what .githooks/pre-push runs on a push of dev: the new commits must come from one
 //                                  chat (their `Chat:` trailers), or IA_PUSH_ALL=1 says Mario wants them together.
+//   node tools/land.mjs --tag v<version>
+//                                  after Mario has merged the release into main: tag what merged and push the tag, from
+//                                  the main checkout (a worktree never pushes, and the push hook lets a tag through only
+//                                  there; Mario, Post-v0.261.5). Makes the tag on origin/main when there is none, and
+//                                  refuses unless the commit it names carries that version and is on main. A tag GitHub
+//                                  already holds is never moved. --dry-run checks and moves nothing.
 //
 // A chat is named by its branch: chat/<work> writes the trailer `Chat: <work>` on every commit (.githooks/prepare-commit-msg).
 // The judges below are pure and tested by hand tables in tests/unit/landing.test.ts; the git calls are at the bottom.
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
+
+// The version rule (CLAUDE.md PRIORITY 1): a version is read and compared only through tests/semver.js.
+const SV = createRequire(import.meta.url)('../tests/semver.js');
 
 /** The chat a commit message names, or null. */
 export function chatOf(message) {
@@ -46,12 +56,69 @@ export function judgeLanding(s, opts = {}) {
   return p.ok ? { ok: true, chats: p.chats, n: s.newMessages.length } : p;
 }
 
+/** A release tag is a lowercase v and three dotted integers (v0.261.5): never V<N>, never a bare number. */
+export function isReleaseTag(name) {
+  return /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(String(name));
+}
+const sameVersion = (a, b) => { try { return SV.cmp(SV.parse(a), SV.parse(b)) === 0; } catch { return false; } };
+const short = (sha) => String(sha).slice(0, 7);
+/**
+ * Whether a release tag may be made and pushed now. `s`: { name, mainSha, mainVersion (the ia-version origin/main
+ * carries, as written, or null), local (the tag in this clone: { sha, version, onMain }, or null), remoteSha (the commit
+ * GitHub's tag names, or null) }. Returns { ok, action: 'create' | 'push' | 'none', sha }, or { ok: false, reason }.
+ */
+export function judgeTag(s) {
+  if (!isReleaseTag(s.name)) return { ok: false, reason: `${s.name} is not a release tag; a release is tagged v<MAJOR.MINOR.PATCH>, as v0.261.5` };
+  if (s.remoteSha) {
+    if (s.local && s.local.sha === s.remoteSha) return { ok: true, action: 'none', sha: s.remoteSha };
+    return { ok: false, reason: `GitHub already holds ${s.name} at ${short(s.remoteSha)}, and ${s.local ? `the tag here names ${short(s.local.sha)}` : 'there is no such tag here'}; a pushed tag is never moved` };
+  }
+  if (s.local) {
+    if (!sameVersion(s.local.version, s.name)) return { ok: false, reason: `the tag ${s.name} here names ${short(s.local.sha)}, which carries ia-version ${s.local.version ?? 'none'}; a tag names a commit that carries its version` };
+    if (!s.local.onMain) return { ok: false, reason: `the tag ${s.name} here names ${short(s.local.sha)}, which is not on origin/main; a release is tagged on what Mario merged` };
+    return { ok: true, action: 'push', sha: s.local.sha };
+  }
+  if (!sameVersion(s.mainVersion, s.name)) return { ok: false, reason: `origin/main (${short(s.mainSha)}) carries ia-version ${s.mainVersion ?? 'none'}, not ${s.name.slice(1)}; a release is tagged after Mario has merged it` };
+  return { ok: true, action: 'create', sha: s.mainSha };
+}
+
 // ── git ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const messages = (range, cwd) => git(['log', '--format=%B%x00', range], cwd).split('\0').map((m) => m.trim()).filter(Boolean);
 
+const HEAD_HTML = 'frontends/app/src/legacy/src/html/head.html';
+const quiet = (args, cwd) => { try { return git(args, cwd) || null; } catch { return null; } };
+
+/** `--tag v<version>`: tags what merged and pushes the tag from the main checkout. */
+function tagRelease(name, dry) {
+  if (!isReleaseTag(name)) { console.error(`land: refused. ${judgeTag({ name: String(name) }).reason}`); return 1; }
+  const here = git(['rev-parse', '--show-toplevel']);
+  const main = dirname(resolve(here, git(['rev-parse', '--git-common-dir'])));
+  const ref = `refs/tags/${name}`;
+  git(['fetch', 'origin', '--quiet'], main);
+  const mainSha = git(['rev-parse', 'refs/remotes/origin/main'], main);
+  const versionAt = (sha) => { const html = quiet(['show', `${sha}:${HEAD_HTML}`], main); try { return html ? SV.str(SV.fromHtml(html)) : null; } catch { return null; } };
+  const localSha = quiet(['rev-parse', '--verify', '--quiet', `${ref}^{commit}`], main);
+  let onMain = false;
+  if (localSha) { try { execFileSync('git', ['merge-base', '--is-ancestor', localSha, mainSha], { cwd: main, stdio: 'ignore' }); onMain = true; } catch { onMain = false; } }
+  // An annotated tag lists twice, the second line (ref^{}) naming its commit; a lightweight one lists once.
+  const listed = (quiet(['ls-remote', '--tags', 'origin', ref, `${ref}^{}`], main) || '').split('\n').filter(Boolean).map((l) => l.split(/\s+/));
+  const remoteSha = (listed.find((l) => l[1] === `${ref}^{}`) || listed[0] || [null])[0];
+  const v = judgeTag({ name, mainSha, mainVersion: versionAt(mainSha), local: localSha ? { sha: localSha, version: versionAt(localSha), onMain } : null, remoteSha });
+  if (!v.ok) { console.error(`land: refused. ${v.reason}`); return 1; }
+  if (v.action === 'none') { console.log(`land: ${name} is already on GitHub at ${short(v.sha)}; nothing to do`); return 0; }
+  console.log(`land: ${name} ${v.action === 'create' ? 'will name' : 'names'} ${short(v.sha)} on origin/main${dry ? ' (dry run, nothing moved)' : ''}`);
+  if (dry) return 0;
+  if (v.action === 'create') git(['tag', name, v.sha], main);
+  execFileSync('git', ['push', 'origin', ref], { cwd: main, stdio: 'inherit', env: { ...process.env } });
+  console.log(`land: ${name} is pushed.`);
+  return 0;
+}
+
 function main(argv) {
   const all = process.env.IA_PUSH_ALL === '1';
+  const t = argv.indexOf('--tag');
+  if (t !== -1) return tagRelease(argv[t + 1], argv.includes('--dry-run'));
   if (argv[0] === '--guard') {
     const [, remote, local] = argv;
     const range = /^0+$/.test(remote || '') ? local : `${remote}..${local}`;
