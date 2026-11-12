@@ -5,6 +5,8 @@ import {
   BAND_H,
   CAPTURE_LIMIT_MS,
   CAPTURE_TRIES,
+  SHUT_LIMIT_MS,
+  captureLimitMessage,
   COLOURS,
   EDGE,
   FLAG,
@@ -19,7 +21,8 @@ import {
   fitShot,
   headerHtml,
   labelsHtml,
-  withRetry,
+  withFreshBrowser,
+  withLimit,
 } from '../e2e/collage.ts';
 import type { CollageLayout, CollageTile, LayoutBand, Placement, Size } from '../e2e/collage.ts';
 import { pngSize } from '../e2e/parity.ts';
@@ -332,56 +335,105 @@ describe('composeCollage', () => {
   });
 });
 
-describe('withRetry: a capture that hangs is abandoned and tried again', () => {
-  // Twice a pull request run passed every step and then hung one collage capture for Puppeteer's 180 s protocol timeout
-  // (PR #10, Post-v0.254.0; v0.259.4's PR, Post-v0.259.4). Limits here are milliseconds; the real one is typed below.
+describe('the collage is drawn in a Chrome of its own, and a hung capture is tried again in another', () => {
+  // Three times a pull request run passed every step and then hung a collage capture (PR #10, Post-v0.254.0; v0.259.4's
+  // PR, Post-v0.259.4; v0.261.5's, Post-v0.261.5). The third time both tries hung on a fresh page of one Chrome.
   const never = () => new Promise<never>(() => undefined);
-  const opts = { tries: 2, limitMs: 20, label: "the collage's header capture" };
+  type Fake = { id: number; shut: boolean };
 
-  it('limits each capture to 30 s and tries it twice', () => {
+  /** A fake launcher: browsers numbered in the order they open, and a log of what happened, in order. */
+  const fakes = () => {
+    const log: string[] = [];
+    let id = 0;
+    const open = async (): Promise<Fake> => {
+      id += 1;
+      log.push(`open ${id}`);
+      return { id, shut: false };
+    };
+    const shut = async (b: Fake): Promise<void> => {
+      b.shut = true;
+      log.push(`shut ${b.id}`);
+    };
+    return { log, open, shut };
+  };
+
+  it('limits each capture to 30 s, tries the collage three times, and gives a browser 5 s to close', () => {
     assert.equal(CAPTURE_LIMIT_MS, 30_000);
-    assert.equal(CAPTURE_TRIES, 2);
+    assert.equal(CAPTURE_TRIES, 3);
+    assert.equal(SHUT_LIMIT_MS, 5_000);
   });
 
-  it('abandons a try that passes its limit, and the next try wins', async () => {
-    const tries: number[] = [];
-    const got = await withRetry((n) => {
-      tries.push(n);
-      return n === 1 ? never() : Promise.resolve('png');
-    }, opts);
+  it('names the capture and the try when a capture passes its limit', () => {
+    assert.equal(captureLimitMessage('header', 3), "the collage's header capture took over 30 s (try 3 of 3, each in a Chrome of its own)");
+    assert.equal(captureLimitMessage('band bars', 1), "the collage's band bars capture took over 30 s (try 1 of 3, each in a Chrome of its own)");
+  });
+
+  it('withLimit gives the work its result inside the limit, and its own error', async () => {
+    assert.equal(await withLimit(Promise.resolve('png'), 20, 'too slow'), 'png');
+    await assert.rejects(withLimit(Promise.reject(new Error('Target closed')), 20, 'too slow'), { message: 'Target closed' });
+  });
+
+  it('withLimit abandons work that passes its limit, with the message it was given', async () => {
+    await assert.rejects(withLimit(never(), 20, 'the header capture took over 0.02 s'), { message: 'the header capture took over 0.02 s' });
+  });
+
+  it('opens one browser, uses it and shuts it when the first try succeeds', async () => {
+    const { log, open, shut } = fakes();
+    const got = await withFreshBrowser(open, shut, async (b, n) => {
+      log.push(`use ${b.id} try ${n}`);
+      return 'png';
+    }, 3);
     assert.equal(got, 'png');
-    assert.deepEqual(tries, [1, 2]);
+    assert.deepEqual(log, ['open 1', 'use 1 try 1', 'shut 1']);
   });
 
-  it('tries again after a try that throws', async () => {
-    const tries: number[] = [];
-    const got = await withRetry((n) => {
-      tries.push(n);
-      return n === 1 ? Promise.reject(new Error('Target closed')) : Promise.resolve('png');
-    }, opts);
+  it('shuts the browser of a try whose capture hung, and the next try draws in another', async () => {
+    const { log, open, shut } = fakes();
+    const got = await withFreshBrowser(open, shut, (b, n) => {
+      log.push(`use ${b.id} try ${n}`);
+      return withLimit(b.id === 1 ? never() : Promise.resolve('png'), 20, 'hung');
+    }, 3);
     assert.equal(got, 'png');
-    assert.deepEqual(tries, [1, 2]);
+    assert.deepEqual(log, ['open 1', 'use 1 try 1', 'shut 1', 'open 2', 'use 2 try 2', 'shut 2']);
   });
 
-  it('makes one try when the first succeeds', async () => {
-    const tries: number[] = [];
-    const got = await withRetry((n) => {
-      tries.push(n);
-      return Promise.resolve('png');
-    }, opts);
+  it('tries again in another browser after a try that throws', async () => {
+    const { log, open, shut } = fakes();
+    const got = await withFreshBrowser(open, shut, async (b) => {
+      if (b.id < 3) throw new Error('Target closed');
+      return 'png';
+    }, 3);
     assert.equal(got, 'png');
-    assert.deepEqual(tries, [1]);
+    assert.deepEqual(log, ['open 1', 'shut 1', 'open 2', 'shut 2', 'open 3', 'shut 3']);
   });
 
-  it('still fails, naming the capture, when every try hangs', async () => {
-    const tries: number[] = [];
+  it('tries again when a browser does not open, with nothing to shut', async () => {
+    const { log, shut } = fakes();
+    let n = 0;
+    const open = async (): Promise<Fake> => {
+      n += 1;
+      if (n === 1) throw new Error('Failed to launch the browser process');
+      log.push(`open ${n}`);
+      return { id: n, shut: false };
+    };
+    assert.equal(await withFreshBrowser(open, shut, async () => 'png', 3), 'png');
+    assert.deepEqual(log, ['open 2', 'shut 2']);
+  });
+
+  it('still fails with the last error, every browser shut, when every try hangs', async () => {
+    const { log, open, shut } = fakes();
     await assert.rejects(
-      withRetry((n) => {
-        tries.push(n);
-        return never();
-      }, opts),
-      { message: "the collage's header capture took over 0.02 s (try 2 of 2)" },
+      withFreshBrowser(open, shut, (_b, n) => withLimit(never(), 20, `hung on try ${n}`), 3),
+      { message: 'hung on try 3' },
     );
-    assert.deepEqual(tries, [1, 2]);
+    assert.deepEqual(log, ['open 1', 'shut 1', 'open 2', 'shut 2', 'open 3', 'shut 3']);
+  });
+
+  it('keeps the result of a try whose browser would not shut', async () => {
+    const { open } = fakes();
+    const shut = async (): Promise<void> => {
+      throw new Error('the browser would not close');
+    };
+    assert.equal(await withFreshBrowser(open, shut, async () => 'png', 3), 'png');
   });
 });

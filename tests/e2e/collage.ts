@@ -374,42 +374,65 @@ export function composeCollage(
 }
 
 /**
- * Each of the three captures' limit, and how many times one is tried. A capture takes seconds; twice a pull request run
- * (PR #10, Post-v0.254.0; v0.259.4's, Post-v0.259.4) passed every step and then hung one capture for Puppeteer's 180 s
- * protocol timeout, so no collage was written and the job went red, while the push run on the same commit drew it in
- * seconds. A try past its limit is abandoned and the next starts on a fresh page; the job still fails when every try does.
+ * Each of the three captures' limit, and how many times the collage is tried. A capture takes seconds. Three times a pull
+ * request run passed every step and then hung a capture (PR #10, Post-v0.254.0; v0.259.4's, Post-v0.259.4; v0.261.5's,
+ * Post-v0.261.5), so no collage was written and the job went red, while the push run on the same commit drew it in
+ * seconds. The third time both tries hung on a fresh page of the Chrome that had run every journey, so each try now draws
+ * in a Chrome of its own: a capture past its limit ends the try, that Chrome is shut, and the next try opens another. The
+ * job still fails when every try does.
  */
 export const CAPTURE_LIMIT_MS = 30_000;
-export const CAPTURE_TRIES = 2;
+export const CAPTURE_TRIES = 3;
+/** How long a browser gets to close before its process is killed. */
+export const SHUT_LIMIT_MS = 5_000;
+
+/** `work`, or an Error saying `message` when it has not settled within `limitMs`. The work is abandoned, not stopped. */
+export function withLimit<T>(work: Promise<T>, limitMs: number, message: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const limit = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), limitMs);
+  });
+  return Promise.race([work, limit]).finally(() => clearTimeout(timer));
+}
 
 /**
- * Runs `attempt` up to `tries` times, each try limited to `limitMs`, and returns the first result. A try that throws or
- * passes its limit is abandoned (its late result is ignored) and the next one starts; when every try fails, the last
- * error is thrown.
+ * Runs `use` in a browser of its own, up to `tries` times, and returns the first result. Every try opens a browser with
+ * `open` and shuts it with `shut` when the try ends, however it ends, before the next one opens. When every try fails,
+ * the last error is thrown. A `shut` that throws is ignored: it must not hide the try's own result.
  */
-export async function withRetry<T>(
-  attempt: (n: number) => Promise<T>,
-  opts: { tries: number; limitMs: number; label: string },
+export async function withFreshBrowser<B, T>(
+  open: () => Promise<B>,
+  shut: (browser: B) => Promise<void>,
+  use: (browser: B, n: number) => Promise<T>,
+  tries: number,
 ): Promise<T> {
-  let last: unknown = new Error(`${opts.label}: no try was made`);
-  for (let n = 1; n <= opts.tries; n++) {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const limit = new Promise<never>((_, reject) => {
-      timer = setTimeout(
-        () => reject(new Error(`${opts.label} took over ${opts.limitMs / 1000} s (try ${n} of ${opts.tries})`)),
-        opts.limitMs,
-      );
-    });
+  let last: unknown = new Error('no try was made');
+  for (let n = 1; n <= tries; n++) {
+    let browser: B | undefined;
     try {
-      return await Promise.race([attempt(n), limit]);
+      browser = await open();
+      return await use(browser, n);
     } catch (err) {
       last = err;
     } finally {
-      clearTimeout(timer);
+      if (browser !== undefined) await shut(browser).catch(() => undefined);
     }
   }
   throw last;
 }
+
+/** Closes a browser, and kills its process when the close has not finished within SHUT_LIMIT_MS (a hung Chrome). */
+export async function shutBrowser(browser: Browser): Promise<void> {
+  try {
+    await withLimit(browser.close(), SHUT_LIMIT_MS, `the browser took over ${SHUT_LIMIT_MS / 1000} s to close`);
+  } catch {
+    browser.process()?.kill('SIGKILL');
+  }
+}
+
+/** What a capture past its limit says: which capture, and which try. */
+export const captureLimitMessage = (what: string, n: number): string =>
+  `the collage's ${what} capture took over ${CAPTURE_LIMIT_MS / 1000} s (try ${n} of ${CAPTURE_TRIES}, each in a Chrome of its own)`;
 
 /** Renders one HTML page at exactly width × height (device scale 1) on a page of its own and returns it as PNG bytes. */
 async function captureOnce(browser: Browser, html: string, width: number, height: number): Promise<Uint8Array> {
@@ -424,21 +447,14 @@ async function captureOnce(browser: Browser, html: string, width: number, height
   }
 }
 
-/** One capture, limited and retried (CAPTURE_LIMIT_MS, CAPTURE_TRIES); `what` names it in the error. */
-function capture(browser: Browser, what: string, html: string, width: number, height: number): Promise<Uint8Array> {
-  return withRetry(() => captureOnce(browser, html, width, height), {
-    tries: CAPTURE_TRIES,
-    limitMs: CAPTURE_LIMIT_MS,
-    label: `the collage's ${what} capture`,
-  });
-}
-
 /**
  * Draws the collage: Chrome renders the header, the band bars and the labels; composeCollage does the rest. The PNG is
- * exactly `layout.width` × `layout.height` pixels, and a screenshot that fits its band's box keeps every pixel.
+ * exactly `layout.width` × `layout.height` pixels, and a screenshot that fits its band's box keeps every pixel. The three
+ * captures are made in a Chrome `open` starts for them alone (never the one that ran the journeys), which is shut when
+ * they are done; a capture past CAPTURE_LIMIT_MS ends the try, and the next try opens another (CAPTURE_TRIES).
  */
 export async function renderCollage(
-  browser: Browser,
+  open: () => Promise<Browser>,
   bands: readonly CollageBand[],
   meta: CollageMeta,
 ): Promise<{ png: Uint8Array; layout: CollageLayout }> {
@@ -446,8 +462,19 @@ export async function renderCollage(
   const tiles = bands.flatMap((b) => b.tiles);
   const widths = layout.bands.flatMap((b) => b.placements.map((p) => p.cellWidth));
   const labelW = Math.max(...widths);
-  const header = await capture(browser, 'header', headerHtml(meta, layout.width), layout.width, HEADER_H);
-  const bars = await capture(browser, 'band bars', bandsHtml(bands, layout.contentWidth), layout.contentWidth, bands.length * BAND_H);
-  const labels = await capture(browser, 'labels', labelsHtml(tiles, labelW, widths), labelW, tiles.length * LABEL_H);
+  const { header, bars, labels } = await withFreshBrowser(
+    open,
+    shutBrowser,
+    async (browser, n) => {
+      const capture = (what: string, html: string, width: number, height: number) =>
+        withLimit(captureOnce(browser, html, width, height), CAPTURE_LIMIT_MS, captureLimitMessage(what, n));
+      return {
+        header: await capture('header', headerHtml(meta, layout.width), layout.width, HEADER_H),
+        bars: await capture('band bars', bandsHtml(bands, layout.contentWidth), layout.contentWidth, bands.length * BAND_H),
+        labels: await capture('labels', labelsHtml(tiles, labelW, widths), labelW, tiles.length * LABEL_H),
+      };
+    },
+    CAPTURE_TRIES,
+  );
   return { png: composeCollage(layout, header, bars, labels, bands), layout };
 }

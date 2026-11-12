@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
 import type { Browser } from 'puppeteer';
 import { FROZEN_NOW, TIMEZONE, VIEWPORT, openPage, settle } from './browser.ts';
-import { renderCollage } from './collage.ts';
+import { renderCollage, shutBrowser } from './collage.ts';
 import type { CollageBand } from './collage.ts';
 import { JOURNEYS, helpers } from './flow.ts';
 import type { FlowState, Journey } from './flow.ts';
@@ -226,7 +226,8 @@ async function main(): Promise<number> {
 
   // Chrome's sandbox needs kernel namespaces that Docker's default profile withholds. The container is the boundary
   // here, and the browser only ever loads this app and its web font.
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', ...DETERMINISTIC_RENDERING] });
+  const launchChrome = (): Promise<Browser> => puppeteer.launch({ headless: true, args: ['--no-sandbox', ...DETERMINISTIC_RENDERING] });
+  const browser = await launchChrome();
   try {
     const browserVersion = await browser.version();
     const every = [...PAGE_JOURNEYS, ...JOURNEYS].map((j) => j.id);
@@ -296,6 +297,9 @@ async function main(): Promise<number> {
     const byBand = `website ${tally(website)}, admin ${tally(admin)}, app ${tally(steps)}`;
     const ranAt = new Date().toISOString();
 
+    // Every journey is done, so their Chrome goes before the collage is drawn: the collage opens its own (collage.ts,
+    // CAPTURE_TRIES), and nothing after this line needs the first one.
+    await shutBrowser(browser);
     let collage: CollageInfo | null = null;
     let collageError: string | null = null;
     try {
@@ -346,7 +350,7 @@ async function main(): Promise<number> {
       const subtitle =
         `${semver.tag(version)} · ${passed}/${total} steps passed: ${byBand} · ${ranAt.slice(0, 16).replace('T', ' ')} UTC · ` +
         `source sha256 ${(sourceSha256 ?? 'unknown').slice(0, 12)}`;
-      const { png, layout } = await renderCollage(browser, bands, { title: 'IRON ASYLUM e2e screens', subtitle });
+      const { png, layout } = await renderCollage(launchChrome, bands, { title: 'IRON ASYLUM e2e screens', subtitle });
       writeFileSync(join(REPORT, 'collage.png'), png);
       collage = {
         file: 'collage.png',
@@ -388,7 +392,7 @@ async function main(): Promise<number> {
       (collage ? `, collage.png ${collage.width}×${collage.height}` : ''));
     return report.ok ? 0 : 1;
   } finally {
-    await browser.close();
+    if (browser.connected) await shutBrowser(browser);
   }
 }
 
