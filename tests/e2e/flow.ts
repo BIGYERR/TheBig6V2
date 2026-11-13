@@ -793,12 +793,40 @@ const STRENGTH: readonly Step[] = [
       await t.expectText('#bugStatus', 'Type what went wrong first.');
       // D286: the Engine row builds HALF_MANNY and the 864 lattice configs in this browser and every digest matches.
       await t.expectText('#engineCheckRun', 'Run the check');
+      await page.evaluate(() => {
+        const w = window as unknown as { __diag: string[] };
+        w.__diag = [];
+        const at = () => performance.now().toFixed(0);
+        addEventListener('scroll', () => w.__diag.push(`${at()} scroll y=${Math.round(scrollY)}`), true);
+        for (const ev of ['pointerdown', 'mousedown', 'click', 'focusout']) {
+          addEventListener(ev, (e) => {
+            const x = e.target as Element | null;
+            w.__diag.push(`${at()} ${ev} ${x?.tagName ?? '?'}#${x?.id ?? ''} y=${Math.round(scrollY)}`);
+          }, true);
+        }
+        const orig = window.scrollTo.bind(window) as (...a: unknown[]) => void;
+        window.scrollTo = ((...a: unknown[]) => {
+          w.__diag.push(`${at()} scrollTo ${JSON.stringify(a)} ${(new Error().stack ?? '').split('\n').slice(2, 4).map((l) => l.trim()).join(' < ')}`);
+          orig(...a);
+        }) as typeof window.scrollTo;
+      });
       await t.tap('#engineCheckRun');
       // The single-file page writes Checking as the tap lands; the Angular screen draws it at its next change detection.
       await page
         .waitForFunction(() => (document.getElementById('engineCheckRun')?.textContent ?? '').includes('Checking'), { timeout: 5000 })
-        .catch(() => {
-          throw new Error('Run the check did not turn to Checking within 5 s');
+        .catch(async () => {
+          const diag = await page.evaluate(() => {
+            const b = document.getElementById('engineCheckRun');
+            const r = b?.getBoundingClientRect();
+            const g = globalThis as unknown as { __diag?: string[]; engineCheckNow?: () => unknown };
+            return [
+              `y=${Math.round(scrollY)} top=${Math.round(r?.top ?? -1)} text=${b?.textContent?.trim()}`,
+              `msg=${document.getElementById('engineCheckMsg')?.textContent?.trim().slice(0, 60)}`,
+              `now=${JSON.stringify(g.engineCheckNow?.() ?? 'no fn')?.slice(0, 80)}`,
+              ...(g.__diag ?? []).slice(-30),
+            ].join(' | ');
+          });
+          throw new Error(`Run the check did not turn to Checking within 5 s. ${diag}`);
         });
       await page
         .waitForFunction(() => (document.getElementById('engineCheckMsg')?.textContent ?? '').startsWith('Lattice'), { timeout: 120000 })
