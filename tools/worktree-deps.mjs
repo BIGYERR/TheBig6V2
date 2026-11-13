@@ -6,7 +6,7 @@
 //
 // Run it on its own at the start of a chat, before the first build (the session-start skill, step 0; Post-v0.261.7: a
 // fresh worktree's `npm run build:index` failed on the app's missing node_modules, which only the check had linked):
-//   node tools/worktree-deps.mjs                     the app's, the website's and the backend's, in this checkout
+//   node tools/worktree-deps.mjs                     the app's, the website's, the backend's and the Expo app's, here
 //   node tools/worktree-deps.mjs --repo <dir> <rel>  another checkout, or other folders (the tests use it)
 // One line per folder; exit 1, naming the npm ci to run, when any folder has none.
 import { execFileSync } from 'node:child_process';
@@ -14,8 +14,9 @@ import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSy
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-/** The folders whose node_modules the 60-second check's lanes need (tools/check.mjs): the app, the website, the backend. */
-export const LANE_DEPS = ['frontends/app', 'frontends', 'backend'];
+/** The folders whose node_modules the 60-second check's lanes need (tools/check.mjs): the app, the website, the backend,
+ * the Expo app. */
+export const LANE_DEPS = ['frontends/app', 'frontends', 'backend', 'frontends/native'];
 
 /**
  * What a lane uses for `<rel>/node_modules`.

@@ -109,8 +109,8 @@ test('run on its own, it links each folder and prints a line for it, and exits 1
   }
 });
 
-test('with no folders named, it links the three the 60-second check\'s lanes need', () => {
-  assert.deepEqual(D.LANE_DEPS, ['frontends/app', 'frontends', 'backend']);
+test('with no folders named, it links the four the 60-second check\'s lanes need', () => {
+  assert.deepEqual(D.LANE_DEPS, ['frontends/app', 'frontends', 'backend', 'frontends/native']);
   const check = readFileSync(join(dirname(TOOL), 'check.mjs'), 'utf8');
   assert.deepEqual([...check.matchAll(/deps\('[a-z]+', '([^']+)'\)/g)].map((m) => m[1]), D.LANE_DEPS, 'the folders tools/check.mjs links, in its order');
 });
