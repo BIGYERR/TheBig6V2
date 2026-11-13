@@ -51,6 +51,14 @@
         <button class="look-opt" onclick="backupCancel()">Cancel</button>
       </div>
     </div>
+    <div class="look-row" role="group" aria-label="Engine">
+      <div class="look-lbl">Engine</div>
+      <div class="look-note">Builds the tested programs on this phone. Each one must match.</div>
+      <div class="look-seg">
+        <button class="look-opt" id="engineCheckRun" onclick="engineCheckRun()">Run the check</button>
+      </div>
+      <div class="look-note" id="engineCheckMsg" aria-live="polite"></div>
+    </div>
     <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0;text-align:center;padding-top:4px"></div>
   </div>
 </div>

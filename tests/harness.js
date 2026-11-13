@@ -62,7 +62,8 @@ const EXPORT_NAMES = [
   'readSwaps','writeSwaps','readSwapCounts','writeSwapCounts','SWAP_NUDGE_AT','readDayEdits','writeDayEdits',
   'readPrograms','writePrograms','readActiveProgramId','writeActiveProgramId','readWildcardDone','writeWildcardDone',
   'recoveryPaceEntry','programWeekAt','SEED_WINDOW_DAYS','SEED_MIN_RUNS',
-  'BACKUP_KIND','BACKUP_FORMAT','backupKeys'
+  'BACKUP_KIND','BACKUP_FORMAT','backupKeys',
+  'sha256Hex','engineCheckDigest','engineCheckBase','engineCheckRun','engineCheckNow','engineCheckListen'
 ];
 
 function makeContext(opts){

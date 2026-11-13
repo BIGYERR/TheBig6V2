@@ -23,10 +23,12 @@ Each phase starts only on Mario's GO, one phase step per session.
   are lifted** ("dont worry about the december 6 race, lets get this moving"): the freeze slice, the phase 5 cutover
   and moving his real data no longer wait for the race. What stays: a backup saved before each install (phase 1's
   numbered steps), and his GO for each phase.
-- **Step 2, the engine check (D286, `docs/decisions/engine-check.md`):** an Engine row on the Bugs tab builds HALF_MANNY
-  and the 864 lattice configs on the phone and prints how many digests match the ones CI pins. Measured first: a
-  digest depends on neither the clock nor the time zone (24 runs, each 864 of 864), and the engine makes no storage
-  call (1,728 builds, 0 calls).
+- **Done, step 2, the engine check (v0.262.0, D286, `docs/decisions/engine-check.md`):** an Engine row on the Bugs tab
+  builds HALF_MANNY and the 864 lattice configs on the phone and prints how many digests match the ones CI pins.
+  Measured first: a digest depends on neither the clock nor the time zone (24 runs, each 864 of 864), and the engine
+  makes no storage call (1,728 builds, 0 calls). On the iOS simulator (iPhone 17 Pro, the app's web view, JavaScriptCore,
+  the Mac busy with the e2e): **Lattice 864 of 864 match. Half Manny matches. Took 30 s.** The phone itself is Mario's
+  run, after he installs the build; phase 2 runs the same core check under Hermes.
 - **Done, the first lift slice (v0.261.2):** every storage call goes through one store. `core/src/engine/state-store.ts`
   holds the interface and its two makers; `storage.ts` makes the page's store, `iaStore`; the 59 direct calls are gone
   (the page names `localStorage` once). Every golden record identical, no golden file touched. The lifted code sits in
