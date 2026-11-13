@@ -502,3 +502,18 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   names pass, as a guard must. `tests/unit/data-backup.test.ts`: its wiring only, so it fails whole on v0.261.7 (the
   names it lifts are not in that page) and no assertion changed. `tests/integration/stored-state.test.ts`, the new case. The other
   golden records and the backup corpus, unchanged.
+
+## The store's third implementation: SQLite, in the Expo app (Post-v0.262.0, the migration's phase 2, session 2)
+
+- **Date:** 2026-11-13. **Ruled by:** the session (form). **Bump:** none, Mario 2026-11-13. The import that uses it
+  is D287 P-NATIVEIMPORT (`docs/decisions/data-backup.md`).
+- **What it is:** `frontends/native/src/store/sqlite-store.ts`, core's `StateStore` on expo-sqlite/kv-store 58.0.17's
+  synchronous calls, beside `storageStore` (the page) and `memoryStore` (the tests). Core does not change.
+- **The rule for every slice, carried to it:** every golden record comes out the same through it, to the byte. The
+  Node runner cannot load expo-sqlite (a native module), so the tests run SQLite itself under `node:sqlite` with the
+  kv-store's own statements (`tests/support/sqlite-kv.ts`) under the app's `sqliteStore`, and put every test phone's
+  storage there (`tests/support/sqlite-phone.ts`): the page's every storage call, and every record, goes through it.
+  `tests/integration/native-store.test.ts` runs `tests/integration/stored-state.test.ts` that way, and
+  `tests/sweeps/native-store.test.ts` the stored-state and backup sweeps, against the same golden files. All equal.
+  Shown to fire first: a store that changes one emoji as it writes turns the golden records red there, and only there.
+- **What only the simulator and the phone prove:** expo-sqlite's own SQLite build and Hermes's strings crossing into it.
