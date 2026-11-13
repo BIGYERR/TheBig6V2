@@ -11,10 +11,13 @@
 //   build    index.html is the build of frontends/app/src/legacy/src and core/src/engine (frontends/app/scripts/build-index.mjs), its ia-version meta reads
 //            as a version, its inline script compiles, and it boots in the harness and builds HALF_MANNY, self-stable.
 //   frontends frontends/ (the website, the admin, common/): type check, lint.
+//   native   frontends/native/ (the Expo app, MIGRATION.md phase 2): type check, against core. Run when it or core/
+//            changes; on a change to core/ alone it is skipped, with a note, when its node_modules is neither here nor
+//            borrowable (CI's native (Expo) job type-checks it on every push to dev).
 //   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint, the production build.
 //   backend  backend/, and the root's package.json, lock file and Procfile (Heroku's build, which its tests read):
 //            type checks, tests, lint.
-// In a chat's worktree, a missing node_modules of the app, the website or the backend is linked from the main checkout
+// In a chat's worktree, a missing node_modules of the app, the website, the backend or the Expo app is linked from the main checkout
 // when this branch's lockfile is the main checkout's (tools/worktree-deps.mjs); otherwise the lane names the npm ci to run.
 //
 //   node tools/check.mjs              every lane
@@ -60,11 +63,13 @@ const FEATURE_TESTS = /^tests\/((unit|integration|sweeps|snapshots|support|e2e)\
 const FEATURE_TEST_DIRS = ['unit', 'integration'];
 const TESTS = join(REPO, 'tests');
 const want = {
-  tests: touches(/^(index\.html|core\/|tests\/harness\.js$|tests\/semver\.js$|tests\/lattice193\.js$)/) || touches(FEATURE_TESTS),
+  // frontends/native: tests/unit/native-shell.test.ts reads its config, package and screens.
+  tests: touches(/^(index\.html|core\/|frontends\/native\/|tests\/harness\.js$|tests\/semver\.js$|tests\/lattice193\.js$)/) || touches(FEATURE_TESTS),
   // index.html is generated from frontends/app/src/legacy/src (frontends/app/scripts/build-index.mjs); the two must never drift.
   build: touches(/^(index\.html|frontends\/app\/src\/legacy\/src\/|core\/src\/engine\/|frontends\/app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
   app: touches(/^(frontends\/app\/|core\/src\/engine\/|tools\/|index\.html)/),
-  frontends: touches(/^frontends\/(?!app\/)/),
+  frontends: touches(/^frontends\/(?!app\/|native\/)/),
+  native: touches(/^(frontends\/native\/|core\/)/),
   // The deploy tree builds the page with frontends/app/scripts (backend/test/deploy.test.ts), so a change there is a backend change too.
   backend: touches(/^(backend\/|package\.json$|package-lock\.json$|Procfile$|frontends\/app\/scripts\/)/),
 };
@@ -76,6 +81,7 @@ if (LIST) {
   console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
   console.log(`  frontends ${want.frontends ? 'typecheck, lint (website, admin, common)' : 'not touched'}`);
   console.log(`  backend ${want.backend ? 'typecheck, test, lint' : 'not touched'}`);
+  console.log(`  native  ${want.native ? 'typecheck (the Expo app, against core)' : 'not touched'}`);
   process.exit(0);
 }
 
@@ -250,13 +256,29 @@ async function backendLane() {
   ]);
 }
 
+/** The Expo app (frontends/native): its type check, which reads core's engine and check through @ia/core. */
+async function nativeLane() {
+  const nat = join(REPO, 'frontends', 'native');
+  if (!touches(/^frontends\/native\//)) {
+    // core/ alone changed: a worktree that never installed the Expo app is not blocked by it; CI checks it.
+    const r = linkDeps(REPO, 'frontends/native');
+    if (!r.ok) {
+      note('native', `skipped: ${r.why} (CI's native (Expo) job type-checks it)`);
+      console.log(`check: native: skipped, ${r.why}`);
+      return;
+    }
+  } else if (!deps('native', 'frontends/native')) return;
+  await step('native', 'typecheck', join(nat, 'node_modules', '.bin', 'tsc'), ['--noEmit'], nat);
+}
+
 const lanes = [];
 if (want.tests) lanes.push(testsLane());
 if (want.build) lanes.push(buildLane());
 if (want.app) lanes.push(appLane());
 if (want.frontends) lanes.push(frontendsLane());
 if (want.backend) lanes.push(backendLane());
-const what = [want.tests && 'tests', want.build && 'build', want.app && 'app', want.frontends && 'frontends', want.backend && 'backend'].filter(Boolean).join(', ') || 'nothing (no staged file needs a check)';
+if (want.native) lanes.push(nativeLane());
+const what = [want.tests && 'tests', want.build && 'build', want.app && 'app', want.frontends && 'frontends', want.backend && 'backend', want.native && 'native'].filter(Boolean).join(', ') || 'nothing (no staged file needs a check)';
 console.log(`check: ${what}; hard limit ${LIMIT_S} s`);
 await Promise.all(lanes);
 

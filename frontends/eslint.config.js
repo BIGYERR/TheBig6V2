@@ -1,6 +1,6 @@
 // @ts-check
 // npm run lint: the website, the admin and common/ (TypeScript and templates), and this file. Errors fail. Same rule
-// sets as app/eslint.config.js; the app is its own package and lints itself.
+// sets as app/eslint.config.js; the app is its own package and lints itself, and native/ (the Expo app) is its own too.
 import eslint from '@eslint/js';
 import angular from 'angular-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
@@ -8,7 +8,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['node_modules/', 'dist/', '.angular/', 'app/', 'website/public/']),
+  globalIgnores(['node_modules/', 'dist/', '.angular/', 'app/', 'native/', 'website/public/']),
   {
     files: ['admin/**/*.ts', 'website/**/*.ts', 'common/**/*.ts'],
     extends: [

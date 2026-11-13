@@ -1,0 +1,25 @@
+{
+  "name": "ia-native",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Iron Asylum in React Native (MIGRATION.md phase 2): an Expo app beside today's frontends/app, with its own bundle id (com.bigyerr.ironasylum.next) so both sit on the phone. Its version is core's (app.config.js reads core/src/version.ts), never this file's.",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "typecheck": "tsc --noEmit",
+    "prebuild-ios": "expo prebuild --platform ios --no-install",
+    "build-ios": "node scripts/ios.mjs build",
+    "sim-ios": "node scripts/ios.mjs sim"
+  },
+  "dependencies": {
+    "@ia/core": "file:../../core",
+    "expo": "58.0.25",
+    "expo-status-bar": "58.0.5",
+    "react": "19.3.0",
+    "react-native": "0.88.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "6.0.3"
+  }
+}

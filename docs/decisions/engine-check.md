@@ -75,3 +75,41 @@ and `Math.pow`).
   seed=3039`, `… seed=76308`, then `healthy bodyweight support_prevention intermediate seed=1013`, `… seed=3039`, `…
   seed=76308`. SHA-256 of `abc`: `ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`; of the empty
   string: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` (FIPS 180-2 examples).
+
+## D286 in the Expo app: the same row, run under Hermes (Post-v0.262.0, the migration's phase 2, session 1)
+
+- **Date:** 2026-11-12. **Ruled by:** the session (form, which is the session's to decide; D286 itself already says
+  "the logic is core's, so phase 2's app runs the same check under Hermes"). No new D-code: the row, its words, its
+  cases and its lines are D286's, unchanged. Mario's GO for phase 2, 2026-11-12. **Bump:** none, Mario 2026-11-12 ("No
+  version"): today's app and `index.html` do not change, so `ia-version` stays 0.262.0 and nothing reaches the phone.
+  **Shipped:** Post-v0.262.0, no build (`frontends/native`, on the chat's branch until Mario merges it).
+- **The finding (measured, `tests/measure/engine-check_hermes.mjs`):**
+  1. Core's check and engine stand alone: run through `core/src/engine/engine-check.ts` and `budget-engine-d.ts` with
+     no page, no harness and no store, under V8, they read Lattice 864 of 864 match. Half Manny matches.
+  2. Core builds for Hermes as it is: the two modules bundled with their types stripped and their syntax left as
+     written (esbuild, `esnext`, 360,636 bytes) compile under `hermesc` from React Native 0.88.1's `hermes-compiler`
+     260318099.0.5 (317,167 bytes of bytecode). That package carries `hermesc` only, for Linux, macOS and Windows, and
+     no Hermes VM, so no CI step on Linux can run the lattice under Hermes without building Hermes from source: the run
+     is the simulator's (`MIGRATION.md` 3.2, answered).
+  3. Metro needs two things and no change to core: core's folder in `watchFolders`, and the packages a core file asks
+     for (Babel's runtime helpers) resolved from the app's `node_modules`. The `.ts` import paths and the package's
+     `exports` resolve as they are. The bundle carries the 17 engine files, `engine-check.ts` and its digests.
+- **What changes:** a new app, `frontends/native/`: Expo SDK 58.0.25, React Native 0.88.1, React 19.3.0, Hermes V1
+  (React Native's default; the bundle is Hermes bytecode version 99 and the app links `hermesvm.framework`), pinned
+  exactly. Bundle id **com.bigyerr.ironasylum.next**, display name IA Next, version and build number core's release
+  version (`app.config.js` reads `core/src/version.ts`). One screen, Bugs: a line **Runs on Hermes. Version 0.262.0.**
+  (read from the runtime and from core, so a build that fell back to another engine says so), and D286's Engine row,
+  element for element: the label, the note, **Run the check** reading **Checking** while it runs, the progress and the
+  result lines from core's `engineCheckLine`, slices of core's 40 ms on `performance.now()` with a zero timer between.
+  The Track tokens, day and night by the phone's setting, the button in ink. A CI job, `native (Expo)`, beside
+  `native (iOS simulator)`: the type check, `expo prebuild` and an unsigned Release build for the simulator.
+- **What deliberately does not change:** today's app (`frontends/app/` untouched, its bundle id
+  `com.bigyerr.ironasylum`; `tests/unit/native-shell.test.ts` holds the two apart); the engine and core (no file
+  edited); every program and golden record; every `ia_` key (the new app has no storage at all yet). Not in this
+  slice: SQLite, loading a backup, This Week, the native spike, the second TestFlight lane.
+- **Result on the iOS simulator (iPhone 17 Pro, iOS 26.5, the Release build, Hermes):** Lattice 864 of 864 match. Half
+  Manny matches. Took 133 s, and 134 s run again. JavaScriptCore read the same line in 30 s on the same simulator
+  (v0.262.0), so the engine runs about 4.4 times slower under Hermes here: about 155 ms a build against 35 ms. The
+  likely cause, not measured:
+  the web view's JavaScriptCore compiles hot code, and Hermes runs bytecode without that. It matters past this check,
+  because `refreshProgram` rebuilds the program on every launch; the phone's own number comes with the phase 2 gate.

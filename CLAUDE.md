@@ -18,7 +18,7 @@ Mario has had to repeat this more than once; a session that makes him say it aga
   `base_v<previous>.html`, where `<previous>` is the version HEAD carries, never "N-1".
 - **Feature files carry no version** (Mario, Post-v0.239.1). Tests are `tests/unit/<feature>.test.ts` and
   `tests/integration/<feature>.test.ts`, snapshots `tests/snapshots/<feature>.json`, rulings
-  `docs/decisions/<feature>.md`, measure scripts `tests/measure/<feature>_<question>.js` (Test layout). No
+  `docs/decisions/<feature>.md`, measure scripts `tests/measure/<feature>_<question>.js` (`.mjs` when it needs ES modules: `tests/` is CommonJS, Post-v0.262.0; Test layout). No
   `v<version>_rulings/` folder is made. Files written before Post-v0.239.1 keep their names (`tests/measure/v0.240.0_*`).
 - **Code** reads, compares and prints a version only through `tests/semver.js` (or `@ia/core`'s `semver`): never `+version`, a
   string compare, `'V'+n` or arithmetic on a version. `SV.tag(v)` prints the label: `V239` for an old build, `v0.239.1` for a new one.
@@ -133,7 +133,7 @@ working tree (Post-v0.259.4: the iOS 15 chat read D280 on `dev` and wrote D281 a
 already held; both were renumbered before any push). v0.254.0's ruling was promised as D265 in chat; a concurrent session
 issued D265 before the ruling was written, and it shipped as D266.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it, and print the deploy picture (step 7).
-2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `<feature>_<question>.js`).
+2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `<feature>_<question>.js`, or `.mjs` for an ES module).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience. The main session appends the ruling to its feature's decision file (Proof for new work).
 4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to the source files under `frontends/app/src/legacy/src/` (every text replaced occurs exactly once in the file it edits before it is replaced), `index.html` rebuilt from them (`npm run build:index`), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line, and run `node tools/claims.mjs`, which reads both on every chat branch too: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
 5. Gatekeeper proves it as **Pipeline** and **Proof for new work** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews. Green, or a NAMED failing test.
@@ -191,13 +191,13 @@ issued D265 before the ruling was written, and it shipped as D266.
   from a worktree, from the main checkout anything but local `dev`'s own commit to `dev` or a tag, and a push of `dev`
   whose new commits come from more than one chat (`IA_PUSH_ALL=1` to carry them together on purpose). A worktree runs
   the hooks of the commit it has checked out, so one made from `dev` carries the guards.
-- **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs four lanes and stops at 60 s: tests (the type
+- **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs six lanes and stops at 60 s: tests (the type
   check of `core/` and `tests/`, and the unit and integration tests by Vitest), build (the page builds from
   `frontends/app/src/legacy/src/` into `dist-github-pages/`, its version meta, its inline script compiles, it boots and builds
-  HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint, the production build with its budgets) and backend (type checks, tests, lint). The pre-commit hook
+  HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint, the production build with its budgets), frontends (the website's and the admin's type check and lint), backend (type checks, tests, lint) and native (the Expo app's type check against core; on a change to `core/` alone it is skipped with a note when no `frontends/native/node_modules` is here or borrowable, since CI's `native (Expo)` job checks it, Post-v0.262.0). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
-  slower belongs in CI. In a chat's worktree the check borrows the main checkout's `node_modules` of the app, the website
-  and the backend when this branch's lockfile is the main checkout's, and otherwise names the `npm ci` to run
+  slower belongs in CI. In a chat's worktree the check borrows the main checkout's `node_modules` of the app, the website,
+  the backend and the Expo app when this branch's lockfile is the main checkout's, and otherwise names the `npm ci` to run
   (`tools/worktree-deps.mjs`, Post-v0.259.1); it installs the tests' own with `npm ci`. It borrows package by package,
   and a package installed from a `file:` spec (the app's two plugins; the tests' `@ia/core` when a session borrows that
   folder by hand) is the worktree's own copy (Post-v0.261.0: borrowed whole, a worktree read the main checkout's core
@@ -279,6 +279,10 @@ issued D265 before the ruling was written, and it shipped as D266.
   is made: its date, its D-code, who ruled, the finding, what changes, what deliberately does not, the expected values
   or after-grid, and the release that shipped it, filled in at ship time. A re-ruling is a new entry naming the one it
   amends. Measure scripts and their saved reports stay in `tests/measure/`, named `<feature>_<question>`.
+  **A ruling carried unchanged into another frontend keeps its D-code** (Post-v0.262.0): the Angular screen, the Expo
+  app or any later one drawing the same row with the same words and behaviour is an entry in the ruling's own
+  decision file under its D-code, with its own release line. A new D-code is issued only when the behaviour or the
+  words change (D286 in the Expo app, `docs/decisions/engine-check.md`).
 - **The legacy gate suite is gone** (test-migration phase 3, Post-v0.239.1): `tests/gates/`, `gate.sh`, the row manifest
   and its licences, era rows and `era_bump.py`, sabotage and its specs, the edit scripts and the identity fuzz were
   deleted after every gate row was mapped to a feature test or dropped for a written reason (`docs/test-migration.md`
