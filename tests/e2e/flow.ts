@@ -131,28 +131,35 @@ export function helpers(page: Page, app = false): Helpers {
     async tap(selector) {
       const el = await page.waitForSelector(selector, { visible: true, timeout: 5000 }).catch(() => null);
       if (!el) throw new Error(`nothing visible to tap at ${selector}`);
-      // Centre it first: an element scrolled only to the edge can sit under the fixed tab bar. Then wait until the
-      // target itself (or a child of it) is what a tap at its centre hits: a click sent before the scroll settles lands
-      // on whatever covers it (Post-v0.262.0: Run the check, low on the Bugs screen, once tapped the tab bar instead).
-      await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
-      await page
-        .waitForFunction(
-          (e: Element) => {
-            const r = e.getBoundingClientRect();
-            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-            return !!hit && (hit === e || e.contains(hit));
-          },
-          { timeout: 3000 },
-          el,
-        )
-        .catch(async () => {
-          const over = await el.evaluate((e) => {
-            const r = e.getBoundingClientRect();
-            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-            return hit ? `${hit.tagName.toLowerCase()}${hit.id ? '#' + hit.id : ''}${hit.className ? '.' + String(hit.className).split(' ')[0] : ''}` : 'nothing';
-          });
-          throw new Error(`${selector} is covered by ${over} at its centre`);
+      // Centre it, then wait until the target itself (or a child of it) is what a tap at its centre hits, two frames
+      // after the scroll, and scroll again while it is not. A click sent before then lands on whatever covers it:
+      // an element scrolled only to the edge sits under the fixed tab bar, and 350 ms after any focusout the page
+      // nudges the scroll a point and puts it back on the next frame (installKeyboardResync, D280), so a scroll made
+      // inside that frame is undone (Post-v0.262.0: Run the check went back under the tab bar and the tap hit it).
+      const placed = await el.evaluate(async (e) => {
+        const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+        const hits = () => {
+          const r = e.getBoundingClientRect();
+          const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+          return !!hit && (hit === e || e.contains(hit));
+        };
+        const until = performance.now() + 3000;
+        do {
+          e.scrollIntoView({ block: 'center', inline: 'center' });
+          await frame();
+          await frame();
+          if (hits()) return true;
+        } while (performance.now() < until);
+        return false;
+      });
+      if (!placed) {
+        const over = await el.evaluate((e) => {
+          const r = e.getBoundingClientRect();
+          const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+          return hit ? `${hit.tagName.toLowerCase()}${hit.id ? '#' + hit.id : ''}${hit.className ? '.' + String(hit.className).split(' ')[0] : ''}` : 'nothing';
         });
+        throw new Error(`${selector} is covered by ${over} at its centre`);
+      }
       await el.click();
       await sleep(SETTLE_MS);
     },
