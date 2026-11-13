@@ -131,8 +131,28 @@ export function helpers(page: Page, app = false): Helpers {
     async tap(selector) {
       const el = await page.waitForSelector(selector, { visible: true, timeout: 5000 }).catch(() => null);
       if (!el) throw new Error(`nothing visible to tap at ${selector}`);
-      // Centre it first: an element scrolled only to the edge can sit under the fixed tab bar.
+      // Centre it first: an element scrolled only to the edge can sit under the fixed tab bar. Then wait until the
+      // target itself (or a child of it) is what a tap at its centre hits: a click sent before the scroll settles lands
+      // on whatever covers it (Post-v0.262.0: Run the check, low on the Bugs screen, once tapped the tab bar instead).
       await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      await page
+        .waitForFunction(
+          (e: Element) => {
+            const r = e.getBoundingClientRect();
+            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+            return !!hit && (hit === e || e.contains(hit));
+          },
+          { timeout: 3000 },
+          el,
+        )
+        .catch(async () => {
+          const over = await el.evaluate((e) => {
+            const r = e.getBoundingClientRect();
+            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+            return hit ? `${hit.tagName.toLowerCase()}${hit.id ? '#' + hit.id : ''}${hit.className ? '.' + String(hit.className).split(' ')[0] : ''}` : 'nothing';
+          });
+          throw new Error(`${selector} is covered by ${over} at its centre`);
+        });
       await el.click();
       await sleep(SETTLE_MS);
     },
@@ -773,19 +793,6 @@ const STRENGTH: readonly Step[] = [
       await t.expectText('#bugStatus', 'Type what went wrong first.');
       // D286: the Engine row builds HALF_MANNY and the 864 lattice configs in this browser and every digest matches.
       await t.expectText('#engineCheckRun', 'Run the check');
-      // The row sits low on the screen: once it is scrolled up, wait until nothing (the fixed tab bar) covers the button,
-      // or the tap lands on the bar (seen once in the single-file page).
-      await page.$eval('#engineCheckRun', (e) => e.scrollIntoView({ block: 'center' }));
-      await page
-        .waitForFunction(() => {
-          const b = document.getElementById('engineCheckRun');
-          if (!b) return false;
-          const r = b.getBoundingClientRect();
-          return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === b;
-        }, { timeout: 5000 })
-        .catch(() => {
-          throw new Error('Run the check stayed covered after scrolling it into view');
-        });
       await t.tap('#engineCheckRun');
       // The single-file page writes Checking as the tap lands; the Angular screen draws it at its next change detection.
       await page
