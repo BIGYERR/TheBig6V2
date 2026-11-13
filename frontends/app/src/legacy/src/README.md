@@ -141,6 +141,7 @@ its own proof.
 | `js/progress-charts.ts` | chart builders, easy-zone charts |
 | `js/lift-ledger-progress-screen.ts` | lift ledger model and cards; `renderProgressScreen`, dot charts |
 | `js/data-backup.ts` | the backup file (D264): `backupSnapshot`, `readBackup`, `loadBackupData`, `saveBackup` (the share sheet or a download) and the Bugs page's Your data block |
+| `js/engine-check-row.ts` | the Bugs page's Engine row (D286): `engineCheckRun` runs the engine check in slices, `engineCheckListen` and `engineCheckNow` for the Angular screen; the cases, digest and lines are `engine/engine-check.ts`, the pinned digests `engine/engine-check-digests.ts` (written by `tools/engine-check-digests.mjs`) |
 | `js/bug-report-init.ts` | bug report, `init` |
 | `js/popups-streaks-reminders.ts` | reinforcement pop-ups; streaks, stats, reminders |
 | `js/update-check.ts` | version label, update banner and check, and the boot statements that end the script (they call `init`) |

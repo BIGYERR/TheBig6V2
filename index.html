@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.261.8">
+<meta name="ia-version" content="0.262.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -19342,6 +19342,351 @@ function backupCancel(){_backupPending=null;_backupShow('',false);}
 
 
 
+const ENGINE_CHECK_MANNY_DIGEST='147f083be4e04e34';
+
+const ENGINE_CHECK_LATTICE_DIGESTS=[
+  '9745f748fefc4304','53d74e1d4eb3f439','59e6ece27d69755d','1e6a047103041d64','6d9f0dd8326c14df','e4fbf7d569a00ea9',
+  'a70390e62dde02ef','514d8d4e3059335f','a90c48b354ee80f3','df25fbc2c8dcd26d','ab125c0ac16570fe','2dd32a174f812a09',
+  'a1a0abe1dd3a8f6b','41b89e4ad4d6a1d3','5a0b7df4a8c2a1b5','e5a484634ad70cf7','e47016dbfaf2c4fa','30daec1716061e15',
+  'b5b7e06ff95ccc49','a97c071c3564742f','30accdc661ad295c','cd91539211c89622','8821b1579277c5d8','5c17a1d310ecd29f',
+  '9e2445875f88bace','6c9d302f43c764e4','557a1d950f477a9d','dc21d85b54dbe8fa','2f299b017dcc7121','cebe7dda16bea64f',
+  '0820c541ffbe8904','6479ff9b19153b53','d866a17cf5e71f69','4a967fc4ab8d731c','c821b19b0ae4ed04','793ddaecf358d4f6',
+  '9d454360e7647339','4f0afbdd49c36a3f','af3b0a42e5332e6c','5f14a10ef18f622c','de6ca63c940307c7','7b93ad100e357547',
+  '09f32c995973a74c','8cecb7266e43274c','bdf585186edb6e51','e7344b73abef6828','7b8afea407dff1fe','c54563b2cd888c79',
+  'ad0e101fb1a2be2f','f10bc7ad8ac188b1','1692b589426e2064','2ca6ad06f589c5e6','34b799c8a911a60b','2055426677a69c5a',
+  'd21577f41b0f1ab7','4302178f0618b3b4','8868ea319b01217b','c2a2e0ceff4d3908','230a74e64dea8d06','93b43d24febdc994',
+  '291f92afa477a52f','e79a1fc1e76bcf6d','b53a41a3c07974d9','cfe4919b334287db','b2c7d01affa86fc3','15dcee1b8fd702cf',
+  '90f6db33ea3cfce2','ed3f7b05cdab573f','b315fae525286aba','c5ef69a2111d2db5','87a98c73b22e1b30','472b59f171106fc8',
+  '64d377f437a44e70','2445e1ec595b016a','b54f84b411afd73b','e89e84bf625662dd','1e94386992e66fdc','cf4d72dcd9dbcd1f',
+  'c1d3b7bb444fbe05','12f4c2dae8bc5449','f7e3d31ecc2a7347','98b496b2f8850e64','08baf096c8d23950','49d90b849fe1ae47',
+  'f21efb6c5ba05182','17aebcb4c61331d1','af7cd9446cc9f950','f8ff0209f25717e6','f38c237c7e7e5c08','1faf6cadf70f15ce',
+  '1564f11a9401aa32','0a695c8aed90e1ed','3023c9ba4dde6238','9a2be50d9f94d050','f97b6d433454eef3','d340e7927ce23c49',
+  'd2441efe2d7d44d0','6b27d119eece5922','2800eba99e075b78','9ccdfed29eab5d2a','9d5677cdb0b90e9b','49d82e8107eb4154',
+  '8f2907b72a493187','9aad31915cd1f0fa','c35e59d4c2f5039d','0f6fca49f82b5969','c820b6ef504ea98b','22825c13a1a4eb41',
+  '9033342ce368b394','1caf8f5d843694ab','1e3dd03d03612180','f2e0a6fab25ba355','415567e8a878f181','d5a0aa6af8573678',
+  '28ffd1ac0356e501','4af2ec77ff0f8dcc','23d142b3edcae679','297e8287ccdc7a20','2c6fe064d9c68f00','68f4cfa60451c361',
+  '0263f8ac127324ac','4a35873555cfc15f','9387d5e07a55af5e','8100a6ba0ae985c8','0fc772935438ecdd','1ca0a8d512ac164a',
+  '68fe1047084f13e2','0f1eecbc29bf4339','91dbaf8f1da6c80c','aac46fbd000f2fcd','7e14a2c6cbfdbd52','5e42c1dc6eea7ca2',
+  'f3e423019213a686','c74c9de0c7bd9688','01392a23c8dea6dd','d0dcc823117b998d','e993e22c6c41a0f8','4cc9469c44529eb1',
+  'ed05b5701ed18f43','c1f97a1fc3a0def6','05d5db4f4ead965f','9facbea88c46554c','43df4f5633807db9','29736a6d8e9600c3',
+  'b823f6e2107368c1','1eac726c230f9cec','2db2bc1a26519879','c23030808cddb2c8','5a54a95725304350','435c2aae6a1096bf',
+  '885a630ef1c4b47a','397037b0308d64bb','174dc7fb5c98521e','5a715b14d830aacd','5e36b3a98ff207c9','1e3c48004dd8e8c3',
+  '2a8ac64f23884cc5','7f9e5ae9cc89b7c6','2673df204940fd67','2d6f602aeebb8b1c','a9e16b6073e152eb','fff3d8c81a900826',
+  'b40f74907d17e1c9','29bd70de9e199a7b','92ae58295f670fb1','d5bee649908be7a4','9fb1d8912d665069','cc8ac6f5fa281689',
+  'eb0b1825e988e5a3','0128f138abbd6b9e','9c4e560736ce6cc3','9ae3e2c7cf77412f','5ae4e98dd1e6136b','866aeaac81cec06c',
+  'bec975d57df82e40','575ecb5b1888975d','4550e72cb73d218b','d87c07489c9fd68b','ca619b57cf1ab984','9067f29234bd7909',
+  'cf771a77c45e3aa2','e84fbab6a6aa1fdf','331bb60ffe46b95b','354101c96c9953cf','94517a0f7259e478','b8b04a6c62b7f2b0',
+  'f1b386c99c86859d','db7757a6e1a0fdc2','024302ccc33a41ac','31eafd9742c0be2d','24c84cfc03539759','f233b3a5f479e82b',
+  'df75481527184bfa','bff977740e4ac731','fc11a2bb4243eb07','192f3e58d4045f2c','77118c6c379f9f6e','a5dd5a7da8193856',
+  '671de7ebda407a5d','41bd91dac8bfdbe4','766b8e91e24d0839','5cd68e6f4e26682f','fe851921d55ec99a','dcf2a231da9eef6c',
+  '7197f922f37f5d38','080b58b56b69753f','21dec9ae32d5e384','8e2782007912f825','cbe669a0bbbd346a','4262702b3dfc5fec',
+  'e52a4319289fef4d','d2fe3e94e46fec80','93d5ecd8b82cf9e6','2b534e1e0cb1a9c1','0b8913f5bc01c875','022edced56fc31dd',
+  '521cf02ac4b5cdd4','e6d097a2e19f427c','a2aeb1115d742bc4','3d91f314382f2d1f','74649b152b9622ea','b4d53ccd44863a96',
+  '870843a1baff7503','a5de755522e87184','2fe276679b6005e0','57428b051c500ee6','e47fddb354b0fcc5','4d38b915ffec7cfc',
+  '80b30ae2b26a571e','2cb42ec470214085','48ca865e88db148d','e572936a21d18b45','14573aa4295a2de8','6e0086c878fcf2fd',
+  '8b73adb4265908e3','69e0e14bea9b777f','62dfa4f0c0c5aced','caf2fa54110c7c95','2eadc07a3dbdd35e','0946da1b49a3d29f',
+  '31e1fc75b1cdb837','2bd28d69e22bbf11','182aeb5758c0a4d4','f157f6d6c61885bd','987ca5efe5944ad9','2198e47a066cb6d6',
+  'b2ba0355ece90992','1fa733a4158728b5','2f797c9cd4f67d70','2a13705959548405','4c56a8fa9f20436f','25c64b487e9a98ec',
+  '8e0025bdeb0359a8','dcf383421defe8a1','ed2a6c4626629c4d','11f7c3dbfba0ad14','6b876df9555fe005','643c56935f3311cd',
+  'bdcb3ed0e935a14e','4f2a89ff00fc4ab8','004f37f46b176eb7','964146f4bea80dbb','800a665ead4daf8d','91f16b05512d22a0',
+  '4bdc5ecf93746abf','568c1cd1e389bd5b','e8f005d8f9acbc4d','ef7de86a7af58299','d8b77c02b9e19b33','0e46b1a623c485d8',
+  '63074a2dbcef06c1','d1870a1b65cad676','5aba098bbd2e631b','d8b62e90c5de7b9f','41189f397b29cc35','c30b909c1a1515ef',
+  '1c9c554db4a762df','75a712b8ffb8bcdd','0aed236ca18b65c6','0aebfb2d3e5cea4b','32752e29f4766cb7','a9edf11215760acf',
+  '7af237b03343c401','5ce9fee4e648f98b','c592ff5c0cd190f4','9777178cfd8309dc','0696b415fcda795b','91c0c696ba7d7121',
+  'a943497e58127179','a48cad6a0f3a95f2','9bfc4c8cf39e8bec','94ea4a3ec9ac0b93','e2fc19f3aede7be8','9f54f92ea9cd17c0',
+  'f4145eddb0099c8c','c724916c00ffe5ac','a2c10d982732e602','0d04715f34cc2a4e','66d0e85f52ec13e1','934182a9dd787657',
+  '729239a940860708','00d7f5bdf5234df6','9bd775fad500c673','1099f5636842c74a','370331f90bb95747','ae7cf6c1d27c5af9',
+  'a422e19c4000d2d3','8327660fc9041e44','50431a9cfd2ee99e','ef6c14ed3edf78a6','015e327ee91faa11','cdfbb305d3ef234e',
+  'fd2aee76cd45b59f','9d889e5716b832f8','2a3ebbd5ad23c082','1c570df29142dbac','31ea85c896c03a49','79349d6a8301ab22',
+  '1a0cd68ddd575159','973c0e9df693c6c1','7edd83e1a298c5be','4f1f5439c0919416','e85e1b9c76d8bff6','c74873b6548590e1',
+  '75d6af37e2bba854','2e6584871f9763a0','2c054ba1717da508','c66ed6c29e06ba0a','f4dafab0424fae66','de97331f419d6fe6',
+  '5e5340710ad326ef','9a83e3b8f85d2f04','4778d6dec0cfcb01','26809df503ebbb60','a786b027fb951979','1acb46338654a90d',
+  'e13a3d8798678e9b','ee6a566d86c54e1a','3e8e954db9f312ca','264116a199f776ab','5ed21f4c031aefaa','2691e934c279e1f4',
+  '1ca6a6ba3cd0e8c5','51925f19c90ce3fb','acb053f9e0d73de1','21781d1151ffe992','49d92f043c0bfd13','6e38557847d9beb4',
+  '79b865d69d317e80','7a6bf97fdb389932','3b74c1ef53bc0d35','912718653ed43bf7','90d8cee19a8941a4','a4fca71d5107147d',
+  '148849f0ac39e852','007f0a1371ae69b6','06b4a2580b3641c0','82385500bc455255','2f5decb05fa8e1c5','f2ca0a1b4ec00265',
+  'b95f4c5f18376629','6828a7b1cafb5f71','1c939e9b8d033854','81e41de6021ffdb0','71336db17881dfbd','e509e881f7c30bda',
+  '5710d2c3619c3e59','d946a79d8a4469c3','3aef57d7d78d7fd3','757e99c23f92d9e3','58d87bb13d6fff9d','1d4f9060b1c55ad3',
+  '6137809e6b42386d','31082530049e8eaa','a03c9a773e582c07','3c9ae2ad1ae1aa33','6773a2dfef99adad','72f86636bebda616',
+  'fb3d3fc72d77edda','ebfe473220ece93c','7e65637241d75208','0ace4cb68c54de8d','cfae29743d553252','7a9fa309284c4ec9',
+  'dc85bf2617b033e6','4552a2b15f28208b','492c253d90901917','fa99e4d52b0ad8c4','e410f6edb76ee723','9bbc4fe457865653',
+  '92d69f75ca7bf96a','ceef61c7e072b836','b918f52472ef0e84','c75143b2d9b9f920','4a21ef7e43bd1633','fa05c3a9b98a7112',
+  'f7b4ecf135bc2dce','336c7b686be02ba2','7c210d2a36cc6b92','a3915910e8959cf8','d564d1ec5991e28b','f4aa8f808db8bfff',
+  'a10a199649ec10de','64efa0f665884fb2','fc52653e6d3f3b57','31ca6490587503c8','6d2c0329bf5dbc12','3129a4b5547e5f45',
+  '5f90b64d805e4c47','76172bdf76559f1f','00fd047b2542f8b1','3af6ae72a0b80f7e','8f0b2d7ef241b97b','fcb2a654e99e854d',
+  '8e62115ba20a7b08','a08b1da3ad4c2d43','d140c7f4f9f28534','f419a457ce28a22e','5a40bf0b72c200a7','7fad07cd895a583c',
+  '0864f86f9891eb12','d87dc5af80466913','5344f0fa700b2ba2','b3e821e6300f8dec','677231f201d0489c','8c8039a03ab608e2',
+  '5c56f9a1b2c25d84','ba87be2c37e109bb','611cfdcfb20511f6','ab6bca1b257efd4a','3ada44370ae08bc8','c93c3bb89be63723',
+  '5585fe92c9f53261','e6370b85f636d2cb','875d56dd6ae3b814','84f5d88f35ee8e69','6eaf292777f36929','aa63c4aaafa4078d',
+  '0667ed25902d2de8','343bafbd7c708af0','b4bb2a57ac5a8fd8','1c240feb25c970a9','ff77283d25da9596','796106523c36cc32',
+  'd5ec7e020692f60b','6bfe3d46ac50ab22','ed9c692daaba6448','d671f965a239ff8f','e5adf65dfacf2315','553b10fc536ac576',
+  '9f980fc2f811dbee','fa3a71c302d04a4c','7fdf97c5ee256173','264903da99f90c76','891a3d76a81df519','e36c921fd3972b9c',
+  'b2cd7fe113eb288d','7b7e13df8e67321f','14571818317f7f65','558d748c314365a1','f2d45679bd3931ec','47d323aff5b633ef',
+  'a32b9273a2dac14f','6429688c3d7c8ec5','9706a139b4836913','85b6594494fda03a','2efc982043bf5765','28e4ee934bd6dd8e',
+  'c214a2d8a225b01c','70020ccf2ad4b167','2c22ba2367ce7cd3','40f01c23230ebfbf','429a7395c946d9be','66c27b208f5a3756',
+  '1013ca423ef19809','4b0976ebd0d8e70e','a5f99ebda7604589','aae4bb20886220e9','467e5f853ffdbe78','6552d81197cceddb',
+  'fef8d0f9902a61df','54cdfd9b783d843b','b143c924f3251fa9','500bc045d00c94ab','35aea0ae6a5e2e3b','2bf140bdfee9fe27',
+  'db57ce37b4cc604a','8d0cbed8ca26204f','ff7bd045d0d98dcb','30e4c048616eb8af','0dd1258d010d5c8e','b1a4c71ecd7035be',
+  '9302f9d5788a9238','8fb83e2cdacdde92','6a990424f1324918','c27135ec48617fcd','058ae399e187feb1','15888b22bc78aaa2',
+  'b1f0a65f9f170463','3c28b5e0a5dac2c9','95a813772806e659','76f1ce7114aac44d','b9591ccabe4c1c80','b960ba1f15a43fd4',
+  'b71fd83f4ed6b41e','d5d34619ca88431e','de234a59e1170e8f','55a8fbc6142e0003','989d15661ef880ee','26a35cf5e766b170',
+  '048222c18c723738','cefb7202e27186fa','bf2c3c6539fab23d','54c6344a77b9c8c4','aec583f2f6d7a798','8ea804aba865f8bc',
+  '6e2d6a075159373b','547a469aab3bfe4d','3f10fbe1fbc0e85d','e27fbbd62c79df52','931314f9ba34d2c1','6e270da0a89822cc',
+  '76abe164aa072e93','89a69603eaf1c34c','ed88ae79d8853d8d','98f32aaf70d12708','6c6fadf63d03184c','8fcb264c562b9f47',
+  '9e1b2f90c3d39064','6043010b3823e0d6','d9236f62e910b764','4139f3e23b77521c','2e30ef5755b88c5f','f02b0474f11a29a6',
+  '6751ee60d6ae95f6','62e783686e18bcde','40afa67c750ebc81','e87a9a919131ceb9','560bce164ff2a499','ddbb1e9dca7d4679',
+  '033cc1cf265bebe9','094d10a1f2a75745','4424192081e4c102','d5bf42a7c2adf873','4f32f11248e4664b','b5d0136cae728a1b',
+  '25757eefdef34165','9307b940096077ce','39ab8df20dcf060b','92b398945f1c6fd3','83196dbbbf7316c0','0e099c089e05f21e',
+  '75590962cbd4fbd8','5e46b1db19c29399','ad6890dec3419043','f2657e6b51adf91d','da5c3bbb411de3d2','ea306248e2b969be',
+  'db7f3d76300c7e8b','3337194a43b27eeb','f738d33397c702a5','f9f5dbe677f812f4','b21c56aeac36da1d','b39d65065cd239df',
+  'ea73fcdc24829be4','e0a9efbc82496728','989d3d4513c6e9a6','83eb47171e23c75e','bad7bbf028785108','f3993e8fa6825241',
+  'c04fc6c2eaeff33d','3463ccb25c2cd6f4','0ce436347c40c681','35e3aa67c79389b8','908a3bfbb865a6b9','d555ea5681f127c2',
+  '8cbbd7ebdb21bd8c','fababd603b5e4a98','e74dab7e328d4351','1b6fafcfca7b6dc4','4a08a96eb9d18d77','0609b3b2533595d1',
+  '0018012a2decc181','a47c05367d4b53bc','70a2d3f0474ffc10','d3861fd99b4d6184','c4b6e760055fd3f8','51e2fc7e9f93b899',
+  '475a1e2a4179ec03','7f9b29d39ccc7446','374518914a47d16d','e6439cf2ac2b6dd4','fe390a15e04351de','32ad926c0726794d',
+  'd3edda3329d241d1','5a630394efdeb11a','13997f5d13bca3f3','7f0f64add9cd36af','f375ce1fb8497876','3aa096bd7ce9b951',
+  '8a0884fd5dd83a73','c536e74be922fcb7','1a6d6668a280fcc3','efef1fe72f64adf7','28898a2dfc0903ae','85251a780c3797ff',
+  '49beb7186967d016','1434c533ae5ac55c','93521a2e67cfae92','e9db897a4be1b4b8','9dedcd31ba62a1e6','fb55e72abacffe19',
+  'bba8c05831b01a41','bc92d1456c2b9ba4','6d1b4dd7272c1212','d30fb3fadbb719fd','38fdef59b17b3065','b4b57a4f96a3868c',
+  '267c3ecba7e0f1f2','2ec1aee750623ec2','fd7a1c4834467e10','2ac74e1f865b07b7','21895a1c27fa256a','14939c7c4c38278e',
+  'dffc26ed6f35f9a1','a8701d33f7f751da','2690a91340578a6f','27bc7f2abda3fcd8','620b1637a4627746','be99e4072c25127e',
+  '1a0e312f0c77d4e5','c34b708757fab101','d3935db749f0bcc1','a0db39a358f7a5da','4c7a09d5ea12b873','8b83a3aa44445a38',
+  'f47010a0181352bf','60ed4bbeaad5634e','b82814644b8596ea','50eb53ef5edafee6','76b0f07df06d459b','5d0ba863020b5057',
+  '5c6dc53424f0eb67','438c19e65964fc51','3bf47e900ba2ac4f','f5d81b4f70770a0e','01a74229db111d03','483d2bd29a964fb0',
+  '3568a7fbc96197a1','9319bbd5667bd5f0','9ad099787ee764ee','998498aa4207ce0a','370336b271224a11','3de03138b85e2684',
+  'feee567e7ea92aa8','c20c1864235dd956','7710c8586136d771','1156b237e1be00a7','572bbc74758b95f6','c6a43326915a677b',
+  'fd18c8ff3139f97a','2fb41090352d5371','5d1b8c5c756c8146','c9e5ccdf308ac099','35ec13f3b5f58364','a8fb35a57fcd8dca',
+  '343f255748f6a48e','06524d6fee62e805','4416253c71236c8b','8bf7883eee553696','25e99d4245915918','52600efba4950995',
+  '3621f68a5a062e9f','a903fe7ec8f5f2d8','7e05276e635b440e','453c8abe35e65c5e','21fce88ec4fd8617','a8ecc863399c9159',
+  '40818921ddb2d405','28b1c93537196b49','c723eebfb4bdf1e6','1f934ef8bb8f952f','1b3feb7148ffa28d','55edfe32a24b3815',
+  '21c8029c4ed289da','edee10ceac233f1e','4b281c11934dcc66','564481b67e53d276','8589afb47daf54ea','33bb340ffb554a94',
+  '391b74c22a4ef1e9','fbc55c050abb34d4','2f18886479207526','4e009a71d8c74140','4bacde54483991f3','e44d15bd8c4a4ee9',
+  '6a82a1017243a4b3','fb64de81dc2fff23','b1c4a2d19e5d0ddc','bfd7c3aee0733c97','33af9c40c377744b','1ca9be8f000f70f8',
+  'cbf9f78a32712681','7290ef2fda9ce6f2','30a36ed6dbdd8631','7bc3a8e5f3c5681c','c04c8374991c2a79','185d9acd0202fa25',
+  'af7e51f238f0a998','51d0eef5af460b2a','5da20eb1517f9d0e','d944c50881286284','d001e216d5e8c112','0c0a7e263169514d',
+  'bef270af37afa799','19e7e89ea0f6bb64','3bc4c255b1bb9b25','3cd3b34b15c45d81','8435414a6cb90330','6bdc8ca1ceeaecec',
+  '6b23b3ebf3af916f','9914b8a289772e6e','c34565ffebcbd974','ba7002421f2ad385','ed90a8e1cb1215ca','418685f3ba0c45de',
+  '6ae835fb4379ef06','c6223e2c4af0a24f','c2692e4a7e634a5e','2b9bef9d22cefa8e','8a05238a75dbecd7','a407801a8be532ff',
+  'e3d8cf432c04f7f7','5bc85d161f58bb26','07ce5901c3102a59','bb4b0f45e26204aa','09654bdf6a774eb4','3e0b5db152b9ac7a',
+  '5688fb3090ed10de','8c5d2603158b7469','48ec8e675572aaf4','eef6dd03dc5972a9','df036a76e8dc43df','3ffe4da233bf0d3b',
+  'fb9c4b9af8aa5c64','602d93a26d4791d9','1c2a5a315788027b','bbb1675b079cfa9e','5dae12558cc68f5c','8c3de842d8bdee78',
+  '9786db0022991fcf','a17318d8738e9fc6','01a08655fcc5c811','965bcbd85f7f9604','e07ee9f8c232695d','e6865a7438fba6a3',
+  '2a2c74969c74fff1','70efc1c20ed5df7f','864377df3e8692b4','529e8b01af6bc2aa','60521e089ef7c3db','0a90dc39318752e8',
+  'eabe80835b491d88','9ff1e3cc7155baea','dd96a6eb77476eea','c9b896f9b82fc167','435ba0d3003690c4','f53b58eeb55657a8',
+  'a451b4174cb0d155','f31a6d7e927d9e21','3d8241db799ea514','e9457f10db8dbb0b','890f09e5b4ebd043','4e03a08a61eb4b85',
+  '1882681caa582bb8','f00285f09f5b45ff','33c04f5d5f99cf98','47281ced29dc465f','e95e6fff4d3521d1','71790e522d0bbdd8',
+  '0e2ed9ddf2792b0c','e4fd8b2fca894da6','cad3298b280601f2','b694455fea87592b','bde020fb7cc9a3b1','b5e192af735d0a7f',
+  '0cefcc1f034e8222','5a872f67f92d1b89','61bce0de054ee268','2182e66dfa92c292','9cb494ae816c8e9e','3ba6b9df8b84af2e',
+  'e0b5b0df3783d939','c505c026fa0ad663','e2f19c423fcf821f','bbc89230eccca40f','5fa3fdcc56a67558','df822fe67cd58002',
+  '2b5fd7ee3f7cd05e','d955c1373c6e9cc7','b8615970c4734ccf','e8212095bb876518','af9031d7e0218e84','1ba99b9b97ee5cbe',
+  'b899c7def365bb02','5f0dcc576cd3e7a0','a4c5faee77256c66','ac9ba599d171a4e8','ecece2e032a3eef7','677ca15fb255e10f',
+  '8e9a56e654958e60','3897f4739bac3be2','7b1caefedf6dd10a','8b87996e6b9137f4','6227dbf71911d54a','63d8f54efde6073a',
+  '7d8d93c8457e51f6','943954d8ef65bdac','4a6da0377e801268','c901021127728232','842142a87bc2641c','9bbc03cbbd9482dc',
+  '88ad3219a17ee925','d991165b007a8854','c084412e203b4ddc','ec9a374abc5dff33','e619d38a17fe3438','d188b45be71464e2',
+  'a704fd8ac5ee5160','2e42fda5815f2e27','f11fa088b3b7f67b','07b37a35b078744f','d6fb6b5ba876355a','bf0d6c5068025435',
+  'cd3ac99c243c7901','828dad75a951b954','9c2572b3ff93ebad','958e606adcef9d12','eb3fda91f2435921','c4d87080c2231f4b',
+  '7ce35b5105170209','33cf87a0550b5a2c','0153bab05cb6f1f9','f30d2ec90ba5e8b8','c023b9dcb5733fb8','f75b0c22da83b443',
+  '5ec0dba599045d2d','b4a6813d8e0caea5','c02e17b7d47aefd1','4940b3f8df0842c6','9cbdf05e5968fe7c','b7a5d6038375fcd5',
+  '9a5118cfebeee202','a40e751669feef0c','be04fc5fa50ffb98','2ae80b9853b4c4d7','e0c3cbad0428db33','4f93f25c6d26761c',
+  'a59fda1f39d65c02','d5ee04f6d7faecee','da6791ce2edaacb4','97e49897070e9d96','ff45d502518ab37b','1093b96f315ac647',
+];
+
+
+
+
+
+
+
+
+
+const SHA256_K=[
+  0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2,
+];
+function utf8Bytes(s){
+  const out=[];
+  for(let i=0;i<s.length;i++){
+    let c=s.charCodeAt(i);
+    if(c>=0xd800&&c<0xdc00&&i+1<s.length){
+      const d=s.charCodeAt(i+1);
+      if(d>=0xdc00&&d<0xe000){c=0x10000+((c-0xd800)<<10)+(d-0xdc00);i++;}
+    }
+    if(c>=0xd800&&c<0xe000) c=0xfffd;   
+    if(c<0x80) out.push(c);
+    else if(c<0x800) out.push(0xc0|(c>>6),0x80|(c&63));
+    else if(c<0x10000) out.push(0xe0|(c>>12),0x80|((c>>6)&63),0x80|(c&63));
+    else out.push(0xf0|(c>>18),0x80|((c>>12)&63),0x80|((c>>6)&63),0x80|(c&63));
+  }
+  return out;
+}
+function sha256Hex(text){
+  const bytes=utf8Bytes(text);
+  const bitLen=bytes.length*8;
+  bytes.push(0x80);
+  while(bytes.length%64!==56) bytes.push(0);
+  const hi=Math.floor(bitLen/0x100000000),lo=bitLen>>>0;
+  bytes.push((hi>>>24)&255,(hi>>>16)&255,(hi>>>8)&255,hi&255,(lo>>>24)&255,(lo>>>16)&255,(lo>>>8)&255,lo&255);
+  const h=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const w=new Array(64);
+  for(let off=0;off<bytes.length;off+=64){
+    for(let t=0;t<16;t++){
+      const j=off+t*4;
+      w[t]=((bytes[j]<<24)|(bytes[j+1]<<16)|(bytes[j+2]<<8)|bytes[j+3])>>>0;
+    }
+    for(let t=16;t<64;t++){
+      const a=w[t-15],b=w[t-2];
+      const s0=((a>>>7)|(a<<25))^((a>>>18)|(a<<14))^(a>>>3);
+      const s1=((b>>>17)|(b<<15))^((b>>>19)|(b<<13))^(b>>>10);
+      w[t]=(w[t-16]+s0+w[t-7]+s1)>>>0;
+    }
+    let a=h[0],b=h[1],c=h[2],d=h[3],e=h[4],f=h[5],g=h[6],k=h[7];
+    for(let t=0;t<64;t++){
+      const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      const ch=(e&f)^(~e&g);
+      const t1=(k+S1+ch+SHA256_K[t]+w[t])>>>0;
+      const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      const maj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+maj)>>>0;
+      k=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;
+    }
+    h[0]=(h[0]+a)>>>0;h[1]=(h[1]+b)>>>0;h[2]=(h[2]+c)>>>0;h[3]=(h[3]+d)>>>0;
+    h[4]=(h[4]+e)>>>0;h[5]=(h[5]+f)>>>0;h[6]=(h[6]+g)>>>0;h[7]=(h[7]+k)>>>0;
+  }
+  return h.map(x=>('00000000'+x.toString(16)).slice(-8)).join('');
+}
+
+
+
+function engineCheckDigest(prog){
+  const clone=JSON.parse(JSON.stringify(prog,(k,v)=>(k==='id'||k==='created'||k==='_swapUniverse'||k==='_swapUniverseByKey')?undefined:v));
+  return sha256Hex(JSON.stringify(clone)).slice(0,16);
+}
+
+
+function engineCheckBase(){
+  return {
+    name:'THE HALF MANNY',primaryPath:'event',cardioTypes:['run'],
+    cardioGoals:{run:{id:'run_half',label:'Half Marathon',mileBestMins:'10',mileBestSecs:'30',baselineDist:'5',baseline:'5mi'}},
+    eventTargeted:true,raceDate:'2026-12-06',
+    liftingFocus:'support_prevention',experience:'intermediate',ageBracket:'18-35',equipment:'crossfit',unit:'lbs',
+    restDays:['sun','wed'],days:['sun','mon','tue','wed','thu','fri','sat'],
+    bench:135,squat:155,deadlift:185,seed:76308,
+  };
+}
+
+
+const ENGINE_CHECK_INJURIES=[
+  {tag:'healthy',injury:null},
+  {tag:'shoulder/protect',injury:{region:'shoulder',tier:'protect'}},
+  {tag:'lowback/protect',injury:{region:'lowback',tier:'protect'}},
+  {tag:'elbow/protect',injury:{region:'elbow',tier:'protect'}},
+  {tag:'knee/protect',injury:{region:'knee',tier:'protect'}},
+  {tag:'hip/workaround',injury:{region:'hip',tier:'workaround'}},
+  {tag:'ankle/workaround',injury:{region:'ankle',tier:'workaround'}},
+  {tag:'lowback/workaround',injury:{region:'lowback',tier:'workaround'}},
+];
+const ENGINE_CHECK_EQUIPMENT=['bodyweight','minimal','home_basic','home_full','commercial','crossfit'];
+const ENGINE_CHECK_FOCUSES=['support_prevention','hypertrophy'];
+const ENGINE_CHECK_LEVELS=['beginner','intermediate','advanced'];
+const ENGINE_CHECK_SEEDS=[1013,3039,76308];
+
+ 
+function engineCheckCases(){
+  const cases=[{tag:'Half Manny',cfg:engineCheckBase(),digest:ENGINE_CHECK_MANNY_DIGEST,manny:true}];
+  let n=0;
+  for(const inj of ENGINE_CHECK_INJURIES) for(const equipment of ENGINE_CHECK_EQUIPMENT) for(const liftingFocus of ENGINE_CHECK_FOCUSES)
+  for(const experience of ENGINE_CHECK_LEVELS) for(const seed of ENGINE_CHECK_SEEDS){
+    const over={equipment,seed,liftingFocus,experience,injury:inj.injury};
+    cases.push({
+      tag:inj.tag+' '+equipment+' '+liftingFocus+' '+experience+' seed='+seed,
+      cfg:{...engineCheckBase(),...over},
+      digest:ENGINE_CHECK_LATTICE_DIGESTS[n]??'',
+      manny:false,
+    });
+    n++;
+  }
+  return cases;
+}
+
+ 
+function engineCheckBegin(cases,now){
+  return {cases,next:0,latticeTotal:cases.filter(c=>!c.manny).length,latticeMatched:0,mannyMatched:null,firstMiss:null,startedAt:now,endedAt:null};
+}
+
+const ENGINE_CHECK_SLICE_MS=40;
+ 
+function engineCheckSlice(run,build,now,budgetMs=ENGINE_CHECK_SLICE_MS){
+  const from=now();
+  while(run.next<run.cases.length){
+    const c=run.cases[run.next];
+    let got=null;
+    try{got=engineCheckDigest(build(c.cfg));}catch{got=null;}
+    const ok=got!==null&&got===c.digest;
+    if(c.manny) run.mannyMatched=ok;
+    else if(ok) run.latticeMatched++;
+    if(!ok&&run.firstMiss===null) run.firstMiss=c.tag;
+    run.next++;
+    if(now()-from>=budgetMs) break;
+  }
+  if(run.next>=run.cases.length&&run.endedAt===null) run.endedAt=now();
+  return run.endedAt!==null;
+}
+
+ 
+function engineCheckLine(run){
+  if(run.endedAt===null) return 'Built '+run.next+' of '+run.cases.length+'.';
+  const parts=['Lattice '+run.latticeMatched+' of '+run.latticeTotal+' match.'];
+  if(run.mannyMatched!==null) parts.push(run.mannyMatched?'Half Manny matches.':'Half Manny does not match.');
+  if(run.firstMiss!==null) parts.push('First miss: '+run.firstMiss+'.');
+  parts.push('Took '+Math.round((run.endedAt-run.startedAt)/1000)+' s.');
+  return parts.join(' ');
+}
+
+
+
+
+
+let _engineCheck=null;
+let _engineCheckListener=null;
+
+
+function engineCheckListen(fn){_engineCheckListener=fn;}
+function _engineCheckShow(run){
+  const line=engineCheckLine(run),running=run.endedAt===null;
+  if(_engineCheckListener){_engineCheckListener(line,running);return;}
+  const m=document.getElementById('engineCheckMsg'),b=document.getElementById('engineCheckRun');
+  if(m) m.textContent=line;
+  if(b) b.textContent=running?'Checking':'Run the check';
+}
+
+function engineCheckNow(){
+  return _engineCheck?{line:engineCheckLine(_engineCheck),running:_engineCheck.endedAt===null}:null;
+}
+
+
+
+function engineCheckRun(){
+  if(_engineCheck&&_engineCheck.endedAt===null) return false;
+  const run=engineCheckBegin(engineCheckCases(),performance.now());
+  _engineCheck=run;
+  _engineCheckShow(run);
+  const tick=()=>{
+    const done=engineCheckSlice(run,buildProgram,()=>performance.now());
+    _engineCheckShow(run);
+    if(!done) setTimeout(tick,0);
+  };
+  setTimeout(tick,0);
+  return true;
+}
+
+
+
 
 
 const BUG_FORM_KEY='0d660f2b-c9d3-4a37-b944-21150f8fb40c';
@@ -19857,6 +20202,14 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
         <button class="look-opt" onclick="backupLoadIt()">Load it</button>
         <button class="look-opt" onclick="backupCancel()">Cancel</button>
       </div>
+    </div>
+    <div class="look-row" role="group" aria-label="Engine">
+      <div class="look-lbl">Engine</div>
+      <div class="look-note">Builds the tested programs on this phone. Each one must match.</div>
+      <div class="look-seg">
+        <button class="look-opt" id="engineCheckRun" onclick="engineCheckRun()">Run the check</button>
+      </div>
+      <div class="look-note" id="engineCheckMsg" aria-live="polite"></div>
     </div>
     <div id="bugVersion" style="font-family:var(--font-mono,monospace);font-size:11px;color:var(--muted);opacity:0.55;letter-spacing:0;text-align:center;padding-top:4px"></div>
   </div>

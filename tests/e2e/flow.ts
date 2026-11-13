@@ -131,8 +131,28 @@ export function helpers(page: Page, app = false): Helpers {
     async tap(selector) {
       const el = await page.waitForSelector(selector, { visible: true, timeout: 5000 }).catch(() => null);
       if (!el) throw new Error(`nothing visible to tap at ${selector}`);
-      // Centre it first: an element scrolled only to the edge can sit under the fixed tab bar.
+      // Centre it first: an element scrolled only to the edge can sit under the fixed tab bar. Then wait until the
+      // target itself (or a child of it) is what a tap at its centre hits: a click sent before the scroll settles lands
+      // on whatever covers it (Post-v0.262.0: Run the check, low on the Bugs screen, once tapped the tab bar instead).
       await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      await page
+        .waitForFunction(
+          (e: Element) => {
+            const r = e.getBoundingClientRect();
+            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+            return !!hit && (hit === e || e.contains(hit));
+          },
+          { timeout: 3000 },
+          el,
+        )
+        .catch(async () => {
+          const over = await el.evaluate((e) => {
+            const r = e.getBoundingClientRect();
+            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+            return hit ? `${hit.tagName.toLowerCase()}${hit.id ? '#' + hit.id : ''}${hit.className ? '.' + String(hit.className).split(' ')[0] : ''}` : 'nothing';
+          });
+          throw new Error(`${selector} is covered by ${over} at its centre`);
+        });
       await el.click();
       await sleep(SETTLE_MS);
     },
@@ -762,7 +782,7 @@ const STRENGTH: readonly Step[] = [
   {
     id: 'bug-report',
     page: 'Report a bug (never submitted)',
-    async run(t) {
+    async run(t, page) {
       await t.tap('#tabBugs');
       await t.screen('screenBugs');
       if (!(await t.count('#bugSubmit'))) throw new Error('the bug form has no send button');
@@ -771,6 +791,28 @@ const STRENGTH: readonly Step[] = [
       // since phase E's first step, the legacy script's in the single-file page: both answer the same).
       await t.tap('#bugSubmit');
       await t.expectText('#bugStatus', 'Type what went wrong first.');
+      // D286: the Engine row builds HALF_MANNY and the 864 lattice configs in this browser and every digest matches.
+      await t.expectText('#engineCheckRun', 'Run the check');
+      await t.tap('#engineCheckRun');
+      // The single-file page writes Checking as the tap lands; the Angular screen draws it at its next change detection.
+      await page
+        .waitForFunction(() => (document.getElementById('engineCheckRun')?.textContent ?? '').includes('Checking'), { timeout: 5000 })
+        .catch(() => {
+          throw new Error('Run the check did not turn to Checking within 5 s');
+        });
+      await page
+        .waitForFunction(() => (document.getElementById('engineCheckMsg')?.textContent ?? '').startsWith('Lattice'), { timeout: 120000 })
+        .catch(() => {
+          throw new Error('the engine check did not finish within 120 s');
+        });
+      await t.expectText('#engineCheckMsg', 'Lattice 864 of 864 match. Half Manny matches. Took');
+      await t.expectText('#engineCheckRun', 'Run the check');
+      // The seconds are this run's wall time, never the same in the two builds; pinned in the shown text once checked,
+      // so the parity still judges every other pixel of the screen (this step's and the next, which shows it too).
+      await page.evaluate(() => {
+        const m = document.getElementById('engineCheckMsg');
+        if (m) m.textContent = (m.textContent ?? '').replace(/Took \d+ s\./, 'Took 10 s.');
+      });
     },
   },
   {

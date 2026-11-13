@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { BUG_SENT_TOAST, BUG_STATUS, bugContextText, submitBugReport } from './bug-report-model';
 import { RunRecorder } from '../run-recorder/run-recorder';
@@ -53,6 +53,14 @@ import { RECORDER_COPY, recorderAvailable } from '../run-recorder/run-recorder-m
         <button class="look-opt" (click)="backupCancel()">Cancel</button>
       </div>
     </div>
+    <div class="look-row" role="group" aria-label="Engine">
+      <div class="look-lbl">Engine</div>
+      <div class="look-note">Builds the tested programs on this phone. Each one must match.</div>
+      <div class="look-seg">
+        <button class="look-opt" id="engineCheckRun" (click)="runEngineCheck()">{{ checkRunning() ? 'Checking' : 'Run the check' }}</button>
+      </div>
+      <div class="look-note" id="engineCheckMsg" aria-live="polite">{{ checkLine() }}</div>
+    </div>
     @if (recorder) {
       <div class="look-row" role="group" aria-label="Run recorder">
         <div class="look-lbl">{{ recorderCopy.row }}</div>
@@ -89,6 +97,30 @@ export class BugReport {
   protected readonly recorder = recorderAvailable(window as { iaGps?: unknown });
   protected readonly recorderCopy = RECORDER_COPY;
   protected readonly recorderOpen = signal(false);
+
+  /**
+   * D286: the Engine row. The legacy engineCheckRun builds the tested programs in slices and hands each line to the
+   * listener this screen sets; a check still running when the screen comes back shows where it is.
+   */
+  protected readonly checkLine = signal('');
+  protected readonly checkRunning = signal(false);
+
+  constructor() {
+    const now = this.bridge.call('engineCheckNow');
+    if (now) {
+      this.checkLine.set(now.line);
+      this.checkRunning.set(now.running);
+    }
+    this.bridge.call('engineCheckListen', (line: string, running: boolean) => {
+      this.checkLine.set(line);
+      this.checkRunning.set(running);
+    });
+    inject(DestroyRef).onDestroy(() => this.bridge.call('engineCheckListen', null));
+  }
+
+  protected runEngineCheck(): void {
+    this.bridge.call('engineCheckRun');
+  }
 
   protected saveBackup(): void {
     this.bridge.call('saveBackup');
