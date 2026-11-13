@@ -131,35 +131,28 @@ export function helpers(page: Page, app = false): Helpers {
     async tap(selector) {
       const el = await page.waitForSelector(selector, { visible: true, timeout: 5000 }).catch(() => null);
       if (!el) throw new Error(`nothing visible to tap at ${selector}`);
-      // Centre it, then wait until the target itself (or a child of it) is what a tap at its centre hits, two frames
-      // after the scroll, and scroll again while it is not. A click sent before then lands on whatever covers it:
-      // an element scrolled only to the edge sits under the fixed tab bar, and 350 ms after any focusout the page
-      // nudges the scroll a point and puts it back on the next frame (installKeyboardResync, D280), so a scroll made
-      // inside that frame is undone (Post-v0.262.0: Run the check went back under the tab bar and the tap hit it).
-      const placed = await el.evaluate(async (e) => {
-        const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
-        const hits = () => {
-          const r = e.getBoundingClientRect();
-          const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-          return !!hit && (hit === e || e.contains(hit));
-        };
-        const until = performance.now() + 3000;
-        do {
-          e.scrollIntoView({ block: 'center', inline: 'center' });
-          await frame();
-          await frame();
-          if (hits()) return true;
-        } while (performance.now() < until);
-        return false;
-      });
-      if (!placed) {
-        const over = await el.evaluate((e) => {
-          const r = e.getBoundingClientRect();
-          const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-          return hit ? `${hit.tagName.toLowerCase()}${hit.id ? '#' + hit.id : ''}${hit.className ? '.' + String(hit.className).split(' ')[0] : ''}` : 'nothing';
+      // Centre it first: an element scrolled only to the edge can sit under the fixed tab bar. Then wait until the
+      // target itself (or a child of it) is what a tap at its centre hits: a click sent before the scroll settles lands
+      // on whatever covers it (Post-v0.262.0: Run the check, low on the Bugs screen, once tapped the tab bar instead).
+      await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      await page
+        .waitForFunction(
+          (e: Element) => {
+            const r = e.getBoundingClientRect();
+            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+            return !!hit && (hit === e || e.contains(hit));
+          },
+          { timeout: 3000 },
+          el,
+        )
+        .catch(async () => {
+          const over = await el.evaluate((e) => {
+            const r = e.getBoundingClientRect();
+            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+            return hit ? `${hit.tagName.toLowerCase()}${hit.id ? '#' + hit.id : ''}${hit.className ? '.' + String(hit.className).split(' ')[0] : ''}` : 'nothing';
+          });
+          throw new Error(`${selector} is covered by ${over} at its centre`);
         });
-        throw new Error(`${selector} is covered by ${over} at its centre`);
-      }
       await el.click();
       await sleep(SETTLE_MS);
     },
@@ -800,12 +793,40 @@ const STRENGTH: readonly Step[] = [
       await t.expectText('#bugStatus', 'Type what went wrong first.');
       // D286: the Engine row builds HALF_MANNY and the 864 lattice configs in this browser and every digest matches.
       await t.expectText('#engineCheckRun', 'Run the check');
+      await page.evaluate(() => {
+        const w = window as unknown as { __diag: string[] };
+        w.__diag = [];
+        const at = () => performance.now().toFixed(0);
+        addEventListener('scroll', () => w.__diag.push(`${at()} scroll y=${Math.round(scrollY)}`), true);
+        for (const ev of ['pointerdown', 'mousedown', 'click', 'focusout']) {
+          addEventListener(ev, (e) => {
+            const x = e.target as Element | null;
+            w.__diag.push(`${at()} ${ev} ${x?.tagName ?? '?'}#${x?.id ?? ''} y=${Math.round(scrollY)}`);
+          }, true);
+        }
+        const orig = window.scrollTo.bind(window) as (...a: unknown[]) => void;
+        window.scrollTo = ((...a: unknown[]) => {
+          w.__diag.push(`${at()} scrollTo ${JSON.stringify(a)} ${(new Error().stack ?? '').split('\n').slice(2, 4).map((l) => l.trim()).join(' < ')}`);
+          orig(...a);
+        }) as typeof window.scrollTo;
+      });
       await t.tap('#engineCheckRun');
       // The single-file page writes Checking as the tap lands; the Angular screen draws it at its next change detection.
       await page
         .waitForFunction(() => (document.getElementById('engineCheckRun')?.textContent ?? '').includes('Checking'), { timeout: 5000 })
-        .catch(() => {
-          throw new Error('Run the check did not turn to Checking within 5 s');
+        .catch(async () => {
+          const diag = await page.evaluate(() => {
+            const b = document.getElementById('engineCheckRun');
+            const r = b?.getBoundingClientRect();
+            const g = globalThis as unknown as { __diag?: string[]; engineCheckNow?: () => unknown };
+            return [
+              `y=${Math.round(scrollY)} top=${Math.round(r?.top ?? -1)} text=${b?.textContent?.trim()}`,
+              `msg=${document.getElementById('engineCheckMsg')?.textContent?.trim().slice(0, 60)}`,
+              `now=${JSON.stringify(g.engineCheckNow?.() ?? 'no fn')?.slice(0, 80)}`,
+              ...(g.__diag ?? []).slice(-30),
+            ].join(' | ');
+          });
+          throw new Error(`Run the check did not turn to Checking within 5 s. ${diag}`);
         });
       await page
         .waitForFunction(() => (document.getElementById('engineCheckMsg')?.textContent ?? '').startsWith('Lattice'), { timeout: 120000 })
