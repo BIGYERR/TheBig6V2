@@ -228,8 +228,8 @@ Mario's order is kept. Three changes, each with its reason:
 
 - **Phase 1 gains one step and one hold.** An engine check on today's app (2.1, step 2), because the phone's
   JavaScript engine has never been run against the lattice, and the answer is the baseline for everything after. And
-  the freeze lift waits until after 2026-12-06, because it rewrites the code that reads Mario's stored grid while he
-  is still training on it.
+  the freeze lift waited until after 2026-12-06, because it rewrites the code that reads Mario's stored grid while he
+  is still training on it (lifted by Mario on 2026-11-12, section 6 decision 13).
 - **Phase 2 gains a native spike:** an empty widget target and one Swift module that build, sign and upload from CI.
   Whether today's Swift drops into an Expo project and signs with two profiles is the largest unknown in "Expo or
   bare". Finding out in phase 4, fifteen sessions in, is too late.
@@ -259,7 +259,7 @@ Mario's order is kept. Three changes, each with its reason:
    all synchronous, strings in and out) with two implementations: the browser's `localStorage`, and a plain map for
    tests. Then, in this order: `storage.ts` (programs, logs, history, completion, parts); `log-entries.ts` and the
    set logging rules; `swaps-edits.ts`; `progress-data.ts` and `day-status.ts`; `data-backup.ts` (snapshot, read,
-   load); then, **after 2026-12-06,** `overlays.ts` (`applyOverlays` only, its sheet stays) and last
+   load); then (no longer held for 2026-12-06, decision 13) `overlays.ts` (`applyOverlays` only, its sheet stays) and last
    `program-manage.ts` (`refreshProgram` and the freeze). `applyOverlays` moved behind the race (Mario,
    Post-v0.261.6): `refreshProgram` runs it on every launch, before the freeze, so it rewrites the grid the way
    `applySessionSwaps` and `applyDayEdits` do, and those wait for the freeze slice. Each slice is plain TypeScript in `core/src/app-state/`, the legacy file keeps
@@ -350,7 +350,8 @@ Activity starts, holds and ends on the lock screen and the Dynamic Island. Both 
 
 ### Phase 5: cutover (2 to 3 sessions)
 
-**Entry gate:** phases 1 to 4 done. After 2026-12-06. Mario's GO for the rehearsal, and a second GO for the real move.
+**Entry gate:** phases 1 to 4 done. Mario's GO for the rehearsal, and a second GO for the real move. (It no longer waits
+for 2026-12-06: Mario lifted that hold on 2026-11-12, section 6 decision 13. A fresh backup before each install stays.)
 
 1. **Rehearsal.** Mario saves a backup and sends it to the Mac (AirDrop into `temp/`, never the repo). The session
    loads that copy into the new app on the simulator and into today's page, and compares every screen's numbers
@@ -366,7 +367,8 @@ Activity starts, holds and ends on the lock screen and the Dynamic Island. Both 
 
 **Deleted, only after the exit gate:** the Cordova project (`config.xml`, the plugin JavaScript and hook, `ios.mjs`),
 the Angular app, the legacy script, CSS and HTML, `build-index` and the VM harness, the RETIRE rows of the ledger, the
-app's Docker journeys and the parity collage. The root `index.html` and Pages go only if Mario retires the web app
+app's Docker journeys and the parity collage, and the Engine row on the Bugs screen (D286, both apps): from then on
+CI's Hermes job proves the engine on every push, so the athlete never needs the button. The root `index.html` and Pages go only if Mario retires the web app
 (section 6).
 
 ### Between 5 and 6: the race plans (D270), its own ruled release
@@ -546,7 +548,7 @@ only person moving, and it leaves a file he holds. The web view's copy stays whe
 
 | # | Risk | How it gets caught |
 |---|---|---|
-| 1 | **A phase 1 slice misreads or damages Mario's live logs while he is training.** The lifted code runs on the only copy. | Golden records byte for byte before any slice ships. A backup saved before each install (the numbered steps in phase 1). The previous TestFlight build as the way back. The freeze slice held until after 2026-12-06. |
+| 1 | **A phase 1 slice misreads or damages Mario's live logs while he is training.** The lifted code runs on the only copy. | Golden records byte for byte before any slice ships. A backup saved before each install (the numbered steps in phase 1). The previous TestFlight build as the way back. (The freeze slice's hold until 2026-12-06 was lifted on 2026-11-12, decision 13.) |
 | 2 | **The stored grid is not identical after the move** and logged runs flip off target (V202). | sha256 of every key at import, and the import refused on a mismatch. The rehearsal on a copy. The numbers check on every screen. |
 | 3 | **The public build carries plans it may not carry.** The four race plans are another publisher's weeks in order, and its terms allow personal use only (handoff §12, D270 proposed). | It is the entry gate to phase 6: D270 shipped, or Mario rules otherwise. Named here so it is not found at review. |
 | 4 | **The engine prescribes something else on the phone** (`Math.sin`, the language dependent sort, `Math.log`, `Math.pow`). | The engine check on today's app in phase 1 and on the new app in phases 2 and 5: 864 of 864 and HALF_MANNY's digest, once more with the phone's language changed. The `Math.sin` table. |
