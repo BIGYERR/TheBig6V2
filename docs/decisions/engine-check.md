@@ -10,9 +10,9 @@ and `Math.pow`).
 
 - **Date:** 2026-11-12. **Ruled by:** the session (form and copy, which are the session's to decide); the line itself
   is Mario's decision 4 (2026-11-12: "decision 4 is yes"). **Bump:** MINOR, Mario 2026-11-12. **Shipped:** v0.262.0
-  (on the chat's branch until Mario merges it). On the iOS simulator (iPhone 17 Pro, JavaScriptCore, the Mac busy with
+  (merged and tagged 2026-11-12). On the iOS simulator (iPhone 17 Pro, JavaScriptCore, the Mac busy with
   the e2e and the break check): Lattice 864 of 864 match. Half Manny matches. Took 30 s (29 s twice on the build
-  before the clock fix).
+  before the clock fix). On two real iPhones, Mario's and his tester's, on the TestFlight build of v0.262.0 (JavaScriptCore), Mario 2026-11-12: Lattice 864 of 864 match. Half Manny matches.
 - **The finding (measured on v0.261.8, `tests/measure/engine-check_clock-and-time.js` and
   `tests/measure/engine-check_storage.js`):**
   1. **A digest does not depend on the clock or the zone.** The 864 lattice programs and HALF_MANNY built at six
