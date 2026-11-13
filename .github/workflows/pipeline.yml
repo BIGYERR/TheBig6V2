@@ -192,6 +192,41 @@ jobs:
           path: temp/
           retention-days: 30
 
+  # The Expo app's compile proof (MIGRATION.md phase 2): frontends/native, beside today's app, built for the simulator.
+  # Its type check, then expo prebuild (ios/ generated, CocoaPods) and an unsigned Release build with the JavaScript
+  # bundled as Hermes bytecode (frontends/native/scripts/ios.mjs build). Nothing is booted, installed or signed.
+  native-expo:
+    name: native (Expo)
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Xcode, CocoaPods and the iOS simulator runtimes this runner carries
+        run: |
+          xcodebuild -version
+          pod --version
+          xcrun simctl list runtimes | grep iOS
+      - name: Install (frontends/native, its lockfile; core is linked from ../../core)
+        working-directory: frontends/native
+        run: npm ci --no-audit --no-fund
+      - name: Type check
+        working-directory: frontends/native
+        run: npm run typecheck
+      - name: The Expo app builds for the iOS simulator (scripts/ios.mjs build; prebuild, CocoaPods, Xcode, unsigned)
+        working-directory: frontends/native
+        run: npm run build-ios
+      - name: Keep the Xcode log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-expo-run-log
+          path: temp/
+          retention-days: 30
+
   pages:
     name: Pages (dist-github-pages)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

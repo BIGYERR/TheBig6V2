@@ -299,6 +299,13 @@ The lattice, HALF_MANNY and all sweeps unchanged. Nothing visible changes except
 - **The native spike:** an empty widget target and a no-op Swift module, built, signed and uploaded by CI.
 - CI: a `native (Expo)` job beside today's `native (iOS simulator)`, and a second TestFlight lane for the beta app.
 
+**Where it stands (session 1, Post-v0.262.0, `docs/decisions/engine-check.md`):** the Expo app is in
+`frontends/native/` (SDK 58.0.25, React Native 0.88.1, Hermes V1, `com.bigyerr.ironasylum.next`), its one screen the
+engine check, and the `native (Expo)` job builds it. On the simulator under Hermes: Lattice 864 of 864 match. Half
+Manny matches. Took 133 s, against 30 s under JavaScriptCore. Found on the way, for later sessions: the generated
+project uses CocoaPods (installed on the Mac with Homebrew; CI's runner has it), and Expo 58's iOS floor is 16.4,
+above today's 15 (D282), which matters at cutover, not for the beta.
+
 **Exit gate:** on Mario's phone, with a copy of his real backup loaded: the lattice at 864 of 864 and HALF_MANNY at
 `147f083be4e04e34` under Hermes; every `ia_` key's sha256 equal to the backup's after import (the app refuses the
 import otherwise); This Week showing the same week, day, cards and numbers as today's app, checked side by side by
@@ -411,7 +418,7 @@ replacement and the counts after. Rules:
 |---|---|---|
 | The engine, the lifted logic, formats, semver | Vitest, as today | `tests/` on `@ia/core`, in CI on Linux and in the 60 second check |
 | The golden records and the lattice | Vitest, as today | `tests/sweeps`, CI |
-| The same engine suite under Hermes | the lattice bundled and run by the Hermes binary | a CI step (to confirm in phase 2 that a Linux binary exists; otherwise the simulator) |
+| The same engine suite under Hermes | the engine check in the Expo app | the simulator (checked in phase 2, session 1: React Native 0.88.1's `hermes-compiler` package carries `hermesc` for Linux, macOS and Windows but no Hermes VM, so no CI step can run the lattice under Hermes without building Hermes from source; `tests/measure/engine-check_hermes.mjs` compiles the engine with `hermesc`) |
 | React Native screens | Jest with `jest-expo` and React Native Testing Library | `frontends/native/`, CI on Linux and the 60 second check |
 | Journeys | Maestro on the iOS simulator | the macOS job |
 | The engine on the phone | the engine check screen | by Mario, at the phase 2 and phase 5 gates |
@@ -561,6 +568,7 @@ only person moving, and it leaves a file he holds. The web view's copy stays whe
 | 11 | **The cutover update is refused or loses the container** (version order, the bundle id handover). | The first real build is 1.0.0, above every 0.x. The backup file is the data path, so the container is a bonus, not a need. Rehearsed on the simulator with an install over the Cordova build. |
 | 12 | **The side by side beta needs Apple setup only Mario can do.** | Numbered browser steps at phase 2. No secret passes through a session. |
 | 13 | **CI gets slow or, if the repo goes private, costly.** | Section 4.3. The macOS job run only when native files change. |
+| 14 | **The engine is slower under Hermes.** Measured in phase 2 session 1 on the simulator: 133 s for the 865 builds against 30 s under JavaScriptCore, about 155 ms a build. `refreshProgram` rebuilds the program on every launch. | The engine check's time on Mario's phone at the phase 2 gate, and a launch timed when This Week arrives. |
 
 ---
 
