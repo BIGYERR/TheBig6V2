@@ -110,7 +110,7 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
      **Checking** while it works. The picker copies the file into the app's cache before it is read
      (`copyToCacheDirectory: true`); the app writes no file and shares none. Under the button, the line, then what the
      store holds: **Holds 8 keys.** (**Holds nothing yet.** when empty), each program as core's readers find it
-     (**Half Manny. 14 weeks from 2026-08-31. Active. 2 days marked.**), and each key with its size and its full
+     (**THE HALF MANNY. 14 weeks from 2026-08-31. Active. 2 days marked.**, the program's own name), and each key with its size and its full
      sha256.
   4. **The lines:** loaded, **Loaded 8 of 8 keys. Every hash matches the file. Saved by version 0.261.0.**; a newer
      file, **This backup is from a newer app. Update the app first.** and not a backup, **That file is not an Asylum
@@ -127,3 +127,10 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
 - **Proof the tests cannot make:** expo-sqlite's own SQLite build and Hermes's strings crossing into it and back,
   `sha256Hex` under Hermes, the picker and the file read, the screen. Checked on the simulator (below) and, at the
   phase 2 exit gate, on Mario's phone with a copy of his backup.
+- **On the simulator** (iPhone 17 Pro, iOS 26, the Release build under Hermes, 2026-11-13): the corpus backup of
+  v0.261.0, copied into the simulator's Files and picked there, read **Loaded 8 of 8 keys. Every hash matches the
+  file. Saved by version 0.261.0.**, the program **THE HALF MANNY. 14 weeks from 2026-08-31. Active. 2 days marked.**
+  The app's own database file, copied off the simulator and read with `node:sqlite`: the table expo-sqlite made,
+  `storage (key TEXT PRIMARY KEY NOT NULL, value TEXT)`, holding the file's 8 keys, each equal to the file's by value
+  and by sha256 (`node:crypto`). The picked file was byte for byte the same afterwards. After a cold relaunch the row
+  read **Holds 8 keys.** with the same program and hashes. Today's app sat beside it on the home screen, untouched.

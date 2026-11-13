@@ -46,10 +46,27 @@ export class Phone {
   /** `file`: another body of the app (a past release's page), for the backup corpus. Default: the page under test. */
   private readonly file: string | undefined;
   constructor(file?: string) { this.file = file; }
+  /**
+   * Where every phone keeps its storage, when set: a fresh map per launch, which the stored keys are copied into, as
+   * the harness's own map is. Null is the harness's plain map. support/sqlite-phone.ts sets it to the Expo app's SQLite
+   * store, so the page's every localStorage call, and every record, goes through SQLite.
+   */
+  static storage: (() => Map<string, string>) | null = null;
 
   /** A cold start at `at` (a local date and time): a fresh page over the stored keys, then the app's own init. */
   launch(at: string, opts: { init?: boolean } = {}): this {
     const IA = loadApp(this.file ? { dom: true, file: this.file } : { dom: true });
+    if (Phone.storage) {
+      // The page asks for localStorage at every call (storageStore), so these stand in from its next call on.
+      const m = Phone.storage(), ls = IA.localStorage;
+      ls.getItem = (k) => { const v = m.get(String(k)); return v === undefined ? null : v; };
+      ls.setItem = (k, v) => { m.set(String(k), String(v)); };
+      ls.removeItem = (k) => { m.delete(String(k)); };
+      ls.clear = () => { m.clear(); };
+      ls.key = (i) => [...m.keys()][i] ?? null;
+      Object.defineProperty(ls, 'length', { get: () => m.size, configurable: true });
+      ls._map = m;
+    }
     pinClock(IA, at);
     IA.eval('Math.random=(function(){var s=20261111;return function(){s=(s*1664525+1013904223)%4294967296;return s/4294967296;};})();');
     IA.localStorage.clear();

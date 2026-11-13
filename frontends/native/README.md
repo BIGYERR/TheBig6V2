@@ -4,9 +4,15 @@ The Expo app the React Native migration builds (`MIGRATION.md`, phase 2), beside
 which it does not touch. Its bundle id is **com.bigyerr.ironasylum.next**, so it installs next to today's app
 (`com.bigyerr.ironasylum`) and never replaces it before cutover. `tests/unit/native-shell.test.ts` holds that.
 
-**Today it holds one screen:** the engine check (D286, `docs/decisions/engine-check.md`), core's
-`core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes. It reads and writes
-no stored key.
+**Today it holds one screen, with two rows:** the engine check (D286, `docs/decisions/engine-check.md`), core's
+`core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes, which reads and writes
+no stored key; and the Backup row (D287, `docs/decisions/data-backup.md`), which loads a backup file, read only, into
+the app's own SQLite store and checks every key against the file by value and by sha256.
+
+**The store** (`src/store/`): core's `StateStore` on expo-sqlite/kv-store (`sqlite-store.ts`, which imports nothing of
+Expo's, so the tests in `tests/` run it on SQLite under `node:sqlite`), the phone's one database `iron-asylum-state`
+(`phone-store.ts`), and the import (`backup-import.ts`). `docs/decisions/stored-state.md` has how the golden records
+are held through it.
 
 ## Versions
 

@@ -306,6 +306,17 @@ Manny matches. Took 133 s, against 30 s under JavaScriptCore. Found on the way, 
 project uses CocoaPods (installed on the Mac with Homebrew; CI's runner has it), and Expo 58's iOS floor is 16.4,
 above today's 15 (D282), which matters at cutover, not for the beta.
 
+**Session 2 (Post-v0.262.0, D287 P-NATIVEIMPORT, `docs/decisions/data-backup.md` and `docs/decisions/stored-state.md`):**
+the storage interface's third implementation, core's `StateStore` on expo-sqlite/kv-store 58.0.17
+(`frontends/native/src/store/`), and the Backup row: a backup file loaded read only into it with core's reader and
+loader, every `ia_` key then checked against the file by value and by sha256, refused and kept nothing on any miss.
+Every stored-state golden record, the sweeps' too, comes out the same with every test phone's storage on SQLite under
+`node:sqlite` with the kv-store's own statements (`tests/integration/native-store.test.ts`). On the simulator under
+Hermes the v0.261.0 corpus backup loaded 8 of 8 keys, every hash matching, and the app's database file read off the
+simulator held each value byte for byte. Found on the way: SQLite stores text as UTF-8, so a lone surrogate comes back
+as U+FFFD with the same sha256; the import compares the values themselves too. What is left of the exit gate: Mario's
+phone (a copy of his backup, the lattice under Hermes there), This Week, the spike, the second TestFlight lane.
+
 **Exit gate:** on Mario's phone, with a copy of his real backup loaded: the lattice at 864 of 864 and HALF_MANNY at
 `147f083be4e04e34` under Hermes; every `ia_` key's sha256 equal to the backup's after import (the app refuses the
 import otherwise); This Week showing the same week, day, cards and numbers as today's app, checked side by side by

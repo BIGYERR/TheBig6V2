@@ -52,6 +52,43 @@ describe('native shell: version and pins', () => {
   test('core is the repo\'s own, linked, never a copy', () => {
     assert.equal(pkg.dependencies['@ia/core'], 'file:../../core');
   });
+
+  // The versions Expo SDK 58.0.25 names for them (its bundledNativeModules.json, read 2026-11-13), pinned exactly.
+  test('the store and the file packages are SDK 58\'s own, pinned exactly', () => {
+    assert.equal(pkg.dependencies['expo-sqlite'], '58.0.17');
+    assert.equal(pkg.dependencies['expo-document-picker'], '58.0.5');
+    assert.equal(pkg.dependencies['expo-file-system'], '58.0.13');
+  });
+});
+
+describe('native shell: the backup is read only, and loaded by core\'s own code (D287)', () => {
+  const files = sources(join(NATIVE, 'src'));
+  const all = files.map((f) => readFileSync(f, 'utf8')).join('\n');
+
+  test('the import reads and loads with core\'s backup code, and checks with core\'s SHA-256', () => {
+    assert.match(all, /import \{ backupKeys, loadBackupInto, readBackupText \} from '@ia\/core\/engine\/state-backup\.ts'/);
+    assert.match(all, /import \{ sha256Hex \} from '@ia\/core\/engine\/engine-check\.ts'/);
+    assert.doesNotMatch(all, /JSON\.parse\([^)]*\)\.data/, 'no reader of its own');
+  });
+
+  test('the app stores through expo-sqlite/kv-store alone, in one database of its own', () => {
+    const stores = files.filter((f) => /from 'expo-sqlite/.test(readFileSync(f, 'utf8')));
+    assert.deepStrictEqual(stores.map((f) => f.slice(NATIVE.length + 1)), [join('src', 'store', 'phone-store.ts')]);
+    assert.match(readFileSync(stores[0]!, 'utf8'), /from 'expo-sqlite\/kv-store'/);
+    assert.doesNotMatch(all, /localStorage|AsyncStorage|openDatabase/);
+  });
+
+  test('nothing in the app writes a file, shares one, or deletes one', () => {
+    assert.doesNotMatch(all, /\.(write|delete|move|copy)\(|writeAsString|expo-sharing|Sharing\./);
+    assert.match(all, /copyToCacheDirectory: true/, 'the picker hands over a copy');
+  });
+
+  test('the row carries D287\'s words', () => {
+    assert.match(all, />Backup</);
+    assert.match(all, /Loads a backup file into this app and checks every key\. Writes nothing back\./);
+    assert.match(all, /'Load a backup'/);
+    assert.match(all, /'Checking'/);
+  });
 });
 
 describe('native shell: the engine check is core\'s, as it is', () => {
