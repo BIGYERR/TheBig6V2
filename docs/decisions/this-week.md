@@ -369,3 +369,89 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   7 amended) and `frontends/app/test/unit/week-view.test.ts` (the new fields).
 - **Not yet seen:** the motion on the phone. The pane runs no animation while hidden, so the feel is Mario's to judge.
 
+
+## D276, D278, D279 and D284 in the Expo app: This Week, read only (Post-v0.262.0, the migration's phase 2, session 4)
+
+- **Date:** 2026-11-13. **Ruled by:** the session (siting and form, the session's to decide). No new D-code: the week
+  titles, the day strip, the race row, the cards, their Skip pills, the words and the order are D276's, D278's,
+  D279's and D284's, and D272's cards (`docs/decisions/gps-recording.md`), unchanged; Mario's brief: "The same words
+  and behaviour as today's screen keep their D-codes". **Bump:** none (his brief: "I expect none: today's app does
+  not change"): today's app, `index.html` and core are untouched, `ia-version` stays 0.262.0. **Mario's word on the
+  cut:** told the measure below and asked go or no, he answered with his phone's engine check and backup import and
+  no objection; the session went ahead on its recommendation, his to stop. **Shipped:** Post-v0.262.0, no build
+  (`frontends/native`; the beta's next TestFlight build, D288).
+- **The finding (measured, `tests/measure/native-this-week_reads.md`):**
+  1. Today's Angular screen reaches the legacy page in 38 places, 41 names: 29 it draws from, 12 a tap's action.
+     Of the 29, 4 are in core by name and 6 more are the page's one line callers of core's readers. 16 readers are
+     still the page's alone, about 300 lines, all pure or reads of the store. The screen's own model
+     (`week-view-model.ts`) and its strip placer (`week-strip.ts`) are plain TypeScript with no Angular in them.
+  2. **The grid is not stored as drawn.** The screen draws what `refreshProgram` hands back: the program rebuilt, the
+     overlays applied, the trained weeks frozen, the moved rest days, the swaps and the edits laid over it. That is
+     318 lines across 20 page names (`program-manage.ts`, `overlays.ts`, `swaps-edits.ts`), phase 1's last two slices.
+     Over 50 launches of the standard history on the ten seeded programs, the stored grid differs from it on 806 of
+     3,745 days, and on 127 of 350 days in the week holding today. On a program nothing has touched since it was
+     stored (every backup of the corpus, 0 of 98 days) the two are the same.
+- **What changes (the Expo app only, `frontends/native/src/this-week/`):**
+  - **The screen's model and its strip placer are today's own files**, copied, and held equal to the byte by a test:
+    a change to today's turns it red until the copy is made again. So what the screen shows for a given input is
+    today's by construction.
+  - **The 16 readers are the page's, line for line** (`week-readers.ts`, the tips in `week-tips.ts`), with the page's
+    globals (the active program, its id, the store, the clock) taken as arguments. The page keeps its own until the
+    cutover deletes it. A test holds every one equal to the page's over whole histories.
+  - **`week-screen.ts` joins them** over core's store: the same inputs as the Angular screen's `render()`, each
+    helper called as that screen calls its legacy one. Its grid is the active program as `ia_programs` stores it
+    (`liveProgram`), the one seam to change when `refreshProgram` is in core.
+  - **`ThisWeek.tsx` draws it** with the Track tokens, day and night by the phone's setting: every size, weight, gap,
+    radius and colour read off today's screen's computed styles at 402 wide. The launch's glide (D279) runs on
+    today's own placer and numbers. Two tabs, This Week and Bugs, in today's floating tab bar; the app opens on This
+    Week when its store holds a program, and on Bugs until a backup is loaded.
+  - **Record run** is offered on a run card, as on today's iOS app (D272 item 6), the phone the beta is checked
+    beside. The recorder itself is phase 4's.
+  - Two packages, the versions Expo SDK 58.0.25 names: `react-native-svg` 15.16.0 (the marks, the glow, the fade)
+    and `react-native-safe-area-context` 5.11.1 (the notch and the home indicator).
+- **What works, and what is drawn and does nothing yet:** a tap on a week title, a swipe of the titles and a tap on
+  a day work: they change what is shown, never what is stored. Drawn as today's and inert until their own screens
+  exist: the cards' buttons (the recorder, the deck, the hand log), the Skip pills (shown as stored, dark when
+  skipped), Reopen, the rest card's two links, Hurt?, the race date and the start date, Random Workout, Traveling?.
+- **Not drawn yet:** Random Workout's counter (it counts against the Wildcard pool, which is the page's still); the
+  chips under Traveling? for an overlay in force; the Skip pill's motion (D284's Pop, Dim, Sunken and the dumbbell
+  breaking play on a tap, and no tap skips here: a skipped card is drawn in its settled state).
+- **What deliberately does not change:** today's app (`frontends/app` untouched), its TestFlight lane, `index.html`,
+  core and the engine, every program and golden record, every `ia_` key. The screen writes nothing: no file under
+  `src/this-week` calls a store write, and the tests draw every screen from a store that is compared to the phone's
+  keys afterwards.
+- **Expected values:**
+  - `tests/unit/native-this-week.test.ts`, typed by hand: the two copies byte for byte; each reader's rule from the
+    ruling it carries (D103a's chips, D229's rest lines, D71's Wildcard and streak, V174's before-start days, V190's
+    set counts, the session's minutes worked through); a whole screen from a small hand built store, drawn through a
+    store that throws on any write; the pill's markup split for React Native; the package pins.
+  - `tests/integration/native-this-week.test.ts`: HALF_MANNY through the standard history, and at each of its five
+    launches every one of the 15 titles with the launch's own pick and with each of the seven columns picked, with
+    and without the recorder: 675 draws, each whole screen equal to today's (the Angular model fed by the page's own
+    functions). The same from the SQLite store. The stores unchanged after. The tips the page's, word for word.
+  - `tests/sweeps/native-this-week.test.ts`: the same over the ten seeded programs, 50 launches (CI).
+  - Eight breaks made in the readers one at a time (a focus word, a set's minutes, the start's edge, the streak's
+    skip, travel, a rest line's dash, the summary's count, the week's cap): each turned a test file red.
+  - Each new test file fails on the previous release by construction: `git cat-file -e` finds no
+    `frontends/native/src/this-week/week-screen.ts`, `week-readers.ts` or `tests/support/native-this-week.ts` in
+    d6223c3. `tests/support/stored-state.ts` gained a callback after each record: wiring only, no assertion changed.
+  - Run where the Expo app's packages are not installed (`node tools/tree-at.mjs --working`): 5 files, 90 tests, and
+    the tests' type check, green.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios`: the Release build under Hermes, the
+  v0.261.0 corpus backup in the app's store from session 2), beside today's Angular build served locally
+  (`npm run pwa-local`) at 402 wide with the same backup in its storage: the launch glides to **Week 11** and reads
+  THE HALF MANNY, **23 days out**, Race day Sun, Dec 6, **Phase 3 — Peak**, the strip 8 to 14 with Friday the 13th
+  picked, **Recovery Run**, 45 min · 13:20/mi, "Just as important as the hard days. Do not run faster than
+  12:40/mi.", Record run, then **Recovery Lift**, Dumbbell incline press + 5 more, Start lift, and the tiles 0/5, 0
+  and 2: today's words and numbers, element for element, in day and in night. A tap picked Monday (Speed Run,
+  Intervals · 25:00 of work, Posterior Chain), Tuesday, and Sunday's rest card with its two links; a swipe of the
+  titles settled on Week 9 and its Saturday (Long Run, 10 mi, then Stretch and roll). Afterwards the Bugs tab read
+  **Holds 8 keys.**, each key's hash the backup file's: nothing was written.
+- **Found on the way:** asked for weight 800, iOS answers Helvetica Neue with Condensed Black, where WebKit draws
+  today's 600 and 800 with Bold: every 600 and 800 of today's CSS is 700 here. A child placed absolutely in a padded
+  box sat below the padding, so the header's glow sits in a box of its own with the padding inside it. Today's page
+  has no rubber band (`overscroll-behavior: none`), so the screen's scroll does not bounce. The tab bar has no blur
+  behind it yet (today's has `backdrop-filter`), so a card's words show faintly through it.
+- **Not yet seen:** the screen on Mario's phone (the beta's next TestFlight build, after he merges). There, a day a
+  swap, an edit, an injury, travel, a moved rest day or an engine change has touched will read as it was stored, not
+  as today's app shows it, until `refreshProgram` is in core and `liveProgram` reads it.

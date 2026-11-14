@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "docs/design"],
       "port": 8765
+    },
+    {
+      "name": "app-pwa-local",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "pwa-local", "--prefix", "frontends/app"],
+      "port": 4400
     }
   ]
 }

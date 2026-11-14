@@ -113,3 +113,6 @@ and `Math.pow`).
   likely cause, not measured:
   the web view's JavaScriptCore compiles hot code, and Hermes runs bytecode without that. It matters past this check,
   because `refreshProgram` rebuilds the program on every launch; the phone's own number comes with the phase 2 gate.
+- **Result on Mario's phone (2026-11-13, IA Next 0.262.0 (100) from TestFlight, Hermes, his screenshot):** Lattice 864
+  of 864 match. Half Manny matches. Took 92 s. About 106 ms a build, against 155 ms on the simulator. The phase 2 exit
+  gate's engine leg is seen.
