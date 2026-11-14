@@ -4,15 +4,15 @@ import {
   _setActiveProg, _setCurrentWeek, activeProg, activeProgId, confirmProgId, confirmTier, editProgId, openProgIds,
   showToast,
 } from './rest-day-shell.ts';
-import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
+import { DEFAULT_1RM } from '../../../../../../core/src/engine/exercise-library.ts';
+import { progTestPin } from '../../../../../../core/src/engine/state-refresh.ts';
 import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
 import {
   CARDIO_GOALS_BY_TYPE, HYBRID_EXCLUDED_GOALS, _GOAL_RANK, _GOAL_REQ_INPUTS, _fmtStartDay, _rsRace, resolveStartDate,
 } from './wizard.ts';
-import { NSW_TABLE6_INT, calcProgramLength } from '../../../../../../core/src/engine/nsw-cardio.ts';
 import {
-  NRC_GOALS, PACE_GOALS, raceAlignment, raceCountdown, raceCountdownWords, testWeekIndex,
+  NRC_GOALS, raceAlignment, raceCountdown, raceCountdownWords,
 } from '../../../../../../core/src/engine/nrc-race-bike-swim.ts';
 import { runAnchorInfo } from '../../../../../../core/src/engine/cardio-progression.ts';
 import { _mileEntryState } from './wizard-generate.ts';
@@ -37,22 +37,6 @@ function setProgRace(dateStr: any){
   _setCurrentWeek(calcCurrentWeek());
   showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
   renderWeekView();
-}
-// D106a (V207), D184 (V223): the one owner of the dated test pin. A run_pace_goal-family goal
-// with a test date and eventTargeted pins to the week holding its test whenever that week is a
-// row of Table 6 (rows 1 to 26; index 0 is unused). A test before the start, or past week 26,
-// pins nothing. doGenerate, setProgStart and the boot backfill read this predicate; none of them
-// carries its own. Returns {tw, len, week, cap}: tw the pinned week or null, len the goal length
-// (sized the way buildProgram sizes it), week the raw test week (null before the start), cap the
-// last row of Table 6 (26), the one place that number is taken, which the wizard's beyond 26 card
-// prints; null for any other program.
-function progTestPin(cfg: any, startIso: any){
-  const c = cfg || {}, g = c.cardioGoals && c.cardioGoals.run;
-  if(!(c.cardioTypes||[]).includes('run') || !g || !PACE_GOALS.has(g.id) || c.eventTargeted === false || !c.raceDate) return null;
-  const len = calcProgramLength(c.cardioTypes, {...c.cardioGoals, _experience:c.experience||'intermediate', _ageBracket:c.ageBracket||'18-35', _eventTargeted:c.eventTargeted},
-    LIFTING_FOCUS_TO_GOAL[c.liftingFocus]||c.liftingFocus||'balanced').weeks;
-  const week = testWeekIndex(startIso, c.raceDate), cap = NSW_TABLE6_INT.length - 1;
-  return {tw: (week! >= 1 && week! <= cap) ? week : null, len, week, cap};
 }
 function setProgStart(dateStr: any){
   if(!dateStr||!activeProg) return;
@@ -554,4 +538,4 @@ function renderProgList(){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { progAlignment, progTestPin, renderProgList };
+export { progAlignment, renderProgList };

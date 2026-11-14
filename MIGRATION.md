@@ -109,11 +109,27 @@ Each phase starts only on Mario's GO, one phase step per session.
     mini gym trip, a swap on a trip day, an overlay that fails, and no stored length" adds its records (579 lines, none
     changed). The break check is at 87 breaks, all red, and 4 open: the three before, and the variant cache, which
     changes nothing a record could hold (`tests/measure/stored-state_overlays-gaps.md`).
-- **Next, on his GO:** `refreshProgram` and the freeze, the last slice, with the date readers it shares with the
-  splice (`overlayWeekRange`, `weekOfDate`, `_progDayDate`) and the replays (`applySessionSwaps`, `applyDayEdits`);
-  then the Expo screen's seam reads it, and Mario's side by side closes phase 2. No longer held for 2026-12-06 (Mario, 2026-11-12). The other readers the Progress screen uses
-  (`lift-ledger-progress-screen.ts`, `progress-charts.ts`) move with that screen, and the backup's saving and reading of
-  a file with the Bugs screen.
+- **Done, the ninth and last lift slice (v0.262.2):** what a launch hands back for a stored program lives in
+  `core/src/engine/state-refresh.ts`: `refreshStoredProgram` holds `refreshProgram`'s rules (the seed put back, the
+  test week pinned, the rebuild, the overlays spliced, the freeze by day, the moves, swaps and edits laid back), with
+  the store, the instant and the failure reports passed in. The page's `refreshProgram` is a thin caller. The eleven
+  page functions it reached moved with it, each under its own name (Mario, 2026-11-14, "All 11 move"): the date
+  readers, the pace clock and the overlay a day came from to `state-overlays.ts`, the replays to `state-swaps.ts` and
+  `state-day-edits.ts`, the dated test pin and the rest day moves to `state-refresh.ts`. `applyOverlays` and
+  `pruneDayEdits` lost their only caller and are deleted. Every golden record identical, every sweep green locally,
+  and every moved function its old text on the built page (`tests/measure/stored-state_freeze-moved.md`).
+  - **The measure found the records blind to 59 of 90 breaks, closed before the slice (Post-v0.262.1):** every
+    history's stored grid equalled its rebuild, every touched day came back from its snapshot, and none held an older
+    program or a dated pace test. Five cases add their records (2,701 lines, none changed), written on v0.262.1's page
+    in a commit of their own. 52 of the 59 are red with them; 7 can never show
+    (`tests/measure/stored-state_freeze-gaps.md`).
+- **Phase 1's lifts are done.** What the page still holds of the stored state is drawing: the sheets, the cards, the
+  Progress screen's own readers (`lift-ledger-progress-screen.ts`, `progress-charts.ts`), which move with that screen,
+  and the backup's saving and reading of a file, with the Bugs screen.
+- **Next, on his GO:** the Expo screen's seam (`frontends/native/src/this-week/week-screen.ts`, `liveProgram`) reads
+  `refreshStoredProgram`, and its own copies of the date readers (`week-readers.ts`) give way to core's; then Mario's
+  side by side closes phase 2. The two findings that belong with the freeze are still not ruled: the Monday after the
+  clocks go forward (decision 12), and a session moved off a day that already has a logged lift (section 7).
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is
@@ -354,8 +370,8 @@ equal to the page's over whole histories; core's readers of the stored state und
 page, and the stored grid differs from it on 127 of 350 days in the week holding today.** So the Expo screen's grid is
 the stored one behind one seam (`liveProgram`), right wherever nothing has touched a day since it was stored, and the
 side by side on Mario's phone is only the gate's proof once phase 1's last two slices (`applyOverlays`, shipped in v0.262.1, then
-`refreshProgram` and the freeze) are in core and the seam reads them. What is left of the exit gate: the last
-slice, the seam, and Mario's side by side. **Mario's phone, 2026-11-14** (build 101 beside today's app, Week 12 of THE
+`refreshProgram` and the freeze, shipped in v0.262.2) are in core and the seam reads them. What is left of the exit gate: the
+seam, and Mario's side by side. **Mario's phone, 2026-11-14** (build 101 beside today's app, Week 12 of THE
 HALF MANNY): the frame, the strip's marks and both cards' names match; three differences, each in the grid (two
 strip words, the run card's pace and note, the lift card's first movement), as measured
 (`docs/decisions/this-week.md`).

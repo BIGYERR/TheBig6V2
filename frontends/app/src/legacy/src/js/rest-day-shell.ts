@@ -1,5 +1,6 @@
 import { completedKey, esc, getCompleted, getLogs, getPrograms, iaStore, saveLogs, savePrograms } from './storage.ts';
 import { CARDIO_PARK_FIELDS } from '../../../../../../core/src/engine/state-day-log.ts';
+import { applyRestDayMoves } from '../../../../../../core/src/engine/state-refresh.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
@@ -237,23 +238,6 @@ function _restDetailRefresh(w: any,day: any){
 // of the app reads, so weekly mileage in Progress picks it up with no new plumbing.
 function getRestMoves(){try{return JSON.parse(iaStore.get('ia_moves_'+activeProgId)||'{}');}catch{return{};}}
 function saveRestMoves(m: any){iaStore.set('ia_moves_'+activeProgId,JSON.stringify(m));}
-// Idempotent: safe to run on a freshly rebuilt week OR on a frozen week that already has
-// the move baked in, which is why it can sit at the tail of refreshProgram unconditionally.
-function applyRestDayMoves(prog: any,moves: any){
-  if(!prog||!prog.weeks||!moves) return prog;
-  Object.keys(moves).forEach(destKey=>{
-    const mv=moves[destKey]; if(!mv) return;
-    const origin=(typeof mv==='string')?mv:mv.from;
-    const m=/^w(\d+)_(\w+)$/.exec(destKey); if(!m) return;
-    const w=+m[1], dest=m[2];
-    const wk=prog.weeks[w]; if(!wk) return;
-    if(wk[dest]&&wk[dest].movedFrom===origin) return;      // already applied
-    const src=wk[origin]; if(!src||src.rest||src.moved) return;
-    wk[dest]={...src, movedFrom:origin};
-    wk[origin]={title:src.title,dot:'rest',tags:['rest'],rest:true,moved:true,movedTo:dest};
-  });
-  return prog;
-}
 // Dominant training region of a day, for the spacing guard. The engine spaces legs/push/
 // pull deliberately (NSW: 2 to 3 days between same-region work), so dropping legs next to
 // legs silently undoes that. We warn rather than block — same posture as everywhere else.
@@ -539,6 +523,6 @@ installPressFeel(window);
 export {
   _curScreen, _setActiveProg, _setActiveProgId, _setCalcLift, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey,
   _setCurrentRandIdx, _setCurrentWeek, _setEditProgId, _setProgressViewId, _setStaleWarnShown, _setStaleWarnSrc,
-  _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, applyRestDayMoves, calcLift, confirmProgId, confirmTier,
-  currentDayKey, currentWeek, editProgId, openProgIds, openRestSheet, progressViewId, showScreen, showToast,
+  _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, calcLift, confirmProgId, confirmTier, currentDayKey,
+  currentWeek, editProgId, openProgIds, openRestSheet, progressViewId, showScreen, showToast,
 };

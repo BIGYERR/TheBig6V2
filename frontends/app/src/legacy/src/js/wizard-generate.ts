@@ -1,6 +1,7 @@
 import { getPrograms, savePrograms } from './storage.ts';
 import { _setCurrentWeek, showScreen, showToast } from './rest-day-shell.ts';
 import { LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
+import { progTestPin } from '../../../../../../core/src/engine/state-refresh.ts';
 import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
 import { WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.ts';
 import { calcProgramLength } from '../../../../../../core/src/engine/nsw-cardio.ts';
@@ -8,7 +9,7 @@ import { runAnchorInfo } from '../../../../../../core/src/engine/cardio-progress
 import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { renderWeekView } from './week-view-sections.ts';
 import { _setRtIntroPending } from './rest-timer.ts';
-import { progTestPin, renderProgList } from './programs.ts';
+import { renderProgList } from './programs.ts';
 import { loadActiveProgram } from './program-manage.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 

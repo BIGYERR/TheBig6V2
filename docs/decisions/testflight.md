@@ -123,6 +123,20 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   gate went (11 s) and skipped the upload, since App Store Connect already held 0.262.0; its upload and processed
   jobs did not run. On `dev` before the merge (run 43552126510, 34a010e) every job was green: `native (Expo)` 799 s,
   unit and integration 776 s, e2e 385 s, `native (iOS simulator)` 224 s, app and backend 76 s.
+- **Seen on `main`, the third run, the first with both lanes uploading** (run 43633436985, merge 0637ec8, pull
+  request 40, 2026-11-14 14:41 EST; the merge carried v0.262.1 and the beta's icon): the two gates went together
+  (12 s each). Today's lane uploaded `0.262.1` (169 s, done 14:45:06) and App Store Connect read it back as processed
+  (132 s, done 14:47:20). The beta's lane archived, signed and uploaded `0.262.1 (103)` (731 s, done 14:54:30) and
+  read it back as processed (103 s, done 14:56:15). The build number moved from 101 to 103 because two commits of the
+  merge changed its inputs: 21f33ef (`core`, the overlay splice) and dc4551e (`frontends/native`, the icon). The legs
+  read `testflight 0.262.1 processed` and `testflight next 0.262.1 (103) processed`. Neither lane waited on the other:
+  today's was processed 7 min 10 s before the beta's upload ended.
 - **On Mario's phone** (his report, 2026-11-14): builds 100 and 101 are installed from TestFlight, today's app
   (`com.bigyerr.ironasylum`) beside them and untouched.
-- **Not yet seen:** the widget extension on the phone.
+- **On Mario's phone, build 103** (his report, 2026-11-14: "yes it says next but i dont see the widget extension"):
+  the icon carries the NEXT band. No widget is offered, and none can be yet: the extension declares one
+  `EmptyWidgetConfiguration` (`frontends/native/targets/RestTimerWidget/RestTimerWidget.swift`), which gives the
+  widget gallery nothing to list. What shows the extension is in the build is the archive, not the phone: the upload
+  job refuses an archive without `PlugIns/RestTimerWidget.appex` at the app's version, signs it with its own profile,
+  and App Store Connect processed the result. The phone sees it in phase 4, when the widget gets its content
+  (MIGRATION.md 4.1).

@@ -135,8 +135,8 @@ its own proof.
 | `js/swap-sheet.ts` | swap sheet, add and skip handlers, undo swap |
 | `js/day-status.ts` | swap nudge, `closeDetail`, RPE info, day status, cardio log, export copy |
 | `js/programs.ts` | program race and start editing, program detail, goal sheet, mile pencil, program list |
-| `js/overlays.ts` | temporary overlays (injury, travel), pace shift, overlay chip and sheets |
-| `js/program-manage.ts` | `refreshProgram`, active program, rename, archive, purge and delete |
+| `js/overlays.ts` | temporary overlays (injury, travel): the overlay chip and sheets, the injury flow (the weeks and the day an overlay reaches, the pace shift and the splice are core's, `engine/state-overlays.ts`) |
+| `js/program-manage.ts` | `refreshProgram` (a thin caller of core's `refreshStoredProgram`, `engine/state-refresh.ts`), active program, rename, archive, purge and delete |
 | `js/progress-data.ts` | progress screen entry, recovery pace trend, wizard seed, progress chips, ladder, class, easy, drift and ledger data |
 | `js/progress-charts.ts` | chart builders, easy-zone charts |
 | `js/lift-ledger-progress-screen.ts` | lift ledger model and cards; `renderProgressScreen`, dot charts |

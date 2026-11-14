@@ -1,12 +1,14 @@
 import { esc, resnapshotDayEdit } from './storage.ts';
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
+import { _dayPlanCfg } from '../../../../../../core/src/engine/state-swaps.ts';
+import { ssSkipToken } from '../../../../../../core/src/engine/state-day-edits.ts';
 import { _stripCapCue, applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY_LABEL, _auxFamily, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _swapDetailFor, applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
 import {
-  _dayPlanCfg, addCandidates, addedDetailFor, auxSwapCandidates, bumpSwapCount, clearAdd, clearSkip, clearSwap,
-  getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
+  addCandidates, addedDetailFor, auxSwapCandidates, bumpSwapCount, clearAdd, clearSkip, clearSwap, getSwaps, recordAdd,
+  recordSkip, recordSwap, swapCandidates, swapLoadNote,
 } from './swaps-edits.ts';
 import { _PATTERN_REGION, _compoundTier } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { _wildDraw, renderRand } from './random-wildcard.ts';

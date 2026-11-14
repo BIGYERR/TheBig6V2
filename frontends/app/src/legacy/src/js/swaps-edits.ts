@@ -1,18 +1,16 @@
 import { iaStore } from './storage.ts';
 import { _ssLegal, _ssPartnerOf } from '../../../../../../core/src/engine/exercise-library.ts';
 import {
-  addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwaps,
+  _dayPlanCfg, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwaps,
 } from '../../../../../../core/src/engine/state-swaps.ts';
 import {
-  addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits,
+  addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, readDayEdits,
 } from '../../../../../../core/src/engine/state-day-edits.ts';
 import { _powerAllowed } from '../../../../../../core/src/engine/power-accessory.ts';
-import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY, _auxFamily, _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
-import { _swapInjuryOK, applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
+import { _swapInjuryOK } from '../../../../../../core/src/engine/swap-prefs.ts';
 import { _PATTERN_REGION, _compoundTier } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { parseRx } from './week-view-sections.ts';
-import { dayOverlayInfo } from './overlays.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // Which region a pattern belongs to (for ceiling bookkeeping + interference).
 // ── EXERCISE SWAP ────────────────────────────────────────────────────────────
@@ -42,16 +40,6 @@ function swapUniverseFor(prog: any,week: any,day: any){
   const byKey=_k&&prog._swapUniverseByKey&&prog._swapUniverseByKey[_k];
   if(Array.isArray(byKey)&&byKey.length) return byKey;
   return Array.isArray(prog._swapUniverse)?prog._swapUniverse:[];
-}
-// D194 R1 (P-INJLENS), measure CF4 reading: the plan that governs a card is the plan of the day the card is on.
-// Outside buildProgram the injury is read off the day's own overlay stamp (_ovKey via dayOverlayInfo, the carrier
-// swapUniverseFor already keys on). A day whose stamp carries no injury key (no stamp, or a travel stamp) keeps
-// prog.cfg's injury, which is what that day's build used. Injury only: every other field is prog.cfg's.
-function _dayPlanCfg(prog: any,day: any){
-  const base=(prog&&prog.cfg)||{};
-  const ov=dayOverlayInfo(day);
-  if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
-  return Object.assign({},base,{injury:ov.patch.injury});
 }
 // Candidates for the ADD picker (V109). Same legality machinery as swapCandidates —
 // same universe harvest (travel-spliced, equipment-legal), same injury filter, same
@@ -194,96 +182,16 @@ function swapLoadNote(outName: any,candName: any){
 // v0.261.6 (docs/decisions/stored-state.md): what a swap, an add, a skip and the nudge store lives in @ia/core, in
 // core/src/engine/state-swaps.ts and state-day-edits.ts, with the reasons each store exists. These are the page's
 // callers: the swap sheet passes the program, the week and the day, and they pass the store and the tap's instant.
-// Laying the records onto a rebuilt grid (applySessionSwaps, applyDayEdits) stays here with refreshProgram.
+// Laying the records onto a rebuilt grid (applySessionSwaps, applyDayEdits), the plan that governs a day (_dayPlanCfg)
+// and a skipped round's token (ssSkipToken) live there too since v0.262.2, under the same names.
 function getDayEdits(pid: any): any{return readDayEdits(iaStore,pid);}
 function recordSkip(pid: any,week: any,dayKey: any,name: any): any{return addSkipEdit(iaStore,pid,week,dayKey,name);}
 function clearSkip(pid: any,week: any,dayKey: any,name: any): any{return dropSkipEdit(iaStore,pid,week,dayKey,name);}
 function recordAdd(pid: any,week: any,dayKey: any,name: any,detail: any): any{return addAddEdit(iaStore,pid,week,dayKey,name,detail,Date.now());}
 function clearAdd(pid: any,week: any,dayKey: any,name: any): any{return dropAddEdit(iaStore,pid,week,dayKey,name);}
-// A skipped superset is stored as '__ss:<sectionIndex>' rather than by name, because the
-// whole block goes: its items are interdependent (rounds with no rest between them), so
-// pulling one movement changes the work:rest ratio, which IS the prescription.
-function ssSkipToken(secIdx: any){return '__ss:'+secIdx;}
-// Re-applied at the very end of refreshProgram beside moves and swaps. Idempotent by
-// construction: skip marks a flag rather than splicing (so a second pass re-marks the
-// same item), and add checks for the name before pushing.
-function applyDayEdits(prog: any,store: any){
-  if(!prog||!prog.weeks||!store) return;
-  Object.keys(store).forEach(function(k){
-    const m=/^w(\d+)_(.+)$/.exec(k); if(!m) return;
-    const w=+m[1],d=m[2];
-    const day=prog.weeks[w]&&prog.weeks[w][d];
-    if(!day||!Array.isArray(day.sections)) return;
-    const e=store[k]||{}, skips=e.skip||[], adds=e.add||[];
-    // Skipped items are FLAGGED, never removed. The struck-through stub is what tells
-    // the athlete the difference between "the engine never programmed this" and "I
-    // bailed on this", and it is the only affordance for putting it back.
-    day.sections.forEach(function(sec: any,si: any){
-      // The athlete's own added block is never subject to skip flagging. Add and skip are
-      // disjoint operations — an added movement is taken off with clearAdd, not skipped —
-      // and enforcing that here is what makes this pass ORDER-INDEPENDENT. Without it, a
-      // store holding both an add and a skip for the same name flags nothing on the first
-      // pass (the item does not exist yet) and flags it on the second, so the function is
-      // not idempotent and refreshProgram produces a different day on every boot.
-      if(sec._added) return;
-      const ssKilled=skips.indexOf(ssSkipToken(si))>=0;
-      if(sec.superset) sec._skipped=ssKilled||undefined;
-      (sec.items||[]).forEach(function(it: any){
-        // V162 (ruling R2): members of a live round skip individually by name. The
-        // block token above still kills the whole round; both survive a re-apply.
-        it._skipped = (skips.indexOf(it.name)>=0) || undefined;
-      });
-    });
-    if(adds.length){
-      let bucket=day.sections.filter(function(s: any){return s._added;})[0];
-      if(!bucket){ bucket={label:'Added by you',_added:true,items:[]}; day.sections.push(bucket); }
-      adds.forEach(function(a: any){
-        if(!a||!a.name) return;
-        if(bucket.items.some(function(it: any){return it.name===a.name;})) return;
-        bucket.items.push({name:a.name,detail:a.detail||'',_addedByUser:true});
-      });
-    }
-  });
-}
-// Every week below the freeze cut gives up its edits (state-day-edits.ts has why). refreshProgram calls it.
-function pruneDayEdits(pid: any,cutWeek: any){pruneDayEditsBefore(iaStore,pid,cutWeek);}
 function getSwaps(pid: any): any{return readSwaps(iaStore,pid);}
 function recordSwap(pid: any,week: any,dayKey: any,from: any,to: any,rx: any): any{return addSwapRecord(iaStore,pid,week,dayKey,from,to,rx,Date.now());}
 function clearSwap(pid: any,week: any,dayKey: any,from: any): any{return dropSwapRecord(iaStore,pid,week,dayKey,from);}
-// Re-applied at the very end of refreshProgram, after the freeze, alongside rest-day
-// moves — both are the athlete's own edits, so nothing the engine does should undo
-// them. V222 D181 (R4'): a day's records replay in recording order (array order, which
-// recordSwap keeps by push) through the same _swapDetailFor the sheet used, so the booted
-// card is the card the athlete built. Days the freeze restored from ia_hist_ never reach
-// this function (R5).
-function applySessionSwaps(prog: any,store: any){
-  if(!prog||!prog.weeks||!store) return;
-  Object.keys(store).forEach(k=>{
-    const m=/^w(\d+)_(.+)$/.exec(k); if(!m) return;
-    const w=+m[1],d=m[2];
-    const day=prog.weeks[w]&&prog.weeks[w][d];
-    if(!day||!Array.isArray(day.sections)) return;
-    // V222 D181 (R4'). Records replay in recording order, one per pass, through the same
-    // _swapDetailFor the sheet used, so each hop's detail comes from the hop before it.
-    // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
-    const list=(store[k]||[]).filter(e=>e&&e.from&&e.to);
-    let hit=false;
-    const _renamed: any[]=[];   // V229 D193 (A3 s4) / D194 R6: the items this replay renamed, by identity
-    // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
-    list.forEach(e=>{
-      const m1=Object.create(null); m1[e.from]=e.to;
-      // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
-      const _was: any[]=[]; day.sections.forEach(s=>((s&&s.items)||[]).forEach(it=>{ if(it&&it.name===e.from) _was.push(it); }));
-      if(applySwapPrefs(day.sections,m1)) hit=true;
-      _was.forEach(it=>{ if(it.name!==e.from&&_renamed.indexOf(it)<0) _renamed.push(it); });
-    });
-    if(hit && _dayPlanCfg(prog,day).injury){
-      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through
-      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });
-      day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));
-    }
-  });
-}
 // ── COACH NUDGE ──────────────────────────────────────────────────────────────
 // Three swaps running of one lift to one replacement is a preference, and the app says so (state-swaps.ts has the
 // count and its reasons). The swap sheet counts each swap; the nudge marks a lift offered when it is answered.
@@ -311,7 +219,6 @@ function auxSwapCandidates(outName: any,day: any,prog: any){
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  _dayPlanCfg, addCandidates, addedDetailFor, applyDayEdits, applySessionSwaps, auxSwapCandidates, bumpSwapCount,
-  clearAdd, clearSkip, clearSwap, getDayEdits, getSwaps, markSwapOffered, pruneDayEdits, recordAdd, recordSkip,
-  recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
+  addCandidates, addedDetailFor, auxSwapCandidates, bumpSwapCount, clearAdd, clearSkip, clearSwap, getSwaps,
+  markSwapOffered, recordAdd, recordSkip, recordSwap, swapCandidates, swapLoadNote,
 };

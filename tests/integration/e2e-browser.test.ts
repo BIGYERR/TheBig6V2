@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, it } from 'vitest';
 import { pathToFileURL } from 'node:url';
 import puppeteer from 'puppeteer';
 import type { Browser } from 'puppeteer';
-import { openPage, settle } from '../e2e/browser.ts';
+import { centre, openPage, settle } from '../e2e/browser.ts';
 import { BAND_H, LABEL_H, PAD, renderCollage } from '../e2e/collage.ts';
 import type { CollageBand, CollageTile } from '../e2e/collage.ts';
 import { pngSize } from '../e2e/parity.ts';
@@ -189,6 +189,68 @@ describe('settle in Chrome', () => {
       assert.deepEqual(await scrolls(), [1, 0, 0]);
       await new Promise((r) => setTimeout(r, 600));
       assert.deepEqual(await scrolls(), [1, 0, 0]);
+    } finally {
+      await context.close();
+    }
+  });
+
+  // The same scroll, met by a tap. Centring an element inside the frame between the app's pixel and its step back is
+  // undone by the step back, and the tap lands on whatever stands there (CI's step 24, Post-v0.262.2: Run the check
+  // tapped the tab bar). The page here holds the app's own resync and makes that frame long (every animation frame
+  // arrives 200 ms late), so the test stands inside it every time.
+  it('centre keeps an element centred through the step back the app makes after a focus change', async () => {
+    const low = join(dir, 'low.html');
+    writeFileSync(
+      low,
+      '<!doctype html><meta charset="utf-8"><body style="margin:0;height:4000px"><button id="a">A</button><button id="b">B</button><button id="low" style="position:absolute;top:3000px">Low</button>',
+    );
+    const { context, page } = await openPage(browser);
+    try {
+      await page.goto(pathToFileURL(low).href, { waitUntil: 'load' });
+      const resync = appFunction('installKeyboardResync').toString();
+      await page.evaluate((src) => {
+        const raf = window.requestAnimationFrame.bind(window);
+        window.requestAnimationFrame = (cb) => {
+          setTimeout(() => raf(cb), 200);
+          return 0;
+        };
+        (0, eval)(`(${src})`)(window);
+      }, resync);
+      const el = (await page.$('#low'))!;
+      const centred = () =>
+        el.evaluate((e) => {
+          const r = e.getBoundingClientRect();
+          return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === e && r.top > 0 && r.bottom < innerHeight;
+        });
+      // A focus change, then the app's pixel: from here its step back is 200 ms away.
+      const insideTheFrame = async () => {
+        await page.focus('#a');
+        await page.focus('#b');
+        await page.waitForFunction(() => scrollY === 1, { timeout: 2000, polling: 10 });
+      };
+      const later = () => new Promise((r) => setTimeout(r, 600));
+
+      // Shown first, so the second half means something: a plain scroll made inside that frame is undone.
+      await insideTheFrame();
+      await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      assert.equal(await centred(), true);
+      await later();
+      assert.deepEqual([await centred(), await page.evaluate(() => scrollY)], [false, 0], 'the step back took the page to its top');
+
+      // centre, called inside the same frame, ends centred and stays there.
+      await insideTheFrame();
+      await centre(page, el);
+      assert.equal(await centred(), true);
+      await later();
+      assert.equal(await centred(), true, 'nothing moves it afterwards');
+
+      // Where centring moves nothing there is nothing to wait for: it returns well inside the focus window (the focus
+      // is moved without the scroll a focus makes by itself, so the element stays centred).
+      await page.evaluate(() => document.getElementById('a')!.focus({ preventScroll: true }));
+      assert.equal(await centred(), true);
+      const began = Date.now();
+      await centre(page, el);
+      assert.ok(Date.now() - began < 300, 'a centring that moves nothing is not held up');
     } finally {
       await context.close();
     }

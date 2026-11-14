@@ -577,6 +577,131 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   the same record. Every sweep, run locally on the candidate before the commit: 34 files, 260 tests, green; the
   lattice and HALF_MANNY unchanged.
 
+## The records hold what a launch does (Post-v0.262.1, tests only, before the ninth slice)
+
+- **Date:** 2026-11-14. **Ruled by:** Mario's rule for the ninth slice ("a rule the records are blind to gets a record
+  in this slice, written on v0.262.1's page, lines added and none changed"); the session chose to land the records as
+  their own commit before any code moves, so git shows they were written on v0.262.1's page. **Bump:** none: the page,
+  core and `ia-version` do not move (standing ruling 1).
+- **The finding (`tests/measure/stored-state_freeze-gaps.md`, read on v0.262.1):** `refreshProgram` is 126 lines of the
+  built page with ten callers. It reads `ia_programs`, `ia_comp_`, `ia_logs_`, `ia_hist_` (twice), `ia_exw_`,
+  `ia_moves_`, `ia_swaps_` and `ia_edits_` (twice), and writes two: `ia_programs` (the seed put back, the test week
+  pinned) and `ia_edits_` (the prune). It reaches 20 names of the page: five one-line store callers, the toast, and
+  eleven that hold rules, all pure (`progTestPin`, `paceShiftMap`, `weekOfDate`, `overlayWeekRange`, `_progDayDate`,
+  `dayOverlayInfo`, `applyRestDayMoves`, `applySessionSwaps`, `_dayPlanCfg`, `applyDayEdits`, `ssSkipToken`).
+- **The records let 59 of 90 breaks through** (a break per rule on v0.262.1's page; two controls, one the fast file
+  turns red and one only the sweeps do, both red). Three reasons every history shared: its stored grid was the same
+  engine's build of the same config as the launch that read it, so a rule that picks between the stored day and the
+  rebuilt one picked between two equal days; every touch snapshots its day, so a touched day came back from its
+  snapshot and nothing was laid back on it; and no history held an older program or a dated pace test.
+- **What changes:** five cases in `tests/integration/stored-state.test.ts`, their records new in
+  `tests/snapshots/stored-state.json`: 2,701 lines added, none removed or changed; the test file 403 lines added, none
+  changed. `tests/integration/native-store.test.ts` runs the same cases through SQLite against the same records.
+  1. **Swaps, edits and a move laid back at launch.** Week 1 of HALF_MANNY with nothing logged until Saturday: a lift
+     traded twice in a chain, the lift traded in skipped, a round skipped whole, a movement added; Tuesday's session
+     moved onto Wednesday's rest and swapped there; a knee flagged on Thursday and a lift swapped under it; then
+     Monday's first lift logged and the lift first traded off added back.
+  2. **Days proved by one store each, and a trip booked over them.** Each trained day left one proof by hand, as older
+     data holds them (a completion, a log, logged lifts, a snapshot), next week's Monday held by its snapshot alone, a
+     mini gym trip booked over all of them; then the Monday of week 2, a trip after the last week refused, and on a
+     second phone a launch ten days after the race.
+  3. **An older program with a dated pace test.** The 1.5 mile goal given a test date by hand as a release before the
+     pin stored it: pinned once at launch, read against the stored length weeks later, and four that pin nothing or
+     stand (a past test, a test past week 26, the event off, a week already pinned).
+  4. **Older and damaged programs, by hand.** No config; no seed anywhere; a seed missing from the second program of
+     two; no seed on the program; no start date with the mile time changed; moves in their old form; a stored grid
+     with days missing; a config the engine cannot build; a renamed program.
+  5. **The pace clock at launch.** Two overlapping injuries, one dated before the first Monday; a shoulder; a shift
+     left in the stored config after its injury was removed.
+- **With them, 52 of the 59 are red. Seven stay green, and none can show** (each read by hand from the code):
+  a date before the start read as week one (`overlayWeekRange` clamps the week again); the current week before the
+  start (the cut and the piercing come out the same at zero as at one); a logged lift with no week (its key matches no
+  day and raises no cut); the current week touched (open since v0.261.5); an empty day dropped from a frozen week
+  (JSON leaves it out either way); and two guards in `applyDayEdits`, the added block never flagged and a movement
+  added once (edits are laid only on a week at or above the cut, a fresh build each launch, laid once). The four in
+  the moved code that a unit test can hold get one in the slice (the week before the start, the empty day, the two
+  guards).
+- **Expected values (typed from the rules and the calendar):** HALF_MANNY's first Monday is 31 August 2026; week 1
+  trains Monday, Tuesday, Thursday, Friday and Saturday; week 14 is Monday 30 November to race day, Sunday 6 December,
+  and rests Wednesday and Friday. The 1.5 mile program made on Saturday 29 August has its first Monday on 24 August
+  and eleven weeks; a test on Saturday 10 October is in the week of 5 October, 42 days on, the seventh week; week 26
+  begins Monday 15 February 2027. A knee hurt from 17 August and an ankle from 28 August, read on Wednesday 2
+  September, count from 24 August and once a day: 7 days before week 2 and 10 before every later week, a shift of one
+  week each (`[0,0,1,1,1,1,1,1,1,1,1,1]`). A shoulder's plan leaves running alone. HALF_MANNY's seed is 76308, the 1.5
+  mile program's 24865. A swap chain A to B to C laid in order leaves C once.
+- **What deliberately does not change:** the page, core, every existing record and every existing test.
+- **Found, not fixed (hostile data only, nothing a tap makes):** a stored config whose sports are not a list stops
+  the launch before the rebuild when its test week is not pinned (the backfill reads it outside any guard), and a
+  config whose rest days are not a list stops it in the program list. The record for "a config the engine cannot
+  build" therefore calls the page's loader on a pinned program. Neither is this slice's to fix.
+
+## Release scope: v0.262.2 moves refreshProgram and the freeze into core, the last lift slice
+
+- **Date:** 2026-11-14. **Ruled by:** Mario (the ninth slice, by his brief: "refreshProgram and the freeze into
+  core/src/engine as a state-*.ts file, code as it was, the page's globals as arguments, the legacy file a thin
+  caller"; asked what moves with it after the measure, he chose "All 11 move"); **bump:** PATCH (asked, picked), by
+  his standing rule for migration steps that change the page and no behaviour. **Shipped:** v0.262.2 (on the chat's
+  branch until Mario merges it).
+- **The finding** is the entry above (`tests/measure/stored-state_freeze-gaps.md`). What it says has to move: the
+  launch reaches eleven page functions that hold rules, all pure. With them in core the launch needs only a store, the
+  program, the instant and a report, which is what the Expo app can hand it.
+- **What changes:** one new file in `core/src/engine` and three that gain functions, code as it was.
+  1. `state-refresh.ts` (new, after `state-overlays.ts` in `order.json`): `refreshStoredProgram(store, prog, now,
+     failed)`, with the types `StoredProgram`, `RefreshReport`, `RestMove` and `TestPin`; `progTestPin` (from
+     `programs.ts`) and `applyRestDayMoves` (from `rest-day-shell.ts`).
+  2. `state-overlays.ts` gains `weekOfDate`, `overlayWeekRange`, `paceShiftMap` and `dayOverlayInfo` (from
+     `overlays.ts`) and `_progDayDate` (from `week-view-sections.ts`), and the types of a held day
+     (`HeldItem`, `HeldSection`, `HeldDay`, `HeldGrid`, `Started`, `Spanned`). `state-swaps.ts` gains
+     `applySessionSwaps` and `_dayPlanCfg`, `state-day-edits.ts` gains `applyDayEdits` and `ssSkipToken` (from
+     `swaps-edits.ts`).
+  3. Every function keeps its name, so every other caller in the page and the two the Angular screens reach through
+     the bridge (`overlayWeekRange`, `_isoToday`) are untouched. Eleven of the twelve are their old text to the byte on
+     the built page. `paceShiftMap` takes the instant as a second argument (its one other caller, the back from injury
+     pop-up, hands it `Date.now()`).
+  4. **The named substitutions in `refreshStoredProgram`, 20 places:** its name and arguments; `readPrograms(store)`
+     for `getPrograms()` (2) and `writePrograms(store,_ps)` for `savePrograms(_ps)` (2); `store.get(` for
+     `iaStore.get(` (6); `readSwaps(store,prog.id)`, `pruneDayEditsBefore(store,prog.id,_swapCut)` and
+     `readDayEdits(store,prog.id)` for the page's three one line callers; `spliceOverlays(prog, rebuilt,
+     overlayWeekRange, _progDayDate, failed.overlay)` for `applyOverlays(prog, rebuilt)`; `new Date(now)` for
+     `new Date()` in the freeze, `_isoOf(new Date(now))` for `_isoToday()` in the backfill and `paceShiftMap(prog,
+     now)`; `failed.freeze(e)` and `failed.rebuild(e)` for the two `console.error` lines.
+  5. The page's `refreshProgram(prog)` keeps its name and argument and calls it with `iaStore`, `Date.now()` and a
+     report that does what the function did: an overlay that fails is logged and told to the athlete ("A plan change
+     failed to apply. Flag it in Bugs.", in its own try), a freeze or a rebuild that fails is logged with the words it
+     had.
+  6. **Deleted, each left with no caller:** the page's `applyOverlays` (its one caller was `refreshProgram`) and
+     `pruneDayEdits` (the same). `tests/harness.js` `EXPORT_NAMES` loses `applyOverlays`.
+- **One thing reads differently, and no record moves:** the launch read the clock three times (the backfill, the pace
+  clock, the freeze) and now reads the one instant it is handed. The three readings differed only across the instant
+  of midnight.
+- **Narrowed.** **Stays in the page:** `_isoToday` (both declarations; the wizard, the sheets and the bridge call
+  it), the overlay sheet, the chip and the injury flow, the swap sheet and its candidates, the rest sheet, the goal
+  and mile sheets, the loader (`loadActiveProgram`). `spliceOverlays` keeps the shape v0.262.1 gave it: the launch
+  hands it the two date readers. **Not in this slice:** the Expo app (its seam and its own copies of the date readers
+  wait for the next session); the two findings that belong with the freeze (the Monday after the clocks go forward,
+  a session moved off a day with a logged lift), each its own ruling.
+- **What deliberately does not change:** every key and every stored byte; what a program prescribes (the lattice and
+  HALF_MANNY); which days freeze, from what, and what is laid back on them; every toast and every logged line; every
+  function name the Angular screens call through the bridge; every golden record.
+- **Proof.** Every golden record identical: `tests/integration/stored-state.test.ts` (25 cases, the five above among
+  them) and the same through SQLite, with no change to `tests/snapshots/`. Every hunk of the page classified by
+  `tests/measure/stored-state_freeze-moved.md`: each moved function is its text in v0.262.1 with the substitutions
+  above, and the rest of the page differs by the version, the two deleted callers, the instant handed to
+  `paceShiftMap`, and the thin `refreshProgram`. The break check (`tests/measure/stored-state_red-on-break.md`) gains
+  the measure's breaks, rewritten for the lifted page, and two of the thin caller (no instant, another store).
+- **Tests:** `tests/unit/stored-state.test.ts`, 18 new (96 to 113, one guard of the deleted `applyOverlays` replaced
+  by the same guard on `refreshProgram`): the freeze by the day read off a stored grid marked by hand; the cut by the
+  furthest touched week and with no start; the injured week and the trip; a week's set of days and the empty key; the
+  two guards; the seed and the test week written to their own program; the pace shift set and cleared; the three
+  failures reported; the order of what is laid back and the prune; the moves, the swaps' replay and the edits' replay
+  on hand made days (the edits laid twice, which holds the two guards no launch can reach); the date readers; the
+  pace clock; the dated test pin; and the page reaching all of it through core. On v0.262.1: the file cannot load
+  (`git cat-file -e HEAD:core/src/engine/state-refresh.ts`, exit 128), which is the proof of the tests of that file's
+  functions; the others, run on v0.262.1's own tree without that import, fail each for the function it tests
+  (`applySessionSwaps`, `applyDayEdits`, `weekOfDate`, `paceShiftMap` are not there); the two page tests fail on
+  v0.262.1's page; the guards pass on both. `tests/support/swaps.ts` is wiring only (it reads the cut at core's
+  `pruneDayEditsBefore`, which both releases call).
+
 ## The store's third implementation: SQLite, in the Expo app (Post-v0.262.0, the migration's phase 2, session 2)
 
 - **Date:** 2026-11-13. **Ruled by:** the session (form). **Bump:** none, Mario 2026-11-13. The import that uses it

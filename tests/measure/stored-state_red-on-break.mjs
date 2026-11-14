@@ -5,11 +5,15 @@
 // Run from the repo root, after a build:
 //   node tests/measure/stored-state_red-on-break.mjs <scratch dir> > tests/measure/stored-state_red-on-break.md
 //
-// A slice runs its own breaks first, in a minute or two, and the whole set once before its release commit:
+// A slice runs its own breaks first and the whole set once before its release commit:
 //   node tests/measure/stored-state_red-on-break.mjs <scratch dir> --only overlay
 // keeps the breaks whose name holds that text, runs the page as built on the fast file alone, and heads its report
 // as a partial run. A partial report is read on the screen, never written over the saved one.
-import { execFileSync } from 'node:child_process';
+//
+// The breaks run several at a time, in two passes: the fast file for every break, then the sweeps for the breaks the
+// fast file let through (--jobs <n>, 4 unless said; 1 is one at a time, as this ran before Post-v0.262.2). Each row of
+// the report is the same whatever the number: a break's copy of the page and its test run share nothing with another's.
+import { execFile } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
@@ -17,8 +21,10 @@ const ROOT = process.cwd();
 const scratch = resolve(process.argv[2] || '');
 const onlyAt = process.argv.indexOf('--only');
 const ONLY = onlyAt > 0 ? String(process.argv[onlyAt + 1] || '').toLowerCase() : '';
-if (!process.argv[2] || process.argv[2].startsWith('--') || (onlyAt > 0 && !ONLY)) {
-  console.error('usage: node tests/measure/stored-state_red-on-break.mjs <scratch dir> [--only <text in a break\'s name>]');
+const jobsAt = process.argv.indexOf('--jobs');
+const JOBS = jobsAt > 0 ? Number(process.argv[jobsAt + 1]) : 4;
+if (!process.argv[2] || process.argv[2].startsWith('--') || (onlyAt > 0 && !ONLY) || !Number.isInteger(JOBS) || JOBS < 1 || JOBS > 16) {
+  console.error('usage: node tests/measure/stored-state_red-on-break.mjs <scratch dir> [--only <text in a break\'s name>] [--jobs <1 to 16>]');
   process.exit(2);
 }
 const picked = (list) => (ONLY ? list.filter(([name]) => name.toLowerCase().includes(ONLY)) : list);
@@ -32,10 +38,6 @@ const SLOW = ['sweeps/stored-state.test.ts', 'sweeps/data-backup.test.ts'];
 // name, what the break does, the exact text (once in the page), its replacement.
 const BREAKS = [
   ['log key', 'a log is stored under w1-mon, not w1_mon', "function logKey(w,d){return dayStoreKey(w,d);}", "function logKey(w,d){return 'w'+w+'-'+d;}"],
-  ['freeze, history', 'a touched day is not restored from its snapshot at launch', 'if(_snap){ _merged[d] = _snap; _histRestored.add(k); return; }', ''],
-  ['freeze, piercing', 'an overlay no longer reaches the untouched days of the current week', 'const _pierce = w >= _curWk;', 'const _pierce = false;'],
-  ['freeze, reach', 'the last frozen week is rebuilt instead', 'for(let w=1; w<_cut; w++){', 'for(let w=1; w<_cut-1; w++){'],
-  ['freeze, injured week', 'a touched day in an injured week keeps its stored form', 'if(_injCovers(w) && _live[d]){ _merged[d] = _live[d]; return; }', ''],
   ['set draft', 'a logged card leaves its draft in the log', '  clearSetDraft(exKey);\n', '\n'],
   ['backup scan', 'the backup leaves out the last key', "store.keys().forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});", "store.keys().slice(0,-1).forEach(k=>{if(k.indexOf('ia_')===0) keys.push(k);});"],
   ['completion status', 'a skipped day is stored as complete', "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,status,Date.now());", "setDayStatus(iaStore,activeProgId,currentWeek,dayKey,title||null,'complete',Date.now());"],
@@ -66,7 +68,6 @@ const BREAKS = [
   ['edits prune', 'the edits of a frozen week are kept', 'if(m&&+m[1]<cutWeek){delete s[k];changed=true;}', ''],
   ['active id', 'the active program is not stored', "function writeActiveProgramId(store, id){store.set('ia_active',id);}", 'function writeActiveProgramId(store, id){}'],
   ['wildcard record', 'a Wildcard done is not stored', 'function writeWildcardDone(store, programId, a){store.set(', 'function writeWildcardDone(store, programId, a){return;store.set('],
-  ['seed write back','an old program\'s seed is not written back to its config', '    prog.cfg.seed = prog.seed;\n', '\n'],
   ['purge', 'a deleted program keeps its logs', "['ia_logs_','ia_comp_',", "['ia_comp_',"],
   ['rest move key', 'a moved rest day is stored under the picked day', 'moves[completedKey(w,day)]={from:pick,ts:Date.now()};', 'moves[completedKey(w,pick)]={from:pick,ts:Date.now()};'],
   ['week count', 'the current week is counted one day late', 'const diff=Math.floor((today-weekMon)/86400000);', 'const diff=Math.floor((today-weekMon)/86400000)-1;'],
@@ -138,8 +139,96 @@ const BREAKS = [
   ['overlay failure', 'a failing overlay stops every later one', 'failed(ov, e);', 'throw e;'],
   ['overlay failure, told', 'a failed overlay is not told to the athlete', "try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}", ''],
   ['overlay length', 'an overlay\'s span is read against the stored length only', 'const totalWeeks = rebuilt.totalWeeks || prog.totalWeeks || 0;', 'const totalWeeks = prog.totalWeeks || 0;'],
-  ['overlay week range', 'the page hands the splice no week range', 'return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov, e)=>{', 'return spliceOverlays(prog, rebuilt, ()=>null, _progDayDate, (ov, e)=>{'],
-  ['overlay day date', 'the page hands the splice no day date', 'return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov, e)=>{', 'return spliceOverlays(prog, rebuilt, overlayWeekRange, ()=>null, (ov, e)=>{'],
+  // v0.262.2, the ninth slice: the launch itself (refreshStoredProgram, the date readers, the pace clock, the replays),
+  // from tests/measure/stored-state_freeze-gaps.mjs with the lift's substitutions. They replace the five rows this list
+  // held inside refreshProgram and the two of the page's applyOverlays. A break of two places is a list of pairs.
+  ['overlay week range', 'the launch hands the splice no week range', 'spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, failed.overlay);', 'spliceOverlays(prog, rebuilt, ()=>null, _progDayDate, failed.overlay);'],
+  ['overlay day date', 'the launch hands the splice no day date', 'spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, failed.overlay);', 'spliceOverlays(prog, rebuilt, overlayWeekRange, ()=>null, failed.overlay);'],
+  ["launch: guard, no config", "a program with no config is handed back as stored -> a program with no config goes on to the rebuild", "if(!prog || !prog.cfg) return prog;", "if(!prog) return prog;"],
+  ["launch: seed, none anywhere", "a program with no seed anywhere is handed back as stored -> a program with no seed is rebuilt", "if(prog.seed == null) return prog;", ""],
+  ["launch: seed, into the config", "an older program's seed is put into its config -> the config stays without its seed", "    prog.cfg.seed = prog.seed;\n", "\n"],
+  ["launch: seed, saved", "the seed put back is written to ia_programs -> the seed is put back in hand only", "_ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed}; writePrograms(store,_ps);", "_ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed};"],
+  ["launch: seed, saved on its program", "the seed is written to the stored program of the same id -> the seed is written to the first stored program", "const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed};", "const _pi=0; if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed};"],
+  ["launch: test week, only when unset", "a program with a pinned test week is left alone -> every program derives its test week again at each launch", "if(prog.cfg._testWeek == null){", "if(true){"],
+  ["launch: test week, backfilled", "a dated test with no pinned week pins it at launch -> no test week is ever backfilled", "if(prog.cfg._testWeek == null){", "if(false){"],
+  ["launch: test week, needs a week", "a test before the start or past week 26 pins nothing -> a test with no week still writes the two keys", "if(_tp && _tp.tw){", "if(_tp){"],
+  ["launch: test week, a past test", "a test already past pins nothing and writes nothing -> a past test pins", "if(!(_rd && _td && _rd < _td)){", "if(true){"],
+  ["launch: test week, set", "the pinned week goes into the config -> the config gets the length and not the week", "        prog.cfg._testWeek = _tp.tw;\n", "\n"],
+  ["launch: test week, length", "the program's length is capped at the test week -> the config gets the week and not the length", "prog.cfg._raceDateCappedWeeks = _tp.tw;", ""],
+  ["launch: test week, saved", "the pin is written to ia_programs -> the pin is in hand only", "_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks}; writePrograms(store,_ps);", "_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks};"],
+  ["launch: test pin, goal family", "only a pace test goal pins -> any run goal with a date pins", "!PACE_GOALS.has(g.id) || ", ""],
+  ["launch: test pin, event off", "a goal with its event switched off pins nothing -> it pins", "c.eventTargeted === false || !c.raceDate) return null;", "!c.raceDate) return null;"],
+  ["launch: test pin, week range", "a test week outside 1 to 26 pins nothing -> any week pins", "return {tw: (week >= 1 && week <= cap) ? week : null, len, week, cap};", "return {tw: week, len, week, cap};"],
+  ["launch: pace shift, set", "an injury that stops quality running sets the pace shift on the config before the build -> no pace shift is ever set", "if(_psm) prog.cfg._paceShift=_psm; else delete prog.cfg._paceShift;", "delete prog.cfg._paceShift;"],
+  ["launch: pace shift, cleared", "a pace shift that no longer derives is deleted from the config -> an old pace shift outlives its overlays", "if(_psm) prog.cfg._paceShift=_psm; else delete prog.cfg._paceShift;", "if(_psm) prog.cfg._paceShift=_psm;"],
+  ["launch: pace map, modes", "only an injury whose plan touches running counts -> every injury with a cardio mode counts", "if(!P||!P.cardioMode||!SUP[P.cardioMode]) return;", "if(!P||!P.cardioMode) return;"],
+  ["launch: pace map, half step", "a half step week never counts -> a half step week counts", "if(inj.halfstep) return;", ""],
+  ["launch: pace map, open end", "an injury with no end counts to today -> an injury with no end counts to the program's end", "let t=ov.to?_parseLocalDate(ov.to):today;", "let t=ov.to?_parseLocalDate(ov.to):end;"],
+  ["launch: pace map, from the start", "days before the program's first Monday do not count -> they count", "const lo=Math.max(f.getTime(),mon.getTime());", "const lo=f.getTime();"],
+  ["launch: pace map, days before the week", "a week is shifted by the days hurt before it -> a week is shifted by the days hurt through its Monday", "const hi=Math.min(s[1],wkStart-86400000);", "const hi=Math.min(s[1],wkStart);"],
+  ["launch: pace map, floor of one", "any day hurt shifts the clock by at least a week -> one to three days hurt shift nothing", "map[w]=days>0?Math.max(1,Math.round(days/7)):0;", "map[w]=days>0?Math.round(days/7):0;"],
+  ["launch: pace map, merged spans", "overlapping injuries count a day once -> overlapping injuries count a day twice", "if(spans[k][0]<=m[1]+86400000) m[1]=Math.max(m[1],spans[k][1]);\n    else merged.push(spans[k].slice());", "merged.push(spans[k].slice());"],
+  ["launch: rebuild, id", "the rebuilt program keeps its id -> it carries the build's own id", "rebuilt.id = prog.id;", ""],
+  ["launch: rebuild, name", "the rebuilt program keeps its name -> it carries the build's name", "rebuilt.name = prog.name;", ""],
+  ["launch: rebuild, created", "the rebuilt program keeps when it was made -> it carries the instant of this launch", "rebuilt.created = prog.created;", ""],
+  ["launch: rebuild, start", "the rebuilt program keeps its start -> it has no start", "rebuilt.startDate = prog.startDate;", ""],
+  ["launch: rebuild, block open", "the rebuilt program keeps where its block opened -> it has none", "rebuilt.blockOpen = prog.blockOpen;", ""],
+  ["launch: rebuild, seed", "the rebuilt program keeps the stored program's own seed -> it carries the config's", "rebuilt.seed = prog.seed;", ""],
+  ["launch: rebuild, overlays", "the rebuilt program keeps its overlays -> it has none", "rebuilt.overlays = Array.isArray(prog.overlays) ? prog.overlays : [];", "rebuilt.overlays = [];"],
+  ["launch: rebuild, failure", "a program the engine cannot build is handed back as stored -> nothing is handed back", "failed.rebuild(e);\n    return prog;", "failed.rebuild(e);\n    return null;"],
+  ["launch: splice, called", "the overlays are spliced into the rebuilt grid -> no overlay is spliced", "    spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, failed.overlay);\n", "\n"],
+  ["launch: order, splice before the freeze", "the freeze has the last word over an overlay -> the overlays are spliced after the freeze", [["    spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, failed.overlay);\n", "\n"], ["    try{\n      const _mv=JSON.parse(", "    spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, failed.overlay);\n    try{\n      const _mv=JSON.parse("]]],
+  ["launch: overlay range, clamped", "an overlay's weeks are clamped to the program -> they are not clamped", "const lo=Math.max(1,fw), hi=Math.min(totalWeeks,tw);", "const lo=fw, hi=tw;"],
+  ["launch: overlay range, no end", "an overlay with no end runs to the last week -> it covers its first week only", "const tw = ov.to ? weekOfDate(prog, ov.to) : totalWeeks;", "const tw = ov.to ? weekOfDate(prog, ov.to) : fw;"],
+  ["launch: day date", "a program day's date is its week's Monday plus its weekday -> every day reads a day late", "dt.setDate(mon.getDate()+(week-1)*7+off);", "dt.setDate(mon.getDate()+(week-1)*7+off+1);"],
+  ["launch: freeze, the stored length", "the current week is capped at the stored length first -> it is capped at the rebuilt length", "const _tw = prog.totalWeeks || rebuilt.totalWeeks || 6;", "const _tw = rebuilt.totalWeeks || 6;"],
+  ["launch: freeze, no clock", "a program with no start still freezes by what was touched -> the freeze fails for it and every week is rebuilt", "const _hasClock = !!prog.startDate;", "const _hasClock = true;"],
+  ["launch: freeze, week count", "the current week is counted from the start's Monday -> it is counted a day late", "const _diff = Math.floor((_today - _mon)/86400000);", "const _diff = Math.floor((_today - _mon)/86400000)-1;"],
+  ["launch: freeze, past the end", "after the last week the current week is the last -> it runs past the end", "_curWk = _diff < 0 ? 1 : Math.min(_tw, Math.floor(_diff/7)+1);", "_curWk = _diff < 0 ? 1 : Math.floor(_diff/7)+1;"],
+  ["launch: touched, completion", "a completion proves a day was seen -> it proves nothing", "try{ Object.assign(_touched, JSON.parse(store.get('ia_comp_'+prog.id)||'{}')); }catch(e){}", ""],
+  ["launch: touched, log", "a log proves a day was seen -> it proves nothing", "try{ Object.assign(_touched, JSON.parse(store.get('ia_logs_'+prog.id)||'{}')); }catch(e){}", ""],
+  ["launch: touched, snapshot", "a snapshot proves a day was seen -> it proves nothing to the cut", "try{ Object.assign(_touched, JSON.parse(store.get('ia_hist_'+prog.id)||'{}')); }catch(e){}", ""],
+  ["launch: touched, lift log", "a logged lift proves its day was seen -> it proves nothing", "_touched['w'+_wn+'_'+(entryDay(_e)||'')] = true;", ""],
+  ["launch: touched, lift log day", "a logged lift freezes its own day -> it moves the cut and freezes no day", "_touched['w'+_wn+'_'+(entryDay(_e)||'')] = true;", "_touched['w'+_wn+'_'] = true;"],
+  ["launch: cut, the date", "every week before the current one is frozen, touched or not -> only weeks up to the furthest touched are frozen", "const _cut = Math.max(_dateCut, _maxTouched + 1);", "const _cut = _maxTouched + 1;"],
+  ["launch: cut, the furthest touched", "every week up to the furthest touched is frozen, wherever the date is -> only the date decides", "const _cut = Math.max(_dateCut, _maxTouched + 1);", "const _cut = _dateCut;"],
+  ["launch: cut, the furthest touched week itself", "the furthest touched week is frozen -> the cut stops a week short of it", "const _cut = Math.max(_dateCut, _maxTouched + 1);", "const _cut = Math.max(_dateCut, _maxTouched);"],
+  ["launch: freeze, reach", "every week below the cut is frozen -> the last frozen week is rebuilt", "for(let w=1; w<_cut; w++){", "for(let w=1; w<_cut-1; w++){"],
+  ["launch: freeze, written", "a frozen week replaces the rebuilt one -> no week is frozen", "rebuilt.weeks[w] = _merged;", ""],
+  ["launch: freeze, history", "a day with a snapshot is given back from it -> a snapshot is not read back", "if(_snap){ _merged[d] = _snap; _histRestored.add(k); return; }", ""],
+  ["launch: freeze, piercing", "the current week and later take live days where untouched -> no frozen week is pierced", "const _pierce = w >= _curWk;", "const _pierce = false;"],
+  ["launch: pierce, new days", "a pierced week gains a day the rebuild has and the stored grid lacks -> it keeps the stored days only", "Object.keys(_live).forEach(d=>{ if(!_seen.has(d)){ _seen.add(d); _days.push(d); } });", ""],
+  ["launch: past week, stored days only", "a week behind the current one keeps the stored set of days -> it gains the rebuild's days too", "if(_pierce){\n            _days = [];", "if(true){\n            _days = [];"],
+  ["launch: injury cover, kind", "only an injury covers a week -> a trip covers it too", ".filter(ov => ov && ov.type==='injury' && ov.patch && ov.patch.injury)", ".filter(ov => ov && ov.patch)"],
+  ["launch: freeze, injured week", "a touched day with no snapshot, in a week an injury covers, takes the live day -> it keeps its stored form", "if(_injCovers(w) && _live[d]){ _merged[d] = _live[d]; return; }", ""],
+  ["launch: touched day, stored form", "a touched day with no snapshot keeps its stored form -> it takes the live day", "_merged[d] = _stored[d] || _live[d];\n              return;", "_merged[d] = _live[d];\n              return;"],
+  ["launch: touched day, live fallback", "a touched day the stored grid lacks takes the live day -> it is dropped", "_merged[d] = _stored[d] || _live[d];\n              return;", "_merged[d] = _stored[d];\n              return;"],
+  ["launch: untouched day, pierced week", "an untouched day of a pierced week takes the live day -> it keeps its stored form", "if(_pierce && _live[d]){ _merged[d] = _live[d]; return; }", ""],
+  ["launch: untouched day, past week", "an untouched day of a past week keeps its stored form -> it takes the live day", "_merged[d] = _stored[d] || _live[d];\n          });", "_merged[d] = _live[d];\n          });"],
+  ["launch: moves, replayed", "a moved rest day is laid back on the rebuilt grid -> no move is replayed", "if(_mv&&Object.keys(_mv).length) applyRestDayMoves(rebuilt,_mv);", ""],
+  ["launch: order, moves before swaps", "the moves are laid before the swaps and the edits -> the moves are laid after the swaps", [["if(_mv&&Object.keys(_mv).length) applyRestDayMoves(rebuilt,_mv);", ""], ["if(typeof _swapCut==='number') pruneDayEditsBefore(store,prog.id,_swapCut);", "try{const _mv2=JSON.parse(store.get('ia_moves_'+prog.id)||'{}'); if(_mv2&&Object.keys(_mv2).length) applyRestDayMoves(rebuilt,_mv2);}catch(e){} if(typeof _swapCut==='number') pruneDayEditsBefore(store,prog.id,_swapCut);"]]],
+  ["launch: move, already applied", "a move a frozen week already holds is not applied again -> it is applied again", "if(wk[dest]&&wk[dest].movedFrom===origin) return;", ""],
+  ["launch: move, source", "a rest day or a day already moved is never the source -> it can be", "const src=wk[origin]; if(!src||src.rest||src.moved) return;", "const src=wk[origin]; if(!src) return;"],
+  ["launch: move, mark", "the moved session says where it came from -> it does not", "wk[dest]={...src, movedFrom:origin};", "wk[dest]={...src};"],
+  ["launch: move, origin rests", "the day a session left becomes a rest day -> the session shows on both days", "wk[origin]={title:src.title,dot:'rest',tags:['rest'],rest:true,moved:true,movedTo:dest};", ""],
+  ["launch: move, old form", "a move stored as a plain day name is read -> it is not", "const origin=(typeof mv==='string')?mv:mv.from;", "const origin=mv.from;"],
+  ["launch: swaps, replayed", "a session swap is laid back on the rebuilt day -> no swap is replayed", "if(Object.keys(_swLive).length) applySessionSwaps(rebuilt,_swLive);", ""],
+  ["launch: swaps, restored days", "a day given back from its snapshot gets no replay -> its swaps are replayed onto the snapshot", "Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; });", "Object.keys(_sw).forEach(k=>{ _swLive[k]=_sw[k]; });"],
+  ["launch: swap replay, order", "a day's swaps replay in the order made -> they replay newest first", "const list=(store[k]||[]).filter(e=>e&&e.from&&e.to);", "const list=(store[k]||[]).filter(e=>e&&e.from&&e.to).reverse();"],
+  ["launch: swap replay, applied", "each swap renames its lift on the day -> no lift is renamed", "if(applySwapPrefs(day.sections,m1)) hit=true;", "hit=true;"],
+  ["launch: swap replay, injury filter", "a swapped day under an injury goes through the injury filter again -> it does not", "if(hit && _dayPlanCfg(prog,day).injury){", "if(false){"],
+  ["launch: swap replay, hold kept", "a renamed lift carries its dose from before the filter -> it does not", "_renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });", ""],
+  ["launch: swap replay, the day's plan", "the injury that governs a day is its own overlay's -> it is the config's", "return Object.assign({},base,{injury:ov.patch.injury});", "return base;"],
+  ["launch: edits, pruned at launch", "the edits of every week below the cut are dropped at launch -> none is dropped", "if(typeof _swapCut==='number') pruneDayEditsBefore(store,prog.id,_swapCut);", ""],
+  ["launch: edits, the prune cut", "the prune stops at the freeze cut -> it takes the cut week too", "if(typeof _swapCut==='number') pruneDayEditsBefore(store,prog.id,_swapCut);", "if(typeof _swapCut==='number') pruneDayEditsBefore(store,prog.id,_swapCut+1);"],
+  ["launch: edits, replayed", "adds and skips are laid back on the rebuilt day -> none is replayed", "if(_ed&&Object.keys(_ed).length) applyDayEdits(rebuilt,_ed);", ""],
+  ["launch: order, swaps before edits", "the edits are laid after the swaps -> the edits are laid before the swaps", [["if(_ed&&Object.keys(_ed).length) applyDayEdits(rebuilt,_ed);", ""], ["const _sw=readSwaps(store,prog.id)||{}, _swLive={};", "{if(typeof _swapCut==='number') pruneDayEditsBefore(store,prog.id,_swapCut); const _ed0=readDayEdits(store,prog.id); if(_ed0&&Object.keys(_ed0).length) applyDayEdits(rebuilt,_ed0);} const _sw=readSwaps(store,prog.id)||{}, _swLive={};"]]],
+  ["launch: edit replay, skip", "a skipped movement is flagged -> it is not", "it._skipped = (skips.indexOf(it.name)>=0) || undefined;", ""],
+  ["launch: edit replay, round", "a skipped round is flagged whole -> it is not", "if(sec.superset) sec._skipped=ssKilled||undefined;", ""],
+  ["launch: edit replay, add", "an added movement is put on the day -> it is not", "bucket.items.push({name:a.name,detail:a.detail||'',_addedByUser:true});", ""],
+  ["launch: edit replay, add mark", "an added movement is marked the athlete's -> it is not", "bucket.items.push({name:a.name,detail:a.detail||'',_addedByUser:true});", "bucket.items.push({name:a.name,detail:a.detail||''});"],
+  ["launch: the instant handed over", "the page hands the launch the instant -> it hands it none, so every launch reads as 1970", "return refreshStoredProgram(iaStore, prog, Date.now(), {", "return refreshStoredProgram(iaStore, prog, 0, {"],
+  ["launch: the store handed over", "the page hands the launch its store -> it hands it an empty one", "return refreshStoredProgram(iaStore, prog, Date.now(), {", "return refreshStoredProgram(memoryStore(), prog, Date.now(), {"],
 ];
 
 // Breaks that change no record. They are run and printed, and they do not fail the script: each is a line no history
@@ -153,54 +242,90 @@ const OPEN = [
     'No reachable effect, settled in v0.261.5 (docs/decisions/stored-state.md). The guard decides only when a day is snapshotted again after it changed. A launch gives every snapshotted day back from its snapshot, and an edit is folded into the snapshot as it is made. One tap changes a snapshotted day and leaves its snapshot alone, the rest sheet\'s Move of a day with a logged lift, and it leaves a moved rest day that nothing snapshots (tests/measure/stored-state_first-touch.md). In 180 random histories, 0 of 4,481 repeat snapshots met a changed day (stored-state_first-touch-walks.md). The rule itself is held by the unit tests.'],
   ['snapshot, a key with no value', 'a listed key with no value goes into the backup', 'if(v!=null) data[k]=v;', 'data[k]=v;',
     'No reachable effect, found in v0.261.8 (tests/measure/stored-state_backup-gaps.md): the snapshot asks the store for a key the store has just listed, and both stores, the browser\'s storage and the memory store, give a string for every key they list. The guard moved as written; the unit tests hold the snapshot.'],
+  ["launch: week of a date, before the start", "a date before the program reads as week one -> it reads as a week before one", "return diff<0 ? 1 : Math.floor(diff/7)+1;", "return Math.floor(diff/7)+1;",
+    "No effect is possible in the grid's path, read in v0.262.2 (tests/measure/stored-state_freeze-gaps.md): overlayWeekRange clamps the week to one again, and the overlay sheet's \"picks your program back up\" line only asks whether the week is past the last. The unit tests hold the rule."],
+  ["launch: freeze, before the start", "before the start the current week is one -> it is a week before one", "_curWk = _diff < 0 ? 1 : Math.min(_tw, Math.floor(_diff/7)+1);", "_curWk = Math.min(_tw, Math.floor(_diff/7)+1);",
+    "No effect is possible: before the start the broken week is zero or less, the cut is still the furthest touched week plus one, and every week from one on is still pierced."],
+  ["launch: touched, lift log week", "a logged lift with no week proves nothing -> it writes a key for week zero or none", "if(!(_wn > 0)) return;", "",
+    "No effect is possible: a key for week zero or for no week matches no real day and never raises the furthest touched week."],
+  ["launch: empty days dropped", "a day with nothing on either side is left out of the week -> it stays as an empty key", "Object.keys(_merged).forEach(d=>{ if(!_merged[d]) delete _merged[d]; });", "",
+    "No record can hold it: the grid in hand is recorded as JSON, which leaves a key with no day out either way. The unit tests hold the week's keys."],
+  ["launch: edit replay, added block", "the athlete's own added block is never flagged skipped -> it can be", "if(sec._added) return;", "",
+    "No reachable effect: edits are laid only on a week at or above the cut, which the freeze never fills, so the day is the engine's fresh build and holds no added block when the skips are flagged. The unit tests hold the rule (the edits laid twice)."],
+  ["launch: edit replay, add once", "an added movement already on the day is not added again -> it is added again", "if(bucket.items.some(function(it){return it.name===a.name;})) return;", "",
+    "No reachable effect: edits are laid only on a week at or above the cut, a fresh build each launch, and each day is laid once. The unit tests hold the rule (the edits laid twice)."],
 ];
 
-const runFiles = (app, files) => {
-  try {
-    execFileSync('npx', ['vitest', 'run', ...files], { cwd: join(ROOT, 'tests'), env: { ...process.env, IA_APP: app, UPDATE_SNAPSHOTS: '' }, stdio: 'pipe' });
-    return { red: false, failed: [] };
-  } catch (e) {
-    const out = String(e.stdout || '') + String(e.stderr || '');
+/** One run of the tests against a copy of the page: red or green, the tests that failed, and what was printed. */
+const runFiles = (app, files) => new Promise((done) => {
+  execFile('npx', ['vitest', 'run', ...files], { cwd: join(ROOT, 'tests'), env: { ...process.env, IA_APP: app, UPDATE_SNAPSHOTS: '' }, maxBuffer: 256 << 20 }, (err, stdout, stderr) => {
+    if (!err) { done({ red: false, failed: [], out: '' }); return; }
+    const out = String(stdout || '') + String(stderr || '');
     const failed = [...new Set([...out.matchAll(/^\s*(?:×|✗)\s+(.+?)\s+\d+ms\s*$/gm)].map((m) => m[1]))];
-    return { red: true, failed, out };
-  }
+    done({ red: true, failed, out });
+  });
+});
+/** Runs `job` over `items`, JOBS at a time; the results keep the items' order. */
+const pool = async (items, job) => {
+  const out = new Array(items.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(JOBS, items.length) }, async () => {
+    while (next < items.length) { const i = next++; out[i] = await job(items[i], i); }
+  }));
+  return out;
 };
-/** Fast first; the sweeps only when the fast file stays green. `by` says which caught it. */
-const run = (app, all = false) => {
-  const f = runFiles(app, FAST);
-  if (f.red && !all) return { ...f, by: 'the fast file' };
-  const s = runFiles(app, SLOW);
-  if (f.red) return { ...f, by: 'the fast file' };
-  return s.red ? { ...s, by: 'the sweeps' } : { red: false, failed: [], by: '' };
+/** Each copy through the fast file, then the sweeps for the copies it let through. `by` says which caught it. */
+const runAll = async (apps) => {
+  const fast = await pool(apps, (app) => (app ? runFiles(app, FAST) : null));
+  const quiet = apps.map((app, i) => (app && !fast[i].red ? i : -1)).filter((i) => i >= 0);
+  const slow = await pool(quiet, (i) => runFiles(apps[i], SLOW));
+  return apps.map((app, i) => {
+    if (!app) return null;
+    if (fast[i].red) return { ...fast[i], by: 'the fast file' };
+    const s = slow[quiet.indexOf(i)];
+    return s.red ? { ...s, by: 'the sweeps' } : { red: false, failed: [], out: '', by: '' };
+  });
 };
 
 const breaks = picked(BREAKS);
 const opens = picked(OPEN);
 if (ONLY && !breaks.length && !opens.length) { console.error('no break\'s name holds "' + ONLY + '"'); process.exit(2); }
+const began = performance.now();
 const rows = [];
-const clean = ONLY ? runFiles(PAGE, FAST) : run(PAGE, true);
+// The page as built: the fast file, and on a whole run the sweeps too, whatever the fast file says.
+const [cleanFast, cleanSlow] = await Promise.all([runFiles(PAGE, FAST), ONLY ? null : runFiles(PAGE, SLOW)]);
+const clean = cleanFast.red ? cleanFast : cleanSlow && cleanSlow.red ? cleanSlow : { red: false, failed: [] };
 rows.push(['(no break)', 'the page as built', clean.red ? 'RED' : 'green', clean.red ? clean.failed.length : 0, ONLY ? 'the fast file alone' : 'all three files']);
 let bad = clean.red ? 1 : 0;
-for (const [name, what, from, to] of breaks) {
-  const n = page.split(from).length - 1;
-  if (n !== 1) { rows.push([name, what, 'NOT RUN: the text occurs ' + n + ' times in the page', '', '']); bad++; continue; }
-  const app = join(scratch, 'break-' + name.replace(/[^a-z]+/g, '-') + '.html');
-  writeFileSync(app, page.replace(from, to));
-  const r = run(app);
+/** A break's copy of the page, or how many times its text was found when that is not once. One place, or a list of
+ *  [text, replacement] pairs for a break of two places (an order of two calls). */
+const copyOf = (kind, name, from, to) => {
+  const pairs = Array.isArray(from) ? from : [[from, to]];
+  const n = pairs.map(([x]) => page.split(x).length - 1).find((c) => c !== 1);
+  if (n !== undefined) return { n };
+  const app = join(scratch, kind + '-' + name.replace(/[^a-z]+/g, '-') + '.html');
+  writeFileSync(app, pairs.reduce((t, [x, y]) => t.replace(x, () => y), page));
+  return { app };
+};
+const breakCopies = breaks.map(([name, , from, to]) => copyOf('break', name, from, to));
+const breakRuns = await runAll(breakCopies.map((c) => c.app || null));
+breaks.forEach(([name, what], i) => {
+  const c = breakCopies[i], r = breakRuns[i];
+  if (!c.app) { rows.push([name, what, 'NOT RUN: the text occurs ' + c.n + ' times in the page', '', '']); bad++; return; }
   if (!r.red) bad++;
-  if (r.red && !r.failed.length) writeFileSync(app + '.out.txt', r.out);
+  if (r.red && !r.failed.length) writeFileSync(c.app + '.out.txt', r.out);
   rows.push([name, what, r.red ? 'red' : 'GREEN (the records miss it)', r.red ? (r.failed.length || (/differs from tests\/snapshots/.test(r.out) ? 'the golden file' : 'a file failed before its tests')) : 0, r.by]);
-}
+});
 
 const open = [];
-for (const [name, what, from, to, note] of opens) {
-  const n = page.split(from).length - 1;
-  if (n !== 1) { open.push([name, what, 'NOT RUN: the text occurs ' + n + ' times', note]); continue; }
-  const app = join(scratch, 'open-' + name.replace(/[^a-z]+/g, '-') + '.html');
-  writeFileSync(app, page.replace(from, to));
-  const r = run(app);
+const openCopies = opens.map(([name, , from, to]) => copyOf('open', name, from, to));
+const openRuns = await runAll(openCopies.map((c) => c.app || null));
+opens.forEach(([name, what, , , note], i) => {
+  const c = openCopies[i], r = openRuns[i];
+  if (!c.app) { open.push([name, what, 'NOT RUN: the text occurs ' + c.n + ' times', note]); return; }
   open.push([name, what, r.red ? 'red now (' + r.failed.length + ' tests): move it to the list above' : 'no record changed', note]);
-}
+});
+process.stderr.write('red-on-break: ' + breaks.length + ' breaks and ' + opens.length + ' open ones, ' + JOBS + ' at a time, in ' + Math.round((performance.now() - began) / 1000) + ' s\n');
 
 const L = [];
 L.push('# Stored state: do the golden records go red when the code is broken on purpose?');

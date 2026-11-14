@@ -28,12 +28,13 @@ export type { DayHistory } from './state-day-history.ts';
 // The session swaps, the swap counts and the day edits, ia_swaps_, ia_swapct_ and ia_edits_<program>, and the program
 // list, the active program and the Wildcard's record, ia_programs, ia_active and ia_wild_<program> (v0.261.6).
 export {
-  SWAP_NUDGE_AT, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts, readSwaps, writeSwapCounts,
-  writeSwaps,
+  SWAP_NUDGE_AT, _dayPlanCfg, addSwapRecord, applySessionSwaps, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts,
+  readSwaps, writeSwapCounts, writeSwaps,
 } from './state-swaps.ts';
 export type { SwapCount, SwapCounts, SwapPlace, SwapRecord, Swaps } from './state-swaps.ts';
 export {
-  addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits, writeDayEdits,
+  addAddEdit, addSkipEdit, applyDayEdits, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits, ssSkipToken,
+  writeDayEdits,
 } from './state-day-edits.ts';
 export type { AddedMove, DayEdit, DayEdits } from './state-day-edits.ts';
 export {
@@ -41,7 +42,12 @@ export {
 } from './state-programs.ts';
 export type { WildcardDone } from './state-programs.ts';
 // The overlays (travel, injury) spliced into a rebuilt program, read off the stored program (v0.262.1).
-export { spliceOverlays } from './state-overlays.ts';
-export type { OverlaidProgram, Overlay, OverlayWeekRange, ProgramDayDate } from './state-overlays.ts';
+export { _progDayDate, dayOverlayInfo, overlayWeekRange, paceShiftMap, spliceOverlays, weekOfDate } from './state-overlays.ts';
+export type {
+  HeldDay, HeldGrid, HeldItem, HeldSection, OverlaidProgram, Overlay, OverlayWeekRange, ProgramDayDate, Spanned, Started,
+} from './state-overlays.ts';
+// What a launch hands back for a stored program: the rebuild, the freeze and what is laid back on it (v0.262.2).
+export { applyRestDayMoves, progTestPin, refreshStoredProgram } from './state-refresh.ts';
+export type { RefreshReport, RestMove, StoredProgram, TestPin } from './state-refresh.ts';
 export type { EngineCfg, CardioSchedule, PaceRow, RunAnchorInfo } from './cardio-progression.ts';
 export type { CardioSession } from './nsw-cardio.ts';
