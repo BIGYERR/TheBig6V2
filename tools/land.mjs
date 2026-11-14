@@ -115,6 +115,17 @@ function tagRelease(name, dry) {
   return 0;
 }
 
+/**
+ * The folders whose packages a landing changes: each one whose package-lock.json is among the changed files, as a path
+ * from the repo root ('.' for the root's own). The main checkout's node_modules there is stale from then on, and every
+ * chat's worktree borrows from it (tools/worktree-deps.mjs), so the landing names the npm ci to run (Post-v0.262.0: the
+ * native spike chat added a package to the Expo app, and nothing said the main checkout had to install it).
+ * @param {string[]} files  the paths the landed commits changed
+ */
+export function installsAfter(files) {
+  return [...new Set(files.filter((f) => /(^|\/)package-lock\.json$/.test(f)).map((f) => (f.includes('/') ? f.slice(0, f.lastIndexOf('/')) : '.')))].sort();
+}
+
 function main(argv) {
   const all = process.env.IA_PUSH_ALL === '1';
   const t = argv.indexOf('--tag');
@@ -139,10 +150,13 @@ function main(argv) {
   const v = judgeLanding({ branch, isChatBranch: /^chat\//.test(branch), devSha, originDevSha, devAhead, devBehind, branchHasDev, newMessages: messages(`${devSha}..HEAD`, here) }, { all });
   if (!v.ok) { console.error(`land: refused. ${v.reason}`); return 1; }
   console.log(`land: ${v.n} commit(s) from ${v.chats.join(', ')} on ${branch}${dry ? ' (dry run, nothing moved)' : ''}`);
-  if (dry) return 0;
+  const installs = installsAfter(git(['diff', '--name-only', `${devSha}..HEAD`], here).split('\n').filter(Boolean));
+  const installNotes = () => { for (const rel of installs) console.log(`land: ${rel}/package-lock.json changed: run npm ci in ${resolve(main, rel)}, or the main checkout and the worktrees that borrow from it keep the old packages`); };
+  if (dry) { installNotes(); return 0; }
   git(['merge', '--ff-only', branch], main);
   execFileSync('git', ['push', 'origin', 'dev'], { cwd: main, stdio: 'inherit', env: { ...process.env } });
   console.log(`land: dev is ${git(['rev-parse', '--short', 'dev'], main)}, pushed. Mario reviews CI and opens the pull request himself.`);
+  installNotes();
   return 0;
 }
 
