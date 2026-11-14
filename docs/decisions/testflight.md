@@ -110,5 +110,9 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   An unsigned Release archive for a device (`npm run archive-ios`) carried `0.262.0 (99)` in the app and the widget.
   Today's signing function, run on the generated project, set both targets to manual signing, and Xcode resolved
   the app's identity to Apple Distribution for a device build.
-- **Not yet seen:** a signed archive and an upload. Both wait for Mario's App Store Connect steps
-  (`frontends/native/README.md`, TestFlight from CI) and first run on `main`.
+- **Seen on `main`** (run 43546144149, merge 62ea4ca, 2026-11-13, after Mario's App Store Connect steps and his two
+  profile secrets): the gate went (28 s), the upload job archived, signed and uploaded `0.262.0 (100)` (7 min 35 s),
+  and the processed job read it back from App Store Connect as processed (1 min 41 s). The lane's leg reads
+  `testflight next 0.262.0 (100) processed`. Today's lane on the same run: its gate skipped, since App Store Connect
+  already held 0.262.0, and its upload and processed jobs did not run. The two lanes ran apart, as ruled.
+- **Not yet seen:** the build installed on Mario's phone from TestFlight, and the widget extension there.
