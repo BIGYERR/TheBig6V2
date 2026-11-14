@@ -317,6 +317,20 @@ simulator held each value byte for byte. Found on the way: SQLite stores text as
 as U+FFFD with the same sha256; the import compares the values themselves too. What is left of the exit gate: Mario's
 phone (a copy of his backup, the lattice under Hermes there), This Week, the spike, the second TestFlight lane.
 
+**Session 3 (Post-v0.262.0, D288 P-NEXTLANE, `docs/decisions/testflight.md`):** the native spike and the second
+TestFlight lane. `@bacons/apple-targets` 5.0.0 adds an empty `RestTimerWidget` target
+(`frontends/native/targets/RestTimerWidget`, bundle id `com.bigyerr.ironasylum.next.RestTimerWidget`) on every
+`expo prebuild`, and a no-op Swift module (`frontends/native/modules/ia-spike`) is found by Expo's autolinking; `ios/`
+stays generated and uncommitted, so 4.1's fallback was not needed. On the simulator the Bugs screen reads "Swift
+answers." and the built app holds the widget extension. The lane is three `next TestFlight` jobs on `main`, signed by
+today's signing code, no EAS, beside today's lane and apart from it. A build goes up once: the version stays core's
+and the build number counts the commits that changed `frontends/native`, `core` or `tests/semver.js`. The gate skips,
+green, until Mario's two profile secrets are set (`frontends/native/README.md`, TestFlight from CI, has his browser
+steps). Found on the way: the plugin writes the widget's `Info.plist` into `targets/`, which is committed; an
+unsigned device archive (`npm run archive-ios`) proves the release path up to the signature, and the signed archive
+first runs on `main`. What is left of the exit gate: Mario's steps and the first upload, his phone (a copy of his
+backup, the lattice under Hermes there), This Week.
+
 **Exit gate:** on Mario's phone, with a copy of his real backup loaded: the lattice at 864 of 864 and HALF_MANNY at
 `147f083be4e04e34` under Hermes; every `ia_` key's sha256 equal to the backup's after import (the app refuses the
 import otherwise); This Week showing the same week, day, cards and numbers as today's app, checked side by side by
@@ -488,7 +502,9 @@ committed, which is the rule this repo already lives by for Cordova's `platforms
 **The strongest argument against:** `@bacons/apple-targets` calls itself experimental, and extension targets are
 where Expo is thinnest. Today that is one target; with app blocking it becomes three or four. If the plugin fails us,
 the fallback is to commit the generated `ios/` folder and keep everything else. That is a step back, not a rewrite,
-and phase 2's spike finds out before any screen depends on it.
+and phase 2's spike finds out before any screen depends on it. **The spike's answer (phase 2, session 3):** 5.0.0, the
+newest, was released before SDK 58 and still generated one widget target on SDK 58.0.25 with nothing committed under
+`ios/`; it built for the simulator and archived for a device. One target is proved, not three or four.
 
 ### 4.2 Where can the phone's JavaScript engine change a result?
 
