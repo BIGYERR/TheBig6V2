@@ -5,11 +5,15 @@
 // Run from the repo root, after a build:
 //   node tests/measure/stored-state_red-on-break.mjs <scratch dir> > tests/measure/stored-state_red-on-break.md
 //
-// A slice runs its own breaks first, in a minute or two, and the whole set once before its release commit:
+// A slice runs its own breaks first and the whole set once before its release commit:
 //   node tests/measure/stored-state_red-on-break.mjs <scratch dir> --only overlay
 // keeps the breaks whose name holds that text, runs the page as built on the fast file alone, and heads its report
 // as a partial run. A partial report is read on the screen, never written over the saved one.
-import { execFileSync } from 'node:child_process';
+//
+// The breaks run several at a time, in two passes: the fast file for every break, then the sweeps for the breaks the
+// fast file let through (--jobs <n>, 4 unless said; 1 is one at a time, as this ran before Post-v0.262.2). Each row of
+// the report is the same whatever the number: a break's copy of the page and its test run share nothing with another's.
+import { execFile } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
@@ -17,8 +21,10 @@ const ROOT = process.cwd();
 const scratch = resolve(process.argv[2] || '');
 const onlyAt = process.argv.indexOf('--only');
 const ONLY = onlyAt > 0 ? String(process.argv[onlyAt + 1] || '').toLowerCase() : '';
-if (!process.argv[2] || process.argv[2].startsWith('--') || (onlyAt > 0 && !ONLY)) {
-  console.error('usage: node tests/measure/stored-state_red-on-break.mjs <scratch dir> [--only <text in a break\'s name>]');
+const jobsAt = process.argv.indexOf('--jobs');
+const JOBS = jobsAt > 0 ? Number(process.argv[jobsAt + 1]) : 4;
+if (!process.argv[2] || process.argv[2].startsWith('--') || (onlyAt > 0 && !ONLY) || !Number.isInteger(JOBS) || JOBS < 1 || JOBS > 16) {
+  console.error('usage: node tests/measure/stored-state_red-on-break.mjs <scratch dir> [--only <text in a break\'s name>] [--jobs <1 to 16>]');
   process.exit(2);
 }
 const picked = (list) => (ONLY ? list.filter(([name]) => name.toLowerCase().includes(ONLY)) : list);
@@ -250,54 +256,76 @@ const OPEN = [
     "No reachable effect: edits are laid only on a week at or above the cut, a fresh build each launch, and each day is laid once. The unit tests hold the rule (the edits laid twice)."],
 ];
 
-const runFiles = (app, files) => {
-  try {
-    execFileSync('npx', ['vitest', 'run', ...files], { cwd: join(ROOT, 'tests'), env: { ...process.env, IA_APP: app, UPDATE_SNAPSHOTS: '' }, stdio: 'pipe' });
-    return { red: false, failed: [] };
-  } catch (e) {
-    const out = String(e.stdout || '') + String(e.stderr || '');
+/** One run of the tests against a copy of the page: red or green, the tests that failed, and what was printed. */
+const runFiles = (app, files) => new Promise((done) => {
+  execFile('npx', ['vitest', 'run', ...files], { cwd: join(ROOT, 'tests'), env: { ...process.env, IA_APP: app, UPDATE_SNAPSHOTS: '' }, maxBuffer: 256 << 20 }, (err, stdout, stderr) => {
+    if (!err) { done({ red: false, failed: [], out: '' }); return; }
+    const out = String(stdout || '') + String(stderr || '');
     const failed = [...new Set([...out.matchAll(/^\s*(?:×|✗)\s+(.+?)\s+\d+ms\s*$/gm)].map((m) => m[1]))];
-    return { red: true, failed, out };
-  }
+    done({ red: true, failed, out });
+  });
+});
+/** Runs `job` over `items`, JOBS at a time; the results keep the items' order. */
+const pool = async (items, job) => {
+  const out = new Array(items.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(JOBS, items.length) }, async () => {
+    while (next < items.length) { const i = next++; out[i] = await job(items[i], i); }
+  }));
+  return out;
 };
-/** Fast first; the sweeps only when the fast file stays green. `by` says which caught it. */
-const run = (app, all = false) => {
-  const f = runFiles(app, FAST);
-  if (f.red && !all) return { ...f, by: 'the fast file' };
-  const s = runFiles(app, SLOW);
-  if (f.red) return { ...f, by: 'the fast file' };
-  return s.red ? { ...s, by: 'the sweeps' } : { red: false, failed: [], by: '' };
+/** Each copy through the fast file, then the sweeps for the copies it let through. `by` says which caught it. */
+const runAll = async (apps) => {
+  const fast = await pool(apps, (app) => (app ? runFiles(app, FAST) : null));
+  const quiet = apps.map((app, i) => (app && !fast[i].red ? i : -1)).filter((i) => i >= 0);
+  const slow = await pool(quiet, (i) => runFiles(apps[i], SLOW));
+  return apps.map((app, i) => {
+    if (!app) return null;
+    if (fast[i].red) return { ...fast[i], by: 'the fast file' };
+    const s = slow[quiet.indexOf(i)];
+    return s.red ? { ...s, by: 'the sweeps' } : { red: false, failed: [], out: '', by: '' };
+  });
 };
 
 const breaks = picked(BREAKS);
 const opens = picked(OPEN);
 if (ONLY && !breaks.length && !opens.length) { console.error('no break\'s name holds "' + ONLY + '"'); process.exit(2); }
+const began = performance.now();
 const rows = [];
-const clean = ONLY ? runFiles(PAGE, FAST) : run(PAGE, true);
+// The page as built: the fast file, and on a whole run the sweeps too, whatever the fast file says.
+const [cleanFast, cleanSlow] = await Promise.all([runFiles(PAGE, FAST), ONLY ? null : runFiles(PAGE, SLOW)]);
+const clean = cleanFast.red ? cleanFast : cleanSlow && cleanSlow.red ? cleanSlow : { red: false, failed: [] };
 rows.push(['(no break)', 'the page as built', clean.red ? 'RED' : 'green', clean.red ? clean.failed.length : 0, ONLY ? 'the fast file alone' : 'all three files']);
 let bad = clean.red ? 1 : 0;
-for (const [name, what, from, to] of breaks) {
-  // One place, or a list of [text, replacement] pairs for a break of two places (an order of two calls).
+/** A break's copy of the page, or how many times its text was found when that is not once. One place, or a list of
+ *  [text, replacement] pairs for a break of two places (an order of two calls). */
+const copyOf = (kind, name, from, to) => {
   const pairs = Array.isArray(from) ? from : [[from, to]];
   const n = pairs.map(([x]) => page.split(x).length - 1).find((c) => c !== 1);
-  if (n !== undefined) { rows.push([name, what, 'NOT RUN: the text occurs ' + n + ' times in the page', '', '']); bad++; continue; }
-  const app = join(scratch, 'break-' + name.replace(/[^a-z]+/g, '-') + '.html');
+  if (n !== undefined) return { n };
+  const app = join(scratch, kind + '-' + name.replace(/[^a-z]+/g, '-') + '.html');
   writeFileSync(app, pairs.reduce((t, [x, y]) => t.replace(x, () => y), page));
-  const r = run(app);
+  return { app };
+};
+const breakCopies = breaks.map(([name, , from, to]) => copyOf('break', name, from, to));
+const breakRuns = await runAll(breakCopies.map((c) => c.app || null));
+breaks.forEach(([name, what], i) => {
+  const c = breakCopies[i], r = breakRuns[i];
+  if (!c.app) { rows.push([name, what, 'NOT RUN: the text occurs ' + c.n + ' times in the page', '', '']); bad++; return; }
   if (!r.red) bad++;
-  if (r.red && !r.failed.length) writeFileSync(app + '.out.txt', r.out);
+  if (r.red && !r.failed.length) writeFileSync(c.app + '.out.txt', r.out);
   rows.push([name, what, r.red ? 'red' : 'GREEN (the records miss it)', r.red ? (r.failed.length || (/differs from tests\/snapshots/.test(r.out) ? 'the golden file' : 'a file failed before its tests')) : 0, r.by]);
-}
+});
 
 const open = [];
-for (const [name, what, from, to, note] of opens) {
-  const n = page.split(from).length - 1;
-  if (n !== 1) { open.push([name, what, 'NOT RUN: the text occurs ' + n + ' times', note]); continue; }
-  const app = join(scratch, 'open-' + name.replace(/[^a-z]+/g, '-') + '.html');
-  writeFileSync(app, page.replace(from, () => to));
-  const r = run(app);
+const openCopies = opens.map(([name, , from, to]) => copyOf('open', name, from, to));
+const openRuns = await runAll(openCopies.map((c) => c.app || null));
+opens.forEach(([name, what, , , note], i) => {
+  const c = openCopies[i], r = openRuns[i];
+  if (!c.app) { open.push([name, what, 'NOT RUN: the text occurs ' + c.n + ' times', note]); return; }
   open.push([name, what, r.red ? 'red now (' + r.failed.length + ' tests): move it to the list above' : 'no record changed', note]);
-}
+});
+process.stderr.write('red-on-break: ' + breaks.length + ' breaks and ' + opens.length + ' open ones, ' + JOBS + ' at a time, in ' + Math.round((performance.now() - began) / 1000) + ' s\n');
 
 const L = [];
 L.push('# Stored state: do the golden records go red when the code is broken on purpose?');

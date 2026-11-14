@@ -133,4 +133,10 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   today's was processed 7 min 10 s before the beta's upload ended.
 - **On Mario's phone** (his report, 2026-11-14): builds 100 and 101 are installed from TestFlight, today's app
   (`com.bigyerr.ironasylum`) beside them and untouched.
-- **Not yet seen:** the widget extension on the phone.
+- **On Mario's phone, build 103** (his report, 2026-11-14: "yes it says next but i dont see the widget extension"):
+  the icon carries the NEXT band. No widget is offered, and none can be yet: the extension declares one
+  `EmptyWidgetConfiguration` (`frontends/native/targets/RestTimerWidget/RestTimerWidget.swift`), which gives the
+  widget gallery nothing to list. What shows the extension is in the build is the archive, not the phone: the upload
+  job refuses an archive without `PlugIns/RestTimerWidget.appex` at the app's version, signs it with its own profile,
+  and App Store Connect processed the result. The phone sees it in phase 4, when the widget gets its content
+  (MIGRATION.md 4.1).
