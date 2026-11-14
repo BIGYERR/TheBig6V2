@@ -1,11 +1,15 @@
 import { dayStoreKey } from './state-day-log.ts';
+import { dayOverlayInfo } from './state-overlays.ts';
+import { applyInjuryFilter } from './injury.ts';
+import { applySwapPrefs } from './swap-prefs.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── The session swaps and the swap counts, ia_swaps_<program> and ia_swapct_<program> (docs/decisions/stored-state.md). ──
 // Moved out of the page's swaps-edits.ts in v0.261.6, code as it was, with the store, the program, the week, the day
 // and the instant passed in where the page read its globals and the clock. The page renames the card, snapshots the day
-// and draws; these hold what a tap stores. Replaying the records onto a rebuilt grid (applySessionSwaps) stays in the
-// page with refreshProgram until the freeze slice. It lives beside the engine while the page is built from this
-// folder, and moves to core/src/app-state at cutover (MIGRATION.md).
+// and draws; these hold what a tap stores. Replaying the records onto a rebuilt grid (applySessionSwaps), with the
+// plan that governs a day (_dayPlanCfg), moved here in v0.262.2 under the page's names, code as it was: the launch
+// calls it (state-refresh.ts). It lives beside the engine while the page is built from this folder, and moves to
+// core/src/app-state at cutover (MIGRATION.md).
 //
 // A swap is session-scoped: the athlete trades one lift for another on the day in front of them, the program itself
 // is untouched, and next week says what it always said. The record is what lets a rebuild triggered by an app
@@ -13,6 +17,8 @@ import { dayStoreKey } from './state-day-log.ts';
 // undoes it (V222 D181); it is replayed in recording order on days the freeze did not restore from ia_hist_ and left
 // alone on days it did.
 import type { StateStore } from './state-store.ts';
+import type { Cfg } from '../domain/index.ts';
+import type { HeldGrid, HeldItem } from './state-overlays.ts';
 /** Where an item named `from` stood before the rename: its section, its place, its detail, and the dose kept before an
  *  injury's re-filter when the card carried one (V221 D177 R4, V229 D193). */
 export interface SwapPlace { s: number; i: number; d: string; ph?: string }
@@ -77,8 +83,50 @@ function markSwapNudged(store: StateStore, programId: string | null, from: strin
   if(c[from]){c[from].offered=true;writeSwapCounts(store,programId,c);}
 }
 
+// D194 R1 (P-INJLENS), measure CF4 reading: the plan that governs a card is the plan of the day the card is on.
+// Outside buildProgram the injury is read off the day's own overlay stamp (_ovKey via dayOverlayInfo, the carrier
+// swapUniverseFor already keys on). A day whose stamp carries no injury key (no stamp, or a travel stamp) keeps
+// prog.cfg's injury, which is what that day's build used. Injury only: every other field is prog.cfg's.
+function _dayPlanCfg(prog: { cfg?: Cfg | null } | null | undefined,day: { _ovKey?: unknown } | null | undefined): Cfg{
+  const base=(prog&&prog.cfg)||{} as Cfg;
+  const ov=dayOverlayInfo(day);
+  if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
+  return Object.assign({},base,{injury:ov.patch.injury});
+}
+// Re-applied at the very end of the launch, after the freeze, alongside rest-day
+// moves — both are the athlete's own edits, so nothing the engine does should undo
+// them. V222 D181 (R4'): a day's records replay in recording order (array order, which
+// recordSwap keeps by push) through the same _swapDetailFor the sheet used, so the booted
+// card is the card the athlete built. Days the freeze restored from ia_hist_ never reach
+// this function (R5).
+function applySessionSwaps(prog: (HeldGrid & { cfg?: Cfg | null }) | null | undefined,store: Swaps | null | undefined): void{
+  if(!prog||!prog.weeks||!store) return;
+  Object.keys(store).forEach(k=>{
+    const m=/^w(\d+)_(.+)$/.exec(k); if(!m) return;
+    const w=+m[1],d=m[2];
+    const day=prog.weeks![w]&&prog.weeks![w][d];
+    if(!day||!Array.isArray(day.sections)) return;
+    // V222 D181 (R4'). Records replay in recording order, one per pass, through the same
+    // _swapDetailFor the sheet used, so each hop's detail comes from the hop before it.
+    const list=(store[k]||[]).filter(e=>e&&e.from&&e.to);
+    let hit=false;
+    const _renamed: HeldItem[]=[];   // V229 D193 (A3 s4) / D194 R6: the items this replay renamed, by identity
+    list.forEach(e=>{
+      const m1=Object.create(null); m1[e.from]=e.to;
+      const _was: HeldItem[]=[]; day.sections!.forEach(s=>((s&&s.items)||[]).forEach(it=>{ if(it&&it.name===e.from) _was.push(it); }));
+      if(applySwapPrefs(day.sections!,m1)) hit=true;
+      _was.forEach(it=>{ if(it.name!==e.from&&_renamed.indexOf(it)<0) _renamed.push(it); });
+    });
+    if(hit && _dayPlanCfg(prog,day).injury){
+      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through
+      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });
+      day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));
+    }
+  });
+}
+
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  SWAP_NUDGE_AT, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts, readSwaps, writeSwapCounts,
-  writeSwaps,
+  SWAP_NUDGE_AT, _dayPlanCfg, addSwapRecord, applySessionSwaps, countSwap, dropSwapRecord, markSwapNudged,
+  readSwapCounts, readSwaps, writeSwapCounts, writeSwaps,
 };

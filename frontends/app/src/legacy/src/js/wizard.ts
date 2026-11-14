@@ -2,6 +2,7 @@ import { getPrograms } from './storage.ts';
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setCalcLift, activeProg, calcLift, showScreen, showToast } from './rest-day-shell.ts';
 import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
+import { progTestPin } from '../../../../../../core/src/engine/state-refresh.ts';
 import {
   ALL_DAYS_ORDER, _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday,
 } from '../../../../../../core/src/engine/calendar.ts';
@@ -15,7 +16,6 @@ import {
   _mileAdvisoryHTML, _mileEntryState, _mileFieldHelp, _swimAdvisoryHTML, generateProgram,
 } from './wizard-generate.ts';
 import { _fmtPaceMi } from './log-entries.ts';
-import { progTestPin } from './programs.ts';
 import { seedFromPriorPrograms } from './progress-data.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 

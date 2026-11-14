@@ -593,7 +593,8 @@ function prefPopulation(regions: string[], limit?: number, srcLimit?: number) {
 // ── a swap stays made until undone (D181) ────────────────────────────────────────────────────────────────────────
 // One page, Mario's config, the stored program starting 2026-08-24 (or dateless), W5 Thu's box squat. The clocks are
 // date arithmetic: 2026-08-24 is a Monday, so W5 Thu is 2026-09-24, and a day's program week is floor(days / 7) + 1.
-// The freeze cut is read where the engine hands it on, by wrapping pruneDayEdits (the one reader of _swapCut).
+// The freeze cut is read where the launch hands it on, by wrapping core's pruneDayEditsBefore (the one reader of
+// _swapCut; the page's own pruneDayEdits went with the lift, v0.262.2).
 const DUR = {
   W: 5, D: 'thu', KEY: 'w5_thu',
   DONOR_M: '4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
@@ -612,7 +613,7 @@ function durableWorld() {
   const X = loadApp();
   const pin = (iso: string) => pinClock(X, new Date(iso + 'T12:00:00'));
   const ev = (c: string) => X.eval(c);
-  ev("showToast=function(){};globalThis.__cut=null;(function(){var f=pruneDayEdits;pruneDayEdits=function(p,c){globalThis.__cut=c;return f(p,c);};})();");
+  ev("showToast=function(){};globalThis.__cut=null;(function(){var f=pruneDayEditsBefore;pruneDayEditsBefore=function(s,p,c){globalThis.__cut=c;return f(s,p,c);};})();");
   pin(CLOCKS.today);
   const built = JSON.stringify(X.buildProgram(MARIO() as Cfg));
   function setup(dated: boolean) {

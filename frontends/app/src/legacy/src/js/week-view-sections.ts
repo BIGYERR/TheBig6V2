@@ -1,6 +1,7 @@
 import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.ts';
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setCurrentWeek, activeProg, currentWeek, openRestSheet, showToast } from './rest-day-shell.ts';
+import { _progDayDate, overlayWeekRange } from '../../../../../../core/src/engine/state-overlays.ts';
 import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL, _fmtStartDay } from './wizard.ts';
 import { INJURY_REGIONS } from '../../../../../../core/src/engine/injury.ts';
@@ -8,7 +9,7 @@ import { updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML } from
 import { buildExItem } from './set-logging.ts';
 import { openDetail } from './day-detail.ts';
 import { progAlignment } from './programs.ts';
-import { _liveInjuryOverlay, dayIsTravel, overlayWeekRange, renderOverlayChip, travelTagHTML } from './overlays.ts';
+import { _liveInjuryOverlay, dayIsTravel, renderOverlayChip, travelTagHTML } from './overlays.ts';
 import { computeStreak, statusOf } from './popups-streaks-reminders.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
@@ -24,14 +25,6 @@ const tagMeta: Record<string, any>={test:{cls:'t-test',label:'Test Week'},peak:{
 // the block: not missed, not pending, no reminder, no tap. Only week 1 can hold them
 // (week 1 is the week containing the start by construction), but the predicate is
 // written on dates so a back-dated setProgStart resolves the same way.
-function _progDayDate(prog: any, week: any, d: any){
-  if(!prog||!prog.startDate) return null;
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ mo
-  const off = {mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6}[d]; if(off==null) return null;
-  const mon = getWeekMonday(prog.startDate);
-  const dt = new Date(mon); dt.setDate(mon.getDate()+(week-1)*7+off); dt.setHours(0,0,0,0);
-  return dt;
-}
 function dayBeforeStart(prog: any, week: any, d: any){
   if(!prog||!prog.startDate) return false;
   const dt = _progDayDate(prog, week, d); if(!dt) return false;
@@ -926,6 +919,6 @@ function rxSuffix(rx: any){
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  REST_WORD, _partialWeek1, _progDayDate, _stripLeadingSets, buildSectionsHTML, calcCurrentWeek, dayBeforeStart,
-  dayOffset, parseRx, renderWeekView, restLogHead, restLogLines, runSessionCode, rxSuffix, tagMeta,
+  REST_WORD, _partialWeek1, _stripLeadingSets, buildSectionsHTML, calcCurrentWeek, dayBeforeStart, dayOffset, parseRx,
+  renderWeekView, restLogHead, restLogLines, runSessionCode, rxSuffix, tagMeta,
 };

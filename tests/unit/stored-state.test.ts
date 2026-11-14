@@ -7,7 +7,9 @@
 // state-programs.ts, v0.261.6), and what Progress reads and computes from the stored state, the run card's regime and
 // the nudge's preference (core/src/engine/state-progress.ts, state-day-log.ts and state-programs.ts, v0.261.7), and the
 // backup's snapshot, reader and loader (core/src/engine/state-backup.ts, v0.261.8), and the overlays spliced into a
-// rebuilt program (core/src/engine/state-overlays.ts, v0.262.1). Every expected value is typed from the ruling.
+// rebuilt program (core/src/engine/state-overlays.ts, v0.262.1), and what a launch hands back for a stored program:
+// the rebuild, the freeze, the date readers, the pace clock and the replays (core/src/engine/state-refresh.ts,
+// state-overlays.ts, state-swaps.ts and state-day-edits.ts, v0.262.2). Every expected value is typed from the ruling.
 // What the app stores through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
@@ -26,11 +28,12 @@ import {
 import { readDayHistory, recordDaySnapshot, refreshDaySnapshot, writeDayHistory } from '@ia/core/engine/state-day-history.ts';
 import type { DayHistory } from '@ia/core/engine/state-day-history.ts';
 import {
-  SWAP_NUDGE_AT, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts, readSwaps, writeSwapCounts,
-  writeSwaps,
+  SWAP_NUDGE_AT, _dayPlanCfg, addSwapRecord, applySessionSwaps, countSwap, dropSwapRecord, markSwapNudged, readSwapCounts,
+  readSwaps, writeSwapCounts, writeSwaps,
 } from '@ia/core/engine/state-swaps.ts';
 import {
-  addAddEdit, addSkipEdit, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits, writeDayEdits,
+  addAddEdit, addSkipEdit, applyDayEdits, dropAddEdit, dropSkipEdit, pruneDayEditsBefore, readDayEdits, ssSkipToken,
+  writeDayEdits,
 } from '@ia/core/engine/state-day-edits.ts';
 import {
   readActiveProgramId, readPrograms, readWildcardDone, recordSwapPreference, writeActiveProgramId, writePrograms, writeWildcardDone,
@@ -43,11 +46,14 @@ import {
 import {
   BACKUP_FORMAT, BACKUP_KIND, backupKeys, backupProgramCount, loadBackupInto, readBackupText, takeBackup,
 } from '@ia/core/engine/state-backup.ts';
-import { spliceOverlays } from '@ia/core/engine/state-overlays.ts';
-import type { OverlaidProgram, Overlay, OverlayWeekRange, ProgramDayDate } from '@ia/core/engine/state-overlays.ts';
+import { _progDayDate, dayOverlayInfo, overlayWeekRange, paceShiftMap, spliceOverlays, weekOfDate } from '@ia/core/engine/state-overlays.ts';
+import type { HeldDay, HeldGrid, OverlaidProgram, Overlay, OverlayWeekRange, ProgramDayDate } from '@ia/core/engine/state-overlays.ts';
+import { applyRestDayMoves, progTestPin, refreshStoredProgram } from '@ia/core/engine/state-refresh.ts';
+import type { RefreshReport, StoredProgram } from '@ia/core/engine/state-refresh.ts';
 import { buildProgram } from '@ia/core/engine/budget-engine-d.ts';
-import type { Cfg, Day, Program } from '@ia/core';
+import type { Cfg, Day, Program, Week } from '@ia/core';
 import { appScript, fixtures, loadApp, pinClock } from '../support/app.ts';
+import { PROGRAMS } from '../support/programs.ts';
 
 /** A stand-in for the browser's storage that records what was asked of it. */
 function fakeStorage(start: [string, string][] = []): StorageLike & { calls: string[]; rows: (readonly [string, string] | null)[] } {
@@ -807,7 +813,8 @@ test('the page\'s own names still answer as they did: a swap, its undo, the coun
   assert.equal(IA.eval("JSON.stringify(getDayEdits('p9'))"), get('ia_edits_p9'));
   IA.eval("clearSkip('p9',2,'mon','Curl');clearAdd('p9',2,'mon','Hip thrust');");
   assert.equal(get('ia_edits_p9'), '{"w4_tue":{"add":[],"skip":["Row"]}}');
-  IA.eval("pruneDayEdits('p9',5)");
+  // The launch calls core's prune itself since v0.262.2, and the page's one line caller went with its only caller.
+  IA.eval("pruneDayEditsBefore(iaStore,'p9',5)");
   assert.equal(get('ia_edits_p9'), '{}');
   IA.eval("savePrograms([{id:'p9',name:'X'}]);setActiveProgId('p9');activeProgId='p9';saveWildcardDone([{title:'Ruck',ts:1,week:null,dayKey:null}]);");
   assert.deepEqual([get('ia_programs'), get('ia_active'), get('ia_wild_p9')], ['[{"id":"p9","name":"X"}]', 'p9', '[{"title":"Ruck","ts":1,"week":null,"dayKey":null}]']);
@@ -1228,7 +1235,7 @@ test('an overlay that fails is reported once with its error, and the one after i
   assert.deepEqual(ovStamps(out, 1), [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]);
 });
 
-test('the page reaches the overlay splice through core: each rule is in the script once, and its own applyOverlays only hands it on', () => {
+test('the page reaches the overlay splice through core: each rule is in the script once, and the launch hands it the two date readers and its report', () => {
   const code = appScript();
   assert.equal(code.split('function spliceOverlays(').length - 1, 1, 'spliceOverlays is in the page once');
   for (const rule of [
@@ -1237,14 +1244,314 @@ test('the page reaches the overlay splice through core: each rule is in the scri
     'const dt = dayDate(prog, w, d); if(!dt) return;',
     'if(dt < _from || (_to && dt > _to)) return;',
     'rebuilt.weeks[w][d] = Object.assign({}, vd, {_ovKey: ck});',
-    'return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov, e)=>{',
+    'spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, failed.overlay);',
   ]) assert.equal(code.split(rule).length - 1, 1, rule + ' is in the page once');
-  assert.equal(code.split('function applyOverlays(').length - 1, 1);
+  assert.equal(code.split('function applyOverlays(').length - 1, 0, 'the page\'s applyOverlays went with its only caller (v0.262.2)');
   assert.equal(code.split('_travel:true').length - 1, 1, 'the travel mark is set in one place');
 });
 
+// ── v0.262.2: what a launch hands back for a stored program (core/src/engine/state-refresh.ts), the date readers, the
+// pace clock and the overlay a day came from (state-overlays.ts), and the swaps' and the edits' replays
+// (state-swaps.ts, state-day-edits.ts). Every expected value is typed from the rules and the calendar. The freeze is
+// read off a stored grid whose every day is marked by hand, so a day in hand says which form it took: its snapshot
+// (SNAP), its stored form (STORED), or the engine's rebuild (neither mark). ──
+const RF_WEEK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+const RF_PACE = PROGRAMS['1.5 mile test goal, commercial, balanced']!;
+const at = (y: number, m: number, d: number, h = 12): number => new Date(y, m - 1, d, h).getTime();
+/** A stored program whose every day is marked STORED, starting Monday 31 August 2026, and the store it sits in. */
+function rfStored(cfg: Cfg = OV_HALF, more: Partial<StoredProgram> = {}): StoredProgram {
+  const p = JSON.parse(JSON.stringify(buildProgram(cfg))) as StoredProgram;
+  for (const w of Object.keys(p.weeks)) for (const d of RF_WEEK) (p.weeks[w]![d] as { title: string }).title = 'STORED';
+  return Object.assign(p, { id: 'p1', name: 'Mine', created: 5, startDate: '2026-08-31', overlays: [] }, more);
+}
+const SNAP = { title: 'SNAP', dot: 'lift', tags: ['lift'], cardio: null, sections: [{ label: 'Main', items: [{ name: 'A', detail: '3×5' }] }] };
+/** A store holding the given keys as JSON, counting every call made to it. */
+function rfStore(keys: Record<string, unknown> = {}): StateStore & { calls: string[] } {
+  const s = memoryStore();
+  for (const k of Object.keys(keys)) s.set(k, JSON.stringify(keys[k]));
+  const calls: string[] = [];
+  return {
+    calls,
+    get: (k) => { calls.push('get ' + k); return s.get(k); },
+    set: (k, v) => { calls.push('set ' + k); s.set(k, v); },
+    remove: (k) => { calls.push('remove ' + k); s.remove(k); },
+    keys: () => s.keys(),
+  };
+}
+/** A report that lists what it was told. */
+function rfReport(): RefreshReport & { told: string[] } {
+  const told: string[] = [];
+  return { told, overlay: (ov) => { told.push('overlay ' + ov.id); }, freeze: () => { told.push('freeze'); }, rebuild: () => { told.push('rebuild'); } };
+}
+/** Each day of a week in hand: SNAP, STORED, or live (the rebuild's own day). */
+const rfForms = (p: StoredProgram, w: number): string[] => RF_WEEK.map((d) => { const t = (p.weeks[w]![d] as { title: string }).title; return t === 'SNAP' || t === 'STORED' ? t : 'live'; });
+const ALL = (form: string): string[] => RF_WEEK.map(() => form);
+
+test('the freeze goes by the day: a snapshot wins, a touched day with none keeps its stored form, an untouched day is rebuilt in the current week and kept behind it', () => {
+  // Wednesday 9 September 2026, the second week from Monday 31 August. Week 1: Monday has a completion, Tuesday a
+  // snapshot. Week 2: Monday a log, Tuesday a logged lift. The cut is week 3.
+  const store = rfStore({
+    ia_comp_p1: { w1_mon: { status: 'complete' } }, ia_hist_p1: { w1_tue: SNAP }, ia_logs_p1: { w2_mon: { rpe: '7' } },
+    ia_exw_p1: { squat: { name: 'Squat', entries: [{ week: 2, day: 'tue', weight: 100 }] } },
+  });
+  const report = rfReport();
+  const out = refreshStoredProgram(store, rfStored(), at(2026, 9, 9), report);
+  assert.deepEqual(rfForms(out, 1), ['STORED', 'SNAP', 'STORED', 'STORED', 'STORED', 'STORED', 'STORED'], 'the week behind: every day as stored, but the snapshot');
+  assert.deepEqual(rfForms(out, 2), ['STORED', 'STORED', 'live', 'live', 'live', 'live', 'live'], 'the current week: the two touched days as stored, the rest rebuilt');
+  assert.deepEqual(rfForms(out, 3), ALL('live'), 'the week at the cut is the rebuild');
+  assert.deepEqual(report.told, []);
+  assert.deepEqual([out.id, out.name, out.created, out.startDate, out.seed, out.overlays], ['p1', 'Mine', 5, '2026-08-31', 76308, []], 'what the rebuild keeps of the stored program');
+  assert.deepEqual(store.calls.filter((c) => c.startsWith('set ') || c.startsWith('remove ')), [], 'nothing is written');
+});
+
+test('the cut is the furthest touched week plus one when the calendar is behind it, and a program with no start freezes by what was touched alone', () => {
+  // Tuesday 1 September, week 1, with one snapshot in week 3: weeks 1 to 3 are inside the cut, and all three are at or
+  // after the current week, so only the snapshot is held.
+  const ahead = refreshStoredProgram(rfStore({ ia_hist_p1: { w3_thu: SNAP } }), rfStored(), at(2026, 9, 1), rfReport());
+  assert.deepEqual([rfForms(ahead, 1), rfForms(ahead, 2), rfForms(ahead, 3), rfForms(ahead, 4)],
+    [ALL('live'), ALL('live'), ['live', 'live', 'live', 'SNAP', 'live', 'live', 'live'], ALL('live')]);
+  // No start date: the current week reads as one whatever the day, and a completion in week 2 puts the cut at week 3.
+  const report = rfReport();
+  const dateless = refreshStoredProgram(rfStore({ ia_comp_p1: { w2_mon: { status: 'complete' } } }), rfStored(OV_HALF, { startDate: null }), at(2027, 1, 1), report);
+  assert.deepEqual([rfForms(dateless, 1), rfForms(dateless, 2), rfForms(dateless, 3)], [ALL('live'), ['STORED', 'live', 'live', 'live', 'live', 'live', 'live'], ALL('live')]);
+  assert.deepEqual(report.told, [], 'no clock is not a failure');
+});
+
+test('a touched day with no snapshot takes the rebuilt day in a week an injury covers, and keeps its stored form under a trip', () => {
+  const comp = { ia_comp_p1: { w1_mon: { status: 'complete' } } };
+  const knee: Overlay = { id: 'knee', type: 'injury', from: '2026-08-31', to: null, patch: KNEE_PATCH, created: 1 };
+  const hurt = refreshStoredProgram(rfStore(comp), rfStored(OV_HALF, { overlays: [knee] }), at(2026, 9, 1), rfReport());
+  assert.deepEqual([rfForms(hurt, 1)[0], ovStamp(hurt, 1, 'mon')], ['live', KNEE_KEY]);
+  const away = refreshStoredProgram(rfStore(comp), rfStored(OV_HALF, { overlays: [trip({ from: '2026-08-31', to: '2026-09-06' })] }), at(2026, 9, 1), rfReport());
+  assert.deepEqual([rfForms(away, 1)[0], ovStamp(away, 1, 'mon'), ovStamp(away, 1, 'tue')], ['STORED', null, TRIP_KEY], 'Monday as stored, Tuesday the trip\'s');
+});
+
+test('a frozen week drops a day with nothing on either side, takes the rebuild\'s days when current, and keeps its own set of days when behind', () => {
+  // Stored weeks 1 and 2 without their Sundays, week 2 with a key that holds no day; a completion in each week;
+  // Tuesday 8 September, week 2.
+  const stored = rfStored();
+  delete (stored.weeks['1'] as Partial<Week>).sun; delete (stored.weeks['2'] as Partial<Week>).sun;
+  (stored.weeks['2'] as unknown as Record<string, null>)['zzz'] = null;
+  const out = refreshStoredProgram(rfStore({ ia_comp_p1: { w1_mon: {}, w2_mon: {} } }), stored, at(2026, 9, 8), rfReport());
+  assert.deepEqual(Object.keys(out.weeks['1']!).sort(), ['fri', 'mon', 'sat', 'thu', 'tue', 'wed'], 'the week behind keeps the days it was stored with');
+  assert.deepEqual(Object.keys(out.weeks['2']!).sort(), ['fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed'], 'the current week gains the rebuild\'s Sunday, and the empty key is left out');
+});
+
+test('a program with no config, or with no seed anywhere, is handed back as it is and the store is never asked', () => {
+  const store = rfStore();
+  const bare = { id: 'p1', weeks: {} } as unknown as StoredProgram;
+  assert.equal(refreshStoredProgram(store, bare, at(2026, 9, 1), rfReport()), bare);
+  const seedless = rfStored();
+  delete (seedless as Partial<StoredProgram>).seed; delete (seedless.cfg as Partial<Cfg>).seed;
+  assert.equal(refreshStoredProgram(store, seedless, at(2026, 9, 1), rfReport()), seedless);
+  assert.deepEqual(store.calls, []);
+});
+
+test('an older program\'s seed is put into its config and written to its own entry in the stored list, and to no other', () => {
+  const older = rfStored();
+  delete (older.cfg as Partial<Cfg>).seed;
+  const store = rfStore({ ia_programs: [{ id: 'p0', cfg: { name: 'first' } }, { id: 'p1', cfg: { name: 'second' } }] });
+  const out = refreshStoredProgram(store, older, at(2026, 9, 1), rfReport());
+  assert.deepEqual([older.cfg.seed, out.cfg.seed], [76308, 76308]);
+  assert.equal(store.get('ia_programs'), '[{"id":"p0","cfg":{"name":"first"}},{"id":"p1","cfg":{"name":"second","seed":76308}}]');
+});
+
+test('a dated pace test with no pinned week is pinned at launch and written once; a past test, and a week already pinned, write nothing', () => {
+  // The 1.5 mile goal starting Saturday 29 August 2026 (first Monday 24 August), its test on Saturday 10 October: the
+  // week of 5 October, 42 days on, the seventh.
+  const dated = (pin?: number): StoredProgram => {
+    const p = rfStored(RF_PACE, { startDate: '2026-08-29' });
+    Object.assign(p.cfg, { raceDate: '2026-10-10', eventTargeted: true });
+    delete p.cfg._testWeek; delete p.cfg._raceDateCappedWeeks;
+    if (pin) Object.assign(p.cfg, { _testWeek: pin, _raceDateCappedWeeks: pin });
+    return p;
+  };
+  const list = { ia_programs: [{ id: 'p1', cfg: { name: 'stored' } }] };
+  const store = rfStore(list);
+  const out = refreshStoredProgram(store, dated(), at(2026, 8, 31), rfReport());
+  assert.deepEqual([out.cfg._testWeek, out.cfg._raceDateCappedWeeks, out.totalWeeks], [7, 7, 7]);
+  assert.equal(store.get('ia_programs'), '[{"id":"p1","cfg":{"name":"stored","_testWeek":7,"_raceDateCappedWeeks":7}}]');
+  const late = rfStore(list);
+  const past = refreshStoredProgram(late, dated(), at(2026, 10, 12), rfReport());
+  assert.deepEqual(['_testWeek' in past.cfg, late.calls.filter((c) => c.startsWith('set '))], [false, []], 'two days after the test nothing is pinned');
+  const held = rfStore(list);
+  assert.equal(refreshStoredProgram(held, dated(6), at(2026, 8, 31), rfReport()).cfg._testWeek, 6);
+  assert.deepEqual(held.calls.filter((c) => c.startsWith('set ') || c === 'get ia_programs'), [], 'a pinned week is not read again');
+});
+
+test('the pace shift is set on the config before the build when an injury stops quality running, and cleared when none derives', () => {
+  const knee: Overlay = { id: 'knee', type: 'injury', from: '2026-08-17', to: null, patch: KNEE_PATCH, created: 1 };
+  const hurt = rfStored(RF_PACE, { startDate: '2026-08-29', overlays: [knee] });
+  assert.deepEqual(refreshStoredProgram(rfStore(), hurt, at(2026, 9, 2), rfReport()).cfg._paceShift, [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  const stale = rfStored(RF_PACE, { startDate: '2026-08-29' });
+  Object.assign(stale.cfg, { _paceShift: [0, 3, 3] });
+  assert.equal('_paceShift' in refreshStoredProgram(rfStore(), stale, at(2026, 9, 2), rfReport()).cfg, false);
+  assert.equal('_paceShift' in stale.cfg, false, 'it is deleted from the config handed in, before the build');
+});
+
+test('a part of the launch that fails is reported once and the launch goes on: an overlay, the freeze, the rebuild', () => {
+  // An overlay the engine cannot build: reported, and the trip beside it still applies.
+  const bad: Overlay = { id: 'bad', type: 'injury', from: '2026-09-01', to: '2026-09-04', patch: { restDays: 7 } as unknown as Overlay['patch'], created: 1 };
+  const r1 = rfReport();
+  const out = refreshStoredProgram(rfStore(), rfStored(OV_HALF, { overlays: [bad, trip()] }), at(2026, 9, 1), r1);
+  assert.deepEqual([r1.told, ovStamps(out, 1)], [['overlay bad'], [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]]);
+  // A start that is not a date (damage): the freeze fails, and the weeks are the rebuilt ones although a day is touched.
+  const r2 = rfReport();
+  const unfrozen = refreshStoredProgram(rfStore({ ia_comp_p1: { w1_mon: {} } }), rfStored(OV_HALF, { startDate: 7 as unknown as string }), at(2026, 9, 1), r2);
+  assert.deepEqual([r2.told, rfForms(unfrozen, 1)], [['freeze'], ALL('live')]);
+  // A config whose sports are not a list (damage), its test week pinned: the stored program is handed back, the same object.
+  const r3 = rfReport();
+  const broken = rfStored();
+  Object.assign(broken.cfg, { cardioTypes: 7, _testWeek: 3 });
+  assert.equal(refreshStoredProgram(rfStore(), broken, at(2026, 9, 1), r3), broken);
+  assert.deepEqual(r3.told, ['rebuild']);
+});
+
+test('at launch the moves are laid first, then the swaps, then the edits; a day given back from its snapshot takes no swap; the edits below the cut are dropped from the store', () => {
+  // Tuesday 1 September, week 1, Monday completed: the cut is week 2. Week 2 is untouched: its Tuesday session is moved
+  // onto Wednesday's rest, the session's first lift swapped there, the lift traded in skipped, and a curl added.
+  const lift = (buildProgram(OV_HALF).weeks['2']!.tue.sections![0]!.items[0]!).name;
+  const store = rfStore({
+    ia_comp_p1: { w1_mon: { status: 'complete' } },
+    ia_hist_p1: { w1_tue: SNAP },
+    ia_moves_p1: { w2_wed: { from: 'tue', ts: 1 } },
+    ia_swaps_p1: { w2_wed: [{ from: lift, to: 'Dumbbell floor press', ts: 2 }], w1_tue: [{ from: 'A', to: 'B', ts: 3 }] },
+    ia_edits_p1: { w1_fri: { skip: ['x'], add: [] }, w2_wed: { skip: ['Dumbbell floor press'], add: [{ name: 'Curl', detail: '3×10', ts: 4 }] } },
+  });
+  const out = refreshStoredProgram(store, rfStored(), at(2026, 9, 1), rfReport());
+  const wed = out.weeks['2']!.wed as HeldDay, tue = out.weeks['2']!.tue as HeldDay;
+  assert.deepEqual([tue.rest, tue.moved, tue.movedTo, wed.movedFrom], [true, true, 'wed', 'tue']);
+  const items = wed.sections!.flatMap((s) => s.items);
+  assert.deepEqual([items.filter((i) => i.name === lift).length, items.filter((i) => i.name === 'Dumbbell floor press').map((i) => i._skipped)], [0, [true]],
+    'the swap found the session on the day it was moved to, and the skip found the lift traded in');
+  assert.deepEqual(wed.sections!.filter((s) => s._added).map((s) => s.items), [[{ name: 'Curl', detail: '3×10', _addedByUser: true }]]);
+  assert.deepEqual((out.weeks['1']!.tue as HeldDay).sections![0]!.items.map((i) => i.name), ['A'], 'the snapshot\'s lift is not traded again');
+  assert.deepEqual(Object.keys(JSON.parse(store.get('ia_edits_p1')!)), ['w2_wed'], 'week 1 is below the cut and gives up its edits; week 2 keeps its own');
+  assert.deepEqual(Object.keys(JSON.parse(store.get('ia_swaps_p1')!)), ['w2_wed', 'w1_tue'], 'the swaps are left as they were');
+});
+
+test('a rest day move puts the session on the day it was moved to and rests the day it left, once; an old plain day name is read; a rest day or a moved day is never moved', () => {
+  const grid = (): HeldGrid => ({ weeks: { 1: { mon: { title: 'Legs', sections: [] }, tue: { title: 'Rest', rest: true }, wed: { title: 'Rest', rest: true } } } });
+  const moved = { mon: { title: 'Legs', dot: 'rest', tags: ['rest'], rest: true, moved: true, movedTo: 'tue' }, tue: { title: 'Legs', sections: [], movedFrom: 'mon' }, wed: { title: 'Rest', rest: true } };
+  const once = applyRestDayMoves(grid(), { w1_tue: { from: 'mon', ts: 1 } });
+  assert.deepEqual(once.weeks![1], moved);
+  assert.deepEqual(applyRestDayMoves(once, { w1_tue: { from: 'mon', ts: 1 } }).weeks![1], moved, 'laid again, nothing changes');
+  assert.deepEqual(applyRestDayMoves(grid(), { w1_tue: 'mon' }).weeks![1], moved, 'the old form');
+  assert.deepEqual(applyRestDayMoves(once, { w1_wed: { from: 'mon' } }).weeks![1], moved, 'a day already moved is not moved again');
+  for (const moves of [{ w1_wed: { from: 'tue' } }, { w9_tue: { from: 'mon' } }, { 'tue': { from: 'mon' } }, { w1_tue: null }, { w1_tue: { from: 'sun' } }]) {
+    assert.deepEqual(applyRestDayMoves(grid(), moves).weeks![1], grid().weeks![1], JSON.stringify(moves) + ' moves nothing');
+  }
+  const bare = {};
+  assert.equal(applyRestDayMoves(bare, { w1_tue: 'mon' }), bare);
+  assert.equal(applyRestDayMoves(null, { w1_tue: 'mon' }), null);
+});
+
+test('a day\'s swaps are laid in the order made; under an injury\'s stamp the day is filtered again and the lift traded in carries the dose it had before', () => {
+  const day = (stamp?: string): HeldDay => ({ title: 'Pull', sections: [{ label: 'Round', items: [{ name: 'Barbell row', detail: '2×6–10 @ RPE 7' }, { name: 'Weighted chinups', detail: '2×5–6 @ RPE 7' }] }], ...(stamp ? { _ovKey: stamp } : {}) });
+  const chain = { w1_mon: [{ from: 'Barbell row', to: 'Pendlay row', ts: 1 }, { from: 'Pendlay row', to: 'Dumbbell row', ts: 2 }, { from: '', to: 'x', ts: 3 }] };
+  const names = (p: HeldGrid): string[] => p.weeks![1]!['mon']!.sections!.flatMap((s) => s.items).map((i) => i.name);
+  const plain: HeldGrid & { cfg: Cfg } = { cfg: OV_HALF, weeks: { 1: { mon: day(), tue: { title: 'Rest', rest: true } } } };
+  applySessionSwaps(plain, { ...chain, w1_tue: [{ from: 'Barbell row', to: 'Pendlay row', ts: 1 }], w7_mon: [{ from: 'a', to: 'b', ts: 1 }], mon: [] });
+  assert.deepEqual(names(plain), ['Dumbbell row', 'Weighted chinups'], 'the last lift of the chain, once');
+  assert.equal(plain.weeks![1]!['mon']!.sections![0]!.items.some((i) => '_preHold' in i), false, 'no injury, nothing held');
+  const hurt: HeldGrid & { cfg: Cfg } = { cfg: OV_HALF, weeks: { 1: { mon: day(KNEE_KEY) } } };
+  applySessionSwaps(hurt, chain);
+  const traded = hurt.weeks![1]!['mon']!.sections!.flatMap((s) => s.items).filter((i) => i.name === 'Dumbbell row');
+  assert.deepEqual([traded.length, typeof traded[0]!._preHold], [1, 'string']);
+  // The plan that governs a day is its own stamp's injury; a day with no stamp, or a trip's, keeps the config's.
+  assert.deepEqual(_dayPlanCfg({ cfg: OV_HALF }, day(KNEE_KEY)).injury, { region: 'knee', tier: 'workaround' });
+  assert.equal(_dayPlanCfg({ cfg: OV_HALF }, day()), OV_HALF);
+  assert.equal(_dayPlanCfg({ cfg: OV_HALF }, day(TRIP_KEY)), OV_HALF);
+  assert.deepEqual(_dayPlanCfg(null, day()), {});
+});
+
+test('a day\'s edits: a skipped movement and a skipped round are flagged, never removed; an add goes in the athlete\'s own block once, and that block is never flagged', () => {
+  const grid = (): HeldGrid => ({ weeks: { 1: { mon: { title: 'Legs', sections: [
+    { label: 'Main', items: [{ name: 'Squat', detail: '3×5' }] },
+    { label: 'Round', superset: true, items: [{ name: 'Row', detail: '2×8' }, { name: 'Curl', detail: '2×10' }] },
+  ] }, tue: { title: 'Rest', rest: true } } } });
+  const edits = { w1_mon: { skip: ['Squat', '__ss:1', 'Curl'], add: [{ name: 'Curl', detail: '3×12', ts: 1 }, { name: '', detail: 'x', ts: 2 }] }, w1_tue: { skip: ['x'], add: [] }, w9_mon: { skip: ['Squat'], add: [] } };
+  const laid: unknown = [
+    { label: 'Main', items: [{ name: 'Squat', detail: '3×5', _skipped: true }] },
+    { label: 'Round', superset: true, _skipped: true, items: [{ name: 'Row', detail: '2×8', _skipped: undefined }, { name: 'Curl', detail: '2×10', _skipped: true }] },
+    { label: 'Added by you', _added: true, items: [{ name: 'Curl', detail: '3×12', _addedByUser: true }] },
+  ];
+  const p = grid();
+  applyDayEdits(p, edits);
+  assert.deepEqual(p.weeks![1]!['mon']!.sections, laid);
+  applyDayEdits(p, edits);
+  assert.deepEqual(p.weeks![1]!['mon']!.sections, laid, 'laid again: one block, one curl in it, and it is not flagged though a curl is skipped');
+  assert.deepEqual(p.weeks![1]!['tue'], { title: 'Rest', rest: true });
+  // A skip put back clears the flag on the next pass.
+  applyDayEdits(p, { w1_mon: { skip: [], add: [] } });
+  assert.deepEqual(p.weeks![1]!['mon']!.sections!.slice(0, 2).map((s) => [s._skipped, s.items.map((i) => i._skipped)]), [[undefined, [undefined]], [undefined, [undefined, undefined]]]);
+  assert.deepEqual([ssSkipToken(1), ssSkipToken('2')], ['__ss:1', '__ss:2']);
+  applyDayEdits(null, edits); applyDayEdits({}, edits); applyDayEdits(p, null);
+});
+
+test('the week a date falls in, the weeks an overlay reaches, a program day\'s date, and the overlay a day came from', () => {
+  // A program starting Wednesday 2 September 2026: its first Monday is 31 August.
+  const prog = { startDate: '2026-09-02' } as OverlaidProgram;
+  assert.deepEqual(['2026-08-31', '2026-09-06', '2026-09-07', '2026-08-01', '2026-12-09'].map((d) => weekOfDate(prog, d)), [1, 1, 2, 1, 15], 'a date before the program reads as week one');
+  assert.deepEqual([weekOfDate(prog, null), weekOfDate(prog, 'soon'), weekOfDate({ startDate: null } as OverlaidProgram, '2026-09-07'), weekOfDate(null, '2026-09-07')], [null, null, null, null]);
+  const span = (from: string | null, to: string | null, total = 14) => overlayWeekRange(prog, { from, to }, total);
+  assert.deepEqual(span('2026-09-08', '2026-09-22'), { fromWeek: 2, toWeek: 4 });
+  assert.deepEqual(span('2026-09-08', null), { fromWeek: 2, toWeek: 14 }, 'no end runs to the last week');
+  assert.deepEqual(span('2026-08-01', '2026-09-08'), { fromWeek: 1, toWeek: 2 });
+  assert.deepEqual(span('2026-12-02', '2027-03-01'), { fromWeek: 14, toWeek: 14 }, 'an end past the program is the last week');
+  assert.deepEqual([span('2026-12-08', '2026-12-10'), span(null, '2026-09-08'), span('2026-09-08', 'soon'), span('2026-09-08', null, 0), overlayWeekRange(prog, null, 14)], [null, null, null, null, null],
+    'wholly after the last week (Monday 30 November to Sunday 6 December) is outside the program');
+  assert.deepEqual([_progDayDate(prog, 2, 'wed'), _progDayDate(prog, 1, 'mon'), _progDayDate(prog, 1, 'xyz'), _progDayDate({ startDate: null } as OverlaidProgram, 1, 'mon')],
+    [new Date(2026, 8, 9), new Date(2026, 7, 31), null, null]);
+  assert.deepEqual(dayOverlayInfo({ _ovKey: TRIP_KEY }), { type: 'substitute', patch: { equipment: 'home_basic' } });
+  assert.deepEqual([dayOverlayInfo({}), dayOverlayInfo(null), dayOverlayInfo({ _ovKey: 'not json' }), dayOverlayInfo({ _ovKey: '{"a":1}' }), dayOverlayInfo({ _ovKey: '["injury"]' })], [null, null, null, null, null]);
+});
+
+test('the pace clock: days hurt are counted once, from the first Monday to the instant given, a week at least; a shoulder, a half step and no injury derive nothing', () => {
+  // Eleven weeks from Saturday 29 August 2026 (first Monday 24 August), read on Wednesday 2 September.
+  const now = at(2026, 9, 2);
+  const prog = (overlays: Overlay[]): OverlaidProgram => ({ startDate: '2026-08-29', totalWeeks: 11, overlays } as OverlaidProgram);
+  const inj = (region: string, from: string, to: string | null = null, more: object = {}): Overlay => ({ type: 'injury', from, to, patch: { injury: { region, tier: 'workaround', ...more } } as unknown as Overlay['patch'] });
+  const ONE = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+  assert.deepEqual(paceShiftMap(prog([inj('knee', '2026-08-17'), inj('ankle', '2026-08-28')]), now), ONE, '7 days before week 2, 10 before each later week: one week each');
+  assert.deepEqual(paceShiftMap(prog([inj('knee', '2026-08-25', '2026-08-25')]), now), ONE, 'one day hurt still holds the clock a week');
+  assert.deepEqual(paceShiftMap(prog([inj('knee', '2026-08-24')]), at(2026, 9, 16)), [0, 0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3], '7, 14 and 21 days before weeks 2, 3 and 4, then 24 to the instant');
+  assert.deepEqual([paceShiftMap(prog([inj('shoulder', '2026-08-24')]), now), paceShiftMap(prog([inj('knee', '2026-08-24', null, { halfstep: true })]), now), paceShiftMap(prog([]), now),
+    paceShiftMap(prog([trip()]), now), paceShiftMap({ startDate: null, totalWeeks: 11, overlays: [inj('knee', '2026-08-24')] } as OverlaidProgram, now), paceShiftMap(null, now)], [null, null, null, null, null, null]);
+});
+
+test('the dated test pin: a pace goal with a date and its event on pins the week holding the test, in weeks 1 to 26', () => {
+  const cfg = (more: object = {}): Cfg => ({ ...RF_PACE, raceDate: '2026-10-10', eventTargeted: true, ...more } as Cfg);
+  const pin = (c: Cfg): unknown[] => { const p = progTestPin(c, '2026-08-29')!; return [p.tw, p.week, p.cap, p.len > 0]; };
+  assert.deepEqual(pin(cfg()), [7, 7, 26, true], 'its test in the seventh week from Monday 24 August; Table 6 has 26 rows');
+  assert.deepEqual(pin(cfg({ raceDate: '2027-04-10' })), [null, 33, 26, true], 'Monday 5 April 2027 is 224 days on, the 33rd week: past the table');
+  assert.deepEqual(pin(cfg({ raceDate: '2026-08-20' })), [null, null, 26, true], 'a test before the start has no week');
+  assert.deepEqual([progTestPin(cfg({ eventTargeted: false }), '2026-08-29'), progTestPin(cfg({ raceDate: null }), '2026-08-29'), progTestPin(OV_HALF, '2026-08-31'), progTestPin(null, '2026-08-29'),
+    progTestPin(cfg({ cardioTypes: ['bike'] }), '2026-08-29')], [null, null, null, null, null]);
+});
+
+test('the page reaches the launch through core: each moved function is in the script once, its own refreshProgram only hands it on, and the two callers left with nothing to call are gone', () => {
+  const code = appScript();
+  for (const name of ['refreshStoredProgram', 'progTestPin', 'applyRestDayMoves', 'applySessionSwaps', '_dayPlanCfg', 'applyDayEdits', 'ssSkipToken', 'weekOfDate', 'overlayWeekRange',
+    '_progDayDate', 'dayOverlayInfo', 'paceShiftMap', 'refreshProgram']) {
+    assert.equal(code.split('function ' + name + '(').length - 1, 1, name + ' is in the page once');
+  }
+  for (const rule of [
+    'return refreshStoredProgram(iaStore, prog, Date.now(), {',
+    'spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, failed.overlay);',
+    'const _cut = Math.max(_dateCut, _maxTouched + 1);',
+    'if(_snap){ _merged[d] = _snap; _histRestored.add(k); return; }',
+    "if(typeof _swapCut==='number') pruneDayEditsBefore(store,prog.id,_swapCut);",
+    "try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}",
+  ]) assert.equal(code.split(rule).length - 1, 1, rule + ' is in the page once');
+  // The launch reads the store it is handed: the page's own store is named in its thin caller, not in the rules.
+  const a = code.indexOf('function refreshStoredProgram('), b = code.indexOf('\n}\n', a);
+  assert.deepEqual([code.slice(a, b).includes('iaStore'), code.slice(a, b).includes('console.'), code.slice(a, b).includes('new Date()')], [false, false, false]);
+  for (const name of ['applyOverlays', 'pruneDayEdits']) assert.equal(code.split(name + '(').length - 1, 0, name + ' is gone');
+});
+
 // This guards behaviour the move must not change: it passes on the release before it too.
-test('the page\'s own applyOverlays still answers as it did: the trip\'s days, and a failed overlay told to the athlete', () => {
+test('the page\'s own refreshProgram still answers as it did: the trip\'s days, and a failed overlay told to the athlete', () => {
   const IA = loadApp();
   pinClock(IA, '2026-08-31T07:00:00');
   IA.ctx['__cfg'] = JSON.parse(JSON.stringify(OV_HALF));
@@ -1252,7 +1559,7 @@ test('the page\'s own applyOverlays still answers as it did: the trip\'s days, a
   IA.eval('showToast=function(m){__said.push(String(m));};');
   const stamps = (overlays: unknown[]): (string | null)[] => {
     IA.ctx['__ovs'] = JSON.parse(JSON.stringify(overlays));
-    return JSON.parse(IA.eval("(function(){var p=buildProgram(__cfg);p.startDate='2026-08-31';p.overlays=__ovs;var r=applyOverlays(p,buildProgram(__cfg));return JSON.stringify(['mon','tue','wed','thu','fri','sat','sun'].map(function(d){return r.weeks[1][d]._ovKey||null;}));})()"));
+    return JSON.parse(IA.eval("(function(){var p=buildProgram(__cfg);p.id='p1';p.startDate='2026-08-31';p.overlays=__ovs;var r=refreshProgram(p);return JSON.stringify(['mon','tue','wed','thu','fri','sat','sun'].map(function(d){return r.weeks[1][d]._ovKey||null;}));})()"));
   };
   assert.deepEqual(stamps([trip()]), [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]);
   assert.deepEqual([...IA.ctx['__said']], []);

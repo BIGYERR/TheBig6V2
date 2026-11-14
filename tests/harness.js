@@ -49,7 +49,7 @@ const EXPORT_NAMES = [
   'EXLIB','RAND_POOLS','REP_AFFINITY','_AUX_FAMILY','_AUX_GEAR','EX_KEY_ALIAS','EX_RENAMED_V113',
   '_pattern','_repFloor','_repFit','_stationClass','_ssLegal','_ssPair','_powerPrescribe','_carryRx',
   'exStoreKey','parseRx','_paceStrToSec','_swapDetailFor','swapCandidates','auxSwapCandidates',
-  'applyInjuryFilter','applyOverlays','bodyweightSweep','singletonSupersetSweep','deconflictAdjacentDupes',
+  'applyInjuryFilter','bodyweightSweep','singletonSupersetSweep','deconflictAdjacentDupes',
   'resolveStartDate','dayBeforeStart','getWeekMonday','_isoToday','calcCurrentWeek',
   'computeStreak','completedCount','statusOf','exControlFlags','_epley',
   'PACE_CHART','_steadyCeilingFor','_mileFromRecoverySec','_halfFromMileSec',

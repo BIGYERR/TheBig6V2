@@ -1,132 +1,19 @@
 import { getPrograms, savePrograms } from './storage.ts';
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setActiveProg, activeProg, showToast } from './rest-day-shell.ts';
-import { spliceOverlays } from '../../../../../../core/src/engine/state-overlays.ts';
-import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
+import {
+  dayOverlayInfo, overlayWeekRange, paceShiftMap, weekOfDate,
+} from '../../../../../../core/src/engine/state-overlays.ts';
+import { _parseLocalDate } from '../../../../../../core/src/engine/calendar.ts';
 import { INJURY_REGIONS, injuryPlan } from '../../../../../../core/src/engine/injury.ts';
-import { _progDayDate, calcCurrentWeek, renderWeekView } from './week-view-sections.ts';
+import { calcCurrentWeek, renderWeekView } from './week-view-sections.ts';
 import { refreshProgram } from './program-manage.ts';
 import { popFire } from './popups-streaks-reminders.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-// Re-run the engine for an EXISTING program on load so it reflects the CURRENT engine rather
-// than whatever was baked when it was first generated — e.g. a program created under the old
-// weight model picks up the new RPE prescriptions on next open. buildProgram is pure
-// (cfg in → program out), so activeProgId MUST already be set to this program before calling.
-// Gated to programs carrying a stored seed (V196+): without a stable seed, rebuilding would
-// reshuffle exercise selection, so older programs are left as their baked selves. Rebuild is
-// in-memory only (storage stays the stable fallback). Fail-safe: any error falls back to the
-// stored program so loading never breaks.
-// ── TEMPORARY OVERLAYS ────────────────────────────────────────────────────────
-// A "temporary modification" is NOT a config change. "I'm in a hotel for two weeks"
-// must not permanently rewrite cfg.equipment — the program has to revert on its own,
-// or the athlete has to remember to undo it (they won't). Overlays live on the
-// program as a SIBLING to cfg: cfg is the recipe for building, overlays are
-// modifications applied to the built result. Shape:
-//   {id, type:'substitute', from:'YYYY-MM-DD', to:'YYYY-MM-DD'|null, patch:{...cfg}, note, created}
-// `to: null` = open-ended (runs to the end of the program) for "no running until
-// further notice" cases. Dates are the SOURCE OF TRUTH, weeks are derived — once
-// Suspend lands and pauses the clock, program weeks shift, so anchoring an overlay
-// to a week number would be circular.
-// Program week containing a calendar date (1-based, matching the weeks object).
-function weekOfDate(prog: any, dateStr: any){
-  if(!prog || !prog.startDate) return null;
-  const d=_parseLocalDate(dateStr); if(!d) return null;
-  const mon=getWeekMonday(prog.startDate);
-  // @ts-expect-error TS2362 The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type
-  const diff=Math.floor((d-mon)/86400000);
-  return diff<0 ? 1 : Math.floor(diff/7)+1;
-}
-// Resolve an overlay's date range to a clamped [fromWeek,toWeek], or null if it
-// falls entirely outside the program.
-function overlayWeekRange(prog: any, ov: any, totalWeeks: any){
-  if(!ov || !ov.from || !totalWeeks) return null;
-  const fw=weekOfDate(prog, ov.from);
-  if(fw==null) return null;
-  const tw = ov.to ? weekOfDate(prog, ov.to) : totalWeeks;   // open-ended → to program end
-  if(tw==null) return null;
-  const lo=Math.max(1,fw), hi=Math.min(totalWeeks,tw);
-  return hi<lo ? null : {fromWeek:lo, toWeek:hi};
-}
-// ── D2b (V142): THE PACE CLOCK FREEZES WHILE THE ATHLETE CANNOT RUN QUALITY ──
-// paceProgression is indexed by calendar week, so it kept tightening through injury
-// overlays: an athlete back at week 6 was handed week 6's pace having last run
-// quality at week 3's. This map is the correction. Derived FRESH from overlays on
-// every rebuild, never stored as state: same overlays, same map, same build. A
-// program with no overlays derives no map and builds byte-identical to V141.
-// Counting rule (D2b-i): DAYS, not week spans, so a Wednesday return can never
-// inflate 9 suppressed days into a 2-week shift. shift = round(days/7), floor 1.
-// A week counts as suppressed only if its overlay's cardioMode actually touched
-// running (easy/reduce/noimpact/noimpact_swim). Halfstep weeks never count: quality
-// is back at pace, the clock legitimately runs. swimout (shoulder) and elbow never
-// count: their runs never stopped. Overlapping overlays are merged so a stacked
-// injury cannot double-count a day.
-function paceShiftMap(prog: any){
-  const tw=prog&&prog.totalWeeks||0;
-  if(!tw||!prog.startDate||!Array.isArray(prog.overlays)||!prog.overlays.length) return null;
-  const SUP: Record<string, any>={easy:1,reduce:1,noimpact:1,noimpact_swim:1};
-  const today=new Date(); today.setHours(0,0,0,0);
-  const mon=getWeekMonday(prog.startDate);
-  const end=new Date(mon.getTime()+tw*7*86400000-86400000);
-  const spans: any[]=[];
-  // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
-  prog.overlays.forEach(ov=>{
-    if(!ov||ov.type!=='injury'||!ov.patch||!ov.patch.injury) return;
-    const inj=ov.patch.injury;
-    if(inj.halfstep) return;
-    // @ts-expect-error TS2345 Argument of type '{ injury: { region: any; tier: any; }; }' is not assignable to parameter of type 'Cfg
-    const P=injuryPlan({injury:{region:inj.region,tier:inj.tier}});
-    if(!P||!P.cardioMode||!SUP[P.cardioMode]) return;
-    const f=_parseLocalDate(ov.from); if(!f) return;
-    // Open-ended live injury: every day hurt so far counts. The map grows as the
-    // injury runs, which is correct: each day the athlete cannot run quality is
-    // another day the clock holds.
-    let t=ov.to?_parseLocalDate(ov.to):today;
-    if(!t) t=today;
-    const lo=Math.max(f.getTime(),mon.getTime());
-    const hi=Math.min(t.getTime(),end.getTime());
-    if(hi>=lo) spans.push([lo,hi]);
-  });
-  if(!spans.length) return null;
-  spans.sort((a,b)=>a[0]-b[0]);
-  const merged=[spans[0].slice()];
-  for(let k=1;k<spans.length;k++){
-    const m=merged[merged.length-1];
-    if(spans[k][0]<=m[1]+86400000) m[1]=Math.max(m[1],spans[k][1]);
-    else merged.push(spans[k].slice());
-  }
-  const map=new Array(tw+1).fill(0);
-  for(let w=1;w<=tw;w++){
-    const wkStart=mon.getTime()+(w-1)*7*86400000;
-    let days=0;
-    merged.forEach(s=>{
-      const hi=Math.min(s[1],wkStart-86400000);
-      if(hi>=s[0]) days+=Math.round((hi-s[0])/86400000)+1;
-    });
-    map[w]=days>0?Math.max(1,Math.round(days/7)):0;
-  }
-  for(let w=1;w<=tw;w++){ if(map[w]>0) return map; }
-  return null;
-}
-// Splices the program's overlays into a freshly built grid: core's spliceOverlays (state-overlays.ts, v0.262.1) holds
-// the rules. The page hands it its week range and its day date, and says what a failed overlay does here: an injury
-// or travel plan silently not applying is a safety failure, not a log line, so the athlete is told the plan change
-// did not take. The toast is wrapped because this can run at boot before the DOM is ready.
-function applyOverlays(prog: any, rebuilt: any){
-  return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov: any, e: any)=>{
-    console.error('overlay apply failed', ov && ov.id, e);
-    try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}
-  });
-}
-
-// ── V175 (D30): the overlay a day came from, read off the day itself ────────────
-// applyOverlays stamps every spliced day with its overlay key. Reading the stamp is
-// what makes the tag, the strip underline and the pill agree with the CARD: a day says
-// it is a hotel session because it IS one, not because a date range says it should be.
-// Survives rest-day moves and lives in the ia_hist_ snapshot as part of the record.
-function dayOverlayInfo(day: any){
-  if(!day||typeof day._ovKey!=='string') return null;
-  try{ const k=JSON.parse(day._ovKey); if(!Array.isArray(k)||!k[1]) return null; return {type:k[0],patch:k[1]}; }catch(e){ return null; }
-}
+// Overlays as stored on the program, the weeks and the day an overlay's dates reach, the pace clock's shift and the
+// overlay a day came from (weekOfDate, overlayWeekRange, paceShiftMap, dayOverlayInfo) live in core's
+// state-overlays.ts since v0.262.2, under the same names; the splice is spliceOverlays there, called by the launch
+// (state-refresh.ts). What stays here is the page's own: the chip, the sheet, the injury flow and their copy.
 // Travel = a substitute overlay that took something AWAY. A commercial patch (pre-V96
 // overlays only) trains normally and never reads as travel.
 function dayIsTravel(day: any){
@@ -479,7 +366,7 @@ function imBackFromInjury(id: any){
     const _cfg=activeProg.cfg||{};
     const _rg=(_cfg.cardioGoals||{}).run||{};
     if(_rg.id==='run_pace_goal'){
-      const _map=paceShiftMap(activeProg);
+      const _map=paceShiftMap(activeProg, Date.now());
       const _tw=activeProg.totalWeeks||0;
       const _n=_map&&_tw?(_map[_tw]||0):0;
       if(_n>0){
@@ -552,7 +439,4 @@ function applyOverlayDraft(){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export {
-  _isoToday, _liveInjuryOverlay, applyOverlays, dayIsTravel, dayOverlayInfo, overlayWeekRange, paceShiftMap,
-  renderOverlayChip, travelTagHTML,
-};
+export { _isoToday, _liveInjuryOverlay, dayIsTravel, renderOverlayChip, travelTagHTML };
