@@ -4,13 +4,24 @@
 //
 // Run from the repo root, after a build:
 //   node tests/measure/stored-state_red-on-break.mjs <scratch dir> > tests/measure/stored-state_red-on-break.md
+//
+// A slice runs its own breaks first, in a minute or two, and the whole set once before its release commit:
+//   node tests/measure/stored-state_red-on-break.mjs <scratch dir> --only overlay
+// keeps the breaks whose name holds that text, runs the page as built on the fast file alone, and heads its report
+// as a partial run. A partial report is read on the screen, never written over the saved one.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const ROOT = process.cwd();
 const scratch = resolve(process.argv[2] || '');
-if (!process.argv[2]) { console.error('usage: node tests/measure/stored-state_red-on-break.mjs <scratch dir>'); process.exit(2); }
+const onlyAt = process.argv.indexOf('--only');
+const ONLY = onlyAt > 0 ? String(process.argv[onlyAt + 1] || '').toLowerCase() : '';
+if (!process.argv[2] || process.argv[2].startsWith('--') || (onlyAt > 0 && !ONLY)) {
+  console.error('usage: node tests/measure/stored-state_red-on-break.mjs <scratch dir> [--only <text in a break\'s name>]');
+  process.exit(2);
+}
+const picked = (list) => (ONLY ? list.filter(([name]) => name.toLowerCase().includes(ONLY)) : list);
 mkdirSync(scratch, { recursive: true });
 const PAGE = join(ROOT, 'dist-' + 'github-pages', 'index.html');
 const page = readFileSync(PAGE, 'utf8');
@@ -163,11 +174,14 @@ const run = (app, all = false) => {
   return s.red ? { ...s, by: 'the sweeps' } : { red: false, failed: [], by: '' };
 };
 
+const breaks = picked(BREAKS);
+const opens = picked(OPEN);
+if (ONLY && !breaks.length && !opens.length) { console.error('no break\'s name holds "' + ONLY + '"'); process.exit(2); }
 const rows = [];
-const clean = run(PAGE, true);
-rows.push(['(no break)', 'the page as built', clean.red ? 'RED' : 'green', clean.red ? clean.failed.length : 0, 'all three files']);
+const clean = ONLY ? runFiles(PAGE, FAST) : run(PAGE, true);
+rows.push(['(no break)', 'the page as built', clean.red ? 'RED' : 'green', clean.red ? clean.failed.length : 0, ONLY ? 'the fast file alone' : 'all three files']);
 let bad = clean.red ? 1 : 0;
-for (const [name, what, from, to] of BREAKS) {
+for (const [name, what, from, to] of breaks) {
   const n = page.split(from).length - 1;
   if (n !== 1) { rows.push([name, what, 'NOT RUN: the text occurs ' + n + ' times in the page', '', '']); bad++; continue; }
   const app = join(scratch, 'break-' + name.replace(/[^a-z]+/g, '-') + '.html');
@@ -179,7 +193,7 @@ for (const [name, what, from, to] of BREAKS) {
 }
 
 const open = [];
-for (const [name, what, from, to, note] of OPEN) {
+for (const [name, what, from, to, note] of opens) {
   const n = page.split(from).length - 1;
   if (n !== 1) { open.push([name, what, 'NOT RUN: the text occurs ' + n + ' times', note]); continue; }
   const app = join(scratch, 'open-' + name.replace(/[^a-z]+/g, '-') + '.html');
@@ -191,6 +205,10 @@ for (const [name, what, from, to, note] of OPEN) {
 const L = [];
 L.push('# Stored state: do the golden records go red when the code is broken on purpose?');
 L.push('');
+if (ONLY) {
+  L.push('**A partial run (`--only ' + ONLY + '`): ' + breaks.length + ' of ' + BREAKS.length + ' breaks and ' + opens.length + ' of ' + OPEN.length + ' open ones, the page as built on the fast file alone. Not the saved report.**');
+  L.push('');
+}
 L.push('Written by `tests/measure/stored-state_red-on-break.mjs`. Each break changes one line of a copy of the built page;');
 L.push('`tests/integration/stored-state.test.ts`, `tests/sweeps/stored-state.test.ts` and `tests/sweeps/data-backup.test.ts`');
 L.push('run against the copy (`IA_APP`): the fast file first, the sweeps only for a break it lets through. The page as built');
@@ -200,7 +218,9 @@ L.push('| Break | What it does | Result | Tests red | Caught by |');
 L.push('|---|---|---|---|---|');
 for (const r of rows) L.push('| ' + r.join(' | ') + ' |');
 L.push('');
-L.push(bad ? '**' + bad + ' row(s) not as required.**' : '**The page as built is green, and all ' + BREAKS.length + ' breaks turn the records red.**');
+L.push(bad ? '**' + bad + ' row(s) not as required.**' : ONLY
+  ? '**The page as built is green on the fast file, and these ' + breaks.length + ' breaks turn the records red.**'
+  : '**The page as built is green, and all ' + BREAKS.length + ' breaks turn the records red.**');
 L.push('');
 L.push('## Breaks that change no record');
 L.push('');

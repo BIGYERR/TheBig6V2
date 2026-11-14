@@ -13,7 +13,10 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
    no work, run `git branch -m chat/<work>` and `git reset --hard refs/heads/dev`, then read `git log -1` back as `dev`'s
    HEAD. Then run `node tools/worktree-deps.mjs` before the first build: a worktree is checked out without the app's,
    the website's and the backend's `node_modules`, and `npm run build:index` fails without the app's (Post-v0.261.7). It
-   borrows each from the main checkout, or exits 1 naming the `npm ci` to run. The main checkout holds `dev` and nothing
+   borrows each from the main checkout, or exits 1 naming the `npm ci` to run. Then, still before step 6, run `npm ci` in
+   `tests/` and `cd frontends/app && npm run build:index`: a fresh worktree has neither the tests' packages nor
+   `dist-github-pages/` (gitignored), which every test boots, so the tests fail there for a reason that is not a red test
+   (Post-v0.262.1). The main checkout holds `dev` and nothing
    else; a chat never commits there (the pre-commit hook refuses). Report the branch in the GIT line. When Mario says push,
    `node tools/land.mjs` from the worktree lands the branch on `dev` and pushes, as one step.
 
