@@ -503,6 +503,80 @@ is moving out of the legacy page into `@ia/core`, a slice a release, as phase 1 
   names it lifts are not in that page) and no assertion changed. `tests/integration/stored-state.test.ts`, the new case. The other
   golden records and the backup corpus, unchanged.
 
+## Release scope: v0.262.1 moves the overlay splice (applyOverlays) into core
+
+- **Date:** 2026-11-14. **Ruled by:** Mario (the eighth slice, on his prompt: "applyOverlays only, into core/src/engine
+  as a state-*.ts file, the page's globals as arguments"); **bump:** PATCH (asked, picked), by his standing rule for
+  migration steps that change the page and no behaviour. **Shipped:** v0.262.1 (on the chat's branch until Mario
+  merges it).
+- **The finding (`tests/measure/stored-state_overlays-gaps.md`, read on v0.262.0):** `applyOverlays` (`overlays.ts`, 36
+  lines of the built page) names no `ia_` key and makes no store call. It reads the overlays, the config and the start
+  off the stored program it is handed (`ia_programs`), builds a variant per distinct kind and patch, and changes the
+  rebuilt grid in place: what `refreshProgram` then freezes and a touch snapshots into `ia_hist_`. One caller,
+  `refreshProgram`. It uses core's `buildProgram` and `_parseLocalDate` and three names of the page:
+  `overlayWeekRange` (with `weekOfDate`; 10 calls in the page, 3 of them outside the overlay code), `_progDayDate`
+  (2 calls) and `showToast` (65). Nothing but the function itself had to move.
+- **The records saw 16 of its 21 rules broken** (a break per rule on v0.262.0's page): the order overlays are applied
+  in, each kind, both ends of the week window, the stamp's key, each patch, an injury built clean, each edge of the
+  day's dates, rest days, the stamp and the splice itself. **Blind to 5:** the travel mark (the standard history
+  travels with no equipment, where the mark changes nothing); the variant's legal swaps kept by overlay key (no
+  history asked the swap sheet about a trip day); an overlay that fails (none did); the length the span is read
+  against (every stored program carries its own); and the variant cache, which no record can see because it changes
+  nothing (below).
+- **What changes:** one new file in `core/src/engine`, code as it was, with the page's week range, its day date and
+  its failure report passed in where the function called the page.
+  1. `state-overlays.ts` (new, after `state-backup.ts` in `order.json`): `spliceOverlays(prog, rebuilt, weekRange,
+     dayDate, failed)`, and the types `Overlay`, `OverlaidProgram`, `OverlayWeekRange` and `ProgramDayDate`. Its text in
+     the page is `applyOverlays`' but for four lines: its name and arguments, `weekRange(` where it called
+     `overlayWeekRange(`, `dayDate(` where it called `_progDayDate(`, and `failed(ov, e)` where it logged and toasted.
+  2. The page's `applyOverlays(prog, rebuilt)` keeps its name and arguments and calls it with `overlayWeekRange`,
+     `_progDayDate` and a report that does what the catch did: `console.error`, then the toast "A plan change failed
+     to apply. Flag it in Bugs." inside its own try.
+  3. Nothing was left with no caller, so nothing is deleted. `tests/harness.js` `EXPORT_NAMES` is unchanged:
+     `applyOverlays` was listed, and the tests import `spliceOverlays` from `@ia/core`.
+- **Narrowed.** **Stays in the page:** `overlayWeekRange`, `weekOfDate` and `_progDayDate` (the chip, the sheet, the
+  week view and `refreshProgram` call them too; they are pure date arithmetic over core's calendar and move with
+  `refreshProgram`, their other caller in the grid's path, in the next slice); `paceShiftMap`, `dayOverlayInfo`,
+  `dayIsTravel`; the overlay sheet, the chip and the injury flow; `refreshProgram` and the freeze. The Expo app's
+  screen does not change: its seam (`liveProgram`) waits for `refreshProgram` in core.
+- **What deliberately does not change:** every key and every stored byte; what a program prescribes (the lattice and
+  HALF_MANNY); which days an overlay takes, in what order, with what stamp; the variant's config; the failure toast's
+  words and when it shows; every function name the Angular screens call through the bridge; every golden record.
+- **Found by the measure, closed in the slice:** the case "a mini gym trip, a swap on a trip day, an overlay that
+  fails, and no stored length" (`tests/integration/stored-state.test.ts`) on HALF_MANNY: a trip to a mini gym booked
+  for Tuesday 1 to Friday 4 September of week 1 (the grid in hand: Tuesday, Thursday and Friday stamped, Wednesday's
+  rest and the days outside left alone; each trip day's main lift three sets in a rep range, not the wave's loaded
+  3×12); Tuesday trained there (its snapshot carries the stamp); the swap sheet asked about Thursday (what it offers,
+  kept in the record, holds no move that needs a bar) and its first offer taken; then the stored program given an
+  overlay the engine cannot build, made before the trip (`restDays` not a list): the next launch says so once and
+  the trip still stands; then the same program stored with no length: the trip still stands, and Thursday is trained.
+  Its records are new in `tests/snapshots/stored-state.json`: 579 lines added, none removed or changed, written on
+  v0.262.0's page and matched by v0.262.1's. The break check gains 23 breaks inside the moved rules and the thin
+  caller: 87 red in all, the four that were blind each red on the new case; 4 open, the variant cache
+  joining the three before (`tests/measure/stored-state_red-on-break.md`).
+- **The cache changes nothing, so no record is owed:** `buildProgram` is a pure function of its config (the engine
+  check holds every digest), so a second build of the same kind and patch gives the same days and the same legal
+  swaps, and each spliced day is a copy. It saves time only.
+- **Expected values (typed from the rules and the calendar):** HALF_MANNY's first Monday is 31 August 2026 and its
+  week 1 trains Monday, Tuesday, Thursday, Friday and Saturday. A trip of kind `substitute` with the patch
+  `{equipment:'home_basic'}` from 2026-09-01 to 2026-09-04 stamps Tuesday, Thursday and Friday with
+  `["substitute",{"equipment":"home_basic"}]` and no other day of the program; each is the day of the build of the
+  config with the patch and the travel mark, where the main lift reads `3 sets of 8 to 12 — RPE 7 (leave ~3 in
+  reserve)` (without the mark, `3×12 — RPE …`); the legal swaps under that key hold no Back squat. An injury builds
+  from the config with its patch and no mark. Of two overlays on one day the later made wins, in either list order.
+  No end runs to the program's last training day. Another kind, no patch, no first day, or a span the page puts
+  outside the program change nothing. The span is asked for against the rebuilt length (14), else the stored one
+  (9), else 0. A day with no date keeps the base. An overlay that fails is reported once, with its error, and the
+  next still applies.
+- **Tests:** `tests/unit/stored-state.test.ts`, 12 new (84 to 96): 10 on `spliceOverlays` from `@ia/core` with the
+  calendar standing in for the page's two date readers, the page reaching it (the function once, six rules once), and
+  the page's own `applyOverlays` answering as it did. On v0.262.0: the 10 cannot load there (`git cat-file -e
+  HEAD:core/src/engine/state-overlays.ts`, exit 128); run on v0.262.0's page, the page read fails and the guard
+  passes, as a guard must. `tests/integration/stored-state.test.ts`, the new case, which passes on v0.262.0's page by
+  design (it wrote the record). `tests/integration/native-store.test.ts` runs the same case through SQLite against
+  the same record. Every sweep, run locally on the candidate before the commit: 34 files, 260 tests, green; the
+  lattice and HALF_MANNY unchanged.
+
 ## The store's third implementation: SQLite, in the Expo app (Post-v0.262.0, the migration's phase 2, session 2)
 
 - **Date:** 2026-11-13. **Ruled by:** the session (form). **Bump:** none, Mario 2026-11-13. The import that uses it

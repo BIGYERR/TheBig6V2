@@ -40,5 +40,8 @@ export {
   readActiveProgramId, readPrograms, readWildcardDone, writeActiveProgramId, writePrograms, writeWildcardDone,
 } from './state-programs.ts';
 export type { WildcardDone } from './state-programs.ts';
+// The overlays (travel, injury) spliced into a rebuilt program, read off the stored program (v0.262.1).
+export { spliceOverlays } from './state-overlays.ts';
+export type { OverlaidProgram, Overlay, OverlayWeekRange, ProgramDayDate } from './state-overlays.ts';
 export type { EngineCfg, CardioSchedule, PaceRow, RunAnchorInfo } from './cardio-progression.ts';
 export type { CardioSession } from './nsw-cardio.ts';

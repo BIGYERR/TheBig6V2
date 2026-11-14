@@ -10,6 +10,7 @@
     "prebuild-ios": "expo prebuild --platform ios --no-install",
     "build-ios": "node scripts/ios.mjs build",
     "sim-ios": "node scripts/ios.mjs sim",
+    "sim-ios:fast": "node scripts/ios.mjs sim --fast",
     "archive-ios": "node scripts/ios.mjs archive",
     "release-ios": "node scripts/ios.mjs release"
   },

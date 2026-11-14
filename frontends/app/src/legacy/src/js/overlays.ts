@@ -1,9 +1,9 @@
 import { getPrograms, savePrograms } from './storage.ts';
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { _setActiveProg, activeProg, showToast } from './rest-day-shell.ts';
+import { spliceOverlays } from '../../../../../../core/src/engine/state-overlays.ts';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { INJURY_REGIONS, injuryPlan } from '../../../../../../core/src/engine/injury.ts';
-import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { _progDayDate, calcCurrentWeek, renderWeekView } from './week-view-sections.ts';
 import { refreshProgram } from './program-manage.ts';
 import { popFire } from './popups-streaks-reminders.ts';
@@ -107,76 +107,15 @@ function paceShiftMap(prog: any){
   for(let w=1;w<=tw;w++){ if(map[w]>0) return map; }
   return null;
 }
-// Splice overlay weeks into a freshly-built program. Builds a VARIANT program from
-// the patched cfg and takes only its week range — rather than mutating cfg mid-build
-// or find-and-replacing exercises in the output. This works because the engine keys
-// everything off the TRUE program week (the lifting wave tiles across the full
-// program), so week 5 pulled from a travel build is still week 5: same wave position,
-// same deload cadence, same taper math. Progression is preserved for free.
-// Overlap rule: later-created overlay wins (applied last).
+// Splices the program's overlays into a freshly built grid: core's spliceOverlays (state-overlays.ts, v0.262.1) holds
+// the rules. The page hands it its week range and its day date, and says what a failed overlay does here: an injury
+// or travel plan silently not applying is a safety failure, not a log line, so the athlete is told the plan change
+// did not take. The toast is wrapped because this can run at boot before the DOM is ready.
 function applyOverlays(prog: any, rebuilt: any){
-  const ovs = Array.isArray(prog && prog.overlays) ? prog.overlays : [];
-  if(!ovs.length) return rebuilt;
-  const totalWeeks = rebuilt.totalWeeks || prog.totalWeeks || 0;
-  const _variantCache: Record<string, any> = {};
-  // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
-  ovs.slice().sort((a: any,b: any)=>((a&&a.created)||0)-((b&&b.created)||0)).forEach(ov=>{
-    try{
-      if(!ov || (ov.type!=='substitute' && ov.type!=='injury') || !ov.patch) return;
-      const range = overlayWeekRange(prog, ov, totalWeeks);
-      if(!range) return;                                   // outside the program → inert
-      const ck = JSON.stringify([ov.type, ov.patch]);      // one build per distinct type+patch
-      // _travel marks the build as a temporary situation rather than the athlete's real
-      // setup. It is what lets "Mini gym" mean a hotel rack (a few light dumbbells, hold
-      // the line) while the SAME home_basic tier chosen in the wizard means a real home
-      // gym with adjustable dumbbells and trains normally. Set here rather than in the
-      // patch so it applies to overlays saved before this existed. TRAVEL-ONLY semantic:
-      // injury variants build clean so home equipment keeps meaning what the wizard said.
-      if(!_variantCache[ck]) _variantCache[ck] = buildProgram(ov.type==='substitute' ? {...prog.cfg, ...ov.patch, _travel:true} : {...prog.cfg, ...ov.patch});
-      const variant = _variantCache[ck];
-      if(!variant || !variant.weeks) return;
-      // V175 (D27): THE UNIT IS THE DAY. Dates are the source of truth (§6b) and the
-      // week range is only the search window: inside it, a day takes the variant only
-      // if its own calendar date falls in [from, to] (both inclusive — D29). A trip that
-      // starts on Tuesday and ends on Tuesday changes Tuesday; the old whole-week splice
-      // rewrote all six days and handed the athlete chair squats on Wednesday. A
-      // full-week overlay resolves every day and is byte-identical to the old splice.
-      // Measured before ruling: the variant's same-day is a structural drop-in (0
-      // mismatches on cardio / core / role / tags over 54,432 pairs — the split is
-      // cfg-driven, equipment only changes the picks) and cross-seam adjacent-day
-      // repeats run BELOW the base engine's own rate, so the merged week is not
-      // re-deconflicted. Bridge and halfstep overlays are date-exact by construction
-      // (from..from+6), so they now cover exactly the seven days the popup promises
-      // instead of spilling into a third calendar week. Rest days stay the base's.
-      const _from = _parseLocalDate(ov.from);
-      const _to   = ov.to ? _parseLocalDate(ov.to) : null;
-      if(!_from) return;
-      // The legal universe rides on the DAY, not the week. A spliced day is stamped
-      // with its overlay key and the sheet looks the universe up by that key, so a
-      // hotel day in a gym week offers hotel-legal candidates and the gym days beside
-      // it still offer the rack. The stamp rides on the content, so it survives a
-      // rest-day move and goes into the ia_hist_ snapshot as part of the record.
-      if(!rebuilt._swapUniverseByKey) rebuilt._swapUniverseByKey = {};
-      if(Array.isArray(variant._swapUniverse)) rebuilt._swapUniverseByKey[ck] = variant._swapUniverse;
-      for(let w=range.fromWeek; w<=range.toWeek; w++){
-        const vw = variant.weeks[w]; if(!vw) continue;
-        if(!rebuilt.weeks[w]) rebuilt.weeks[w] = {};
-        Object.keys(vw).forEach(d=>{
-          const vd = vw[d]; if(!vd || vd.rest) return;
-          const dt = _progDayDate(prog, w, d); if(!dt) return;
-          if(dt < _from || (_to && dt > _to)) return;
-          rebuilt.weeks[w][d] = Object.assign({}, vd, {_ovKey: ck});
-        });
-      }
-    }catch(e){
-      // An injury or travel plan silently not applying is a safety failure, not a
-      // log line. Tell the athlete the plan change did not take. Toast is wrapped
-      // because applyOverlays can run at boot before the DOM is ready.
-      console.error('overlay apply failed', ov && ov.id, e);
-      try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}
-    }
+  return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov: any, e: any)=>{
+    console.error('overlay apply failed', ov && ov.id, e);
+    try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}
   });
-  return rebuilt;
 }
 
 // ── V175 (D30): the overlay a day came from, read off the day itself ────────────
