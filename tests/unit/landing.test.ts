@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-interface Landing { chatOf(m: string): string | null; distinctChats(m: string[]): string[]; judgePush(m: string[], o?: { all?: boolean }): { ok: boolean; chats: string[]; reason?: string }; judgeLanding(s: Record<string, unknown>, o?: { all?: boolean }): { ok: boolean; reason?: string; chats?: string[]; n?: number }; isReleaseTag(name: unknown): boolean; judgeTag(s: Record<string, unknown>): { ok: boolean; action?: string; sha?: string; reason?: string } }
+interface Landing { chatOf(m: string): string | null; distinctChats(m: string[]): string[]; judgePush(m: string[], o?: { all?: boolean }): { ok: boolean; chats: string[]; reason?: string }; judgeLanding(s: Record<string, unknown>, o?: { all?: boolean }): { ok: boolean; reason?: string; chats?: string[]; n?: number }; isReleaseTag(name: unknown): boolean; judgeTag(s: Record<string, unknown>): { ok: boolean; action?: string; sha?: string; reason?: string }; installsAfter(files: string[]): string[] }
 const L = (await import(pathToFileURL(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'tools', 'land.mjs')).href)) as Landing;
 
 const A = 'v0.256.0: the leg day before a tier A long run is a maintenance day\n\nBody.\n\nChat: leg-day-volume';
@@ -102,4 +102,13 @@ test('tag refuses: before the merge; a name that is not a release tag; a tag off
   assert.equal(moved.ok, false);
   assert.match(String(moved.reason), /GitHub already holds v0\.261\.5 at bbbbbbb.*a pushed tag is never moved/);
   assert.match(String(L.judgeTag(T({ remoteSha: OLD })).reason), /there is no such tag here/);
+});
+
+// Post-v0.262.0: the native spike chat added a package to the Expo app. Its worktree had installed it; the main
+// checkout, which every other worktree borrows from, had not, and nothing said so. The landing now names each folder.
+test('a landing names every folder whose lockfile it changed, and no other', () => {
+  assert.deepEqual(L.installsAfter(['frontends/native/package-lock.json', 'frontends/native/package.json', 'tests/unit/native-shell.test.ts']), ['frontends/native']);
+  assert.deepEqual(L.installsAfter(['tests/package-lock.json', 'package-lock.json', 'backend/package-lock.json', 'backend/package-lock.json']), ['.', 'backend', 'tests']);
+  assert.deepEqual(L.installsAfter(['frontends/native/package.json', 'docs/package-lock.json.md', 'tools/my-package-lock.json', 'IRON_ASYLUM_HANDOFF_1_1.md']), []);
+  assert.deepEqual(L.installsAfter([]), []);
 });

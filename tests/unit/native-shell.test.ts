@@ -9,11 +9,12 @@ import { join } from 'node:path';
 import { describe, test } from 'vitest';
 import { VERSION, semver } from '@ia/core';
 import { REPO } from '../support/app.ts';
+import { SWIFT_WORD, swiftLine } from '../../frontends/native/src/spike-line.ts';
 
 const require = createRequire(import.meta.url);
 const NATIVE = join(REPO, 'frontends', 'native');
 
-interface ExpoConfig { name: string; version: string; ios: { bundleIdentifier: string; buildNumber: string } }
+interface ExpoConfig { name: string; version: string; ios: { bundleIdentifier: string; buildNumber: string }; plugins?: string[] }
 const config = (require(join(NATIVE, 'app.config.js')) as () => ExpoConfig)();
 const pkg = JSON.parse(readFileSync(join(NATIVE, 'package.json'), 'utf8')) as {
   dependencies: Record<string, string>; devDependencies: Record<string, string>;
@@ -38,6 +39,7 @@ describe('native shell: beside today\'s app, never over it', () => {
 });
 
 describe('native shell: version and pins', () => {
+  // Outside the TestFlight lane, which hands in its own count (D288; tests/unit/native-testflight.test.ts).
   test('its version and build number are core\'s release version', () => {
     assert.equal(semver.cmp(config.version, VERSION), 0);
     assert.equal(semver.cmp(config.ios.buildNumber, VERSION), 0);
@@ -58,6 +60,73 @@ describe('native shell: version and pins', () => {
     assert.equal(pkg.dependencies['expo-sqlite'], '58.0.17');
     assert.equal(pkg.dependencies['expo-document-picker'], '58.0.5');
     assert.equal(pkg.dependencies['expo-file-system'], '58.0.13');
+  });
+});
+
+// The native spike (MIGRATION.md phase 2 and 4.1): a widget target and a Swift module of the app's own, both added to
+// the project expo prebuild generates, so ios/ is still never committed. Expected values are typed from the plan
+// (the widget keeps today's name, RestTimerWidget, under the Expo app's bundle id) and from the Swift file's one word.
+describe('native shell: the native spike, a widget target and a Swift module with ios/ still generated', () => {
+  const read = (...path: string[]): string => readFileSync(join(NATIVE, ...path), 'utf8');
+  const files = sources(join(NATIVE, 'src'));
+  const all = files.map((f) => readFileSync(f, 'utf8')).join('\n');
+
+  // @bacons/apple-targets 5.0.0 (2026-07-17, the newest; its peer is expo >=52), read from the registry 2026-11-13.
+  test('the widget plugin is pinned exactly, and it is the config\'s one plugin', () => {
+    assert.equal(pkg.dependencies['@bacons/apple-targets'], '5.0.0');
+    assert.deepEqual(config.plugins, ['@bacons/apple-targets']);
+  });
+
+  // The release reads and writes the generated project with it (scripts/ios.mjs release), so it is the app's own
+  // dependency, never one that happens to arrive under Expo's: 4.0.0, the version Expo SDK 58's config plugins install.
+  test('the project file reader the release signs with is pinned exactly', () => {
+    assert.equal(pkg.devDependencies['xcode'], '4.0.0');
+  });
+
+  test('the widget target is RestTimerWidget, under the Expo app\'s bundle id, with no entitlement to register', () => {
+    const target = require(join(NATIVE, 'targets', 'RestTimerWidget', 'expo-target.config.js')) as Record<string, unknown>;
+    assert.deepEqual(target, { type: 'widget', name: 'RestTimerWidget', bundleIdentifier: '.RestTimerWidget', deploymentTarget: '16.4', entitlements: {} });
+    assert.match(read('targets', 'RestTimerWidget', 'Info.plist'), /<key>NSExtensionPointIdentifier<\/key>\s*<string>com\.apple\.widgetkit-extension<\/string>/);
+  });
+
+  test('the widget extension is empty: one widget, with nothing in it', () => {
+    const swift = read('targets', 'RestTimerWidget', 'RestTimerWidget.swift');
+    assert.match(swift, /@main\s+struct RestTimerWidgetBundle: WidgetBundle/);
+    assert.equal(swift.match(/WidgetConfiguration \{\s*EmptyWidgetConfiguration\(\)\s*\}/g)?.length, 1);
+    assert.doesNotMatch(swift, /StaticConfiguration|ActivityConfiguration|AppIntentConfiguration/);
+  });
+
+  // A guard: it passes on the release before the spike too. The spike must not change it (MIGRATION.md 4.1: a
+  // committed ios/ folder is the fallback this session did not need).
+  test('ios/ is generated on every build and never committed', () => {
+    assert.match(read('.gitignore'), /^\/ios\/$/m);
+  });
+
+  test('the Swift module is the app\'s own local module, IASpike, and answers with one word', () => {
+    assert.deepEqual(JSON.parse(read('modules', 'ia-spike', 'expo-module.config.json')), { platforms: ['apple'], apple: { modules: ['IASpikeModule'] } });
+    const swift = read('modules', 'ia-spike', 'ios', 'IASpikeModule.swift');
+    assert.match(swift, /public class IASpikeModule: Module/);
+    assert.match(swift, /Name\("IASpike"\)/);
+    assert.match(swift, /Function\("answer"\) \{ \(\) -> String in\s+"swift"\s+\}/);
+    assert.match(read('modules', 'ia-spike', 'ios', 'IASpike.podspec'), /s\.dependency 'ExpoModulesCore'/);
+  });
+
+  test('the app asks Swift once, when the bundle loads, and a build without the module is no answer, not a crash', () => {
+    const spike = read('src', 'native-spike.ts');
+    assert.match(spike, /requireOptionalNativeModule<Spike>\('IASpike'\)\?\.answer\(\) \?\? null/);
+    assert.match(spike, /catch \{\s*return null;\s*\}/);
+    assert.match(spike, /export const SWIFT_ANSWER: string \| null = ask\(\);/);
+    assert.equal(all.match(/\.answer\(/g)?.length, 1, 'one call site');
+    assert.equal(all.match(/\bask\(\)/g)?.length, 2, 'ask is declared once and called once');
+  });
+
+  test('the screen says whether Swift answered, in a sentence', () => {
+    assert.equal(SWIFT_WORD, 'swift');
+    assert.equal(swiftLine('swift'), 'Swift answers.');
+    assert.equal(swiftLine(null), 'Swift does not answer.');
+    assert.equal(swiftLine(''), 'Swift does not answer.');
+    assert.equal(swiftLine('Swift'), 'Swift does not answer.');
+    assert.match(all, /<Text testID="swift-line"[^>]*>\s*\{swiftLine\(SWIFT_ANSWER\)\}\s*<\/Text>/);
   });
 });
 
