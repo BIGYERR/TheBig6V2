@@ -1,0 +1,7 @@
+corpus: 17 files loaded, 136 of 136 keys read back equal (1514057 bytes), core sha256 agrees on 136 of 136
+edge emoji: length 22 back 22, equal true, core sha256 = node true, stored sha256 = file true
+edge loneSurrogate: length 11 back 11, equal false, core sha256 = node true, stored sha256 = file true
+edge nul: length 3 back 3, equal true, core sha256 = node true, stored sha256 = file true
+edge big: length 6291456 back 6291456, equal true, core sha256 = node true, stored sha256 = file true
+edge empty: length 0 back 0, equal true, core sha256 = node true, stored sha256 = file true
+misses: none

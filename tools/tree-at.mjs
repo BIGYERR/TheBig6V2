@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // The tree a past commit had, for running a new or changed test that reads source files instead of the page against the
 // previous release (CLAUDE.md, Proof for new work). The tests' global setup builds the page from the sources, so a copy
-// needs the app, core, the tests and the tools, the page and its icon, and the main checkout's node_modules; assembled by
-// hand at v0.260.0 the copy took four tries. The plan is pure (tests/unit/tree-at.test.ts); writeTree does the git, the
+// needs the app, the Expo app (whose sources tests/unit/native-shell.test.ts reads; Post-v0.262.0), core, the tests and
+// the tools, the page and its icon, and the main checkout's node_modules; assembled by hand at v0.260.0 the copy took
+// four tries. The plan is pure (tests/unit/tree-at.test.ts); writeTree does the git, the
 // links and the copies.
 //
 // Usage: node tools/tree-at.mjs <ref> <dir> [test file ...]
@@ -15,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { gitFreeEnv, mainCheckout } from './worktree-deps.mjs';
 
 /** What a copy holds: the paths archived from the commit, when the commit has them. */
-export const TREE = ['frontends/app', 'core', 'tests', 'tools', 'index.html', 'apple-touch-icon.png'];
+export const TREE = ['frontends/app', 'frontends/native', 'core', 'tests', 'tools', 'index.html', 'apple-touch-icon.png'];
 /** The packages whose node_modules the copy borrows. */
 export const DEPS = ['tests', 'frontends/app'];
 

@@ -81,3 +81,56 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
   program stored makes no file and toasts "Nothing to back up yet.", so no backup exists that Load would refuse; (3) a
   write the phone refuses during a load puts back every key it held, and toasts "Loading failed. Nothing changed."
 - **Release:** v0.253.0, with D264.
+
+## D287 P-NATIVEIMPORT: the Expo app loads a backup, read only, and checks every key (2026-11-13)
+
+- **Date:** 2026-11-13. **Ruled by:** the session (form and copy, which are the session's to decide); the feature is
+  Mario's brief for the React Native migration's phase 2, session 2 (`MIGRATION.md`, phase 2: "Load a backup, read
+  only"), 2026-11-13. **Bump:** none, Mario 2026-11-13 (a Post-v0.262.0 native pass, as session 1's shell was).
+  **Shipped:** Post-v0.262.0, no build (`frontends/native`, on `chat/sqlite-store` until Mario merges it).
+- **The finding (measured, `tests/measure/native-store_sqlite-roundtrip.mjs`, its report beside it):** the 17 corpus
+  backups loaded into SQLite through expo-sqlite/kv-store 58.0.17's own statements (under `node:sqlite`) read back
+  136 of 136 keys equal (1,514,057 bytes), and core's `sha256Hex` agrees with `node:crypto` on all 136. Emoji, NUL,
+  an empty value and a 6 MB value come back whole. **A lone surrogate does not:** SQLite stores text as UTF-8, so
+  `'half \uD83D pair'` comes back with U+FFFD in its place, and its sha256 is the same as the original's, because
+  both encode to the same bytes. A check by hash alone would pass it. No value the app writes holds one (every
+  `ia_` value but the ids is `JSON.stringify` output, which escapes a lone surrogate), but a check must not rest on that.
+- **What changes (the Expo app only; today's app, its page and core do not change):**
+  1. **The store.** Core's `StateStore` on SQLite (`frontends/native/src/store/sqlite-store.ts`), standing on
+     expo-sqlite/kv-store's synchronous `SQLiteStorage` (`getItemSync`, `setItemSync`, `removeItemSync`,
+     `getAllKeysSync`), one database, `iron-asylum-state`, in the Expo app's own container
+     (`phone-store.ts`; the bundle id `com.bigyerr.ironasylum.next` is not today's app's). Keys and values go in as
+     strings. Core's `state-*.ts` readers and writers take it unchanged.
+  2. **The import** (`backup-import.ts`): core's `readBackupText` checks the file, core's `loadBackupInto` loads it all
+     or nothing, then every `ia_` key the store holds is checked against the file: the same key set, and each value
+     equal to the file's character for character and by sha256. Any miss puts back what the store held before, so a
+     refused import keeps nothing.
+  3. **The row,** on the Expo app's one screen after the Engine row: label **Backup**; note **Loads a backup file
+     into this app and checks every key. Writes nothing back.**; one button, **Load a backup**, which reads
+     **Checking** while it works. The picker copies the file into the app's cache before it is read
+     (`copyToCacheDirectory: true`); the app writes no file and shares none. Under the button, the line, then what the
+     store holds: **Holds 8 keys.** (**Holds nothing yet.** when empty), each program as core's readers find it
+     (**THE HALF MANNY. 14 weeks from 2026-08-31. Active. 2 days marked.**, the program's own name), and each key with its size and its full
+     sha256.
+  4. **The lines:** loaded, **Loaded 8 of 8 keys. Every hash matches the file. Saved by version 0.261.0.**; a newer
+     file, **This backup is from a newer app. Update the app first.** and not a backup, **That file is not an Asylum
+     backup.** (today's app's own words); a refused write, **The phone refused the write. Nothing was kept.**; a
+     mismatch, **1 key does not match the file. Nothing was kept. First miss: ia_note_P1 differs.**; a file that
+     cannot be read, **That file could not be read. Nothing was kept.**
+- **What deliberately does not change:** today's app, its storage and its backup; the backup format; core (the
+  import calls core's reader, loader and SHA-256 as they are); program output. The Expo app sends nothing anywhere.
+- **Expected values** (typed by hand; `tests/unit/native-backup-import.test.ts`, `tests/integration/native-store.test.ts`):
+  every corpus backup imports with each key's value, size (`Buffer.byteLength`) and sha256 (`node:crypto`) the
+  file's, and one program, `prog_1788008400000`, 14 weeks from 2026-08-31, active, 2 days marked; the lone surrogate
+  case refuses as a mismatch and the store holds exactly what it held before; a refused third write, a dropped key and
+  a key the remove leaves behind each refuse and keep nothing.
+- **Proof the tests cannot make:** expo-sqlite's own SQLite build and Hermes's strings crossing into it and back,
+  `sha256Hex` under Hermes, the picker and the file read, the screen. Checked on the simulator (below) and, at the
+  phase 2 exit gate, on Mario's phone with a copy of his backup.
+- **On the simulator** (iPhone 17 Pro, iOS 26, the Release build under Hermes, 2026-11-13): the corpus backup of
+  v0.261.0, copied into the simulator's Files and picked there, read **Loaded 8 of 8 keys. Every hash matches the
+  file. Saved by version 0.261.0.**, the program **THE HALF MANNY. 14 weeks from 2026-08-31. Active. 2 days marked.**
+  The app's own database file, copied off the simulator and read with `node:sqlite`: the table expo-sqlite made,
+  `storage (key TEXT PRIMARY KEY NOT NULL, value TEXT)`, holding the file's 8 keys, each equal to the file's by value
+  and by sha256 (`node:crypto`). The picked file was byte for byte the same afterwards. After a cold relaunch the row
+  read **Holds 8 keys.** with the same program and hashes. Today's app sat beside it on the home screen, untouched.

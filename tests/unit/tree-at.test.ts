@@ -22,8 +22,8 @@ const gitEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k
 
 const base = { dirEmpty: true, has: () => true, files: [] as string[], depsRoot: '/main', dir: '/scratch/prev', repo: '/wt' };
 
-test('a copy holds the app, core, the tests, the tools, the page and its icon, and borrows two packages', () => {
-  assert.deepEqual(T.TREE, ['frontends/app', 'core', 'tests', 'tools', 'index.html', 'apple-touch-icon.png']);
+test('a copy holds the app, the Expo app, core, the tests, the tools, the page and its icon, and borrows two packages', () => {
+  assert.deepEqual(T.TREE, ['frontends/app', 'frontends/native', 'core', 'tests', 'tools', 'index.html', 'apple-touch-icon.png']);
   const plan = T.treePlan({ ...base, files: ['tests/unit/swipe-deck.test.ts', 'frontends/app/test/unit/deck.test.ts'] });
   assert.ok(plan.ok);
   assert.deepEqual(plan.archive, T.TREE);
