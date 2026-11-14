@@ -4,7 +4,18 @@ The Expo app the React Native migration builds (`MIGRATION.md`, phase 2), beside
 which it does not touch. Its bundle id is **com.bigyerr.ironasylum.next**, so it installs next to today's app
 (`com.bigyerr.ironasylum`) and never replaces it before cutover. `tests/unit/native-shell.test.ts` holds that.
 
-**Today it holds one screen, with two rows and a line saying whether its Swift module answered:** the engine check (D286, `docs/decisions/engine-check.md`), core's
+**Today it holds two tabs.** **This Week** (phase 2 session 4, `src/this-week/`; D276, D278, D279 and D284 carried over,
+`docs/decisions/this-week.md`), read only: today's screen drawn from the stored state. `week-view-model.ts` and
+`week-strip.ts` are copies of the Angular screen's own files, held equal to the byte by
+`tests/unit/native-this-week.test.ts`: copy them again with `cp` when today's change, never edit them here.
+`week-readers.ts` is the legacy page's readers the screen needs, line for line, held equal to the page's by
+`tests/integration/native-this-week.test.ts`. `week-screen.ts` joins them over core's store; `ThisWeek.tsx` and
+`marks.tsx` draw it. **Its grid is the stored one for now** (`week-screen.ts`, `liveProgram`): `refreshProgram` is
+still in the page, so a day a swap, an edit, an injury, travel, a moved rest day or an engine change has touched reads
+as it was stored, not as today's app shows it, until that code is in core. A tap on a week title or a day works;
+every other control is drawn and does nothing yet.
+
+**Bugs**, with two rows and a line saying whether its Swift module answered: the engine check (D286, `docs/decisions/engine-check.md`), core's
 `core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes, which reads and writes
 no stored key; and the Backup row (D287, `docs/decisions/data-backup.md`), which loads a backup file, read only, into
 the app's own SQLite store and checks every key against the file by value and by sha256.

@@ -229,16 +229,18 @@ export { cards, training, resting, trainDay, DAYS };
 /**
  * The standard history, the same walk over any program: five stretches, a record after each, so a difference names
  * where it began. Weeks are counted from the first whole week after the program was made, and every launch is dated
- * from the program's own first Monday, so time only moves forward.
+ * from the program's own first Monday, so time only moves forward. `each` is called after each record, with the phone.
  */
-export function life(cfg: Cfg, createdAt: string, file?: string): { records: Record<string, StateRecord>; phone: Phone } {
+export function life(cfg: Cfg, createdAt: string, file?: string, each?: (stage: string, P: Phone) => void): { records: Record<string, StateRecord>; phone: Phone } {
   const P = new Phone(file).launch(createdAt);
   P.generate(cfg);
   const { first, start } = firstWeek(P, createdAt);
   const A = first, B = first + 1, C = first + 2;
   const day0 = (w: number) => 7 * (w - 1);
   const records: Record<string, StateRecord> = {};
-  records['0 generated'] = P.record();
+  // Each stretch's record, then `each`, for a test that reads the phone as that launch left it (This Week in the Expo app).
+  const mark = (stage: string): void => { records[stage] = P.record(); if (each) each(stage, P); };
+  mark('0 generated');
 
   // The first week: three days trained, one skipped, a swap, a skipped move and an added one, one part skipped alone.
   const wa = training(P.launch(at(start, day0(A), '06:30')), A);
@@ -264,7 +266,7 @@ export function life(cfg: Cfg, createdAt: string, file?: string): { records: Rec
     if (i === 4) { P.open(A, d); P.ev(`(function(){var p=dayPartsOf(${A},${JSON.stringify(d)});if(p.length>1)skipPart(${A},${JSON.stringify(d)},p[p.length-1]);})()`); return; }
     trainDay(P, A, d, i, i === 3 ? 'skipped' : 'complete');
   });
-  records['1 first week'] = P.record();
+  mark('1 first week');
 
   // The second week: an injury flagged, a day trained, a rest day's session moved, travel booked, a Wildcard done.
   P.launch(at(start, day0(B), '07:00'));
@@ -281,7 +283,7 @@ export function life(cfg: Cfg, createdAt: string, file?: string): { records: Rec
   }
   P.ev(`_ovDraft.equipment='minimal';_ovDraft.from=${JSON.stringify(at(start, day0(C)).slice(0, 10))};_ovDraft.to=${JSON.stringify(at(start, day0(C) + 4).slice(0, 10))};applyOverlayDraft();`);
   P.ev(`completeWildcard('Golden record wildcard');`);
-  records['2 second week'] = P.record();
+  mark('2 second week');
 
   // The third week: back from the injury, a day trained under travel, an earlier week's lift logged again.
   P.launch(at(start, day0(C) + 2, '19:15'));
@@ -290,13 +292,13 @@ export function life(cfg: Cfg, createdAt: string, file?: string): { records: Rec
   if (wc[0]) trainDay(P, C, wc[0], 7);
   const past = wa[0] && cards(P.day(A, wa[0]))[0];
   if (past && wa[0]) { P.open(A, wa[0]); P.logLift(past.name, past.detail, [past.reps, past.reps], [185, 190]); }
-  records['3 third week'] = P.record();
+  mark('3 third week');
 
   // Two weeks unopened, then a launch: the freeze catches up. A Wednesday, on purpose: on a Monday after the clocks
   // have gone forward the app reads the week before (the defect tests/integration/stored-state.test.ts holds), which
   // is Auckland's case here (2026-09-27), and this history is the same walk in every zone.
   P.launch(at(start, day0(C) + 23, '08:00'));
-  records['4 after two weeks away'] = P.record();
+  mark('4 after two weeks away');
   return { records, phone: P };
 }
 

@@ -331,6 +331,19 @@ unsigned device archive (`npm run archive-ios`) proves the release path up to th
 first runs on `main`. What is left of the exit gate: Mario's steps and the first upload, his phone (a copy of his
 backup, the lattice under Hermes there), This Week.
 
+**Session 4 (Post-v0.262.0, `docs/decisions/this-week.md`, D276, D278, D279 and D284 in the Expo app):** the first
+upload ran on `main` (run 43546144149: `0.262.0 (100)`, signed, processed), and Mario's phone read **Lattice 864 of
+864 match. Half Manny matches. Took 92 s.** and, for a backup saved by today's app, **Loaded 36 of 36 keys. Every hash
+matches the file.** This Week is drawn in the Expo app, read only (`frontends/native/src/this-week/`): today's own
+model and strip placer, copied and held equal to the byte; the 16 page readers the screen needs, line for line, held
+equal to the page's over whole histories; core's readers of the stored state under them. **Measured first
+(`tests/measure/native-this-week_reads.md`): the grid the screen draws is `refreshProgram`'s, which is still in the
+page, and the stored grid differs from it on 127 of 350 days in the week holding today.** So the Expo screen's grid is
+the stored one behind one seam (`liveProgram`), right wherever nothing has touched a day since it was stored, and the
+side by side on Mario's phone is only the gate's proof once phase 1's last two slices (`applyOverlays`, then
+`refreshProgram` and the freeze) are in core and the seam reads them. What is left of the exit gate: those two
+slices, the seam, and Mario's side by side.
+
 **Exit gate:** on Mario's phone, with a copy of his real backup loaded: the lattice at 864 of 864 and HALF_MANNY at
 `147f083be4e04e34` under Hermes; every `ia_` key's sha256 equal to the backup's after import (the app refuses the
 import otherwise); This Week showing the same week, day, cards and numbers as today's app, checked side by side by

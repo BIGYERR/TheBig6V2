@@ -134,3 +134,8 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
   `storage (key TEXT PRIMARY KEY NOT NULL, value TEXT)`, holding the file's 8 keys, each equal to the file's by value
   and by sha256 (`node:crypto`). The picked file was byte for byte the same afterwards. After a cold relaunch the row
   read **Holds 8 keys.** with the same program and hashes. Today's app sat beside it on the home screen, untouched.
+- **On Mario's phone** (2026-11-13, IA Next 0.262.0 (100) from TestFlight, a backup saved by today's app at 0.262.0,
+  his screenshot): **Loaded 36 of 36 keys. Every hash matches the file. Saved by version 0.262.0.** and **Holds 36
+  keys.** Three programs: TEST TING, 12 weeks from 2026-07-06, 35 days marked; THE HALF MANNY, 14 weeks from
+  2026-08-24, active, 50 days marked; PRT TING, 11 weeks from 2026-09-23, 15 days marked. The phase 2 exit gate's
+  import leg is seen. Today's app was not touched: the file was a copy, and the beta writes nothing back.
