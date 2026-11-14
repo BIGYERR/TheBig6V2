@@ -38,12 +38,23 @@ npm ci
 npm run typecheck
 npm run build-ios     # expo prebuild (ios/ is generated, never committed) and an unsigned Release build for the simulator
 npm run sim-ios       # the same, then install on the booted simulator and launch
+npm run sim-ios:fast  # the same, skipping prebuild and pod install while ios/ is current
 npm run archive-ios   # the release path without a signature: an unsigned Release archive for a device, checked
 ```
 
 `build-ios` needs Xcode and CocoaPods (`brew install cocoapods`). Its Xcode log is `temp/native-expo/xcodebuild.log`
 at the repo root. CI's `native (Expo)` job runs the type check and `build-ios` on every push to `dev` and every pull
 request. The build fails unless the app holds its widget extension and its Swift module.
+
+**The fast build** (`--fast` on `build` or `sim`; `scripts/prebuild-stamp.mjs`). Every prebuild leaves the digest of
+what it read in `ios/.ia-prebuild`: the config, the packages and their lockfile, the icon, `targets/`, `modules/` and
+core's version. A fast build skips prebuild and its pod install only while that digest still matches, and Xcode then
+builds only what changed; the JavaScript under `src/` is bundled on every build either way. When anything prebuild
+reads has changed, or `ios/` is missing, it runs prebuild and says why. CI and the archive never use it.
+
+**The icon** is `assets/icon.png`: today's icon with an orange band reading NEXT, so the two apps are told apart on
+the home screen. `python3 scripts/make-icon.py` makes it again when today's icon changes (it needs Pillow; no build
+runs it).
 
 ## Native code (the spike, phase 2 session 3)
 
@@ -74,33 +85,98 @@ and stays green.
 The signing is today's lane's own code (`frontends/app/scripts/signing.mjs`), plain: the one Apple Distribution
 certificate today's lane already holds, and one App Store profile for each signed target. No EAS. Five of the seven
 secrets are today's and already set: `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `IOS_DIST_CERT_P12`,
-`IOS_DIST_CERT_PASSWORD`. Mario makes the rest in the browser, once:
+`IOS_DIST_CERT_PASSWORD`. Mario makes the rest in the browser, once.
 
-1. **Agreements.** At developer.apple.com/account, signed in as the Account Holder, accept the Apple Developer
-   Program License Agreement if a banner asks. At appstoreconnect.apple.com > Business, accept anything pending. While
-   one is unsigned, App Store Connect answers every lane 403, "A required agreement is missing or has expired".
-2. **The app's App ID.** developer.apple.com > Certificates, Identifiers & Profiles > Identifiers > **+** > App IDs >
-   App. Description `IA Next`, Bundle ID Explicit `com.bigyerr.ironasylum.next`, no capabilities.
-3. **The widget's App ID.** The same, with description `IA Next Widget` and Bundle ID
+These steps were done once, on 2026-11-13. They are kept whole for the day they are needed again. You need a Mac,
+a browser and Terminal, about 20 minutes, and no Xcode. Do the parts in order: each one needs the one before. Never
+paste a secret or a profile's contents into a chat, an issue or a commit.
+
+### Part 1. Sign the agreements (2 minutes)
+
+1. Open developer.apple.com/account and sign in with the Apple ID that owns the developer account.
+2. If a banner at the top names the Apple Developer Program License Agreement, click **Review Agreement**, tick the
+   box at the bottom and click **I Agree**.
+3. Open appstoreconnect.apple.com with the same Apple ID and click **Business** (on some accounts, "Agreements, Tax,
+   and Banking").
+4. The row Free Apps Agreement should say Active. If any row offers "View and Agree to Terms" or "Review", open it
+   and accept.
+
+Done when no banner is left and the Free Apps Agreement says Active. While one is unsigned, App Store Connect answers
+every lane 403, "A required agreement is missing or has expired", today's lane included.
+
+### Part 2. Register two App IDs (4 minutes)
+
+An App ID is Apple's record that a bundle id is yours. The app needs one and its widget needs one.
+
+1. Open developer.apple.com/account/resources/identifiers/list and click the **+** beside Identifiers.
+2. Choose **App IDs**, Continue, then **App**, Continue.
+3. Description `IA Next`. Bundle ID **Explicit**, exactly `com.bigyerr.ironasylum.next`.
+4. Tick no capability. Continue, then Register.
+5. Click **+** again and repeat steps 2 to 4 with description `IA Next Widget` and Bundle ID
    `com.bigyerr.ironasylum.next.RestTimerWidget`.
-4. **The App Store Connect record.** appstoreconnect.apple.com > Apps > **+** > New App: iOS, a name (`IA Next`, or
-   any name that is free), English (U.S.), Bundle ID `com.bigyerr.ironasylum.next`, SKU `ironasylum-next`, Full Access.
-5. **Profiles.** Profiles > **+** > Distribution > App Store Connect, App ID `com.bigyerr.ironasylum.next`, the Apple
-   Distribution certificate today's profiles were made with, name `Asylum Next App Store`, download. Then the same
-   for `com.bigyerr.ironasylum.next.RestTimerWidget`, named `Asylum Next Widget App Store`.
-6. **Secrets.** GitHub > the repo > Settings > Secrets and variables > Actions > New repository secret:
 
-   | Secret | What goes in it |
-   | --- | --- |
-   | `IOS_PROFILE_NEXT_APP` | `Asylum_Next_App_Store.mobileprovision` as base64 (`base64 -i <file> \| pbcopy`) |
-   | `IOS_PROFILE_NEXT_WIDGET` | `Asylum_Next_Widget_App_Store.mobileprovision` as base64 |
-7. **First upload.** The next merge into `main` that changes this app, or Actions > pipeline > Run workflow on `main`.
-   The run's notice says what happened: `testflight next 0.262.0 (101) processed`, or why it skipped.
-8. **The phone.** App Store Connect > IA Next > TestFlight > Internal Testing: add a group with automatic
-   distribution and yourself. TestFlight on the iPhone then offers IA Next, beside The Asylum.
+Done when the list shows both. If Apple says an identifier is not available, it is already registered: find it in the
+list and go on.
+
+### Part 3. Create the app in App Store Connect (3 minutes)
+
+1. Open appstoreconnect.apple.com/apps, click the **+** beside Apps, then **New App**.
+2. Platform iOS only. Name `IA Next` (if taken, `IA Next Beta`; the name does not matter to the build). Primary
+   language English (U.S.).
+3. Bundle ID: pick the one ending in `com.bigyerr.ironasylum.next`. If it is not listed yet, wait a minute and reload.
+4. SKU `ironasylum-next`. User Access Full Access. Click **Create**.
+
+Stop there. TestFlight needs no screenshots, price or description.
+
+### Part 4. Make two profiles (5 minutes)
+
+A profile is a small file that says this certificate may sign this app.
+
+1. Open developer.apple.com/account/resources/profiles/list and click the **+** beside Profiles.
+2. Under Distribution choose **App Store Connect**, Continue.
+3. App ID: the one ending in `com.bigyerr.ironasylum.next`, not the RestTimerWidget one. Continue.
+4. Certificate: the **Apple Distribution** one. If there are several, pick the one with the expiry date of today's
+   profile "Asylum App Store". Continue.
+5. Name `Asylum Next App Store`. Generate, then Download.
+6. Click **+** again and repeat steps 2 to 5 with the App ID ending in
+   `com.bigyerr.ironasylum.next.RestTimerWidget`, the same certificate, and the name `Asylum Next Widget App Store`.
+
+Done when Downloads holds `Asylum_Next_App_Store.mobileprovision` and `Asylum_Next_Widget_App_Store.mobileprovision`.
+Do not open them. A wrong certificate breaks nothing: the upload job fails naming the mismatch, and both profiles are
+made again.
+
+### Part 5. Put them in GitHub as secrets (4 minutes)
+
+GitHub stores text, so Terminal turns each file into text and copies it.
+
+1. In Terminal: `base64 -i ~/Downloads/Asylum_Next_App_Store.mobileprovision | pbcopy`. Nothing prints; the text is on
+   the clipboard.
+2. Open the repo on GitHub > Settings > Secrets and variables > Actions > **New repository secret**. Name
+   `IOS_PROFILE_NEXT_APP`, paste into Secret, **Add secret**.
+3. In Terminal: `base64 -i ~/Downloads/Asylum_Next_Widget_App_Store.mobileprovision | pbcopy`.
+4. **New repository secret** again. Name `IOS_PROFILE_NEXT_WIDGET`, paste, **Add secret**.
+
+Done when the list shows both beside the five older ones. If Terminal says "No such file", the file in Downloads has
+another name. Afterwards the two downloaded files can go to the Trash.
+
+### Part 6. Add yourself as a tester (2 minutes)
+
+1. Open appstoreconnect.apple.com/apps, click **IA Next**, then the **TestFlight** tab.
+2. Beside Internal Testing click **+**. Name the group, leave automatic distribution on, **Create**.
+3. In the group, beside Testers click **+**, tick your own name, **Add**.
+
+It is fine that there is no build yet.
+
+### After
+
+The first build goes up with the next merge into `main` that changes this app, or from Actions > pipeline > Run
+workflow on `main`. The run's notice says what happened: `testflight next 0.262.0 (101) processed`, or why it skipped.
+About 20 to 30 minutes later TestFlight on the iPhone offers IA Next, beside The Asylum. Nothing in these steps
+changes The Asylum (`com.bigyerr.ironasylum`) or its data.
 
 **Once a year** the certificate expires and all four profiles with it (today's two and these two); the upload warns
-within 30 days. `node scripts/testflight.mjs leg` reads the newest run on `main` for the deploy picture.
+within 30 days. Then parts 4 and 5 are done again with the new certificate, and today's lane's own two profiles
+beside them (`frontends/app/README.md`). `node scripts/testflight.mjs leg` reads the newest run on `main` for the deploy picture.
 
 ## Core
 

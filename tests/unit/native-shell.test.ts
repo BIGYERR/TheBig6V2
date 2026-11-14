@@ -3,9 +3,12 @@
 // Expected values are typed from MIGRATION.md (phase 2: Expo SDK 58, React Native 0.88, the bundle id
 // com.bigyerr.ironasylum.next) and docs/decisions/engine-check.md (D286), never read from the app.
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { describe, test } from 'vitest';
 import { VERSION, semver } from '@ia/core';
 import { REPO } from '../support/app.ts';
@@ -14,7 +17,7 @@ import { SWIFT_WORD, swiftLine } from '../../frontends/native/src/spike-line.ts'
 const require = createRequire(import.meta.url);
 const NATIVE = join(REPO, 'frontends', 'native');
 
-interface ExpoConfig { name: string; version: string; ios: { bundleIdentifier: string; buildNumber: string }; plugins?: string[] }
+interface ExpoConfig { name: string; version: string; icon?: string; ios: { bundleIdentifier: string; buildNumber: string }; plugins?: string[] }
 const config = (require(join(NATIVE, 'app.config.js')) as () => ExpoConfig)();
 const pkg = JSON.parse(readFileSync(join(NATIVE, 'package.json'), 'utf8')) as {
   dependencies: Record<string, string>; devDependencies: Record<string, string>;
@@ -185,5 +188,106 @@ describe('native shell: the engine check is core\'s, as it is', () => {
   test('it times its slices on performance.now(), never the date', () => {
     assert.match(all, /performance\.now\(\)/);
     assert.doesNotMatch(all, /Date\.now\(\)/);
+  });
+});
+
+// The beta's own icon (Mario, 2026-11-14): today's icon with an orange band reading NEXT, so the two apps are told
+// apart on the home screen. Expected values typed by hand: Apple asks for 1024 square with no alpha; a PNG says so in
+// its header (width and height at bytes 16 and 20, colour type 2, truecolour with no alpha, at byte 25).
+describe('native shell: the beta has an icon of its own', () => {
+  test('the config names assets/icon.png', () => {
+    assert.equal(config.icon, './assets/icon.png');
+  });
+
+  test('it is a PNG, 1024 square, with no alpha', () => {
+    const png = readFileSync(join(NATIVE, 'assets', 'icon.png'));
+    assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+    assert.equal(png.subarray(12, 16).toString('latin1'), 'IHDR');
+    assert.equal(png.readUInt32BE(16), 1024);
+    assert.equal(png.readUInt32BE(20), 1024);
+    assert.equal(png.readUInt8(25), 2);
+  });
+
+  test('it is not today\'s icon, byte for byte', () => {
+    const sha = (path: string): string => createHash('sha256').update(readFileSync(path)).digest('hex');
+    assert.notEqual(sha(join(NATIVE, 'assets', 'icon.png')), sha(join(REPO, 'apple-touch-icon.png')));
+  });
+});
+
+// A fast simulator build (Mario, 2026-11-14): `--fast` skips expo prebuild and its pod install only while ios/ is
+// current. The rule is typed by hand: prebuild runs on a full build, with no ios/, with no record of the last prebuild,
+// and when anything prebuild reads has changed; it is skipped only when all four are otherwise.
+interface Stamp {
+  STAMP: string;
+  NATIVE_INPUTS: string[];
+  nativeInputsDigest(appDir: string, build?: string): string;
+  prebuildDecision(q: { fast: boolean; hasIos: boolean; stamp: string | null; digest: string }): { run: boolean; why: string };
+}
+const P = (await import(pathToFileURL(join(NATIVE, 'scripts', 'prebuild-stamp.mjs')).href)) as Stamp;
+
+describe('native shell: a fast simulator build skips prebuild only while ios/ is current', () => {
+  test('prebuild runs on a full build, with no ios/, with no record, and after a change; it is skipped otherwise', () => {
+    assert.deepEqual(P.prebuildDecision({ fast: false, hasIos: true, stamp: 'a', digest: 'a' }), { run: true, why: 'a full build' });
+    assert.deepEqual(P.prebuildDecision({ fast: true, hasIos: false, stamp: 'a', digest: 'a' }), { run: true, why: 'there is no ios/ here yet' });
+    assert.deepEqual(P.prebuildDecision({ fast: true, hasIos: true, stamp: null, digest: 'a' }), { run: true, why: 'ios/ carries no record of its prebuild' });
+    assert.deepEqual(P.prebuildDecision({ fast: true, hasIos: true, stamp: 'a', digest: 'b' }), { run: true, why: 'a native input changed since ios/ was made' });
+    assert.deepEqual(P.prebuildDecision({ fast: true, hasIos: true, stamp: 'a', digest: 'a' }), { run: false, why: 'ios/ is current' });
+  });
+
+  test('the record lives inside ios/, so it goes when ios/ goes', () => {
+    assert.equal(P.STAMP, join('ios', '.ia-prebuild'));
+  });
+
+  test('the digest moves with each thing prebuild reads, and with nothing else', () => {
+    const root = mkdtempSync(join(tmpdir(), 'ia-prebuild-'));
+    const app = join(root, 'frontends', 'native');
+    const put = (path: string, text: string): void => {
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, text);
+    };
+    try {
+      const inputs = [
+        join(app, 'app.config.js'), join(app, 'package.json'), join(app, 'package-lock.json'), join(app, 'assets', 'icon.png'),
+        join(app, 'targets', 'RestTimerWidget', 'RestTimerWidget.swift'), join(app, 'modules', 'ia-spike', 'ios', 'IASpikeModule.swift'),
+        join(root, 'core', 'src', 'version.ts'),
+      ];
+      for (const path of inputs) put(path, 'one');
+      put(join(app, 'src', 'Bugs.tsx'), 'one');
+      const start = P.nativeInputsDigest(app);
+      assert.match(start, /^[0-9a-f]{64}$/);
+      assert.equal(P.nativeInputsDigest(app), start, 'the same files, the same digest');
+
+      // The JavaScript, a package folder inside a module, and the generated folder are not prebuild's to read.
+      put(join(app, 'src', 'Bugs.tsx'), 'two');
+      put(join(app, 'modules', 'ia-spike', 'node_modules', 'x', 'index.js'), 'one');
+      put(join(app, 'ios', 'Podfile'), 'one');
+      assert.equal(P.nativeInputsDigest(app), start);
+
+      let last = start;
+      for (const path of inputs) {
+        put(path, 'two');
+        const now = P.nativeInputsDigest(app);
+        assert.notEqual(now, last, `${path} changed and the digest did not`);
+        last = now;
+      }
+      put(join(app, 'targets', 'RestTimerWidget', 'Assets.swift'), '');
+      assert.notEqual(P.nativeInputsDigest(app), last, 'a file added to the widget target');
+      assert.notEqual(P.nativeInputsDigest(app, '102'), P.nativeInputsDigest(app), 'the lane\'s build number');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('a simulator build asks before it prebuilds, an archive always starts clean, and CI never asks for fast', () => {
+    const ios = readFileSync(join(NATIVE, 'scripts', 'ios.mjs'), 'utf8');
+    assert.match(ios, /function build\(\) \{\s+const t0 = performance\.now\(\);\s+const \{ workspace, scheme \} = prebuildUnlessCurrent\(\);/);
+    assert.match(ios, /function archive\(signing\) \{[\s\S]*?prebuild\(\{ clean: true, env: \{ IA_NEXT_BUILD: build \} \}\);/);
+    assert.match(ios, /if \(has\('fast'\) && !\['build', 'sim'\]\.includes\(cmd\)\) \{\s+console\.error\([^\n]+\);\s+process\.exit\(2\);/);
+    const scripts = (JSON.parse(readFileSync(join(NATIVE, 'package.json'), 'utf8')) as { scripts: Record<string, string> }).scripts;
+    assert.equal(scripts['sim-ios:fast'], 'node scripts/ios.mjs sim --fast');
+    assert.equal(scripts['build-ios'], 'node scripts/ios.mjs build');
+    assert.equal(scripts['archive-ios'], 'node scripts/ios.mjs archive');
+    assert.equal(scripts['release-ios'], 'node scripts/ios.mjs release');
+    assert.doesNotMatch(readFileSync(join(REPO, '.github', 'workflows', 'pipeline.yml'), 'utf8'), /--fast|sim-ios/);
   });
 });

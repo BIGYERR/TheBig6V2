@@ -34,6 +34,8 @@ module.exports = () => {
     name: 'IA Next',
     slug: 'iron-asylum-next',
     version,
+    // Today's icon with an orange band reading NEXT (scripts/make-icon.py), so the two apps are told apart.
+    icon: './assets/icon.png',
     orientation: 'portrait',
     userInterfaceStyle: 'automatic',
     ios: {

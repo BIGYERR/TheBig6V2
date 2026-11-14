@@ -6,6 +6,9 @@
 //                                  build for the simulator with the JavaScript bundled in as Hermes bytecode: CI's
 //                                  `native (Expo)` job. The built app must hold its widget extension and its Swift module.
 //   node scripts/ios.mjs sim       build, then install on the booted simulator and launch it. The simulator only.
+//                                  `--fast` on build or sim skips prebuild and its pod install while ios/ is current:
+//                                  no native input changed since the prebuild that made it (scripts/prebuild-stamp.mjs).
+//                                  Otherwise it runs prebuild and says why. CI never passes it.
 //   node scripts/ios.mjs archive   the release path without a signature: a clean prebuild with the lane's build number,
 //                                  an unsigned Release archive for any iOS device, and the archive checked. A local
 //                                  proof that the device build compiles; it uploads nothing.
@@ -19,12 +22,13 @@
 // signing, one profile per signed target, no EAS. The Xcode logs go to <repo>/temp/native-expo/ (CI uploads temp/).
 // The products stay under ios/build, inside this checkout, so two worktrees never share them.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, openSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { homedir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exportOptions, profileProblems, readProfile, signForRelease } from '../../app/scripts/signing.mjs';
+import { STAMP, nativeInputsDigest, prebuildDecision } from './prebuild-stamp.mjs';
 import { NOTICE_TITLE, archiveProblems, buildLabel, currentBuild, nextRelease } from './testflight.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,7 +40,11 @@ const ENV = { ...process.env, LANG: 'en_US.UTF-8' };
 const cmd = process.argv[2];
 const has = (name) => process.argv.includes(`--${name}`);
 if (!['build', 'sim', 'archive', 'release'].includes(cmd)) {
-  console.error('usage: node scripts/ios.mjs build|sim|archive|release [--no-upload]');
+  console.error('usage: node scripts/ios.mjs build|sim [--fast] | archive | release [--no-upload]');
+  process.exit(2);
+}
+if (has('fast') && !['build', 'sim'].includes(cmd)) {
+  console.error('ios.mjs: --fast is for build and sim; an archive always starts from a clean prebuild');
   process.exit(2);
 }
 
@@ -53,12 +61,35 @@ function run(file, args, opts = {}) {
 const capture = (file, args) => execFileSync(file, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 const plist = (file, key) => capture('/usr/libexec/PlistBuddy', ['-c', `Print :${key}`, file]).trim();
 
-/** expo prebuild; returns the generated workspace and its scheme. `clean` throws ios/ away first. */
+/** The generated workspace and its scheme, read from ios/. */
+function generated() {
+  const workspace = readdirSync(join(APP, 'ios')).find((f) => f.endsWith('.xcworkspace'));
+  if (!workspace) fail('no .xcworkspace in ios/');
+  return { workspace, scheme: workspace.replace(/\.xcworkspace$/, '') };
+}
+
+/**
+ * expo prebuild; returns the generated workspace and its scheme. `clean` throws ios/ away first. The digest of what
+ * it read is kept in ios/ afterwards, with the build number it was handed, so a later fast build knows ios/ is current.
+ */
 function prebuild({ clean = false, env = {} } = {}) {
   run('npx', ['expo', 'prebuild', '--platform', 'ios', ...(clean ? ['--clean'] : [])], { env: { ...ENV, ...env } });
-  const workspace = readdirSync(join(APP, 'ios')).find((f) => f.endsWith('.xcworkspace'));
-  if (!workspace) fail('expo prebuild made no .xcworkspace');
-  return { workspace, scheme: workspace.replace(/\.xcworkspace$/, '') };
+  const made = generated();
+  writeFileSync(join(APP, STAMP), nativeInputsDigest(APP, env.IA_NEXT_BUILD ?? ''));
+  return made;
+}
+
+/** A simulator build's prebuild: always, unless `--fast` finds ios/ current. */
+function prebuildUnlessCurrent() {
+  const stampPath = join(APP, STAMP);
+  const decision = prebuildDecision({
+    fast: has('fast'),
+    hasIos: existsSync(join(APP, 'ios')),
+    stamp: existsSync(stampPath) ? readFileSync(stampPath, 'utf8') : null,
+    digest: nativeInputsDigest(APP),
+  });
+  if (has('fast')) console.log(`ios.mjs: --fast: ${decision.run ? 'running prebuild' : 'prebuild and pod install skipped'}, ${decision.why}`);
+  return decision.run ? prebuild() : generated();
 }
 
 /** One xcodebuild run, its output in temp/native-expo/<label>.log; on failure the log's last lines, then exit. */
@@ -85,7 +116,7 @@ function bundleFacts(path) {
 
 function build() {
   const t0 = performance.now();
-  const { workspace, scheme } = prebuild();
+  const { workspace, scheme } = prebuildUnlessCurrent();
   xcodebuild('xcodebuild', [
     '-workspace', join('ios', workspace), '-scheme', scheme, '-configuration', 'Release',
     '-sdk', 'iphonesimulator', '-destination', 'generic/platform=iOS Simulator', '-derivedDataPath', DERIVED,
