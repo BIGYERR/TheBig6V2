@@ -9,8 +9,8 @@ must be green on all three and every break red.
 |---|---|---|---|---|
 | (no break) | the page as built | green | 0 | all three files |
 | log key | a log is stored under w1-mon, not w1_mon | red | 4 | the fast file |
-| freeze, history | a touched day is not restored from its snapshot at launch | red | 1 | the fast file |
-| freeze, piercing | an overlay no longer reaches the untouched days of the current week | red | the golden file | the fast file |
+| freeze, history | a touched day is not restored from its snapshot at launch | red | 2 | the fast file |
+| freeze, piercing | an overlay no longer reaches the untouched days of the current week | red | 1 | the fast file |
 | freeze, reach | the last frozen week is rebuilt instead | red | 1 | the fast file |
 | freeze, injured week | a touched day in an injured week keeps its stored form | red | 1 | the fast file |
 | set draft | a logged card leaves its draft in the log | red | the golden file | the fast file |
@@ -18,9 +18,9 @@ must be green on all three and every break red.
 | completion status | a skipped day is stored as complete | red | the golden file | the fast file |
 | part skip | a skipped part is not stored | red | 2 | the fast file |
 | parts settle | the parts of a day never write its completion | red | 1 | the fast file |
-| history, kept | a touched day is never snapshotted | red | 3 | the fast file |
+| history, kept | a touched day is never snapshotted | red | 4 | the fast file |
 | edit re-snapshot | an edit after the first touch is not folded into the day's snapshot | red | 1 | the fast file |
-| swap record | a swap is not stored | red | 2 | the fast file |
+| swap record | a swap is not stored | red | 3 | the fast file |
 | swap places | a swap is stored without where the lift stood | red | 1 | the fast file |
 | swap places, merge | a pair swapped again forgets the places the earlier tap saw | red | 1 | the fast file |
 | swap undo | an undone swap keeps its record | red | 1 | the fast file |
@@ -31,7 +31,7 @@ must be green on all three and every break red.
 | add record | an added movement is not stored | red | 1 | the fast file |
 | add undo | a removed movement stays added in the store | red | 1 | the fast file |
 | edits prune | the edits of a frozen week are kept | red | the golden file | the fast file |
-| active id | the active program is not stored | red | 19 | the fast file |
+| active id | the active program is not stored | red | 20 | the fast file |
 | wildcard record | a Wildcard done is not stored | red | 1 | the fast file |
 | seed write back | an old program's seed is not written back to its config | red | the golden file | the fast file |
 | purge | a deleted program keeps its logs | red | 1 | the fast file |
@@ -72,13 +72,37 @@ must be green on all three and every break red.
 | load rollback, clear | a refused load keeps what it wrote | red | 1 | the fast file |
 | load rollback, restore | a refused load does not put back what the phone held | red | 1 | the fast file |
 | load result | a refused load reports success | red | 1 | the fast file |
+| overlay order | the newest overlay is applied first, so the oldest wins | red | the golden file | the fast file |
+| overlay kinds, injury | an injury overlay is skipped | red | 2 | the fast file |
+| overlay kinds, travel | a travel overlay is skipped | red | 1 | the fast file |
+| overlay window, last week | the last week of an overlay's span is not searched | red | 1 | the fast file |
+| overlay window, first week | the first week of an overlay's span is not searched | red | 2 | the fast file |
+| overlay key | a spliced day's stamp holds the overlay's kind only | red | 1 | the fast file |
+| overlay travel mark | a trip builds as the athlete's own gym | red | 1 | the fast file |
+| overlay patch, travel | a trip builds without its patch | red | 1 | the fast file |
+| overlay patch, injury | an injury builds without its patch | red | 1 | the fast file |
+| overlay clean injury build | an injury builds as a temporary setup | red | 2 | the sweeps |
+| overlay day, before | a day before the span, in its first week, takes the variant | red | 1 | the fast file |
+| overlay day, after | a day after the span, in its last week, takes the variant | red | 1 | the fast file |
+| overlay day, first | the span's first day keeps the base | red | 2 | the fast file |
+| overlay day, last | the span's last day keeps the base | red | 1 | the fast file |
+| overlay rest days | a rest day of the variant replaces the base day | red | 1 | the fast file |
+| overlay stamp | a spliced day carries no overlay key | red | 1 | the fast file |
+| overlay splice | no day takes the variant | red | 2 | the fast file |
+| overlay legal swaps | no variant's legal swaps are kept | red | 1 | the fast file |
+| overlay failure | a failing overlay stops every later one | red | 1 | the fast file |
+| overlay failure, told | a failed overlay is not told to the athlete | red | 1 | the fast file |
+| overlay length | an overlay's span is read against the stored length only | red | 1 | the fast file |
+| overlay week range | the page hands the splice no week range | red | 2 | the fast file |
+| overlay day date | the page hands the splice no day date | red | 2 | the fast file |
 
-**The page as built is green, and all 64 breaks turn the records red.**
+**The page as built is green, and all 87 breaks turn the records red.**
 
 ## Breaks that change no record
 
 | Break | What it does | Result | Why |
 |---|---|---|---|
+| overlay cache | an overlay's variant is built again for every overlay of the same kind and patch | no record changed | No effect is possible, found in v0.262.1 (tests/measure/stored-state_overlays-gaps.md): buildProgram is a pure function of its config (the engine check holds every digest), so a second build of the same kind and patch gives the same days and the same legal swaps, and a spliced day is a copy. The cache saves time and nothing else. |
 | freeze cut, the touched term | the current week, when touched, is not frozen a week further | no record changed | No effect is possible: the next line takes the larger of this and the highest touched week plus one, and a touched current week is at least that week. The term is redundant. |
 | history, first touch | a day's snapshot is overwritten on every touch | no record changed | No reachable effect, settled in v0.261.5 (docs/decisions/stored-state.md). The guard decides only when a day is snapshotted again after it changed. A launch gives every snapshotted day back from its snapshot, and an edit is folded into the snapshot as it is made. One tap changes a snapshotted day and leaves its snapshot alone, the rest sheet's Move of a day with a logged lift, and it leaves a moved rest day that nothing snapshots (tests/measure/stored-state_first-touch.md). In 180 random histories, 0 of 4,481 repeat snapshots met a changed day (stored-state_first-touch-walks.md). The rule itself is held by the unit tests. |
 | snapshot, a key with no value | a listed key with no value goes into the backup | no record changed | No reachable effect, found in v0.261.8 (tests/measure/stored-state_backup-gaps.md): the snapshot asks the store for a key the store has just listed, and both stores, the browser's storage and the memory store, give a string for every key they list. The guard moved as written; the unit tests hold the snapshot. |

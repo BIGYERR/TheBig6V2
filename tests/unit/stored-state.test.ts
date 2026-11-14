@@ -6,8 +6,8 @@
 // the active program and the Wildcard's record (core/src/engine/state-swaps.ts, state-day-edits.ts and
 // state-programs.ts, v0.261.6), and what Progress reads and computes from the stored state, the run card's regime and
 // the nudge's preference (core/src/engine/state-progress.ts, state-day-log.ts and state-programs.ts, v0.261.7), and the
-// backup's snapshot, reader and loader (core/src/engine/state-backup.ts, v0.261.8). Every expected value is typed from
-// the ruling.
+// backup's snapshot, reader and loader (core/src/engine/state-backup.ts, v0.261.8), and the overlays spliced into a
+// rebuilt program (core/src/engine/state-overlays.ts, v0.262.1). Every expected value is typed from the ruling.
 // What the app stores through it is held by tests/integration/stored-state.test.ts and the sweeps.
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
@@ -43,8 +43,11 @@ import {
 import {
   BACKUP_FORMAT, BACKUP_KIND, backupKeys, backupProgramCount, loadBackupInto, readBackupText, takeBackup,
 } from '@ia/core/engine/state-backup.ts';
-import type { Day, Program } from '@ia/core';
-import { appScript, loadApp, pinClock } from '../support/app.ts';
+import { spliceOverlays } from '@ia/core/engine/state-overlays.ts';
+import type { OverlaidProgram, Overlay, OverlayWeekRange, ProgramDayDate } from '@ia/core/engine/state-overlays.ts';
+import { buildProgram } from '@ia/core/engine/budget-engine-d.ts';
+import type { Cfg, Day, Program } from '@ia/core';
+import { appScript, fixtures, loadApp, pinClock } from '../support/app.ts';
 
 /** A stand-in for the browser's storage that records what was asked of it. */
 function fakeStorage(start: [string, string][] = []): StorageLike & { calls: string[]; rows: (readonly [string, string] | null)[] } {
@@ -1080,4 +1083,179 @@ test('the page\'s own names still answer as they did: the snapshot, the reader, 
   assert.equal(IA.eval('readBackup("{}").why'), 'bad');
   assert.equal(IA.eval('loadBackupData({ia_active:"b",ia_programs:"[]"})'), true);
   assert.deepEqual([IA.localStorage.getItem('ia_active'), IA.localStorage.getItem('ia_programs'), IA.localStorage.getItem('keep')], ['b', '[]', 'x']);
+});
+
+// ── v0.262.1: overlays spliced into a rebuilt program (core/src/engine/state-overlays.ts) ───────────────────────────
+// HALF_MANNY, whose first Monday is 31 August 2026. Its week 1 trains Monday, Tuesday, Thursday, Friday and Saturday
+// (tests/integration/stored-state.test.ts holds that by hand). The page's two date readers are stood in for by the
+// calendar itself: a day's date counted from that Monday, and a window that is the whole program.
+const OV_WEEK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+const OV_HALF = fixtures.HALF_MANNY;
+const TRIP_PATCH = { equipment: 'home_basic' } as const;
+const TRIP_KEY = '["substitute",{"equipment":"home_basic"}]';
+const KNEE_PATCH = { injury: { region: 'knee', tier: 'workaround' } } as unknown as Overlay['patch'];
+const KNEE_KEY = '["injury",{"injury":{"region":"knee","tier":"workaround"}}]';
+const ovDayDate: ProgramDayDate = (_p, w, d) => new Date(2026, 7, 31 + (w - 1) * 7 + OV_WEEK.indexOf(d as (typeof OV_WEEK)[number]));
+const ovWholeProgram: OverlayWeekRange = (_p, _ov, total) => (total ? { fromWeek: 1, toWeek: total } : null);
+const ovNever = (ov: Overlay, e: unknown): void => { throw new Error('an overlay failed: ' + ov.id + ' ' + String(e)); };
+const ovStored = (cfg: Cfg, overlays: Overlay[]): OverlaidProgram => ({ ...buildProgram(cfg), startDate: '2026-08-31', overlays });
+const ovStamp = (p: Program, w: number, d: (typeof OV_WEEK)[number]): string | null => (p.weeks[w]![d] as { _ovKey?: string })._ovKey ?? null;
+const ovStamps = (p: Program, w: number): (string | null)[] => OV_WEEK.map((d) => ovStamp(p, w, d));
+/** How many of a day's movements have a prescription that starts with `lead`. */
+const ovLead = (day: Day, lead: string): number => (day.rest ? 0 : day.sections.flatMap((s) => s.items).filter((i) => String(i.detail).startsWith(lead)).length);
+const trip = (o: Partial<Overlay> = {}): Overlay => ({ id: 'trip', type: 'substitute', from: '2026-09-01', to: '2026-09-04', patch: TRIP_PATCH, created: 2, ...o });
+
+test('a program with no overlays comes back as it was built, and the page is asked nothing', () => {
+  const asked: string[] = [];
+  for (const overlays of [[], null, undefined]) {
+    const rebuilt = buildProgram(OV_HALF);
+    const before = JSON.stringify(rebuilt);
+    const out = spliceOverlays({ ...buildProgram(OV_HALF), startDate: '2026-08-31', overlays } as OverlaidProgram, rebuilt,
+      (...a) => { asked.push('range'); return ovWholeProgram(...a); }, (...a) => { asked.push('date'); return ovDayDate(...a); }, ovNever);
+    assert.equal(out, rebuilt, 'the same object');
+    assert.equal(JSON.stringify(out), before);
+  }
+  assert.deepEqual(asked, []);
+});
+
+test('a trip takes the training days its dates hold, both ends in: each is the trip build\'s day with the trip\'s stamp, and every other day is the base\'s', () => {
+  const rebuilt = buildProgram(OV_HALF);
+  const out = spliceOverlays(ovStored(OV_HALF, [trip()]), rebuilt, ovWholeProgram, ovDayDate, ovNever);
+  assert.equal(out, rebuilt, 'the rebuilt program is changed in place and handed back');
+  // Tuesday 1 to Friday 4 September. Wednesday rests, so it stays the base's; Monday and Saturday are outside.
+  assert.deepEqual(ovStamps(out, 1), [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]);
+  const base = buildProgram(OV_HALF);
+  const variant = buildProgram({ ...OV_HALF, ...TRIP_PATCH, _travel: true });
+  for (const d of ['tue', 'thu', 'fri'] as const) assert.deepEqual(out.weeks[1]![d], { ...variant.weeks[1]![d], _ovKey: TRIP_KEY }, d);
+  for (const d of ['mon', 'wed', 'sat', 'sun'] as const) assert.deepEqual(out.weeks[1]![d], base.weeks[1]![d], d);
+  for (let w = 2; w <= 14; w++) assert.deepEqual(out.weeks[w], base.weeks[w], 'week ' + w + ' is the base\'s');
+  // The trip builds as a temporary setup: a mini gym on a trip is a hotel rack whose dumbbells top out, so the day's
+  // main lift is three sets in a rep range at the program's easy effort. The same gym as the athlete's own would
+  // keep the wave's loaded 3×12.
+  const RANGE = '3 sets of 8 to 12 — RPE 7 (leave ~3 in reserve)';
+  assert.deepEqual([ovLead(out.weeks[1]!.tue, RANGE), ovLead(out.weeks[1]!.thu, RANGE), ovLead(out.weeks[1]!.tue, '3×12 — RPE'), ovLead(out.weeks[1]!.thu, '3×12 — RPE')], [1, 1, 0, 0]);
+  const own = buildProgram({ ...OV_HALF, ...TRIP_PATCH }).weeks[1]!;
+  assert.deepEqual([ovLead(own.tue, RANGE), ovLead(own.thu, RANGE), ovLead(own.tue, '3×12 — RPE'), ovLead(own.thu, '3×12 — RPE')], [0, 0, 1, 1], 'without the mark');
+  // The trip build's legal swaps ride on the program under the trip's key: a mini gym has no bar.
+  const legal = out._swapUniverseByKey[TRIP_KEY] as string[];
+  assert.deepEqual(legal, variant._swapUniverse);
+  assert.ok(base._swapUniverse.includes('Back squat') && !legal.includes('Back squat'));
+  assert.deepEqual(Object.keys(out._swapUniverseByKey), [TRIP_KEY]);
+});
+
+test('an injury builds clean, from the config with its patch and no travel mark', () => {
+  // The athlete's own gym is a mini gym here, so the travel mark would change the build if the injury carried it.
+  const HOME = { ...OV_HALF, equipment: 'home_basic' } as Cfg;
+  const knee: Overlay = { id: 'knee', type: 'injury', from: '2026-09-07', to: '2026-09-13', patch: KNEE_PATCH, created: 1 };
+  const out = spliceOverlays(ovStored(HOME, [knee]), buildProgram(HOME), ovWholeProgram, ovDayDate, ovNever);
+  const clean = buildProgram({ ...HOME, ...KNEE_PATCH });
+  const marked = buildProgram({ ...HOME, ...KNEE_PATCH, _travel: true });
+  const base = buildProgram(HOME);
+  assert.deepEqual(out.weeks[1], base.weeks[1], 'the week before the injury is the base\'s');
+  let stamped = 0, tellsApart = 0;
+  for (const d of OV_WEEK) {
+    const day = clean.weeks[2]![d];
+    if (day.rest) { assert.deepEqual(out.weeks[2]![d], base.weeks[2]![d], d + ' rests: the base\'s day'); continue; }
+    assert.deepEqual(out.weeks[2]![d], { ...day, _ovKey: KNEE_KEY }, d);
+    stamped++;
+    if (JSON.stringify(day) !== JSON.stringify(marked.weeks[2]![d])) tellsApart++;
+  }
+  assert.ok(stamped >= 4 && tellsApart > 0, 'the week holds days the travel mark would have changed');
+});
+
+test('where two overlays hold the same day the one made later wins, whatever order the list keeps them in', () => {
+  const knee = (created: number): Overlay => ({ id: 'knee', type: 'injury', from: '2026-09-01', to: '2026-09-01', patch: KNEE_PATCH, created });
+  const tuesday = (overlays: Overlay[]): string | null => ovStamp(spliceOverlays(ovStored(OV_HALF, overlays), buildProgram(OV_HALF), ovWholeProgram, ovDayDate, ovNever), 1, 'tue');
+  assert.equal(tuesday([trip({ created: 2 }), knee(1)]), TRIP_KEY);
+  assert.equal(tuesday([knee(1), trip({ created: 2 })]), TRIP_KEY);
+  assert.equal(tuesday([trip({ created: 1 }), knee(2)]), KNEE_KEY);
+  assert.equal(tuesday([knee(2), trip({ created: 1 })]), KNEE_KEY);
+});
+
+test('an overlay with no end runs to the program\'s last day, from its first day on', () => {
+  const out = spliceOverlays(ovStored(OV_HALF, [trip({ from: '2026-09-03', to: null })]), buildProgram(OV_HALF), ovWholeProgram, ovDayDate, ovNever);
+  assert.deepEqual(ovStamps(out, 1), [null, null, null, TRIP_KEY, TRIP_KEY, TRIP_KEY, null], 'week 1 from Thursday');
+  for (let w = 2; w <= 14; w++) for (const d of OV_WEEK) assert.equal(ovStamp(out, w, d), out.weeks[w]![d].rest ? null : TRIP_KEY, 'week ' + w + ' ' + d);
+});
+
+test('an overlay of another kind, one with no patch, one with no first day and one the page puts outside the program change nothing', () => {
+  const rebuilt = buildProgram(OV_HALF);
+  const before = JSON.stringify(rebuilt.weeks);
+  const out = spliceOverlays(ovStored(OV_HALF, [
+    trip({ id: 'kind', type: 'note' }), trip({ id: 'patch', patch: null }), trip({ id: 'from', from: null }), trip({ id: 'outside' }),
+  ]), rebuilt, (p, ov, total) => (ov.id === 'outside' ? null : ovWholeProgram(p, ov, total)), ovDayDate, ovNever);
+  assert.equal(JSON.stringify(out.weeks), before);
+});
+
+test('the page is asked for the span against the rebuilt program\'s length, then the stored one\'s, then none', () => {
+  const asked = (rebuiltWeeks: number | undefined, storedWeeks: number | undefined): number[] => {
+    const seen: number[] = [];
+    spliceOverlays({ ...ovStored(OV_HALF, [trip()]), totalWeeks: storedWeeks } as OverlaidProgram, { ...buildProgram(OV_HALF), totalWeeks: rebuiltWeeks } as Program,
+      (_p, _ov, total) => { seen.push(total); return null; }, ovDayDate, ovNever);
+    return seen;
+  };
+  assert.deepEqual([asked(14, 9), asked(14, undefined), asked(undefined, 9), asked(0, 9), asked(undefined, undefined)], [[14], [14], [9], [9], [0]]);
+  // A stored program with no length still takes its trip: the window is the rebuilt program's.
+  const out = spliceOverlays({ ...ovStored(OV_HALF, [trip()]), totalWeeks: undefined } as unknown as OverlaidProgram, buildProgram(OV_HALF), ovWholeProgram, ovDayDate, ovNever);
+  assert.deepEqual(ovStamps(out, 1), [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]);
+});
+
+test('only the weeks of the span the page gives are searched, its first and its last included; a week the rebuilt program lacks is made', () => {
+  const open = trip({ from: '2026-08-31', to: null });
+  const rebuilt = buildProgram(OV_HALF);
+  delete rebuilt.weeks[3];
+  const out = spliceOverlays(ovStored(OV_HALF, [open]), rebuilt, () => ({ fromWeek: 2, toWeek: 3 }), ovDayDate, ovNever);
+  const training = (w: number): (string | null)[] => OV_WEEK.map((d) => (buildProgram(OV_HALF).weeks[w]![d].rest ? null : TRIP_KEY));
+  assert.deepEqual(ovStamps(out, 1), [null, null, null, null, null, null, null], 'week 1 is outside the span');
+  assert.deepEqual(ovStamps(out, 2), training(2));
+  assert.deepEqual(OV_WEEK.filter((d) => out.weeks[3]![d]).map((d) => ovStamp(out, 3, d)), training(3).filter((k) => k), 'week 3 holds the trip\'s training days only');
+  assert.deepEqual(ovStamps(out, 4), [null, null, null, null, null, null, null], 'week 4 is outside the span');
+});
+
+test('a day with no date takes nothing; a day is asked for by the stored program, its week and its key', () => {
+  const stored = ovStored(OV_HALF, [trip()]);
+  const asks: string[] = [];
+  const out = spliceOverlays(stored, buildProgram(OV_HALF), () => ({ fromWeek: 1, toWeek: 1 }), (p, w, d) => { asks.push((p === stored) + ' ' + w + ' ' + d); return d === 'thu' ? null : ovDayDate(p, w, d); }, ovNever);
+  assert.deepEqual(ovStamps(out, 1), [null, TRIP_KEY, null, null, TRIP_KEY, null, null], 'Thursday has no date, so it keeps the base');
+  assert.deepEqual(asks, ['true 1 mon', 'true 1 tue', 'true 1 thu', 'true 1 fri', 'true 1 sat'], 'the week\'s training days, and no rest day');
+});
+
+test('an overlay that fails is reported once with its error, and the one after it is still applied', () => {
+  const bad: Overlay = { id: 'bad', type: 'injury', from: '2026-09-01', to: '2026-09-04', patch: { restDays: 7 } as unknown as Overlay['patch'], created: 1 };
+  const reports: [string | undefined, boolean][] = [];
+  const out = spliceOverlays(ovStored(OV_HALF, [trip(), bad]), buildProgram(OV_HALF), ovWholeProgram, ovDayDate, (ov, e) => { reports.push([ov.id, e instanceof TypeError]); });
+  assert.deepEqual(reports, [['bad', true]], 'the engine cannot build a config whose rest days are not a list');
+  assert.deepEqual(ovStamps(out, 1), [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]);
+});
+
+test('the page reaches the overlay splice through core: each rule is in the script once, and its own applyOverlays only hands it on', () => {
+  const code = appScript();
+  assert.equal(code.split('function spliceOverlays(').length - 1, 1, 'spliceOverlays is in the page once');
+  for (const rule of [
+    "if(!ov || (ov.type!=='substitute' && ov.type!=='injury') || !ov.patch) return;",
+    'const range = weekRange(prog, ov, totalWeeks);',
+    'const dt = dayDate(prog, w, d); if(!dt) return;',
+    'if(dt < _from || (_to && dt > _to)) return;',
+    'rebuilt.weeks[w][d] = Object.assign({}, vd, {_ovKey: ck});',
+    'return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov, e)=>{',
+  ]) assert.equal(code.split(rule).length - 1, 1, rule + ' is in the page once');
+  assert.equal(code.split('function applyOverlays(').length - 1, 1);
+  assert.equal(code.split('_travel:true').length - 1, 1, 'the travel mark is set in one place');
+});
+
+// This guards behaviour the move must not change: it passes on the release before it too.
+test('the page\'s own applyOverlays still answers as it did: the trip\'s days, and a failed overlay told to the athlete', () => {
+  const IA = loadApp();
+  pinClock(IA, '2026-08-31T07:00:00');
+  IA.ctx['__cfg'] = JSON.parse(JSON.stringify(OV_HALF));
+  IA.ctx['__said'] = [];
+  IA.eval('showToast=function(m){__said.push(String(m));};');
+  const stamps = (overlays: unknown[]): (string | null)[] => {
+    IA.ctx['__ovs'] = JSON.parse(JSON.stringify(overlays));
+    return JSON.parse(IA.eval("(function(){var p=buildProgram(__cfg);p.startDate='2026-08-31';p.overlays=__ovs;var r=applyOverlays(p,buildProgram(__cfg));return JSON.stringify(['mon','tue','wed','thu','fri','sat','sun'].map(function(d){return r.weeks[1][d]._ovKey||null;}));})()"));
+  };
+  assert.deepEqual(stamps([trip()]), [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]);
+  assert.deepEqual([...IA.ctx['__said']], []);
+  assert.deepEqual(stamps([trip(), { id: 'bad', type: 'injury', from: '2026-09-01', to: '2026-09-04', patch: { restDays: 7 }, created: 1 }]), [null, TRIP_KEY, null, TRIP_KEY, TRIP_KEY, null, null]);
+  assert.deepEqual([...IA.ctx['__said']], ['A plan change failed to apply. Flag it in Bugs.']);
 });

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.262.0">
+<meta name="ia-version" content="0.262.1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -3184,6 +3184,89 @@ function loadBackupInto(store, data){
     Object.keys(before).forEach(k=>{try{store.set(k,before[k]);}catch{}});
     return false;
   }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+function spliceOverlays(prog, rebuilt, weekRange, dayDate, failed){
+  const ovs = Array.isArray(prog && prog.overlays) ? prog.overlays : [];
+  if(!ovs.length) return rebuilt;
+  const totalWeeks = rebuilt.totalWeeks || prog.totalWeeks || 0;
+  const _variantCache = {};
+  ovs.slice().sort((a,b)=>((a&&a.created)||0)-((b&&b.created)||0)).forEach(ov=>{
+    try{
+      if(!ov || (ov.type!=='substitute' && ov.type!=='injury') || !ov.patch) return;
+      const range = weekRange(prog, ov, totalWeeks);
+      if(!range) return;                                   
+      const ck = JSON.stringify([ov.type, ov.patch]);      
+      
+      
+      
+      
+      
+      
+      if(!_variantCache[ck]) _variantCache[ck] = buildProgram(ov.type==='substitute' ? {...prog.cfg, ...ov.patch, _travel:true} : {...prog.cfg, ...ov.patch});
+      const variant = _variantCache[ck];
+      if(!variant || !variant.weeks) return;
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      const _from = _parseLocalDate(ov.from);
+      const _to   = ov.to ? _parseLocalDate(ov.to) : null;
+      if(!_from) return;
+      
+      
+      
+      
+      
+      if(!rebuilt._swapUniverseByKey) rebuilt._swapUniverseByKey = {};
+      if(Array.isArray(variant._swapUniverse)) rebuilt._swapUniverseByKey[ck] = variant._swapUniverse;
+      for(let w=range.fromWeek; w<=range.toWeek; w++){
+        const vw = variant.weeks[w]; if(!vw) continue;
+        if(!rebuilt.weeks[w]) rebuilt.weeks[w] = {};
+        Object.keys(vw).forEach(d=>{
+          const vd = vw[d]; if(!vd || vd.rest) return;
+          const dt = dayDate(prog, w, d); if(!dt) return;
+          if(dt < _from || (_to && dt > _to)) return;
+          rebuilt.weeks[w][d] = Object.assign({}, vd, {_ovKey: ck});
+        });
+      }
+    }catch(e){
+      
+      
+      
+      failed(ov, e);
+    }
+  });
+  return rebuilt;
 }
 
 
@@ -17046,71 +17129,11 @@ function paceShiftMap(prog){
 
 
 
-
-
-
 function applyOverlays(prog, rebuilt){
-  const ovs = Array.isArray(prog && prog.overlays) ? prog.overlays : [];
-  if(!ovs.length) return rebuilt;
-  const totalWeeks = rebuilt.totalWeeks || prog.totalWeeks || 0;
-  const _variantCache = {};
-  ovs.slice().sort((a,b)=>((a&&a.created)||0)-((b&&b.created)||0)).forEach(ov=>{
-    try{
-      if(!ov || (ov.type!=='substitute' && ov.type!=='injury') || !ov.patch) return;
-      const range = overlayWeekRange(prog, ov, totalWeeks);
-      if(!range) return;                                   
-      const ck = JSON.stringify([ov.type, ov.patch]);      
-      
-      
-      
-      
-      
-      
-      if(!_variantCache[ck]) _variantCache[ck] = buildProgram(ov.type==='substitute' ? {...prog.cfg, ...ov.patch, _travel:true} : {...prog.cfg, ...ov.patch});
-      const variant = _variantCache[ck];
-      if(!variant || !variant.weeks) return;
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      const _from = _parseLocalDate(ov.from);
-      const _to   = ov.to ? _parseLocalDate(ov.to) : null;
-      if(!_from) return;
-      
-      
-      
-      
-      
-      if(!rebuilt._swapUniverseByKey) rebuilt._swapUniverseByKey = {};
-      if(Array.isArray(variant._swapUniverse)) rebuilt._swapUniverseByKey[ck] = variant._swapUniverse;
-      for(let w=range.fromWeek; w<=range.toWeek; w++){
-        const vw = variant.weeks[w]; if(!vw) continue;
-        if(!rebuilt.weeks[w]) rebuilt.weeks[w] = {};
-        Object.keys(vw).forEach(d=>{
-          const vd = vw[d]; if(!vd || vd.rest) return;
-          const dt = _progDayDate(prog, w, d); if(!dt) return;
-          if(dt < _from || (_to && dt > _to)) return;
-          rebuilt.weeks[w][d] = Object.assign({}, vd, {_ovKey: ck});
-        });
-      }
-    }catch(e){
-      
-      
-      
-      console.error('overlay apply failed', ov && ov.id, e);
-      try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}
-    }
+  return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov, e)=>{
+    console.error('overlay apply failed', ov && ov.id, e);
+    try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}
   });
-  return rebuilt;
 }
 
 

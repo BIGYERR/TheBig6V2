@@ -115,4 +115,14 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   and the processed job read it back from App Store Connect as processed (1 min 41 s). The lane's leg reads
   `testflight next 0.262.0 (100) processed`. Today's lane on the same run: its gate skipped, since App Store Connect
   already held 0.262.0, and its upload and processed jobs did not run. The two lanes ran apart, as ruled.
-- **Not yet seen:** the build installed on Mario's phone from TestFlight, and the widget extension there.
+- **Seen on `main`, the second run** (run 43554008703, merge 250e861, pull request 39, 2026-11-13 22:54 EST; the
+  merge carried This Week in the Expo app, `docs/decisions/this-week.md`): the beta's gate went (9 s), the upload job
+  archived, signed and uploaded `0.262.0 (101)` (581 s), and the processed job read it back as processed (101 s).
+  The build number moved from 100 to 101 because the merge changed `frontends/native`: a build goes up once, and
+  this was a new one. The leg reads `testflight next 0.262.0 (101) processed`. Today's lane on the same run: its
+  gate went (11 s) and skipped the upload, since App Store Connect already held 0.262.0; its upload and processed
+  jobs did not run. On `dev` before the merge (run 43552126510, 34a010e) every job was green: `native (Expo)` 799 s,
+  unit and integration 776 s, e2e 385 s, `native (iOS simulator)` 224 s, app and backend 76 s.
+- **On Mario's phone** (his report, 2026-11-14): builds 100 and 101 are installed from TestFlight, today's app
+  (`com.bigyerr.ironasylum`) beside them and untouched.
+- **Not yet seen:** the widget extension on the phone.

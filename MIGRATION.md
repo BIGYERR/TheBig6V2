@@ -1,7 +1,7 @@
 # Iron Asylum: the move to React Native
 
-**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and seven lift slices have
-shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5, v0.261.6, v0.261.7, v0.261.8) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
+**Status: phase 1 is under way (Mario's GO, 2026-11-11). The golden records are done, and eight lift slices have
+shipped (v0.261.2, v0.261.3, v0.261.4, v0.261.5, v0.261.6, v0.261.7, v0.261.8, v0.262.1) with no behaviour change. No React Native code is written.** The plan was written 2026-11-11 on `chat/rn-migration`, measured at v0.261.1.
 Each phase starts only on Mario's GO, one phase step per session.
 
 **Where phase 1 stands:**
@@ -97,8 +97,21 @@ Each phase starts only on Mario's GO, one phase step per session.
     was good and loaded onto an empty phone. The case "backups refused, a load refused, and a backup loaded over another program"
     adds its records (336 lines, none changed). The break check is at 64 breaks, all red, and 3 open: the two before, and a
     key with no value, which no store can hand the snapshot.
-- **Next, on his GO:** `applyOverlays` with the freeze (Mario, Post-v0.261.6: it rewrites the grid on
-  every launch), then `refreshProgram` and the freeze. No longer held for 2026-12-06 (Mario, 2026-11-12). The other readers the Progress screen uses
+- **Done, the eighth lift slice (v0.262.1):** the overlay splice lives in `core/src/engine/state-overlays.ts`:
+  `spliceOverlays` holds `applyOverlays`' rules (which overlays apply and in what order, the variant built per kind and
+  patch, with the travel mark on a trip, the days a span takes, the stamp, the legal swaps kept by overlay key, a
+  failure reported and passed over). The page's `applyOverlays` is a thin caller that hands it `overlayWeekRange`,
+  `_progDayDate` and the failure toast. It names no `ia_` key. Every golden record identical, and every sweep green
+  locally. Narrowed: `overlayWeekRange`, `weekOfDate` and `_progDayDate` stay in the page until `refreshProgram`
+  moves, which calls them too; the overlay sheet, the chip and the injury flow stay.
+  - **The measure found the records blind to 5 of the 21 rules, closed in the slice:** no history booked a mini gym,
+    asked the swap sheet about a trip day, held an overlay that fails or a program with no stored length. The case "a
+    mini gym trip, a swap on a trip day, an overlay that fails, and no stored length" adds its records (579 lines, none
+    changed). The break check is at 87 breaks, all red, and 4 open: the three before, and the variant cache, which
+    changes nothing a record could hold (`tests/measure/stored-state_overlays-gaps.md`).
+- **Next, on his GO:** `refreshProgram` and the freeze, the last slice, with the date readers it shares with the
+  splice (`overlayWeekRange`, `weekOfDate`, `_progDayDate`) and the replays (`applySessionSwaps`, `applyDayEdits`);
+  then the Expo screen's seam reads it, and Mario's side by side closes phase 2. No longer held for 2026-12-06 (Mario, 2026-11-12). The other readers the Progress screen uses
   (`lift-ledger-progress-screen.ts`, `progress-charts.ts`) move with that screen, and the backup's saving and reading of
   a file with the Bugs screen.
 
@@ -340,9 +353,12 @@ equal to the page's over whole histories; core's readers of the stored state und
 (`tests/measure/native-this-week_reads.md`): the grid the screen draws is `refreshProgram`'s, which is still in the
 page, and the stored grid differs from it on 127 of 350 days in the week holding today.** So the Expo screen's grid is
 the stored one behind one seam (`liveProgram`), right wherever nothing has touched a day since it was stored, and the
-side by side on Mario's phone is only the gate's proof once phase 1's last two slices (`applyOverlays`, then
-`refreshProgram` and the freeze) are in core and the seam reads them. What is left of the exit gate: those two
-slices, the seam, and Mario's side by side.
+side by side on Mario's phone is only the gate's proof once phase 1's last two slices (`applyOverlays`, shipped in v0.262.1, then
+`refreshProgram` and the freeze) are in core and the seam reads them. What is left of the exit gate: the last
+slice, the seam, and Mario's side by side. **Mario's phone, 2026-11-14** (build 101 beside today's app, Week 12 of THE
+HALF MANNY): the frame, the strip's marks and both cards' names match; three differences, each in the grid (two
+strip words, the run card's pace and note, the lift card's first movement), as measured
+(`docs/decisions/this-week.md`).
 
 **Exit gate:** on Mario's phone, with a copy of his real backup loaded: the lattice at 864 of 864 and HALF_MANNY at
 `147f083be4e04e34` under Hermes; every `ia_` key's sha256 equal to the backup's after import (the app refuses the

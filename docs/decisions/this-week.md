@@ -452,6 +452,21 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   box sat below the padding, so the header's glow sits in a box of its own with the padding inside it. Today's page
   has no rubber band (`overscroll-behavior: none`), so the screen's scroll does not bounce. The tab bar has no blur
   behind it yet (today's has `backdrop-filter`), so a card's words show faintly through it.
-- **Not yet seen:** the screen on Mario's phone (the beta's next TestFlight build, after he merges). There, a day a
-  swap, an edit, an injury, travel, a moved rest day or an engine change has touched will read as it was stored, not
-  as today's app shows it, until `refreshProgram` is in core and `liveProgram` reads it.
+- **In TestFlight** (run 43554008703 on `main`, merge 250e861, pull request 39, 2026-11-13): IA Next `0.262.0 (101)`
+  carries this screen, uploaded in 581 s and processed in 101 s (`docs/decisions/testflight.md`, D288's second run).
+  `native (Expo)` was green on `dev` before the merge (run 43552126510, 34a010e, 799 s).
+- **Seen on Mario's phone** (his report of his screenshots, 2026-11-14 09:37, recorded as given): IA Next
+  `0.262.0 (101)` from TestFlight beside today's app 0.262.0, THE HALF MANNY, Week 12, Saturday the 14th.
+  - **The same in both:** the overline, Week 12, Hurt?, 22 days out, Race day Sun, Dec 6, the Recovery Week pill, the
+    strip's dates and marks (Monday's cross, the checks on Tuesday, Thursday and Friday, today's ring) and five of its
+    seven words, Today · Saturday, Skip run, Long Run, Record run, Then lift, Skip lift, Full Body Support, Start
+    lift, the tab bar.
+  - **Three differences, each in the grid**, in the fields the measure named (title, cardio, sections;
+    `tests/measure/native-this-week_reads.md`): Tuesday reads LEGS where today's app reads RECOV, and Thursday SPEED
+    where today's reads LEGS; the run card reads Cutback · 60 min and "The long run steps back on purpose.", without
+    today's · 10:30/mi and "Average no faster than 9:58/mi."; the lift card reads Kettlebell swing + 2 more where
+    today's reads Pushups (slow tempo) + 1 more. Which rule of `refreshProgram` made each is not read off a
+    screenshot. They are what the screen was said to show until `refreshProgram` is in core and `liveProgram` reads
+    it: the stored grid, not the one today's app draws.
+  - **Two open in the look, for the session that wires the seam:** the Recovery Week pill's arrow is thinner than
+    today's, and the week title sits a few points higher.

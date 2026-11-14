@@ -567,6 +567,68 @@ test('backups the reader refuses, a load the phone refuses, and a backup loaded 
   };
 });
 
+test('a trip to a mini gym, a swap on a trip day, an overlay the engine cannot build and a program stored with no length: the grid in hand and what each stores are in the records', () => {
+  // No other history books a mini gym (the standard one travels with no equipment, where the trip's mark changes
+  // nothing), asks the swap sheet about a trip day, holds an overlay that fails, or holds a program with no length:
+  // four rules of the splice no record could see (found by the measure before v0.262.1,
+  // tests/measure/stored-state_overlays-gaps.md). Week 1 of HALF_MANNY trains Monday, Tuesday, Thursday, Friday and
+  // Saturday; the trip is Tuesday 1 September to Friday 4 September.
+  const TRIP = '["substitute",{"equipment":"home_basic"}]';
+  const WEEK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+  const P = new Phone().launch(CREATED);
+  const id = P.generate(HALF);
+  const stamps = (): (string | null)[] => WEEK.map((d) => P.day(1, d)._ovKey || null);
+  const onTrip = [null, TRIP, null, TRIP, TRIP, null, null];   // Wednesday rests, so it keeps the base's day
+  P.launch(at(START, 0, '07:00'));
+  assert.deepStrictEqual(WEEK.map((d) => !!P.day(1, d).rest), [false, false, true, false, false, false, true]);
+  P.ev(`_ovDraft.equipment='home_basic';_ovDraft.from='2026-09-01';_ovDraft.to='2026-09-04';applyOverlayDraft();`);
+  P.settle();
+  assert.deepStrictEqual(stamps(), onTrip, 'the trip\'s training days carry its stamp, and no other day does');
+  // A mini gym on a trip is a hotel rack (the travel mark): its dumbbells top out, so the day's main lift is three sets
+  // in a rep range at the program's easy effort, not the loaded 3×12 of the wave. Monday, at home, keeps the wave.
+  const mains = (d: 'mon' | 'tue' | 'thu', lead: string): number =>
+    (P.day(1, d).sections || []).flatMap((s: any) => s.items || []).filter((i: any) => String(i.detail).startsWith(lead)).length;
+  assert.deepStrictEqual([mains('tue', '3 sets of 8 to 12 — RPE 7 (leave ~3 in reserve)'), mains('thu', '3 sets of 8 to 12 — RPE 7 (leave ~3 in reserve)')], [1, 1]);
+  assert.deepStrictEqual([mains('tue', '3×12 — RPE'), mains('thu', '3×12 — RPE'), mains('mon', '3×12 — RPE'), mains('mon', '3 sets of 8 to 12')], [0, 0, 1, 0]);
+
+  // Tuesday trained on the trip. Then the swap sheet on Thursday: what a mini gym can do, and nothing a rack is needed for.
+  P.launch(at(START, 1));
+  trainDay(P, 1, 'tue', 0);
+  assert.equal(parsed(P, 'ia_hist_' + id).w1_tue._ovKey, TRIP, 'the day\'s snapshot carries the trip\'s stamp');
+  P.open(1, 'thu');
+  const c = cards(P.day(1, 'thu'))[0]!;
+  P.IA.ctx['__c'] = { secIdx: c.secIdx, itemIdx: c.itemIdx, name: c.name, detail: c.detail };
+  const offered: string[] = P.ev("(function(){var r=swapCandidates(__c.name,activeProg.weeks[1].thu,1,activeProg);return [].concat(r.tier1||[],r.tier2||[]).map(function(x){return x.name||x;});})()");
+  assert.ok(offered.length > 0, 'the swap sheet offers a move for Thursday\'s first card');
+  assert.equal(offered.filter((n) => /barbell|landmine|back squat|front squat|^deadlift$/i.test(n)).join(', '), '', 'no move that needs a bar');
+  P.ev(`_swapCtx=__c;applySwapChoice(${JSON.stringify(offered[0])});`);
+  P.settle();
+  assert.deepStrictEqual(parsed(P, 'ia_swaps_' + id).w1_thu.map((r: any) => [r.from, r.to]), [[c.name, offered[0]]]);
+  const trip = P.record();
+
+  // An overlay the engine cannot build, made before the trip: the athlete is told once, and the trip still applies.
+  const withBroken = JSON.parse(P.dump()['ia_programs']!);
+  const tripOnly = JSON.stringify(withBroken[0].overlays);
+  withBroken[0].overlays.unshift({ id: 'ov_broken', type: 'injury', from: '2026-09-01', to: '2026-09-04', patch: { restDays: 7 }, note: '', created: 1 });
+  P.damage('ia_programs', JSON.stringify(withBroken));
+  P.launch(at(START, 2));
+  assert.deepStrictEqual(P.toasts.filter((t) => /failed to apply/.test(t)), ['A plan change failed to apply. Flag it in Bugs.']);
+  assert.deepStrictEqual(stamps(), onTrip, 'the trip still stands beside the overlay that failed');
+  const broken = P.record();
+
+  // The same program stored with no length, the broken overlay gone: the trip is read against the rebuilt length.
+  const noLength = JSON.parse(P.dump()['ia_programs']!);
+  noLength[0].overlays = JSON.parse(tripOnly);
+  delete noLength[0].totalWeeks;
+  P.damage('ia_programs', JSON.stringify(noLength));
+  P.launch(at(START, 3));
+  assert.deepStrictEqual(P.toasts.filter((t) => /failed to apply/.test(t)), []);
+  assert.deepStrictEqual(stamps(), onTrip, 'a program with no stored length still takes its trip');
+  trainDay(P, 1, 'thu', 1);
+  assert.equal(parsed(P, 'ia_hist_' + id).w1_thu._ovKey, TRIP);
+  golden['a mini gym trip, a swap on a trip day, an overlay that fails, and no stored length'] = { offered, trip, broken, noLength: P.record() };
+});
+
 afterAll(() => {
   // One file for the whole feature. A case that failed above left its entry out, and the comparison says so.
   matchSnapshot('stored-state', { zone: process.env['TZ'], created: CREATED, records: golden as Record<string, StateRecord> });

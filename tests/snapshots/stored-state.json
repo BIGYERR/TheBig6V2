@@ -5318,6 +5318,585 @@
           "weeksSha256": "49869436b64451c6436aa17de4a32bd5cd5d1cea2cec3d5ca28380f80bbae8ea"
         }
       }
+    },
+    "a mini gym trip, a swap on a trip day, an overlay that fails, and no stored length": {
+      "offered": [
+        "Deficit reverse lunge (KB)",
+        "Dumbbell Bulgarian split squat",
+        "Dumbbell goblet side lunge",
+        "Walking lunge (KB)",
+        "Goblet side lunge to knee drive",
+        "Step-downs (KB)",
+        "Step-ups (KB)",
+        "Double Kettlebell deadlift",
+        "Dumbbell Romanian deadlift",
+        "Kettlebell goblet squat",
+        "Kettlebell Romanian deadlift",
+        "Heel-elevated goblet squat"
+      ],
+      "trip": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 78,
+            "sha256": "96ae74ecd15e6ee08c9a5e84a0b690845c0be8eaf29bbbb04574105b64cd9d6b",
+            "value": {
+              "w1_tue": {
+                "title": "Strength Support",
+                "ts": 1788300000000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 402,
+            "sha256": "5b578ef1f2ef7204aad2867f9c4252eb2ff9bf7337ffff6b9eaa5550d0cb5ea5",
+            "value": {
+              "kettlebell_single_arm_press": {
+                "name": "Kettlebell single-arm press",
+                "entries": [
+                  {
+                    "weight": 100,
+                    "setsReps": "2×6–10 each @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      95,
+                      100
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              },
+              "dumbbell_lateral_raise": {
+                "name": "Dumbbell lateral raise",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×12–15 @ RPE 7",
+                    "setsDone": [
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 1486,
+            "sha256": "6bce52cc74f3e666b05aa7a44a136a31bea888d301f252f132aeb54547f6fdf2"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 204,
+            "sha256": "9fab35a2db9fcf6fd21bafc9b9db465e682106586561db555aa5561f539f6f8b",
+            "value": {
+              "w1_tue": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "9:20/mi",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788300000000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+            "value": {
+              "date": "2026-9-1",
+              "idx": 0
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "97519582111a4410e7f33df517780d88152d8fff6d5cc3f38cfd311551e3908a",
+            "value": {
+              "reminder": 2,
+              "workout": 10
+            }
+          },
+          "ia_programs": {
+            "bytes": 84401,
+            "sha256": "2ff4fc614b0c3633af379f89515a695930c3512fb6359b8627531d4ff673e32c"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 8,
+            "sha256": "3a04fa37debb86eadf33a8de2d98086dfdd376c8b150863170201725f3ff4d3e",
+            "value": "2026-9-1"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 15,
+            "sha256": "270c5686a3bebfd45b08c2ab993e6e0fb7f7e23ec00d5aee65daa18c008c6985",
+            "value": {
+              "w1_mon": true
+            }
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 80,
+            "sha256": "1455123a29a101b5f7207daa3c7d5316f7e9f56c207666f2299661d23f583d96",
+            "value": {
+              "Reverse lunge (KB)": {
+                "to": "Deficit reverse lunge (KB)",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 145,
+            "sha256": "c7e2f1528fb61bbe2a9eb0405050e243e3acf48595f28f0e83b2043d32cb6a68",
+            "value": {
+              "w1_thu": [
+                {
+                  "from": "Reverse lunge (KB)",
+                  "to": "Deficit reverse lunge (KB)",
+                  "ts": 1788300000000,
+                  "rx": [
+                    {
+                      "s": 1,
+                      "i": 0,
+                      "d": "2×8–12 each @ RPE 7"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 1,
+            "digest": "473505c939ba980f"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "1896031f02be8010",
+          "weeksSha256": "7ec9a2104e3b9c368ed881be808d5bb9a6002b8c5ba47cd4ea7f5ddf1662365c"
+        }
+      },
+      "broken": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 78,
+            "sha256": "96ae74ecd15e6ee08c9a5e84a0b690845c0be8eaf29bbbb04574105b64cd9d6b",
+            "value": {
+              "w1_tue": {
+                "title": "Strength Support",
+                "ts": 1788300000000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 402,
+            "sha256": "5b578ef1f2ef7204aad2867f9c4252eb2ff9bf7337ffff6b9eaa5550d0cb5ea5",
+            "value": {
+              "kettlebell_single_arm_press": {
+                "name": "Kettlebell single-arm press",
+                "entries": [
+                  {
+                    "weight": 100,
+                    "setsReps": "2×6–10 each @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      95,
+                      100
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              },
+              "dumbbell_lateral_raise": {
+                "name": "Dumbbell lateral raise",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×12–15 @ RPE 7",
+                    "setsDone": [
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 1486,
+            "sha256": "6bce52cc74f3e666b05aa7a44a136a31bea888d301f252f132aeb54547f6fdf2"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 204,
+            "sha256": "9fab35a2db9fcf6fd21bafc9b9db465e682106586561db555aa5561f539f6f8b",
+            "value": {
+              "w1_tue": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "9:20/mi",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788300000000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "00464a6956cd44688fb1593ead95d0a60bf2014fc4ea4eb6d63f2cb82fec84b6",
+            "value": {
+              "date": "2026-9-1",
+              "idx": 0
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "97519582111a4410e7f33df517780d88152d8fff6d5cc3f38cfd311551e3908a",
+            "value": {
+              "reminder": 2,
+              "workout": 10
+            }
+          },
+          "ia_programs": {
+            "bytes": 84519,
+            "sha256": "518ea3fada6ec99151e9c9482b2c0d166aec58654a4492bcacc480dbb6a458b3"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 8,
+            "sha256": "3a04fa37debb86eadf33a8de2d98086dfdd376c8b150863170201725f3ff4d3e",
+            "value": "2026-9-1"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 15,
+            "sha256": "270c5686a3bebfd45b08c2ab993e6e0fb7f7e23ec00d5aee65daa18c008c6985",
+            "value": {
+              "w1_mon": true
+            }
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 80,
+            "sha256": "1455123a29a101b5f7207daa3c7d5316f7e9f56c207666f2299661d23f583d96",
+            "value": {
+              "Reverse lunge (KB)": {
+                "to": "Deficit reverse lunge (KB)",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 145,
+            "sha256": "c7e2f1528fb61bbe2a9eb0405050e243e3acf48595f28f0e83b2043d32cb6a68",
+            "value": {
+              "w1_thu": [
+                {
+                  "from": "Reverse lunge (KB)",
+                  "to": "Deficit reverse lunge (KB)",
+                  "ts": 1788300000000,
+                  "rx": [
+                    {
+                      "s": 1,
+                      "i": 0,
+                      "d": "2×8–12 each @ RPE 7"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "totalWeeks": 14,
+            "startDate": "2026-08-31",
+            "overlays": 2,
+            "digest": "31a081c43765e770"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "ea1da0be321e5832",
+          "weeksSha256": "7ec9a2104e3b9c368ed881be808d5bb9a6002b8c5ba47cd4ea7f5ddf1662365c"
+        }
+      },
+      "noLength": {
+        "keys": {
+          "ia_active": {
+            "bytes": 18,
+            "sha256": "f8fb8f34d53c69c9c3fc5d8c360dafa7f34bef929f3ab5d924f9ac74fcf6e6ae",
+            "value": "prog_1788008400000"
+          },
+          "ia_comp_prog_1788008400000": {
+            "bytes": 162,
+            "sha256": "9cf03f66961966a5dcc1b9e43bec27bc29ec3d639b55548c869bcc16203b2b58",
+            "value": {
+              "w1_tue": {
+                "title": "Strength Support",
+                "ts": 1788300000000,
+                "status": "complete"
+              },
+              "w1_thu": {
+                "title": "Leg Strength + Mobility",
+                "ts": 1788472800000,
+                "status": "complete"
+              }
+            }
+          },
+          "ia_exw_prog_1788008400000": {
+            "bytes": 795,
+            "sha256": "413c0fe4df85c40982464d6cd911ec5a2b6c57762f6b759425e1670046a200da",
+            "value": {
+              "kettlebell_single_arm_press": {
+                "name": "Kettlebell single-arm press",
+                "entries": [
+                  {
+                    "weight": 100,
+                    "setsReps": "2×6–10 each @ RPE 7",
+                    "setsDone": [
+                      6,
+                      5
+                    ],
+                    "setsW": [
+                      95,
+                      100
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              },
+              "dumbbell_lateral_raise": {
+                "name": "Dumbbell lateral raise",
+                "entries": [
+                  {
+                    "weight": 110,
+                    "setsReps": "2×12–15 @ RPE 7",
+                    "setsDone": [
+                      12,
+                      11
+                    ],
+                    "setsW": [
+                      105,
+                      110
+                    ],
+                    "week": 1,
+                    "day": "tue",
+                    "ts": 1788300000000
+                  }
+                ]
+              },
+              "deficit_reverse_lunge__kb_": {
+                "name": "Deficit reverse lunge (KB)",
+                "entries": [
+                  {
+                    "weight": 105,
+                    "setsReps": "2×8–12 each @ RPE 7",
+                    "setsDone": [
+                      8,
+                      7
+                    ],
+                    "setsW": [
+                      100,
+                      105
+                    ],
+                    "week": 1,
+                    "day": "thu",
+                    "ts": 1788472800000
+                  }
+                ]
+              },
+              "spanish_squat_hold__kb_": {
+                "name": "Spanish squat hold (KB)",
+                "entries": [
+                  {
+                    "weight": 115,
+                    "setsReps": "2×25 sec",
+                    "setsDone": [
+                      25,
+                      24
+                    ],
+                    "setsW": [
+                      110,
+                      115
+                    ],
+                    "week": 1,
+                    "day": "thu",
+                    "ts": 1788472800000
+                  }
+                ]
+              }
+            }
+          },
+          "ia_hist_prog_1788008400000": {
+            "bytes": 2903,
+            "sha256": "7175407fe5860d3fed3f1d7e0e0b928f4a216e1b261a1919a64dbf428e702071"
+          },
+          "ia_logs_prog_1788008400000": {
+            "bytes": 422,
+            "sha256": "28509a2c7f25b462c49769b07a26e267563be6554a08e2b997def6638ab49401",
+            "value": {
+              "w1_tue": {
+                "rpe": "6",
+                "run_dist": "3.0",
+                "run_pace": "9:20/mi",
+                "run_mins": "28",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788300000000
+              },
+              "w1_thu": {
+                "rpe": "7",
+                "run_dist": "",
+                "run_pace": "",
+                "run_mins": "",
+                "run_reps": "",
+                "run_rep_time": "",
+                "bike_mins": "",
+                "swim_yards": "",
+                "notes": "Felt strong 💪, slept 7 h",
+                "swapFrom": "",
+                "swapTo": "",
+                "week": 1,
+                "ts": 1788472800000
+              }
+            }
+          },
+          "ia_pop_dismiss_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "787badccd37a10e508c1b279f28dd64624fcc2af0d0595292955fd0d0e61f06a",
+            "value": {
+              "date": "2026-9-3",
+              "idx": 2
+            }
+          },
+          "ia_pop_idx_prog_1788008400000": {
+            "bytes": 27,
+            "sha256": "3d9bb1e597a5af30d75c990b9a3c1e62d4b9b77fa3634df9a451c264b499124a",
+            "value": {
+              "reminder": 2,
+              "workout": 14
+            }
+          },
+          "ia_programs": {
+            "bytes": 84385,
+            "sha256": "c909c9d8c346ad2484325421910bf68ffce00c7b379226ec101b365cab2dfbc6"
+          },
+          "ia_remind_last_prog_1788008400000": {
+            "bytes": 8,
+            "sha256": "3a04fa37debb86eadf33a8de2d98086dfdd376c8b150863170201725f3ff4d3e",
+            "value": "2026-9-1"
+          },
+          "ia_reminded_prog_1788008400000": {
+            "bytes": 15,
+            "sha256": "270c5686a3bebfd45b08c2ab993e6e0fb7f7e23ec00d5aee65daa18c008c6985",
+            "value": {
+              "w1_mon": true
+            }
+          },
+          "ia_swapct_prog_1788008400000": {
+            "bytes": 80,
+            "sha256": "1455123a29a101b5f7207daa3c7d5316f7e9f56c207666f2299661d23f583d96",
+            "value": {
+              "Reverse lunge (KB)": {
+                "to": "Deficit reverse lunge (KB)",
+                "n": 1,
+                "offered": false
+              }
+            }
+          },
+          "ia_swaps_prog_1788008400000": {
+            "bytes": 145,
+            "sha256": "c7e2f1528fb61bbe2a9eb0405050e243e3acf48595f28f0e83b2043d32cb6a68",
+            "value": {
+              "w1_thu": [
+                {
+                  "from": "Reverse lunge (KB)",
+                  "to": "Deficit reverse lunge (KB)",
+                  "ts": 1788300000000,
+                  "rx": [
+                    {
+                      "s": 1,
+                      "i": 0,
+                      "d": "2×8–12 each @ RPE 7"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "programs": [
+          {
+            "id": "prog_1788008400000",
+            "startDate": "2026-08-31",
+            "overlays": 1,
+            "digest": "50a148f353962555"
+          }
+        ],
+        "live": {
+          "week": 1,
+          "digest": "1896031f02be8010",
+          "weeksSha256": "7ec9a2104e3b9c368ed881be808d5bb9a6002b8c5ba47cd4ea7f5ddf1662365c"
+        }
+      }
     }
   }
 }

@@ -101,11 +101,41 @@ const BREAKS = [
   ['load rollback, clear', 'a refused load keeps what it wrote', 'backupKeys(store).forEach(k=>{try{store.remove(k);}catch{}});', ''],
   ['load rollback, restore', 'a refused load does not put back what the phone held', 'Object.keys(before).forEach(k=>{try{store.set(k,before[k]);}catch{}});', ''],
   ['load result', 'a refused load reports success', 'catch{}});\n    return false;', 'catch{}});\n    return true;'],
+  // v0.262.1: a break inside each rule that moved to core with the overlay splice (the page's applyOverlays, now
+  // spliceOverlays). Sixteen were red on v0.262.0's records, which book an injury and a trip and train under both. Four
+  // were green (the travel mark, the legal swaps kept by overlay, an overlay that fails, the length the span is read
+  // against) until the records gained the case "a mini gym trip, a swap on a trip day, an overlay that fails, and no
+  // stored length" (tests/measure/stored-state_overlays-gaps.md).
+  ['overlay order', 'the newest overlay is applied first, so the oldest wins', '.sort((a,b)=>((a&&a.created)||0)-((b&&b.created)||0)).forEach(ov=>{', '.sort((a,b)=>((b&&b.created)||0)-((a&&a.created)||0)).forEach(ov=>{'],
+  ['overlay kinds, injury', 'an injury overlay is skipped', "if(!ov || (ov.type!=='substitute' && ov.type!=='injury') || !ov.patch) return;", "if(!ov || (ov.type!=='substitute') || !ov.patch) return;"],
+  ['overlay kinds, travel', 'a travel overlay is skipped', "if(!ov || (ov.type!=='substitute' && ov.type!=='injury') || !ov.patch) return;", "if(!ov || (ov.type!=='injury') || !ov.patch) return;"],
+  ['overlay window, last week', 'the last week of an overlay\'s span is not searched', 'for(let w=range.fromWeek; w<=range.toWeek; w++){', 'for(let w=range.fromWeek; w<range.toWeek; w++){'],
+  ['overlay window, first week', 'the first week of an overlay\'s span is not searched', 'for(let w=range.fromWeek; w<=range.toWeek; w++){', 'for(let w=range.fromWeek+1; w<=range.toWeek; w++){'],
+  ['overlay key', 'a spliced day\'s stamp holds the overlay\'s kind only', 'const ck = JSON.stringify([ov.type, ov.patch]);', 'const ck = JSON.stringify([ov.type]);'],
+  ['overlay travel mark', 'a trip builds as the athlete\'s own gym', '{...prog.cfg, ...ov.patch, _travel:true}', '{...prog.cfg, ...ov.patch}'],
+  ['overlay patch, travel', 'a trip builds without its patch', '{...prog.cfg, ...ov.patch, _travel:true}', '{...prog.cfg, _travel:true}'],
+  ['overlay patch, injury', 'an injury builds without its patch', ': {...prog.cfg, ...ov.patch});', ': {...prog.cfg});'],
+  ['overlay clean injury build', 'an injury builds as a temporary setup', ': {...prog.cfg, ...ov.patch});', ': {...prog.cfg, ...ov.patch, _travel:true});'],
+  ['overlay day, before', 'a day before the span, in its first week, takes the variant', 'if(dt < _from || (_to && dt > _to)) return;', 'if((_to && dt > _to)) return;'],
+  ['overlay day, after', 'a day after the span, in its last week, takes the variant', 'if(dt < _from || (_to && dt > _to)) return;', 'if(dt < _from) return;'],
+  ['overlay day, first', 'the span\'s first day keeps the base', 'if(dt < _from || (_to && dt > _to)) return;', 'if(dt <= _from || (_to && dt > _to)) return;'],
+  ['overlay day, last', 'the span\'s last day keeps the base', 'if(dt < _from || (_to && dt > _to)) return;', 'if(dt < _from || (_to && dt >= _to)) return;'],
+  ['overlay rest days', 'a rest day of the variant replaces the base day', 'const vd = vw[d]; if(!vd || vd.rest) return;', 'const vd = vw[d]; if(!vd) return;'],
+  ['overlay stamp', 'a spliced day carries no overlay key', 'rebuilt.weeks[w][d] = Object.assign({}, vd, {_ovKey: ck});', 'rebuilt.weeks[w][d] = Object.assign({}, vd);'],
+  ['overlay splice', 'no day takes the variant', 'rebuilt.weeks[w][d] = Object.assign({}, vd, {_ovKey: ck});', ''],
+  ['overlay legal swaps', 'no variant\'s legal swaps are kept', 'if(Array.isArray(variant._swapUniverse)) rebuilt._swapUniverseByKey[ck] = variant._swapUniverse;', ''],
+  ['overlay failure', 'a failing overlay stops every later one', 'failed(ov, e);', 'throw e;'],
+  ['overlay failure, told', 'a failed overlay is not told to the athlete', "try{ showToast('A plan change failed to apply. Flag it in Bugs.'); }catch(_e){}", ''],
+  ['overlay length', 'an overlay\'s span is read against the stored length only', 'const totalWeeks = rebuilt.totalWeeks || prog.totalWeeks || 0;', 'const totalWeeks = prog.totalWeeks || 0;'],
+  ['overlay week range', 'the page hands the splice no week range', 'return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov, e)=>{', 'return spliceOverlays(prog, rebuilt, ()=>null, _progDayDate, (ov, e)=>{'],
+  ['overlay day date', 'the page hands the splice no day date', 'return spliceOverlays(prog, rebuilt, overlayWeekRange, _progDayDate, (ov, e)=>{', 'return spliceOverlays(prog, rebuilt, overlayWeekRange, ()=>null, (ov, e)=>{'],
 ];
 
 // Breaks that change no record. They are run and printed, and they do not fail the script: each is a line no history
 // can reach an effect through, and the note says how that was shown.
 const OPEN = [
+  ['overlay cache', 'an overlay\'s variant is built again for every overlay of the same kind and patch', 'if(!_variantCache[ck]) _variantCache[ck] = buildProgram(', '_variantCache[ck] = buildProgram(',
+    'No effect is possible, found in v0.262.1 (tests/measure/stored-state_overlays-gaps.md): buildProgram is a pure function of its config (the engine check holds every digest), so a second build of the same kind and patch gives the same days and the same legal swaps, and a spliced day is a copy. The cache saves time and nothing else.'],
   ['freeze cut, the touched term', 'the current week, when touched, is not frozen a week further', 'const _dateCut = _curWk + (_curTouched ? 1 : 0);', 'const _dateCut = _curWk;',
     'No effect is possible: the next line takes the larger of this and the highest touched week plus one, and a touched current week is at least that week. The term is redundant.'],
   ['history, first touch', 'a day\'s snapshot is overwritten on every touch', 'if(h[k]) return;', '',
