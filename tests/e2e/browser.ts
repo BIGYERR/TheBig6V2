@@ -2,7 +2,7 @@
 // no animations, no outbound feedback form, and every console error and uncaught exception recorded.
 // The website and admin pages (pages.ts) pass their own viewport, keep the real clock (the admin compares times with
 // a live server), and also fail on any same-origin HTTP error they were not told to expect.
-import type { Browser, BrowserContext, Page } from 'puppeteer';
+import type { Browser, BrowserContext, ElementHandle, Page } from 'puppeteer';
 import type { Viewport } from './types.ts';
 
 /** The moment every run happens at: a Wednesday, so a rest day can be "today" (future rest days are inert). */
@@ -97,6 +97,36 @@ export async function settle(page: Page): Promise<void> {
       }),
     { timeout: 5000 },
   );
+}
+
+/**
+ * Scrolls an element to the centre of the screen, and keeps it there. The app answers every focus change with a scroll
+ * of one pixel 350 ms later, and a frame after steps back to where the page stood before that pixel
+ * (installKeyboardResync). A scroll of ours made inside that frame is undone by the step back, and the tap sent next
+ * lands on whatever stands there instead (Post-v0.262.2: CI's step 24 tapped the tab bar where Run the check had been;
+ * the step's own recorder showed the step back to 0 in the same millisecond as the scroll to 194). So when centring
+ * moves the page: wait until no focus change is still inside its window (FOCUS_QUIET_MS, which outlasts the app's
+ * 350 ms), then one frame more (a step back asked for before ours runs before ours), and centre again. A centring that
+ * moves nothing has nothing to lose, and is not held up.
+ */
+export async function centre(page: Page, el: ElementHandle<Element>): Promise<void> {
+  const moved = await el.evaluate((e) => {
+    const y = scrollY;
+    e.scrollIntoView({ block: 'center', inline: 'center' });
+    return scrollY !== y;
+  });
+  if (!moved) return;
+  await page.evaluate(
+    () =>
+      new Promise<void>((done) => {
+        const wait = (): void => {
+          if ((window as unknown as { __e2eFocusWindows?: number }).__e2eFocusWindows) setTimeout(wait, 20);
+          else requestAnimationFrame(() => done());
+        };
+        wait();
+      }),
+  );
+  await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
 }
 
 export interface OpenedPage {

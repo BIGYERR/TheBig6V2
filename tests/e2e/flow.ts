@@ -3,7 +3,7 @@
 // A journey's steps run in order on one page, so state carries forward exactly as it does for a real user. Every
 // journey starts from empty storage in its own browser context, so no journey depends on another.
 import type { Page } from 'puppeteer';
-import { LATER_NOW_KEY } from './browser.ts';
+import { LATER_NOW_KEY, centre } from './browser.ts';
 
 const PROGRAM_NAME = 'E2E Run';
 const SETTLE_MS = 150;
@@ -131,10 +131,11 @@ export function helpers(page: Page, app = false): Helpers {
     async tap(selector) {
       const el = await page.waitForSelector(selector, { visible: true, timeout: 5000 }).catch(() => null);
       if (!el) throw new Error(`nothing visible to tap at ${selector}`);
-      // Centre it first: an element scrolled only to the edge can sit under the fixed tab bar. Then wait until the
+      // Centre it first (centre, browser.ts: it outlasts the page's own step back after a focus change): an element
+      // scrolled only to the edge can sit under the fixed tab bar. Then wait until the
       // target itself (or a child of it) is what a tap at its centre hits: a click sent before the scroll settles lands
       // on whatever covers it (Post-v0.262.0: Run the check, low on the Bugs screen, once tapped the tab bar instead).
-      await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      await centre(page, el);
       await page
         .waitForFunction(
           (e: Element) => {
@@ -240,7 +241,7 @@ export function helpers(page: Page, app = false): Helpers {
       const els = await page.$$(selector);
       const el = els[index];
       if (!el) throw new Error(`no match ${index + 1} for ${selector} (found ${els.length})`);
-      await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      await centre(page, el);
       await el.click();
       await sleep(SETTLE_MS);
     },
@@ -301,7 +302,7 @@ export function helpers(page: Page, app = false): Helpers {
       const label = key.charAt(0).toUpperCase() + key.slice(1);
       for (const cell of await page.$$('.wk-strip .wk-day')) {
         if ((await cell.$eval('.wk-day-lbl', (e) => (e.textContent ?? '').trim())) !== label) continue;
-        await cell.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+        await centre(page, cell);
         await cell.click();
         await sleep(SETTLE_MS);
         return;
@@ -318,7 +319,7 @@ export function helpers(page: Page, app = false): Helpers {
     },
     async tapCard(label) {
       const card = await wizardCard(page, label);
-      await card.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      await centre(page, card);
       await card.click();
       await sleep(SETTLE_MS);
     },
@@ -335,7 +336,7 @@ export function helpers(page: Page, app = false): Helpers {
     async tapSport(name) {
       for (const el of await page.$$('#wizardBody div')) {
         if (!(await el.evaluate((e, n) => e.childElementCount === 0 && (e.textContent ?? '').trim() === n, name))) continue;
-        await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+        await centre(page, el);
         await el.click();
         await sleep(SETTLE_MS);
         return;
@@ -351,7 +352,7 @@ export function helpers(page: Page, app = false): Helpers {
         const field = (await lbl.evaluateHandle((e) => e.parentElement)).asElement();
         const input = field && (await field.$$('input'))[index];
         if (!input) throw new Error(`the ${label} field has no input ${index}`);
-        await input.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+        await centre(page, input);
         await input.click();
         await page.keyboard.type(text);
         await sleep(SETTLE_MS);
@@ -386,7 +387,7 @@ async function tapNamed(page: Page, rows: string, nameSel: string, name: string,
     if ((await row.$eval(nameSel, (e) => (e.textContent ?? '').trim()).catch(() => null)) !== name) continue;
     const target = control ? await row.$(control) : row;
     if (!target) throw new Error(`the ${name} row has no ${control}`);
-    await target.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+    await centre(page, target);
     await target.click();
     await sleep(SETTLE_MS);
     return;
