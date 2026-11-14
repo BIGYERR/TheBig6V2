@@ -629,6 +629,409 @@ test('a trip to a mini gym, a swap on a trip day, an overlay the engine cannot b
   golden['a mini gym trip, a swap on a trip day, an overlay that fails, and no stored length'] = { offered, trip, broken, noLength: P.record() };
 });
 
+// ── The launch itself: refreshProgram and the freeze (found by the measure before v0.262.2) ──────────────────────────
+// tests/measure/stored-state_freeze-gaps.md: of 90 breaks inside the rules a launch applies, the records above let 59
+// through, for three reasons they all share. A history's stored grid is the same engine's build of the same config as
+// the launch that reads it, so a rule that picks between the stored day and the rebuilt one picks between two equal
+// days. Every touch snapshots its day, so a touched day comes back from its snapshot and nothing is laid back on it.
+// And no history holds an older program or a dated pace test. The cases below are the histories that were missing.
+type Wd = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+const WD: Wd[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const MINI = '["substitute",{"equipment":"home_basic"}]';   // the stamp of a trip to a mini gym
+/** A value the page made, as a value of this file's own (the page runs in its own realm, and deepStrictEqual tells the two apart). */
+const plain = <T>(x: T): T => JSON.parse(JSON.stringify(x));
+const itemsOf = (day: any): any[] => (day?.sections || []).flatMap((s: any) => s.items || []);
+const namesOf = (day: any): string[] => itemsOf(day).map((i) => i.name);
+/** What the swap sheet offers for a lift on a day of week `w`. */
+const offeredFor = (P: Phone, w: number, d: Wd, n: string): string[] => {
+  P.IA.ctx['__n'] = n;
+  return P.ev(`(function(){var r=swapCandidates(__n,activeProg.weeks[${w}].${d},${w},activeProg);return [].concat(r.tier1||[],r.tier2||[]).map(function(x){return x.name||x;});})()`);
+};
+/** The swap sheet's tap: the lift named `n` on the open day traded for `t`. */
+const swapOn = (P: Phone, w: number, d: Wd, n: string, t: string): void => {
+  let c: unknown = null;
+  (P.day(w, d).sections || []).forEach((s: any, si: number) => (s.items || []).forEach((it: any, ii: number) => {
+    if (!c && it && it.name === n) c = { secIdx: si, itemIdx: ii, name: n, detail: it.detail };
+  }));
+  P.IA.ctx['__c'] = c;
+  P.ev(`_swapCtx=__c;applySwapChoice(${JSON.stringify(t)});`);
+  P.settle();
+};
+/** The program in hand beside its grid: what a launch carries over from the stored one, or derives. */
+const inHand = (P: Phone): Record<string, unknown> | null => {
+  const p = P.prog;
+  return p ? {
+    id: p.id, name: p.name, created: p.created, seed: p.seed ?? null, startDate: p.startDate ?? null, blockOpen: p.blockOpen ?? null,
+    totalWeeks: p.totalWeeks, weeks: Object.keys(p.weeks || {}).length, overlays: Array.isArray(p.overlays) ? p.overlays.length : null,
+    testWeek: p.cfg ? p.cfg._testWeek ?? null : null, cappedWeeks: p.cfg ? p.cfg._raceDateCappedWeeks ?? null : null,
+    paceShift: p.cfg ? p.cfg._paceShift ?? null : null,
+  } : null;
+};
+/** The stored program list, parsed. */
+const stored = (P: Phone): any[] => JSON.parse(P.dump()['ia_programs']!);
+/** Each day of a week as the launch left it: a trip's day, a day of the athlete's own gym, or rest. */
+const forms = (P: Phone, w: number): string[] => WD.map((d) => { const x = P.day(w, d); return !x ? 'none' : x.rest ? 'rest' : x._ovKey === MINI ? 'trip' : 'gym'; });
+
+test('swaps, edits and a moved session on days not yet trained are laid back at each launch, and a trained day comes back from its snapshot with nothing laid on it', () => {
+  // Week 1 of HALF_MANNY, and nothing logged until Saturday: Monday edited, Tuesday's session moved onto Wednesday's
+  // rest and swapped there, an injury flagged on Thursday and a lift swapped under it.
+  const P = new Phone().launch(CREATED);
+  const id = P.generate(HALF);
+  const day = (d: Wd): any => P.day(1, d);
+
+  // Monday morning: the second card traded twice in a row (a chain), the lift traded in skipped, the other round
+  // skipped whole, a movement added.
+  P.launch(at(START, 0, '07:00'));
+  P.open(1, 'mon');
+  const A = cards(day('mon'))[1]!.name;
+  const B = offeredFor(P, 1, 'mon', A)[0]!;
+  swapOn(P, 1, 'mon', A, B);
+  const C = offeredFor(P, 1, 'mon', B).find((n) => n !== A)!;
+  swapOn(P, 1, 'mon', B, C);
+  assert.equal(new Set([A, B, C]).size, 3, 'three different lifts');
+  P.ev(`skipExercise(${JSON.stringify(C)});`);
+  const rounds = (day('mon').sections as any[]).map((s, i) => (s.superset ? i : -1)).filter((i) => i >= 0);
+  assert.equal(rounds.length, 2, 'Monday holds two rounds');
+  const other = rounds.find((i) => !(day('mon').sections[i].items as any[]).some((it) => it.name === C))!;
+  P.ev(`skipSuperset(${other});`);
+  const add: string = P.ev("(function(){var c=addCandidates(activeProg.weeks[1].mon,1,activeProg);return (c.more||[])[0]||(c.gap||[])[0]||null;})()");
+  P.ev(`applyAddChoice(${JSON.stringify(add)});`);
+  assert.deepStrictEqual(parsed(P, 'ia_swaps_' + id).w1_mon.map((r: any) => [r.from, r.to]), [[A, B], [B, C]], 'two records, in the order made');
+  const edits = parsed(P, 'ia_edits_' + id).w1_mon;
+  assert.deepStrictEqual([edits.skip, edits.add.map((a: any) => a.name)], [[C, '__ss:' + other], [add]]);
+  assert.deepStrictEqual([parsed(P, 'ia_hist_' + id), parsed(P, 'ia_comp_' + id), parsed(P, 'ia_logs_' + id)], [null, null, null], 'an edit is not a touch: nothing is snapshotted, logged or marked');
+  const monday = (): unknown[] => plain([
+    namesOf(day('mon')).filter((n) => n === C).length, namesOf(day('mon')).includes(A), namesOf(day('mon')).includes(B),
+    itemsOf(day('mon')).some((i) => i.name === C && i._skipped === true), day('mon').sections[other]._skipped === true,
+    (day('mon').sections as any[]).filter((s) => s._added).map((s) => (s.items as any[]).map((i) => [i.name, i._addedByUser])),
+  ]);
+  const asLeft = [1, false, false, true, true, [[[add, true]]]];
+  assert.deepStrictEqual(monday(), asLeft);
+
+  // Wednesday: the launch lays Monday's swaps on the rebuilt day in the order made, then its edits. The week is not
+  // touched, so it is not below the cut and its edits are kept. Then Tuesday's session is moved onto today's rest, and
+  // its first card swapped there.
+  P.launch(at(START, 2, '10:00'));
+  assert.deepStrictEqual(monday(), asLeft, 'Monday in hand is the card the athlete left: the chain\'s last lift once, skipped, the round off, the add on');
+  assert.deepStrictEqual(Object.keys(parsed(P, 'ia_edits_' + id)), ['w1_mon'], 'the edits of an untouched week are kept');
+  const edited = P.record();
+  P.ev("openRestSheet(1,'wed','move');_rdSet('pick','tue');applyRestMove();");
+  P.settle();
+  P.open(1, 'wed');
+  const W0 = cards(day('wed'))[0]!.name;
+  const W = offeredFor(P, 1, 'wed', W0)[0]!;
+  swapOn(P, 1, 'wed', W0, W);
+  assert.deepStrictEqual(Object.keys(parsed(P, 'ia_swaps_' + id)), ['w1_mon', 'w1_wed'], 'the swap is recorded under the day the session now stands on');
+
+  // Thursday: the move is laid first, so the swap finds its session on Wednesday. Then a knee flagged from today, and
+  // a lift of today's injured session swapped.
+  P.launch(at(START, 3, '07:00'));
+  assert.deepStrictEqual([day('tue').rest, day('tue').movedTo, day('wed').movedFrom, namesOf(day('wed')).includes(W), namesOf(day('wed')).includes(W0)],
+    [true, 'wed', 'tue', true, false], 'Tuesday rests, Wednesday holds its session with the lift traded in');
+  const moved = P.record();
+  P.ev("_ovDraft.injRegion='knee';_ovDraft.injTier='workaround';_ovDraft.from='2026-09-03';applyInjuryDraft();");
+  const KNEE = '["injury",{"injury":{"region":"knee","tier":"workaround"}}]';
+  assert.deepStrictEqual(WD.map((d) => day(d)._ovKey || null), [null, null, null, KNEE, KNEE, KNEE, null], 'Thursday, Friday and Saturday are the injured build\'s days');
+  P.open(1, 'thu');
+  const T0 = cards(day('thu'))[0]!.name;
+  const T = offeredFor(P, 1, 'thu', T0)[0]!;
+  swapOn(P, 1, 'thu', T0, T);
+
+  // Friday: the swap is laid on the rebuilt injured day, and the day goes through the injury's filter again, the plan
+  // read off the day's own stamp. The lift traded in carries the dose it had before the filter.
+  P.launch(at(START, 4, '07:00'));
+  const traded = itemsOf(day('thu')).filter((i) => i.name === T);
+  assert.deepStrictEqual([traded.length, typeof traded[0]._preHold, namesOf(day('thu')).includes(T0)], [1, 'string', false]);
+  const injured = P.record();
+
+  // Saturday: Monday's first lift logged, the day's first touch, so the day is snapshotted as it stands. Then the lift
+  // first traded off is added back from the add sheet.
+  P.launch(at(START, 5, '09:00'));
+  P.open(1, 'mon');
+  const first = cards(day('mon'))[0]!;
+  P.logLift(first.name, first.detail, [first.reps, first.reps], [135, 140]);
+  const adds: string[] = P.ev("(function(){var c=addCandidates(activeProg.weeks[1].mon,1,activeProg);return [].concat(c.gap||[],c.more||[],c.off||[]);})()");
+  assert.ok(adds.includes(A), 'the add sheet offers the lift traded off');
+  P.ev(`applyAddChoice(${JSON.stringify(A)});`);
+  const snap = JSON.stringify(parsed(P, 'ia_hist_' + id).w1_mon);
+
+  // Sunday: Monday comes back from its snapshot and its swaps are not laid on it again (they would trade the lift
+  // just added back). The week is touched now, so it is below the cut and its edits are dropped from the store.
+  P.launch(at(START, 6, '08:00'));
+  assert.equal(JSON.stringify(day('mon')), snap, 'Monday in hand is its snapshot, to the byte');
+  assert.deepStrictEqual([namesOf(day('mon')).filter((n) => n === A).length, namesOf(day('mon')).filter((n) => n === C).length], [1, 1]);
+  assert.deepStrictEqual(parsed(P, 'ia_edits_' + id), {}, 'a touched week gives up its edits');
+  assert.deepStrictEqual(Object.keys(parsed(P, 'ia_swaps_' + id)), ['w1_mon', 'w1_wed', 'w1_thu'], 'the swaps stay, for undo');
+  golden['swaps, edits and a move laid back at launch'] = { chain: [A, B, C], edited, moved, injured, restored: P.record() };
+});
+
+test('days proved by one store each, a trip booked over them, a Monday launch and a launch after the last week: which form each day takes', () => {
+  // Week 1 of HALF_MANNY trained Monday, Tuesday, Thursday and Friday, and next Monday trained early. Then, as older
+  // data holds them, each day is left one proof: Monday its completion, Tuesday its log, Thursday its logged lifts,
+  // Friday its snapshot, next Monday its snapshot. A trip to a mini gym is then booked over all of them (Monday 31
+  // August to Monday 7 September), so the rebuilt day and the stored day differ on every training day.
+  const P = new Phone().launch(CREATED);
+  const id = P.generate(HALF);
+  (['mon', 'tue', 'thu', 'fri'] as Wd[]).forEach((d, i) => { P.launch(at(START, WD.indexOf(d))); trainDay(P, 1, d, i); });
+  P.launch(at(START, 4, '20:00'));
+  trainDay(P, 2, 'mon', 4);
+  const keep = (key: string, days: string[]): void => {
+    const v = parsed(P, key + id);
+    Object.keys(v).forEach((k) => { if (!days.includes(k)) delete v[k]; });
+    P.damage(key + id, JSON.stringify(v));
+  };
+  keep('ia_comp_', ['w1_mon']); keep('ia_logs_', ['w1_tue']); keep('ia_hist_', ['w1_fri', 'w2_mon']);
+  const exw = parsed(P, 'ia_exw_' + id);
+  Object.keys(exw).forEach((k) => { exw[k].entries = exw[k].entries.filter((e: any) => e.week === 1 && e.day === 'thu'); if (!exw[k].entries.length) delete exw[k]; });
+  assert.equal(Object.keys(exw).length, 2, 'Thursday\'s two logged lifts');
+  P.damage('ia_exw_' + id, JSON.stringify(exw));
+
+  // Saturday of week 1. Every proved day keeps its own gym's form; Saturday, untouched in the current week, takes the
+  // trip. A trip is not an injury: it never rewrites a touched day. Next Monday is held by its snapshot alone: the
+  // furthest touched week is frozen though the calendar is a week behind it.
+  P.launch(at(START, 5, '08:00'));
+  P.ev("_ovDraft.equipment='home_basic';_ovDraft.from='2026-08-31';_ovDraft.to='2026-09-07';applyOverlayDraft();");
+  P.settle();
+  const SAT = [['gym', 'gym', 'rest', 'gym', 'gym', 'trip', 'rest'], ['gym', 'gym', 'rest', 'gym', 'gym', 'gym', 'rest']];
+  assert.deepStrictEqual([forms(P, 1), forms(P, 2)], SAT);
+  const booked = P.record();
+  P.launch(at(START, 6, '08:00'));
+  assert.deepStrictEqual([forms(P, 1), forms(P, 2)], SAT, 'the next launch reads the same');
+  const sunday = P.record();
+
+  // Monday of week 2 (2026-09-07): week 1 is behind now, a dead record, and its untouched Saturday goes back to the
+  // stored form. A trip wholly after the last week (the race is 6 December) is refused and nothing is stored.
+  P.launch(at(START, 7, '08:00'));
+  assert.equal(P.record().live!.week, 2, '2026-09-07 is the second Monday from 2026-08-31');
+  assert.deepStrictEqual([forms(P, 1), forms(P, 2)], [['gym', 'gym', 'rest', 'gym', 'gym', 'gym', 'rest'], ['gym', 'gym', 'rest', 'gym', 'gym', 'gym', 'rest']]);
+  P.ev("_ovDraft.equipment='home_basic';_ovDraft.from='2026-12-08';_ovDraft.to='2026-12-10';applyOverlayDraft();");
+  assert.deepStrictEqual(P.toasts.filter((t) => /outside/.test(t)), ['That range is outside your program']);
+  assert.equal(stored(P)[0].overlays.length, 1, 'only the first trip is stored');
+  const monday = P.record();
+
+  // Another phone, race week (week 14, Monday 30 November): Monday trained, a trip Tuesday to Thursday. Ten days after
+  // the race the program holds on its last week, which is still the current one: its untouched days take the trip.
+  const Q = new Phone().launch(CREATED);
+  Q.generate(HALF);
+  Q.launch('2026-11-30T07:00:00');
+  trainDay(Q, 14, 'mon', 0);
+  Q.ev("_ovDraft.equipment='home_basic';_ovDraft.from='2026-12-01';_ovDraft.to='2026-12-03';applyOverlayDraft();");
+  Q.settle();
+  Q.launch('2026-12-16T09:00:00');
+  assert.equal(Q.record().live!.week, 14);
+  assert.deepStrictEqual(forms(Q, 14), ['gym', 'trip', 'rest', 'trip', 'rest', 'gym', 'gym'], 'Tuesday and Thursday are the trip\'s, Friday rests, the shakeout and the race are outside the trip');
+  golden['days proved by one store each, and a trip booked over them'] = { booked, sunday, monday, afterTheRace: Q.record() };
+});
+
+test('an older program with a dated pace test and no pinned week: the launch pins it once, a past test, a test past week 26 and an event switched off pin nothing, and a pinned week stands', () => {
+  // The 1.5 mile goal, made on Saturday 29 August with no date (11 weeks), then given a test date by hand as a
+  // release before the pin stored it: the date and the event in the config, no _testWeek and no capped length.
+  // Typed from the calendar: the first Monday is 24 August, the test (Saturday 10 October) is in the week of 5 October,
+  // 42 days on, the seventh week.
+  const older = (raceDate: string, on = true, pin?: number): Phone => {
+    const P = new Phone().launch(CREATED);
+    P.generate(PACE);
+    const progs = stored(P);
+    assert.deepStrictEqual([progs[0].totalWeeks, progs[0].startDate, progs[0].cfg._testWeek], [11, '2026-08-29', null]);
+    progs[0].cfg.raceDate = raceDate; progs[0].cfg.eventTargeted = on;
+    delete progs[0].cfg._testWeek; delete progs[0].cfg._raceDateCappedWeeks;
+    if (pin) { progs[0].cfg._testWeek = pin; progs[0].cfg._raceDateCappedWeeks = pin; }
+    P.damage('ia_programs', JSON.stringify(progs));
+    return P;
+  };
+  const pinOf = (P: Phone): unknown[] => { const c = stored(P)[0].cfg; return ['_testWeek' in c, c._testWeek, '_raceDateCappedWeeks' in c, c._raceDateCappedWeeks]; };
+
+  // The launch on Monday 31 August pins week 7 and stores it; the program in hand is the seven week build, and the
+  // stored program keeps the length it was made with.
+  const P = older('2026-10-10');
+  P.launch('2026-08-31T07:00:00');
+  assert.deepStrictEqual(pinOf(P), [true, 7, true, 7]);
+  assert.deepStrictEqual([P.prog.totalWeeks, stored(P)[0].totalWeeks], [7, 11]);
+  const pinned = { record: P.record(), inHand: inHand(P) };
+  const bytes = P.dump()['ia_programs'];
+  P.launch('2026-09-01T07:00:00');
+  assert.equal(P.dump()['ia_programs'], bytes, 'the pin is written once');
+  // Monday 19 October, the ninth week by the calendar: the current week is read against the stored length (11), not
+  // the rebuilt one (7), so weeks 7 and 8 are behind and keep their stored days.
+  P.launch('2026-10-19T07:00:00');
+  assert.equal(P.record().live!.week, 7, 'the screen holds on the last week of the seven');
+  const later = { record: P.record(), inHand: inHand(P) };
+
+  // First opened on Monday 12 October, two days after the test: nothing is pinned and nothing is written.
+  const past = older('2026-10-10');
+  const before = past.dump()['ia_programs'];
+  past.launch('2026-10-12T07:00:00');
+  assert.deepStrictEqual([pinOf(past), past.dump()['ia_programs'] === before], [[false, undefined, false, undefined], true]);
+
+  // A test on Saturday 10 April 2027 is past week 26 (which begins Monday 15 February): nothing is pinned.
+  const far = older('2027-04-10');
+  far.launch('2026-08-31T07:00:00');
+  assert.deepStrictEqual(pinOf(far), [false, undefined, false, undefined]);
+
+  // The same date with the event switched off: nothing is pinned.
+  const off = older('2026-10-10', false);
+  off.launch('2026-08-31T07:00:00');
+  assert.deepStrictEqual(pinOf(off), [false, undefined, false, undefined]);
+
+  // A program already pinned, to week 6 where its dates say 7: the launch leaves a pinned week alone.
+  const held = older('2026-10-10', true, 6);
+  held.launch('2026-08-31T07:00:00');
+  assert.deepStrictEqual(pinOf(held), [true, 6, true, 6]);
+
+  golden['an older program with a dated pace test'] = {
+    pinned, later, past: { record: past.record(), inHand: inHand(past) }, far: { record: far.record(), inHand: inHand(far) },
+    off: { record: off.record(), inHand: inHand(off) }, held: { record: held.record(), inHand: inHand(held) },
+  };
+});
+
+test('older and damaged programs, by hand: no config, no seed anywhere, a seed missing from the second program, no start date, old moves, a stored week missing days, a config the engine cannot build, and a renamed program', () => {
+  const recs: Record<string, unknown> = {};
+  const sameAsStored = (P: Phone): boolean => { const r = P.record(); return r.live!.digest === r.programs.find((p) => p.id === P.prog.id)!.digest; };
+  const edit = (P: Phone, fn: (progs: any[]) => void): void => { const progs = stored(P); fn(progs); P.damage('ia_programs', JSON.stringify(progs)); };
+
+  // No config (damage): the program is handed back as stored, and the launch goes on.
+  { const { P } = oneDayIn();
+    edit(P, (g) => { delete g[0].cfg; });
+    P.launch(at(START, 1));
+    assert.deepStrictEqual(['cfg' in P.prog, sameAsStored(P)], [false, true]);
+    recs['no config'] = { record: P.record(), inHand: inHand(P) }; }
+
+  // No seed on the program or in its config (a program from before seeds were kept): never rebuilt, never written.
+  { const { P } = oneDayIn();
+    edit(P, (g) => { delete g[0].seed; delete g[0].cfg.seed; });
+    const bytes = P.dump()['ia_programs'];
+    P.launch(at(START, 1));
+    assert.deepStrictEqual([P.dump()['ia_programs'] === bytes, sameAsStored(P), P.prog.seed], [true, true, undefined]);
+    recs['no seed anywhere'] = { record: P.record(), inHand: inHand(P) }; }
+
+  // Two programs, the second (the active one) with no seed in its config: the seed is written to that program's
+  // config, and the first program's is left alone. HALF_MANNY's seed is 76308, the 1.5 mile program's 24865.
+  { const { P } = oneDayIn();
+    P.launch(at(START, 1, '07:00'));
+    P.generate(PACE);
+    edit(P, (g) => { assert.deepStrictEqual([g[0].cfg.seed, g[1].seed], [76308, 24865]); delete g[1].cfg.seed; });
+    P.launch(at(START, 2));
+    assert.deepStrictEqual(stored(P).map((g) => g.cfg.seed), [76308, 24865]);
+    recs['a seed missing from the second program'] = { record: P.record(), inHand: inHand(P) }; }
+
+  // No seed on the program itself, its config's kept: the program in hand carries none, as stored.
+  { const { P } = oneDayIn();
+    edit(P, (g) => { delete g[0].seed; });
+    P.launch(at(START, 1));
+    assert.deepStrictEqual([inHand(P)!['seed'], P.prog.cfg.seed], [null, 76308]);
+    recs['no seed on the program'] = { record: P.record(), inHand: inHand(P) }; }
+
+  // No start date (a program from before start dates). Tuesday trained, a day with a paced run; then the mile time
+  // changed (10:30 to 9:30), so every paced run still ahead reads another pace. With no clock the freeze goes by what
+  // was touched alone: Tuesday comes back from its snapshot at the old pace, Friday is rebuilt at the new one.
+  { const P = new Phone().launch(CREATED);
+    const id = P.generate(HALF);
+    P.launch(at(START, 1));
+    trainDay(P, 1, 'tue', 0);
+    P.launch(at(START, 2, '07:00'));
+    const friBefore = JSON.stringify(P.day(1, 'fri'));
+    P.ev(`openMileSheet(${JSON.stringify(id)});`);
+    P.type('mileSheetMins', '9'); P.type('mileSheetSecs', '30');
+    P.ev('commitMileChange();');
+    P.clearFields();
+    assert.deepStrictEqual([stored(P)[0].cfg.cardioGoals.run.mileBestMins, stored(P)[0].cfg.cardioGoals.run.mileBestSecs], ['9', '30']);
+    edit(P, (g) => { delete g[0].startDate; delete g[0].blockOpen; });
+    P.launch(at(START, 3));
+    const tue = JSON.stringify(P.day(1, 'tue'));
+    assert.equal(tue, JSON.stringify(parsed(P, 'ia_hist_' + id).w1_tue), 'the trained day is its snapshot');
+    assert.notEqual(JSON.stringify(P.day(1, 'fri')), friBefore, 'the day not yet trained reads the new mile');
+    assert.notEqual(tue, JSON.stringify(P.ev(`buildProgram(getPrograms()[0].cfg).weeks[1].tue`)), 'and the snapshot is not what the engine builds today');
+    recs['no start date, and the mile changed'] = { record: P.record(), inHand: inHand(P) }; }
+
+  // Moves as older data holds them: one stored as a plain day name (Tuesday's session onto Wednesday, week 1), and
+  // one whose source is a rest day (Wednesday onto Sunday, week 2), which moves nothing.
+  { const P = new Phone().launch(CREATED);
+    const id = P.generate(HALF);
+    P.damage('ia_moves_' + id, JSON.stringify({ w1_wed: 'tue', w2_sun: { from: 'wed', ts: 1 } }));
+    P.launch(at(START, 0));
+    assert.deepStrictEqual([P.day(1, 'wed').movedFrom, P.day(1, 'tue').rest, P.day(1, 'tue').movedTo], ['tue', true, 'wed']);
+    assert.deepStrictEqual([P.day(2, 'sun').rest, 'movedFrom' in P.day(2, 'sun'), 'moved' in P.day(2, 'wed')], [true, false, false]);
+    recs['moves in their old form'] = P.record(); }
+
+  // A stored grid with days missing (an older build stored no entry for some days). Week 1 and week 2 each trained on
+  // Monday; the stored weeks then lose their Sundays, week 2 loses its Monday, and Monday's snapshot goes too. Opened
+  // on Tuesday of week 2: the week behind keeps the days it was stored with; the current week takes the rebuild's
+  // days as well, and its trained Monday, with no stored form and no snapshot, takes the rebuilt one.
+  { const { P, id } = oneDayIn();
+    P.launch(at(START, 7));
+    trainDay(P, 2, 'mon', 1);
+    edit(P, (g) => { delete g[0].weeks['1'].sun; delete g[0].weeks['2'].sun; delete g[0].weeks['2'].mon; });
+    const hist = parsed(P, 'ia_hist_' + id); delete hist.w2_mon; P.damage('ia_hist_' + id, JSON.stringify(hist));
+    P.launch(at(START, 8));
+    assert.deepStrictEqual(Object.keys(P.prog.weeks[1]).sort(), ['fri', 'mon', 'sat', 'thu', 'tue', 'wed']);
+    assert.deepStrictEqual(Object.keys(P.prog.weeks[2]).sort(), ['fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed']);
+    assert.deepStrictEqual([!!P.day(2, 'mon').rest, Array.isArray(P.day(2, 'mon').sections)], [false, true]);
+    recs['a stored grid with days missing'] = { record: P.record(), week1: Object.keys(P.prog.weeks[1]), week2: Object.keys(P.prog.weeks[2]) }; }
+
+  // A config the engine cannot build (damage: its sports are not a list), on the dated 1.5 mile program, whose test
+  // week is pinned so the launch goes straight to the rebuild. The screens cannot draw such a program, so the page's
+  // loader is called on its own, as Set Active calls it: the stored program is handed back as it is.
+  { const P = new Phone().launch(CREATED);
+    const id = P.generate({ ...PACE, raceDate: '2026-10-10', eventTargeted: true });
+    edit(P, (g) => { assert.equal(g[0].cfg._testWeek, 7); g[0].cfg.cardioTypes = 7; });
+    P.launch(at(START, 1), { init: false });
+    assert.equal(P.ev(`loadActiveProgram(${JSON.stringify(id)})`), true);
+    assert.deepStrictEqual([P.prog.cfg.cardioTypes, sameAsStored(P)], [7, true]);
+    recs['a config the engine cannot build'] = { record: P.record(), inHand: inHand(P) }; }
+
+  // Renamed, then opened the next day: the program in hand keeps its id, its new name, the instant it was made (the
+  // Saturday morning, not the launch) and its start.
+  { const { P, id } = oneDayIn();
+    P.type('renameInput_' + id, 'Half, the long way');
+    P.ev(`commitRename(${JSON.stringify(id)});`);
+    P.clearFields();
+    P.launch(at(START, 1));
+    const h = inHand(P)!;
+    assert.deepStrictEqual([h['id'], h['name'], h['created'], h['seed'], h['startDate']], [id, 'Half, the long way', new Date(2026, 7, 29, 9, 0, 0).getTime(), 76308, START]);
+    recs['a renamed program'] = { record: P.record(), inHand: h }; }
+
+  golden['older and damaged programs, by hand'] = recs;
+});
+
+test('the pace clock at launch: days hurt before the first Monday do not count, two injuries count a day once, a shoulder counts nothing, and a shift left in the stored config is cleared', () => {
+  // The 1.5 mile goal, made Saturday 29 August: its first Monday is 24 August, eleven weeks.
+  // A knee flagged from Monday 17 August (before the program) and an ankle from Friday 28 August, both still open on
+  // Wednesday 2 September. Counted from 24 August and once a day: 7 days hurt before week 2, 10 before every later
+  // week (the count stops at today), each a shift of one week.
+  const P = new Phone().launch(CREATED);
+  P.generate(PACE);
+  P.launch('2026-08-29T10:00:00');
+  P.ev("_ovDraft.injRegion='knee';_ovDraft.injTier='workaround';_ovDraft.from='2026-08-17';applyInjuryDraft();");
+  P.launch('2026-08-29T11:00:00');
+  P.ev("_ovDraft.injRegion='ankle';_ovDraft.injTier='workaround';_ovDraft.from='2026-08-28';applyInjuryDraft();");
+  assert.equal(stored(P)[0].overlays.length, 2);
+  P.launch('2026-09-02T08:00:00');
+  assert.deepStrictEqual(plain(P.prog.cfg._paceShift), [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  const twoInjuries = { record: P.record(), inHand: inHand(P) };
+
+  // A shoulder, from the first Monday on: its plan leaves running alone, so the clock runs.
+  const S = new Phone().launch(CREATED);
+  S.generate(PACE);
+  S.launch('2026-08-29T10:00:00');
+  S.ev("_ovDraft.injRegion='shoulder';_ovDraft.injTier='workaround';_ovDraft.from='2026-08-24';applyInjuryDraft();");
+  S.launch('2026-09-02T08:00:00');
+  assert.deepStrictEqual([stored(S)[0].overlays.length, '_paceShift' in S.prog.cfg], [1, false]);
+  const shoulder = { record: S.record(), inHand: inHand(S) };
+
+  // A knee from the first Monday, then the start date set again (which stores the program in hand, its shift with
+  // it), then the injury removed. The stored config still holds the shift; the next launch derives none and clears it.
+  const R = new Phone().launch(CREATED);
+  R.generate(PACE);
+  R.launch('2026-08-29T10:00:00');
+  R.ev("_ovDraft.injRegion='knee';_ovDraft.injTier='workaround';_ovDraft.from='2026-08-24';applyInjuryDraft();");
+  R.ev("setProgStart('2026-08-29');");
+  R.ev('removeOverlay(activeProg.overlays[0].id);');
+  assert.deepStrictEqual([stored(R)[0].overlays.length, Array.isArray(stored(R)[0].cfg._paceShift)], [0, true], 'no injury is stored, and the config still holds the shift');
+  R.launch('2026-08-30T08:00:00');
+  assert.equal('_paceShift' in R.prog.cfg, false);
+  golden['the pace clock at launch'] = { twoInjuries, shoulder, cleared: { record: R.record(), inHand: inHand(R) } };
+});
+
 afterAll(() => {
   // One file for the whole feature. A case that failed above left its entry out, and the comparison says so.
   matchSnapshot('stored-state', { zone: process.env['TZ'], created: CREATED, records: golden as Record<string, StateRecord> });
