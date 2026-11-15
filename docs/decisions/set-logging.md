@@ -4,7 +4,8 @@ What an exercise card logs and how it labels it: the set rows, the load field, t
 drawn by `buildExItem` (`frontends/app/src/legacy/src/js/set-logging.ts`) on the single-file page and by
 `exItemView` (`frontends/app/src/app/screens/day-detail/session-sections-model.ts`) in the iOS app; the pill's text
 after a log is rewritten in place by `day-detail.ts`. What a line logs is `parseRx` (`docs/decisions/supersets.md`,
-D253). Tests: `tests/integration/session-sheet.test.ts`, `frontends/app/test/unit/session-sections.test.ts`.
+D253). Tests: `tests/integration/session-sheet.test.ts`, `frontends/app/test/unit/session-sections.test.ts`, and
+for what Log stores, `tests/integration/set-logging.test.ts`.
 
 ## D257: P-KBUNIT, a kettlebell weighs in the program's unit (v0.249.0)
 
@@ -28,7 +29,7 @@ D253). Tests: `tests/integration/session-sheet.test.ts`, `frontends/app/test/uni
 
 - **Date:** found, measured and ruled 2026-11-14. **Ruled by:** the main session (a defect: no doctrine is in play,
   a move's entry holds that move's sets), built on Mario's word when it was put to him as a task of its own ("Do
-  this task here"). **Bump:** to be asked before the edit. **Shipped:** not yet.
+  this task here"). **Bump:** PATCH, v0.262.3 (Mario, asked before the edit). **Shipped:** v0.262.3.
 - **How it was found:** not reported. The React Native migration's measure of the swipe deck's logging
   (`tests/measure/native-deck-logging_writes.md`, section C) read how `saveExWeight` finds a move's rows, and counted
   the days where that reaches further than the move.
@@ -66,3 +67,16 @@ D253). Tests: `tests/integration/session-sheet.test.ts`, `frontends/app/test/uni
 - **Expected values (typed by hand):** on that day, with 8, 8, 7 in Split squat's rows and 31, 32 in the hold's, Log
   on Split squat stores `setsDone [8,8,7]`; Log on the hold stores `[31,32]`; Split squat's card then reads
   "8 / 8 / 7".
+- **As built (v0.262.3):** two lines of `saveExWeight` (`frontends/app/src/legacy/src/js/day-detail.ts`): `setsDone`
+  is `setRepVals(exKey)`, and the "Nothing to log here" guard reads its length. `set-logging.ts` exports
+  `setRepVals` to it. Nothing else moved.
+- **Tests:** `tests/integration/set-logging.test.ts` (new, 5 tests, inside the 60-second check). Changed behaviour,
+  two tests: each of the four pairs with typed numbers in both moves' rows, Log on the shorter key stores its own
+  sets, then the longer key's Log stores its own and leaves the first alone; and a set changed after Log
+  (`commitSetsLive`) rewrites the entry as `[9,8,7]`. Guards that pass on both releases on purpose, three tests: a
+  blank row logs its placeholder and 0 where the placeholder is no number (`[10,7,0]`); a move with a load and no
+  rows logs 135 with no sets; a move with neither says "Nothing to log here" and stores nothing.
+- **Proof:** on the previous release (`IA_APP` on v0.262.2's page) the two changed tests fail, the first on "Split
+  squat beside Split-squat heel-raise hold: its own 3 sets", and the three guards pass. The page's diff is three
+  hunks: the version meta, the rows read, and the guard's count. `tests/snapshots/` has no diff: every golden record
+  of stored state and every program output is identical, the sweeps included.

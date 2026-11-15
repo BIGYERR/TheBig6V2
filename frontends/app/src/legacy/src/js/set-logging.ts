@@ -684,4 +684,6 @@ function buildCardioHTML(cardio: any){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { buildCardioHTML, buildExItem, exControlFlags, exLoggable, refreshSetSummary, setWeightVals, toStoreW };
+export {
+  buildCardioHTML, buildExItem, exControlFlags, exLoggable, refreshSetSummary, setRepVals, setWeightVals, toStoreW,
+};
