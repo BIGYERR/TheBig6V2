@@ -160,3 +160,14 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   the tip is drawn only on a rest day that is today (`week-view-model.ts`, `if (s.today) tip = d.restTip()`, since
   v0.258.0, D276). So it is the rule and not a change of 0.262.2; whether a past rest day should carry a tip is his
   to rule, and nothing was changed.
+- **Seen on `main`, the fifth run, the beta's lane alone** (run 43662580379, merge 0c0d496, pull request 42,
+  2026-11-14 20:20 EST; the merge carried no version: 6bfa503, the Expo screen's seam reading the lifted launch, and
+  9995acd, a tests-only pass): the two gates went together (11 s and 13 s). Today's lane skipped its upload and its
+  processed job, as the rule has it: App Store Connect already holds `0.262.2`, and a version goes up once. The beta's
+  lane archived, signed and uploaded `0.262.2 (105)` (739 s, done 20:33:23) and read it back as processed (101 s, done
+  20:35:06). The build number moved from 104 to 105 because one commit of the merge changed its inputs: 6bfa503
+  (`frontends/native`, the seam). 9995acd changed neither `frontends/native`, `core` nor `tests/semver.js`, and did
+  not count. The legs read `testflight 0.262.2 processed (uploaded before this run; a version goes up once, a fix is
+  the next PATCH)` and `testflight next 0.262.2 (105) processed`. The run ended green, every job passed or skipped by
+  rule. This is the first run where one lane went up and the other held, which is D288's point: neither waits on the
+  other, and a merge that moves only the beta leaves today's app as it was.

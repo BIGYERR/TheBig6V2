@@ -587,3 +587,29 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
      under the title, its blurb and the lift's summary. Swipe to one other week and do two days there.
   6. Back in IA Next, Bugs: it still reads "Holds 36 keys." Nothing was written.
   7. Send "same", or a screenshot of each app for anything that differs.
+- **On Mario's phone, IA Next build 105 beside today's app** (his two screenshots and "looks the same to me!",
+  2026-11-14 20:50; run 43662580379 on `main`, `docs/decisions/testflight.md`): THE HALF MANNY, Week 12, 22 days out,
+  Race day Sun, Dec 6, Recovery Week with its arrow; the strip 8, a cross, a check, 11 and three checks over REST,
+  SPEED, RECOV, REST, LEGS, RECOV, LONG, Saturday ringed; Today · Saturday, Skipped, Long Run, Cutback · 60 min ·
+  10:30/mi, "The long run steps back on purpose. Average no faster than 9:58/mi.", Record run sunk; Then lift, Full
+  Body Support, Pushups (slow tempo) + 1 more, closed out with Reopen; This week. Every word and number is today's.
+  Each element sits 2 to 8 pixels of 2000 higher than today's (the title 969 against 977), the native text's own
+  metrics. The tab bar holds two tabs against today's four, and today's rest clock pill at the right edge is not the
+  beta's yet: both as built.
+  - **One mark differed: the dumbbell beside Then lift was broken in IA Next and whole in today's app.** Both apps
+    break it by one rule, a skipped lift (D284). Proved on his data, the copy of his backup in the simulator's store:
+    `ia_parts` holds `w12_fri: { lift: 1 }` and `w12_sat: { run: 1 }`, so Friday's lift is skipped and Saturday's is
+    not. Step 5 has him tap each day; after Friday, Saturday's dumbbell stayed broken. On the simulator (iPhone 17
+    Pro, iOS 26.5, `npm run sim-ios`, the Release build under Hermes): the launch draws Saturday's dumbbell whole;
+    a tap on Friday breaks it, as it should; a tap back on Saturday leaves it broken, his screenshot exactly.
+  - **Root cause:** `marks.tsx` handed each half `transform={broken ? '…' : undefined}`. The lift card is one view
+    kept across the days (its key is its kind), and react-native-svg 15.16.0 leaves a group as it last stood when its
+    transform is taken away. The model was right throughout: `skip.on` is false for Saturday's lift, and the card was
+    neither dimmed nor marked Skipped. The dumbbell is the only mark in the app that is handed a transform.
+  - **Fix (Post-v0.262.2, no build of today's app, no new D-code: D284's mark drawn as D284 rules it):** a whole half
+    is handed `translate(0 0) rotate(0 12 12)`, never none. Seen on the simulator with `npm run sim-ios:fast`: the
+    same three taps, Saturday's dumbbell whole after Friday's broken one. The store held its 36 keys afterwards,
+    `ia_parts` as the file's. **Test:** `tests/unit/native-this-week.test.ts`, "a mark that turns is handed a
+    transform in each case, never none": red on the commit before (1 failed of 47, naming the expression), green
+    here. It reads the source, since no test here draws a native view; the simulator is what saw the mark.
+  - **Not seen yet:** the fix on his phone. The next IA Next build carries it (a build number above 105).

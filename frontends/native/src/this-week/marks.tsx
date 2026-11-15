@@ -35,12 +35,20 @@ export function Cross({ color, size = 11 }: Mark) {
   return <Svg width={size} height={size} viewBox="0 0 12 12" fill="none" stroke={color} strokeWidth={2.2} strokeLinecap="round"><Path d="M2.5 2.5l7 7M9.5 2.5l-7 7" /></Svg>;
 }
 
-/** The lift card's dumbbell, in two halves; broken on a skipped lift, each half drooping at the break (D284). */
+/** A half of the dumbbell as it sits when the lift is on: moved nowhere, turned by nothing. */
+const WHOLE = 'translate(0 0) rotate(0 12 12)';
+
+/**
+ * The lift card's dumbbell, in two halves; broken on a skipped lift, each half drooping at the break (D284). A whole
+ * half is handed WHOLE, never no transform at all: the lift card is one view kept across the days (its key is its
+ * kind), and react-native-svg leaves a group as it last stood when its transform is taken away, so the dumbbell of a
+ * day whose lift is on stayed broken after a day whose lift was skipped (Mario's phone, IA Next build 105).
+ */
 export function Dumbbell({ color, size = 18, broken = false }: Mark & { broken?: boolean }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" {...STROKE} stroke={color} strokeWidth={2} style={{ overflow: 'visible' }}>
-      <G transform={broken ? 'translate(-2 1.2) rotate(22 6 12)' : undefined}><Path d="M3 10v4M6 8v8M9 10v4M9 12h3" /></G>
-      <G transform={broken ? 'translate(2 1.2) rotate(-22 18 12)' : undefined}><Path d="M15 10v4M18 8v8M21 10v4M15 12h-3" /></G>
+      <G transform={broken ? 'translate(-2 1.2) rotate(22 6 12)' : WHOLE}><Path d="M3 10v4M6 8v8M9 10v4M9 12h3" /></G>
+      <G transform={broken ? 'translate(2 1.2) rotate(-22 18 12)' : WHOLE}><Path d="M15 10v4M18 8v8M21 10v4M15 12h-3" /></G>
     </Svg>
   );
 }

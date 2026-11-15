@@ -96,6 +96,21 @@ describe('native This Week: read only, and drawn with Expo SDK 58\'s own package
       assert.ok(screen.includes(words), 'ThisWeek.tsx carries ' + words);
     }
   });
+
+  // Mario's phone, IA Next build 105: after Friday (its lift skipped, the dumbbell broken, D284) Saturday's dumbbell
+  // stayed broken, its lift on. The lift card is one view kept across the days, and react-native-svg leaves a group
+  // as it last stood when its transform is taken away. So a mark states its transform in both cases.
+  test('a mark that turns is handed a transform in each case, never none: a kept view stands as it last stood', () => {
+    const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+    const drawn = files.filter((f) => f.endsWith('.tsx')).map((f) => strip(readFileSync(join(dir, f), 'utf8'))).join('\n');
+    const given = [...drawn.matchAll(/\btransform=\{([^}]*)\}/g)].map((m) => m[1]!);
+    assert.ok(given.length >= 2, 'the dumbbell\'s two halves each carry a transform: ' + given.length + ' found');
+    for (const g of given) assert.doesNotMatch(g, /\bundefined\b|\bnull\b/, 'a transform that falls to none: ' + g);
+    const marks = strip(readFileSync(join(dir, 'marks.tsx'), 'utf8'));
+    assert.match(marks, /<G transform=\{broken \? 'translate\(-2 1\.2\) rotate\(22 6 12\)' : WHOLE\}>/, 'the left half: D284\'s droop when broken, WHOLE when on');
+    assert.match(marks, /<G transform=\{broken \? 'translate\(2 1\.2\) rotate\(-22 18 12\)' : WHOLE\}>/, 'the right half');
+    assert.match(marks, /const WHOLE = 'translate\(0 0\) rotate\(0 12 12\)';/, 'WHOLE moves a half nowhere and turns it by nothing');
+  });
 });
 
 // The tables for a program day's date, the week a date falls in and the weeks an overlay covers were typed for the
