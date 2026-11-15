@@ -17,6 +17,7 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Bag, Calendar, Check, CoreIcon, Cross, Die, Dumbbell, Fade, Flag, Glow, Play, RecDot, Runner, WildcardMark } from './marks';
+import { type DeckProgram, type DeckView, deckView } from '../deck/deck-screen';
 import { BLANK, PLAN_CHANGE_FAILED, drawWeek, launch, launchTitle, pillArrow, pillParts, tokenOf } from './week-screen';
 import { type StripClock, type StripEl, StripPlacer } from './week-strip';
 import { type Column, type DayCard, type DaysView, TITLE_W, type WeekView } from './week-view-model';
@@ -37,7 +38,7 @@ const TAB_ROOM = 96;
 
 type Tint = keyof Pick<Palette, 'run' | 'bike' | 'swim' | 'lift' | 'signal' | 'dim'>;
 
-export function ThisWeek({ palette: p, store, tick }: { palette: Palette; store: StateStore; tick: number }) {
+export function ThisWeek({ palette: p, store, tick, onDeck }: { palette: Palette; store: StateStore; tick: number; onDeck: (deck: DeckView) => void }) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -147,6 +148,14 @@ export function ThisWeek({ palette: p, store, tick }: { palette: Palette; store:
   const [headH, setHeadH] = useState(0);
   const [stripH, setStripH] = useState(0);
   const pill = pillParts(view.pill.html);
+  // Start lift, Start session: the day opened as a deck, or nothing where today's app opens the day sheet instead (a
+  // day whose only card is its cool down), which this app does not draw yet.
+  const startDeck = (week: number, key: string): void => {
+    if (!prog) return;
+    const deck = deckView(store, prog as unknown as DeckProgram, week, key, Date.now());
+    if (deck) onDeck(deck);
+  };
+
   const pillInk = view.pill.cls.includes('recovery');
   const pillWords = pillArrow(pill.text);
   const s = styles;
@@ -223,7 +232,7 @@ export function ThisWeek({ palette: p, store, tick }: { palette: Palette; store:
         )}
 
         <View style={s.days}>
-          {view.days && <Days d={view.days} p={p} onPick={pickDay} />}
+          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} />}
         </View>
 
         <View style={s.settings}>
@@ -241,7 +250,7 @@ export function ThisWeek({ palette: p, store, tick }: { palette: Palette; store:
   );
 }
 
-function Days({ d, p, onPick }: { d: DaysView; p: Palette; onPick: (col: number) => void }) {
+function Days({ d, p, onPick, onStart }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string) => void }) {
   const s = styles;
   const first = d.cards[0];
   return (
@@ -249,7 +258,7 @@ function Days({ d, p, onPick }: { d: DaysView; p: Palette; onPick: (col: number)
       <View testID="week-days" accessibilityLabel="Pick a day" style={[s.week, { backgroundColor: p.surface }]}>
         {d.strip.map((c, i) => <Col key={i} c={c} i={i} p={p} onPick={onPick} />)}
       </View>
-      {d.cards.map((k) => <Card key={k.kind} k={k} p={p} />)}
+      {d.cards.map((k) => <Card key={k.kind} k={k} p={p} onStart={onStart} />)}
       {d.rest && (
         <View testID="week-card-rest" style={[s.card, s.cardFirst, { backgroundColor: p.surface }]}>
           <View style={s.head}><Text numberOfLines={1} style={[s.label, { color: p.muted }]}>{d.rest.when}</Text></View>
@@ -328,11 +337,12 @@ function Col({ c, i, p, onPick }: { c: Column; i: number; p: Palette; onPick: (c
   );
 }
 
-function Card({ k, p }: { k: DayCard; p: Palette }) {
+function Card({ k, p, onStart }: { k: DayCard; p: Palette; onStart: (week: number, key: string) => void }) {
   const s = styles;
   const off = !!(k.skip && k.skip.on);
   const bt = k.button;
   const btColor = bt ? (bt.sunk ? p.muted : bt.glow ? p.onSignal : p.text) : p.text;
+  const starts = !!bt && bt.act === 'deck' && !bt.sunk;
   return (
     <View testID={'week-card-' + k.kind} style={[s.card, k.first ? s.cardFirst : s.cardSecond, { backgroundColor: off ? p.cardOff : p.surface }]}>
       {k.skip && (
@@ -366,10 +376,13 @@ function Card({ k, p }: { k: DayCard; p: Palette }) {
           </View>
         )}
         {bt && (
-          <View
+          <Pressable
             testID={'week-button-' + k.kind}
             accessibilityRole="button"
-            accessibilityState={{ disabled: true }}
+            // Start lift and Start session open the deck (D275, cardRoute); Record run and the hand log are not built yet.
+            disabled={!starts}
+            onPress={() => onStart(k.week, k.key)}
+            accessibilityState={{ disabled: !starts }}
             style={[
               s.btn, { borderColor: p.border2 },
               bt.glow && [s.btnGlow, { backgroundColor: p.signal, boxShadow: '0 10px 28px rgba(' + p.signalRgb + ',0.35)' }],
@@ -378,7 +391,7 @@ function Card({ k, p }: { k: DayCard; p: Palette }) {
           >
             {bt.act === 'record' ? <RecDot color={btColor} /> : bt.act === 'deck' ? <Play color={btColor} /> : null}
             <Text style={[bt.glow ? s.btnGlowText : s.btnText, { color: btColor }]}>{bt.text}</Text>
-          </View>
+          </Pressable>
         )}
       </View>
     </View>

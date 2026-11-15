@@ -1,6 +1,6 @@
 # frontends/native: Iron Asylum in React Native
 
-The Expo app the React Native migration builds (`MIGRATION.md`, phase 2), beside today's app in `frontends/app/`,
+The Expo app the React Native migration builds (`MIGRATION.md`, phases 2 and 3), beside today's app in `frontends/app/`,
 which it does not touch. Its bundle id is **com.bigyerr.ironasylum.next**, so it installs next to today's app
 (`com.bigyerr.ironasylum`) and never replaces it before cutover. `tests/unit/native-shell.test.ts` holds that.
 
@@ -14,8 +14,20 @@ joins them over core's store; `ThisWeek.tsx` and `marks.tsx` draw it. **Its grid
 `liveProgram`): core's `refreshStoredProgram`, called as today's page calls it, so the screen draws the program
 today's app draws. The launch is handed a store that drops writes (`store/read-only-store.ts`), because this app's
 copy of the stored state is a backup loaded read only (D287). One launch when the screen mounts and one on each
-return to its tab, about 55 ms under Hermes on the simulator. A tap on a week title or a day works; every other
-control is drawn and does nothing yet.
+return to its tab, about 55 ms under Hermes on the simulator. A tap on a week title or a day works, and Start lift
+and Start session open the swipe deck; every other control is drawn and does nothing yet.
+
+**The swipe deck** (phase 3, its first screen, `src/deck/`; D275 and D283 carried over, `docs/decisions/swipe-deck.md`),
+read only: a day's lift work as today's deck of cards, opened from This Week over the tab bar. `deck-model.ts` and
+`src/day-detail/session-sections-model.ts` (the session sheet's card model, which the deck's model stands on) are
+copies of the Angular app's own files, held equal to the byte by `tests/unit/native-deck.test.ts`: copy them again
+with `cp` when today's change, never edit them here. `deck-readers.ts` is the legacy page's readers the cards need,
+line for line; `deck-screen.ts` joins them over core's store and the launch's grid; `Deck.tsx` draws it.
+`tests/integration/native-deck.test.ts` holds every card equal to today's over whole histories. The swipe, the
+dots, the session map, the RPE bubble and a move's sets opening in place work. Everything that writes (Log, the
+steppers, skip, swap, Done, next one, Mark the day done) is drawn and does nothing until the session that builds
+logging, when the app starts writing to its own copy (D289, `docs/decisions/data-backup.md`). The opening out of
+the card, the done motion, the punch and the up and down pager come with that session.
 
 **Bugs**, with two rows and a line saying whether its Swift module answered: the engine check (D286, `docs/decisions/engine-check.md`), core's
 `core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes, which reads and writes

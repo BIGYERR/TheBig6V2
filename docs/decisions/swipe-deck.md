@@ -336,3 +336,94 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   an iPhone 17 Pro (402 pt wide, Roomy) and an iPhone SE third generation (375 pt, Tight), the page printing each card's
   need: his size 582 of 624 at the tightest (the Leg circuit with a swap), 42 to spare; the SE 474 of 479, 5 to spare;
   every other card 510 or less and 447 or less. WebKit lays the cards out within a few points of Chrome.
+
+## D275 and D283 in the Expo app: the deck's cards, read only (Post-v0.262.2, the migration's phase 3, its first session)
+
+- **Date:** 2026-11-14. **Ruled by:** no new ruling. The deck's cards, words and order are D275's and D283's (with
+  D281), carried unchanged into the Expo app, so they keep their D-codes (CLAUDE.md, Proof for new work). The cut is
+  Mario's brief ("the deck drawn in the Expo app from the launch's grid, opened from This Week's Start lift, read
+  only, with set logging and Call it next session"), confirmed against the measure. **Bump:** none, the page and
+  core do not move (a Post-v0.262.2 pass, standing ruling 1). **Shipped:** Post-v0.262.2, no build of today's app;
+  the beta's next build carries it once Mario merges it.
+- **The finding (measured before any edit, `tests/measure/native-deck_reads.md` and `native-deck_days.md`):** today's
+  deck makes 83 reaches to 62 legacy names. Behind the cards stand 26 page readers (37 declarations, 212 lines):
+  the prescription parser, the set summary's words, the recency and stale-load words, and one-line wrappers over
+  core's own store readers. None writes. Set logging is 9 names, Call it 6, the edits 7; every one of those writes
+  ends in a writer core already holds. Over the standard histories (10 programs, 50 launches, 2,755 training days)
+  Start opens the deck on 2,628 days, the day sheet on 95 (the cool down is the only card), and 32 days have no card.
+  The histories hold no set draft and no load from another program, so the proof builds both.
+- **What changes (the Expo app only):**
+  1. **The models are today's files.** `frontends/native/src/deck/deck-model.ts` and
+     `frontends/native/src/day-detail/session-sections-model.ts` are copies of the Angular app's, at the same two
+     paths under `src/` so the import between them is today's, each held equal to the byte by a test. The deck's model
+     stands on the session sheet's card model, so both come; the session sheet itself is not built.
+  2. **The readers** (`deck/deck-readers.ts`): the page's own functions, line for line, with the page's globals (the
+     program's id, the week and day in hand, the unit, the store, the clock) as arguments.
+  3. **The seam** (`deck/deck-screen.ts`): `deckReads`, `dayCards` and `deckView` feed the two models from core's
+     store readers and the launch's grid, as `deck.ts` `build()` and `open()` feed them through the bridge. The
+     once-per-open stale warning, two globals on the page, is held new for each draw. The lift log is folded on a
+     copy as it is read (below).
+  4. **The screen** (`deck/Deck.tsx`), opened from This Week's Start lift and Start session, over the tab bar: the
+     card with its numeral, title, meta line, cue and swapped-in line; each move with its name, set summary and RPE,
+     cue, chips, load box, reuse pill and stale warning; the fan of three behind; a sideways swipe with the next card
+     rising drawn in full (call 3: 80 to commit, 140 to full, 290 ms back); the dots; the big button's words; the
+     session map; the RPE bubble (call 7); a move's sets opening in place while the others fold, the pips past four
+     sets (D283, board P); Call it's effort, word and notes. Roomy at 700 points tall or more, Tight below (D283).
+  5. **Read only (D287, until the session D289 names).** Drawn with today's words and taking no press: Log, the
+     steppers and fields, the reuse pills, skip, Skip all, swap, put it back, remove, the effort slider and the
+     notes. The big button moves on where moving on is all it does (Next one, on a card already logged or skipped)
+     and closes on Day done; Done, next one and Mark the day done wait for logging.
+- **What deliberately does not change:** today's app, its page, core, program output and every golden record of
+  stored state. The 95 days whose only card is the cool down open nothing here yet: today's app opens the day sheet
+  there. A done lift's Reopen is the day sheet's too.
+- **Not built yet, with the session that builds logging:** set logging, Call it, skip and its undo, swap; the
+  opening out of the card (call 16, Lift first at 420 ms), the done motion (call 10), the punch (call 5) and the up
+  and down pager (call 1). The deck opens and closes at once, as today's does under Reduce Motion. The deck's ledger
+  rows (MIGRATION.md 3.1) are filled when the screen is whole.
+- **Found on the way:**
+  - Today's page folds the active program's lift log into today's keys as it launches, and stores it
+    (`bug-report-init.ts`, `foldExAliasKeys`). That is a launch write outside `refreshStoredProgram`, so the Expo
+    seam's launch does not make it. The deck folds a copy as it reads, so a backup holding an old key draws the same
+    cards; the store keeps the old key. When the beta writes (D289), its launch makes this write too.
+  - The build number of IA Next moves on a commit under `frontends/native`, so this pass makes the next build.
+- **Expected values:** today's deck, on purpose, as This Week's proof takes today's screen: the Expo app's cards
+  equal to today's, whole, on every training day of every week of every launch. Beside that, typed by hand
+  (`tests/unit/native-deck.test.ts`): the prescription parser's shapes (`3×12` is three sets of 12; `2×8–12 each` is
+  two of 10 a side; `2×45 sec each`; `3 sets of 8 to 10` is 9; `10/8/6` a ladder; `4×max` open), the summary's
+  words (`3 × 12`, `12 / 11 / 9`, `as prescribed`, `logged`, `not logged`, `nothing logged`), 135 lb as 61 kg and 45
+  lb as 20.5 kg, the recency words by age and the 21 day line, the newest load across other programs, a swap's
+  origin by day, a card's colours (terracotta `rgb(141,80,50)` by day), and a day opened as a deck from a store
+  typed by hand.
+- **Proof:**
+  - `tests/integration/native-deck.test.ts` (4 tests, inside the 60-second check): HALF_MANNY through the standard
+    history, 350 training days over five launches, 308 decks and 34 cool down only days, 1,110 cards, 4,148 set rows,
+    136 reuse pills (25 stale, the warning 21 times), 22 cards logged, 4 skipped, 4 swapped in, 4 moves added: each
+    day's cards and deck equal to today's. Then the built cases: a set draft, a day done with its effort and notes,
+    loads thirty days old, a second program in kilograms reusing the first one's loads, and a lift log holding an
+    old key. The store holds the phone's keys, to the byte, after every draw.
+  - `tests/sweeps/native-deck.test.ts` (CI): the ten seeded programs, 50 launches, 2,755 training days.
+  - `tests/unit/native-deck.test.ts` (29 tests): the two copies byte for byte; the hand-typed tables above; no file
+    of the deck writes a key or calls one of core's writers; every press on the screen is one of eleven that move
+    through the deck or open something to read.
+  - **Each new file is red on the commit before by construction:** none of the three can load there
+    (`git cat-file -e HEAD~:frontends/native/src/deck/deck-screen.ts` fails; the module is new).
+  - **The break check** (ten breaks of the readers and the seam, one at a time, the unit and integration files run
+    on each): ten red, none let through. The lift log read without its fold; a load shown in pounds whatever the
+    unit; another program's loads never read; a set draft never read; a load stale a week later; the warning
+    speaking on every move; a swap's origin read off another day; the day's effort never read; the deck always
+    opening on its first card; a cool down alone opening a deck. The pounds break first turned only the unit file
+    red: no history logged a lift in kilograms, so the built case now logs one (60 and 62.5 kg), and both files
+    turn red on it.
+  - **Where the Expo app's packages are not installed** (`node tools/tree-at.mjs --working`, the tests' packages
+    alone, as CI's tests job has them): the three files pass (80 tests with This Week's unit file) and `tsc -p .` is
+    clean.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios:fast`, the Release build under Hermes, a copy
+  of Mario's backup of 2026-11-14 in the app's store): Week 13, Monday, Start lift opens **Posterior Chain**, card
+  01/02 **Trap bar deadlift**, "2 to 3 min rest between sets", "Taper. Volume and load pulled back so you arrive
+  fresh.", **3 × 12 · RPE 5 to 6**; a tap on the summary opens three rows of 12 with their load cells and "Every
+  set"; the info mark opens **RPE 6**, "About four reps left in the tank. Stop the set there.", Moderate lit; a
+  swipe goes to **Call it**, 7, "working, three left". Thursday's Start session opens **Leg Strength + Mobility**:
+  **Front squat** with the reuse pill "135 lbs · 2 months…" dashed and "That 135 lbs is about 2 months old. Still
+  where you are?"; the plum **Foot & ankle** card, "Straight through · 60 to 90 sec rest", two moves; the session map
+  with its three tiles. Back closes to This Week as it was. Afterwards the store held its 36 keys.
+- **Not seen yet:** Mario's phone, and today's deck beside it on the same day.

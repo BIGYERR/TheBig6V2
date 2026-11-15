@@ -189,9 +189,13 @@ describe('native shell: the engine check is core\'s, as it is', () => {
     const check = readFileSync(join(NATIVE, 'src', 'EngineCheck.tsx'), 'utf8');
     assert.match(check, /performance\.now\(\)/);
     assert.doesNotMatch(check, /Date\.now\(\)/);
-    // The app reads the date in one place, and not to time anything: the instant This Week's launch is handed, which
-    // says what day it is (core's refreshStoredProgram, as today's page hands it Date.now()).
-    assert.deepStrictEqual(all.match(/[^\n]*Date\.now\(\)[^\n]*/g), ['  const launched = useMemo(() => launch(store, Date.now()), [store, tick]);']);
+    // The app reads the date in two places, and in neither to time anything: the instant This Week's launch is
+    // handed, which says what day it is (core's refreshStoredProgram, as today's page hands it Date.now()), and the
+    // instant a deck is opened, which says how old a logged load is (the page's recencyBucket reads the same clock).
+    assert.deepStrictEqual(all.match(/[^\n]*Date\.now\(\)[^\n]*/g), [
+      '  const launched = useMemo(() => launch(store, Date.now()), [store, tick]);',
+      '    const deck = deckView(store, prog as unknown as DeckProgram, week, key, Date.now());',
+    ]);
   });
 });
 
