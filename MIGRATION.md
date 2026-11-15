@@ -140,7 +140,18 @@ Each phase starts only on Mario's GO, one phase step per session.
   (`marks.tsx`, a whole half is handed an identity transform) and tested (`docs/decisions/this-week.md`, its last
   entry). He closed the gate on that fix and gave the GO for phase 3 the same evening. The fix reaches his phone in
   the next IA Next build.
-- **Next:** phase 3, the remaining screens, the swipe deck first. Still not
+- **Done, phase 3's first session, the swipe deck read only (Post-v0.262.2, no build):** the deck's cards drawn in
+  the Expo app from the launch's grid and the stored state, opened from This Week's Start lift and Start session
+  (`frontends/native/src/deck/`; D275 and D283 carried over, `docs/decisions/swipe-deck.md`, its last entry). The
+  deck's model and the session sheet's card model are today's own files, copied and held equal; 26 page readers
+  behind the cards are ported line for line (`tests/measure/native-deck_reads.md`). Every card is held equal to
+  today's on every training day of every launch of the histories (`tests/support/native-deck.ts`): 350 days for
+  HALF_MANNY inside the 60-second check, 2,755 across the ten programs in CI. Nothing writes. Found on the way: the
+  page's launch folds the lift log's old keys and stores it, a launch write outside `refreshStoredProgram`; the
+  deck folds a copy as it reads, and the beta's launch makes that write when it writes (D289).
+- **Next:** the deck's second session: set logging, Call it, skip and swap, with the beta writing to its own copy
+  (D289), the deck's motions (the opening out of the card, the done motion, the punch, the up and down pager) and
+  its ledger rows. Then the session sheet. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,

@@ -1,0 +1,299 @@
+// The swipe deck in the Expo app (MIGRATION.md phase 3, the first screen): the deck's pure logic in
+// frontends/native/src/deck. Every expected value here is typed by hand: from the prescriptions the engine writes
+// ("3×12", "2×8–12 each @ RPE 7", "2×45 sec each"), from the rulings the page's readers carry (the set summary's
+// words, the reuse pill's recency words, the 21 day line for a stale load), from arithmetic (a pound is 0.453592 kg,
+// shown to the half), or from the deck's own rulings (D275, D283, docs/decisions/swipe-deck.md). None is asked of the
+// app: the comparison with today's deck is tests/integration/native-deck.test.ts.
+process.env['TZ'] = 'America/New_York';
+import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, test } from 'vitest';
+import { memoryStore } from '@ia/core/engine/state-store.ts';
+import type { StateStore } from '@ia/core/engine/state-store.ts';
+import { REPO } from '../support/app.ts';
+import {
+  STALE_LOAD_DAYS, crossProgLastEntry, exControlFlags, isKBExercise, isStaleTs, parseRx, recencyLabel, rxSuffix, setsSubLabel, setsSummary,
+  setsVaried, stripLeadingSets, swapOriginOf, toDispW,
+} from '../../frontends/native/src/deck/deck-readers.ts';
+import { type DeckProgram, dayCards, deckView, shaded, toneColor } from '../../frontends/native/src/deck/deck-screen.ts';
+
+const DAY = 86400000;
+const NOW = new Date(2026, 10, 14, 12, 0, 0).getTime();
+const filled = (keys: Record<string, unknown>): StateStore => { const s = memoryStore(); for (const [k, v] of Object.entries(keys)) s.set(k, typeof v === 'string' ? v : JSON.stringify(v)); return s; };
+const held = (s: StateStore): Record<string, string> => Object.fromEntries(s.keys().sort().map((k) => [k, s.get(k)!]));
+
+describe('native deck: the two models are today\'s files', () => {
+  // The Expo app draws from copies of the Angular deck's model and of the session sheet's card model, which the deck's
+  // model stands on. A copy can drift, so each is held equal to the byte: a change to today's turns this red until
+  // the copy is made again. The copies sit at the same two paths under src/, so the import between them is today's.
+  for (const [f, from, to] of [
+    ['deck-model.ts', 'frontends/app/src/app/screens/deck', 'frontends/native/src/deck'],
+    ['session-sections-model.ts', 'frontends/app/src/app/screens/day-detail', 'frontends/native/src/day-detail'],
+  ] as const) {
+    test(f + ' in frontends/native is frontends/app\'s, byte for byte', () => {
+      const today = readFileSync(join(REPO, from, f));
+      const copy = readFileSync(join(REPO, to, f));
+      assert.ok(today.length > 10000);
+      assert.ok(copy.equals(today), f + ' differs from today\'s: copy it again (cp), never edit the copy');
+    });
+  }
+  test('the deck\'s model reaches the card model by the path the copies keep', () => {
+    assert.ok(readFileSync(join(REPO, 'frontends/native/src/deck/deck-model.ts'), 'utf8').includes("from '../day-detail/session-sections-model.ts';"));
+  });
+});
+
+describe('native deck: the prescription, as the page\'s parseRx reads it', () => {
+  test('sets of reps, a range read at its middle, each side, seconds to the five, yards', () => {
+    assert.deepStrictEqual(parseRx('3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest', 'Barbell Romanian deadlift'),
+      { sets: 3, kind: 'reps', unit: '', step: 1, target: 12, perSide: false });
+    assert.deepStrictEqual(parseRx('2×8–12 each @ RPE 7', 'Dumbbell Bulgarian split squat'), { sets: 2, kind: 'reps', unit: '', step: 1, target: 10, perSide: true });
+    assert.deepStrictEqual(parseRx('2×45 sec each', 'Hip 90/90 stretch'), { sets: 2, kind: 'sec', unit: 'sec', step: 5, target: 45, perSide: true });
+    assert.deepStrictEqual(parseRx('3×20–30 sec', 'Plank'), { sets: 3, kind: 'sec', unit: 'sec', step: 5, target: 25, perSide: false });
+    assert.deepStrictEqual(parseRx('3×40 yd each', 'Suitcase carry'), { sets: 3, kind: 'dist', unit: 'yd', step: 1, target: 40, perSide: true });
+    assert.deepStrictEqual(parseRx('3 x 5', 'Deadlift'), { sets: 3, kind: 'reps', unit: '', step: 1, target: 5, perSide: false });
+  });
+  test('"N sets of M", "N sets" alone, and a count past twenty held at twenty', () => {
+    assert.deepStrictEqual(parseRx('3 sets of 8 to 10', 'Row'), { sets: 3, kind: 'reps', unit: '', step: 1, target: 9, perSide: false });
+    assert.deepStrictEqual(parseRx('2 sets of 15', 'Curl'), { sets: 2, kind: 'reps', unit: '', step: 1, target: 15, perSide: false });
+    assert.deepStrictEqual(parseRx('3 sets — easy', 'Band pull apart'), { sets: 3, open: true, perSide: false });
+    assert.equal(parseRx('30×1', 'Singles')!.sets, 20);
+  });
+  test('the loose shapes: to the max, a ladder, one number with its unit, a count in the name, and nothing', () => {
+    assert.deepStrictEqual(parseRx('4×max', 'Pull-ups'), { sets: 4, open: true, perSide: false });
+    assert.deepStrictEqual(parseRx('max reps', 'Pushups'), { sets: 1, open: true, perSide: false });
+    assert.deepStrictEqual(parseRx('10/8/6', 'Bench'), { sets: 3, kind: 'reps', unit: '', step: 1, target: 10, targets: [10, 8, 6], perSide: false });
+    assert.deepStrictEqual(parseRx('8, 6, amrap', 'Squat'), { sets: 3, kind: 'reps', unit: '', step: 1, target: 8, targets: [8, 6, null], perSide: false });
+    assert.deepStrictEqual(parseRx('60 sec', 'Dead hang'), { sets: 1, kind: 'sec', unit: 'sec', step: 5, target: 60, perSide: false });
+    assert.deepStrictEqual(parseRx('100 yards', 'Farmer carry'), { sets: 1, kind: 'dist', unit: 'yd', step: 1, target: 100, perSide: false });
+    assert.deepStrictEqual(parseRx('12 reps', 'Dips'), { sets: 1, kind: 'reps', unit: '', step: 1, target: 12, perSide: false });
+    assert.deepStrictEqual(parseRx('', '50 Kettlebell swings'), { sets: 1, kind: 'reps', unit: '', step: 1, target: 50, perSide: false });
+    assert.equal(parseRx('easy, by feel', 'Foam roll'), null);
+    assert.equal(parseRx(undefined, undefined), null);
+  });
+  test('the unit a set carries, and a round\'s row without its own count', () => {
+    assert.deepStrictEqual([rxSuffix(parseRx('2×45 sec each', '')), rxSuffix(parseRx('2×45 sec', '')), rxSuffix(parseRx('3×40 yd each', '')), rxSuffix(parseRx('3×40 yd', '')),
+      rxSuffix(parseRx('2×10 each', '')), rxSuffix(parseRx('2×10', '')), rxSuffix(null)], ['sec/side', 'sec', 'yd/side', 'yd', '/side', '', '']);
+    assert.deepStrictEqual([stripLeadingSets('3×12 each'), stripLeadingSets('3 x 10'), stripLeadingSets('2 sets of 15'), stripLeadingSets('3 sets — easy'), stripLeadingSets('3 sets'), stripLeadingSets('10–12'), stripLeadingSets(null)],
+      ['12 each', '10', '15', 'easy', '', '10–12', '']);
+  });
+});
+
+describe('native deck: the set summary\'s words', () => {
+  const rx = parseRx('3×12', '')!, side = parseRx('2×10 each', '')!, open = parseRx('4×max', '')!, ladder = parseRx('10/8/6', '')!;
+  test('as prescribed, logged as prescribed, logged another way, varied, to the max, a ladder', () => {
+    assert.equal(setsSummary(rx, [], []), '3 × 12');
+    assert.equal(setsSummary(side, [], []), '2 × 10 /side');
+    assert.equal(setsSummary(rx, [], [12, 12, 12]), '3 × 12');
+    assert.equal(setsSummary(rx, [], [10, 10, 10]), '3 × 10');
+    assert.equal(setsSummary(rx, [], [12, 12]), '2 × 12');
+    assert.equal(setsSummary(rx, [], [12, 11, 9]), '12 / 11 / 9');
+    assert.equal(setsSummary(side, [], [10, 8]), '10 / 8 /side');
+    assert.equal(setsSummary(open, [], []), '4 × max');
+    assert.equal(setsSummary(open, [], [9, 9, 9, 9]), '4 × 9');
+    assert.equal(setsSummary(ladder, [], []), '10 / 8 / 6');
+    assert.equal(setsSummary(parseRx('8, 6, amrap', '')!, [], []), '8 / 6 / max');
+    assert.equal(setsSummary(null, [], []), '');
+  });
+  test('the words after it', () => {
+    assert.equal(setsSubLabel(rx, [], [], false), 'as prescribed');
+    assert.equal(setsSubLabel(rx, [], [12, 12, 12], true), 'logged');
+    assert.equal(setsSubLabel(rx, [], [10, 10, 10], false), 'not logged');
+    assert.equal(setsSubLabel(rx, [], [12, 11, 9], true), '');
+    assert.equal(setsSubLabel(open, [], [], false), 'nothing logged');
+  });
+  test('varied is two sets that differ; one set, none, or equal ones are not', () => {
+    assert.deepStrictEqual([setsVaried([5, 5, 4]), setsVaried(['5', 5]), setsVaried([5]), setsVaried([]), setsVaried(null)], [true, false, false, false, false]);
+  });
+  test('a stored load as it is shown: pounds as they are, kilograms to the half', () => {
+    // 135 lb is 61.23 kg, 45 lb is 20.41 kg, 225 lb is 102.06 kg.
+    assert.deepStrictEqual([toDispW(135, 'lbs'), toDispW('135', 'lbs'), toDispW(135, 'kg'), toDispW(45, 'kg'), toDispW(225, 'kg'), toDispW('', 'kg'), toDispW(null, 'lbs')], [135, 135, 61, 20.5, 102, '', '']);
+  });
+});
+
+describe('native deck: how old a load is', () => {
+  const ago = (days: number): number => NOW - days * DAY;
+  test('the reuse pill\'s words by age', () => {
+    assert.deepStrictEqual([0, 1, 3, 6, 7, 13, 14, 27, 28, 59, 60, 95].map((d) => recencyLabel(ago(d), undefined, NOW)),
+      ['earlier today', 'yesterday', '3 days ago', '6 days ago', 'last week', 'last week', '2 weeks ago', '3 weeks ago', 'last month', 'last month', '2 months ago', '3 months ago']);
+    assert.equal(recencyLabel(undefined, undefined, NOW), 'last time');
+  });
+  test('the stale warning\'s words by age', () => {
+    assert.deepStrictEqual([0, 1, 3, 7, 14, 27, 28, 60].map((d) => recencyLabel(ago(d), 'age', NOW)),
+      ['from earlier today', 'from yesterday', 'about 3 days old', 'about a week old', 'about 2 weeks old', 'about 3 weeks old', 'about a month old', 'about 2 months old']);
+    assert.equal(recencyLabel(undefined, 'age', NOW), 'from an earlier block');
+  });
+  test('a load is stale past 21 days, and one with no date is not', () => {
+    assert.equal(STALE_LOAD_DAYS, 21);
+    assert.deepStrictEqual([isStaleTs(ago(21), NOW), isStaleTs(ago(22), NOW), isStaleTs(ago(0), NOW), isStaleTs(undefined, NOW)], [false, true, false, false]);
+  });
+});
+
+describe('native deck: the card\'s controls and the stored state behind them', () => {
+  test('a lift can be swapped and skipped, an unknown move only skipped, a note neither', () => {
+    const main = { label: 'Main — Hinge', items: [] };
+    assert.deepStrictEqual(exControlFlags(main, 0, { name: 'Deadlift' }), { isNote: false, inSS: false, isMainSlot: true, canSwap: true, canSkip: true });
+    assert.deepStrictEqual(exControlFlags({ label: 'Accessory', superset: true }, 0, { name: 'Deadlift' }), { isNote: false, inSS: true, isMainSlot: false, canSwap: true, canSkip: true });
+    assert.deepStrictEqual(exControlFlags(main, 1, { name: 'A move no library holds' }), { isNote: false, inSS: false, isMainSlot: false, canSwap: false, canSkip: true });
+    assert.deepStrictEqual(exControlFlags(null, 0, { name: '<svg width="14"></svg> Taper' }), { isNote: true, inSS: false, isMainSlot: false, canSwap: false, canSkip: false });
+  });
+  test('a kettlebell move is one whose name says so', () => {
+    assert.deepStrictEqual([isKBExercise('Kettlebell swing'), isKBExercise('Spanish squat hold (KB)'), isKBExercise('Back squat'), isKBExercise('')], [true, true, false, false]);
+  });
+  test('the lift a card was swapped in for: the last swap to that name on that day, of that program', () => {
+    const store = filled({ ia_swaps_p1: { w2_mon: [{ from: 'Back squat', to: 'Front squat', ts: 1 }, { from: 'Goblet squat', to: 'Front squat', ts: 2 }], w2_tue: [{ from: 'Bench press', to: 'Floor press', ts: 3 }] } });
+    assert.equal(swapOriginOf(store, 'p1', 2, 'mon', 'Front squat'), 'Goblet squat');
+    assert.equal(swapOriginOf(store, 'p1', 2, 'tue', 'Floor press'), 'Bench press');
+    assert.deepStrictEqual([swapOriginOf(store, 'p1', 3, 'mon', 'Front squat'), swapOriginOf(store, 'p2', 2, 'mon', 'Front squat'), swapOriginOf(store, 'p1', 2, 'mon', 'Back squat'),
+      swapOriginOf(store, null, 2, 'mon', 'Front squat'), swapOriginOf(store, 'p1', 2, null, 'Front squat')], [null, null, null, null, null]);
+  });
+  test('the newest load in another program: this program\'s own is passed over, a load of nothing too, an old key folded', () => {
+    const store = filled({
+      ia_programs: [{ id: 'p1', name: 'NOW' }, { id: 'p2', name: 'SPRING' }, { id: 'p3', name: 'SUMMER' }, { name: 'no id' }],
+      ia_exw_p1: { deadlift: { name: 'Deadlift', entries: [{ week: 1, weight: 315, ts: 900 }] } },
+      ia_exw_p2: { deadlift: { name: 'Deadlift', entries: [{ week: 1, weight: 225, ts: 100 }, { week: 2, weight: 245, ts: 200 }] } },
+      ia_exw_p3: { deadlift: { name: 'Deadlift', entries: [{ week: 1, weight: 235, ts: 150 }, { week: 2, weight: 0, ts: 500 }] }, romanian_deadlift: { name: 'Romanian deadlift', entries: [{ week: 1, weight: 135, ts: 50 }] } },
+    });
+    const before = held(store);
+    assert.deepStrictEqual(crossProgLastEntry(store, 'p1', 'deadlift'), { entry: { week: 2, weight: 245, ts: 200 }, progName: 'SPRING' });
+    assert.deepStrictEqual(crossProgLastEntry(store, 'p2', 'deadlift'), { entry: { week: 1, weight: 315, ts: 900 }, progName: 'NOW' });
+    assert.equal(crossProgLastEntry(store, 'p1', 'barbell_romanian_deadlift')!.progName, 'SUMMER', 'romanian_deadlift is today\'s barbell_romanian_deadlift');
+    assert.equal(crossProgLastEntry(store, 'p1', 'barbell_romanian_deadlift')!.entry.weight, 135);
+    assert.equal(crossProgLastEntry(store, 'p1', 'bench_press'), null);
+    assert.deepStrictEqual(held(store), before, 'reading folds a copy: the store keeps its old key');
+  });
+});
+
+describe('native deck: a day opened as a deck', () => {
+  const lift = (name: string, detail: string) => ({ name, detail });
+  const prog: DeckProgram = {
+    id: 'p1', cfg: { unit: 'lbs' },
+    weeks: {
+      1: {
+        mon: { title: 'Posterior Chain', sections: [
+          { label: 'Main — Hinge', items: [lift('Deadlift', '3×5 — RPE 7, 3 min rest')] },
+          { label: 'Accessory', superset: true, items: [lift('Dumbbell row', '3×10 each'), lift('Pushups', '3×12')] },
+        ] },
+        tue: { rest: true },
+        sat: { title: 'Long Run', sections: [{ label: 'Post-run mobility', items: [lift('Hip 90/90 stretch', '2×45 sec each')] }] },
+        sun: { sections: [{ label: 'Main — Squat', items: [lift('Back squat', '3×5')] }] },
+      },
+    },
+  };
+  test('a lift day opens on its first card that is not logged, effort at 7, no notes, not done', () => {
+    const v = deckView(memoryStore(), prog, 1, 'mon', NOW)!;
+    assert.deepStrictEqual(v.cards.map((c) => [c.kind, c.kicker, c.title, c.meta]), [
+      ['lift', 'Main', 'Deadlift', '3 min rest between sets'], ['round', 'Round', 'Accessory', '3 rounds · 60 sec rest after each'], ['finish', 'Finish', 'Call it', 'How did the whole thing feel?']]);
+    assert.deepStrictEqual([v.title, v.week, v.dayKey, v.first, v.rpe, v.notes, v.dayDone], ['Posterior Chain', 1, 'mon', 0, 7, '', false]);
+    assert.equal(v.cards[0]!.cue, 'Leave about three reps in reserve. Two or three warmup sets first.');
+    const sets = (v.cards[0]!.views[0] as { body: { items: { log: { sets: { head: string; sub: string; rows: { value: string }[] } } }[] } }).body.items[0]!.log.sets;
+    assert.deepStrictEqual([sets.head, sets.sub, sets.rows.map((r) => r.value)], ['3 × 5', 'as prescribed', ['5', '5', '5']]);
+  });
+  test('the stored state shows on it: a lift logged that day, the day\'s effort and notes, the day done', () => {
+    const store = filled({
+      ia_exw_p1: { deadlift: { name: 'Deadlift', entries: [{ week: 1, day: 'mon', weight: 225, setsDone: [5, 5, 4], setsW: [225, 225, 225], ts: NOW - DAY }] } },
+      ia_logs_p1: { w1_mon: { rpe: '8', notes: 'Bar felt heavy', week: 1, ts: NOW } },
+      ia_comp_p1: { w1_mon: { status: 'complete', ts: NOW } },
+    });
+    const before = held(store);
+    const v = deckView(store, prog, 1, 'mon', NOW)!;
+    assert.deepStrictEqual([v.first, v.rpe, v.notes, v.dayDone], [1, 8, 'Bar felt heavy', true]);
+    assert.deepStrictEqual(v.cards.map((c) => c.logged), [true, false, false]);
+    const item = (v.cards[0]!.views[0] as { body: { items: { logged: boolean; log: { sets: { head: string; sub: string }; load: { value: string; unit: string; reuse: { text: string; rec: string; stale: boolean } } } }[] } }).body.items[0]!;
+    assert.deepStrictEqual([item.logged, item.log.sets.head, item.log.sets.sub, item.log.load.value, item.log.load.unit], [true, '5 / 5 / 4', '', '225', 'lbs']);
+    assert.deepStrictEqual(item.log.load.reuse, { stale: false, value: 225, text: '225 lbs', rec: 'yesterday' });
+    assert.deepStrictEqual(held(store), before, 'drawing the deck wrote nothing');
+  });
+  test('a title falls to Training; an effort outside 1 to 10 falls to 7', () => {
+    const store = filled({ ia_logs_p1: { w1_sun: { rpe: '11', notes: 5 } } });
+    const v = deckView(store, prog, 1, 'sun', NOW)!;
+    assert.deepStrictEqual([v.title, v.rpe, v.notes], ['Training', 7, '']);
+  });
+  test('Start opens no deck on a rest day, on a day the grid does not hold, or where the cool down is the only card', () => {
+    const s = memoryStore();
+    assert.equal(deckView(s, prog, 1, 'tue', NOW), null);
+    assert.equal(deckView(s, prog, 1, 'wed', NOW), null);
+    assert.equal(deckView(s, prog, 9, 'mon', NOW), null);
+    assert.equal(deckView(s, prog, 1, 'sat', NOW), null);
+    assert.deepStrictEqual(dayCards(s, prog, 1, 'sat', NOW).map((c) => [c.kind, c.title, c.meta]), [['cool', 'Stretch and roll', '1 easy move · about 2 min'], ['finish', 'Call it', 'How did the whole thing feel?']]);
+    assert.deepStrictEqual(dayCards(s, prog, 1, 'tue', NOW), []);
+  });
+});
+
+describe('native deck: read only', () => {
+  const dirs = ['frontends/native/src/deck', 'frontends/native/src/day-detail'];
+  const all = dirs.flatMap((d) => readdirSync(join(REPO, d)).filter((f) => /\.tsx?$/.test(f)).map((f) => readFileSync(join(REPO, d, f), 'utf8'))).join('\n');
+  const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+  test('no file of the deck writes or removes a stored key, or calls one of core\'s writers (D287, until the session D289 names)', () => {
+    const code = strip(all);
+    assert.ok(code.length > 30000, 'the deck\'s files were read');
+    assert.doesNotMatch(code, /\b\w*[sS]tore\.(set|remove)\(/, 'no store write');
+    // setDraftOf reads a set draft (core's state-day-log.ts); every other name of these shapes is a writer.
+    assert.doesNotMatch(code, /\b(?!setDraftOf\b)(write|record|clear|drop|set|add)[A-Z]\w*\(store\b/, 'none of core\'s writers is called');
+    assert.doesNotMatch(code, /localStorage|AsyncStorage/, 'no other storage');
+  });
+});
+
+describe('native deck: the screen', () => {
+  const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+  const deck = readFileSync(join(REPO, 'frontends/native/src/deck/Deck.tsx'), 'utf8');
+  const code = strip(deck);
+
+  test('the deck\'s folder holds the screen, its seam, its readers and the model\'s copy; the card model\'s copy sits beside it', () => {
+    assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/deck')).sort(), ['Deck.tsx', 'deck-model.ts', 'deck-readers.ts', 'deck-screen.ts']);
+    assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/day-detail')), ['session-sections-model.ts']);
+  });
+
+  test('a card\'s ground is its kind\'s colour under the deck\'s shade: a quarter of black by day, two fifths by night', () => {
+    // 188,106,67 by three quarters; 126,94,150; 166,130,47. By night 217,138,99 by three fifths; 171,140,196; 207,167,82.
+    const day = { lift: '#bc6a43', hip: '#7e5e96', core: '#a6822f', band: '#111111', mark: '#777773', deckShade: 0.25 };
+    const night = { lift: '#D98A63', hip: '#AB8CC4', core: '#CFA752', band: '#242424', mark: '#767676', deckShade: 0.4 };
+    assert.deepStrictEqual(['lift', 'hip', 'core', 'finish', 'skip'].map((t) => toneColor(day, t)), ['rgb(141,80,50)', 'rgb(95,71,113)', 'rgb(125,98,35)', '#111111', '#777773']);
+    assert.deepStrictEqual(['lift', 'hip', 'core', 'finish', 'skip'].map((t) => toneColor(night, t)), ['rgb(130,83,59)', 'rgb(103,84,118)', 'rgb(124,100,49)', '#242424', '#767676']);
+    assert.equal(shaded('#FFFFFF', 0.5), 'rgb(128,128,128)');
+    const theme = readFileSync(join(REPO, 'frontends/native/src/theme.ts'), 'utf8');
+    assert.ok(theme.includes("hip: '#7e5e96', core: '#a6822f', band: '#111111', onBand: '#FFFFFF', mark: '#777773', deckShade: 0.25"), 'the day palette holds today\'s tokens (base.css)');
+    assert.ok(theme.includes("hip: '#AB8CC4', core: '#CFA752', band: '#242424', onBand: '#FFFFFF', mark: '#767676', deckShade: 0.4"), 'the night palette holds today\'s tokens');
+  });
+
+  test('the screen draws today\'s words for the parts the model leaves to it', () => {
+    for (const words of ['>Logged<', '>Skip all<', '>Swapped in<', "{'for ' + c.swappedFrom}", '>Notes<', '>Got it<', '>Log<', '>Put it back<', '>Varied<', '>Skipped<', '>You added this<',
+      "' · not in the plan  '", '>remove<', '>put it back<', "{'RPE ' + bubble}", '"Back to This Week"', '"See the whole session"', '"The whole session"', '"What RPE means"',
+      '"How hard was the whole session, 1 to 10"', '"Swap this exercise"', '"Skip the whole card"', '"Skip this card"', '"Skip this exercise"', "'Card ' + (k + 1) + ', ' + states[k]", "'Open ' + plain(x.name)", "'Set ' + (r.s + 1)"]) {
+      assert.ok(deck.includes(words), 'Deck.tsx carries ' + words);
+    }
+  });
+
+  // Read only until the session D289 names. A press does one of these and nothing else: closes the deck, moves through
+  // it, opens or closes the map or the bubble, opens a move's sets or a folded move, picks a pip. Log, the steppers,
+  // the reuse pills, skip, swap, put it back and remove are drawn with no press at all.
+  test('every press on the deck moves through it or opens something to read: none logs, skips, swaps or marks the day', () => {
+    const presses = [...new Set([...code.matchAll(/onPress=\{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]!.trim()))].sort();
+    assert.deepStrictEqual(presses, [
+      '() => (ctaCloses ? onClose() : go(i + 1))', '() => go(k)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)', '() => setBubble(null)',
+      "() => setSheet('map')", '() => setSheet(null)', '() => { go(k); setSheet(null); }', 'onClose', 'onRpe',
+    ]);
+    assert.ok(code.includes('disabled={!(ctaMoves || ctaCloses)}'), 'the big button is off where it would log a card or mark the day');
+    assert.ok(code.includes("const ctaMoves = !!top && top.kind !== 'finish' && (top.skipped || top.logged);") && code.includes("const ctaCloses = !!top && top.kind === 'finish' && view.dayDone;"));
+    assert.doesNotMatch(code, /TextInput|onChangeText|onValueChange/, 'no field takes a touch yet');
+    assert.ok((code.match(/accessibilityState=\{\{ disabled: true \}\}/g) || []).length >= 12, 'each control that writes says it is off');
+  });
+
+  test('the deck opens and closes at once, as today\'s does under Reduce Motion, and swipes by today\'s numbers', () => {
+    assert.ok(code.includes('const FAN = 3;') && code.includes('const SWIPE = 80;') && code.includes('const PEEK = 140;'));
+    assert.ok(code.includes('{ x: 15, y: -7, s: 0.965, r: \'1.6deg\' }') && code.includes('{ x: 0, y: 0, s: 0.92, r: \'0deg\' }'), 'the card that rises: from the fan going on, from behind going back');
+    assert.ok(code.includes('{ translateX: pos * 15 }, { translateY: pos * -7 }, { scale: 1 - pos * 0.035 }, { rotate: pos * 1.6 + \'deg\' }'), 'the fan');
+    assert.ok(code.includes('duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1)'), 'a swipe let go short settles back in 290 ms');
+    assert.ok(code.includes('height >= 700 ? ROOMY : TIGHT'), 'D283: Roomy on a screen 700 points tall or more');
+  });
+
+  test('This Week\'s Start lift and Start session open it, over the tab bar; a sunk button and the run\'s buttons open nothing', () => {
+    const week = strip(readFileSync(join(REPO, 'frontends/native/src/this-week/ThisWeek.tsx'), 'utf8'));
+    assert.ok(week.includes("const starts = !!bt && bt.act === 'deck' && !bt.sunk;"));
+    assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={() => onStart(k.week, k.key)}'));
+    assert.ok(week.includes('const deck = deckView(store, prog as unknown as DeckProgram, week, key, Date.now());') && week.includes('if (deck) onDeck(deck);'));
+    const app = strip(readFileSync(join(REPO, 'frontends/native/src/App.tsx'), 'utf8'));
+    assert.ok(app.includes('onDeck={setDeck}') && app.includes('{deck && <Deck palette={p} view={deck} onClose={() => setDeck(null)} />}'));
+    assert.ok(app.indexOf('<Deck ') > app.indexOf('testID="tab-bar"'), 'the deck is drawn after the tab bar, so over it');
+  });
+});

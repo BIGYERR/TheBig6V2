@@ -1,5 +1,5 @@
-// The Expo app (MIGRATION.md phase 2). Two tabs, as today's app names them: This Week (session 4), drawn read only
-// from the stored state, and Bugs: the engine check under Hermes (session 1), the Backup row, a backup loaded read
+// The Expo app (MIGRATION.md phases 2 and 3). Two tabs, as today's app names them: This Week (phase 2, session 4),
+// drawn read only from the stored state, whose Start lift opens the swipe deck (phase 3, its first screen), and Bugs: the engine check under Hermes (session 1), the Backup row, a backup loaded read
 // only into the app's own SQLite store (session 2), and one line saying whether the app's own Swift module answered
 // (session 3, the native spike). Programs and Progress are today's app's still (phase 3).
 import { StatusBar } from 'expo-status-bar';
@@ -9,6 +9,8 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { VERSION } from '@ia/core';
 
 import { BackupLoad } from './BackupLoad';
+import { Deck } from './deck/Deck';
+import type { DeckView } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
 import { SWIFT_ANSWER } from './native-spike';
 import { swiftLine } from './spike-line';
@@ -41,6 +43,8 @@ function Shell() {
   const [tab, setTab] = useState<Tab>(() => (storedProgram(phoneStore) ? 'week' : 'bugs'));
   // Counts the visits to This Week, so it reads the store again after a backup is loaded on Bugs.
   const [tick, setTick] = useState(0);
+  // The day open as a swipe deck, over the whole screen and the tab bar (deck.css: above the tab bar), or none.
+  const [deck, setDeck] = useState<DeckView | null>(null);
   const go = (t: Tab): void => {
     if (t === 'week' && tab !== 'week') setTick((n) => n + 1);
     setTab(t);
@@ -48,11 +52,12 @@ function Shell() {
   return (
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
-      {tab === 'week' ? <ThisWeek palette={p} store={phoneStore} tick={tick} /> : <Bugs palette={p} />}
+      {tab === 'week' ? <ThisWeek palette={p} store={phoneStore} tick={tick} onDeck={setDeck} /> : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
         <TabButton id="tab-week" label="This Week" on={tab === 'week'} palette={p} onPress={() => go('week')} icon={(c) => <Calendar color={c} size={22} />} />
         <TabButton id="tab-bugs" label="Bugs" on={tab === 'bugs'} palette={p} onPress={() => go('bugs')} icon={(c) => <Bug color={c} />} />
       </View>
+      {deck && <Deck palette={p} view={deck} onClose={() => setDeck(null)} />}
     </View>
   );
 }

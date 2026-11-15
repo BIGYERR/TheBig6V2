@@ -16,6 +16,12 @@ export interface Palette {
   sinkAlpha: number;
   /** The floating tab bar: its ground, its edge and the active tab's ground. */
   nav: string; navEdge: string; navOn: string;
+  /** The swipe deck (D275, deck.css): hip work, core work, the finish card's band, type on a card, a skipped tile. */
+  hip: string; core: string; band: string; onBand: string; mark: string;
+  /** The black laid over a kind's colour on a deck card, as its alpha (--deck-shade). */
+  deckShade: number;
+  /** The scrim under a sheet, as "r,g,b" (--scrim-rgb). */
+  scrimRgb: string;
 }
 export const DAY: Palette = {
   bg: '#F3F3F1', surface: '#FFFFFF', surface2: '#EDEDEA', border: '#E3E3DF', border2: '#CFCFCA',
@@ -26,6 +32,7 @@ export const DAY: Palette = {
   inkRgb: '17,17,17', signalRgb: '207,78,26', redRgb: '158,51,40',
   glowAlpha: 0.26, sinkAlpha: 0.16,
   nav: 'rgba(255,255,255,0.92)', navEdge: 'rgba(0,0,0,0.06)', navOn: 'rgba(0,0,0,0.06)',
+  hip: '#7e5e96', core: '#a6822f', band: '#111111', onBand: '#FFFFFF', mark: '#777773', deckShade: 0.25, scrimRgb: '17,17,17',
 };
 export const NIGHT: Palette = {
   bg: '#000000', surface: '#161616', surface2: '#242424', border: '#262626', border2: '#3C3C3C',
@@ -36,6 +43,7 @@ export const NIGHT: Palette = {
   inkRgb: '255,255,255', signalRgb: '226,98,43', redRgb: '217,102,90',
   glowAlpha: 0.64, sinkAlpha: 0.7,
   nav: 'rgba(28,28,28,0.92)', navEdge: 'rgba(255,255,255,0.08)', navOn: 'rgba(255,255,255,0.10)',
+  hip: '#AB8CC4', core: '#CFA752', band: '#242424', onBand: '#FFFFFF', mark: '#767676', deckShade: 0.4, scrimRgb: '0,0,0',
 };
 
 /** The app's two faces: the display face for titles and controls, the text face for running words (base.css). */
