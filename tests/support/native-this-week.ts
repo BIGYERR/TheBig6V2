@@ -5,13 +5,14 @@
 //               fed by the legacy page's own functions, each called as week-view.ts render() calls it through the bridge.
 //   nativeView  the Expo app's: frontends/native/src/this-week/week-screen.ts over core's store, the phone's keys in it.
 //
-// Both draw the grid the page holds (activeProg, what refreshProgram handed back), so the two can be compared on every
-// launch of a history; the Expo app's own source of the grid, the stored one, is checked apart from this.
+// Each draws its own grid: the page the one it holds (activeProg, what its refreshProgram handed back), the Expo app
+// the one its own launch hands back from the phone's keys (nativeGrid: liveProgram, core's refreshStoredProgram). So
+// the two screens are compared whole, launch and draw, on every launch of a history.
 import { memoryStore } from '@ia/core/engine/state-store.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 import { type WeekDeps, type WeekInput, type WeekView, liveTitle, weekView } from '../../frontends/app/src/app/screens/week-view/week-view-model.ts';
 import { wildcardSub } from '../../frontends/app/src/app/screens/day-detail/sheet-marks-model.ts';
-import { type ScreenProgram, drawWeek, midnight } from '../../frontends/native/src/this-week/week-screen.ts';
+import { type ScreenProgram, drawWeek, liveProgram, midnight } from '../../frontends/native/src/this-week/week-screen.ts';
 import type { Phone } from './stored-state.ts';
 
 /** The launch's clock, as the page reads it (pinClock). */
@@ -89,7 +90,17 @@ export function phoneStore(P: Phone, store: StateStore = memoryStore()): StateSt
   return store;
 }
 
-/** The Expo app's screen for the same title and column, over the grid given (the page's, to compare the two). */
+/**
+ * The Expo app's own grid for the phone: its launch (liveProgram) over a store holding the phone's keys, at the
+ * phone's instant. Plain data, as pageGrid is. `told` counts the failures the launch reported, when given.
+ */
+export function nativeGrid(P: Phone, store: StateStore = phoneStore(P), told: { overlay: number; freeze: number; rebuild: number } = { overlay: 0, freeze: 0, rebuild: 0 }): ScreenProgram {
+  const grid = liveProgram(store, launchNow(P).getTime(), { overlay: () => { told.overlay++; }, freeze: () => { told.freeze++; }, rebuild: () => { told.rebuild++; } });
+  if (!grid) throw new Error('the store holds no active program');
+  return JSON.parse(JSON.stringify(grid)) as ScreenProgram;
+}
+
+/** The Expo app's screen for the same title and column, over the grid given (its own launch's, nativeGrid). */
 export function nativeView(store: StateStore, grid: ScreenProgram, now: Date, shown: number | null, picked: number | null, gps: boolean): WeekView {
   return JSON.parse(JSON.stringify(drawWeek(store, grid, now, { shown, picked }, gps).view)) as WeekView;
 }
@@ -103,10 +114,10 @@ export const seen = (): Seen => ({ draws: 0, cards: 0, rests: 0, done: 0, skippe
  * handed to `same` to compare. Returns what the draws held.
  */
 export function everyDraw(P: Phone, same: (native: WeekView, page: WeekView, what: string) => void, tally: Seen = seen()): Seen {
-  const grid = pageGrid(P);
   const store = phoneStore(P);
+  const grid = nativeGrid(P, store);
   const now = launchNow(P);
-  const total = grid.totalWeeks || 6;
+  const total = pageGrid(P).totalWeeks || 6;
   for (const gps of [true, false]) {
     for (let shown = 1; shown <= total + 1; shown++) {
       for (const picked of [null, 0, 1, 2, 3, 4, 5, 6]) {

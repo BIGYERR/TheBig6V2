@@ -140,3 +140,23 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   job refuses an archive without `PlugIns/RestTimerWidget.appex` at the app's version, signs it with its own profile,
   and App Store Connect processed the result. The phone sees it in phase 4, when the widget gets its content
   (MIGRATION.md 4.1).
+- **Seen on `main`, the fourth run, both lanes uploading again** (run 43654925719, merge f28435c, pull request 41,
+  2026-11-14 18:46 EST; the merge carried v0.262.2, `refreshProgram` and the freeze in core): the two gates went
+  together (10 s and 11 s). Today's lane uploaded `0.262.2` (264 s, done 18:52:16) and App Store Connect read it back
+  as processed (101 s, done 18:54:00). The beta's lane archived, signed and uploaded `0.262.2 (104)` (711 s, done
+  18:59:44) and read it back as processed (132 s, done 19:01:58). The build number moved from 103 to 104 because one
+  commit of the merge changed its inputs: eef5517 (`core`, the launch). The two tests-only commits beside it changed
+  neither `frontends/native`, `core` nor `tests/semver.js`, and did not count. The legs read `testflight 0.262.2
+  processed` and `testflight next 0.262.2 (104) processed`. Today's lane was processed 5 min 44 s before the beta's
+  upload ended.
+- **On Mario's phone, today's app after the fourth run** (his two screenshots and his note, 2026-11-14 19:17: "i think
+  the only thing atleast what i noticed is that no more tips from NSW on the rest day"): THE HALF MANNY, Week 12, 22
+  days out, Race day Sun, Dec 6, Recovery Week; the strip REST, SPEED, RECOV, REST, LEGS, RECOV, LONG with Monday's
+  cross and five checks; today's card Long Run, Skipped, Cutback · 60 min · 10:30/mi, "The long run steps back on
+  purpose. Average no faster than 9:58/mi.", then Full Body Support, Pushups (slow tempo) + 1 more, closed out. The
+  same words as his report of 09:37 that morning under 0.262.0, so nothing on This Week moved with the launch's lift
+  into core. The screenshots do not show the build number, and he did not say whether the backup came first; a backup
+  saved by 0.262.1 that day is on his Mac. **The tip:** his rest day screenshot is Wednesday the 11th, a past day, and
+  the tip is drawn only on a rest day that is today (`week-view-model.ts`, `if (s.today) tip = d.restTip()`, since
+  v0.258.0, D276). So it is the rule and not a change of 0.262.2; whether a past rest day should carry a tip is his
+  to rule, and nothing was changed.

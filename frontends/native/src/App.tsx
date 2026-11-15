@@ -16,7 +16,7 @@ import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
 import { Bug, Calendar } from './this-week/marks';
 import { ThisWeek } from './this-week/ThisWeek';
-import { liveProgram } from './this-week/week-screen';
+import { storedProgram } from './this-week/week-screen';
 
 /** Which JavaScript engine runs this bundle: Hermes sets HermesInternal on the global object. */
 function engineName(): string {
@@ -37,7 +37,8 @@ function Shell() {
   const p = useColorScheme() === 'dark' ? NIGHT : DAY;
   const insets = useSafeAreaInsets();
   // This Week when the store holds a program, as today's app opens; Bugs, where a backup is loaded, until it does.
-  const [tab, setTab] = useState<Tab>(() => (liveProgram(phoneStore) ? 'week' : 'bugs'));
+  // Asked of the stored program, not of a launch: the screen makes the one launch when it mounts.
+  const [tab, setTab] = useState<Tab>(() => (storedProgram(phoneStore) ? 'week' : 'bugs'));
   // Counts the visits to This Week, so it reads the store again after a backup is loaded on Bugs.
   const [tick, setTick] = useState(0);
   const go = (t: Tab): void => {

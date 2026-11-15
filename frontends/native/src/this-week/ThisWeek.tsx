@@ -17,7 +17,7 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Bag, Calendar, Check, CoreIcon, Cross, Die, Dumbbell, Fade, Flag, Glow, Play, RecDot, Runner, WildcardMark } from './marks';
-import { BLANK, drawWeek, launchTitle, liveProgram, pillParts, tokenOf } from './week-screen';
+import { BLANK, PLAN_CHANGE_FAILED, drawWeek, launch, launchTitle, pillArrow, pillParts, tokenOf } from './week-screen';
 import { type StripClock, type StripEl, StripPlacer } from './week-strip';
 import { type Column, type DayCard, type DaysView, TITLE_W, type WeekView } from './week-view-model';
 
@@ -41,8 +41,11 @@ export function ThisWeek({ palette: p, store, tick }: { palette: Palette; store:
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
-  // ── What is shown: the program as stored, the title in view, the day picked in each title ──
-  const prog = useMemo(() => liveProgram(store), [store, tick]);
+  // ── What is shown: the program a launch hands back, the title in view, the day picked in each title ──
+  // One launch when the screen mounts and one on each return to it (a backup may have been loaded on Bugs), as
+  // today's app makes one at boot: the rebuild is about 55 ms under Hermes on the simulator.
+  const launched = useMemo(() => launch(store, Date.now()), [store, tick]);
+  const prog = launched.prog;
   const [shownPick, setShown] = useState<number | null>(null);
   const picks = useRef(new Map<number, number>());
   const [, redraw] = useState(0);
@@ -145,6 +148,7 @@ export function ThisWeek({ palette: p, store, tick }: { palette: Palette; store:
   const [stripH, setStripH] = useState(0);
   const pill = pillParts(view.pill.html);
   const pillInk = view.pill.cls.includes('recovery');
+  const pillWords = pillArrow(pill.text);
   const s = styles;
   return (
     <ScrollView style={{ flex: 1, backgroundColor: p.bg }} contentContainerStyle={{ flexGrow: 1, paddingBottom: TAB_ROOM + insets.bottom }} stickyHeaderIndices={[0]} showsVerticalScrollIndicator={false} bounces={false} overScrollMode="never">
@@ -207,10 +211,16 @@ export function ThisWeek({ palette: p, store, tick }: { palette: Palette; store:
           {pill.text !== '' && (
             <View testID="week-pill" style={[s.pill, { borderColor: p.signal }, pillInk && { backgroundColor: p.accent }]}>
               {pill.icon && <CoreIcon xml={pill.icon} color={p.signal} />}
-              <Text numberOfLines={1} style={[s.pillText, { color: p.signal }]}>{pill.text}</Text>
+              <Text numberOfLines={1} style={[s.pillText, { color: p.signal }]}>
+                {pillWords.arrow !== '' && <Text style={s.pillArrow}>{pillWords.arrow}</Text>}
+                {pillWords.words}
+              </Text>
             </View>
           )}
         </View>
+        {launched.failures.overlay > 0 && (
+          <Text testID="week-launch-failed" style={[s.failed, { color: p.muted }]}>{PLAN_CHANGE_FAILED}</Text>
+        )}
 
         <View style={s.days}>
           {view.days && <Days d={view.days} p={p} onPick={pickDay} />}
@@ -382,7 +392,11 @@ const styles = StyleSheet.create({
   over: { paddingHorizontal: 20, fontFamily: DISPLAY, fontSize: 13, fontWeight: '700', letterSpacing: 0.78, textTransform: 'uppercase', lineHeight: 16 },
   titles: { marginTop: 4 },
   title: { width: TITLE_W, paddingVertical: 4, paddingLeft: 20 },
-  titleText: { fontFamily: DISPLAY, fontSize: 56, fontWeight: '700', letterSpacing: -1.68, lineHeight: 56 },
+  // The web centres the font's own line (Helvetica Neue at 56: 53.3 above the baseline and 11.9 below, 65.2) in the
+  // 56 of line-height 1, so the baseline sits 48.7 down. iOS text stands the letters on the line's foot instead, the
+  // baseline 44.1 down: the title sat 4.6 higher than today's (Mario's phone, 2026-11-14). The shift puts it back
+  // and leaves the header's height alone.
+  titleText: { fontFamily: DISPLAY, fontSize: 56, fontWeight: '700', letterSpacing: -1.68, lineHeight: 56, transform: [{ translateY: 4.6 }] },
   hurt: { position: 'absolute', right: 20, height: 40, paddingHorizontal: 16, borderRadius: 20, borderWidth: 1.5, justifyContent: 'center' },
   hurtText: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '700' },
 
@@ -398,6 +412,11 @@ const styles = StyleSheet.create({
   startTxt: { fontFamily: TEXT, fontSize: 17 },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 34, paddingHorizontal: 14, borderWidth: 1.5, borderRadius: 999 },
   pillText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700' },
+  // Helvetica Neue holds no arrow, so the phone draws it from another font: the web picks the system font at the
+  // pill's own weight, and left to itself React Native picks a thin one (Mario's phone, 2026-11-14).
+  pillArrow: { fontFamily: 'System', fontWeight: '700' },
+  // The launch's failure line: today's toast words, standing, until this app has a toast.
+  failed: { fontFamily: TEXT, fontSize: 13, lineHeight: 16, paddingHorizontal: 20, paddingTop: 4 },
 
   // The day strip
   days: { flexGrow: 1, paddingTop: 14, paddingHorizontal: 16, paddingBottom: 16, gap: 14 },

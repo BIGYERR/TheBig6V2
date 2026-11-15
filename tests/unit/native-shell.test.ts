@@ -186,8 +186,12 @@ describe('native shell: the engine check is core\'s, as it is', () => {
   });
 
   test('it times its slices on performance.now(), never the date', () => {
-    assert.match(all, /performance\.now\(\)/);
-    assert.doesNotMatch(all, /Date\.now\(\)/);
+    const check = readFileSync(join(NATIVE, 'src', 'EngineCheck.tsx'), 'utf8');
+    assert.match(check, /performance\.now\(\)/);
+    assert.doesNotMatch(check, /Date\.now\(\)/);
+    // The app reads the date in one place, and not to time anything: the instant This Week's launch is handed, which
+    // says what day it is (core's refreshStoredProgram, as today's page hands it Date.now()).
+    assert.deepStrictEqual(all.match(/[^\n]*Date\.now\(\)[^\n]*/g), ['  const launched = useMemo(() => launch(store, Date.now()), [store, tick]);']);
   });
 });
 

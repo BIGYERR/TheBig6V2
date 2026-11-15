@@ -470,3 +470,120 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
     it: the stored grid, not the one today's app draws.
   - **Two open in the look, for the session that wires the seam:** the Recovery Week pill's arrow is thinner than
     today's, and the week title sits a few points higher.
+
+## D276, D278, D279 and D284 in the Expo app: the grid is the launch's (Post-v0.262.2, the migration's phase 2, the last build session)
+
+- **Date:** 2026-11-14. **Ruled by:** Mario's brief for the session ("the Expo screen's seam reads the lifted launch":
+  `liveProgram` calls `refreshStoredProgram` with the SQLite store, `Date.now()` and a report; the Expo app's copies of
+  the date readers give way to core's; then the two look items). No new D-code: the words and the behaviour are
+  today's, and after this the grid is too. **Bump:** none, the page and core do not move (a Post-v0.262.2 pass,
+  standing ruling 1). **Shipped:** Post-v0.262.2, no build of today's app; the beta's next build carries it once Mario
+  merges it.
+- **The finding (measured before any edit, `tests/measure/native-this-week_launch.ts`, its report beside it):** run
+  as the seam would call it, over the Expo app's SQLite store and at the page's own instant, core's launch hands back
+  the program today's page holds, whole, every field:
+  - the ten seeded programs through the standard history, every launch: 104 of 104, 0 of 7,854 days differ;
+  - the 50 records the earlier report counted: 50 of 50 against a second phone launched on the same keys, and 0 of
+    3,745 days against the grid the page holds in session, 0 of 350 in the week holding today. The control, the same
+    comparison with the stored grid in the seam's place: 806 of 3,745 and 127 of 350, the earlier report's numbers;
+  - the 25 cases of `tests/integration/stored-state.test.ts`: 149 of 149 launches, 0 of 13,880 days;
+  - the 17 corpus backups: 17 of 17; and Mario's own backup of 2026-11-14, read from his Desktop and never copied
+    into the repo: 1 of 1, 0 of 98 days.
+  - **What it writes:** `ia_edits_` on 15 launches and `ia_programs` on 4, each time leaving the key as the page's own
+    launch leaves it (19 of 19). On Mario's backup: nothing today, and nothing with the same copy opened 1, 2, 7, 14,
+    21 or 28 days on. Through a store that drops every write the grid is the writing store's on all 329 launches.
+  - **Cost under Hermes** (the simulator, the Release build, Mario's program, a probe never committed): 54.3 to 57.6
+    ms a launch over seven runs, of which one `buildProgram` is 52.6 to 55.1 ms; reading the three stored programs,
+    1.7 to 3.1 ms. He has no overlay, so no variant was built; each distinct overlay kind in range adds about 53 ms.
+  - **The failure report:** the Expo app made none (nothing called the launch). Today's page toasts "A plan change
+    failed to apply. Flag it in Bugs." for an overlay that fails and logs the freeze and the rebuild to the console.
+  - **Two things the measure met and this does not change:** a stored config whose sports are not a list stops the
+    page's launch at its program list, where the seam's launch hands back the stored program (the finding not yet
+    ruled); and in one case ("a day's swaps and edits made and undone before the next launch") the page's grid in
+    session differs on 1 of 98 days from its own next launch, which the seam equals.
+- **What changes (the Expo app only):**
+  1. **The seam.** `liveProgram(store, now, failed)` (`frontends/native/src/this-week/week-screen.ts`) hands the
+     active program as stored to core's `refreshStoredProgram` and returns what it hands back. `storedProgram(store)`
+     is the old reader (no launch), which the shell asks which tab to open on. `launch(store, now)` is the screen's
+     one call: the program, and the failures counted and logged in the page's own console words. The screen makes one
+     launch when it mounts and one on each return to its tab (`useMemo` on the store and the visit count), at
+     `Date.now()`.
+  2. **The launch is handed a store that drops writes** (`frontends/native/src/store/read-only-store.ts`). The
+     session's recommendation, put to Mario with the alternative (let the beta write its own copy) on 2026-11-14; he
+     sent his phone report and chose neither, so the one that keeps D287 as ruled ("Writes nothing back.") was built.
+     His to overturn: it is one line of `liveProgram`. Why: the beta's copy is a backup loaded read only, the Bugs
+     row shows each key's hash against the file, and the grid is the same either way. Against: at cutover the app
+     must write, so the tests also hold core's launch through a writing store, each key left as the page leaves it.
+  3. **The failure words.** While the launch in hand reported an overlay that failed, This Week draws today's words,
+     "A plan change failed to apply. Flag it in Bugs.", as a standing line under the race row (the app has no toast
+     yet; the form is the session's, the words are today's). The freeze and the rebuild are logged, as on the page.
+  4. **The date readers.** `week-readers.ts` no longer declares `weekOfDate`, `overlayWeekRange`, `progDayDate` or
+     `dayOverlayInfo`: it imports core's (`state-overlays.ts`), the ones the launch and the page call.
+  5. **The two look items** (Mario's phone, 2026-11-14 09:37). The Recovery Week pill's arrow: Helvetica Neue holds
+     none, the web draws it from the system font at the pill's weight and React Native picked a thin one, so the
+     arrow is drawn in the system font at 700 (`pillArrow`). The week title: the web centres the font's 65.2 line in
+     the 56 of `line-height: 1` (baseline 48.7 down) and iOS stands the letters on the line's foot (44.1 down), so the
+     title sat 4.6 high; it is moved down 4.6 and the header's height is as it was.
+- **What deliberately does not change:** today's app, its page, core, what a program prescribes, every golden record
+  of stored state, the backup import and its row, the store's keys (the beta still writes none of them). Logging, the
+  overlay sheet and every tap that writes stay out, as before.
+- **Expected values** (typed by hand): a stored grid whose every day is marked STALE comes back from the launch with
+  a trained Monday still STALE and the six days after it rebuilt, on the Tuesday of week 1; on the Wednesday of week
+  3 with nothing trained, weeks 1 and 2 STALE and week 3 on rebuilt; an older program whose seed is beside its
+  config launches through a store that throws on any write, with nothing thrown and nothing changed, where core's own
+  launch on the same keys stores seed 4242; an overlay whose rest days are not a list counts one overlay failure and
+  logs `overlay apply failed`, `bad`; a config whose sports are not a list counts one rebuild failure and comes back
+  as stored; `↓ Recovery Week` splits into the arrow with its space and `Recovery Week`.
+- **Proof:**
+  - `tests/support/native-launch.ts` (new): imported first, it makes every launch of every test phone a launch of
+    the seam too, over the keys as they stood before the page launched, in SQLite: the same program as the page's,
+    whole; nothing written; core's launch through a writing store equal too, each key it changed left as the page
+    left it; an overlay failure reported as often as the page's toast.
+  - `tests/integration/native-this-week.test.ts` imports it and then `stored-state.test.ts`, so that file's 25 tests
+    and every one of their launches run under the check (at least 149 with a program, 43 with none, 8 that wrote, one
+    failed overlay). HALF_MANNY's five launches: the Expo app's own grid equal to the page's, the stored grid stale
+    on four of the five, 675 draws on the Expo app's own grid, the same from SQLite, and from the store alone on the
+    stale last launch; the stores unchanged after. 30 tests.
+  - `tests/sweeps/native-this-week.test.ts`: the same over the ten programs' 50 launches, with the stored-state
+    sweeps (the ten programs, three time zones, the lattice sample) under the launch check. Run locally: 5 tests, 65 s.
+  - `tests/unit/native-this-week.test.ts`: the launch's four tests above, the pill's arrow, the folder holding no
+    copy of the four readers, the seam handed the read only store. 46 tests.
+  - **Red on the commit before** (`tools/tree-at.mjs HEAD`, the changed test files over 1a1c619's tree): the unit
+    file 8 red of 46 (five by assertion; `pillArrow`, `launch` and `storedProgram` are new functions, red by
+    construction), the 38 others green, among them the readers' tables, which hold behaviour that must not change;
+    the integration file 29 red of 30, each stored-state test at its first launch ("the program the seam hands back
+    is not the one the page holds"), the tips test green; the sweep file 5 red of 5, at its first launch; `tests/unit/native-shell.test.ts`'s date test
+    red (its one other red there is the copy's own: `tools/tree-at.mjs` copies no `.github`, and that test reads
+    the workflow).
+  - **The readers' replacement fires** (`tests/measure/native-this-week_readers-break.mjs`, its report beside it):
+    each of core's four readers broken in a copy of the tree turns the unit file red, 3, 3, 4 and 1 tests, each
+    break through one of the screen's own readers at least (`liveInjuryOverlay`, `dayBeforeStart`, `scheduledDays`,
+    `dayIsTravel`).
+  - Every golden record identical: `tests/snapshots/` has no diff, and the stored-state integration file and its
+    sweeps pass under the check. Core and the page are not touched, so no other sweep can move.
+  - Where the Expo app's packages are not installed (`node tools/tree-at.mjs --working`): the unit and integration
+    files, 76 tests, and the tests' type check, green. The Expo app's own type check green. The 60-second check
+    green (42.8 s).
+  - `tests/unit/native-shell.test.ts`: its ban on `Date.now()` anywhere in the Expo app was the engine check's rule
+    for a timed slice; it now holds `EngineCheck.tsx` to it and names the app's one read of the date, the launch's.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios` earlier in the session and `npm run
+  sim-ios:fast` on the final code: the Release build under Hermes), with a copy of Mario's backup of 2026-11-14
+  written into the app's database file: Week 12, 22 days out, the pill's arrow bold, Tuesday RECOV and Thursday LEGS,
+  Long Run, **Cutback · 60 min · 10:30/mi**, "The long run steps back on purpose. Average no faster than 9:58/mi.",
+  Full Body Support, **Pushups (slow tempo) + 1 more**: his phone's screenshot of today's app at 19:17, element for
+  element, the three differences of build 101 gone. The title's middle sits 114.7 points down against today's 115.
+  Before the seam the same store drew Tuesday LEGS, Thursday SPEED, Cutback · 60 min and Kettlebell swing + 2 more.
+  After the launch and two taps the database held the file's 36 keys, each equal to the file's.
+- **Not seen yet:** Mario's phone. The side by side on the next IA Next build closes phase 2's gate. Its steps, as
+  given to him:
+  1. After the merge, TestFlight offers a new IA Next (0.262.2, a build number above 104). Install it. Today's app is
+     not touched.
+  2. In today's app, Bugs: save a backup.
+  3. In IA Next, Bugs: Load a backup, pick that file. It should read "Loaded 36 of 36 keys. Every hash matches the
+     file." (the count is whatever today's app holds).
+  4. Open This Week in both, on the same week.
+  5. Compare, top to bottom: the week title and where it sits beside Hurt?; the race row and the pill with its arrow;
+     the strip's seven words and marks; then tap each of the seven days in both and read each card's title, its line
+     under the title, its blurb and the lift's summary. Swipe to one other week and do two days there.
+  6. Back in IA Next, Bugs: it still reads "Holds 36 keys." Nothing was written.
+  7. Send "same", or a screenshot of each app for anything that differs.
