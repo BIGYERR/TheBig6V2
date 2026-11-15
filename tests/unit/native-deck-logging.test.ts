@@ -14,7 +14,7 @@ import type { ExCard } from '../../frontends/native/src/day-detail/session-secti
 import { parseRx } from '../../frontends/native/src/deck/deck-readers.ts';
 import { type DeckProgram, type Fields, deckView, freshFields, loggedCards, movesOf } from '../../frontends/native/src/deck/deck-screen.ts';
 import { type Session, act, leftField, markDay, saveLift, tapDone, tapFill, tapLog, tapReuse, tapStep } from '../../frontends/native/src/deck/deck-writes.ts';
-import { type MoveFields, fieldsView, fillLoads, loadVals, repVals, reuseLoad, stepRep, typeLoad, typeRep, typeSetLoad } from '../../frontends/native/src/deck/set-fields.ts';
+import { type MoveFields, afterLog, fieldsView, fillLoads, loadVals, openedSets, repVals, reuseLoad, stepRep, typeLoad, typeRep, typeSetLoad } from '../../frontends/native/src/deck/set-fields.ts';
 import { REPO } from '../support/app.ts';
 
 const NOW = 1_800_000_000_000;
@@ -54,10 +54,48 @@ describe('native deck logging: a move\'s fields', () => {
       reps: [{ value: '5', placeholder: '', rx: '5', step: 1 }, { value: '5', placeholder: '', rx: '5', step: 1 }, { value: '5', placeholder: '', rx: '5', step: 1 }],
       loads: [{ value: '', placeholder: '', inherit: true }, { value: '', placeholder: '', inherit: true }, { value: '', placeholder: '', inherit: true }],
       load: { value: '', placeholder: '' }, logged: false, reuse: null,
+      drawn: { head: '3 × 5', sub: 'as prescribed', varied: false, label: 'Load' },
     });
-    // A timed hold steps by five seconds and carries no load.
-    assert.deepStrictEqual(F['side_plank'], { reps: [{ value: '30', placeholder: '', rx: '30', step: 5 }, { value: '30', placeholder: '', rx: '30', step: 5 }], loads: [], load: null, logged: false, reuse: null });
+    // A timed hold steps by five seconds and carries no load. Its summary as drawn is its card's own.
+    const hold = x['side_plank']!.log!.sets!;
+    assert.deepStrictEqual(F['side_plank'], { reps: [{ value: '30', placeholder: '', rx: '30', step: 5 }, { value: '30', placeholder: '', rx: '30', step: 5 }], loads: [], load: null, logged: false, reuse: null,
+      drawn: { head: hold.head, sub: hold.sub, varied: hold.varied, label: 'Load' } });
     assert.ok(x['back_squat']!.log!.load, 'a barbell lift takes a load');
+  });
+
+  // Today's card draws a logged move's summary from the day's entry, and restates it from the cells when the move is
+  // next touched (set-logging.ts refreshSetSummary: after a step or a typed rep, after Log, and through markTopSet,
+  // which stops short on a move with no load cell per set). The two differ where the entry holds another count of
+  // sets than the card has rows: a lift logged on one card, then swapped in on a card of fewer sets, or an entry
+  // from before v0.262.3 that holds another move's sets (D290).
+  test('a summary stands as the card drew it until the page would restate it: four sets logged on a card of three rows', () => {
+    const { F } = opened();
+    const rx = parseRx(SQUAT, 'Back squat');
+    const drawn = { head: '4 × 5', sub: 'logged', varied: false, label: 'Top set' };
+    const f: MoveFields = { ...F['back_squat']!, logged: true, drawn };
+    const says = (g: MoveFields): string[] => { const v = fieldsView(g, rx, 'lbs'); return [v.head, v.sub]; };
+    assert.deepStrictEqual(says(f), ['4 × 5', 'logged'], 'as drawn');
+    // The load's label is drawn from the entry's loads and restated with the summary: every cell at one load reads Load.
+    assert.equal(fieldsView(f, rx, 'lbs').loadLabel, 'Top set');
+    assert.equal(fieldsView(openedSets(f), rx, 'lbs').loadLabel, 'Load');
+    // Varied stands as drawn too: an entry of uneven sets on rows that are all at their target.
+    const uneven: MoveFields = { ...f, drawn: { ...drawn, varied: true } };
+    assert.equal(fieldsView(uneven, rx, 'lbs').varied, true);
+    assert.equal(fieldsView(openedSets(uneven), rx, 'lbs').varied, false);
+    // Each of these restates it from the three rows.
+    assert.deepStrictEqual(says(openedSets(f)), ['3 × 5', 'logged'], 'its sets open');
+    assert.deepStrictEqual(says(stepRep(f, 0, 1)), ['6 / 5 / 5', ''], 'a step (a ladder carries no words after it)');
+    assert.deepStrictEqual(says(typeRep(f, 0, '5')), ['3 × 5', 'logged'], 'a rep typed');
+    assert.deepStrictEqual(says(typeLoad(f, '135')), ['3 × 5', 'logged'], 'the load typed');
+    assert.deepStrictEqual(says(typeSetLoad(f, 1, '145')), ['3 × 5', 'logged'], 'a set\'s load typed');
+    assert.deepStrictEqual(says(reuseLoad(f, 135)!), ['3 × 5', 'logged'], 'the reuse pill');
+    assert.deepStrictEqual(says(fillLoads(f, 135)), ['3 × 5', 'logged'], 'Fill every set');
+    assert.deepStrictEqual(says(afterLog(f, false, 0, 'lbs')), ['3 × 5', 'logged'], 'Log');
+    // A move with no load cell per set: opening its sets marks no top set and restates nothing; a step does.
+    const hold: MoveFields = { ...F['side_plank']!, logged: true, drawn: { head: 'as drawn', sub: 'logged', varied: false, label: 'Load' } };
+    const hrx = parseRx('2×30 sec each', 'Side plank');
+    assert.equal(fieldsView(openedSets(hold), hrx, 'lbs').head, 'as drawn');
+    assert.notEqual(fieldsView(stepRep(hold, 0, 5), hrx, 'lbs').head, 'as drawn');
   });
 
   test('a step moves a set by one and never under zero; an open set steps up from nothing', () => {
@@ -104,7 +142,7 @@ describe('native deck logging: a move\'s fields', () => {
     const f: MoveFields = {
       reps: [{ value: '', placeholder: '10', rx: '10', step: 1 }, { value: '7', placeholder: '10', rx: '10', step: 1 }, { value: '', placeholder: 'max', rx: null, step: 1 }, { value: 'x', placeholder: '', rx: null, step: 1 }],
       loads: [{ value: '', placeholder: '135', inherit: true }, { value: '142.5', placeholder: '135', inherit: false }, { value: '', placeholder: '', inherit: true }],
-      load: { value: '135', placeholder: '' }, logged: false, reuse: null,
+      load: { value: '135', placeholder: '' }, logged: false, reuse: null, drawn: null,
     };
     assert.deepStrictEqual(repVals(f), [10, 7, 0, 0]);
     assert.deepStrictEqual(loadVals(f), [135, 142.5, 0]);
@@ -124,7 +162,7 @@ describe('native deck logging: a move\'s fields', () => {
     const flat = fieldsView(typeLoad(F['back_squat']!, '60'), rx, 'kg');
     assert.deepStrictEqual([flat.loadLabel, flat.footLabel, flat.footValue, flat.top], ['Load', 'Every set', '60 kg', [false, false, false]]);
     // Logged as prescribed, and logged off the prescription.
-    assert.equal(fieldsView({ ...F['back_squat']!, logged: true }, rx, 'lbs').sub, 'logged');
+    assert.equal(fieldsView(afterLog(F['back_squat']!, false, 0, 'lbs'), rx, 'lbs').sub, 'logged');
     const seven = [0, 1, 2].reduce((g, s) => typeRep(g, s, '4'), F['back_squat']!);
     assert.deepStrictEqual([fieldsView(seven, rx, 'lbs').head, fieldsView(seven, rx, 'lbs').sub], ['3 × 4', 'not logged']);
   });
@@ -148,7 +186,7 @@ describe('native deck logging: what a tap stores', () => {
     leftField(S, typed, 'back_squat', NOW);
     assert.deepStrictEqual((parsed(S.store, 'ia_logs_p1') as { w1_mon: { sets: unknown } }).w1_mon.sets, { back_squat: { r: ['5', '4', '5'], w: ['', '', '125'], L: '135' } });
     // A blank cell over a placeholder is still blank in a draft: the load field, a set's load, an open set.
-    const blank: MoveFields = { reps: [{ value: '', placeholder: 'max', rx: null, step: 1 }], loads: [{ value: '', placeholder: '135', inherit: true }], load: { value: '', placeholder: '135' }, logged: false, reuse: null };
+    const blank: MoveFields = { reps: [{ value: '', placeholder: 'max', rx: null, step: 1 }], loads: [{ value: '', placeholder: '135', inherit: true }], load: { value: '', placeholder: '135' }, logged: false, reuse: null, drawn: null };
     leftField(S, { ...typed, back_squat: blank }, 'back_squat', NOW);
     assert.deepStrictEqual((parsed(S.store, 'ia_logs_p1') as { w1_mon: { sets: unknown } }).w1_mon.sets, { back_squat: { r: [''], w: [''], L: '' } });
   });
@@ -187,7 +225,7 @@ describe('native deck logging: what a tap stores', () => {
     assert.deepStrictEqual(parsed(S.store, 'ia_hist_p1'), { w1_mon: JSON.parse(JSON.stringify(S.prog.weeks[1]!['mon'])) });
     assert.deepStrictEqual(parsed(S.store, 'ia_exw_p1'), { side_plank: { name: 'Side plank', entries: [{ weight: 0, setsReps: '2×30 sec', setsDone: [30, 30], setsW: [], week: 1, day: 'mon', ts: NOW }] } });
     const before = dump(S.store);
-    const none = saveLift(S, 'box_breathing', 'Box breathing', '', { reps: [], loads: [], load: null, logged: false, reuse: null }, NOW);
+    const none = saveLift(S, 'box_breathing', 'Box breathing', '', { reps: [], loads: [], load: null, logged: false, reuse: null, drawn: null }, NOW);
     assert.deepStrictEqual([none.ok, none.toast, none.fields.logged], [false, 'Nothing to log here', false]);
     assert.equal(dump(S.store), before);
   });
@@ -291,20 +329,25 @@ describe('native deck logging: which files write', () => {
   const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
   const code = (f: string): string => strip(readFileSync(join(dir, f), 'utf8'));
   const files = readdirSync(dir).filter((f) => /\.tsx?$/.test(f)).sort();
-  const writers = (t: string): string[] => [...new Set([...t.matchAll(/\b((?:write|record|refresh|clear|drop|set|add)[A-Z]\w*)\(\s*(?:s\.)?store\b/g)].map((m) => m[1]!))].filter((n) => n !== 'setDraftOf').sort();
+  const writers = (t: string): string[] => [...new Set([...t.matchAll(/\b((?:write|record|refresh|clear|drop|set|add|count|mark)[A-Z]\w*)\(\s*(?:s\.)?store\b/g)].map((m) => m[1]!))].filter((n) => n !== 'setDraftOf').sort();
 
   test('the deck\'s folder holds the screen, its seam, its readers, its fields, its writes and the model\'s copy', () => {
-    assert.deepStrictEqual(files, ['Deck.tsx', 'deck-model.ts', 'deck-readers.ts', 'deck-screen.ts', 'deck-writes.ts', 'set-fields.ts']);
+    assert.deepStrictEqual(files, ['Deck.tsx', 'deck-model.ts', 'deck-readers.ts', 'deck-screen.ts', 'deck-swaps.ts', 'deck-writes.ts', 'set-fields.ts']);
     assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/day-detail')), ['session-sections-model.ts']);
+    assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/swap-sheet')).sort(), ['SwapSheet.tsx', 'swap-sheet-model.ts']);
   });
 
-  // The nine of core's writers the deck's taps end in (tests/measure/native-deck-logging_writes.md): the day's
-  // snapshot and its renewal, a set draft and its drop, the lift log, the day's log, the day's status, a skip and
-  // its undo. setDraftOf is a reader.
-  test('deck-writes.ts alone calls core\'s writers, and exactly the nine the measure named; nothing writes a key by hand', () => {
-    assert.deepStrictEqual(writers(code('deck-writes.ts')), ['addSkipEdit', 'dropSetDraft', 'dropSkipEdit', 'recordDaySnapshot', 'recordSetDraft', 'refreshDaySnapshot', 'setDayStatus', 'writeDayLogs', 'writeLiftLog']);
+  // The twelve of core's writers the deck's taps end in (tests/measure/native-deck-logging_writes.md and
+  // native-deck-swap_writes.md): the day's snapshot and its renewal, a set draft and its drop, the lift log, the
+  // day's log, the day's status, a skip and its undo, a swap's record, its count and its undo. setDraftOf is a
+  // reader. The nudge's two writers (markSwapNudged, recordSwapPreference) are called nowhere: it is not built.
+  test('deck-writes.ts alone calls core\'s writers, and exactly the twelve the measures named; nothing writes a key by hand', () => {
+    assert.deepStrictEqual(writers(code('deck-writes.ts')), ['addSkipEdit', 'addSwapRecord', 'countSwap', 'dropSetDraft', 'dropSkipEdit', 'dropSwapRecord', 'recordDaySnapshot', 'recordSetDraft', 'refreshDaySnapshot', 'setDayStatus', 'writeDayLogs', 'writeLiftLog']);
     for (const f of files.filter((x) => x !== 'deck-writes.ts')) assert.deepStrictEqual(writers(code(f)), [], f + ' calls none of core\'s writers');
-    const all = files.map(code).join('\n') + strip(readFileSync(join(REPO, 'frontends/native/src/day-detail/session-sections-model.ts'), 'utf8'));
+    const sheet = ['SwapSheet.tsx', 'swap-sheet-model.ts'].map((f) => strip(readFileSync(join(REPO, 'frontends/native/src/swap-sheet', f), 'utf8'))).join('\n');
+    assert.deepStrictEqual(writers(sheet), [], 'the swap sheet calls none of core\'s writers');
+    assert.doesNotMatch(files.map(code).join('\n') + sheet, /markSwapNudged|recordSwapPreference/, 'the nudge is not built');
+    const all = files.map(code).join('\n') + sheet + strip(readFileSync(join(REPO, 'frontends/native/src/day-detail/session-sections-model.ts'), 'utf8'));
     assert.doesNotMatch(all, /\b\w*[sS]tore\.(set|remove)\(/, 'no key is written or removed by hand');
     assert.doesNotMatch(all, /localStorage|AsyncStorage/, 'no other storage');
     assert.doesNotMatch(all, /ia_(pop|remind|season)/, 'the pop-ups\' keys are named nowhere in the deck');
@@ -314,12 +357,12 @@ describe('native deck logging: which files write', () => {
     const deck = code('Deck.tsx');
     assert.deepStrictEqual([...deck.matchAll(/from '(@ia\/core[^']*)'/g)].map((m) => m[1]), ['@ia/core/engine/icons.ts', '@ia/core/engine/state-store.ts']);
     assert.match(deck, /import type \{ StateStore \} from '@ia\/core\/engine\/state-store\.ts'/);
-    assert.match(deck, /import \{ type Session, act, leftField, markDay, tapDone, tapFill, tapLog, tapReuse, tapStep \} from '\.\/deck-writes'/);
+    assert.match(deck, /import \{ type Session, act, leftField, markDay, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap \} from '\.\/deck-writes'/);
     const body = deck.replace(/^import [^\n]*\n/gm, '');
     assert.deepStrictEqual([...new Set([...body.matchAll(/\bstore\b[^,;)\]}\n]*/g)].map((m) => m[0].trim()))].sort(), ['store', 'store: StateStore'].sort(), 'the store is only handed on');
   });
 
-  test('each control that writes calls its tap; swap, its put it back and remove still take no press', () => {
+  test('each control that writes calls its tap; remove alone still takes no press', () => {
     const deck = code('Deck.tsx');
     for (const wired of [
       'onPress={() => h.log(x)}', 'onPress={() => h.step(x.exKey, r.s, -r.step)}', 'onPress={() => h.step(x.exKey, r.s, r.step)}',
@@ -331,11 +374,25 @@ describe('native deck logging: which files write', () => {
     // The effort is stored only once the slider was moved (D219), with the notes, by Mark the day done alone.
     assert.ok(deck.includes('markDay(session, view.title, rpeTouched.current ? rpe : null, notes, Date.now());'));
     assert.equal((deck.match(/\bmarkDay\(/g) || []).length, 1);
-    // Three controls are drawn and off: a card's swap, a move's swap, and the put it back of a lift swapped in.
-    assert.equal((deck.match(/accessibilityState=\{\{ disabled: true \}\}/g) || []).length, 3);
-    assert.equal((deck.match(/"Swap this exercise" accessibilityState=\{\{ disabled: true \}\}/g) || []).length, 2);
+    // Swap and put it back, from a single lift's card and from a move's row (the deck's third session): the sheet
+    // opens on the lift at that place, a pick swaps it, and each put it back undoes the lift it names.
+    for (const wired of [
+      'onPress={() => openSwap(c.swap!.secIdx, c.swap!.itemIdx)}', 'onPress={() => h.swap(x.swap!.secIdx, x.swap!.itemIdx)}',
+      'onPress={() => putBack(c.swappedFrom!)}', 'onPress={() => h.unswap(x.swappedFrom!)}',
+      '{swap && <SwapSheet palette={p} view={swap.view} calm={calm} onPick={pick} onClose={() => setSwap(null)} />}',
+    ]) assert.ok(deck.includes(wired), 'Deck.tsx wires ' + wired);
+    assert.ok(deck.includes('const r = swapMove(session, swap.ctx, to, Date.now());') && deck.includes('const toast = undoSwap(session, from);'));
+    // Each draws the day again, as a skip does, and raises the toast its tap gave; each takes the keyboard off its field first.
+    assert.ok(deck.includes('    const r = swapMove(session, swap.ctx, to, Date.now());\n    if (!r) return;\n    redraw();\n    say(r.toast);'));
+    assert.ok(deck.includes('    const toast = undoSwap(session, from);\n    if (!toast) return;\n    redraw();\n    say(toast);'));
+    assert.ok(deck.includes('function openSwap(secIdx: number, itemIdx: number): void {\n    leave();') && deck.includes('function putBack(from: string): void {\n    leave();'));
+    assert.equal((deck.match(/\bswapMove\(/g) || []).length, 1);
+    assert.equal((deck.match(/\bundoSwap\(/g) || []).length, 1);
+    assert.ok(deck.includes("if (sheet) setSwap(sheet); else say('Nothing to swap here');"), 'today\'s toast where there is nothing to swap');
+    // No control is drawn and off any longer but remove, which today's deck does not reach either (deck.css hides the
+    // chip on the single lift's card an added move gets): its word is plain text, with no press.
+    assert.equal((deck.match(/accessibilityState=\{\{ disabled: true \}\}/g) || []).length, 0);
     assert.match(deck, /<Text style=\{\{ color: p\.onBand \}\}>remove<\/Text>/);
-    assert.match(deck, /<Text style=\{\{ color: p\.onBand \}\}>put it back<\/Text>/);
   });
 
   test('a press on a control takes the keyboard off its field first, so the field\'s cells are saved before the tap', () => {

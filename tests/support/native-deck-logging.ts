@@ -4,11 +4,14 @@
 //
 //   the page   today's own handlers, run on the page of a test phone (support/stored-state.ts): stepSet, setDelta,
 //              onSetWeight, cascadeSetWeights, reuseWeight, fillAllSetWeights, autoSaveSets, saveExWeight,
-//              skipExercise and its three siblings, and the deck's markDay as deck.ts writes it, with the pop-up that
-//              follows. Its fields are placed from today's own card model as the session sheet's template draws them
-//              (session-sections.ts), and placed again after an edit, as the template draws the cards afresh.
+//              skipExercise and its three siblings, applySwapChoice and undoSwap, and the deck's markDay as deck.ts
+//              writes it, with the pop-up that follows. Its fields are placed from today's own card model as the
+//              session sheet's template draws them (session-sections.ts), and placed again after an edit, as the
+//              template draws the cards afresh. Its swap sheet is the Angular sheet's open() over the page's own
+//              swapCandidates, auxSwapCandidates and swapLoadNote, through today's swap-sheet-model.ts.
 //   the beta   the Expo app's own taps (frontends/native/src/deck/deck-writes.ts over set-fields.ts), the ones its
-//              screen calls, over its own SQLite store (support/sqlite-kv.ts) and the grid its own launch handed back.
+//              screen calls, over its own SQLite store (support/sqlite-kv.ts) and the grid its own launch handed back;
+//              its swap sheet is deck-swaps.ts swapSheetOf.
 //
 // After every tap: the two stores hold each ia_ key equal, value for value; every field of every move holds the same
 // text, placeholder and inherit mark; the set summary, its words, Varied and the load's label read the same; and the
@@ -22,10 +25,12 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 import { type CardAct, type DeckCard, callItLog, deckCards } from '../../frontends/app/src/app/screens/deck/deck-model.ts';
 import { type ExCard, type ExSection, sectionsView } from '../../frontends/app/src/app/screens/day-detail/session-sections-model.ts';
 import { sectionReads } from '../../frontends/app/src/app/screens/day-detail/session-sections-reads.ts';
+import { type SwapSheetView, swapSheetView } from '../../frontends/app/src/app/screens/swap-sheet/swap-sheet-model.ts';
 import { parseRx } from '../../frontends/native/src/deck/deck-readers.ts';
 import { type DeckProgram, type DeckView, type Fields, deckView, freshFields, loggedCards, movesOf } from '../../frontends/native/src/deck/deck-screen.ts';
-import { type Session, act, leftField, markDay, tapDone, tapFill, tapLog, tapReuse, tapStep } from '../../frontends/native/src/deck/deck-writes.ts';
-import { fieldsView, typeLoad, typeRep, typeSetLoad } from '../../frontends/native/src/deck/set-fields.ts';
+import { type SwapOpen, swapSheetOf } from '../../frontends/native/src/deck/deck-swaps.ts';
+import { type Session, act, leftField, markDay, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from '../../frontends/native/src/deck/deck-writes.ts';
+import { fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from '../../frontends/native/src/deck/set-fields.ts';
 import { nativeDay, pageDay } from './native-deck.ts';
 import type { Phone } from './stored-state.ts';
 
@@ -63,8 +68,38 @@ function el(id: string, value = '', placeholder = '', cls = '', rx: string | nul
 export interface Tally {
   days: number; taps: number; checks: number; steps: number; typed: number; pills: number; logs: number; dones: number; commits: number;
   skips: number; undos: number; marks: number; drafts: number; loaded: number; toasts: number; popups: number;
+  /** The swap sheet: sheets compared, their rows, sheets with no row, picks, put backs, nudges that came due, and each toast's kind. */
+  sheets: number; rows: number; empty: number; picks: number; unswaps: number; nudges: number; swapToasts: Record<string, number>;
 }
-export const tally = (): Tally => ({ days: 0, taps: 0, checks: 0, steps: 0, typed: 0, pills: 0, logs: 0, dones: 0, commits: 0, skips: 0, undos: 0, marks: 0, drafts: 0, loaded: 0, toasts: 0, popups: 0 });
+export const tally = (): Tally => ({ days: 0, taps: 0, checks: 0, steps: 0, typed: 0, pills: 0, logs: 0, dones: 0, commits: 0, skips: 0, undos: 0, marks: 0, drafts: 0, loaded: 0, toasts: 0, popups: 0,
+  sheets: 0, rows: 0, empty: 0, picks: 0, unswaps: 0, nudges: 0, swapToasts: {} });
+
+/**
+ * Today's swap sheet for one lift of a day, as the Angular sheet's open() builds it (swap-sheet.ts): the page's own
+ * swapCandidates (the aux family's list for a lift with no pattern), _compoundTier and swapLoadNote, through today's
+ * swap-sheet-model.ts. Null where today's says "Nothing to swap here". Reads only.
+ */
+export function pageSheet(P: Phone, week: number, dayKey: string, secIdx: number, itemIdx: number): SwapSheetView | null {
+  const ctx = P.IA.ctx as Record<string, unknown>;
+  ctx['__sw'] = { week, dayKey, secIdx, itemIdx };
+  const raw = P.ev(`(function(){var a=__sw;var day=activeProg&&activeProg.weeks&&activeProg.weeks[a.week]&&activeProg.weeks[a.week][a.dayKey];
+    var sec=day&&day.sections&&day.sections[a.secIdx];var item=sec&&sec.items&&sec.items[a.itemIdx];
+    if(!item||!item.name) return null;
+    var c=swapCandidates(item.name,day,a.week,activeProg);var fam=!c.pattern?_auxFamily(item.name):null;
+    if(fam){c.tier1=auxSwapCandidates(item.name,day,activeProg);c.tier2=[];}
+    return JSON.stringify({name:item.name,detail:item.detail||'',sec:{label:sec.label,superset:sec.superset,type:sec.type,items:(sec.items||[]).map(function(x){return x?{name:x.name}:x;})},
+      c:c,label:fam?(_AUX_FAMILY_LABEL[fam]==null?null:_AUX_FAMILY_LABEL[fam]):null,tier:_compoundTier(item.name)});})()`) as string | null;
+  if (raw == null) return null;
+  const r = JSON.parse(raw) as { name: string; detail: string; sec: { label?: string; superset?: boolean; type?: string; items?: { name: string }[] }; c: { tier1: string[]; tier2: string[]; pattern: string | null; region: string | null }; label: string | null; tier: number };
+  const note = P.ev('swapLoadNote') as (o: string, c: string) => string;
+  return plain(swapSheetView({ name: r.name, detail: r.detail, itemIdx, section: r.sec, candidates: r.c, familyLabel: r.label, compoundTier: r.tier, loadNote: (o, c) => note(o, c) }));
+}
+/** The kind of toast a pick raised, by its words (swap-sheet.ts applySwapChoice has six). */
+export function swapToastKind(t: string): string {
+  const hold = /Your injury plan holds this one at RPE 7\.$/.test(t);
+  const kind = /The load runs out before the reps do here\./.test(t) ? 'window' : /No load to add here/.test(t) ? 'no load' : /Same job, same numbers\.$|Same sets, same reps\./.test(t) ? 'same' : 'other';
+  return kind + (hold ? ', held' : '');
+}
 
 /** One day's deck, open on today's page and in the Expo app, over the same keys. */
 export class TwoDecks {
@@ -76,6 +111,8 @@ export class TwoDecks {
   /** The page's side: its cards as drawn, and the moves whose top set the page has marked. */
   pageCards: DeckCard[] = [];
   private readonly topped = new Set<string>();
+  /** The moves whose sets stand open (the page's exset-open class), which a redraw closes again. */
+  private readonly setsOpen = new Set<string>();
   /** Every key of the beta's store as it stood before the deck opened. */
   private readonly pre: Record<string, string>;
   private readonly now: number;
@@ -119,6 +156,7 @@ export class TwoDecks {
     const m = this.els;
     m.clear();
     this.topped.clear();
+    this.setsOpen.clear();
     for (const x of movesOf(this.pageCards)) {
       const k = x.exKey;
       m.set('excard_' + k, el('excard_' + k, '', '', 'exercise-item' + (x.logged ? ' logged' : '')));
@@ -245,7 +283,11 @@ export class TwoDecks {
   // ── The taps ───────────────────────────────────────────────────────────────────────────────────────────────────
   /** A move's sets opened (today's toggleSets, which marks the top set): nothing is stored, the foot is then compared. */
   toggle(exKey: string): void {
-    this.tap('the sets of ' + exKey + ' opened', () => { this.page(`toggleSets(${J(exKey)});`); this.topped.add(exKey); }, () => []);
+    // The page's toggle opens and closes; the top set is marked, and the summary restated, as the sets open.
+    const opening = !this.setsOpen.has(exKey);
+    if (opening) this.setsOpen.add(exKey); else this.setsOpen.delete(exKey);
+    this.tap('the sets of ' + exKey + (opening ? ' opened' : ' closed'), () => { this.page(`toggleSets(${J(exKey)});`); this.topped.add(exKey); },
+      () => { if (opening) this.fields = { ...this.fields, [exKey]: openedSets(this.fields[exKey]!) }; return []; });
   }
   step(exKey: string, row: number, dir: 1 | -1): void {
     const f = this.fields[exKey]!, by = dir * f.reps[row]!.step;
@@ -317,6 +359,68 @@ export class TwoDecks {
     });
     if (off) this.T.skips++; else this.T.undos++;
   }
+  // ── The swap sheet (swap-sheet.ts) ─────────────────────────────────────────────────────────────────────────────
+  /**
+   * An edit whose redraw lands on the deck. In the app, openDetail with the deck open is the deck's redraw
+   * (day-detail.ts open(), D275), which leaves the stale warning's once-per-open marks alone. On the bare page
+   * openDetail is the session sheet's own draw, which sets them afresh and speaks the warning itself. So the marks
+   * are put back as they stood, and the deck's cards are then drawn from them, as the app draws them: a lift swapped
+   * in whose last load is stale speaks the warning if none has spoken in this open.
+   */
+  private redrawn(edit: () => void): void {
+    const was = this.page('[_staleWarnShown,_staleWarnSrc]') as [boolean, string];
+    edit();
+    (this.P.IA.ctx as Record<string, unknown>)['__warn'] = was;
+    this.page('_setStaleWarnShown(__warn[0]);_setStaleWarnSrc(__warn[1]);');
+  }
+  /** The sheet for one lift, on both apps: the same sheet, whole. Nothing is stored by opening it. */
+  sheet(secIdx: number, itemIdx: number): SwapOpen | null {
+    const before = held(this.s.store);
+    const page = pageSheet(this.P, this.week, this.dayKey, secIdx, itemIdx);
+    const beta = swapSheetOf(this.s.prog, this.week, this.dayKey, secIdx, itemIdx);
+    assert.deepStrictEqual(beta ? plain(beta.view) : null, page, this.what + ': the swap sheet of section ' + secIdx + ', item ' + itemIdx);
+    assert.deepStrictEqual(held(this.s.store), before, this.what + ': opening the sheet stored something');
+    this.T.sheets++;
+    if (beta) { const rows = beta.view.sameJob.length + beta.view.otherJob.length; this.T.rows += rows; if (!rows) this.T.empty++; }
+    return beta;
+  }
+  /**
+   * A pick: today's sheet writes the lift in hand as the Angular sheet does (LegacyBridge.set of _swapCtx), then
+   * applySwapChoice, which draws the cards afresh; the beta's swapMove, then its own redraw. The nudge that comes due
+   * on the third pick running of one pair is compared and left unanswered on the page, as the beta raises none.
+   */
+  swap(open: SwapOpen, to: string): void {
+    let due = false;
+    this.tap('a swap of ' + open.ctx.name + ' for ' + to, () => {
+      (this.P.IA.ctx as Record<string, unknown>)['__ctx'] = { ...open.ctx };
+      this.redrawn(() => { this.page(`_nudgeCtx=null;_swapCtx=__ctx;applySwapChoice(${J(to)});`); this.P.settle(); });
+      due = !!this.page('_nudgeCtx');
+      this.page('_nudgeCtx=null;');
+      this.pagePlace();
+    }, () => {
+      const r = swapMove(this.s, open.ctx, to, this.now);
+      assert.ok(r, this.what + ': the beta swapped where today\'s did');
+      assert.equal(r.nudge, due, this.what + ': the nudge is due on both, or on neither');
+      const k = swapToastKind(r.toast);
+      this.T.swapToasts[k] = (this.T.swapToasts[k] || 0) + 1;
+      this.nativeDraw();
+      this.sameCards('drawn again after a swap');
+      return [r.toast];
+    });
+    this.T.picks++;
+    if (due) this.T.nudges++;
+  }
+  /** Put it back: today's undoSwap, which draws the cards afresh; the beta's, then its own redraw. */
+  unswap(from: string): void {
+    this.tap('a put back of ' + from, () => { this.redrawn(() => { this.page(`undoSwap(${J(from)});`); }); this.pagePlace(); }, () => {
+      const t = undoSwap(this.s, from);
+      this.nativeDraw();
+      this.sameCards('drawn again after a put back');
+      return t ? [t] : [];
+    });
+    this.T.unswaps++;
+  }
+
   /** Mark the day done, as deck.ts markDay writes it, with the deck's close and the pop-up over This Week. */
   mark(rpe: number | null, notes: string): void {
     const w = this.week, d = this.dayKey, title = this.view.title;

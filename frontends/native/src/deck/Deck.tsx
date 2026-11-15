@@ -13,9 +13,14 @@
 // page's inputs are. Done, next one sends the card behind the deck with a glow (call 10); a skip punches the card
 // (call 5). Both are still under Reduce Motion.
 //
-// Not here yet: swap and its put it back, and remove on an added move (drawn, taking no press: they wait for the swap
-// sheet and the add sheet); the opening out of the card (call 16) and the up and down pager (call 1); the completion
-// pop-up, in whose place Mark the day done raises the toast today's app raises when no pop-up shows.
+// IT SWAPS (the deck's third session). The swap mark on a single lift's card and on a move's row opens the swap sheet
+// (swap-sheet/SwapSheet.tsx over deck-swaps.ts); a pick swaps the lift and Put it back undoes it (deck-writes.ts
+// swapMove and undoSwap, the page's applySwapChoice and undoSwap), each drawing the day again as a skip does.
+//
+// Not here yet: remove on an added move (drawn, taking no press: today's deck hides it on the card an added move
+// gets, and the add sheet is the session sheet's); the coach's nudge after the third swap running of one pair; the
+// opening out of the card (call 16) and the up and down pager (call 1); the completion pop-up, in whose place Mark
+// the day done raises the toast today's app raises when no pop-up shows.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Keyboard, PanResponder, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,9 +35,11 @@ import {
   CALL_IT_WORDS, type CardAct, type DeckCard, PIP_THRESHOLD, ctaText, numeral, openAfterSetsTap, restOpen, rpeBubble, rxLine, stateOf,
 } from './deck-model';
 import { parseRx } from './deck-readers';
-import { type DeckOpen, type Fields, deckView, freshFields, loggedCards, movesOf, toneColor } from './deck-screen';
-import { type Session, act, leftField, markDay, tapDone, tapFill, tapLog, tapReuse, tapStep } from './deck-writes';
-import { type FieldsView, type MoveFields, fieldsView, typeLoad, typeRep, typeSetLoad } from './set-fields';
+import { SwapSheet } from '../swap-sheet/SwapSheet';
+import { type CoverKind, type DeckOpen, type Fields, coverOf, deckView, freshFields, loggedCards, movesOf, toneColor } from './deck-screen';
+import { type SwapOpen, swapSheetOf } from './deck-swaps';
+import { type Session, act, leftField, markDay, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from './deck-writes';
+import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from './set-fields';
 
 /** A card's sizes (D283, Mario's "Auto"): Roomy on a screen 700 points tall or more, Tight below it. */
 interface Sizes { num: number; title: number; meta: number; name: number; line: number; cue: number; ctl: number; ic: number; mic: number; pad: number; item: number; row: number; load: number }
@@ -77,6 +84,8 @@ interface Handlers {
   log: (x: ExCard) => void;
   skip: (name: string) => void;
   unskip: (name: string) => void;
+  swap: (secIdx: number, itemIdx: number) => void;
+  unswap: (from: string) => void;
 }
 
 export function Deck({ palette: p, store, open, onClose, say }: { palette: Palette; store: StateStore; open: DeckOpen; onClose: () => void; say: (toast: string) => void }) {
@@ -167,14 +176,20 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
 
   // ── Sets open in place, the other moves fold (D283; deck.ts foldOf, setsTapped, foldTapped) ──
   const foldOf = (c: DeckCard): string | null => openMove[c.key] || restOpen(c);
+  /** A move's sets as they open: the page marks the top set then, which restates the summary from the cells. */
+  const setsOpened = (exKey: string): void => {
+    const f = fieldsNow.current[exKey];
+    if (f) apply({ ...fieldsNow.current, [exKey]: openedSets(f) });
+  };
   const setsTapped = (c: DeckCard, exKey: string): void => {
     const opened = !setsOpen[exKey];
+    if (opened) setsOpened(exKey);
     setSetsOpen((m) => ({ ...m, [exKey]: opened }));
     setOpenMove((m) => ({ ...m, [c.key]: openAfterSetsTap(c, exKey, opened) }));
   };
   const foldTapped = (c: DeckCard, exKey: string): void => {
     const was = foldOf(c);
-    if (was && setsOpen[was]) setSetsOpen((m) => ({ ...m, [was]: false, [exKey]: true }));
+    if (was && setsOpen[was]) { setsOpened(exKey); setSetsOpen((m) => ({ ...m, [was]: false, [exKey]: true })); }
     setOpenMove((m) => ({ ...m, [c.key]: exKey }));
   };
 
@@ -211,6 +226,8 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
     },
     skip: (name) => edit({ kind: 'exercise', name }, true),
     unskip: (name) => edit({ kind: 'exercise', name }, false),
+    swap: (secIdx, itemIdx) => openSwap(secIdx, itemIdx),
+    unswap: (from) => putBack(from),
   };
 
   // ── Skip and put it back (deck.ts act, skip and redraw) ──
@@ -231,6 +248,29 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
     const toast = act(session, a, off);
     redraw();
     if (toast) say(toast);
+  }
+  // ── Swap and put it back (swap-sheet.ts openSwapSheet, applySwapChoice and undoSwap) ──
+  /** The swap sheet, open on one lift of the day, or none. */
+  const [swap, setSwap] = useState<SwapOpen | null>(null);
+  function openSwap(secIdx: number, itemIdx: number): void {
+    leave();
+    const sheet = swapSheetOf(open.prog, open.week, open.dayKey, secIdx, itemIdx);
+    if (sheet) setSwap(sheet); else say('Nothing to swap here');
+  }
+  /** A pick: the lift swapped, the day drawn again under the sheet as it slides away, the toast. The nudge is not raised yet. */
+  const pick = (to: string): void => {
+    if (!swap) return;
+    const r = swapMove(session, swap.ctx, to, Date.now());
+    if (!r) return;
+    redraw();
+    say(r.toast);
+  };
+  function putBack(from: string): void {
+    leave();
+    const toast = undoSwap(session, from);
+    if (!toast) return;
+    redraw();
+    say(toast);
   }
   /** A skip punches the card (board V), plain grey under Reduce Motion, and raises no pop up (call 5). */
   const skip = (c: DeckCard): void => {
@@ -346,13 +386,16 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
     }
     return { zIndex: 1, opacity: 0 };
   };
-  const faceOpacity = (k: number): number | Animated.AnimatedInterpolation<number> => {
-    if (k === i) return 1;
-    if (k !== peek) return 0;
-    if (leaving) return leaveV.interpolate({ inputRange: [0, 2], outputRange: [0.25, 1] });
-    // The card behind is a plain card until a drag begins (deck.ts faceStyle: no face while nothing moves), so a
-    // skipped card, which is drawn at 72%, shows no words through it. From two points of drag it fades in from a quarter.
-    return done ? 0 : q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [0, 0.25 + (0.75 * 2) / PEEK, 1] });
+  // A card's words are never hidden by an opacity of their own: every card but the top one wears a cover of its own
+  // colour (deck-screen.ts coverOf), and the top card wears none, so nothing can leave its words hidden. Hidden by
+  // their own opacity, the words of the card a swipe brought up stayed hidden whenever the finger rested before it
+  // lifted (IA Next build 109, Mario's phone): the opacity went from a moving value to a plain 1 the screen was never sent.
+  // The card behind is a plain card until a drag begins (deck.ts faceStyle: no face while nothing moves), so a skipped
+  // card, which is drawn at 72%, shows no words through it. From two points of drag its words come up from a quarter.
+  const coverOpacity = (kind: CoverKind): number | Animated.AnimatedInterpolation<number> => {
+    if (kind === 'rest') return 1;
+    if (kind === 'leave') return leaveV.interpolate({ inputRange: [0, 2], outputRange: [0.75, 0] });
+    return q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [1, 0.75 - (0.75 * 2) / PEEK, 0] });
   };
 
   const s = styles;
@@ -371,7 +414,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
       </View>
 
       <View testID="deck-stage" style={s.stage} onLayout={(e) => setStageW(e.nativeEvent.layout.width)} {...pan.panHandlers}>
-        {cards.map((c, k) => (
+        {cards.map((c, k) => { const cover = coverOf(k, i, peek, done ? done.phase : null); return (
           <Animated.View
             key={c.key}
             testID={'deck-card-' + k}
@@ -382,7 +425,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
               isLogged(c) && { boxShadow: '0 0 0 3px ' + p.signal + ', 0 14px 38px rgba(' + p.signalRgb + ',0.40), 0 8px 24px rgba(0,0,0,0.14)' },
               c.skipped && k === i && { opacity: 0.72 }, cardStyle(k)]}
           >
-            <Animated.View style={[s.face, { opacity: faceOpacity(k) }]}>
+            <View style={s.face}>
               <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: z.pad, paddingBottom: z.pad - 2 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
                 {isLogged(c) && <View pointerEvents="none" style={s.bigcheck}><Tick size={240} color={on(1)} /></View>}
                 <View style={[s.top, { minHeight: z.ic }]}>
@@ -392,7 +435,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
                     {isLogged(c) && <View style={[s.doneChip, { backgroundColor: on(0.2) }]}><Tick size={12} color={p.onBand} width={3.5} /><Text style={[s.doneText, { color: p.onBand }]}>Logged</Text></View>}
                   </View>
                   <View style={s.acts}>
-                    {c.swap && <View accessibilityRole="button" accessibilityLabel="Swap this exercise" accessibilityState={{ disabled: true }} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: on(0.16) }]}><Icon name="swap" size={17} color={p.onBand} /></View>}
+                    {c.swap && <Pressable testID="deck-swap" accessibilityRole="button" accessibilityLabel="Swap this exercise" onPress={() => openSwap(c.swap!.secIdx, c.swap!.itemIdx)} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: on(0.16) }]}><Icon name="swap" size={17} color={p.onBand} /></Pressable>}
                     {c.skip && c.kind !== 'lift' && <Pressable testID="deck-skip" accessibilityRole="button" accessibilityLabel="Skip the whole card" onPress={() => skip(c)} style={[s.act, s.actAll, { height: z.ic, backgroundColor: on(0.16) }]}><Text style={[s.actAllText, { color: p.onBand }]}>Skip all</Text></Pressable>}
                     {c.undo && <Pressable testID="deck-undo" accessibilityRole="button" accessibilityLabel="Put it back" onPress={() => edit(c.undo!, false)} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: p.onBand }]}><Undo size={18} color={p.band} /></Pressable>}
                     {c.skip && c.kind === 'lift' && <Pressable testID="deck-skip" accessibilityRole="button" accessibilityLabel="Skip this card" onPress={() => skip(c)} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: on(0.16) }]}><Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={p.onBand} strokeWidth={2.5} strokeLinecap="round"><Line x1={5} y1={12} x2={19} y2={12} /></Svg></Pressable>}
@@ -406,7 +449,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
                   <View style={[s.from, { backgroundColor: on(0.16) }]}>
                     <Text style={[s.fromB, { color: p.onBand }]}>Swapped in</Text>
                     <Text numberOfLines={1} style={[s.fromText, { color: on(0.78) }]}>{'for ' + c.swappedFrom}</Text>
-                    <View accessibilityRole="button" accessibilityLabel="Put it back" accessibilityState={{ disabled: true }} style={[s.fromBtn, { backgroundColor: p.onBand }]}><Undo size={15} color={p.band} /></View>
+                    <Pressable testID="deck-unswap" accessibilityRole="button" accessibilityLabel="Put it back" hitSlop={8} onPress={() => putBack(c.swappedFrom!)} style={[s.fromBtn, { backgroundColor: p.onBand }]}><Undo size={15} color={p.band} /></Pressable>
                   </View>
                 )}
                 {c.kind === 'finish' ? (
@@ -432,7 +475,8 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
                   </View>
                 )}
               </ScrollView>
-            </Animated.View>
+            </View>
+            {cover && <Animated.View key={cover} testID={'deck-cover-' + k} pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: toneColor(p, c.tone), opacity: coverOpacity(cover) }]} />}
             {c.skipped && (
               <Animated.View pointerEvents="none" style={[s.hole, hit === c.key && { opacity: holeV.interpolate({ inputRange: [0, 0.55, 1], outputRange: [0, 1, 1] }), transform: [{ rotate: '-13deg' }, { scale: holeV.interpolate({ inputRange: [0, 0.55, 1], outputRange: [0.2, 1.12, 1] }) }] }]}>
                 <Svg viewBox="0 0 220 220" width={200} height={200}>
@@ -450,7 +494,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
               </Animated.View>
             ))}
           </Animated.View>
-        ))}
+        ); })}
       </View>
 
       <View testID="deck-dots" style={s.dots}>
@@ -508,6 +552,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
           </View>
         </View>
       )}
+      {swap && <SwapSheet palette={p} view={swap.view} calm={calm} onPick={pick} onClose={() => setSwap(null)} />}
     </View>
   );
 }
@@ -637,7 +682,7 @@ function Move({ x, c, z, p, last, open, folded, pip, f, fv, h, onSets, onFold, o
       )}
       {!lift && !!line.cue && <Text style={[s.moveCue, { fontSize: z.cue, lineHeight: z.cue * 1.3, color: on(0.76) }]}>{line.cue}</Text>}
       {!lift && x.added && <Text style={[s.chip, { color: on(0.76) }]}><Text style={{ color: p.onBand, fontWeight: '700' }}>You added this</Text>{' · not in the plan  '}<Text style={{ color: p.onBand }}>remove</Text></Text>}
-      {!lift && x.swappedFrom && <Text style={[s.chip, { color: on(0.76) }]}><Text style={{ color: p.onBand, fontWeight: '700' }}>Swapped in</Text>{' for ' + x.swappedFrom + '  '}<Text style={{ color: p.onBand }}>put it back</Text></Text>}
+      {!lift && x.swappedFrom && <Text style={[s.chip, { color: on(0.76) }]}><Text style={{ color: p.onBand, fontWeight: '700' }}>Swapped in</Text>{' for ' + x.swappedFrom + '  '}<Text testID={'deck-unswap-' + x.exKey} accessibilityRole="button" suppressHighlighting onPress={() => h.unswap(x.swappedFrom!)} style={{ color: p.onBand }}>put it back</Text></Text>}
       {sets && open && f && fv && <Rows x={x} rows={sets.rows} f={f} fv={fv} foot={sets.foot} pip={pip} p={p} h={h} onPip={(n2) => onPip(x.exKey, n2)} />}
       {load && (
         <View style={[s.weightRow, { marginTop: z.row }]}>
@@ -675,13 +720,13 @@ function Move({ x, c, z, p, last, open, folded, pip, f, fv, h, onSets, onFold, o
   );
 }
 
-/** A move's name, with its swap (drawn, not yet taking a touch), its minus and its check once logged. */
+/** A move's name, with its swap, its minus and its check once logged. */
 function NameRow({ x, z, p, controls, logged, h }: { x: ExCard; z: Sizes; p: Palette; controls: boolean; logged: boolean; h: Handlers }) {
   const s = styles;
   return (
     <View style={s.nameRow}>
       <Text style={[s.moveName, { flex: 1, fontSize: z.name, lineHeight: z.name * 1.22, color: p.onBand }]}>{plain(x.name)}</Text>
-      {controls && x.swap && <View accessibilityRole="button" accessibilityLabel="Swap this exercise" accessibilityState={{ disabled: true }} style={[s.mic, { width: z.mic, height: z.mic, backgroundColor: on(0.14) }]}><Icon name="swap" size={16} color={p.onBand} /></View>}
+      {controls && x.swap && <Pressable testID={'deck-swap-' + x.exKey} accessibilityRole="button" accessibilityLabel="Swap this exercise" onPress={() => h.swap(x.swap!.secIdx, x.swap!.itemIdx)} style={[s.mic, { width: z.mic, height: z.mic, backgroundColor: on(0.14) }]}><Icon name="swap" size={16} color={p.onBand} /></Pressable>}
       {controls && x.skip && <Pressable testID={'deck-minus-' + x.exKey} accessibilityRole="button" accessibilityLabel="Skip this exercise" onPress={() => h.skip(x.name)} style={[s.mic, { width: z.mic, height: z.mic, backgroundColor: on(0.14) }]}><Icon name="minus" size={16} color={p.onBand} /></Pressable>}
       {logged && <Text style={[s.badge, { color: p.onBand }]}>✓</Text>}
     </View>

@@ -16,7 +16,7 @@ import {
   STALE_LOAD_DAYS, crossProgLastEntry, exControlFlags, isKBExercise, isStaleTs, parseRx, recencyLabel, rxSuffix, setsSubLabel, setsSummary,
   setsVaried, stripLeadingSets, swapOriginOf, toDispW,
 } from '../../frontends/native/src/deck/deck-readers.ts';
-import { type DeckProgram, dayCards, deckView, shaded, toneColor } from '../../frontends/native/src/deck/deck-screen.ts';
+import { type DeckProgram, coverOf, dayCards, deckView, shaded, toneColor } from '../../frontends/native/src/deck/deck-screen.ts';
 
 const DAY = 86400000;
 const NOW = new Date(2026, 10, 14, 12, 0, 0).getTime();
@@ -267,9 +267,10 @@ describe('native deck: the screen', () => {
     const presses = [...new Set([...code.matchAll(/onPress=\{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]!.trim()))].sort();
     assert.deepStrictEqual(presses, [
       '() => edit(c.undo!, false)', '() => h.fill(x.exKey, load.fill!.value)', '() => h.log(x)', '() => h.reuse(x.exKey, reuse.value)', '() => h.skip(x.name)',
-      '() => h.step(x.exKey, r.s, -r.step)', '() => h.step(x.exKey, r.s, r.step)', '() => h.unskip(x.name)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)',
-      '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k); }', '() => { leave(); onClose(); }',
-      "() => { leave(); setSheet('map'); }", 'advance', 'onRpe',
+      '() => h.step(x.exKey, r.s, -r.step)', '() => h.step(x.exKey, r.s, r.step)', '() => h.swap(x.swap!.secIdx, x.swap!.itemIdx)', '() => h.unskip(x.name)',
+      '() => h.unswap(x.swappedFrom!)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)', '() => openSwap(c.swap!.secIdx, c.swap!.itemIdx)',
+      '() => putBack(c.swappedFrom!)', '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k); }',
+      '() => { leave(); onClose(); }', "() => { leave(); setSheet('map'); }", 'advance', 'onRpe',
     ]);
   });
 
@@ -279,11 +280,37 @@ describe('native deck: the screen', () => {
     assert.ok(code.includes('{ x: 15, y: -7, s: 0.965, r: \'1.6deg\' }') && code.includes('{ x: 0, y: 0, s: 0.92, r: \'0deg\' }'), 'the card that rises: from the fan going on, from behind going back');
     assert.ok(code.includes('{ translateX: pos * 15 }, { translateY: pos * -7 }, { scale: 1 - pos * 0.035 }, { rotate: pos * 1.6 + \'deg\' }'), 'the fan');
     assert.ok(code.includes('duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1)'), 'a swipe let go short settles back in 290 ms');
-    // At rest the card behind shows no face (deck.ts faceStyle), so nothing reads through a skipped card's 72%; it
-    // fades in from a quarter once a drag passes two points, and the fan is the next card's again when the drag ends.
-    assert.ok(code.includes('q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [0, 0.25 + (0.75 * 2) / PEEK, 1] })'), 'the card behind has no face until a drag begins');
+    // At rest the card behind shows no words (deck.ts faceStyle), so nothing reads through a skipped card's 72%; they
+    // come up from a quarter once a drag passes two points, and the fan is the next card's again when the drag ends.
+    // The words are hidden by a cover of the card's colour, so the numbers are one minus today's: 1, then 0.75, then 0.
+    assert.ok(code.includes('q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [1, 0.75 - (0.75 * 2) / PEEK, 0] })'), 'the card behind shows no words until a drag begins');
+    assert.ok(code.includes('leaveV.interpolate({ inputRange: [0, 2], outputRange: [0.75, 0] })'), 'the card behind comes up from a quarter as Done, next one sends the top card away');
     assert.ok(code.includes('.start(rest);') && code.includes('const rest = (): void => { dirNow.current = 1; setDir(1); };'), 'at rest the card behind is the next one');
     assert.ok(code.includes('height >= 700 ? ROOMY : TIGHT'), 'D283: Roomy on a screen 700 points tall or more');
+  });
+
+  // IA Next build 109, Mario's phone, 2026-11-15: after a swipe whose finger rested before it lifted, the card it
+  // brought up was blank. Its words were hidden by an opacity of their own, which went from a moving value to a plain 1
+  // that React Native never sent (it had recorded 1 while the finger rested, then set 0 itself as the drag ended).
+  // Seen again on the simulator on his backup: a drag of 220 points held a quarter second, then let go.
+  test('the top card wears no cover, so nothing can hide its words; every card behind wears one, drawn afresh when what it is doing changes', () => {
+    // Three cards, the second on top, the third behind it. Typed by hand from the rule.
+    assert.equal(coverOf(1, 1, 2, null), null, 'the top card at rest');
+    assert.equal(coverOf(1, 1, 2, 'lift'), null, 'the top card as Done, next one lifts it');
+    assert.equal(coverOf(1, 1, 2, 'leave'), null, 'the top card as it leaves');
+    assert.equal(coverOf(1, 1, 1, null), null, 'a deck of one card: the top card is never the card behind');
+    assert.equal(coverOf(2, 1, 2, null), 'drag', 'the card behind follows the finger');
+    assert.equal(coverOf(2, 1, 2, 'lift'), 'rest', 'the card behind is a plain card while the top one lifts');
+    assert.equal(coverOf(2, 1, 2, 'leave'), 'leave', 'the card behind comes up as the top one leaves');
+    assert.equal(coverOf(0, 1, 2, null), 'rest', 'a card further back is a plain card');
+    assert.equal(coverOf(0, 1, 2, 'leave'), 'rest');
+    // The screen: a card's words sit in a plain view with no opacity of its own, and the cover is keyed by its kind,
+    // so a card that comes to the top loses its cover and a cover never passes from a moving value to a plain one.
+    assert.ok(code.includes('<View style={s.face}>'), 'the words sit in a plain view');
+    assert.doesNotMatch(code, /s\.face, \{ opacity|faceOpacity/, 'the words carry no opacity of their own');
+    assert.ok(code.includes('const cover = coverOf(k, i, peek, done ? done.phase : null);'));
+    assert.ok(code.includes("{cover && <Animated.View key={cover} testID={'deck-cover-' + k} pointerEvents=\"none\" style={[StyleSheet.absoluteFill, { backgroundColor: toneColor(p, c.tone), opacity: coverOpacity(cover) }]} />}"), 'the cover is the card\'s own colour, takes no touch, and is keyed by its kind');
+    assert.ok(code.includes("if (kind === 'rest') return 1;"), 'a plain card is covered whole');
   });
 
   test('This Week\'s Start lift and Start session open it, over the tab bar; a sunk button and the run\'s buttons open nothing', () => {
