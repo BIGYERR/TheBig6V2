@@ -62,8 +62,10 @@ for what Log stores, `tests/integration/set-logging.test.ts`.
   set the athlete added by hand without the day's prescription, and the phone's data is the only copy. Such an
   entry keeps reading its long line on its day; a Log on that day rewrites that day's entry in place with the
   move's own sets (`recordLift` replaces the entry of the same week and day). Program output does not move.
-- **In the Expo app:** the deck's logging is not built yet (it is this chat's next piece). It is built to this rule
-  from the start, under this D-code.
+- **In the Expo app (Post-v0.262.3):** the deck's logging is built to this rule from the start, under this D-code:
+  a move's fields are its own (`frontends/native/src/deck/set-fields.ts`), so Log reads no other move's.
+  `tests/unit/native-deck-logging.test.ts` types the pair by hand, and `tests/integration/native-deck-logging.test.ts`
+  holds both apps equal on the pair's own day of the bodyweight program.
 - **Expected values (typed by hand):** on that day, with 8, 8, 7 in Split squat's rows and 31, 32 in the hold's, Log
   on Split squat stores `setsDone [8,8,7]`; Log on the hold stores `[31,32]`; Split squat's card then reads
   "8 / 8 / 7".

@@ -133,7 +133,8 @@ test('a lift log holding an old key: the page folds and stores it as it launches
   const folded = JSON.parse(P.dump()['ia_exw_' + id]!) as Record<string, unknown>;
   for (const k of renamed) assert.ok(folded[k] && !folded[OLD[k]!], 'the page\'s launch folded ' + OLD[k] + ' into ' + k + ' and stored it');
 
-  // The Expo app on the keys as they stood before that launch: its own launch, its own read of the log, nothing stored.
+  // The Expo app on the keys as they stood before that launch: its own launch folds the log and stores it, as the
+  // page's did (D289), and the cards are drawn from it.
   const store = memoryStore();
   for (const [k, v] of Object.entries(pre)) store.set(k, v);
   const now = launchNow(P).getTime();
@@ -145,7 +146,8 @@ test('a lift log holding an old key: the page folds and stores it as it launches
     logged += page.cards.filter((x) => x.logged).length;
   }
   assert.ok(logged >= 1, 'a card drawn logged from the folded key');
-  assert.deepStrictEqual(held(store), pre, 'the Expo app stored nothing: the old key is still the store\'s');
+  assert.notDeepStrictEqual(held(store), pre, 'the launch stored the folded log');
+  assert.deepStrictEqual(held(store), P.dump(), 'the Expo app\'s launch left every key as the page\'s launch left it');
 });
 
 test('the Expo app\'s deck writes nothing: after every draw of every day the store holds the phone\'s keys, to the byte', () => {

@@ -5,7 +5,7 @@
 // comparison with today's screen is tests/integration/native-this-week.test.ts.
 process.env['TZ'] = 'America/New_York';
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, test } from 'vitest';
 import { memoryStore } from '@ia/core/engine/state-store.ts';
@@ -40,7 +40,7 @@ describe('native This Week: the screen\'s model and strip are today\'s files', (
   }
 });
 
-describe('native This Week: read only, and drawn with Expo SDK 58\'s own packages', () => {
+describe('native This Week: what writes, and drawn with Expo SDK 58\'s own packages', () => {
   const dir = join(REPO, 'frontends/native/src/this-week');
   const files = readdirSync(dir).filter((f) => /\.tsx?$/.test(f));
   const all = files.map((f) => readFileSync(join(dir, f), 'utf8')).join('\n');
@@ -49,11 +49,13 @@ describe('native This Week: read only, and drawn with Expo SDK 58\'s own package
     assert.deepStrictEqual(files.sort(), ['ThisWeek.tsx', 'marks.tsx', 'week-readers.ts', 'week-screen.ts', 'week-strip.ts', 'week-tips.ts', 'week-view-model.ts']);
   });
 
-  test('no file of the screen writes or removes a stored key', () => {
-    // The one `.set(` in the folder is the screen's own map of picked days, never the store.
-    assert.doesNotMatch(all, /\b\w*[sS]tore\.(set|remove)\(/, 'no store write');
-    assert.deepStrictEqual(all.match(/\b[\w.]+\.(set|remove)\(/g), ['picks.current.set(']);
-    assert.doesNotMatch(all, /\b(write|record|clear|set)[A-Z]\w*\(store/, 'none of core\'s writers is called');
+  test('the launch\'s three writes are the only ones in the folder: the pointer set or removed, the folded lift log (D289)', () => {
+    const code = (f: string): string => readFileSync(join(dir, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+    const writes = (t: string): string[] => (t.match(/\b\w*[sS]tore\.(set|remove)\([^)]*\)|\b(write|record|clear|drop|add|set)[A-Z]\w*\(store\b/g) || []).sort();
+    assert.deepStrictEqual(writes(code('week-screen.ts')), ["store.remove('ia_active')", 'writeActiveProgramId(store', 'writeLiftLog(store']);
+    // Drawing writes nothing. The one `.set(` beside the launch is the screen's own map of picked days, never the store.
+    for (const f of files.filter((x) => x !== 'week-screen.ts')) assert.deepStrictEqual(writes(code(f)), [], f + ' writes nothing');
+    assert.deepStrictEqual(all.match(/\b[\w.]+\.(set|remove)\(/g), ['picks.current.set(', 'store.remove(']);
   });
 
   // The versions Expo SDK 58.0.25 names for them (its bundledNativeModules.json, read 2026-11-13): 15.16.0 and ~5.11.1.
@@ -79,9 +81,11 @@ describe('native This Week: read only, and drawn with Expo SDK 58\'s own package
     assert.deepStrictEqual(from('week-screen.ts'), ['overlayWeekRange']);
   });
 
-  test('the launch is handed a store that drops writes, and the screen carries today\'s words for an overlay that failed', () => {
+  test('the launch is handed the store itself (D289), and the screen carries today\'s words for an overlay that failed', () => {
     const seam = readFileSync(join(dir, 'week-screen.ts'), 'utf8');
-    assert.ok(seam.includes('refreshStoredProgram(readOnly(store), '), 'liveProgram hands core\'s launch the read only store');
+    assert.ok(seam.includes('return refreshStoredProgram(store, stored as unknown as StoredProgram, now, failed)'), 'liveProgram hands core\'s launch the store it was handed');
+    assert.ok(!seam.includes('readOnly') && !existsSync(join(REPO, 'frontends/native/src/store/read-only-store.ts')), 'the store that dropped writes is gone');
+    assert.ok(seam.indexOf('const stored = pickActive(store);') < seam.indexOf('foldLiftLog(store, stored.id);') && seam.indexOf('foldLiftLog(store, stored.id);') < seam.indexOf('return refreshStoredProgram(store, '), 'today\'s order: the pick, the fold, core\'s launch');
     assert.equal(screen.PLAN_CHANGE_FAILED, 'A plan change failed to apply. Flag it in Bugs.');
     const drawn = readFileSync(join(dir, 'ThisWeek.tsx'), 'utf8');
     assert.ok(drawn.includes('launched.failures.overlay > 0') && drawn.includes('{PLAN_CHANGE_FAILED}'), 'ThisWeek.tsx draws the words while an overlay failed');
@@ -450,22 +454,52 @@ describe('native This Week: the launch', () => {
     assert.deepStrictEqual([titles(p, 1)[0], titles(p, 2)[6], titles(p, 3)[0], titles(p, 4)[0]], ['STALE', 'STALE', 'live', 'live']);
   });
 
-  test('the launch writes nothing, where core\'s own launch on the same keys writes the seed back', () => {
-    // An older program: its seed beside its config, not in it. Core's launch puts it back and stores the program list.
+  test('the launch writes what core\'s own launch writes: the seed back into an older program (D289)', () => {
+    // An older program: its seed beside its config, not in it. The launch puts it back and stores the program list.
     const older = (): StoredProgram => { const p = stale({ seed: 4242 }); delete (p.cfg as { seed?: unknown }).seed; return p; };
     const keys = keysOf(older());
-    // The seam, on a store that throws at any write: nothing thrown, nothing changed, and the program still rebuilt.
     const m = memoryStore(keys);
-    const strict: StateStore = { get: (k) => m.get(k), keys: () => m.keys(), set: () => { throw new Error('the launch wrote a key'); }, remove: () => { throw new Error('the launch removed a key'); } };
-    const p = liveProgram(strict, tuesday, QUIET);
+    const p = liveProgram(m, tuesday, QUIET);
     assert.deepStrictEqual(titles(p, 1), ['live', 'live', 'live', 'live', 'live', 'live', 'live']);
-    assert.deepStrictEqual(Object.fromEntries(m.keys().map((k) => [k, m.get(k)])), keys);
-
-    // That is the store's doing, not the launch's: core's own launch on the same keys writes, so the check above fires.
+    assert.notEqual(m.get('ia_programs'), keys.ia_programs, 'the launch stored the repaired program list');
+    assert.equal((JSON.parse(m.get('ia_programs')!) as { cfg: { seed: number } }[])[0]!.cfg.seed, 4242);
+    assert.equal(m.get('ia_active'), 'p1');
+    // Key for key what core's own launch leaves on the same keys.
     const plain = memoryStore(keys);
     refreshStoredProgram(plain, (JSON.parse(keys.ia_programs!) as StoredProgram[])[0]!, tuesday, QUIET);
-    assert.notEqual(plain.get('ia_programs'), keys.ia_programs, 'core\'s launch stored the repaired program list');
-    assert.equal((JSON.parse(plain.get('ia_programs')!) as { cfg: { seed: number } }[])[0]!.cfg.seed, 4242);
+    assert.deepStrictEqual(Object.fromEntries(m.keys().sort().map((k) => [k, m.get(k)])), Object.fromEntries(plain.keys().sort().map((k) => [k, plain.get(k)])));
+  });
+
+  // Today's init and loadActiveProgram, typed by hand: the pointer's program unless it is archived or gone, else the
+  // first that is not archived, written to ia_active; a pointer that leads nowhere is removed; no pointer, nothing.
+  test('the launch loads the program today\'s launch loads, and puts the pointer right (D289)', () => {
+    const prog = (id: string, more: object = {}): StoredProgram => Object.assign(stale(), { id, name: id }, more);
+    const store = (active: string | null, list: StoredProgram[]): StateStore => memoryStore({ ...(active === null ? {} : { ia_active: active }), ia_programs: JSON.stringify(list) });
+    const picked = (s: StateStore): [string | null, string | null] => { const p = liveProgram(s, tuesday, QUIET); return [p ? p.id : null, s.get('ia_active')]; };
+    assert.deepStrictEqual(picked(store('a', [prog('a'), prog('b')])), ['a', 'a'], 'the program the pointer names');
+    assert.deepStrictEqual(picked(store('b', [prog('a'), prog('b', { archived: true })])), ['a', 'a'], 'an archived one: the first that is not, and the pointer moved');
+    assert.deepStrictEqual(picked(store('gone', [prog('a', { archived: true }), prog('b')])), ['b', 'b'], 'a pointer to no program: the first not archived');
+    assert.deepStrictEqual(picked(store('a', [prog('a', { archived: true }), prog('b', { archived: true })])), [null, null], 'every program archived: none, and the pointer removed');
+    assert.deepStrictEqual(picked(store('a', [])), [null, null], 'no program stored: the pointer removed');
+    assert.deepStrictEqual(picked(store(null, [prog('a')])), [null, null], 'no pointer: none loaded, none written');
+    // storedProgram reads the same pick and writes nothing.
+    const s = store('b', [prog('a'), prog('b', { archived: true })]);
+    assert.equal(screen.storedProgram(s)!.id, 'a');
+    assert.equal(s.get('ia_active'), 'b');
+  });
+
+  // The page's fold before its launch (bug-report-init.ts). EX_KEY_ALIAS sends romanian_deadlift to
+  // barbell_romanian_deadlift, and the row takes today's name.
+  test('the launch folds the lift log\'s old keys into today\'s and stores it, once (D289)', () => {
+    const entry = { week: 1, weight: 135, setsReps: '3×8', setsDone: [8, 8, 8], setsW: [], day: 'mon', ts: 5 };
+    const m = memoryStore(keysOf(stale(), { ia_exw_p1: { romanian_deadlift: { name: 'Romanian deadlift', entries: [entry] } } }));
+    liveProgram(m, tuesday, QUIET);
+    assert.deepStrictEqual(JSON.parse(m.get('ia_exw_p1')!), { barbell_romanian_deadlift: { name: 'Barbell Romanian deadlift', entries: [entry] } });
+    // Folded already: a second launch does not store the log again.
+    let wrote = 0;
+    const watch: StateStore = { get: (k) => m.get(k), keys: () => m.keys(), remove: (k) => m.remove(k), set: (k, v) => { if (k === 'ia_exw_p1') wrote++; m.set(k, v); } };
+    liveProgram(watch, tuesday, QUIET);
+    assert.equal(wrote, 0);
   });
 
   test('what failed is counted and logged in the page\'s words: an overlay the engine cannot build, a config it cannot build', () => {
@@ -509,10 +543,17 @@ describe('native This Week: the screen from a store', () => {
   const keys = { ia_active: 'p1', ia_programs: JSON.stringify([program]), ia_comp_p1: JSON.stringify({ w1_mon: { status: 'complete' } }) };
   const now = new Date(2026, 10, 13, 22, 0, 0);
 
-  /** A store that reads and refuses every write, so a draw that wrote anything would throw. */
+  /**
+   * A store that refuses every write but the one a launch makes on these keys, the pointer restated as it stands
+   * (D289), so a draw that wrote anything would throw.
+   */
   const readOnly = (): StateStore => {
     const m = memoryStore(keys);
-    return { get: (k) => m.get(k), keys: () => m.keys(), set: () => { throw new Error('the screen wrote a key'); }, remove: () => { throw new Error('the screen removed a key'); } };
+    return {
+      get: (k) => m.get(k), keys: () => m.keys(),
+      set: (k, v) => { if (k !== 'ia_active' || v !== m.get(k)) throw new Error('the screen wrote a key'); },
+      remove: () => { throw new Error('the screen removed a key'); },
+    };
   };
 
   test('the active program is the one the store names, and one with no config comes back from the launch as stored', () => {

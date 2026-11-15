@@ -5,34 +5,41 @@ which it does not touch. Its bundle id is **com.bigyerr.ironasylum.next**, so it
 (`com.bigyerr.ironasylum`) and never replaces it before cutover. `tests/unit/native-shell.test.ts` holds that.
 
 **Today it holds two tabs.** **This Week** (phase 2 session 4, `src/this-week/`; D276, D278, D279 and D284 carried over,
-`docs/decisions/this-week.md`), read only: today's screen drawn from the stored state. `week-view-model.ts` and
+`docs/decisions/this-week.md`): today's screen drawn from the stored state; drawing it writes nothing. `week-view-model.ts` and
 `week-strip.ts` are copies of the Angular screen's own files, held equal to the byte by
 `tests/unit/native-this-week.test.ts`: copy them again with `cp` when today's change, never edit them here.
 `week-readers.ts` is the legacy page's readers the screen needs, line for line, held equal to the page's by
 `tests/integration/native-this-week.test.ts`; its date readers are core's own (`state-overlays.ts`). `week-screen.ts`
 joins them over core's store; `ThisWeek.tsx` and `marks.tsx` draw it. **Its grid is the launch's** (`week-screen.ts`,
 `liveProgram`): core's `refreshStoredProgram`, called as today's page calls it, so the screen draws the program
-today's app draws. The launch is handed a store that drops writes (`store/read-only-store.ts`), because this app's
-copy of the stored state is a backup loaded read only (D287). One launch when the screen mounts and one on each
+today's app draws. The launch is handed the store itself and writes what today's launch writes (D289,
+`docs/decisions/data-backup.md`): the active program's pointer put right (`pickActive`), the lift log's old keys
+folded (`foldLiftLog`), then core's own two. `tests/support/native-launch.ts` holds its store equal to the page's
+after every launch a test phone makes. One launch when the screen mounts and one on each
 return to its tab, about 55 ms under Hermes on the simulator. A tap on a week title or a day works, and Start lift
-and Start session open the swipe deck; every other control is drawn and does nothing yet.
+and Start session open the swipe deck; every other control of the screen is drawn and does nothing yet.
 
-**The swipe deck** (phase 3, its first screen, `src/deck/`; D275 and D283 carried over, `docs/decisions/swipe-deck.md`),
-read only: a day's lift work as today's deck of cards, opened from This Week over the tab bar. `deck-model.ts` and
-`src/day-detail/session-sections-model.ts` (the session sheet's card model, which the deck's model stands on) are
-copies of the Angular app's own files, held equal to the byte by `tests/unit/native-deck.test.ts`: copy them again
-with `cp` when today's change, never edit them here. `deck-readers.ts` is the legacy page's readers the cards need,
-line for line; `deck-screen.ts` joins them over core's store and the launch's grid; `Deck.tsx` draws it.
-`tests/integration/native-deck.test.ts` holds every card equal to today's over whole histories. The swipe, the
-dots, the session map, the RPE bubble and a move's sets opening in place work. Everything that writes (Log, the
-steppers, skip, swap, Done, next one, Mark the day done) is drawn and does nothing until the session that builds
-logging, when the app starts writing to its own copy (D289, `docs/decisions/data-backup.md`). The opening out of
-the card, the done motion, the punch and the up and down pager come with that session.
+**The swipe deck** (phase 3, its first screen, `src/deck/`; D275 and D283 carried over, `docs/decisions/swipe-deck.md`):
+a day's lift work as today's deck of cards, opened from This Week over the tab bar, and it logs into this app's own
+store (D289). `deck-model.ts` and `src/day-detail/session-sections-model.ts` (the session sheet's card model, which
+the deck's model stands on) are copies of the Angular app's own files, held equal to the byte by
+`tests/unit/native-deck.test.ts`: copy them again with `cp` when today's change, never edit them here.
+`deck-readers.ts` is the legacy page's readers the cards need, line for line; `deck-screen.ts` joins them over
+core's store and the launch's grid. **`set-fields.ts`** is what a move's fields hold between a typed set and Log,
+with each of today's set handlers as a function from them to the next; **`deck-writes.ts`** is the page's code
+around core's writers (a draft, Log, a change after Log, Done next one, Mark the day done, skip and put it back),
+and the only file of the deck that writes. `Deck.tsx` draws it and calls those. `tests/integration/native-deck.test.ts`
+holds every card equal to today's over whole histories, and `tests/integration/native-deck-logging.test.ts` holds
+the two apps' stores equal, key for key, after every tap of whole histories (`tests/support/native-deck-logging.ts`).
+Not here yet: swap, its put it back and remove (drawn, taking no press); the opening out of the card and the up and
+down pager; the completion pop-up, in whose place Mark the day done raises "Done ✓". The beta writes none of the
+pop-ups' keys.
 
 **Bugs**, with two rows and a line saying whether its Swift module answered: the engine check (D286, `docs/decisions/engine-check.md`), core's
 `core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes, which reads and writes
-no stored key; and the Backup row (D287, `docs/decisions/data-backup.md`), which loads a backup file, read only, into
-the app's own SQLite store and checks every key against the file by value and by sha256.
+no stored key; and the Backup row (D287, `docs/decisions/data-backup.md`), which loads a backup file into the app's own SQLite
+store in place of everything in it and checks every key against the file by value and by sha256. Under it, D289's
+line: what is logged in this app stays in this app, and loading a backup replaces it.
 
 **The store** (`src/store/`): core's `StateStore` on expo-sqlite/kv-store (`sqlite-store.ts`, which imports nothing of
 Expo's, so the tests in `tests/` run it on SQLite under `node:sqlite`), the phone's one database `iron-asylum-state`

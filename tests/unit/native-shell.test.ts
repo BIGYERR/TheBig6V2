@@ -189,13 +189,13 @@ describe('native shell: the engine check is core\'s, as it is', () => {
     const check = readFileSync(join(NATIVE, 'src', 'EngineCheck.tsx'), 'utf8');
     assert.match(check, /performance\.now\(\)/);
     assert.doesNotMatch(check, /Date\.now\(\)/);
-    // The app reads the date in two places, and in neither to time anything: the instant This Week's launch is
-    // handed, which says what day it is (core's refreshStoredProgram, as today's page hands it Date.now()), and the
-    // instant a deck is opened, which says how old a logged load is (the page's recencyBucket reads the same clock).
-    assert.deepStrictEqual(all.match(/[^\n]*Date\.now\(\)[^\n]*/g), [
-      '  const launched = useMemo(() => launch(store, Date.now()), [store, tick]);',
-      '    const deck = deckView(store, prog as unknown as DeckProgram, week, key, Date.now());',
-    ]);
+    // The app reads the date to say what day it is and to stamp what it stores, never to time anything: the instant
+    // This Week's launch is handed (core's refreshStoredProgram, as today's page hands it Date.now()), the instant a
+    // deck is drawn, which says how old a logged load is (the page's recencyBucket reads the same clock), and the
+    // instant of each write the deck makes (the page stamps a draft, a lift and a day's status with Date.now()).
+    const dated = files.filter((f) => /Date\.now\(\)/.test(readFileSync(f, 'utf8'))).map((f) => f.slice(NATIVE.length + 1)).sort();
+    assert.deepStrictEqual(dated, [join('src', 'deck', 'Deck.tsx'), join('src', 'this-week', 'ThisWeek.tsx')]);
+    assert.doesNotMatch(all, /Date\.now\(\)\s*-|-\s*Date\.now\(\)/, 'no span of time is taken from the date');
   });
 });
 

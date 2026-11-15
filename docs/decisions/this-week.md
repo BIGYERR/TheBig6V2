@@ -616,3 +616,19 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
     asked for the dumbbell with Friday tapped and then Saturday in week 12: "Both same", the other half being the
     deck). The dumbbell beside Then lift is whole after a skipped lift's day, as in today's app. No screenshot came
     with it, so the record is his words.
+
+## D276, D278, D279 and D284 in the Expo app: the launch writes what today's writes (Post-v0.262.3, D289)
+
+- **Date:** 2026-11-14. **Ruled by:** D289 (`docs/decisions/data-backup.md`); no ruling of This Week's changes.
+  **Bump:** none. **Shipped:** Post-v0.262.3, with the swipe deck's logging.
+- **What changes:** `liveProgram` is handed the store itself, and before core's launch it makes the page's own two
+  launch writes: the pick (`pickActive`: the pointer's program unless archived or gone, else the first not archived,
+  written to `ia_active`; a pointer that leads nowhere removed) and the fold of the lift log's old keys
+  (`foldLiftLog`). `storedProgram` reads the same pick and writes nothing. `store/read-only-store.ts` is gone.
+- **What deliberately does not change:** what the screen draws. Drawing writes nothing, and the folder's only
+  writes are those three (`tests/unit/native-this-week.test.ts`). This Week draws again from the store when the
+  deck closes, so a day marked done shows done.
+- **Not here:** the day-after reminder, which today's app shows 600 ms after a launch and which stores
+  `ia_remind_last_` and `ia_reminded_` (54 of 118 launches measured). It waits with the pop-ups.
+- **Proof:** `tests/support/native-launch.ts`: at every launch a test phone makes, the beta's store after its own
+  launch equals the page's, every key. Red on the commit before.

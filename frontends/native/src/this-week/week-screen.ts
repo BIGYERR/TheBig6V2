@@ -2,25 +2,31 @@
 // words and marks out. The view is today's own model (week-view-model.ts, a copy of the Angular screen's, held equal by
 // a test), so every word, mark and order here is D276, D272, D278 and D284's, unchanged. The Angular screen feeds that
 // model through its bridge into the legacy page; this feeds it from core's readers of the stored state and from
-// week-readers.ts. Read only: nothing here writes a key.
+// week-readers.ts. Drawing the screen writes nothing; the launch below writes what today's launch writes.
 //
 // THE GRID IS THE LAUNCH'S. Today's app draws the grid refreshProgram hands back (the program rebuilt, the overlays
 // applied, the trained weeks frozen, the moves, swaps and edits laid over it). That is core's refreshStoredProgram
 // since v0.262.2 (core/src/engine/state-refresh.ts), and liveProgram below calls it as the page's refreshProgram
-// does: the store, the instant, the failure reports. One difference, on purpose: the store it hands the launch drops
-// every write (store/read-only-store.ts), because this app's copy of the stored state is a backup loaded read only
-// (D287). The grid is the same either way, on every launch measured (tests/measure/native-this-week_launch.md).
+// does: the store, the instant, the failure reports.
+//
+// THE LAUNCH WRITES, TO THIS APP'S OWN STORE (D289 P-NATIVEWRITES, docs/decisions/data-backup.md). It is handed the
+// store itself, and makes each write today's launch makes (the page's init and loadActiveProgram, with core's launch
+// inside them), in today's order: the active program put right (pickActive), the lift log's old keys folded
+// (foldLiftLog), then core's own two (an older program repaired, the day edits of frozen weeks dropped). The page's
+// timers after a launch (the day-after reminder) are not here: that pop-up is not built. Held equal to the page's
+// launch, key for key, on every launch of the stored-state histories (tests/support/native-launch.ts).
 import { _parseLocalDate, getWeekMonday } from '@ia/core/engine/calendar.ts';
 import { asyIcon } from '@ia/core/engine/icons.ts';
 import { INJURY_REGIONS } from '@ia/core/engine/injury.ts';
 import { dayStoreKey, readDayLogs } from '@ia/core/engine/state-day-log.ts';
 import { dayStatus, readCompleted, readPartSkips } from '@ia/core/engine/state-day-status.ts';
 import { overlayWeekRange } from '@ia/core/engine/state-overlays.ts';
-import { readActiveProgramId, readPrograms } from '@ia/core/engine/state-programs.ts';
+import { foldExAliasKeys } from '@ia/core/engine/exercise-library.ts';
+import { readLiftLog, writeLiftLog } from '@ia/core/engine/state-lift-log.ts';
+import { readActiveProgramId, readPrograms, writeActiveProgramId } from '@ia/core/engine/state-programs.ts';
 import { type RefreshReport, type StoredProgram, refreshStoredProgram } from '@ia/core/engine/state-refresh.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
-import { readOnly } from '../store/read-only-store';
 import {
   DAY_FULL, type ReadDay, type ReadProgram, computeStreak, currentWeek, dayBeforeStart, dayIsTravel, fmtStartDay,
   heroSummary, liftFocusCode, liveInjuryOverlay, progAlignment, restDayTip, restLogLines,
@@ -37,23 +43,54 @@ export const BLANK: WeekView = {
   titles: [{ n: 1, title: 'Week 1', active: true }], row: { kind: 'start', shown: null, iso: '' }, days: null,
 };
 
-/** The active program as ia_programs stores it, or null when the store holds none: no launch, no rebuild. */
+/**
+ * The program a launch loads, as ia_programs stores it, or null when it loads none (the page's init): the one
+ * ia_active names unless it is archived or gone, else the first that is not archived; none without ia_active, and
+ * none when every program is archived. Reads only.
+ */
 export function storedProgram(store: StateStore): ScreenProgram | null {
   const id = readActiveProgramId(store);
   if (!id) return null;
-  const p = (readPrograms(store) as unknown as ScreenProgram[]).find((x) => x && x.id === id);
-  return p && p.weeks ? p : null;
+  const all = readPrograms(store) as unknown as ScreenProgram[];
+  return all.find((x) => x && x.id === id && !x.archived) || all.find((x) => x && !x.archived) || null;
 }
 
 /**
- * The program the screen draws: what a launch hands back for the active program (core's refreshStoredProgram), as
- * today's page holds it in activeProg. `now` is the instant of the launch, `failed` what it is told when a part of
- * the launch fails. The launch reads the store and writes nothing to it (the top of this file).
+ * The page's init and loadActiveProgram, as far as they write: the program the launch loads is written to ia_active
+ * (the same id on most launches, another when the pointer named an archived or missing program), and a pointer that
+ * leads to no program is removed. Returns the program loaded, or null.
+ */
+export function pickActive(store: StateStore): ScreenProgram | null {
+  const stored = storedProgram(store);
+  if (stored) {
+    writeActiveProgramId(store, stored.id);
+    return stored;
+  }
+  if (readActiveProgramId(store)) store.remove('ia_active');
+  return null;
+}
+
+/**
+ * The page's fold before its launch (bug-report-init.ts): the loaded program's lift log with its old keys folded
+ * into today's, stored only when the fold changed it. A fault is swallowed, as the page swallows it.
+ */
+export function foldLiftLog(store: StateStore, programId: string): void {
+  try {
+    const log = readLiftLog(store, programId);
+    if (foldExAliasKeys(log as never)) writeLiftLog(store, programId, log);
+  } catch { /* the launch goes on */ }
+}
+
+/**
+ * The program the screen draws: what a launch hands back (the page's init: the pick, the fold, then core's
+ * refreshStoredProgram), as today's page holds it in activeProg. `now` is the instant of the launch, `failed` what
+ * it is told when a part of the launch fails. The launch writes to the store it is handed (the top of this file).
  */
 export function liveProgram(store: StateStore, now: number, failed: RefreshReport): ScreenProgram | null {
-  const stored = storedProgram(store);
+  const stored = pickActive(store);
   if (!stored) return null;
-  return refreshStoredProgram(readOnly(store), stored as unknown as StoredProgram, now, failed) as unknown as ScreenProgram;
+  foldLiftLog(store, stored.id);
+  return refreshStoredProgram(store, stored as unknown as StoredProgram, now, failed) as unknown as ScreenProgram;
 }
 
 /** How many parts of a launch failed, by kind (core's RefreshReport). */
