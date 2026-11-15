@@ -426,4 +426,127 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   **Front squat** with the reuse pill "135 lbs · 2 months…" dashed and "That 135 lbs is about 2 months old. Still
   where you are?"; the plum **Foot & ankle** card, "Straight through · 60 to 90 sec rest", two moves; the session map
   with its three tiles. Back closes to This Week as it was. Afterwards the store held its 36 keys.
-- **Not seen yet:** Mario's phone, and today's deck beside it on the same day.
+- **Seen on Mario's phone, IA Next build 107 beside today's app** (run 43673451809 on `main`, merge 249af41; his
+  report, 2026-11-14, asked for the deck beside today's deck on the same day: "Both same", the other half being
+  the dumbbell). The deck's cards, read only, are today's on his phone. No screenshot came with it, so the record
+  is his words. What a card does when it is pressed was not in that build; it is the next entry's.
+
+## D275 and D283 in the Expo app: the deck logs (Post-v0.262.3, the migration's phase 3, its second session)
+
+- **Date:** 2026-11-14. **Ruled by:** no new ruling for the deck. Its words and behaviour are D275's and D283's,
+  carried unchanged, so they keep their D-codes; what it stores is ruled by D289 (`docs/decisions/data-backup.md`)
+  and D290 (`docs/decisions/set-logging.md`). The cut was put to Mario after the measure and he took it ("lets go").
+  **Bump:** none, the page and core do not move (a Post-v0.262.3 pass, standing ruling 1). **Shipped:**
+  Post-v0.262.3, no build of today's app; the beta's next build carries it once Mario merges it.
+- **The finding (measured before any edit, `tests/measure/native-deck-logging_writes.md`):**
+  - *What each press writes in today's app.* A stepper tap, a pill, or a field left is a draft: the day snapshotted
+    on its first touch (`ia_hist_`) and the cells as typed in the day's log (`ia_logs_`, its `sets`). Log records the
+    lift under its heaviest set (`ia_exw_`) and drops the draft. Any of those once the move is logged goes straight
+    to its entry. Done, next one is Log, quietly, for each move of the card the store holds no entry for. Mark the day
+    done merges the effort (only once the slider moved, D219) and the notes into the day's log and sets the day's
+    status (`ia_comp_`). A skip and its undo store the edit (`ia_edits_`) and renew the snapshot. Each ends in one of
+    nine of core's writers. Opening the deck, opening a move's sets, typing before the field is left, the rest clock
+    and the redraw of This Week write nothing.
+  - *One write is not core's:* the completion pop-up that follows Mark the day done stores its pick (`ia_pop_idx_`,
+    `ia_pop_dismiss_`, and `ia_season_shown_` on the program's last day).
+  - *What replaces the page's fields.* Per move: each set's text and placeholder, each set's load cell with the load
+    it inherits and whether it still inherits, the load field's text and placeholder, and whether the move is
+    logged. The summary, Varied, Top set and each set's difference derive from those.
+  - *What today's launch writes that the beta's did not* (118 launches): the lift log's old keys folded (1, built);
+    the active program's pointer put right (3, built: a pointer to an archived or missing program moves to the first
+    that is not archived, and one that leads nowhere is removed), where the beta also loaded a different program
+    than today's in all three; the day-after reminder 600 ms after the launch (54). Core's own two are equal already.
+  - *A defect in today's app,* fixed on Mario's word as v0.262.3 before this was built: Log read another move's set
+    rows (D290).
+- **The cut (Mario's "lets go"):** in: the store real with the launch's pick and fold (D289); set logging whole;
+  Done, next one with its done motion (call 10); Call it; skip, Skip all, a round's skip and put it back with the
+  punch (call 5); the toast with today's words; the Bugs line. Out, waiting: swap, its put it back and remove (the
+  swap sheet and the add sheet); the opening out of the card (call 16) and the up and down pager (call 1); the
+  completion pop-up and the day-after reminder, with This Week's pop-ups. In place of the pop-up, Mark the day done
+  raises "Done ✓", the toast today's app raises when no pop-up shows.
+- **What changes (the Expo app only):**
+  1. **A move's fields** (`deck/set-fields.ts`): one plain value per move, and each of today's handlers as a
+     function from it to the next, line for line (`stepSet`, `onSetWeight`, `cascadeSetWeights`, `reuseWeight`,
+     `fillAllSetWeights`, and what `saveExWeight` leaves on the card), with their readers (`setRepVals`,
+     `setWeightVals`, `rawSetVals`) and what the card says from them (`refreshSetSummary`, `markTopSet`, `setDelta`).
+  2. **What a tap stores** (`deck/deck-writes.ts`): `autoSaveSets`, `writeSetDraft`, `commitSetsLive`,
+     `saveExWeight` with `logExerciseWeight` (to D290: a move's own rows), `snapshotDay`, the deck's `markDay` with
+     `markDayComplete`, and the four skip handlers, each the page's code around core's writer with the page's
+     globals as arguments. The screen's taps are functions there (`tapStep`, `tapReuse`, `tapFill`, `leftField`,
+     `tapLog`, `tapDone`, `act`, `markDay`), so the tests call what the screen calls.
+  3. **The screen** (`deck/Deck.tsx`): the set rows and the load are fields; the steppers, both pills, Log, the big
+     button, Skip all, the minus and put it back take a press; Call it's slider drags and its notes type. A press
+     on a control takes the keyboard off its field first, so the field's cells are saved before the tap, as a tap on
+     the page blurs the field. A move's fields are drawn from its card when the deck opens and again after a skip
+     or its undo, and changed in place in between, as the page's inputs are. The stale-load warning speaks once an
+     open, across a redraw, as the page's does. Done, next one lifts the card with a glow and sends it behind the
+     deck (340 ms, held 560 or 220, then 760); a skip shakes the card, lands the hole and throws four shards (520,
+     380, 620 ms). Both are still under Reduce Motion.
+  4. **The toast** (`App.tsx`): today's line over everything, the run colour, 2.2 s.
+  5. **This Week hands the deck** its grid, week and day, and draws again from the store when the deck closes.
+- **What deliberately does not change:** today's app, its page, core, program output and every golden record of
+  stored state. Swap, the put it back of a lift swapped in, and remove are drawn and take no press. The 95 days
+  whose only card is the cool down still open nothing here. The deck opens and closes at once.
+- **Where the beta differs from today's app, on purpose:** it writes none of the pop-ups' five key families
+  (`ia_pop_idx_`, `ia_pop_dismiss_`, `ia_season_shown_`, `ia_remind_last_`, `ia_reminded_`), and shows "Done ✓" where
+  today's shows the completion pop-up. Every other key is today's, value for value.
+- **Found on the way, in today's app, not ruled** (`tests/measure/day-edits_skip-lost-at-launch.md`): a skip made on
+  a day not yet trained is lost at the next launch once another day of the same week is trained. The launch cuts
+  the freeze one past the highest week holding any training and drops the day edits of every week under the cut
+  (`pruneDayEditsBefore`), because a trained day's snapshot holds its edits; but the freeze is per day, so an
+  untouched day of that week is rebuilt with no edit and no snapshot. Seen first on the simulator (Thursday's Front
+  squat back on its card after a relaunch, Monday marked done), then proved on today's page in the harness: with no
+  day of the week trained the skip is kept, with Monday trained it is gone and `ia_edits_` is `{}`. The launch is
+  core's, so the beta does the same and is held equal on it. A skip made in the session that trains the day is
+  kept. Carried to Mario; nothing changed.
+- **One difference from today's deck found on the simulator and fixed here:** the card behind the top one showed
+  its words at a quarter while nothing moved, which read through a skipped card (drawn at 72%). Today's draws a
+  plain card behind until a drag begins (`deck.ts` `faceStyle`). The card behind now has no face at rest, fades in
+  from a quarter once a drag passes two points, and is the next card's again when a drag ends
+  (`tests/unit/native-deck.test.ts`).
+- **Expected values:** today's page, on purpose, tap for tap. Beside that, typed by hand
+  (`tests/unit/native-deck-logging.test.ts`): a step from 5 is 6 and never under 0; an open set steps from nothing to
+  1; the load field reaches only the sets that inherit it, so 135 then a set typed 145 then 140 reads 140, 145, 140,
+  and that set cleared reads 140, 135, 140 until the field next changes; a draft holds the cells as typed, untouched
+  ones blank (`r ['6','5','5'], w ['','',''], L ''`); Log under 135 with one set at 145 stores weight 145, sets
+  `[6,5,5]`, loads `[135,145,135]`, and says "145 lbs logged ✓"; 100 kg stores 220; a change after Log rewrites the
+  one entry under its prescription; Mark the day done with 8 and notes keeps the day's run distance and stores
+  `{title:'Legs', ts, status:'complete'}`; a slider never moved stores no number; a skip stores `{add:[], skip:[name]}`
+  and its words; a round goes by `__ss:2`.
+- **Proof:**
+  - `tests/integration/native-deck-logging.test.ts` (5 tests, inside the 60-second check, about 5 s). HALF_MANNY
+    through the standard history: at each of its five stretches every training day of the week in view is worked
+    through its deck on both apps: **24 days, 1,246 taps, 1,270 checks** (205 steps, 380 typed fields, 17 pills, 25
+    Log, 77 Done next one, 80 changes after Log, 505 drafts, 32 skips, 28 put backs, 24 days marked, 108 loaded
+    moves, 99 toasts, the page's pop-up 24 times). After every tap the two stores hold each `ia_` key equal, every
+    field of every move holds the same text, placeholder and inherit mark, the summary, its words, Varied, the
+    load's label, the foot and each set's difference read the same, and the toasts are the same; after each draw the
+    cards are equal whole; after the deck closes the day drawn again is equal. Then: a backup taken before two
+    logged days loads over them and leaves the store the file's, key for key and by sha256; a kilogram program (100
+    kg stored 220); the D290 pair on its own day of the bodyweight program; and a phone with nothing marked, where
+    the page's first pop-up stores its pick and the beta's store holds none.
+  - `tests/sweeps/native-deck-logging.test.ts` (CI, 21 s here): the ten seeded programs, 50 stretches: **257 days,
+    11,818 taps, 12,075 checks**, 249 Log, 756 Done next one, 719 changes after Log, 369 skips, 317 put backs, 257
+    days marked, and 204 launches compared.
+  - **The launch** (`tests/support/native-launch.ts`, rewritten): at every launch a test phone makes, the beta's
+    launch on the keys as they stood leaves its store equal to the page's own launch, every key, and hands back the
+    same program. `tests/integration/native-this-week.test.ts` runs it over the stored-state file's histories (192
+    launches, the old lift key, the older and damaged programs), and holds that each kind of launch write was made
+    (`ia_programs`, `ia_edits_`, `ia_exw_`).
+  - `tests/unit/native-deck-logging.test.ts` (25 tests): the hand-typed values above; `deck-writes.ts` alone calls
+    core's writers, and exactly the nine the measure named; the screen reaches the store only through it; no file of
+    the deck names a pop-up's key; each control is wired to its tap; the motions' numbers; the words.
+  - `tests/unit/native-this-week.test.ts`: the pick, typed by hand (six states of the pointer), the fold
+    (`romanian_deadlift` to `barbell_romanian_deadlift`, stored once), the seed written back as core's launch
+    writes it, and the folder's three writes.
+  - **Red on the commit before** (8e1c1dc, `tools/tree-at.mjs` with the changed files copied over): the five changed
+    files fail, 20 tests, among them every changed one (3 in `unit/native-deck`, 1 in `unit/native-shell`, 5 in
+    `unit/native-this-week`, 1 in `integration/native-deck`, 10 in `integration/native-this-week` through the
+    launch check). The three new files and the support file cannot load there: `git cat-file -e
+    8e1c1dc:frontends/native/src/deck/set-fields.ts` fails, the module is new.
+  - **The break check** (`tests/measure/native-deck-logging_breaks.md`): 47 breaks, one per rule (15 of a move's fields, 23 of what a tap stores, 2 of the day's draw, 7 of the launch), each made in a copy of the tree with the six files that hold the deck and the launch run on it, four copies at once: **47 turn at least one file red, none let through** (30 turn two files red, 3 turn three, 14 turn one: the unit file alone, for a rule the walks never reach first, such as the pointer's states or a step from a numeric placeholder). On the first pass three were let through: Log as a day's first touch and a draft over a placeholder, which each got a hand-typed test, and a break that took out one of Mark the day done's two snapshots and so changed nothing; it now takes out both.
+  - **Where the Expo app's packages are not installed** (`node tools/tree-at.mjs --working`, the tests' packages
+    alone): the new and changed files pass (8 files, 175 tests) and `tsc -p .` is clean.
+- **Seen on the simulator:** iPhone 17 Pro, iOS 26.5, `npm run sim-ios` (the Release build under Hermes), then `npm run sim-ios:fast` after the one fix below, on the copy of Mario's backup of 2026-11-14 already in the app's store. Week 13, Monday, Start lift: **Trap bar deadlift**; 185 typed in the load field shows in all three sets and in "Every set 185 lbs"; the plus on set 1 reads 13 with "+1", the summary "13 / 12 / 12" and Varied; Log marks the card Logged with its ring and check and the button reads Next one. Call it: the slider drags from 7 to 9, "very hard, one left", and the deck does not take the drag; the notes take "Felt easy"; Mark the day done closes the deck, raises "Done ✓", and This Week shows Monday checked, both cards closed out and Done 1/5, which a relaunch keeps. Thursday, Start session: a skip strikes **Front squat** through, with the hole, the shards, the put back arrow and "Front squat is off today. Tap to put it back."; put it back restores the card, and the stale-load warning does not speak a second time. Not seen there: the done motion and the punch in motion (stills only), and a field under the software keyboard (the simulator typed from the Mac's).
+- **Not seen yet:** Mario's phone. A field under the keyboard, the slider's drag and the two motions are the parts a
+  test cannot see.

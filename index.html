@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.262.2">
+<meta name="ia-version" content="0.262.3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -16269,12 +16269,10 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
   const unit = activeProg?.cfg?.unit || 'lbs';
   
   
-  const rows = Array.prototype.slice.call(document.querySelectorAll('input[id^="exset_'+exKey+'_"]'));
-  const setsDone = rows.map(function(el){
-    const raw = (el.value!=='' ? el.value : el.placeholder);
-    const v = parseInt(raw||'0',10);
-    return isNaN(v) ? 0 : v;
-  });
+  
+  
+  
+  const setsDone = setRepVals(exKey);
   
   
   const dispSets = setWeightVals(exKey);
@@ -16297,7 +16295,7 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
     const top = Math.max.apply(null, setsW);
     if(top>0){ storedW = top; hasW = true; dispW = Math.max.apply(null, dispSets); }
   }
-  if(!rows.length && !hasW){ showToast('Nothing to log here'); return; }
+  if(!setsDone.length && !hasW){ showToast('Nothing to log here'); return; }
   logExerciseWeight(exName, storedW, setsReps, currentWeek, setsDone, setsW, currentDayKey);
   
   

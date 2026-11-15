@@ -3,7 +3,7 @@
 // sheet's card model, ../day-detail/session-sections-model.ts, copies of the Angular app's held equal by a test), so
 // every card, word and order here is D275's and D283's, unchanged. The Angular deck feeds those models through its
 // bridge into the legacy page (deck.ts build() and open()); this feeds them from core's readers of the stored state
-// and from deck-readers.ts. Read only (D287, until the session D289 names): nothing here writes a key.
+// and from deck-readers.ts. Nothing here writes a key: what the deck writes is deck-writes.ts (D289).
 import { isRepExercise, isTimeExercise, isTrackableWeight } from '@ia/core/engine/exercise-kinds.ts';
 import { exStoreKey, foldExAliasKeys } from '@ia/core/engine/exercise-library.ts';
 import { dayStoreKey, readDayLogs, setDraftOf } from '@ia/core/engine/state-day-log.ts';
@@ -11,7 +11,7 @@ import { dayStatus } from '@ia/core/engine/state-day-status.ts';
 import { entryDay, readLiftLog } from '@ia/core/engine/state-lift-log.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
-import { type ExEntry, type ExSection, type SectionReads, sectionsView } from '../day-detail/session-sections-model';
+import { type ExCard, type ExEntry, type ExSection, type SectionReads, sectionsView } from '../day-detail/session-sections-model';
 import type { Palette } from '../theme';
 import { secRounds } from '../this-week/week-readers';
 import { type DeckCard, deckCards, deckOpens } from './deck-model';
@@ -19,6 +19,7 @@ import {
   crossProgLastEntry, exControlFlags, isKBExercise, isStaleTs, parseRx, recencyLabel, rxSuffix, setsSubLabel, setsSummary, setsVaried,
   stripLeadingSets, swapOriginOf, toDispW,
 } from './deck-readers';
+import { type MoveFields, fieldsOf } from './set-fields';
 
 /** A colour under the deck's shade of black (deck.css --deck-shade over --lift, --hip, --core). */
 export function shaded(hex: string, alpha: number): string {
@@ -42,11 +43,18 @@ export interface DeckProgram {
   weeks: Record<string, Record<string, DeckDay | null | undefined> | undefined>;
 }
 
-/** The lift log as the page holds it after its launch: old keys folded into today's, on a copy, never written back. */
+/**
+ * The stale-load warning of one open of the deck (the page's _staleWarnShown and _staleWarnSrc): it speaks once, on
+ * the first stale load drawn, and a redraw after an edit does not speak it again.
+ */
+export interface StaleWarn { shown: boolean; src: string }
+
+/** The lift log as the page holds it after its launch: old keys folded into today's, on a copy. */
 function liftLog(store: StateStore, programId: string): Record<string, { entries?: ExEntry[] } | undefined> {
   const log = JSON.parse(JSON.stringify(readLiftLog(store, programId) || {})) as Record<string, { entries?: ExEntry[] } | undefined>;
-  // Today's page folds the active program's log as it launches and stores it (bug-report-init.ts). This app's copy
-  // is read only, so the same fold is made here on the copy in hand: a log already folded comes through unchanged.
+  // Today's page folds the active program's log as it launches and stores it (bug-report-init.ts), and so does this
+  // app's launch (week-screen.ts foldLiftLog). A log already folded comes through this unchanged; it stays for a
+  // store drawn without a launch.
   try { foldExAliasKeys(log as never); } catch { /* an unreadable row draws as it is */ }
   return log;
 }
@@ -54,15 +62,14 @@ function liftLog(store: StateStore, programId: string): Record<string, { entries
 /**
  * What the cards read (the Angular sectionReads, session-sections-reads.ts), from the store and the grid in hand:
  * the page's globals are `prog`, `week` and `dayKey`, its clock is `nowMs`, and its once-per-open stale warning
- * (two globals the deck resets as it opens) is held here, new for each call.
+ * (two globals the deck resets as it opens) is `warn`: new for each call unless the caller keeps one for the open.
  */
-export function deckReads(store: StateStore, prog: DeckProgram, week: number, dayKey: string, nowMs: number): SectionReads {
+export function deckReads(store: StateStore, prog: DeckProgram, week: number, dayKey: string, nowMs: number, warn: StaleWarn = { shown: false, src: '' }): SectionReads {
   const id = prog.id;
   const log = liftLog(store, id);
   const unit = prog.cfg && prog.cfg.unit === 'kg' ? 'kg' : 'lbs';
   const wk = prog.weeks[week];
   const day = (wk && wk[dayKey]) || null;
-  let shown = false, src = '';
   return {
     exKey: (name) => exStoreKey(name as string),
     entries: (k) => (log[k] && log[k]!.entries) || [],
@@ -81,7 +88,7 @@ export function deckReads(store: StateStore, prog: DeckProgram, week: number, da
     swapOrigin: (n) => swapOriginOf(store, id, week, dayKey, n),
     parseRx: (d, n) => parseRx(d, n),
     rxSuffix: (rx) => rxSuffix(rx),
-    // The page caches each prescription for its set handlers. Nothing here logs yet, so nothing reads one.
+    // The page caches each prescription for its set handlers. The deck reads it again from the card (Deck.tsx rxOf).
     cacheRx: () => {},
     setsSummary: (rx, w, r) => setsSummary(rx, w, r),
     setsSubLabel: (rx, w, r, logged) => setsSubLabel(rx, w, r, logged),
@@ -90,21 +97,21 @@ export function deckReads(store: StateStore, prog: DeckProgram, week: number, da
     toDispW: (x) => toDispW(x, unit),
     isStale: (ts) => isStaleTs(ts, nowMs),
     recency: (ts, form) => recencyLabel(ts, form, nowMs),
-    warnShown: () => shown,
-    warnSrc: () => src,
-    speakWarn: (s) => { shown = true; src = s; },
+    warnShown: () => warn.shown,
+    warnSrc: () => warn.src,
+    speakWarn: (s) => { warn.shown = true; warn.src = s; },
     stripLeadingSets: (d) => stripLeadingSets(d),
     secRounds: (sec) => secRounds(sec as never),
   };
 }
 
 /** The day's cards: the deck's model over the session sheet's cards for the whole day (deck.ts build()). */
-export function dayCards(store: StateStore, prog: DeckProgram, week: number, dayKey: string, nowMs: number): DeckCard[] {
+export function dayCards(store: StateStore, prog: DeckProgram, week: number, dayKey: string, nowMs: number, warn?: StaleWarn): DeckCard[] {
   const wk = prog.weeks[week];
   const day = (wk && wk[dayKey]) || null;
   if (!day || day.rest) return [];
   const secs = day.sections || [];
-  const views = sectionsView(secs, 0, deckReads(store, prog, week, dayKey, nowMs));
+  const views = sectionsView(secs, 0, deckReads(store, prog, week, dayKey, nowMs, warn));
   return deckCards(secs, views, (s) => secRounds(s as never));
 }
 
@@ -124,15 +131,18 @@ export interface DeckView {
   dayDone: boolean;
 }
 
+/** What This Week hands the deck it opens: the launch's grid, the week and the day, the day as first drawn, and that draw's stale warning. */
+export interface DeckOpen { prog: DeckProgram; week: number; dayKey: string; view: DeckView; warn: StaleWarn }
+
 /**
  * The deck for a day, or null when Start does not open one: a rest day, a day the grid does not hold, or a day whose
  * only card is its cool down (today's app opens the day sheet there, which this app does not draw yet).
  */
-export function deckView(store: StateStore, prog: DeckProgram, week: number, dayKey: string, nowMs: number): DeckView | null {
+export function deckView(store: StateStore, prog: DeckProgram, week: number, dayKey: string, nowMs: number, warn?: StaleWarn): DeckView | null {
   const wk = prog.weeks[week];
   const day = (wk && wk[dayKey]) || null;
   if (!day || day.rest) return null;
-  const cards = dayCards(store, prog, week, dayKey, nowMs);
+  const cards = dayCards(store, prog, week, dayKey, nowMs, warn);
   if (!deckOpens(cards)) return null;
   const entry = (readDayLogs(store, prog.id) as unknown as Record<string, { rpe?: unknown; notes?: unknown } | undefined>)[dayStoreKey(week, dayKey)] || null;
   const stored = entry && entry.rpe != null && entry.rpe !== '' ? +(entry.rpe as string) : NaN;
@@ -146,4 +156,31 @@ export function deckView(store: StateStore, prog: DeckProgram, week: number, day
     notes: entry && typeof entry.notes === 'string' ? entry.notes : '',
     dayDone: dayStatus(store, prog.id, week, dayKey) === 'complete',
   };
+}
+
+/** Every move's fields of a deck, by the move's key. */
+export type Fields = Record<string, MoveFields>;
+
+/** Every move's card of a day's deck, in order. */
+export function movesOf(cards: DeckCard[]): ExCard[] {
+  return cards.flatMap((c) => c.views.flatMap((v) => (v.kind === 'section' ? v.body.items : []))).filter((x): x is ExCard => x.kind === 'card');
+}
+
+/** Each move's fields as its card draws them: at the deck's opening, and again after a skip or its undo. */
+export function freshFields(cards: DeckCard[]): Fields {
+  const out: Fields = {};
+  for (const x of movesOf(cards)) out[x.exKey] = fieldsOf(x);
+  return out;
+}
+
+/**
+ * The cards with what this open has logged: a move is logged once Log has left it so, and a card when each of its
+ * moves is (the page reads the same from the store after each tap, deck.ts touched()).
+ */
+export function loggedCards(cards: DeckCard[], fields: Fields): DeckCard[] {
+  return cards.map((c) => {
+    if (!c.moves.length) return c;
+    const moves = c.moves.map((m) => ({ ...m, logged: fields[m.exKey] ? fields[m.exKey]!.logged : m.logged }));
+    return { ...c, moves, logged: moves.every((m) => m.logged) };
+  });
 }

@@ -46,7 +46,10 @@ const QUIET = { overlay: () => {}, freeze: () => {}, rebuild: () => {} };
 test('every launch of the stored-state histories was a launch of the Expo app\'s seam too, and each one agreed', () => {
   assert.ok(launches.compared >= 149, 'launches with a program, the seam\'s equal to the page\'s: ' + JSON.stringify(launches));
   assert.ok(launches.none >= 43, 'launches with no program on either side: ' + JSON.stringify(launches));
-  assert.ok(launches.wrote >= 8, 'launches where core\'s launch wrote a key, each left as the page left it: ' + JSON.stringify(launches));
+  assert.ok(launches.wrote >= 8, 'launches where the launch wrote a key, each left as the page left it: ' + JSON.stringify(launches));
+  // D289: the launch writes what today's writes, so each kind of write was made and compared at least once: an older
+  // program repaired, the day edits of frozen weeks dropped, and the lift log's old keys folded.
+  for (const f of ['ia_programs', 'ia_edits_', 'ia_exw_']) assert.ok((launches.families[f] || 0) >= 1, f + ' written by a launch: ' + JSON.stringify(launches));
   assert.ok(launches.overlayFailed >= 1, 'an overlay that failed, reported as often as the page\'s toast: ' + JSON.stringify(launches));
 });
 

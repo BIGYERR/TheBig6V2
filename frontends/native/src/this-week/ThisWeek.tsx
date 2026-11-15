@@ -17,7 +17,7 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Bag, Calendar, Check, CoreIcon, Cross, Die, Dumbbell, Fade, Flag, Glow, Play, RecDot, Runner, WildcardMark } from './marks';
-import { type DeckProgram, type DeckView, deckView } from '../deck/deck-screen';
+import { type DeckOpen, type DeckProgram, deckView } from '../deck/deck-screen';
 import { BLANK, PLAN_CHANGE_FAILED, drawWeek, launch, launchTitle, pillArrow, pillParts, tokenOf } from './week-screen';
 import { type StripClock, type StripEl, StripPlacer } from './week-strip';
 import { type Column, type DayCard, type DaysView, TITLE_W, type WeekView } from './week-view-model';
@@ -38,7 +38,7 @@ const TAB_ROOM = 96;
 
 type Tint = keyof Pick<Palette, 'run' | 'bike' | 'swim' | 'lift' | 'signal' | 'dim'>;
 
-export function ThisWeek({ palette: p, store, tick, onDeck }: { palette: Palette; store: StateStore; tick: number; onDeck: (deck: DeckView) => void }) {
+export function ThisWeek({ palette: p, store, tick, onDeck }: { palette: Palette; store: StateStore; tick: number; onDeck: (deck: DeckOpen) => void }) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -152,8 +152,10 @@ export function ThisWeek({ palette: p, store, tick, onDeck }: { palette: Palette
   // day whose only card is its cool down), which this app does not draw yet.
   const startDeck = (week: number, key: string): void => {
     if (!prog) return;
-    const deck = deckView(store, prog as unknown as DeckProgram, week, key, Date.now());
-    if (deck) onDeck(deck);
+    const grid = prog as unknown as DeckProgram;
+    const warn = { shown: false, src: '' };
+    const view = deckView(store, grid, week, key, Date.now(), warn);
+    if (view) onDeck({ prog: grid, week, dayKey: key, view, warn });
   };
 
   const pillInk = view.pill.cls.includes('recovery');

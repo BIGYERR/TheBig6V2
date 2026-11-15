@@ -145,8 +145,8 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
 - **Date:** 2026-11-14. **Ruled by:** Mario ("Yes, its own copy"), on the session's recommendation, at the opening
   of the React Native migration's phase 3. **Amends:** D287 (the copy is loaded read only), from the session that
   builds logging on; D287 stands until then. **Bump:** none (a Post-v0.262.2 native pass; today's app, its page and
-  core do not move). **Shipped:** not yet: the ruling is recorded here in the session that drew the swipe deck read
-  only; the first write ships with the session that builds set logging and Call it.
+  core do not move). **Shipped:** Post-v0.262.3, with the session that built set logging and Call it (the entry
+  below); the beta's next build carries it.
 - **The finding (measured, `tests/measure/native-deck_reads.md`):** every write today's deck makes ends in a writer
   core already holds (the lift log, the day's snapshot, the day's log, the day's status, the skips and the swaps).
   What is still the page's is the code around them, which reads the fields off the screen and redraws. The launch's
@@ -172,3 +172,28 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
 - **Expected values, for the session that builds it:** after the same taps on the same keys, the beta's store holds
   each `ia_` key equal to today's page's, value for value (the stored-state histories, as the launch is held today);
   a backup loaded after a logged set leaves the store the file's, key for key and hash for hash.
+
+## D289 as built (Post-v0.262.3, 2026-11-14)
+
+- **The store is the real one.** `store/read-only-store.ts` is gone. The launch (`this-week/week-screen.ts`
+  `liveProgram`) is handed the store itself and makes each write today's launch makes, in today's order: the
+  program the launch loads written to `ia_active` or a pointer that leads nowhere removed (`pickActive`, the page's
+  init and `loadActiveProgram`), the lift log's old keys folded and stored when the fold changed it (`foldLiftLog`),
+  then core's `refreshStoredProgram` (an older program repaired, the day edits of frozen weeks dropped). Measured
+  first (`tests/measure/native-deck-logging_writes.md`, section A): of 118 launches the page alone wrote the fold on
+  1 and the pointer on 3, all four built for the measure, and on those three the beta had loaded a different
+  program than today's.
+- **The deck writes** through `deck/deck-writes.ts` alone, into the same store: nine of core's writers, named in
+  `docs/decisions/swipe-deck.md`, its last entry.
+- **Loading a backup is unchanged** (D287's import): it replaces the copy whole and checks every key. Proved after
+  logged sets: the store then differs from the file by at least three keys, and after the load holds the file's keys
+  and no other, each equal by value and by sha256 (`tests/integration/native-deck-logging.test.ts`).
+- **The Bugs line** (Mario, 2026-11-14, asked once with the proposed copy recommended: "The proposed copy"), a
+  second line under the Backup row's note, which stays: **Sets you log here stay in this app. Today's app does not
+  see them. Loading a backup replaces everything here.**
+- **Not written by the beta:** the pop-ups' keys (`ia_pop_idx_`, `ia_pop_dismiss_`, `ia_season_shown_`,
+  `ia_remind_last_`, `ia_reminded_`). The completion pop-up and the day-after reminder are not built, so those keys
+  stand as a loaded backup left them. This is the one place the beta's store differs from today's after the same
+  taps, and the tests name it.
+- **Held:** after its launch the beta's store equals the page's on every launch a test phone makes, and after
+  every tap of the deck walks (1,246 taps for HALF_MANNY, 11,818 across the ten programs).

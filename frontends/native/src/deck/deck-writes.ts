@@ -1,0 +1,223 @@
+// What the Expo deck writes (MIGRATION.md phase 3, the deck's second session; D289 P-NATIVEWRITES,
+// docs/decisions/data-backup.md): a set draft, a logged lift, Call it and the day marked done, a skip and its undo.
+// Every write ends in one of core's own writers (state-day-log.ts, state-lift-log.ts, state-day-history.ts,
+// state-day-status.ts, state-day-edits.ts). What stands here is the page's code around them, line for line, with the
+// page's globals (the store, the active program, the week and day in hand, the clock) taken as arguments and the
+// fields read from set-fields.ts instead of the screen:
+//
+//   autoSaveSets, writeSetDraft, commitSetsLive   set-logging.ts, storage.ts
+//   saveExWeight, logExerciseWeight               day-detail.ts, log-entries.ts (D290: a move's own rows)
+//   snapshotDay, resnapshotDayEdit                storage.ts
+//   markDay (the deck's), markDayComplete         deck.ts, day-status.ts
+//   skipExercise, unskipExercise, skipSuperset,
+//   unskipSuperset                                swap-sheet.ts
+//
+// The store is this app's own SQLite store and nothing else. tests/integration/native-deck-logging.test.ts holds it
+// equal to today's page, key for key, after the same taps on the same keys. Not here, with their own screens: the
+// completion pop-up and the day-after reminder (the page's ia_pop_ and ia_remind keys), swap and its undo, remove.
+import type { Day } from '@ia/core';
+import { addSkipEdit, dropSkipEdit, ssSkipToken } from '@ia/core/engine/state-day-edits.ts';
+import { recordDaySnapshot, refreshDaySnapshot } from '@ia/core/engine/state-day-history.ts';
+import { dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, writeDayLogs } from '@ia/core/engine/state-day-log.ts';
+import { setDayStatus } from '@ia/core/engine/state-day-status.ts';
+import { entryDay, readLiftLog, recordLift, writeLiftLog } from '@ia/core/engine/state-lift-log.ts';
+import type { StateStore } from '@ia/core/engine/state-store.ts';
+
+import { type CardAct, type CardMove, type DayLog, callItLog } from './deck-model';
+import type { DeckDay, DeckProgram, Fields } from './deck-screen';
+import { type MoveFields, afterLog, fillLoads, loadVals, rawLoads, rawReps, repVals, reuseLoad, stepRep } from './set-fields';
+
+/** The page's globals a write reads: the store, the program a launch handed back, the week and the day in hand. */
+export interface Session { store: StateStore; prog: DeckProgram; week: number; dayKey: string }
+
+const dayOf = (s: Session): DeckDay | null => { const wk = s.prog.weeks[s.week]; return (wk && wk[s.dayKey]) || null; };
+const unitOf = (s: Session): string => (s.prog.cfg && s.prog.cfg.unit) || 'lbs';
+
+/** The page's toStoreW: a shown load in pounds, as it is stored. The deck sets the page's unit label from the program's. */
+function toStoreW(disp: number | '' | null | undefined, kg: boolean): number {
+  if (disp === '' || disp == null) return 0;
+  return kg ? Math.round(+disp * 2.20462) : +disp;
+}
+
+/** The page's snapshotDay: the day as it stands, kept on its first touch. A fault never stops the tap. */
+export function snapshotDay(s: Session, log: (...a: unknown[]) => void = console.error): void {
+  try {
+    if (!s.prog || !s.prog.weeks || !s.week || !s.dayKey) return;
+    const wk = s.prog.weeks[s.week];
+    recordDaySnapshot(s.store, s.prog.id, s.week, s.dayKey, (wk && wk[s.dayKey]) as unknown as Day | null | undefined);
+  } catch (e) { log('day snapshot failed', s.week, s.dayKey, e); }
+}
+
+/** The page's resnapshotDayEdit: the snapshot takes in the athlete's own edit. */
+function resnapshotDay(s: Session, log: (...a: unknown[]) => void = console.error): void {
+  try {
+    if (!s.prog || !s.prog.weeks || !s.week || !s.dayKey) return;
+    const wk = s.prog.weeks[s.week];
+    refreshDaySnapshot(s.store, s.prog.id, s.week, s.dayKey, (wk && wk[s.dayKey]) as unknown as Day | null | undefined);
+  } catch (e) { log('day edit re-snapshot failed', s.week, s.dayKey, e); }
+}
+
+/** What Log did: the fields as it leaves them, and the toast it raises, null when it raises none. */
+export interface Logged { ok: boolean; fields: MoveFields; toast: string | null }
+
+/**
+ * The page's saveExWeight and logExerciseWeight: the move's own sets (D290), each set's load, the load field; the
+ * entry's weight is the heaviest set; the day is snapshotted, the lift recorded, the draft dropped. `quiet` is Done,
+ * next one and the straight-through commit, which raise no toast for a lift logged.
+ */
+export function saveLift(s: Session, exKey: string, exName: string, setsReps: string, f: MoveFields, now: number, quiet = false): Logged {
+  const unit = unitOf(s), kg = unit === 'kg';
+  const setsDone = repVals(f);
+  const dispSets = loadVals(f);
+  let storedW = 0, hasW = false, dispW = 0;
+  if (f.load) {
+    const v = parseFloat(f.load.value !== '' ? f.load.value : f.load.placeholder);
+    if (!isNaN(v) && v > 0) { dispW = v; storedW = kg ? Math.round(v * 2.20462) : v; hasW = true; }
+  }
+  let setsW: number[] = [];
+  if (dispSets.length && dispSets.some((x) => x > 0)) {
+    // The deck sets the page's unit label to kg only for a kilogram program, pounds for anything else.
+    setsW = dispSets.map((x) => toStoreW(x, kg));
+    const top = Math.max(...setsW);
+    if (top > 0) { storedW = top; hasW = true; dispW = Math.max(...dispSets); }
+  }
+  if (!setsDone.length && !hasW) return { ok: false, fields: f, toast: 'Nothing to log here' };
+  // logExerciseWeight.
+  if (exName && (storedW || setsDone.length)) {
+    const log = readLiftLog(s.store, s.prog.id);
+    if (s.dayKey) snapshotDay(s);
+    recordLift(log, { name: exName, weight: storedW, setsReps, week: s.week, day: s.dayKey, setsDone, setsW, now });
+    writeLiftLog(s.store, s.prog.id, log);
+  }
+  dropSetDraft(s.store, s.prog.id, s.week, s.dayKey, exKey);
+  return { ok: true, fields: afterLog(f, hasW, dispW, unit), toast: quiet ? null : hasW ? dispW + ' ' + unit + ' logged ✓' : 'Logged ✓' };
+}
+
+/** The page's writeSetDraft: the cells as they stand, untouched ones blank, into the day's log; the day snapshotted first. */
+function writeSetDraft(s: Session, exKey: string, f: MoveFields, now: number): void {
+  if (!s.prog.id || !s.dayKey || !exKey) return;
+  snapshotDay(s);
+  recordSetDraft(s.store, s.prog.id, s.week, s.dayKey, exKey, { r: rawReps(f), w: rawLoads(f), L: f.load ? f.load.value : '' }, now);
+}
+
+/** The page's commitSetsLive: a logged move's change goes straight to its entry, with the prescription it was logged under. */
+function commitSetsLive(s: Session, exKey: string, f: MoveFields, now: number): MoveFields {
+  const rec = readLiftLog(s.store, s.prog.id)[exKey];
+  if (!rec || !rec.name) return f;
+  const prev = (rec.entries || []).filter((e) => +e.week === +s.week && entryDay(e) === s.dayKey)[0];
+  return saveLift(s, exKey, rec.name, (prev && prev.setsReps) || '', f, now, true).fields;
+}
+
+/**
+ * The page's autoSaveSets, after a stepper tap, a pill, or a field left: before Log the cells are a draft; after it
+ * the change is committed. Returns the fields, which a commit restates.
+ */
+export function autoSave(s: Session, exKey: string, f: MoveFields, now: number): MoveFields {
+  if (!exKey) return f;
+  if (f.logged) return commitSetsLive(s, exKey, f, now);
+  writeSetDraft(s, exKey, f, now);
+  return f;
+}
+
+/**
+ * The deck's markDay with the page's markDayComplete (deck.ts, day-status.ts): the day snapshotted, its effort (only
+ * once the slider was moved, D219) and notes merged into its log entry, every other field kept, and the day marked
+ * complete. The rest clock and the completion pop-up are the page's own screens, not built here.
+ */
+export function markDay(s: Session, title: string, rpe: number | null, notes: string, now: number): void {
+  snapshotDay(s);
+  const logs = readDayLogs(s.store, s.prog.id) as unknown as Record<string, DayLog>;
+  const key = dayStoreKey(s.week, s.dayKey);
+  logs[key] = callItLog(logs[key], rpe, notes, s.week, now);
+  writeDayLogs(s.store, s.prog.id, logs as never);
+  snapshotDay(s);
+  setDayStatus(s.store, s.prog.id, s.week, s.dayKey, title, 'complete', now);
+}
+
+/** The page's skipExercise and unskipExercise: the move marked on the day in hand, the edit stored, the snapshot renewed. */
+function skipMove(s: Session, name: string, off: boolean): string | null {
+  const day = dayOf(s);
+  if (!day || !s.prog.id) return null;
+  let hit = false;
+  (day.sections || []).forEach((sec) => (sec.items || []).forEach((it) => {
+    if (it && it.name === name) { it._skipped = off ? true : (undefined as unknown as boolean); hit = true; }
+  }));
+  if (off && !hit) return null;
+  if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name);
+  resnapshotDay(s);
+  return off ? name + ' is off today. Tap to put it back.' : name + ' is back on the card.';
+}
+
+/** The page's skipSuperset and unskipSuperset: the round marked, its token stored, the snapshot renewed. */
+function skipRound(s: Session, secIdx: number, off: boolean): string | null {
+  const day = dayOf(s);
+  if (!day || !s.prog.id) return null;
+  const sec = (day.sections || [])[secIdx];
+  if (off && !sec) return null;
+  if (sec) sec._skipped = off ? true : (undefined as unknown as boolean);
+  if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, ssSkipToken(secIdx)); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, ssSkipToken(secIdx));
+  resnapshotDay(s);
+  return off ? 'Round is off today. Tap to put it back.' : 'Round is back on the card.';
+}
+
+/**
+ * The deck's act (deck.ts): a skip or its undo through the page's own handlers, one move, a round, or each name of a
+ * block in turn. The grid's day is changed in place, as the page changes activeProg. Returns the last toast raised.
+ */
+export function act(s: Session, a: CardAct, off: boolean): string | null {
+  if (a.kind === 'exercise') return skipMove(s, a.name, off);
+  if (a.kind === 'round') return skipRound(s, a.secIdx, off);
+  let toast: string | null = null;
+  for (const n of a.names) toast = skipMove(s, n, off) ?? toast;
+  return toast;
+}
+
+// ── The deck's taps: each one the fields of every move after it (the screen's handlers, Deck.tsx) ───────────────
+const withMove = (F: Fields, exKey: string, f: MoveFields): Fields => ({ ...F, [exKey]: f });
+
+/** A field of the move was left (the page's blur): what its cells hold is saved. */
+export function leftField(s: Session, F: Fields, exKey: string, now: number): Fields {
+  const f = F[exKey];
+  return f ? withMove(F, exKey, autoSave(s, exKey, f, now)) : F;
+}
+/** A set's plus or minus (the page's stepSet): the row moved, then saved. */
+export function tapStep(s: Session, F: Fields, exKey: string, row: number, step: number, now: number): Fields {
+  const f = F[exKey];
+  return f ? withMove(F, exKey, autoSave(s, exKey, stepRep(f, row, step), now)) : F;
+}
+/** The reuse pill (the page's reuseWeight): its number into the load field, then saved. A move with no load field takes nothing. */
+export function tapReuse(s: Session, F: Fields, exKey: string, value: number, now: number): Fields {
+  const f = F[exKey];
+  const g = f ? reuseLoad(f, value) : null;
+  return g ? withMove(F, exKey, autoSave(s, exKey, g, now)) : F;
+}
+/** Fill every set (the page's fillAllSetWeights): the pill's number into every set's cell, then saved. */
+export function tapFill(s: Session, F: Fields, exKey: string, value: number, now: number): Fields {
+  const f = F[exKey];
+  return f ? withMove(F, exKey, autoSave(s, exKey, fillLoads(f, value), now)) : F;
+}
+/** Log on a move (the page's saveExWeight from its button). */
+export function tapLog(s: Session, F: Fields, x: { exKey: string; name: string; rxDetail: string }, now: number): { fields: Fields; toast: string | null } {
+  const f = F[x.exKey];
+  if (!f) return { fields: F, toast: null };
+  const r = saveLift(s, x.exKey, x.name, x.rxDetail, f, now);
+  return { fields: withMove(F, x.exKey, r.fields), toast: r.toast };
+}
+/**
+ * Done, next one on a card not yet logged (deck.ts advance): Log, quietly, for each of its moves that is not logged.
+ * `tried` is how many it logged for; a card with none is marked done by the deck alone.
+ */
+export function tapDone(s: Session, F: Fields, moves: CardMove[], now: number): { fields: Fields; toasts: string[]; tried: number } {
+  let fields = F;
+  const toasts: string[] = [];
+  const open = moves.filter((m) => !m.logged);
+  for (const m of open) {
+    const f = fields[m.exKey];
+    if (!f) continue;
+    const r = saveLift(s, m.exKey, m.name, m.rxDetail, f, now, true);
+    fields = withMove(fields, m.exKey, r.fields);
+    if (r.toast) toasts.push(r.toast);
+  }
+  return { fields, toasts, tried: open.length };
+}
+

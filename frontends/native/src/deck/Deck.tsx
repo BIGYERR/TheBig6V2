@@ -5,27 +5,34 @@
 // finger (call 3), the dots, the session map, the RPE bubble (call 7), and each move's sets opening in place while
 // the others fold (D283).
 //
-// READ ONLY (D287, until the session D289 names). Everything that writes is drawn with today's words and does
-// nothing: Log, the steppers and the fields, the reuse pills, skip, Skip all, swap, put it back, remove, Done, next
-// one, Mark the day done, the effort slider and the notes. Moving through the deck writes nothing, so it works: the
-// swipe, the dots, the map's tiles, and Next one on a card that is already logged or skipped.
+// IT LOGS (D289 P-NATIVEWRITES, docs/decisions/data-backup.md), into this app's own store and nowhere else. A set's
+// steppers and fields, the load field, the reuse pill and Fill every set, Log, Done next one, Call it's effort and
+// notes with Mark the day done, and skip with put it back all do what today's do: the fields are set-fields.ts, the
+// writes deck-writes.ts, each the page's own handler with the page's globals as arguments. A move's fields are drawn
+// from its card when the deck opens and again after a skip or its undo, and are changed in place in between, as the
+// page's inputs are. Done, next one sends the card behind the deck with a glow (call 10); a skip punches the card
+// (call 5). Both are still under Reduce Motion.
 //
-// Not here yet, with the session that builds logging: the opening out of the card (call 16), the done motion (call
-// 10), the punch (call 5) and the up and down pager (call 1). The deck opens and closes as today's does under Reduce
-// Motion: at once.
-import { useMemo, useRef, useState } from 'react';
-import { Animated, Easing, PanResponder, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+// Not here yet: swap and its put it back, and remove on an added move (drawn, taking no press: they wait for the swap
+// sheet and the add sheet); the opening out of the card (call 16) and the up and down pager (call 1); the completion
+// pop-up, in whose place Mark the day done raises the toast today's app raises when no pop-up shows.
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, Keyboard, PanResponder, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Path, Polyline, Rect, SvgXml } from 'react-native-svg';
 
 import { asyIcon } from '@ia/core/engine/icons.ts';
+import type { StateStore } from '@ia/core/engine/state-store.ts';
 
-import type { ExCard, ExView, SetRow } from '../day-detail/session-sections-model';
+import type { ExCard, ExView, Rx, SetRow } from '../day-detail/session-sections-model';
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import {
-  CALL_IT_WORDS, type DeckCard, PIP_THRESHOLD, ctaText, numeral, openAfterSetsTap, restOpen, rpeBubble, rxLine, stateOf,
+  CALL_IT_WORDS, type CardAct, type DeckCard, PIP_THRESHOLD, ctaText, numeral, openAfterSetsTap, restOpen, rpeBubble, rxLine, stateOf,
 } from './deck-model';
-import { type DeckView, toneColor } from './deck-screen';
+import { parseRx } from './deck-readers';
+import { type DeckOpen, type Fields, deckView, freshFields, loggedCards, movesOf, toneColor } from './deck-screen';
+import { type Session, act, leftField, markDay, tapDone, tapFill, tapLog, tapReuse, tapStep } from './deck-writes';
+import { type FieldsView, type MoveFields, fieldsView, typeLoad, typeRep, typeSetLoad } from './set-fields';
 
 /** A card's sizes (D283, Mario's "Auto"): Roomy on a screen 700 points tall or more, Tight below it. */
 interface Sizes { num: number; title: number; meta: number; name: number; line: number; cue: number; ctl: number; ic: number; mic: number; pad: number; item: number; row: number; load: number }
@@ -35,11 +42,17 @@ const TIGHT: Sizes = { num: 22, title: 20, meta: 13, name: 15, line: 13, cue: 12
 const FAN = 3;
 const SWIPE = 80;
 const PEEK = 140;
+/** The done motion's curve and the two parts of its 760 ms (deck.css deckTuck: out to the side by 42%, then behind). */
+const TUCK = Easing.bezier(0.45, 0, 0.2, 1);
+const TUCK_OUT = 319;
+const TUCK_IN = 441;
 
 /** Type and tints on a card: white at an alpha (rgba(var(--on-band-rgb), a)). */
 const on = (a: number): string => 'rgba(255,255,255,' + a + ')';
 /** Markup a name may carry, dropped: a card's words are plain here. */
 const plain = (s: string): string => String(s).replace(/<[^>]*>/g, '').trim();
+/** A hex colour as "r,g,b", for a glow written as rgba. */
+const rgbOf = (hex: string): string => { const n = parseInt(hex.slice(1), 16); return ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255); };
 
 function Icon({ name, size, color }: { name: string; size: number; color: string }) {
   return <SvgXml xml={asyIcon(name, size).replace(/ style="[^"]*"/, '')} color={color} width={size} height={size} />;
@@ -51,14 +64,51 @@ function Undo({ size, color }: { size: number; color: string }) {
   return <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><Path d="M9 14L4 9l5-5" /><Path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" /></Svg>;
 }
 
-export function Deck({ palette: p, view, onClose }: { palette: Palette; view: DeckView; onClose: () => void }) {
+/** What a move's controls call, by the move's key. */
+interface Handlers {
+  step: (exKey: string, s: number, step: number) => void;
+  rep: (exKey: string, s: number, text: string) => void;
+  setLoad: (exKey: string, s: number, text: string) => void;
+  load: (exKey: string, text: string) => void;
+  focus: (exKey: string) => void;
+  blur: (exKey: string) => void;
+  reuse: (exKey: string, value: number) => void;
+  fill: (exKey: string, value: number) => void;
+  log: (x: ExCard) => void;
+  skip: (name: string) => void;
+  unskip: (name: string) => void;
+}
+
+export function Deck({ palette: p, store, open, onClose, say }: { palette: Palette; store: StateStore; open: DeckOpen; onClose: () => void; say: (toast: string) => void }) {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const z = height >= 700 ? ROOMY : TIGHT;
-  const cards = view.cards;
-  const n = cards.length;
+  const session: Session = { store, prog: open.prog, week: open.week, dayKey: open.dayKey };
+  const unit = open.prog.cfg && open.prog.cfg.unit === 'kg' ? 'kg' : 'lbs';
 
-  const [i, setI] = useState(view.first);
+  // ── What the deck holds: the day as drawn, each move's fields, and what was done in this open ──
+  const [view, setView] = useState(open.view);
+  const [fields, setFields] = useState(() => freshFields(open.view.cards));
+  const fieldsNow = useRef(fields);
+  const apply = (F: Fields): void => {
+    fieldsNow.current = F;
+    setFields(F);
+  };
+  /** Cards marked done with nothing on them the app can log; the deck's own, for this open. */
+  const [doneLocal, setDoneLocal] = useState<Record<string, boolean>>({});
+  const [dayDone, setDayDone] = useState(open.view.dayDone);
+  const [rpe, setRpe] = useState(open.view.rpe);
+  const rpeTouched = useRef(false);
+  const [notes, setNotes] = useState(open.view.notes);
+  const cards = useMemo(() => loggedCards(view.cards, fields), [view, fields]);
+  const n = cards.length;
+  const rxOf = useMemo(() => {
+    const out: Record<string, Rx | null> = {};
+    for (const x of movesOf(view.cards)) out[x.exKey] = parseRx(x.rxDetail, x.name);
+    return out;
+  }, [view]);
+
+  const [i, setI] = useState(open.view.first);
   const [sheet, setSheet] = useState<'map' | null>(null);
   const [bubble, setBubble] = useState<number | null>(null);
   /** Per move, whether its sets are open; per card, the move kept whole while the others fold (D283); per move, its pip. */
@@ -71,15 +121,36 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
   const dx = useRef(new Animated.Value(0)).current;
   const at = useRef(i);
   at.current = i;
+  /** A finger on Call it's slider keeps the deck from taking the drag. */
+  const sliding = useRef(false);
 
+  // ── Motion (call 10 and call 5), still under Reduce Motion ──
+  const [calm, setCalm] = useState(false);
+  useEffect(() => { AccessibilityInfo.isReduceMotionEnabled().then(setCalm, () => {}); }, []);
+  const [done, setDone] = useState<{ phase: 'lift' | 'leave'; glow: boolean; tucked: boolean } | null>(null);
+  const busy = useRef(false);
+  const liftV = useRef(new Animated.Value(0)).current;
+  const leaveV = useRef(new Animated.Value(0)).current;
+  const [hit, setHit] = useState<string | null>(null);
+  const hitV = useRef(new Animated.Value(0)).current;
+  const holeV = useRef(new Animated.Value(1)).current;
+  const shardV = useRef(SHARDS.map(() => new Animated.Value(0))).current;
+  const [stageW, setStageW] = useState(0);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
+  const later = (fn: () => void, ms: number): void => { timers.current.push(setTimeout(fn, ms)); };
+
+  /** At rest the card behind is the next one, in the fan. */
+  const rest = (): void => { dirNow.current = 1; setDir(1); };
   const go = (k: number): void => {
     if (!n) return;
     dx.setValue(0);
+    rest();
     setI(((k % n) + n) % n);
   };
   const pan = useMemo(() => PanResponder.create({
     // A sideways drag moves the deck; an up and down one is the card's own scroll (deck.css touch-action: pan-y).
-    onMoveShouldSetPanResponderCapture: (_e, g) => n > 1 && Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2,
+    onMoveShouldSetPanResponderCapture: (_e, g) => n > 1 && !busy.current && !sliding.current && Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2,
     onPanResponderMove: (_e, g) => {
       const d = g.dx < 0 ? 1 : -1;
       if (d !== dirNow.current) { dirNow.current = d; setDir(d); }
@@ -88,18 +159,18 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
     onPanResponderRelease: (_e, g) => {
       if (g.dx < -SWIPE) go(at.current + 1);
       else if (g.dx > SWIPE) go(at.current - 1);
-      else Animated.timing(dx, { toValue: 0, duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1), useNativeDriver: true }).start();
+      else Animated.timing(dx, { toValue: 0, duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1), useNativeDriver: true }).start(rest);
     },
-    onPanResponderTerminate: () => dx.setValue(0),
+    onPanResponderTerminate: () => { dx.setValue(0); rest(); },
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [n]);
 
   // ── Sets open in place, the other moves fold (D283; deck.ts foldOf, setsTapped, foldTapped) ──
   const foldOf = (c: DeckCard): string | null => openMove[c.key] || restOpen(c);
   const setsTapped = (c: DeckCard, exKey: string): void => {
-    const open = !setsOpen[exKey];
-    setSetsOpen((m) => ({ ...m, [exKey]: open }));
-    setOpenMove((m) => ({ ...m, [c.key]: openAfterSetsTap(c, exKey, open) }));
+    const opened = !setsOpen[exKey];
+    setSetsOpen((m) => ({ ...m, [exKey]: opened }));
+    setOpenMove((m) => ({ ...m, [c.key]: openAfterSetsTap(c, exKey, opened) }));
   };
   const foldTapped = (c: DeckCard, exKey: string): void => {
     const was = foldOf(c);
@@ -107,24 +178,165 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
     setOpenMove((m) => ({ ...m, [c.key]: exKey }));
   };
 
+  // ── Set logging (set-logging.ts through set-fields.ts and deck-writes.ts) ──
+  /** The move whose field holds the keyboard. Leaving a field saves what the move's cells hold (the page's blur). */
+  const focused = useRef<string | null>(null);
+  const save = (exKey: string): void => apply(leftField(session, fieldsNow.current, exKey, Date.now()));
+  /** A press on a control takes the keyboard off its field first, as a tap on the page does, so its cells are saved first. */
+  const leave = (): void => {
+    const k = focused.current;
+    focused.current = null;
+    if (k) save(k);
+    Keyboard.dismiss();
+  };
+  /** A key typed into a field: the field holds it, and nothing is saved until the field is left. */
+  const typed = (exKey: string, next: (f: MoveFields) => MoveFields): void => {
+    const f = fieldsNow.current[exKey];
+    if (f) apply({ ...fieldsNow.current, [exKey]: next(f) });
+  };
+  const h: Handlers = {
+    step: (exKey, s, step) => { leave(); apply(tapStep(session, fieldsNow.current, exKey, s, step, Date.now())); },
+    rep: (exKey, s, text) => typed(exKey, (f) => typeRep(f, s, text)),
+    setLoad: (exKey, s, text) => typed(exKey, (f) => typeSetLoad(f, s, text)),
+    load: (exKey, text) => typed(exKey, (f) => typeLoad(f, text)),
+    focus: (exKey) => { focused.current = exKey; },
+    blur: (exKey) => { if (focused.current === exKey) { focused.current = null; save(exKey); } },
+    reuse: (exKey, value) => { leave(); apply(tapReuse(session, fieldsNow.current, exKey, value, Date.now())); },
+    fill: (exKey, value) => { leave(); apply(tapFill(session, fieldsNow.current, exKey, value, Date.now())); },
+    log: (x) => {
+      leave();
+      const r = tapLog(session, fieldsNow.current, x, Date.now());
+      apply(r.fields);
+      if (r.toast) say(r.toast);
+    },
+    skip: (name) => edit({ kind: 'exercise', name }, true),
+    unskip: (name) => edit({ kind: 'exercise', name }, false),
+  };
+
+  // ── Skip and put it back (deck.ts act, skip and redraw) ──
+  /** The day drawn again after an edit: every move's fields afresh, the reader kept on their card. */
+  const redraw = (): void => {
+    const next = deckView(store, open.prog, open.week, open.dayKey, Date.now(), open.warn);
+    if (!next) return;
+    const key = (cards[at.current] || { key: '' }).key;
+    const k = next.cards.findIndex((c) => c.key === key);
+    setView(next);
+    apply(freshFields(next.cards));
+    setOpenMove({});
+    setSetsOpen({});
+    setI(k >= 0 ? k : Math.min(at.current, next.cards.length - 1));
+  };
+  function edit(a: CardAct, off: boolean): void {
+    leave();
+    const toast = act(session, a, off);
+    redraw();
+    if (toast) say(toast);
+  }
+  /** A skip punches the card (board V), plain grey under Reduce Motion, and raises no pop up (call 5). */
+  const skip = (c: DeckCard): void => {
+    if (!c.skip) return;
+    edit(c.skip, true);
+    if (calm) return;
+    setHit(c.key);
+    hitV.setValue(0);
+    holeV.setValue(0);
+    Animated.timing(hitV, { toValue: 1, duration: 520, easing: Easing.linear, useNativeDriver: true }).start();
+    Animated.timing(holeV, { toValue: 1, duration: 380, easing: Easing.bezier(0.3, 1.2, 0.4, 1), useNativeDriver: true }).start();
+    shardV.forEach((v, k) => { v.setValue(0); Animated.timing(v, { toValue: 1, duration: 620, delay: k * 15, easing: Easing.bezier(0.2, 0.6, 0.5, 1), useNativeDriver: true }).start(); });
+    later(() => setHit(null), 680);
+  };
+
+  // ── The big button (deck.ts advance and markDay) ──
   const top = cards[i];
-  const isLogged = (c: DeckCard): boolean => !c.skipped && c.logged && (c.kind !== 'finish' || view.dayDone);
-  const states = cards.map((c, k) => stateOf(c, k, i, c.kind === 'finish' && view.dayDone));
-  const cta = top ? ctaText(top, false, view.dayDone) : '';
-  const quiet = !!top && (top.kind === 'finish' ? view.dayDone : top.skipped || top.logged);
-  // The big button moves on where moving on is all it does; where it would log or mark the day, it waits for logging.
-  const ctaMoves = !!top && top.kind !== 'finish' && (top.skipped || top.logged);
-  const ctaCloses = !!top && top.kind === 'finish' && view.dayDone;
+  const isLogged = (c: DeckCard): boolean => !c.skipped && (c.logged || !!doneLocal[c.key]) && (c.kind !== 'finish' || dayDone);
+  const states = cards.map((c, k) => stateOf(c, k, i, !!doneLocal[c.key] || (c.kind === 'finish' && dayDone)));
+  const cta = top ? ctaText(top, !!doneLocal[top.key], dayDone) : '';
+  const quiet = !!top && (top.kind === 'finish' ? dayDone : top.skipped || top.logged || !!doneLocal[top.key]);
+
+  /** Mark the day done: the day's effort (only once the slider is moved, D219) and notes, the day complete, the deck closed. */
+  const mark = (): void => {
+    markDay(session, view.title, rpeTouched.current ? rpe : null, notes, Date.now());
+    setDayDone(true);
+    onClose();
+    say('Done ✓');
+  };
+  /** Done, next one logs what the card shows and sends it behind the deck; on a card logged or skipped it moves on. */
+  const advance = (): void => {
+    const c = cards[i];
+    if (!c || busy.current) return;
+    leave();
+    if (c.kind === 'finish') {
+      if (dayDone) onClose(); else mark();
+      return;
+    }
+    const marking = !c.skipped && !c.logged && !doneLocal[c.key];
+    if (marking) {
+      const r = tapDone(session, fieldsNow.current, c.moves, Date.now());
+      apply(r.fields);
+      r.toasts.forEach(say);
+      if (!r.tried) setDoneLocal((d) => ({ ...d, [c.key]: true }));
+    }
+    if (calm || n < 2) {
+      later(() => go(at.current + 1), 200);
+      return;
+    }
+    // Call 10: the card lifts, with a glow when it was just marked, then goes out to the side and behind the deck
+    // while the next one rises (deck.css deckTuck and deckPeekRise, 760 ms).
+    busy.current = true;
+    liftV.setValue(0);
+    leaveV.setValue(0);
+    setDone({ phase: 'lift', glow: marking, tucked: false });
+    Animated.timing(liftV, { toValue: 1, duration: 340, easing: Easing.bezier(0.2, 0.8, 0.2, 1), useNativeDriver: true }).start();
+    later(() => {
+      setDone({ phase: 'leave', glow: false, tucked: false });
+      Animated.timing(leaveV, { toValue: 1, duration: TUCK_OUT, easing: TUCK, useNativeDriver: true }).start(() => {
+        setDone({ phase: 'leave', glow: false, tucked: true });
+        Animated.timing(leaveV, { toValue: 2, duration: TUCK_IN, easing: TUCK, useNativeDriver: true }).start(() => {
+          busy.current = false;
+          setDone(null);
+          go(at.current + 1);
+        });
+      });
+    }, marking ? 560 : 220);
+  };
 
   // ── Where each card sits (deck.ts cardStyle and faceStyle, sideways) ──
   const q = dx.interpolate({ inputRange: [-PEEK, 0, PEEK], outputRange: [1, 0, 1], extrapolate: 'clamp' });
-  const peek = n > 1 ? (i + dir + n) % n : -1;
+  const leaving = !!done && done.phase === 'leave';
+  const peek = n > 1 ? (i + (done ? 1 : dir) + n) % n : -1;
   const cardStyle = (k: number): object => {
     const pos = (k - i + n) % n;
     if (pos === 0) {
+      const c = cards[k]!;
+      if (hit === c.key) {
+        const f = [0, 0.07, 0.17, 0.29, 0.43, 0.59, 0.77, 1];
+        return { zIndex: 20, transform: [
+          { translateX: hitV.interpolate({ inputRange: f, outputRange: [0, -14, 12, -9, 6, -4, 2, 0] }) },
+          { translateY: hitV.interpolate({ inputRange: f, outputRange: [0, 6, -5, 4, -2, 2, -1, 0] }) },
+          { rotate: hitV.interpolate({ inputRange: f, outputRange: ['0deg', '-2deg', '1.6deg', '-1.1deg', '0.7deg', '-0.4deg', '0.2deg', '0deg'] }) },
+        ] };
+      }
+      if (done && done.phase === 'lift') {
+        const g = rgbOf(c.tone === 'hip' ? p.hip : c.tone === 'core' ? p.core : c.tone === 'finish' ? p.onBand : p.lift);
+        return [{ zIndex: 20, transform: [{ translateY: liftV.interpolate({ inputRange: [0, 1], outputRange: [0, -10] }) }, { scale: liftV.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] }) }] },
+          done.glow && { boxShadow: '0 0 0 2px rgba(' + g + ',0.9), 0 0 42px 8px rgba(' + g + ',0.6), 0 20px 44px rgba(0,0,0,0.26)' }];
+      }
+      if (leaving) {
+        const t = [0, 1, 2];
+        return { zIndex: done!.tucked ? 1 : 20, opacity: leaveV.interpolate({ inputRange: [0, 1.69, 2], outputRange: [1, 1, 0] }), transform: [
+          { translateX: leaveV.interpolate({ inputRange: t, outputRange: [0, stageW * 0.72, 45] }) },
+          { translateY: leaveV.interpolate({ inputRange: t, outputRange: [-10, -30, -21] }) },
+          { scale: leaveV.interpolate({ inputRange: t, outputRange: [1.03, 0.97, 0.895] }) },
+          { rotate: leaveV.interpolate({ inputRange: t, outputRange: ['0deg', '10deg', '4.8deg'] }) },
+        ] };
+      }
       return { zIndex: 20, transform: [{ translateX: dx }, { rotate: dx.interpolate({ inputRange: [-260, 260], outputRange: ['-10deg', '10deg'] }) }] };
     }
-    if (k === peek) {
+    if (k === peek && leaving) {
+      const l = (a: number, b: number) => leaveV.interpolate({ inputRange: [0, 2], outputRange: [a, b] });
+      return { zIndex: 15, transform: [{ translateX: l(15, 0) }, { translateY: l(-7, 0) }, { scale: l(0.965, 1) }, { rotate: leaveV.interpolate({ inputRange: [0, 2], outputRange: ['1.6deg', '0deg'] }) }] };
+    }
+    if (k === peek && !done) {
       const f = dir > 0 ? { x: 15, y: -7, s: 0.965, r: '1.6deg' } : { x: 0, y: 0, s: 0.92, r: '0deg' };
       const l = (a: number, b: number) => q.interpolate({ inputRange: [0, 1], outputRange: [a, b] });
       return { zIndex: 15, transform: [{ translateX: l(f.x, 0) }, { translateY: l(f.y, 0) }, { scale: l(f.s, 1) }, { rotate: q.interpolate({ inputRange: [0, 1], outputRange: [f.r, '0deg'] }) }] };
@@ -134,25 +346,31 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
     }
     return { zIndex: 1, opacity: 0 };
   };
-  const faceOpacity = (k: number): number | Animated.AnimatedInterpolation<number> =>
-    (k === i ? 1 : k === peek ? q.interpolate({ inputRange: [0, 1], outputRange: [0.25, 1] }) : 0);
+  const faceOpacity = (k: number): number | Animated.AnimatedInterpolation<number> => {
+    if (k === i) return 1;
+    if (k !== peek) return 0;
+    if (leaving) return leaveV.interpolate({ inputRange: [0, 2], outputRange: [0.25, 1] });
+    // The card behind is a plain card until a drag begins (deck.ts faceStyle: no face while nothing moves), so a
+    // skipped card, which is drawn at 72%, shows no words through it. From two points of drag it fades in from a quarter.
+    return done ? 0 : q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [0, 0.25 + (0.75 * 2) / PEEK, 1] });
+  };
 
   const s = styles;
   return (
     <View testID="deck" accessibilityViewIsModal style={[StyleSheet.absoluteFill, { backgroundColor: p.bg, paddingTop: Math.max(12, insets.top), paddingBottom: Math.max(14, insets.bottom) }]}>
       <View style={s.head}>
-        <Pressable testID="deck-back" accessibilityRole="button" accessibilityLabel="Back to This Week" onPress={onClose} style={s.round44}>
+        <Pressable testID="deck-back" accessibilityRole="button" accessibilityLabel="Back to This Week" onPress={() => { leave(); onClose(); }} style={s.round44}>
           <Icon name="chevronLeft" size={22} color={p.text} />
         </Pressable>
         <Text testID="deck-title" numberOfLines={1} style={[s.title, { color: p.text }]}>{view.title}</Text>
-        <Pressable testID="deck-map" accessibilityRole="button" accessibilityLabel="See the whole session" onPress={() => setSheet('map')} style={s.round44}>
+        <Pressable testID="deck-map" accessibilityRole="button" accessibilityLabel="See the whole session" onPress={() => { leave(); setSheet('map'); }} style={s.round44}>
           <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={p.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <Rect x={4} y={4} width={6} height={6} rx={1.5} /><Rect x={14} y={4} width={6} height={6} rx={1.5} /><Rect x={4} y={14} width={6} height={6} rx={1.5} /><Rect x={14} y={14} width={6} height={6} rx={1.5} />
           </Svg>
         </Pressable>
       </View>
 
-      <View testID="deck-stage" style={s.stage} {...pan.panHandlers}>
+      <View testID="deck-stage" style={s.stage} onLayout={(e) => setStageW(e.nativeEvent.layout.width)} {...pan.panHandlers}>
         {cards.map((c, k) => (
           <Animated.View
             key={c.key}
@@ -165,7 +383,7 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
               c.skipped && k === i && { opacity: 0.72 }, cardStyle(k)]}
           >
             <Animated.View style={[s.face, { opacity: faceOpacity(k) }]}>
-              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: z.pad, paddingBottom: z.pad - 2 }} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: z.pad, paddingBottom: z.pad - 2 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
                 {isLogged(c) && <View pointerEvents="none" style={s.bigcheck}><Tick size={240} color={on(1)} /></View>}
                 <View style={[s.top, { minHeight: z.ic }]}>
                   <View style={s.numRow}>
@@ -175,9 +393,9 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
                   </View>
                   <View style={s.acts}>
                     {c.swap && <View accessibilityRole="button" accessibilityLabel="Swap this exercise" accessibilityState={{ disabled: true }} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: on(0.16) }]}><Icon name="swap" size={17} color={p.onBand} /></View>}
-                    {c.skip && c.kind !== 'lift' && <View accessibilityRole="button" accessibilityLabel="Skip the whole card" accessibilityState={{ disabled: true }} style={[s.act, s.actAll, { height: z.ic, backgroundColor: on(0.16) }]}><Text style={[s.actAllText, { color: p.onBand }]}>Skip all</Text></View>}
-                    {c.undo && <View accessibilityRole="button" accessibilityLabel="Put it back" accessibilityState={{ disabled: true }} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: p.onBand }]}><Undo size={18} color={p.band} /></View>}
-                    {c.skip && c.kind === 'lift' && <View accessibilityRole="button" accessibilityLabel="Skip this card" accessibilityState={{ disabled: true }} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: on(0.16) }]}><Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={p.onBand} strokeWidth={2.5} strokeLinecap="round"><Line x1={5} y1={12} x2={19} y2={12} /></Svg></View>}
+                    {c.skip && c.kind !== 'lift' && <Pressable testID="deck-skip" accessibilityRole="button" accessibilityLabel="Skip the whole card" onPress={() => skip(c)} style={[s.act, s.actAll, { height: z.ic, backgroundColor: on(0.16) }]}><Text style={[s.actAllText, { color: p.onBand }]}>Skip all</Text></Pressable>}
+                    {c.undo && <Pressable testID="deck-undo" accessibilityRole="button" accessibilityLabel="Put it back" onPress={() => edit(c.undo!, false)} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: p.onBand }]}><Undo size={18} color={p.band} /></Pressable>}
+                    {c.skip && c.kind === 'lift' && <Pressable testID="deck-skip" accessibilityRole="button" accessibilityLabel="Skip this card" onPress={() => skip(c)} style={[s.act, { width: z.ic, height: z.ic, backgroundColor: on(0.16) }]}><Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={p.onBand} strokeWidth={2.5} strokeLinecap="round"><Line x1={5} y1={12} x2={19} y2={12} /></Svg></Pressable>}
                   </View>
                 </View>
                 <Text testID={'deck-name-' + k} style={[s.name, { fontSize: z.title, lineHeight: z.title * 1.12, color: p.onBand }, c.skipped && { textDecorationLine: 'line-through', textDecorationColor: on(0.5) }]}>{c.title}</Text>
@@ -191,44 +409,59 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
                     <View accessibilityRole="button" accessibilityLabel="Put it back" accessibilityState={{ disabled: true }} style={[s.fromBtn, { backgroundColor: p.onBand }]}><Undo size={15} color={p.band} /></View>
                   </View>
                 )}
-                {c.kind === 'finish' ? <CallIt p={p} rpe={view.rpe} notes={view.notes} /> : !c.skipped && (
+                {c.kind === 'finish' ? (
+                  <CallIt p={p} rpe={rpe} notes={notes} sliding={sliding}
+                    onRpe={(v) => { rpeTouched.current = true; setRpe(v); }} onNotes={setNotes} />
+                ) : !c.skipped && (
                   <View>
-                    {c.views.flatMap((v) => (v.kind === 'section' ? v.body.items : [])).map((x, xi, all) => (
-                      <Move
-                        key={xi} x={x} c={c} z={z} p={p} last={xi === all.length - 1}
-                        open={x.kind === 'card' && !!setsOpen[x.exKey]}
-                        folded={x.kind === 'card' && foldOf(c) !== null && foldOf(c) !== x.exKey}
-                        pip={x.kind === 'card' ? pips[x.exKey] ?? 0 : 0}
-                        onSets={(key) => setsTapped(c, key)} onFold={(key) => foldTapped(c, key)}
-                        onPip={(key, n2) => setPips((m) => ({ ...m, [key]: n2 }))}
-                        onRpe={() => setBubble(c.rpe ?? 7)}
-                      />
-                    ))}
+                    {c.views.flatMap((v) => (v.kind === 'section' ? v.body.items : [])).map((x, xi, all) => {
+                      const f = x.kind === 'card' ? fields[x.exKey] : undefined;
+                      return (
+                        <Move
+                          key={xi} x={x} c={c} z={z} p={p} last={xi === all.length - 1}
+                          f={f} fv={x.kind === 'card' && f ? fieldsView(f, rxOf[x.exKey] ?? null, unit) : null} h={h}
+                          open={x.kind === 'card' && !!setsOpen[x.exKey]}
+                          folded={x.kind === 'card' && foldOf(c) !== null && foldOf(c) !== x.exKey}
+                          pip={x.kind === 'card' ? pips[x.exKey] ?? 0 : 0}
+                          onSets={(key) => setsTapped(c, key)} onFold={(key) => foldTapped(c, key)}
+                          onPip={(key, n2) => setPips((m) => ({ ...m, [key]: n2 }))}
+                          onRpe={() => setBubble(c.rpe ?? 7)}
+                        />
+                      );
+                    })}
                   </View>
                 )}
               </ScrollView>
             </Animated.View>
             {c.skipped && (
-              <View pointerEvents="none" style={s.hole}>
+              <Animated.View pointerEvents="none" style={[s.hole, hit === c.key && { opacity: holeV.interpolate({ inputRange: [0, 0.55, 1], outputRange: [0, 1, 1] }), transform: [{ rotate: '-13deg' }, { scale: holeV.interpolate({ inputRange: [0, 0.55, 1], outputRange: [0.2, 1.12, 1] }) }] }]}>
                 <Svg viewBox="0 0 220 220" width={200} height={200}>
                   <Path d={HOLE} fill="rgba(0,0,0,0.62)" transform="translate(5,7)" /><Path d={HOLE} fill={p.bg} />
                 </Svg>
-              </View>
+              </Animated.View>
             )}
+            {c.skipped && hit === c.key && SHARDS.map((sh, k2) => (
+              <Animated.View key={k2} pointerEvents="none" style={[s.shard, { opacity: shardV[k2]!.interpolate({ inputRange: [0, 0.38, 1], outputRange: [1, 1, 0] }), transform: [
+                { translateX: shardV[k2]!.interpolate({ inputRange: [0, 0.38, 1], outputRange: [0, sh.x[0], sh.x[1]] }) },
+                { translateY: shardV[k2]!.interpolate({ inputRange: [0, 0.38, 1], outputRange: [0, sh.y[0], sh.y[1]] }) },
+                { rotate: shardV[k2]!.interpolate({ inputRange: [0, 0.38, 1], outputRange: ['0deg', sh.r[0] + 'deg', sh.r[1] + 'deg'] }) },
+              ] }]}>
+                <Svg viewBox="0 0 30 30" width={sh.s} height={sh.s}><Path d="M4,8 L20,2 L28,18 L12,28 Z" fill={on(0.85)} /></Svg>
+              </Animated.View>
+            ))}
           </Animated.View>
         ))}
       </View>
 
       <View testID="deck-dots" style={s.dots}>
         {cards.map((c, k) => (
-          <Pressable key={c.key} testID={'deck-dot-' + k} accessibilityRole="button" accessibilityLabel={'Card ' + (k + 1) + ', ' + states[k]} hitSlop={8} onPress={() => go(k)}
+          <Pressable key={c.key} testID={'deck-dot-' + k} accessibilityRole="button" accessibilityLabel={'Card ' + (k + 1) + ', ' + states[k]} hitSlop={8} onPress={() => { leave(); go(k); }}
             style={[s.dot, { backgroundColor: k === i ? p.text : states[k] === 'Logged' ? p.signal : p.border2 }, k === i && { width: 22 }]} />
         ))}
       </View>
       <View style={s.foot}>
         <Pressable
-          testID="deck-cta" accessibilityRole="button" accessibilityState={{ disabled: !(ctaMoves || ctaCloses) }} disabled={!(ctaMoves || ctaCloses)}
-          onPress={() => (ctaCloses ? onClose() : go(i + 1))}
+          testID="deck-cta" accessibilityRole="button" onPress={advance}
           style={[s.cta, quiet ? { backgroundColor: p.text } : { backgroundColor: p.signal, boxShadow: '0 10px 28px rgba(' + p.signalRgb + ',0.42)' }]}
         >
           <Text style={[s.ctaText, { color: quiet ? p.bg : p.onSignal }]}>{cta}</Text>
@@ -281,66 +514,98 @@ export function Deck({ palette: p, view, onClose }: { palette: Palette; view: De
 
 /** The punched hole of a skipped card (deck.ts, board V). */
 const HOLE = 'M110,30 L122,52 L142,42 L140,66 L164,60 L154,82 L182,84 L164,102 L190,114 L166,124 L184,146 L158,144 L166,168 L142,158 L138,186 L118,166 L104,192 L96,164 L72,178 L74,152 L48,158 L60,136 L32,130 L52,112 L28,98 L54,88 L40,64 L66,68 L64,42 L88,54 Z';
+/** The punch's four shards (deck.css deckD1 to deckD4): a size, and where each flies at 38% and at its end. */
+const SHARDS = [
+  { s: 17, x: [-52, -98], y: [-26, 86], r: [-140, -300] },
+  { s: 13, x: [46, 88], y: [-34, 74], r: [120, 280] },
+  { s: 11, x: [-22, -44], y: [-44, 104], r: [-90, -210] },
+  { s: 15, x: [28, 58], y: [-40, 112], r: [100, 240] },
+] as const;
 
-/** Call it (call R): the day's effort and its word, the slider and the notes, drawn and not yet taking a touch. */
-function CallIt({ p, rpe, notes }: { p: Palette; rpe: number; notes: string }) {
+/** Call it (call R): the day's effort and its word, the slider, the notes. Nothing is stored until Mark the day done. */
+function CallIt({ p, rpe, notes, sliding, onRpe, onNotes }: { p: Palette; rpe: number; notes: string; sliding: { current: boolean }; onRpe: (v: number) => void; onNotes: (t: string) => void }) {
   const s = styles;
   const fill = ((rpe - 1) / 9) * 100;
+  const width = useRef(0);
+  const x0 = useRef(0);
+  const at = (x: number): void => {
+    if (!width.current) return;
+    onRpe(Math.min(10, Math.max(1, Math.round(1 + (x / width.current) * 9))));
+  };
+  const drag = useMemo(() => PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderTerminationRequest: () => false,
+    onPanResponderGrant: (e) => { sliding.current = true; x0.current = e.nativeEvent.locationX; at(x0.current); },
+    onPanResponderMove: (_e, g) => at(x0.current + g.dx),
+    onPanResponderRelease: () => { sliding.current = false; },
+    onPanResponderTerminate: () => { sliding.current = false; },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), []);
   return (
     <View testID="deck-callit" style={s.callit}>
       <View style={s.rpeRead}>
-        <Text style={[s.rpeN, { color: p.onBand }]}>{rpe}</Text>
+        <Text testID="deck-rpe" style={[s.rpeN, { color: p.onBand }]}>{rpe}</Text>
         <Text style={[s.rpeW, { color: on(0.84) }]}>{CALL_IT_WORDS[rpe] || ''}</Text>
       </View>
-      <View accessibilityRole="adjustable" accessibilityLabel="How hard was the whole session, 1 to 10" accessibilityState={{ disabled: true }} style={s.slider}>
-        <View style={[s.track, { backgroundColor: on(0.18) }]} />
-        <View style={[s.track, { width: (fill + '%') as `${number}%`, right: undefined, backgroundColor: p.signal }]} />
-        <View style={[s.thumb, { left: (fill + '%') as `${number}%`, backgroundColor: p.signal, borderColor: p.onBand }]} />
+      <View
+        testID="deck-slider" accessible accessibilityRole="adjustable" accessibilityLabel="How hard was the whole session, 1 to 10"
+        accessibilityValue={{ min: 1, max: 10, now: rpe }} accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+        onAccessibilityAction={(e) => onRpe(Math.min(10, Math.max(1, rpe + (e.nativeEvent.actionName === 'increment' ? 1 : -1))))}
+        onLayout={(e) => { width.current = e.nativeEvent.layout.width; }} style={s.slider} {...drag.panHandlers}
+      >
+        <View pointerEvents="none" style={[s.track, { backgroundColor: on(0.18) }]} />
+        <View pointerEvents="none" style={[s.track, { width: (fill + '%') as `${number}%`, right: undefined, backgroundColor: p.signal }]} />
+        <View pointerEvents="none" style={[s.thumb, { left: (fill + '%') as `${number}%`, backgroundColor: p.signal, borderColor: p.onBand }]} />
       </View>
       <Text style={[s.notesLbl, { color: on(0.78) }]}>Notes</Text>
-      <View style={[s.notes, { backgroundColor: on(0.1) }]}><Text style={[s.notesText, { color: p.onBand }]}>{notes}</Text></View>
+      <TextInput testID="deck-notes" accessibilityLabel="Notes" multiline value={notes} onChangeText={onNotes} style={[s.notes, s.notesText, { backgroundColor: on(0.1), color: p.onBand }]} />
     </View>
   );
 }
 
 interface MoveProps {
   x: ExView; c: DeckCard; z: Sizes; p: Palette; last: boolean; open: boolean; folded: boolean; pip: number;
+  /** The move's fields and what they show, for a move with a card. */
+  f: MoveFields | undefined; fv: FieldsView | null; h: Handlers;
   onSets: (exKey: string) => void; onFold: (exKey: string) => void; onPip: (exKey: string, s: number) => void; onRpe: () => void;
 }
 
 /** One move on a card: the session sheet's exercise card in deck mode (session-sections.ts with deck.css over it). */
-function Move({ x, c, z, p, last, open, folded, pip, onSets, onFold, onPip, onRpe }: MoveProps) {
+function Move({ x, c, z, p, last, open, folded, pip, f, fv, h, onSets, onFold, onPip, onRpe }: MoveProps) {
   const s = styles;
   if (x.kind === 'skipped') {
     return (
       <View style={s.skipped}>
         <Text style={[s.skippedLbl, { color: on(0.72) }]}>Skipped</Text>
         <Text numberOfLines={1} style={[s.skippedName, { color: on(0.72) }]}>{plain(x.name)}</Text>
-        <Text accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.skippedUndo, { color: on(0.72) }]}>Put it back</Text>
+        <Text testID="deck-putback" accessibilityRole="button" onPress={() => h.unskip(x.name)} style={[s.skippedUndo, { color: on(0.72) }]}>Put it back</Text>
       </View>
     );
   }
   const line = rxLine(String(x.rxDetail || x.detail || ''));
   const lift = c.kind === 'lift', cool = c.kind === 'cool';
   const sets = x.log ? x.log.sets : null, load = x.log ? x.log.load : null;
+  const logged = f ? f.logged : x.logged;
+  const head = fv && sets ? fv.head : sets ? sets.head : '';
   const edge = [{ paddingVertical: z.item }, !last && !lift && { borderBottomWidth: 1, borderBottomColor: on(0.14) }, (last || lift) && { paddingBottom: 0 }];
   if (folded) {
     return (
       <Pressable testID={'deck-move-' + x.exKey} accessibilityRole="button" accessibilityLabel={'Open ' + plain(x.name)} onPress={() => onFold(x.exKey)} style={[s.foldRow, edge, { paddingVertical: z.item - 2 }]}>
         <Text numberOfLines={1} style={[s.moveName, { flex: 1, fontSize: z.name - 1, color: p.onBand }]}>{plain(x.name)}</Text>
-        {sets && <Text style={[s.foldVal, { color: on(0.72) }]}>{sets.head}</Text>}
-        {x.logged && <Text style={[s.badge, { color: p.onBand }]}>✓</Text>}
+        {sets && <Text style={[s.foldVal, { color: on(0.72) }]}>{head}</Text>}
+        {logged && <Text style={[s.badge, { color: p.onBand }]}>✓</Text>}
       </Pressable>
     );
   }
   const logBtn = x.log && (
-    <View accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.log, { height: z.ctl, backgroundColor: p.onBand }]}><Text style={[s.logText, { color: p.band }]}>Log</Text></View>
+    <Pressable testID={'deck-log-' + x.exKey} accessibilityRole="button" onPress={() => h.log(x)} style={[s.log, { height: z.ctl, backgroundColor: p.onBand }]}><Text style={[s.logText, { color: p.band }]}>Log</Text></Pressable>
   );
   if (cool) {
     return (
       <View testID={'deck-move-' + x.exKey} style={[s.coolRow, edge]}>
         <View style={{ flex: 1 }}>
-          <NameRow x={x} z={z} p={p} controls={false} />
+          <NameRow x={x} z={z} p={p} controls={false} logged={logged} h={h} />
           {!!line.dose && <Text style={[s.dose, { fontSize: z.line, lineHeight: z.line * 1.25, color: p.onBand }]}>{line.dose}</Text>}
           {!!line.cue && <Text style={[s.moveCue, { fontSize: z.cue, lineHeight: z.cue * 1.3, color: on(0.76) }]}>{line.cue}</Text>}
         </View>
@@ -351,9 +616,9 @@ function Move({ x, c, z, p, last, open, folded, pip, onSets, onFold, onPip, onRp
   const setLine = sets && (
     <View style={s.setLine}>
       <Pressable testID={'deck-sets-' + x.exKey} accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => onSets(x.exKey)} style={s.setHead}>
-        <Text style={[s.setVal, { fontSize: z.line, color: p.onBand }]}>{sets.head}</Text>
+        <Text style={[s.setVal, { fontSize: z.line, color: p.onBand }]}>{head}</Text>
         {!!line.rpe && <Text style={[s.setRpe, { fontSize: z.line, color: on(0.76) }]}>{'· ' + line.rpe}</Text>}
-        {sets.varied && <Text style={[s.vary, { color: p.onBand, borderColor: on(0.35) }]}>Varied</Text>}
+        {(fv ? fv.varied : sets.varied) && <Text style={[s.vary, { color: p.onBand, borderColor: on(0.35) }]}>Varied</Text>}
         <View style={[s.caret, { backgroundColor: open ? p.onBand : on(0.16) }, open && { transform: [{ rotate: '180deg' }] }]}><Icon name="chevronDown" size={14} color={open ? p.band : p.onBand} /></View>
       </Pressable>
       {lift && c.rpe !== null && !!line.rpe && (
@@ -363,28 +628,35 @@ function Move({ x, c, z, p, last, open, folded, pip, onSets, onFold, onPip, onRp
       )}
     </View>
   );
+  const reuse = load && load.reuse ? { ...load.reuse, ...(f && f.reuse ? f.reuse : {}) } : null;
   return (
     <View testID={'deck-move-' + x.exKey} style={edge}>
-      {!lift && <NameRow x={x} z={z} p={p} controls />}
+      {!lift && <NameRow x={x} z={z} p={p} controls logged={logged} h={h} />}
       {load ? setLine : (
         <View style={s.lineLog}><View style={{ flex: 1 }}>{setLine}</View>{logBtn}</View>
       )}
       {!lift && !!line.cue && <Text style={[s.moveCue, { fontSize: z.cue, lineHeight: z.cue * 1.3, color: on(0.76) }]}>{line.cue}</Text>}
       {!lift && x.added && <Text style={[s.chip, { color: on(0.76) }]}><Text style={{ color: p.onBand, fontWeight: '700' }}>You added this</Text>{' · not in the plan  '}<Text style={{ color: p.onBand }}>remove</Text></Text>}
       {!lift && x.swappedFrom && <Text style={[s.chip, { color: on(0.76) }]}><Text style={{ color: p.onBand, fontWeight: '700' }}>Swapped in</Text>{' for ' + x.swappedFrom + '  '}<Text style={{ color: p.onBand }}>put it back</Text></Text>}
-      {sets && open && <Rows x={x} rows={sets.rows} foot={sets.foot} pip={pip} p={p} onPip={(n2) => onPip(x.exKey, n2)} />}
+      {sets && open && f && fv && <Rows x={x} rows={sets.rows} f={f} fv={fv} foot={sets.foot} pip={pip} p={p} h={h} onPip={(n2) => onPip(x.exKey, n2)} />}
       {load && (
         <View style={[s.weightRow, { marginTop: z.row }]}>
           {!open && (
             <View style={s.weight}>
               <View style={[s.winput, { width: z.load, height: z.ctl, backgroundColor: on(0.1), borderColor: on(0.26) }]}>
-                <Text style={[s.wval, { color: p.onBand }]}>{load.value}</Text><Text style={[s.wunit, { color: on(0.72) }]}>{load.unit}</Text>
+                <TextInput
+                  testID={'deck-load-' + x.exKey} accessibilityLabel={(fv ? fv.loadLabel : load.label) + ', ' + load.unit} keyboardType="decimal-pad" selectTextOnFocus
+                  value={f && f.load ? f.load.value : load.value} placeholder={f && f.load ? f.load.placeholder : ''} placeholderTextColor={on(0.5)}
+                  onChangeText={(t) => h.load(x.exKey, t)} onFocus={() => h.focus(x.exKey)} onBlur={() => h.blur(x.exKey)}
+                  style={[s.wval, s.field, { flex: 1, color: p.onBand }]}
+                />
+                <Text style={[s.wunit, { color: on(0.72) }]}>{load.unit}</Text>
               </View>
-              {load.reuse && (
-                <View accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.reuse, { height: z.ctl - 6, backgroundColor: load.reuse.stale ? 'transparent' : on(0.16) }, load.reuse.stale && { borderWidth: 1, borderStyle: 'dashed', borderColor: on(0.26) }]}>
+              {reuse && (
+                <Pressable testID={'deck-reuse-' + x.exKey} accessibilityRole="button" onPress={() => h.reuse(x.exKey, reuse.value)} style={[s.reuse, { height: z.ctl - 6, backgroundColor: reuse.stale ? 'transparent' : on(0.16) }, reuse.stale && { borderWidth: 1, borderStyle: 'dashed', borderColor: on(0.26) }]}>
                   <Text style={[s.reuseIco, { color: p.onBand }]}>↺</Text>
-                  <Text numberOfLines={1} style={[s.reuseTxt, { color: p.onBand }]}>{load.reuse.text}<Text style={[s.reuseRec, { color: on(0.76) }]}>{' · ' + load.reuse.rec}</Text></Text>
-                </View>
+                  <Text numberOfLines={1} style={[s.reuseTxt, { color: p.onBand }]}>{reuse.text}<Text style={[s.reuseRec, { color: on(0.76) }]}>{' · ' + reuse.rec}</Text></Text>
+                </Pressable>
               )}
             </View>
           )}
@@ -394,37 +666,32 @@ function Move({ x, c, z, p, last, open, folded, pip, onSets, onFold, onPip, onRp
       )}
       {load && load.warn && <View style={s.warn}><Text style={[s.warnIco, { color: p.onBand }]}>△</Text><Text style={[s.warnTxt, { color: on(0.84) }]}>{load.warn}</Text></View>}
       {load && load.fill && open && (
-        <View accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.fill, { backgroundColor: load.fill.stale ? 'transparent' : on(0.16) }, load.fill.stale && { borderWidth: 1, borderStyle: 'dashed', borderColor: on(0.26) }]}>
+        <Pressable testID={'deck-fill-' + x.exKey} accessibilityRole="button" onPress={() => h.fill(x.exKey, load.fill!.value)} style={[s.fill, { backgroundColor: load.fill.stale ? 'transparent' : on(0.16) }, load.fill.stale && { borderWidth: 1, borderStyle: 'dashed', borderColor: on(0.26) }]}>
           <Text style={[s.reuseIco, { color: p.onBand }]}>↺</Text>
           <Text style={[s.reuseTxt, { color: p.onBand }]}>{load.fill.text}<Text style={[s.reuseRec, { color: on(0.76) }]}>{'  ' + load.fill.rec}</Text></Text>
-        </View>
+        </Pressable>
       )}
     </View>
   );
 }
 
-/** A move's name, with its swap and its minus (drawn, not yet taking a touch) and its check once logged. */
-function NameRow({ x, z, p, controls }: { x: ExCard; z: Sizes; p: Palette; controls: boolean }) {
+/** A move's name, with its swap (drawn, not yet taking a touch), its minus and its check once logged. */
+function NameRow({ x, z, p, controls, logged, h }: { x: ExCard; z: Sizes; p: Palette; controls: boolean; logged: boolean; h: Handlers }) {
   const s = styles;
   return (
     <View style={s.nameRow}>
       <Text style={[s.moveName, { flex: 1, fontSize: z.name, lineHeight: z.name * 1.22, color: p.onBand }]}>{plain(x.name)}</Text>
       {controls && x.swap && <View accessibilityRole="button" accessibilityLabel="Swap this exercise" accessibilityState={{ disabled: true }} style={[s.mic, { width: z.mic, height: z.mic, backgroundColor: on(0.14) }]}><Icon name="swap" size={16} color={p.onBand} /></View>}
-      {controls && x.skip && <View accessibilityRole="button" accessibilityLabel="Skip this exercise" accessibilityState={{ disabled: true }} style={[s.mic, { width: z.mic, height: z.mic, backgroundColor: on(0.14) }]}><Icon name="minus" size={16} color={p.onBand} /></View>}
-      {x.logged && <Text style={[s.badge, { color: p.onBand }]}>✓</Text>}
+      {controls && x.skip && <Pressable testID={'deck-minus-' + x.exKey} accessibilityRole="button" accessibilityLabel="Skip this exercise" onPress={() => h.skip(x.name)} style={[s.mic, { width: z.mic, height: z.mic, backgroundColor: on(0.14) }]}><Icon name="minus" size={16} color={p.onBand} /></Pressable>}
+      {logged && <Text style={[s.badge, { color: p.onBand }]}>✓</Text>}
     </View>
   );
 }
 
 /** A move's set rows, open: past four sets one at a time behind the pips (board P), the top set marked, the foot. */
-function Rows({ x, rows, foot, pip, p, onPip }: { x: ExCard; rows: SetRow[]; foot: string | null; pip: number; p: Palette; onPip: (s: number) => void }) {
+function Rows({ x, rows, f, fv, foot, pip, p, h, onPip }: { x: ExCard; rows: SetRow[]; f: MoveFields; fv: FieldsView; foot: string | null; pip: number; p: Palette; h: Handlers; onPip: (s: number) => void }) {
   const s = styles;
   const pipped = rows.length > PIP_THRESHOLD;
-  // The page's markTopSet: each set's load, the largest of them, and which rows hold it when the loads differ.
-  const loads = rows.map((r) => (r.weight ? parseFloat(r.weight.value) : NaN)).filter((v) => !isNaN(v));
-  const max = loads.length ? Math.max(...loads) : 0;
-  const vary = loads.length > 1 && loads.some((v) => v !== loads[0]);
-  const unit = rows[0] && rows[0].weight ? rows[0].weight.unit : '';
   return (
     <View testID={'deck-rows-' + x.exKey} style={s.rows}>
       {pipped && (
@@ -437,23 +704,35 @@ function Rows({ x, rows, foot, pip, p, onPip }: { x: ExCard; rows: SetRow[]; foo
         </View>
       )}
       {rows.filter((r) => !pipped || r.s === pip).map((r, ri, shown) => {
-        const isTop = vary && !!r.weight && parseFloat(r.weight.value) === max;
+        const rep = f.reps[r.s], cell = r.weight ? f.loads[r.s] : undefined;
+        const isTop = !!cell && !!fv.top[r.s];
         return (
           <View key={r.s} style={[s.row, ri < shown.length - 1 && { borderBottomWidth: 1, borderBottomColor: on(0.14) }]}>
             <Text style={[s.rowNum, { color: on(0.72) }]}>{r.s + 1}</Text>
             <View style={[s.ctl, { borderColor: on(0.26), backgroundColor: on(0.1) }]}>
-              <View style={[s.step, { backgroundColor: on(0.16) }]}><Text style={[s.stepText, { color: p.onBand }]}>−</Text></View>
+              <Pressable testID={'deck-minus-' + x.exKey + '-' + r.s} accessibilityRole="button" accessibilityLabel={'Set ' + (r.s + 1) + ', fewer'} onPress={() => h.step(x.exKey, r.s, -r.step)} style={[s.step, { backgroundColor: on(0.16) }]}><Text style={[s.stepText, { color: p.onBand }]}>−</Text></Pressable>
               <View style={s.val}>
-                <Text style={[s.valText, { color: r.value === '' ? on(0.72) : p.onBand }]}>{r.value === '' ? r.placeholder : r.value}</Text>
+                <TextInput
+                  testID={'deck-rep-' + x.exKey + '-' + r.s} accessibilityLabel={'Set ' + (r.s + 1)} keyboardType="number-pad" selectTextOnFocus
+                  value={rep ? rep.value : r.value} placeholder={rep ? rep.placeholder : r.placeholder} placeholderTextColor={on(0.72)}
+                  onChangeText={(t) => h.rep(x.exKey, r.s, t)} onFocus={() => h.focus(x.exKey)} onBlur={() => h.blur(x.exKey)}
+                  style={[s.valText, s.field, { minWidth: 34, textAlign: 'center', color: p.onBand }]}
+                />
                 {!!r.suffix && <Text style={[s.suf, { color: on(0.72) }]}>{r.suffix}</Text>}
-                {!!r.deltaText && <Text style={[s.delta, { color: p.onBand }]}>{r.deltaText}</Text>}
+                {!!fv.delta[r.s] && <Text style={[s.delta, { color: p.onBand }]}>{fv.delta[r.s]}</Text>}
               </View>
-              <View style={[s.step, { backgroundColor: on(0.16) }]}><Text style={[s.stepText, { color: p.onBand }]}>+</Text></View>
+              <Pressable testID={'deck-plus-' + x.exKey + '-' + r.s} accessibilityRole="button" accessibilityLabel={'Set ' + (r.s + 1) + ', more'} onPress={() => h.step(x.exKey, r.s, r.step)} style={[s.step, { backgroundColor: on(0.16) }]}><Text style={[s.stepText, { color: p.onBand }]}>+</Text></Pressable>
             </View>
-            {r.weight && (
+            {r.weight && cell && (
               <View style={[s.wcell, { borderColor: isTop ? p.onBand : on(0.26), backgroundColor: on(0.1) }]}>
                 {isTop && <Text style={[s.toppip, { backgroundColor: p.onBand, color: p.band }]}>Top</Text>}
-                <Text style={[s.wcellVal, { color: p.onBand }]}>{r.weight.value}</Text><Text style={[s.wcellU, { color: on(0.72) }]}>{r.weight.unit}</Text>
+                <TextInput
+                  testID={'deck-setload-' + x.exKey + '-' + r.s} accessibilityLabel={'Set ' + (r.s + 1) + ' load, ' + r.weight.unit} keyboardType="decimal-pad" selectTextOnFocus
+                  value={cell.value} placeholder={cell.placeholder} placeholderTextColor={on(0.6)}
+                  onChangeText={(t) => h.setLoad(x.exKey, r.s, t)} onFocus={() => h.focus(x.exKey)} onBlur={() => h.blur(x.exKey)}
+                  style={[s.wcellVal, s.field, { flex: 1, textAlign: 'right', color: p.onBand }]}
+                />
+                <Text style={[s.wcellU, { color: on(0.72) }]}>{r.weight.unit}</Text>
               </View>
             )}
           </View>
@@ -461,8 +740,8 @@ function Rows({ x, rows, foot, pip, p, onPip }: { x: ExCard; rows: SetRow[]; foo
       })}
       {foot && (
         <View style={[s.rowFoot, { borderTopColor: on(0.14) }]}>
-          <Text style={[s.footLbl, { color: on(0.72) }]}>{vary ? 'Top set' : 'Every set'}</Text>
-          <Text style={[s.footVal, { color: p.onBand }]}>{max > 0 ? max + ' ' + unit : '—'}</Text>
+          <Text style={[s.footLbl, { color: on(0.72) }]}>{fv.footLabel}</Text>
+          <Text style={[s.footVal, { color: p.onBand }]}>{fv.footValue}</Text>
         </View>
       )}
     </View>
@@ -497,6 +776,9 @@ const styles = StyleSheet.create({
   fromText: { flex: 1, fontFamily: TEXT, fontSize: 12 },
   fromBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   hole: { position: 'absolute', left: '50%', top: '46%', marginLeft: -100, marginTop: -100, transform: [{ rotate: '-13deg' }] },
+  shard: { position: 'absolute', left: '50%', top: '46%' },
+  // A field on a card: the box around it is the card's own, so the input adds no room of its own.
+  field: { padding: 0, margin: 0 },
 
   // A move (deck.css .deck-work .exercise-item.ex-deck).
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -568,7 +850,7 @@ const styles = StyleSheet.create({
   track: { position: 'absolute', left: 0, right: 0, top: 17, height: 6, borderRadius: 3 },
   thumb: { position: 'absolute', top: 6, width: 28, height: 28, marginLeft: -14, borderRadius: 14, borderWidth: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.45)' },
   notesLbl: { fontFamily: TEXT, fontSize: 13, fontWeight: '700' },
-  notes: { minHeight: 84, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 14 },
+  notes: { minHeight: 84, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 14, textAlignVertical: 'top' },
   notesText: { fontFamily: TEXT, fontSize: 16, lineHeight: 20 },
 
   dots: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingTop: 14, paddingHorizontal: 20 },

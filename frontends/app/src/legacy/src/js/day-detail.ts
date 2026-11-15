@@ -8,7 +8,7 @@ import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.t
 import { DAY_FULL } from './wizard.ts';
 import { wildcardTagHTML } from './random-wildcard.ts';
 import { buildSectionsHTML, restLogLines } from './week-view-sections.ts';
-import { buildCardioHTML, refreshSetSummary, setWeightVals, toStoreW } from './set-logging.ts';
+import { buildCardioHTML, refreshSetSummary, setRepVals, setWeightVals, toStoreW } from './set-logging.ts';
 import { getExWeights, logExerciseWeight, updateDoseDerived } from './log-entries.ts';
 import { buildLogHTML, iaWheelInit, modTagsHTML, sessionLogProgress } from './wheel-log.ts';
 import { ruResetIfIdle } from './rest-timer.ts';
@@ -242,12 +242,10 @@ function saveExWeight(exKey: any, exName: any, setsReps: any, quiet?: any) {
   const unit = activeProg?.cfg?.unit || 'lbs';
   // Per-set actual reps (or seconds/yards) — read every row, empty falls back to its
   // prescribed placeholder so an untouched set logs as prescribed.
-  const rows = Array.prototype.slice.call(document.querySelectorAll('input[id^="exset_'+exKey+'_"]'));
-  const setsDone = rows.map(function(el){
-    const raw = (el.value!=='' ? el.value : el.placeholder);
-    const v = parseInt(raw||'0',10);
-    return isNaN(v) ? 0 : v;
-  });
+  // v0.262.3 (D290, P-OWNROWS): the move's own rows, one id at a time (setRepVals, the same blank rule). They were
+  // read by the start of their id, which also took the rows of a move whose key starts with this one's, so Split
+  // squat logged beside Split-squat heel-raise hold stored five sets for a move of three.
+  const setsDone = setRepVals(exKey);
   // Per-set load, display units. Present only on loaded movements; an untouched cell
   // reads its placeholder, which cascade keeps synced to the collapsed Load field.
   const dispSets = setWeightVals(exKey);
@@ -271,7 +269,7 @@ function saveExWeight(exKey: any, exName: any, setsReps: any, quiet?: any) {
     const top = Math.max.apply(null, setsW);
     if(top>0){ storedW = top; hasW = true; dispW = Math.max.apply(null, dispSets); }
   }
-  if(!rows.length && !hasW){ showToast('Nothing to log here'); return; }
+  if(!setsDone.length && !hasW){ showToast('Nothing to log here'); return; }
   logExerciseWeight(exName, storedW, setsReps, currentWeek, setsDone, setsW, currentDayKey);
   // The record now owns this exercise for this day. The draft has to go, or the next
   // render has two sources of truth for the same cells.

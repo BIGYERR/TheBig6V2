@@ -48,6 +48,8 @@ export function BackupLoad({ palette: p }: { palette: Palette }) {
     <View style={[styles.card, { backgroundColor: p.surface, borderColor: p.border }]}>
       <Text style={[styles.label, { color: p.text }]}>Backup</Text>
       <Text style={[styles.note, { color: p.muted }]}>Loads a backup file into this app and checks every key. Writes nothing back.</Text>
+      {/* D289 (Mario, 2026-11-14, "The proposed copy"): the beta logs into its own copy, and says so here. */}
+      <Text testID="backup-own-copy" style={[styles.note, { color: p.muted }]}>Sets you log here stay in this app. Today's app does not see them. Loading a backup replaces everything here.</Text>
       <Pressable testID="backup-load" accessibilityRole="button" onPress={load} disabled={busy}
         style={[styles.button, { backgroundColor: p.accent, opacity: busy ? 0.6 : 1 }]}>
         <Text style={[styles.buttonText, { color: p.onInk }]}>{busy ? 'Checking' : 'Load a backup'}</Text>

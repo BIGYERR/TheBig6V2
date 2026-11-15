@@ -128,7 +128,7 @@ Each phase starts only on Mario's GO, one phase step per session.
   and the backup's saving and reading of a file, with the Bugs screen.
 - **Done, the Expo screen's seam (Post-v0.262.2, no build):** `liveProgram` (`frontends/native/src/this-week/week-screen.ts`)
   returns what core's `refreshStoredProgram` hands back, called as the page's `refreshProgram` calls it, through a
-  store that drops writes (`store/read-only-store.ts`: the beta's copy is a backup loaded read only, D287). The Expo
+  store that dropped writes until the deck logged (D287; the store is the real one since Post-v0.262.3, D289). The Expo
   app's copies of the date readers are gone; `week-readers.ts` imports core's. Measured before the edit: the seam's
   program is the page's on every launch of every history, 0 of 3,745 days where the stored grid read 806
   (`tests/measure/native-this-week_launch.md`); 54 to 58 ms a launch under Hermes on the simulator. Every launch of the
@@ -149,14 +149,23 @@ Each phase starts only on Mario's GO, one phase step per session.
   HALF_MANNY inside the 60-second check, 2,755 across the ten programs in CI. Nothing writes. Found on the way: the
   page's launch folds the lift log's old keys and stores it, a launch write outside `refreshStoredProgram`; the
   deck folds a copy as it reads, and the beta's launch makes that write when it writes (D289).
-- **Next:** the deck's second session: set logging, Call it, skip and swap, with the beta writing to its own copy
-  (D289), the deck's motions (the opening out of the card, the done motion, the punch, the up and down pager) and
-  its ledger rows. Then the session sheet. Still not
+- **Done, phase 3's second session, the deck logs (Post-v0.262.3, no build; D289 built):** the beta's store is the
+  real one and its launch makes today's launch writes (the active program's pointer put right, the lift log's old
+  keys folded, then core's own). The deck logs through nine of core's writers: set drafts, Log, changes after Log,
+  Done next one with its motion, Call it, skip and put it back with the punch; the toast and the Bugs line. What
+  the page does around core's writers is ported line for line (`frontends/native/src/deck/set-fields.ts`,
+  `deck-writes.ts`; measured first, `tests/measure/native-deck-logging_writes.md`). Held equal to today's page key
+  for key after every tap of whole histories and after every launch (`tests/support/native-deck-logging.ts`,
+  `native-launch.ts`): 1,246 taps for HALF_MANNY inside the 60-second check, 11,818 across the ten programs in CI.
+  The one difference, on purpose: the beta writes none of the pop-ups' keys, since neither pop-up is built.
+- **Next:** Mario's phone on the next IA Next build. Then the swap sheet (with swap, its put it back and remove on
+  the deck), the opening out of the card and the up and down pager, the completion pop-up and the day-after
+  reminder, and the deck's ledger rows. Then the session sheet. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
-  `docs/decisions/data-backup.md`): the beta writes to its own copy, its launch included, from the session that
-  builds logging; until then nothing in it writes.
+  `docs/decisions/data-backup.md`) and built in phase 3's second session: the beta writes to its own copy, its
+  launch included.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is

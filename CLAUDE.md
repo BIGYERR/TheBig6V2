@@ -197,7 +197,8 @@ issued D265 before the ruling was written, and it shipped as D266.
   `frontends/app/src/legacy/src/` into `dist-github-pages/`, its version meta, its inline script compiles, it boots and builds
   HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint, the production build with its budgets), frontends (the website's and the admin's type check and lint), backend (type checks, tests, lint) and native (the Expo app's type check against core; on a change to `core/` alone it is skipped with a note when no `frontends/native/node_modules` is here or borrowable, since CI's `native (Expo)` job checks it, Post-v0.262.0). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
-  slower belongs in CI. In a chat's worktree the check borrows the main checkout's `node_modules` of the app, the website,
+  slower belongs in CI. The check runs alone, never beside the sweeps, a break check or a simulator build: sharing the
+  processors it hits its limit with no test red (Post-v0.262.3). In a chat's worktree the check borrows the main checkout's `node_modules` of the app, the website,
   the backend and the Expo app when this branch's lockfile is the main checkout's, and otherwise names the `npm ci` to run
   (`tools/worktree-deps.mjs`, Post-v0.259.1); it installs the tests' own with `npm ci`. It borrows package by package,
   and a package installed from a `file:` spec (the app's two plugins; the tests' `@ia/core` when a session borrows that
@@ -386,7 +387,7 @@ which does reach him arrives with a recommendation.
 - No process substitution `<(...)` — use temp files.
 - Oracles are independent: a test never asserts the engine equals its own output. Hand tables, the doctrine text, date arithmetic; a golden snapshot is the one deliberate exception.
 - A test file that crashes before its first test, or registers no tests, is a failure, never a pass. Count a ported or rewritten file's tests against the original: phase 2's pace-clock lattice helper returned its tests instead of registering them, and two sweeps and two integration files ran green without their lattices (Post-v0.239.1).
-- A check that takes minutes runs its fast half first and its slow half only where the fast half is silent, and always in the background: the stored state's break check runs the integration file on each broken page and the sweeps only for a break that file lets through (Post-v0.261.2: fifteen minutes a run became under three). A slice runs its own breaks first (`--only <text in their names>`, read on the screen) and the whole set once before its release commit. The breaks run four at a time, the fast file for every break and then the sweeps for the ones it let through (`--jobs <n>`; Post-v0.262.2: one at a time, a slice's 85 breaks took about 18 minutes and the whole set of 167 about 35; four at a time they take 4 and 8, and the report is the same to the byte).
+- A check that takes minutes runs its fast half first and its slow half only where the fast half is silent, and always in the background: the stored state's break check runs the integration file on each broken page and the sweeps only for a break that file lets through (Post-v0.261.2: fifteen minutes a run became under three). A slice runs its own breaks first (`--only <text in their names>`, read on the screen) and the whole set once before its release commit. The breaks run four at a time, the fast file for every break and then the sweeps for the ones it let through (`--jobs <n>`; Post-v0.262.2: one at a time, a slice's 85 breaks took about 18 minutes and the whole set of 167 about 35; four at a time they take 4 and 8, and the report is the same to the byte). A break check written for another part of the app runs in parts from its first run, each part in a copy of the tree of its own (`node tools/tree-at.mjs --working`), and merges their rows into one report: in one copy the Expo deck's 47 breaks ran about a minute each beside other work, and in four copies the whole set took about 8 minutes (`tests/measure/native-deck-logging_breaks.mjs --part k/n --json`, then `--merge`; Post-v0.262.3). A break that turns no file red is read before a test is written for it: one that takes out half of a rule the code keeps twice changes nothing, and is fixed in the break (Mark the day done snapshots the day twice).
 - An instrument is shown to fire, on one file, before its silence is read. A copy of the page that reports or throws at a call proves the call never happens only after its always-fire twin has turned a test red; then the real one runs (Post-v0.261.5: two clean runs of the whole suite meant nothing, one reporting through a console line the runner does not print, the other throwing after a `return` had left the function).
 - A new test that reads another package's folder (the Expo app's, today's app's, a tool's) is run once where that package is not installed, before it is trusted: `node tools/tree-at.mjs --working <scratch>/ci` writes this checkout's files as they stand, committed or not, with the tests' packages alone, which is what CI's tests job has; then `npx vitest run <files>` and `npx tsc -p .` in its `tests/` (Post-v0.262.0: three files passed locally and failed in CI for want of the Expo app's packages; the next session's copy, overlaid by hand, lost a folder and read red).
 - A check that searches a binary is shown to find what is there, and to find nothing where it is not, before its build trusts it: Swift writes the class `IASpikeModule` of the module `IASpike` as `7IASpike0A6Module`, so a search for the class name failed a good build (Post-v0.262.0).
@@ -481,8 +482,9 @@ before a merge into `main` touches the build).
   `www/` are generated by Cordova and gitignored: never commit them. A change to the native project is a change to one of
   the three tracked things, so there is no Xcode project diff to classify.
 - **The version.** `config.xml`'s `version` and `ios-CFBundleVersion` carry the page's `ia-version`, written by `cd frontends/app
-  && npm run version-ios` in the release commit; `test/unit/native-version.test.ts`, in the app lane of the 60-second check, is
-  red when they differ.
+  && npm run version-ios` in the release commit, after the page is rebuilt (`npm run build:index`): it reads the built
+  page's version and stops before that (Post-v0.262.3). `test/unit/native-version.test.ts`, in the app lane of the
+  60-second check, is red when they differ.
 - **The compile proof is CI's.** The 60-second check cannot build iOS. The pipeline's `native (iOS simulator)` job runs
   `npm run build-ios` (`scripts/ios.mjs build`: the Angular app, the Cordova platform, an unsigned Xcode build for the
   simulator, nothing launched) on a macOS runner on every push to `dev` and every pull request; its Xcode log is the
@@ -512,7 +514,8 @@ before a merge into `main` touches the build).
   or `core` is edited while its simulator build runs: the bundle may hold either side of the edit, so what the
   simulator shows is not known to be the code. An edit made anyway is followed by a build of its own before the
   simulator is read (Post-v0.262.2: two helpers moved between files during a build, and the deck was built and looked
-  at once more on the final code).
+  at once more on the final code). A simulator screenshot taken right after a tap shows the frame before the tap:
+  what a tap did is read from the second screenshot (Post-v0.262.3: the deck's first skip looked like nothing).
 
 ## Files
 - `index.html` — the app's page, generated. Its source is `frontends/app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta

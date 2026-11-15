@@ -220,16 +220,17 @@ describe('native deck: a day opened as a deck', () => {
   });
 });
 
-describe('native deck: read only', () => {
-  const dirs = ['frontends/native/src/deck', 'frontends/native/src/day-detail'];
-  const all = dirs.flatMap((d) => readdirSync(join(REPO, d)).filter((f) => /\.tsx?$/.test(f)).map((f) => readFileSync(join(REPO, d, f), 'utf8'))).join('\n');
+// Which files of the deck write, and through which of core's writers, is tests/unit/native-deck-logging.test.ts (D289).
+// What stays here: drawing a day writes nothing.
+describe('native deck: drawing writes nothing', () => {
   const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
-  test('no file of the deck writes or removes a stored key, or calls one of core\'s writers (D287, until the session D289 names)', () => {
-    const code = strip(all);
-    assert.ok(code.length > 30000, 'the deck\'s files were read');
+  test('the readers, the seam, the models and the fields call none of core\'s writers and write no key', () => {
+    const files = ['deck/deck-model.ts', 'deck/deck-readers.ts', 'deck/deck-screen.ts', 'deck/set-fields.ts', 'day-detail/session-sections-model.ts'];
+    const code = strip(files.map((f) => readFileSync(join(REPO, 'frontends/native/src', f), 'utf8')).join('\n'));
+    assert.ok(code.length > 30000, 'the files were read');
     assert.doesNotMatch(code, /\b\w*[sS]tore\.(set|remove)\(/, 'no store write');
     // setDraftOf reads a set draft (core's state-day-log.ts); every other name of these shapes is a writer.
-    assert.doesNotMatch(code, /\b(?!setDraftOf\b)(write|record|clear|drop|set|add)[A-Z]\w*\(store\b/, 'none of core\'s writers is called');
+    assert.doesNotMatch(code, /\b(?!setDraftOf\b)(write|record|refresh|clear|drop|set|add)[A-Z]\w*\((s\.)?store\b/, 'none of core\'s writers is called');
     assert.doesNotMatch(code, /localStorage|AsyncStorage/, 'no other storage');
   });
 });
@@ -238,11 +239,6 @@ describe('native deck: the screen', () => {
   const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
   const deck = readFileSync(join(REPO, 'frontends/native/src/deck/Deck.tsx'), 'utf8');
   const code = strip(deck);
-
-  test('the deck\'s folder holds the screen, its seam, its readers and the model\'s copy; the card model\'s copy sits beside it', () => {
-    assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/deck')).sort(), ['Deck.tsx', 'deck-model.ts', 'deck-readers.ts', 'deck-screen.ts']);
-    assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/day-detail')), ['session-sections-model.ts']);
-  });
 
   test('a card\'s ground is its kind\'s colour under the deck\'s shade: a quarter of black by day, two fifths by night', () => {
     // 188,106,67 by three quarters; 126,94,150; 166,130,47. By night 217,138,99 by three fifths; 171,140,196; 207,167,82.
@@ -264,26 +260,29 @@ describe('native deck: the screen', () => {
     }
   });
 
-  // Read only until the session D289 names. A press does one of these and nothing else: closes the deck, moves through
-  // it, opens or closes the map or the bubble, opens a move's sets or a folded move, picks a pip. Log, the steppers,
-  // the reuse pills, skip, swap, put it back and remove are drawn with no press at all.
-  test('every press on the deck moves through it or opens something to read: none logs, skips, swaps or marks the day', () => {
+  // Every press on the deck, by what it calls. The ones that write (h.log, h.step, h.reuse, h.fill, h.skip, h.unskip,
+  // skip, edit, advance) are held to their taps in tests/unit/native-deck-logging.test.ts; the rest move through the
+  // deck or open something to read. A press added later lands here first.
+  test('every press on the deck is one of these: it moves through the deck, opens something to read, or calls a tap', () => {
     const presses = [...new Set([...code.matchAll(/onPress=\{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]!.trim()))].sort();
     assert.deepStrictEqual(presses, [
-      '() => (ctaCloses ? onClose() : go(i + 1))', '() => go(k)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)', '() => setBubble(null)',
-      "() => setSheet('map')", '() => setSheet(null)', '() => { go(k); setSheet(null); }', 'onClose', 'onRpe',
+      '() => edit(c.undo!, false)', '() => h.fill(x.exKey, load.fill!.value)', '() => h.log(x)', '() => h.reuse(x.exKey, reuse.value)', '() => h.skip(x.name)',
+      '() => h.step(x.exKey, r.s, -r.step)', '() => h.step(x.exKey, r.s, r.step)', '() => h.unskip(x.name)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)',
+      '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k); }', '() => { leave(); onClose(); }',
+      "() => { leave(); setSheet('map'); }", 'advance', 'onRpe',
     ]);
-    assert.ok(code.includes('disabled={!(ctaMoves || ctaCloses)}'), 'the big button is off where it would log a card or mark the day');
-    assert.ok(code.includes("const ctaMoves = !!top && top.kind !== 'finish' && (top.skipped || top.logged);") && code.includes("const ctaCloses = !!top && top.kind === 'finish' && view.dayDone;"));
-    assert.doesNotMatch(code, /TextInput|onChangeText|onValueChange/, 'no field takes a touch yet');
-    assert.ok((code.match(/accessibilityState=\{\{ disabled: true \}\}/g) || []).length >= 12, 'each control that writes says it is off');
   });
 
   test('the deck opens and closes at once, as today\'s does under Reduce Motion, and swipes by today\'s numbers', () => {
+    assert.doesNotMatch(code, /growBox|openMotion|deck-ghost/, 'the opening out of the card (call 16) is not built yet');
     assert.ok(code.includes('const FAN = 3;') && code.includes('const SWIPE = 80;') && code.includes('const PEEK = 140;'));
     assert.ok(code.includes('{ x: 15, y: -7, s: 0.965, r: \'1.6deg\' }') && code.includes('{ x: 0, y: 0, s: 0.92, r: \'0deg\' }'), 'the card that rises: from the fan going on, from behind going back');
     assert.ok(code.includes('{ translateX: pos * 15 }, { translateY: pos * -7 }, { scale: 1 - pos * 0.035 }, { rotate: pos * 1.6 + \'deg\' }'), 'the fan');
     assert.ok(code.includes('duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1)'), 'a swipe let go short settles back in 290 ms');
+    // At rest the card behind shows no face (deck.ts faceStyle), so nothing reads through a skipped card's 72%; it
+    // fades in from a quarter once a drag passes two points, and the fan is the next card's again when the drag ends.
+    assert.ok(code.includes('q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [0, 0.25 + (0.75 * 2) / PEEK, 1] })'), 'the card behind has no face until a drag begins');
+    assert.ok(code.includes('.start(rest);') && code.includes('const rest = (): void => { dirNow.current = 1; setDir(1); };'), 'at rest the card behind is the next one');
     assert.ok(code.includes('height >= 700 ? ROOMY : TIGHT'), 'D283: Roomy on a screen 700 points tall or more');
   });
 
@@ -291,9 +290,10 @@ describe('native deck: the screen', () => {
     const week = strip(readFileSync(join(REPO, 'frontends/native/src/this-week/ThisWeek.tsx'), 'utf8'));
     assert.ok(week.includes("const starts = !!bt && bt.act === 'deck' && !bt.sunk;"));
     assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={() => onStart(k.week, k.key)}'));
-    assert.ok(week.includes('const deck = deckView(store, prog as unknown as DeckProgram, week, key, Date.now());') && week.includes('if (deck) onDeck(deck);'));
+    assert.ok(week.includes('const view = deckView(store, grid, week, key, Date.now(), warn);') && week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn });'));
     const app = strip(readFileSync(join(REPO, 'frontends/native/src/App.tsx'), 'utf8'));
-    assert.ok(app.includes('onDeck={setDeck}') && app.includes('{deck && <Deck palette={p} view={deck} onClose={() => setDeck(null)} />}'));
+    assert.ok(app.includes('onDeck={setDeck}') && app.includes('{deck && <Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} say={say} />}'));
+    assert.ok(app.indexOf('<Toast ') > app.indexOf('<Deck '), 'the toast is drawn after the deck, so over it');
     assert.ok(app.indexOf('<Deck ') > app.indexOf('testID="tab-bar"'), 'the deck is drawn after the tab bar, so over it');
   });
 });

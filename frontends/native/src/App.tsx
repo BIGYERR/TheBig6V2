@@ -1,16 +1,17 @@
 // The Expo app (MIGRATION.md phases 2 and 3). Two tabs, as today's app names them: This Week (phase 2, session 4),
-// drawn read only from the stored state, whose Start lift opens the swipe deck (phase 3, its first screen), and Bugs: the engine check under Hermes (session 1), the Backup row, a backup loaded read
-// only into the app's own SQLite store (session 2), and one line saying whether the app's own Swift module answered
-// (session 3, the native spike). Programs and Progress are today's app's still (phase 3).
+// drawn from the stored state, whose Start lift opens the swipe deck (phase 3, its first screen), which logs into
+// this app's own SQLite store (D289); and Bugs: the engine check under Hermes (session 1), the Backup row, a backup
+// loaded into that store in place of everything in it (session 2), and one line saying whether the app's own Swift
+// module answered (session 3, the native spike). Programs and Progress are today's app's still (phase 3).
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VERSION } from '@ia/core';
 
 import { BackupLoad } from './BackupLoad';
 import { Deck } from './deck/Deck';
-import type { DeckView } from './deck/deck-screen';
+import type { DeckOpen } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
 import { SWIFT_ANSWER } from './native-spike';
 import { swiftLine } from './spike-line';
@@ -44,7 +45,10 @@ function Shell() {
   // Counts the visits to This Week, so it reads the store again after a backup is loaded on Bugs.
   const [tick, setTick] = useState(0);
   // The day open as a swipe deck, over the whole screen and the tab bar (deck.css: above the tab bar), or none.
-  const [deck, setDeck] = useState<DeckView | null>(null);
+  const [deck, setDeck] = useState<DeckOpen | null>(null);
+  // Today's toast (rest-day-shell.ts showToast): one line over everything, gone after 2.2 s.
+  const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
+  const say = (text: string): void => setToast((t) => ({ text, n: t ? t.n + 1 : 1 }));
   const go = (t: Tab): void => {
     if (t === 'week' && tab !== 'week') setTick((n) => n + 1);
     setTab(t);
@@ -57,7 +61,26 @@ function Shell() {
         <TabButton id="tab-week" label="This Week" on={tab === 'week'} palette={p} onPress={() => go('week')} icon={(c) => <Calendar color={c} size={22} />} />
         <TabButton id="tab-bugs" label="Bugs" on={tab === 'bugs'} palette={p} onPress={() => go('bugs')} icon={(c) => <Bug color={c} />} />
       </View>
-      {deck && <Deck palette={p} view={deck} onClose={() => setDeck(null)} />}
+      {deck && <Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} say={say} />}
+      {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
+    </View>
+  );
+}
+
+/** The toast (overlays-components.css .toast with look.css): the run colour, ink type, fading in and out over 0.2 s. */
+function Toast({ text, palette: p, bottom, onDone }: { text: string; palette: Palette; bottom: number; onDone: () => void }) {
+  const shown = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(shown, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+    const out = setTimeout(() => Animated.timing(shown, { toValue: 0, duration: 200, useNativeDriver: true }).start(onDone), 2200);
+    return () => clearTimeout(out);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <View pointerEvents="none" style={[styles.toastWrap, { bottom }]}>
+      <Animated.View testID="toast" accessibilityLiveRegion="polite" style={[styles.toast, { backgroundColor: p.run, opacity: shown }]}>
+        <Text numberOfLines={1} style={styles.toastText}>{text}</Text>
+      </Animated.View>
     </View>
   );
 }
@@ -98,4 +121,7 @@ const styles = StyleSheet.create({
   tabbar: { position: 'absolute', left: 12, right: 12, flexDirection: 'row', padding: 6, borderRadius: 34, borderWidth: 1, boxShadow: '0 10px 30px rgba(0,0,0,0.18)' },
   tab: { flex: 1, alignItems: 'center', gap: 3, paddingTop: 9, paddingHorizontal: 4, paddingBottom: 8, borderRadius: 28 },
   tabLabel: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
+  toastWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
+  toast: { paddingVertical: 10, paddingHorizontal: 20, borderRadius: 4, maxWidth: '92%' },
+  toastText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700', color: '#0a0a0a' },
 });
