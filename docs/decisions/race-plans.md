@@ -150,7 +150,7 @@ Tests: `tests/integration/race-plans.test.ts`, `tests/integration/run-names.test
   the 40 mile a week mark van Gent's 2007 review flags for men. *Accepted cost:* the half runs 15% more than the source,
   and on Mario's own four run week the two easy runs go from 15 and 25 minutes to 25 and 30 in week 1; if he wants the
   half nearer the source's volume, the easy runs can be written 20 to 45 instead of 25 to 50 (about +5% overall), which
-  coach does not recommend.
+  coach does not recommend. Mario kept them as ruled ("Keep as ruled", 2026-11-15).
 - **What changes in the engine:** the 48 rows of the four tables, and nothing else in `nrc-race-bike-swim.ts`. The
   `detailIfHalfSlow` variant (D31) travels with the session that carries it (the 23:00 progression tempo, now half
   week 6 and marathon week 13). The After tables:
