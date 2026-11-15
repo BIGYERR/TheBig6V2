@@ -139,3 +139,36 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
   keys.** Three programs: TEST TING, 12 weeks from 2026-07-06, 35 days marked; THE HALF MANNY, 14 weeks from
   2026-08-24, active, 50 days marked; PRT TING, 11 weeks from 2026-09-23, 15 days marked. The phase 2 exit gate's
   import leg is seen. Today's app was not touched: the file was a copy, and the beta writes nothing back.
+
+## D289 P-NATIVEWRITES: the beta may write to its own copy, from the session that builds logging (2026-11-14)
+
+- **Date:** 2026-11-14. **Ruled by:** Mario ("Yes, its own copy"), on the session's recommendation, at the opening
+  of the React Native migration's phase 3. **Amends:** D287 (the copy is loaded read only), from the session that
+  builds logging on; D287 stands until then. **Bump:** none (a Post-v0.262.2 native pass; today's app, its page and
+  core do not move). **Shipped:** not yet: the ruling is recorded here in the session that drew the swipe deck read
+  only; the first write ships with the session that builds set logging and Call it.
+- **The finding (measured, `tests/measure/native-deck_reads.md`):** every write today's deck makes ends in a writer
+  core already holds (the lift log, the day's snapshot, the day's log, the day's status, the skips and the swaps).
+  What is still the page's is the code around them, which reads the fields off the screen and redraws. The launch's
+  own two writes (an older program repaired, the day edits of frozen weeks dropped) are already held equal to the
+  page's on every launch of the stored-state histories, through a store that writes (`tests/support/native-launch.ts`,
+  its third check). Each screen's exit gate in phase 3 is "Mario has used it on the phone", and a deck that cannot
+  log cannot be used.
+- **What changes, when logging is built (the Expo app only):**
+  1. The beta writes to its own store and nowhere else: the SQLite database in its own container
+     (`com.bigyerr.ironasylum.next`, `phone-store.ts`). It has no path to today's app's storage, and gains none.
+  2. Its launch is handed the store itself, not the one that drops writes; `store/read-only-store.ts` goes.
+  3. Loading a backup still replaces the copy whole, all or nothing, checked key by key (D287's import, unchanged).
+     What was logged in the beta since the last load is gone with it, by design.
+  4. Bugs says so in words, beside the Backup row. The copy, proposed, to be confirmed when it is built: **Sets you
+     log here stay in this app. Today's app does not see them. Loading a backup replaces everything here.**
+- **What deliberately does not change:** today's app, its storage, its backup and its TestFlight lane; the backup
+  format; core's writers (the beta calls them as they are); program output. Nothing moves from the beta to today's
+  app before the cutover (phase 5), which has its own GO. Until the logging session, D287 holds: no screen of the
+  beta writes, and the launch is still handed the store that drops writes.
+- **The counter-argument, recorded:** a set logged in the beta by mistake is a set missing from today's app, the only
+  real copy. And once the beta has written, "every hash matches the file" is no longer true of its copy until a
+  backup is loaded again; the side by side of a later screen starts by loading one.
+- **Expected values, for the session that builds it:** after the same taps on the same keys, the beta's store holds
+  each `ia_` key equal to today's page's, value for value (the stored-state histories, as the launch is held today);
+  a backup loaded after a logged set leaves the store the file's, key for key and hash for hash.

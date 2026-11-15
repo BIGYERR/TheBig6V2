@@ -134,11 +134,18 @@ Each phase starts only on Mario's GO, one phase step per session.
   (`tests/measure/native-this-week_launch.md`); 54 to 58 ms a launch under Hermes on the simulator. Every launch of the
   stored-state histories is now a launch of the seam too (`tests/support/native-launch.ts`). The record is
   `docs/decisions/this-week.md`, its last entry.
-- **Next:** Mario's side by side on his phone, IA Next's next build beside today's app, closes phase 2. Still not
+- **Done, phase 2's exit gate (Mario, 2026-11-14):** his side by side, IA Next build 105 beside today's app on Week 12
+  of THE HALF MANNY: "looks the same to me!", every word and number today's. One mark differed, the Then lift
+  dumbbell drawn broken after a day whose lift was skipped; proved on a copy of his backup in the simulator, fixed
+  (`marks.tsx`, a whole half is handed an identity transform) and tested (`docs/decisions/this-week.md`, its last
+  entry). He closed the gate on that fix and gave the GO for phase 3 the same evening. The fix reaches his phone in
+  the next IA Next build.
+- **Next:** phase 3, the remaining screens, the swipe deck first. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
-  stops the page's launch where the Expo seam hands back the stored program. His to say when the beta logs: whether
-  its launch writes its own copy.
+  stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
+  `docs/decisions/data-backup.md`): the beta writes to its own copy, its launch included, from the session that
+  builds logging; until then nothing in it writes.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is
