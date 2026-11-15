@@ -131,6 +131,26 @@ Tests: `tests/integration/race-plans.test.ts`, `tests/integration/run-names.test
   - *Recovery runs grow with the long run (convention).* Daniels' easy runs of 30 to 60 minutes and every mainstream plan
     scale the easy days with the week; the source's half pinned 15 minutes beside every long run from 3 to 20K, which no
     plan does.
+- **The volume delta, counted (coach, 2026-11-15, on Mario's "looks like we are packing on more miles in every delta").**
+  Source against coach, every long and recovery entry before race week, the source's minute entries at 10:30 a mile
+  (the easy pace the seeded cards print); the speed sessions are the same 75 library slots on both sides. 5K: long runs
+  17.9 → 17.5 mi, easy runs 26.8 → 22.3, all 44.7 → 39.8 (−11%; the first time runner's plan is lighter than the
+  source). 10K: long 34.6 → 40.5 (+17%), easy 43.5 → 38.6 (−11%), all 78.1 → 79.1 (+1%: the same running, more of it in
+  the long run). Half: long 95.2 → 100.0 (+5%), easy 65.1 → 84.9 (+30%), all 160.3 → 184.9 (+15%; biggest easy-plus-long
+  week 18.2 → 20.6 mi). Marathon: long 182.3 → 198.0 (+9%), easy 174.7 → 185.0 (+6%), all 357.0 → 383.0 (+7%; biggest
+  week 30.4 → 34.3 mi). So the one plan that runs materially more is the half, and the whole of its increase is the easy
+  runs: the source pinned a 15 minute jog beside the long run in all thirteen training weeks (1.4 miles, a warm up, not a
+  run), and coach's easy runs are 25 to 50 minutes. *Why more easy running is the right direction:* Doherty et al. 2020
+  (J Sci Med Sport 23:182, a meta-regression over 85 studies and 137 cohorts) found average weekly distance, runs a week
+  and the biggest week each inversely related to marathon time (R² 0.38 to 0.81); Vickers and Vertosick 2016 (BMC Sports
+  Sci Med Rehabil 8:26) found typical weekly mileage associated with race speed at every distance from 5K up. *Why it is
+  safe at this size:* the injury evidence points at the rate of increase, not the level (Damsted 2019, Nielsen 2014,
+  above), and Nielsen's 2012 review (Int J Sports Phys Ther 7:58) found only moderate, confounded evidence that volume
+  itself raises risk; the half's biggest week is about 25 miles with the speed session and the marathon's about 38, under
+  the 40 mile a week mark van Gent's 2007 review flags for men. *Accepted cost:* the half runs 15% more than the source,
+  and on Mario's own four run week the two easy runs go from 15 and 25 minutes to 25 and 30 in week 1; if he wants the
+  half nearer the source's volume, the easy runs can be written 20 to 45 instead of 25 to 50 (about +5% overall), which
+  coach does not recommend.
 - **What changes in the engine:** the 48 rows of the four tables, and nothing else in `nrc-race-bike-swim.ts`. The
   `detailIfHalfSlow` variant (D31) travels with the session that carries it (the 23:00 progression tempo, now half
   week 6 and marathon week 13). The After tables:
