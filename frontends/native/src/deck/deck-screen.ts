@@ -158,6 +158,20 @@ export function deckView(store: StateStore, prog: DeckProgram, week: number, day
   };
 }
 
+/**
+ * What hides a card's words while it is not the top card: a cover of the card's own colour, by what the card is doing.
+ * 'rest' is a plain card (the fan, and the card behind while nothing moves), 'drag' the card behind as a finger pulls
+ * the top one, 'leave' the card behind as Done, next one sends the top one away. The top card has none, whatever else
+ * is going on, so its words always show. The screen draws a fresh cover whenever the kind changes.
+ */
+export type CoverKind = 'rest' | 'drag' | 'leave';
+export function coverOf(k: number, top: number, peek: number, done: 'lift' | 'leave' | null): CoverKind | null {
+  if (k === top) return null;
+  if (k !== peek) return 'rest';
+  if (done === 'leave') return 'leave';
+  return done ? 'rest' : 'drag';
+}
+
 /** Every move's fields of a deck, by the move's key. */
 export type Fields = Record<string, MoveFields>;
 

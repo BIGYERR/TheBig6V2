@@ -550,3 +550,42 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
 - **Seen on the simulator:** iPhone 17 Pro, iOS 26.5, `npm run sim-ios` (the Release build under Hermes), then `npm run sim-ios:fast` after the one fix below, on the copy of Mario's backup of 2026-11-14 already in the app's store. Week 13, Monday, Start lift: **Trap bar deadlift**; 185 typed in the load field shows in all three sets and in "Every set 185 lbs"; the plus on set 1 reads 13 with "+1", the summary "13 / 12 / 12" and Varied; Log marks the card Logged with its ring and check and the button reads Next one. Call it: the slider drags from 7 to 9, "very hard, one left", and the deck does not take the drag; the notes take "Felt easy"; Mark the day done closes the deck, raises "Done ✓", and This Week shows Monday checked, both cards closed out and Done 1/5, which a relaunch keeps. Thursday, Start session: a skip strikes **Front squat** through, with the hole, the shards, the put back arrow and "Front squat is off today. Tap to put it back."; put it back restores the card, and the stale-load warning does not speak a second time. Not seen there: the done motion and the punch in motion (stills only), and a field under the software keyboard (the simulator typed from the Mac's).
 - **Not seen yet:** Mario's phone. A field under the keyboard, the slider's drag and the two motions are the parts a
   test cannot see.
+- **On Mario's phone, IA Next build 109** (2026-11-15, four screenshots, each read here enlarged). One defect of the
+  beta's, fixed here; two things that are today's rulings, carried to him; the rest not reported.
+  - **A blank card (the beta's, fixed).** "After i log then swipe to another card it goes blank", and "when i skip it
+    does the same thing". Week 13, Monday, Posterior Chain: the top card is its colour and its Logged ring with no
+    numeral, no title and no fields (10:48), and the same card punched, still with no words (10:49). Proved on the
+    simulator on the copy of his backup, the build 109 code: Thursday, a drag of 220 points whose finger rests a quarter
+    second before it lifts leaves the card it brought up blank, every time; the same drag let go without a rest draws
+    the card whole. No Log is needed: a Log is where a finger pauses. The skip screenshot is that blank card, punched
+    after it went blank (its minus still takes a touch).
+  - **The cause.** A card's words were hidden by an opacity of their own: 0 on the cards behind, a moving value on
+    the card a drag raises, a plain 1 on the top card. React Native 0.88 moves a JS driven value with
+    `setNativeProps` and, 48 ms after the last move, redraws to tell React what the screen holds
+    (`createAnimatedPropsHook.js`). A finger that rests past the rise's 140 points records 1. The drag's end then
+    sets the value to 0 on the screen, the card becomes the top card with a plain 1, React compares 1 with the 1 it
+    recorded and sends nothing, and the words stay at 0.
+  - **The fix.** The words carry no opacity at all. Every card but the top one wears a cover of its own colour
+    (`deck-screen.ts` `coverOf`, `Deck.tsx`): whole on a card of the fan and on the card behind while nothing moves,
+    lifting from three quarters as a drag passes two points, and from three quarters as Done, next one sends the top
+    card away. The numbers are one minus the ones before, so the card behind looks as it did. The top card wears
+    none, so nothing can leave its words hidden, and a cover is drawn afresh whenever what its card is doing changes,
+    so none passes from a moving value to a plain one. Today's deck and the page are not touched; no stored key is.
+  - **Tests:** `tests/unit/native-deck.test.ts`: the cover by hand for the top card, the card behind and a card
+    further back, at rest, lifting and leaving; the words in a plain view; the cover keyed by its kind; and the
+    rise's numbers restated. On the commit before (`tools/tree-at.mjs`), the changed test fails on "the card behind
+    shows no words until a drag begins" and the new one on `coverOf is not a function`. No test can see the screen
+    hold a stale value: the proof of that is the simulator.
+  - **Seen fixed on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios`, the Release build under Hermes, the
+    same store): the same resting drag brings up Front squat whole, logged, with its ring and check; a skip strikes
+    it through with the hole, the put back arrow and "Front squat is off today."; put back restores it; Next one
+    sends it behind and Foot & ankle comes up whole.
+  - **The run reads "Closed out" after only the lift was done (today's ruling, not a difference).** Mark the day
+    done closes the day, and This Week shows every card of a closed day as done (D276 item 7; `week-view-model.ts`
+    `runDone = cardioLogged || closed`). No run is logged by it: Miles stays 0. Today's app does the same. Carried to
+    Mario, not ruled: whether the deck's finish should close the lift alone.
+  - **Reopen on a done lift opens the session sheet in today's app (today's ruling).** D278 item 4: a done lift card
+    reopens the whole day, where a closed day is undone (D179). Carried to Mario, not ruled: whether it should open
+    the deck. In the beta Reopen takes no press yet: it waits for the session sheet.
+  - **Not reported, so not recorded as the same:** a load typed with the field under the keyboard, the motion of
+    Done, next one, Call it's slider and notes, and a backup loaded over the day. Asked again on the next build.

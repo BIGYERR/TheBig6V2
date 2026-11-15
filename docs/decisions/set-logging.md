@@ -82,3 +82,6 @@ for what Log stores, `tests/integration/set-logging.test.ts`.
   squat beside Split-squat heel-raise hold: its own 3 sets", and the three guards pass. The page's diff is three
   hunks: the version meta, the rows read, and the guard's count. `tests/snapshots/` has no diff: every golden record
   of stored state and every program output is identical, the sweeps included.
+- **On Mario's phone** (2026-11-15, today's app 0.262.3, run 43720981347): asked for Log on a move. His report
+  was of the beta's blank card and of two of today's rulings on This Week (`docs/decisions/swipe-deck.md`, the
+  build 109 entry); it says nothing of Log on a move in today's app, so nothing is recorded as seen. Asked again.

@@ -30,7 +30,7 @@ import {
   CALL_IT_WORDS, type CardAct, type DeckCard, PIP_THRESHOLD, ctaText, numeral, openAfterSetsTap, restOpen, rpeBubble, rxLine, stateOf,
 } from './deck-model';
 import { parseRx } from './deck-readers';
-import { type DeckOpen, type Fields, deckView, freshFields, loggedCards, movesOf, toneColor } from './deck-screen';
+import { type CoverKind, type DeckOpen, type Fields, coverOf, deckView, freshFields, loggedCards, movesOf, toneColor } from './deck-screen';
 import { type Session, act, leftField, markDay, tapDone, tapFill, tapLog, tapReuse, tapStep } from './deck-writes';
 import { type FieldsView, type MoveFields, fieldsView, typeLoad, typeRep, typeSetLoad } from './set-fields';
 
@@ -346,13 +346,16 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
     }
     return { zIndex: 1, opacity: 0 };
   };
-  const faceOpacity = (k: number): number | Animated.AnimatedInterpolation<number> => {
-    if (k === i) return 1;
-    if (k !== peek) return 0;
-    if (leaving) return leaveV.interpolate({ inputRange: [0, 2], outputRange: [0.25, 1] });
-    // The card behind is a plain card until a drag begins (deck.ts faceStyle: no face while nothing moves), so a
-    // skipped card, which is drawn at 72%, shows no words through it. From two points of drag it fades in from a quarter.
-    return done ? 0 : q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [0, 0.25 + (0.75 * 2) / PEEK, 1] });
+  // A card's words are never hidden by an opacity of their own: every card but the top one wears a cover of its own
+  // colour (deck-screen.ts coverOf), and the top card wears none, so nothing can leave its words hidden. Hidden by
+  // their own opacity, the words of the card a swipe brought up stayed hidden whenever the finger rested before it
+  // lifted (IA Next build 109, Mario's phone): the opacity went from a moving value to a plain 1 the screen was never sent.
+  // The card behind is a plain card until a drag begins (deck.ts faceStyle: no face while nothing moves), so a skipped
+  // card, which is drawn at 72%, shows no words through it. From two points of drag its words come up from a quarter.
+  const coverOpacity = (kind: CoverKind): number | Animated.AnimatedInterpolation<number> => {
+    if (kind === 'rest') return 1;
+    if (kind === 'leave') return leaveV.interpolate({ inputRange: [0, 2], outputRange: [0.75, 0] });
+    return q.interpolate({ inputRange: [0, 2 / PEEK, 1], outputRange: [1, 0.75 - (0.75 * 2) / PEEK, 0] });
   };
 
   const s = styles;
@@ -371,7 +374,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
       </View>
 
       <View testID="deck-stage" style={s.stage} onLayout={(e) => setStageW(e.nativeEvent.layout.width)} {...pan.panHandlers}>
-        {cards.map((c, k) => (
+        {cards.map((c, k) => { const cover = coverOf(k, i, peek, done ? done.phase : null); return (
           <Animated.View
             key={c.key}
             testID={'deck-card-' + k}
@@ -382,7 +385,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
               isLogged(c) && { boxShadow: '0 0 0 3px ' + p.signal + ', 0 14px 38px rgba(' + p.signalRgb + ',0.40), 0 8px 24px rgba(0,0,0,0.14)' },
               c.skipped && k === i && { opacity: 0.72 }, cardStyle(k)]}
           >
-            <Animated.View style={[s.face, { opacity: faceOpacity(k) }]}>
+            <View style={s.face}>
               <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: z.pad, paddingBottom: z.pad - 2 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
                 {isLogged(c) && <View pointerEvents="none" style={s.bigcheck}><Tick size={240} color={on(1)} /></View>}
                 <View style={[s.top, { minHeight: z.ic }]}>
@@ -432,7 +435,8 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
                   </View>
                 )}
               </ScrollView>
-            </Animated.View>
+            </View>
+            {cover && <Animated.View key={cover} testID={'deck-cover-' + k} pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: toneColor(p, c.tone), opacity: coverOpacity(cover) }]} />}
             {c.skipped && (
               <Animated.View pointerEvents="none" style={[s.hole, hit === c.key && { opacity: holeV.interpolate({ inputRange: [0, 0.55, 1], outputRange: [0, 1, 1] }), transform: [{ rotate: '-13deg' }, { scale: holeV.interpolate({ inputRange: [0, 0.55, 1], outputRange: [0.2, 1.12, 1] }) }] }]}>
                 <Svg viewBox="0 0 220 220" width={200} height={200}>
@@ -450,7 +454,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
               </Animated.View>
             ))}
           </Animated.View>
-        ))}
+        ); })}
       </View>
 
       <View testID="deck-dots" style={s.dots}>

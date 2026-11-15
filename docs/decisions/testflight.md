@@ -185,3 +185,17 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   12 and for the deck beside today's deck on the same day: "Both same"). No screenshot came with it, so the record
   is his words. The dumbbell's entry is in `docs/decisions/this-week.md`, the deck's in
   `docs/decisions/swipe-deck.md`.
+- **Seen on `main`, the seventh run, both lanes uploading** (run 43720981347, merge 199c85d, pull request 44,
+  2026-11-15 08:49 EST; the merge carried v0.262.3: a80424f, docs, 8e1c1dc, the release, f70ae7c, the deck's logging
+  in the Expo app, and 4d25a23, rule wording): the two gates went together (10 s and 11 s). Today's lane archived,
+  signed and uploaded `0.262.3` (294 s, done 08:55:10) and read it back as processed (101 s, done 08:56:54). The
+  beta's lane archived, signed and uploaded `0.262.3 (109)` (715 s, done 09:02:12) and read it back as processed
+  (162 s, done 09:04:56). The build number moved from 107 to 109 because two commits of the merge changed its inputs,
+  8e1c1dc (`core`'s version) and f70ae7c (`frontends/native`); there is no build 108. The legs read
+  `testflight 0.262.3 processed` and `testflight next 0.262.3 (109) processed`. The run ended green, every job passed
+  or skipped by rule. Both lanes went up in one merge, each on its own jobs, as in the third and fourth runs.
+- **On Mario's phone, build 109** (his report, 2026-11-15, four screenshots): the deck's card went blank after a
+  swipe, the beta's own defect, proved on the simulator on his backup and fixed
+  (`docs/decisions/swipe-deck.md`, the build 109 entry). The fix reaches his phone with the next merge that
+  changes `frontends/native`, as build 110. Today's app 0.262.3 came down from this run too; his one remark on it
+  is Reopen opening the session sheet, which is D278 item 4.
