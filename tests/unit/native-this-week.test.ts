@@ -11,11 +11,17 @@ import { describe, test } from 'vitest';
 import { memoryStore } from '@ia/core/engine/state-store.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 import { REPO } from '../support/app.ts';
+import { buildProgram } from '@ia/core/engine/budget-engine-d.ts';
+import { _progDayDate as progDayDate, overlayWeekRange, weekOfDate } from '@ia/core/engine/state-overlays.ts';
+import { refreshStoredProgram } from '@ia/core/engine/state-refresh.ts';
+import type { StoredProgram } from '@ia/core/engine/state-refresh.ts';
+import { fixtures } from '../support/app.ts';
 import {
   type ReadDay, type ReadProgram, computeStreak, currentWeek, dayBeforeStart, dayIsTravel, fmtStartDay, heroSummary, itemSets,
-  liftFocusCode, liveInjuryOverlay, overlayWeekRange, progAlignment, progDayDate, restDayTip, restLogLines, runSessionCode,
-  scheduledDays, secRounds, sessionTimeEst, weekOfDate, wildcardOn,
+  liftFocusCode, liveInjuryOverlay, progAlignment, restDayTip, restLogLines, runSessionCode,
+  scheduledDays, secRounds, sessionTimeEst, wildcardOn,
 } from '../../frontends/native/src/this-week/week-readers.ts';
+import * as screen from '../../frontends/native/src/this-week/week-screen.ts';
 import { BLANK, type ScreenProgram, liveProgram, midnight, pillParts, tokenOf, weekScreen, wildcardSub } from '../../frontends/native/src/this-week/week-screen.ts';
 
 const day = (y: number, m: number, d: number): Date => new Date(y, m - 1, d);
@@ -57,6 +63,31 @@ describe('native This Week: read only, and drawn with Expo SDK 58\'s own package
     assert.equal(pkg.dependencies['react-native-safe-area-context'], '5.11.1');
   });
 
+  // The four date readers the launch and the page call are core's (state-overlays.ts, v0.262.2). The Expo app held its
+  // own copies of them until its seam read core's launch; a copy put back here would be a second rule for a date.
+  test('the screen holds no copy of the date readers: weekOfDate, overlayWeekRange, _progDayDate and dayOverlayInfo are core\'s', () => {
+    const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+    const code = strip(all);
+    for (const name of ['weekOfDate', 'overlayWeekRange', '_progDayDate', 'progDayDate', 'dayOverlayInfo']) {
+      assert.doesNotMatch(code, new RegExp('(function|const|let|var)\\s+' + name + '\\b'), name + ' is declared in the screen\'s folder');
+    }
+    const from = (file: string): string[] => {
+      const m = /import \{([^}]*)\} from '@ia\/core\/engine\/state-overlays\.ts';/.exec(readFileSync(join(dir, file), 'utf8'));
+      return m ? m[1]!.split(',').map((x) => x.trim()).sort() : [];
+    };
+    assert.deepStrictEqual(from('week-readers.ts'), ['_progDayDate', 'dayOverlayInfo', 'overlayWeekRange']);
+    assert.deepStrictEqual(from('week-screen.ts'), ['overlayWeekRange']);
+  });
+
+  test('the launch is handed a store that drops writes, and the screen carries today\'s words for an overlay that failed', () => {
+    const seam = readFileSync(join(dir, 'week-screen.ts'), 'utf8');
+    assert.ok(seam.includes('refreshStoredProgram(readOnly(store), '), 'liveProgram hands core\'s launch the read only store');
+    assert.equal(screen.PLAN_CHANGE_FAILED, 'A plan change failed to apply. Flag it in Bugs.');
+    const drawn = readFileSync(join(dir, 'ThisWeek.tsx'), 'utf8');
+    assert.ok(drawn.includes('launched.failures.overlay > 0') && drawn.includes('{PLAN_CHANGE_FAILED}'), 'ThisWeek.tsx draws the words while an overlay failed');
+    assert.ok(drawn.includes('useMemo(() => launch(store, Date.now()), [store, tick])'), 'one launch a mount and a return, at the clock\'s instant');
+  });
+
   test('the screen draws today\'s words for the parts the model leaves to it', () => {
     const screen = readFileSync(join(dir, 'ThisWeek.tsx'), 'utf8');
     for (const words of ['>Rest day<', 'Recovery is where the work sets in. Move easy, refuel, sleep.', '>Training anyway?<', '>No sessions<',
@@ -67,6 +98,10 @@ describe('native This Week: read only, and drawn with Expo SDK 58\'s own package
   });
 });
 
+// The tables for a program day's date, the week a date falls in and the weeks an overlay covers were typed for the
+// Expo app's own copies of those readers. The copies are gone (the test above); the tables stay, on core's readers,
+// which the screen now calls. They hold behaviour that must not change, so they pass on the release before too; what
+// went red on a break of each reader is in tests/measure/native-this-week_readers-break.md.
 describe('native This Week: dates', () => {
   // 2026-09-02 is a Wednesday; its week's Monday is 2026-08-31.
   const prog: ReadProgram = { startDate: '2026-09-02', totalWeeks: 14 };
@@ -75,7 +110,7 @@ describe('native This Week: dates', () => {
     assert.equal(iso(progDayDate(prog, 1, 'mon')), '2026-08-31');
     assert.equal(iso(progDayDate(prog, 1, 'sun')), '2026-09-06');
     assert.equal(iso(progDayDate(prog, 3, 'thu')), '2026-09-17');
-    assert.equal(progDayDate({ totalWeeks: 6 }, 1, 'mon'), null, 'no start, no dates');
+    assert.equal(progDayDate({} as ReadProgram, 1, 'mon'), null, 'no start, no dates');
     assert.equal(progDayDate(prog, 1, 'someday'), null);
   });
 
@@ -128,7 +163,7 @@ describe('native This Week: overlays', () => {
     assert.equal(weekOfDate(prog, '2026-09-20'), 3);
     assert.equal(weekOfDate(prog, '2026-08-01'), 1, 'before the start reads as week 1');
     assert.equal(weekOfDate(prog, 'nope'), null);
-    assert.equal(weekOfDate({ totalWeeks: 6 }, '2026-09-14'), null);
+    assert.equal(weekOfDate({} as ReadProgram, '2026-09-14'), null);
   });
 
   test('the weeks an overlay covers: open ended runs to the program\'s end, and past the end is nothing', () => {
@@ -159,6 +194,9 @@ describe('native This Week: overlays', () => {
     const bridge: ReadProgram = { ...prog, overlays: [{ ...inj, patch: { injury: { region: 'knee', bridge: true } } }] };
     assert.equal(liveInjuryOverlay(bridge, day(2026, 9, 16)), null);
     assert.equal(liveInjuryOverlay(prog, day(2026, 9, 16)), null, 'no overlays at all');
+    // One flagged in the program's last week (week 14 opens Monday 2026-11-30) with no end is open, on its own week.
+    const late = { type: 'injury', from: '2026-12-02', to: null, patch: { injury: { region: 'knee' } } };
+    assert.equal(liveInjuryOverlay({ ...prog, overlays: [late] }, day(2026, 12, 3)), late);
   });
 
   test('a race plan is aligned to its race; a base goal, a bike program or an untargeted race is not', () => {
@@ -347,11 +385,97 @@ describe('native This Week: what React Native draws from the model', () => {
     assert.deepStrictEqual(pillParts(''), { icon: null, text: '' });
   });
 
+  test('a pill that opens with an arrow hands it over apart, for the font that holds one', () => {
+    assert.deepStrictEqual(screen.pillArrow('↓ Recovery Week'), { arrow: '↓ ', words: 'Recovery Week' });
+    assert.deepStrictEqual(screen.pillArrow('Phase 3 — Peak'), { arrow: '', words: 'Phase 3 — Peak' });
+    assert.deepStrictEqual(screen.pillArrow('Race Week'), { arrow: '', words: 'Race Week' });
+    assert.deepStrictEqual(screen.pillArrow(''), { arrow: '', words: '' });
+  });
+
   test('a colour the model names as the web does reads as its token', () => {
     assert.equal(tokenOf('var(--run)'), 'run');
     assert.equal(tokenOf('var(--signal)'), 'signal');
     assert.equal(tokenOf('var(--dim)'), 'dim');
     assert.equal(tokenOf('#ff0000'), 'dim');
+  });
+});
+
+const QUIET = { overlay: () => {}, freeze: () => {}, rebuild: () => {} };
+
+describe('native This Week: the launch', () => {
+  // HALF_MANNY as the engine builds it, stored with every day's title marked STALE, from Monday 2026-08-31.
+  const WEEK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+  const stale = (more: Record<string, unknown> = {}): StoredProgram => {
+    const p = JSON.parse(JSON.stringify(buildProgram(fixtures.HALF_MANNY))) as StoredProgram;
+    for (const w of Object.keys(p.weeks)) for (const d of WEEK) (p.weeks[w]![d] as { title: string }).title = 'STALE';
+    return Object.assign(p, { id: 'p1', name: 'Mine', created: 5, startDate: '2026-08-31', overlays: [] }, more);
+  };
+  const titles = (p: ScreenProgram | StoredProgram | null, w: number): string[] => WEEK.map((d) => (((p as StoredProgram).weeks[w]![d] as { title: string }).title === 'STALE' ? 'STALE' : 'live'));
+  const keysOf = (p: StoredProgram, more: Record<string, unknown> = {}): Record<string, string> => ({
+    ia_active: 'p1', ia_programs: JSON.stringify([p]), ...Object.fromEntries(Object.entries(more).map(([k, v]) => [k, JSON.stringify(v)])),
+  });
+  const tuesday = new Date(2026, 8, 1, 12).getTime();   // week 1
+
+  test('the program the screen draws is the launch\'s: a day never trained is rebuilt, a trained day is kept as stored', () => {
+    const store = memoryStore(keysOf(stale(), { ia_comp_p1: { w1_mon: { status: 'complete' } } }));
+    const p = liveProgram(store, tuesday, QUIET);
+    // Monday is touched, so the freeze keeps it as stored; the week is the current one, so its other days are rebuilt.
+    assert.deepStrictEqual(titles(p, 1), ['STALE', 'live', 'live', 'live', 'live', 'live', 'live']);
+    assert.deepStrictEqual(titles(p, 2), ['live', 'live', 'live', 'live', 'live', 'live', 'live']);
+    assert.equal(p!.id, 'p1');
+    assert.equal(p!.name, 'Mine');
+    // The stored program is still the stored one: no launch, every day as ia_programs holds it.
+    assert.deepStrictEqual(titles(screen.storedProgram(store), 1), ['STALE', 'STALE', 'STALE', 'STALE', 'STALE', 'STALE', 'STALE']);
+  });
+
+  test('the launch reads the instant it is handed: a later one freezes the weeks gone by', () => {
+    const store = memoryStore(keysOf(stale()));
+    // Wednesday of week 3, nothing trained: weeks 1 and 2 are past and stay as stored, week 3 on is rebuilt.
+    const p = liveProgram(store, new Date(2026, 8, 16, 12).getTime(), QUIET);
+    assert.deepStrictEqual([titles(p, 1)[0], titles(p, 2)[6], titles(p, 3)[0], titles(p, 4)[0]], ['STALE', 'STALE', 'live', 'live']);
+  });
+
+  test('the launch writes nothing, where core\'s own launch on the same keys writes the seed back', () => {
+    // An older program: its seed beside its config, not in it. Core's launch puts it back and stores the program list.
+    const older = (): StoredProgram => { const p = stale({ seed: 4242 }); delete (p.cfg as { seed?: unknown }).seed; return p; };
+    const keys = keysOf(older());
+    // The seam, on a store that throws at any write: nothing thrown, nothing changed, and the program still rebuilt.
+    const m = memoryStore(keys);
+    const strict: StateStore = { get: (k) => m.get(k), keys: () => m.keys(), set: () => { throw new Error('the launch wrote a key'); }, remove: () => { throw new Error('the launch removed a key'); } };
+    const p = liveProgram(strict, tuesday, QUIET);
+    assert.deepStrictEqual(titles(p, 1), ['live', 'live', 'live', 'live', 'live', 'live', 'live']);
+    assert.deepStrictEqual(Object.fromEntries(m.keys().map((k) => [k, m.get(k)])), keys);
+
+    // That is the store's doing, not the launch's: core's own launch on the same keys writes, so the check above fires.
+    const plain = memoryStore(keys);
+    refreshStoredProgram(plain, (JSON.parse(keys.ia_programs!) as StoredProgram[])[0]!, tuesday, QUIET);
+    assert.notEqual(plain.get('ia_programs'), keys.ia_programs, 'core\'s launch stored the repaired program list');
+    assert.equal((JSON.parse(plain.get('ia_programs')!) as { cfg: { seed: number } }[])[0]!.cfg.seed, 4242);
+  });
+
+  test('what failed is counted and logged in the page\'s words: an overlay the engine cannot build, a config it cannot build', () => {
+    // An overlay whose patch the engine cannot build (its rest days are not a list): the launch goes on without it.
+    const bad = { id: 'bad', type: 'injury', from: '2026-09-01', to: '2026-09-04', patch: { restDays: 7 }, created: 1 };
+    const said: unknown[][] = [];
+    const one = screen.launch(memoryStore(keysOf(stale({ overlays: [bad] }))), tuesday, (...a) => { said.push(a); });
+    assert.deepStrictEqual(one.failures, { overlay: 1, freeze: 0, rebuild: 0 });
+    assert.deepStrictEqual(said.map((a) => a.slice(0, 2)), [['overlay apply failed', 'bad']]);
+    assert.deepStrictEqual(titles(one.prog, 2), ['live', 'live', 'live', 'live', 'live', 'live', 'live']);
+
+    // A config the engine cannot build (its sports are not a list, its test week pinned): the stored program, as stored.
+    const broken = stale();
+    Object.assign(broken.cfg, { cardioTypes: 7, _testWeek: 3 });
+    const said2: unknown[][] = [];
+    const two = screen.launch(memoryStore(keysOf(broken)), tuesday, (...a) => { said2.push(a); });
+    assert.deepStrictEqual(two.failures, { overlay: 0, freeze: 0, rebuild: 1 });
+    assert.deepStrictEqual(said2.map((a) => a[0]), ['refreshProgram failed; using stored program']);
+    assert.deepStrictEqual(titles(two.prog, 1), ['STALE', 'STALE', 'STALE', 'STALE', 'STALE', 'STALE', 'STALE']);
+
+    // Nothing failed: nothing counted, nothing logged; and no program, no launch.
+    const said3: unknown[][] = [];
+    assert.deepStrictEqual(screen.launch(memoryStore(keysOf(stale())), tuesday, (...a) => { said3.push(a); }).failures, { overlay: 0, freeze: 0, rebuild: 0 });
+    assert.deepStrictEqual(screen.launch(memoryStore(), tuesday, (...a) => { said3.push(a); }), { prog: null, failures: { overlay: 0, freeze: 0, rebuild: 0 } });
+    assert.deepStrictEqual(said3, []);
   });
 });
 
@@ -376,8 +500,9 @@ describe('native This Week: the screen from a store', () => {
     return { get: (k) => m.get(k), keys: () => m.keys(), set: () => { throw new Error('the screen wrote a key'); }, remove: () => { throw new Error('the screen removed a key'); } };
   };
 
-  test('the active program is the one the store names', () => {
-    assert.deepStrictEqual(liveProgram(readOnly()), program as unknown as ScreenProgram);
+  test('the active program is the one the store names, and one with no config comes back from the launch as stored', () => {
+    assert.deepStrictEqual(screen.storedProgram(readOnly()), program as unknown as ScreenProgram);
+    assert.deepStrictEqual(liveProgram(readOnly(), now.getTime(), QUIET), program as unknown as ScreenProgram);
   });
 
   test('the launch draws the week holding today, today picked, and writes nothing', () => {

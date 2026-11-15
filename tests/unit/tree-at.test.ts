@@ -27,8 +27,10 @@ const gitEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k
 
 const base = { dirEmpty: true, has: () => true, files: [] as string[], depsRoot: '/main', dir: '/scratch/prev', repo: '/wt' };
 
-test('a copy holds the app, the Expo app, core, the tests, the tools, the page and its icon, and borrows two packages', () => {
-  assert.deepEqual(T.TREE, ['frontends/app', 'frontends/native', 'core', 'tests', 'tools', 'index.html', 'apple-touch-icon.png']);
+// The pipeline file is in a past commit's copy too (Post-v0.262.2): tests/unit/native-shell.test.ts reads it, and
+// without it one of that file's tests read red in every copy, whatever the commit held.
+test('a copy holds the app, the Expo app, core, the tests, the tools, the page, its icon and the pipeline file, and borrows two packages', () => {
+  assert.deepEqual(T.TREE, ['frontends/app', 'frontends/native', 'core', 'tests', 'tools', 'index.html', 'apple-touch-icon.png', '.github/workflows']);
   const plan = T.treePlan({ ...base, files: ['tests/unit/swipe-deck.test.ts', 'frontends/app/test/unit/deck.test.ts'] });
   assert.ok(plan.ok);
   assert.deepEqual(plan.archive, T.TREE);
@@ -90,7 +92,7 @@ test('writes the commit\'s files, links the packages and copies the new test ove
 // folder named like an ignored one and a good test read red.
 const work = { dirEmpty: true, listed: [] as string[], onDisk: () => true, depsRoot: '/main', dir: '/scratch/ci', repo: '/wt', doctrine: null as string | null };
 
-test('a working copy holds the same paths and the pipeline file, and borrows the tests\' packages alone', () => {
+test('a working copy holds the same paths, and borrows the tests\' packages alone', () => {
   assert.deepEqual(T.WORKING_TREE, ['frontends/app', 'frontends/native', 'core', 'tests', 'tools', 'index.html', 'apple-touch-icon.png', '.github/workflows']);
   assert.deepEqual(T.WORKING_DEPS, ['tests']);
   const plan = T.workingPlan({ ...work, listed: ['core/v.ts', 'frontends/native/modules/ia-spike/ios/M.swift', ''] });

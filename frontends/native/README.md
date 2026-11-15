@@ -9,11 +9,13 @@ which it does not touch. Its bundle id is **com.bigyerr.ironasylum.next**, so it
 `week-strip.ts` are copies of the Angular screen's own files, held equal to the byte by
 `tests/unit/native-this-week.test.ts`: copy them again with `cp` when today's change, never edit them here.
 `week-readers.ts` is the legacy page's readers the screen needs, line for line, held equal to the page's by
-`tests/integration/native-this-week.test.ts`. `week-screen.ts` joins them over core's store; `ThisWeek.tsx` and
-`marks.tsx` draw it. **Its grid is the stored one for now** (`week-screen.ts`, `liveProgram`): `refreshProgram` is
-still in the page, so a day a swap, an edit, an injury, travel, a moved rest day or an engine change has touched reads
-as it was stored, not as today's app shows it, until that code is in core. A tap on a week title or a day works;
-every other control is drawn and does nothing yet.
+`tests/integration/native-this-week.test.ts`; its date readers are core's own (`state-overlays.ts`). `week-screen.ts`
+joins them over core's store; `ThisWeek.tsx` and `marks.tsx` draw it. **Its grid is the launch's** (`week-screen.ts`,
+`liveProgram`): core's `refreshStoredProgram`, called as today's page calls it, so the screen draws the program
+today's app draws. The launch is handed a store that drops writes (`store/read-only-store.ts`), because this app's
+copy of the stored state is a backup loaded read only (D287). One launch when the screen mounts and one on each
+return to its tab, about 55 ms under Hermes on the simulator. A tap on a week title or a day works; every other
+control is drawn and does nothing yet.
 
 **Bugs**, with two rows and a line saying whether its Swift module answered: the engine check (D286, `docs/decisions/engine-check.md`), core's
 `core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes, which reads and writes

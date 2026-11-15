@@ -4,22 +4,26 @@
 // model through its bridge into the legacy page; this feeds it from core's readers of the stored state and from
 // week-readers.ts. Read only: nothing here writes a key.
 //
-// THE GRID IS THE STORED ONE, FOR NOW. Today's app draws the grid refreshProgram hands back (the program rebuilt, the
-// overlays applied, the trained weeks frozen, the moves, swaps and edits laid over it). That code is still in the
-// page (program-manage.ts, overlays.ts, swaps-edits.ts: phase 1's last two slices). Until it is in core, liveProgram
-// below returns the grid as ia_programs stores it, which is the same grid on a day nothing has touched since it was
-// stored, and not otherwise (tests/measure/native-this-week_reads.md, section 2). It is the one seam to change.
+// THE GRID IS THE LAUNCH'S. Today's app draws the grid refreshProgram hands back (the program rebuilt, the overlays
+// applied, the trained weeks frozen, the moves, swaps and edits laid over it). That is core's refreshStoredProgram
+// since v0.262.2 (core/src/engine/state-refresh.ts), and liveProgram below calls it as the page's refreshProgram
+// does: the store, the instant, the failure reports. One difference, on purpose: the store it hands the launch drops
+// every write (store/read-only-store.ts), because this app's copy of the stored state is a backup loaded read only
+// (D287). The grid is the same either way, on every launch measured (tests/measure/native-this-week_launch.md).
 import { _parseLocalDate, getWeekMonday } from '@ia/core/engine/calendar.ts';
 import { asyIcon } from '@ia/core/engine/icons.ts';
 import { INJURY_REGIONS } from '@ia/core/engine/injury.ts';
 import { dayStoreKey, readDayLogs } from '@ia/core/engine/state-day-log.ts';
 import { dayStatus, readCompleted, readPartSkips } from '@ia/core/engine/state-day-status.ts';
+import { overlayWeekRange } from '@ia/core/engine/state-overlays.ts';
 import { readActiveProgramId, readPrograms } from '@ia/core/engine/state-programs.ts';
+import { type RefreshReport, type StoredProgram, refreshStoredProgram } from '@ia/core/engine/state-refresh.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
+import { readOnly } from '../store/read-only-store';
 import {
   DAY_FULL, type ReadDay, type ReadProgram, computeStreak, currentWeek, dayBeforeStart, dayIsTravel, fmtStartDay,
-  heroSummary, liftFocusCode, liveInjuryOverlay, overlayWeekRange, progAlignment, restDayTip, restLogLines,
+  heroSummary, liftFocusCode, liveInjuryOverlay, progAlignment, restDayTip, restLogLines,
   runSessionCode, sessionTimeEst, wildcardOn,
 } from './week-readers';
 import { type DayLog, type WeekDay, type WeekProgram, type WeekView, liveTitle, weekView } from './week-view-model';
@@ -33,15 +37,42 @@ export const BLANK: WeekView = {
   titles: [{ n: 1, title: 'Week 1', active: true }], row: { kind: 'start', shown: null, iso: '' }, days: null,
 };
 
-/**
- * The program the screen draws: the active one, as stored. The seam named at the top of this file: when refreshProgram
- * is in core, this returns what it hands back.
- */
-export function liveProgram(store: StateStore): ScreenProgram | null {
+/** The active program as ia_programs stores it, or null when the store holds none: no launch, no rebuild. */
+export function storedProgram(store: StateStore): ScreenProgram | null {
   const id = readActiveProgramId(store);
   if (!id) return null;
   const p = (readPrograms(store) as unknown as ScreenProgram[]).find((x) => x && x.id === id);
   return p && p.weeks ? p : null;
+}
+
+/**
+ * The program the screen draws: what a launch hands back for the active program (core's refreshStoredProgram), as
+ * today's page holds it in activeProg. `now` is the instant of the launch, `failed` what it is told when a part of
+ * the launch fails. The launch reads the store and writes nothing to it (the top of this file).
+ */
+export function liveProgram(store: StateStore, now: number, failed: RefreshReport): ScreenProgram | null {
+  const stored = storedProgram(store);
+  if (!stored) return null;
+  return refreshStoredProgram(readOnly(store), stored as unknown as StoredProgram, now, failed) as unknown as ScreenProgram;
+}
+
+/** How many parts of a launch failed, by kind (core's RefreshReport). */
+export interface LaunchFailures { overlay: number; freeze: number; rebuild: number }
+/** Today's words for an overlay that did not apply (the page's toast, program-manage.ts). */
+export const PLAN_CHANGE_FAILED = 'A plan change failed to apply. Flag it in Bugs.';
+
+/**
+ * One launch, as the screen makes it: the program, and what failed. Each failure goes to the console in the page's
+ * own words; the screen draws PLAN_CHANGE_FAILED while an overlay failed, where today's page shows it as a toast.
+ */
+export function launch(store: StateStore, now: number, log: (...a: unknown[]) => void = console.error): { prog: ScreenProgram | null; failures: LaunchFailures } {
+  const failures: LaunchFailures = { overlay: 0, freeze: 0, rebuild: 0 };
+  const prog = liveProgram(store, now, {
+    overlay: (ov, e) => { failures.overlay++; log('overlay apply failed', ov && ov.id, e); },
+    freeze: (e) => { failures.freeze++; log('week freeze failed; showing fully rebuilt weeks', e); },
+    rebuild: (e) => { failures.rebuild++; log('refreshProgram failed; using stored program', e); },
+  });
+  return { prog, failures };
 }
 
 /** The words under WILDCARD DONE (the Angular sheet-marks-model's wildcardSub, D71), or null with no Wildcard. */
@@ -121,9 +152,9 @@ export function drawWeek(store: StateStore, prog: ScreenProgram, now: Date, pick
   return { view, shown, totalWeeks, programId: id };
 }
 
-/** This Week from the store: the active program drawn, or null when the store holds none (the screen draws BLANK). */
+/** This Week from the store: the active program launched and drawn, or null when the store holds none (the screen draws BLANK). */
 export function weekScreen(store: StateStore, now: Date, pick: ScreenPick, gps: boolean): WeekScreen | null {
-  const prog = liveProgram(store);
+  const { prog } = launch(store, now.getTime());
   return prog ? drawWeek(store, prog, now, pick, gps) : null;
 }
 
@@ -140,6 +171,15 @@ export function pillParts(html: string): PillParts {
   const rest = m ? m[2]! : html;
   const text = rest.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').trim();
   return { icon, text };
+}
+
+/**
+ * The pill's words with a leading arrow apart ("↓ Recovery Week"): the arrow with its space, and the words after it.
+ * The screen draws the arrow in the system font, which holds one at the pill's weight; '' when the words open with none.
+ */
+export function pillArrow(text: string): { arrow: string; words: string } {
+  const m = /^([↓↑] )([\s\S]*)$/.exec(text);
+  return m ? { arrow: m[1]!, words: m[2]! } : { arrow: '', words: text };
 }
 
 /** A token the model names as the web does (`var(--run)`), as a key of the palette: `run`. Unknown reads as `dim`. */

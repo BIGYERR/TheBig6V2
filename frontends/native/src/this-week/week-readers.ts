@@ -4,9 +4,14 @@
 // (the active program, its id, the store, the clock) taken as arguments. The page keeps its own until the cutover
 // deletes it; tests/integration/native-this-week.test.ts holds every one equal to the page's over whole histories,
 // so a change to either turns red until the other follows. Nothing here writes: no store call but a read.
+//
+// The date readers are core's since the launch moved there (v0.262.2, core/src/engine/state-overlays.ts): weekOfDate,
+// overlayWeekRange, _progDayDate and dayOverlayInfo, the ones the page and the launch itself call. This file held its
+// own copies of the four until the seam read core's launch; it declares none of them now.
 import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from '@ia/core/engine/calendar.ts';
 import { raceAlignment } from '@ia/core/engine/nrc-race-bike-swim.ts';
 import { dayStoreKey } from '@ia/core/engine/state-day-log.ts';
+import { _progDayDate, dayOverlayInfo, overlayWeekRange } from '@ia/core/engine/state-overlays.ts';
 import { dayStatus } from '@ia/core/engine/state-day-status.ts';
 import { readWildcardDone } from '@ia/core/engine/state-programs.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
@@ -46,26 +51,12 @@ const DAY_MS = 86400000;
 
 /** The page's DAY_FULL (wizard.ts). */
 export const DAY_FULL: Record<string, string> = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
-/** The page's dayOffset: days from Monday to each day. */
-const DAY_OFFSET: Record<string, number> = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
 
 // ── Dates ────────────────────────────────────────────────────────────────────────────────────────────────────────
-/** The page's _progDayDate: the calendar date of a program day, or null with no start. */
-export function progDayDate(prog: ReadProgram | null | undefined, week: number, d: string): Date | null {
-  if (!prog || !prog.startDate) return null;
-  const off = DAY_OFFSET[d];
-  if (off == null) return null;
-  const mon = getWeekMonday(prog.startDate);
-  const dt = new Date(mon);
-  dt.setDate(mon.getDate() + (week - 1) * 7 + off);
-  dt.setHours(0, 0, 0, 0);
-  return dt;
-}
-
 /** The page's dayBeforeStart (V174 D24, V188 D14a): a day before the start, or before the block opened. */
 export function dayBeforeStart(prog: ReadProgram | null | undefined, week: number, d: string): boolean {
   if (!prog || !prog.startDate) return false;
-  const dt = progDayDate(prog, week, d);
+  const dt = _progDayDate(prog, week, d);
   if (!dt) return false;
   const sd = _parseLocalDate(prog.startDate);
   if (!sd) return false;
@@ -95,39 +86,6 @@ export function fmtStartDay(iso: string, withYear?: boolean): string {
 }
 
 // ── Overlays ─────────────────────────────────────────────────────────────────────────────────────────────────────
-/** The page's weekOfDate: the program week a date falls in. */
-export function weekOfDate(prog: ReadProgram | null | undefined, dateStr: string | null | undefined): number | null {
-  if (!prog || !prog.startDate) return null;
-  const d = _parseLocalDate(dateStr);
-  if (!d) return null;
-  const mon = getWeekMonday(prog.startDate);
-  const diff = Math.floor((d.getTime() - mon.getTime()) / DAY_MS);
-  return diff < 0 ? 1 : Math.floor(diff / 7) + 1;
-}
-
-/** The page's overlayWeekRange: the weeks an overlay covers, open ended to the program's end. */
-export function overlayWeekRange(prog: ReadProgram | null | undefined, ov: ReadOverlay | null | undefined, totalWeeks: number): { fromWeek: number; toWeek: number } | null {
-  if (!ov || !ov.from || !totalWeeks) return null;
-  const fw = weekOfDate(prog, ov.from);
-  if (fw == null) return null;
-  const tw = ov.to ? weekOfDate(prog, ov.to) : totalWeeks;
-  if (tw == null) return null;
-  const lo = Math.max(1, fw), hi = Math.min(totalWeeks, tw);
-  return hi < lo ? null : { fromWeek: lo, toWeek: hi };
-}
-
-/** The page's dayOverlayInfo: the overlay a day was built under, read off its _ovKey. */
-export function dayOverlayInfo(day: ReadDay | null | undefined): { type: unknown; patch: { equipment?: unknown } } | null {
-  if (!day || typeof day._ovKey !== 'string') return null;
-  try {
-    const k: unknown = JSON.parse(day._ovKey);
-    if (!Array.isArray(k) || !k[1]) return null;
-    return { type: k[0], patch: k[1] };
-  } catch {
-    return null;
-  }
-}
-
 /** The page's dayIsTravel: a day built under a travel overlay (any equipment but a commercial gym). */
 export function dayIsTravel(day: ReadDay | null | undefined): boolean {
   const i = dayOverlayInfo(day);
@@ -310,7 +268,7 @@ export function scheduledDays(prog: ReadProgram | null | undefined, cutoff?: Dat
     ALL_DAYS_ORDER.forEach((d) => {
       const day = wk[d];
       if (!day || day.rest) return;
-      const dt = progDayDate(prog, w, d);
+      const dt = _progDayDate(prog, w, d);
       if (!dt) return;
       if (dayBeforeStart(prog, w, d)) return;
       if (cutoff && dt > cutoff) return;

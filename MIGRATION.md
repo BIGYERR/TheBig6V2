@@ -126,10 +126,19 @@ Each phase starts only on Mario's GO, one phase step per session.
 - **Phase 1's lifts are done.** What the page still holds of the stored state is drawing: the sheets, the cards, the
   Progress screen's own readers (`lift-ledger-progress-screen.ts`, `progress-charts.ts`), which move with that screen,
   and the backup's saving and reading of a file, with the Bugs screen.
-- **Next, on his GO:** the Expo screen's seam (`frontends/native/src/this-week/week-screen.ts`, `liveProgram`) reads
-  `refreshStoredProgram`, and its own copies of the date readers (`week-readers.ts`) give way to core's; then Mario's
-  side by side closes phase 2. The two findings that belong with the freeze are still not ruled: the Monday after the
-  clocks go forward (decision 12), and a session moved off a day that already has a logged lift (section 7).
+- **Done, the Expo screen's seam (Post-v0.262.2, no build):** `liveProgram` (`frontends/native/src/this-week/week-screen.ts`)
+  returns what core's `refreshStoredProgram` hands back, called as the page's `refreshProgram` calls it, through a
+  store that drops writes (`store/read-only-store.ts`: the beta's copy is a backup loaded read only, D287). The Expo
+  app's copies of the date readers are gone; `week-readers.ts` imports core's. Measured before the edit: the seam's
+  program is the page's on every launch of every history, 0 of 3,745 days where the stored grid read 806
+  (`tests/measure/native-this-week_launch.md`); 54 to 58 ms a launch under Hermes on the simulator. Every launch of the
+  stored-state histories is now a launch of the seam too (`tests/support/native-launch.ts`). The record is
+  `docs/decisions/this-week.md`, its last entry.
+- **Next:** Mario's side by side on his phone, IA Next's next build beside today's app, closes phase 2. Still not
+  ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
+  day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
+  stops the page's launch where the Expo seam hands back the stored program. His to say when the beta logs: whether
+  its launch writes its own copy.
 
 **Decided (Mario, 2026-11-11):** React Native, not SwiftUI. iPhone only. The end goal is an App Store release, and the
 first public build is the React Native one. The Cordova build never ships publicly, so the only data that ever moves is

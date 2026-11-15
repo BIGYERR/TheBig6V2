@@ -268,7 +268,7 @@ issued D265 before the ruling was written, and it shipped as D266.
     <scratch>/base_v<previous>.html`: that commit's root copy, or the build of its sources; then `cd tests && IA_APP=<that
     file> npx vitest run <file>`; a test that reads source files instead of the page (the deck's tests, the native app's
     `frontends/app/test`) runs on a copy of the previous commit's tree: `node tools/tree-at.mjs <previous>
-    <scratch>/prev <changed test files>` writes the app, the Expo app (`frontends/native`), core, the tests, the tools, the page and its icon as that commit
+    <scratch>/prev <changed test files>` writes the app, the Expo app (`frontends/native`), core, the tests, the tools, the page, its icon and the pipeline file (`.github/workflows`, Post-v0.262.2) as that commit
     had them, links the main checkout's node_modules and copies the changed test files over, then `npx vitest run` or
     `node --test` on them there (Post-v0.260.0: assembled by hand, the copy took four tries): a test written for a changed
     behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
