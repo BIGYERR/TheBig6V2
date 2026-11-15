@@ -36,7 +36,7 @@ import {
 } from './deck-model';
 import { parseRx } from './deck-readers';
 import { SwapSheet } from '../swap-sheet/SwapSheet';
-import { type CoverKind, type DeckOpen, type Fields, coverOf, deckView, freshFields, loggedCards, movesOf, toneColor } from './deck-screen';
+import { type CoverKind, type DeckOpen, type Fields, type Travel, coverOf, deckView, freshFields, loggedCards, movesOf, toneColor, travelOf } from './deck-screen';
 import { type SwapOpen, swapSheetOf } from './deck-swaps';
 import { type Session, act, leftField, markDay, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from './deck-writes';
 import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from './set-fields';
@@ -49,6 +49,9 @@ const TIGHT: Sizes = { num: 22, title: 20, meta: 13, name: 15, line: 13, cue: 12
 const FAN = 3;
 const SWIPE = 80;
 const PEEK = 140;
+/** A card let go past the line: the card coming to the top settles in 290 ms, every other in 260 (deck.ts cardStyle's transitions; CSS ease). */
+const SETTLE_TOP = { duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1) };
+const SETTLE_FAN = { duration: 260, easing: Easing.bezier(0.25, 0.1, 0.25, 1) };
 /** The done motion's curve and the two parts of its 760 ms (deck.css deckTuck: out to the side by 42%, then behind). */
 const TUCK = Easing.bezier(0.45, 0, 0.2, 1);
 const TUCK_OUT = 319;
@@ -136,6 +139,17 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
   // ── Motion (call 10 and call 5), still under Reduce Motion ──
   const [calm, setCalm] = useState(false);
   useEffect(() => { AccessibilityInfo.isReduceMotionEnabled().then(setCalm, () => {}); }, []);
+  const calmNow = useRef(false);
+  calmNow.current = calm;
+  // A swipe let go past the line, or a dot pressed: today's cards ease to their new places (deck.ts cardStyle's
+  // transitions), they do not jump. Each card keeps the place go() gives it and wears what it has left to travel on
+  // top, which runs out to nothing; the values are new for every move and are never taken off a card mid flight.
+  const [settle, setSettle] = useState<{ travel: (Travel | null)[]; top: Animated.Value; fan: Animated.Value } | null>(null);
+  useEffect(() => {
+    if (!settle) return;
+    Animated.timing(settle.top, { toValue: 1, ...SETTLE_TOP, useNativeDriver: true }).start();
+    Animated.timing(settle.fan, { toValue: 1, ...SETTLE_FAN, useNativeDriver: true }).start();
+  }, [settle]);
   const [done, setDone] = useState<{ phase: 'lift' | 'leave'; glow: boolean; tucked: boolean } | null>(null);
   const busy = useRef(false);
   const liftV = useRef(new Animated.Value(0)).current;
@@ -151,11 +165,16 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
 
   /** At rest the card behind is the next one, in the fan. */
   const rest = (): void => { dirNow.current = 1; setDir(1); };
-  const go = (k: number): void => {
+  /** To card k. With `letGo`, the points the top card was dragged when it was let go (0 for a dot), the cards ease there. */
+  const go = (k: number, letGo?: number): void => {
     if (!n) return;
+    const to = ((k % n) + n) % n;
+    if (letGo !== undefined && !calmNow.current && to !== at.current) {
+      setSettle({ travel: Array.from({ length: n }, (_x, j) => travelOf(j, at.current, to, n, letGo, FAN, PEEK)), top: new Animated.Value(0), fan: new Animated.Value(0) });
+    } else setSettle(null);
     dx.setValue(0);
     rest();
-    setI(((k % n) + n) % n);
+    setI(to);
   };
   const pan = useMemo(() => PanResponder.create({
     // A sideways drag moves the deck; an up and down one is the card's own scroll (deck.css touch-action: pan-y).
@@ -166,8 +185,8 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
       dx.setValue(g.dx);
     },
     onPanResponderRelease: (_e, g) => {
-      if (g.dx < -SWIPE) go(at.current + 1);
-      else if (g.dx > SWIPE) go(at.current - 1);
+      if (g.dx < -SWIPE) go(at.current + 1, g.dx);
+      else if (g.dx > SWIPE) go(at.current - 1, g.dx);
       else Animated.timing(dx, { toValue: 0, duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1), useNativeDriver: true }).start(rest);
     },
     onPanResponderTerminate: () => { dx.setValue(0); rest(); },
@@ -344,6 +363,14 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
   const q = dx.interpolate({ inputRange: [-PEEK, 0, PEEK], outputRange: [1, 0, 1], extrapolate: 'clamp' });
   const leaving = !!done && done.phase === 'leave';
   const peek = n > 1 ? (i + (done ? 1 : dir) + n) % n : -1;
+  /** A card's place with what it has left to travel on top: the shift before its own, the scale and the turn after. */
+  const settling = (k: number, place: { zIndex: number; transform: object[] }): object => {
+    const t = settle ? settle.travel[k] : null;
+    if (!t) return place;
+    const v = k === i ? settle!.top : settle!.fan;
+    const l = (a: number, b: number) => v.interpolate({ inputRange: [0, 1], outputRange: [a, b] });
+    return { zIndex: place.zIndex, transform: [{ translateX: l(t.x, 0) }, { translateY: l(t.y, 0) }, ...place.transform, { scale: l(t.s, 1) }, { rotate: v.interpolate({ inputRange: [0, 1], outputRange: [t.r + 'deg', '0deg'] }) }] };
+  };
   const cardStyle = (k: number): object => {
     const pos = (k - i + n) % n;
     if (pos === 0) {
@@ -370,7 +397,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
           { rotate: leaveV.interpolate({ inputRange: t, outputRange: ['0deg', '10deg', '4.8deg'] }) },
         ] };
       }
-      return { zIndex: 20, transform: [{ translateX: dx }, { rotate: dx.interpolate({ inputRange: [-260, 260], outputRange: ['-10deg', '10deg'] }) }] };
+      return settling(k, { zIndex: 20, transform: [{ translateX: dx }, { rotate: dx.interpolate({ inputRange: [-260, 260], outputRange: ['-10deg', '10deg'] }) }] });
     }
     if (k === peek && leaving) {
       const l = (a: number, b: number) => leaveV.interpolate({ inputRange: [0, 2], outputRange: [a, b] });
@@ -379,10 +406,10 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
     if (k === peek && !done) {
       const f = dir > 0 ? { x: 15, y: -7, s: 0.965, r: '1.6deg' } : { x: 0, y: 0, s: 0.92, r: '0deg' };
       const l = (a: number, b: number) => q.interpolate({ inputRange: [0, 1], outputRange: [a, b] });
-      return { zIndex: 15, transform: [{ translateX: l(f.x, 0) }, { translateY: l(f.y, 0) }, { scale: l(f.s, 1) }, { rotate: q.interpolate({ inputRange: [0, 1], outputRange: [f.r, '0deg'] }) }] };
+      return settling(k, { zIndex: 15, transform: [{ translateX: l(f.x, 0) }, { translateY: l(f.y, 0) }, { scale: l(f.s, 1) }, { rotate: q.interpolate({ inputRange: [0, 1], outputRange: [f.r, '0deg'] }) }] });
     }
     if (pos >= 1 && pos <= FAN) {
-      return { zIndex: 10 - pos, transform: [{ translateX: pos * 15 }, { translateY: pos * -7 }, { scale: 1 - pos * 0.035 }, { rotate: pos * 1.6 + 'deg' }] };
+      return settling(k, { zIndex: 10 - pos, transform: [{ translateX: pos * 15 }, { translateY: pos * -7 }, { scale: 1 - pos * 0.035 }, { rotate: pos * 1.6 + 'deg' }] });
     }
     return { zIndex: 1, opacity: 0 };
   };
@@ -499,7 +526,7 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
 
       <View testID="deck-dots" style={s.dots}>
         {cards.map((c, k) => (
-          <Pressable key={c.key} testID={'deck-dot-' + k} accessibilityRole="button" accessibilityLabel={'Card ' + (k + 1) + ', ' + states[k]} hitSlop={8} onPress={() => { leave(); go(k); }}
+          <Pressable key={c.key} testID={'deck-dot-' + k} accessibilityRole="button" accessibilityLabel={'Card ' + (k + 1) + ', ' + states[k]} hitSlop={8} onPress={() => { leave(); go(k, 0); }}
             style={[s.dot, { backgroundColor: k === i ? p.text : states[k] === 'Logged' ? p.signal : p.border2 }, k === i && { width: 22 }]} />
         ))}
       </View>

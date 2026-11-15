@@ -673,3 +673,66 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   Not seen there: a swap from a move's row and its put it back line (no row of the days opened offers one), and
   the sheet's slide in motion (stills only).
 - **Not seen yet:** Mario's phone.
+
+## D275 in the Expo app: Mario's phone on IA Next build 111, and the swipe's settle (Post-v0.262.3, the migration's phase 3, its fourth session)
+
+- **Date:** 2026-11-15. **Who:** Mario's report from his phone, by a written brief that said to record it first
+  and "if anything differs, prove it at my data first and fix it before anything else". **Ruling carried:** D275
+  (the deck's motion is today's); no new D-code. **Release:** no version; `ia-version` stays 0.262.3. The page and
+  core are not touched.
+- **His report, whole** (no screenshot came with it, so the record is his words): "on build 111 you cant reopen
+  sessions once they are done, i logged the weightlift and it logged the run too for some reason and you cant
+  double tap to make it go vertical scroll and the swipe feels off and less natural". He did not answer the list
+  the brief asked about (a card after Log and a swipe and after a skip; the swap sheet, its slide, a pick, put it
+  back; a typed load under the keyboard; Done, next one; a skip and put it back; Call it; Mark the day done; a
+  backup loaded over it; Log on a move in today's app), so none of it is recorded as the same. Asked again on the
+  next build.
+- **The four, each read against both decks' code:**
+  1. **The swipe feels off (the beta's, fixed here).** Today's deck eases every card to its new place when a swipe
+     is let go past the line of 80 points (`deck.ts` `cardStyle`: the card coming to the top over 290 ms on
+     cubic-bezier(0.22, 0.61, 0.36, 1), every other card over 260 ms on ease, a card that leaves the fan gone at
+     once). The beta's `go` set the drag to nothing and the new card on top in one frame: the card coming up
+     jumped the rest of its way, the fan jumped a seat, and a card let go to the right jumped into the fan. Let go
+     at the line the jump is 6 points and 1.5% of scale for the card coming up, and a whole seat (15 points across,
+     7 up, 1.6 degrees) for each card of the fan. A dot pressed jumped the same way. The earlier sessions carried
+     this as an open item ("the fan re-seating at once after a swipe where today's eases"); his report is that item
+     firing.
+  2. **No double tap, so no up and down pager (not built).** Call 1 of D275. Carried as not built since the deck's
+     first session in the beta, with the opening out of the card.
+  3. **Reopen takes no press (not built).** This Week draws Reopen as today's and it does nothing until the session
+     sheet exists (`ThisWeek.tsx`). What his report adds: the beta now writes to its own store, so a day marked done
+     there cannot be undone there until the session sheet is built. Today's app and its data are not touched by it.
+  4. **Mark the day done closes the run's card too (today's ruling, not a difference).** D276 item 7, as on build
+     109: the deck's finish marks the day, and This Week shows every card of a closed day as done. No run is logged
+     by it. Today's app does the same, and the two stores are equal after the tap. Raised from his phone a second
+     time; still not ruled.
+- **What changes (the beta only):**
+  - `frontends/native/src/deck/deck-screen.ts`: `poseOf`, where a card stands for a given top card and drag
+    (`deck.ts` `cardStyle`, sideways), and `travelOf`, what a card has left to travel when the deck moves on.
+  - `frontends/native/src/deck/Deck.tsx`: a swipe let go past the line and a dot pressed hand `go` where the top
+    card was let go. Each card keeps the place `go` gives it and wears its travel on top, which runs out over 290
+    ms for the card coming to the top and 260 ms for every other, on today's two curves. The values are new for
+    every move and are started once they are on the screen; none is taken off a card mid flight, so no style
+    passes from a moving value to a plain one (the cause of build 109's blank card). Still under Reduce Motion.
+- **Deliberately not changed:** Done, next one lands at once after its tuck, as today's does (`snap`); the map's
+  tile jumps under its sheet; a swipe let go short settles back as before. A second swipe begun inside the 290 ms
+  starts from the cards' resting places, where today's starts from where they are; not changed, and not seen to
+  matter. The drag itself: the beta takes the finger after 8 points across and today's follows from the first
+  point; not changed here, named so the next report can be read against it.
+- **Tests:** `tests/unit/native-deck.test.ts`: where each card stands (the top card, the card a drag raises going on
+  and going back, the fan, the rest), typed by hand from `deck.ts`; a swipe let go, card by card, on six cards and
+  on three, going on and going back, and a dot; the settle's two durations and curves, nothing under Reduce Motion,
+  Done, next one still at once; and the list of presses, where the dot's changed. On the commit before
+  (`tools/tree-at.mjs`) all four fail: `poseOf is not a function`, `travelOf is not a function`, "the card coming
+  to the top: 290 ms", and the list of presses. No test can feel a swipe: the proof of that is the simulator, then
+  his phone.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios`, the Release build under Hermes, the copy of
+  Mario's backup; the screen recorded with `simctl io recordVideo` and its frames read): Thursday's deck of three
+  cards, on Call it. A drag of 200 points to the left that rests a quarter second before it lifts: Front squat is
+  on top whole at once, logged, with its ring, and the card let go slides from the left edge behind it to the fan's
+  second seat over 17 frames, 278 ms. The same drag to the right: Call it comes back on top whole, and Front squat
+  eases from where the finger left it into the fan's first seat over 17 frames, 273 ms. Before the fix, by its code, each was a
+  single frame (not recorded). No card was blank after either resting drag. Nothing was logged or marked: the simulator's store is as it
+  was.
+- **Not seen yet:** his phone, which is the only place the feel is judged. A deck of five cards or more, where the
+  card let go to the left goes at once as today's does, was not opened on the simulator (Thursday holds three).

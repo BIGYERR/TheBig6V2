@@ -16,7 +16,7 @@ import {
   STALE_LOAD_DAYS, crossProgLastEntry, exControlFlags, isKBExercise, isStaleTs, parseRx, recencyLabel, rxSuffix, setsSubLabel, setsSummary,
   setsVaried, stripLeadingSets, swapOriginOf, toDispW,
 } from '../../frontends/native/src/deck/deck-readers.ts';
-import { type DeckProgram, coverOf, dayCards, deckView, shaded, toneColor } from '../../frontends/native/src/deck/deck-screen.ts';
+import { type DeckProgram, coverOf, dayCards, deckView, poseOf, shaded, toneColor, travelOf } from '../../frontends/native/src/deck/deck-screen.ts';
 
 const DAY = 86400000;
 const NOW = new Date(2026, 10, 14, 12, 0, 0).getTime();
@@ -269,7 +269,7 @@ describe('native deck: the screen', () => {
       '() => edit(c.undo!, false)', '() => h.fill(x.exKey, load.fill!.value)', '() => h.log(x)', '() => h.reuse(x.exKey, reuse.value)', '() => h.skip(x.name)',
       '() => h.step(x.exKey, r.s, -r.step)', '() => h.step(x.exKey, r.s, r.step)', '() => h.swap(x.swap!.secIdx, x.swap!.itemIdx)', '() => h.unskip(x.name)',
       '() => h.unswap(x.swappedFrom!)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)', '() => openSwap(c.swap!.secIdx, c.swap!.itemIdx)',
-      '() => putBack(c.swappedFrom!)', '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k); }',
+      '() => putBack(c.swappedFrom!)', '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k, 0); }',
       '() => { leave(); onClose(); }', "() => { leave(); setSheet('map'); }", 'advance', 'onRpe',
     ]);
   });
@@ -287,6 +287,79 @@ describe('native deck: the screen', () => {
     assert.ok(code.includes('leaveV.interpolate({ inputRange: [0, 2], outputRange: [0.75, 0] })'), 'the card behind comes up from a quarter as Done, next one sends the top card away');
     assert.ok(code.includes('.start(rest);') && code.includes('const rest = (): void => { dirNow.current = 1; setDir(1); };'), 'at rest the card behind is the next one');
     assert.ok(code.includes('height >= 700 ? ROOMY : TIGHT'), 'D283: Roomy on a screen 700 points tall or more');
+  });
+
+  // IA Next build 111, Mario's phone, 2026-11-15: "the swipe feels off and less natural". Today's deck eases every card
+  // to its new place when a swipe is let go past the line (deck.ts cardStyle: the card coming to the top over 290 ms on
+  // cubic-bezier(0.22,0.61,0.36,1), every other over 260 ms on ease); the beta's cards jumped there. Every number here
+  // is typed by hand from deck.ts cardStyle: a seat of the fan is 15 points across, 7 up, 3.5% smaller and 1.6 degrees
+  // round per place; the card a drag raises covers its way over 140 points; the top card turns a degree per 26 points.
+  const near = (a: number, b: number, what: string): void => assert.ok(Math.abs(a - b) < 1e-9, what + ': ' + a + ' is not ' + b);
+  test('where each card stands: the top card under the finger, the card a drag raises, the fan, and the rest not drawn', () => {
+    // Six cards, the first on top, at rest.
+    assert.deepStrictEqual(poseOf(0, 0, 6, 0, 3, 140), { x: 0, y: 0, s: 1, r: 0, shown: true });
+    assert.deepStrictEqual(poseOf(1, 0, 6, 0, 3, 140), { x: 15, y: -7, s: 0.965, r: 1.6, shown: true });
+    const second = poseOf(2, 0, 6, 0, 3, 140);
+    assert.deepStrictEqual([second.x, second.y, second.r, second.shown], [30, -14, 3.2, true]); near(second.s, 0.93, 'the second seat\'s scale');
+    const third = poseOf(3, 0, 6, 0, 3, 140);
+    near(third.x, 45, 'the third seat across'); near(third.y, -21, 'up'); near(third.s, 0.895, 'its scale'); near(third.r, 4.8, 'its turn');
+    assert.deepStrictEqual([4, 5].map((k) => poseOf(k, 0, 6, 0, 3, 140).shown), [false, false], 'a card past the fan is not drawn');
+    // Dragged 70 points to the left, half of the rise: the top card is 70 across and turned 70/26 of a degree back,
+    // the next card half way from its seat (7.5, -3.5, 0.9825, 0.8), the fan's other seats as they were.
+    const top = poseOf(0, 0, 6, -70, 3, 140), up = poseOf(1, 0, 6, -70, 3, 140);
+    assert.equal(top.x, -70); near(top.r, -2.6923076923076925, 'the top card\'s turn');
+    near(up.x, 7.5, 'the next card across'); near(up.y, -3.5, 'up'); near(up.s, 0.9825, 'its scale'); near(up.r, 0.8, 'its turn');
+    assert.deepStrictEqual(poseOf(2, 0, 6, -70, 3, 140), second, 'the fan\'s other seats as they were');
+    // Dragged 70 to the right, the card before comes up from 92% behind the top card: 96% half way, and it is drawn.
+    const back = poseOf(5, 0, 6, 70, 3, 140);
+    near(back.s, 0.96, 'the card before, half way'); assert.deepStrictEqual([back.x, back.y, back.r, back.shown], [0, 0, 0, true]);
+    assert.deepStrictEqual(poseOf(1, 0, 6, 70, 3, 140), { x: 15, y: -7, s: 0.965, r: 1.6, shown: true }, 'going back, the next card keeps its seat');
+    // Past the rise the card is fully up; two points of drag raise none.
+    assert.deepStrictEqual(poseOf(1, 0, 6, -200, 3, 140), { x: 0, y: 0, s: 1, r: 0, shown: true });
+    assert.deepStrictEqual(poseOf(1, 0, 6, -2, 3, 140), { x: 15, y: -7, s: 0.965, r: 1.6, shown: true });
+  });
+
+  test('a swipe let go past the line: every card eases from where it stood to its new place, and none jumps', () => {
+    // Six cards, the first on top, let go 100 points to the left: the second card comes to the top.
+    // It stood 100/140 of its way up: 15 × 2/7 across, 7 × 2/7 up, 0.965 + 0.035 × 5/7, 1.6 × 2/7 round.
+    const t = (k: number) => travelOf(k, 0, 1, 6, -100, 3, 140);
+    const up = t(1)!;
+    near(up.x, 30 / 7, 'the card coming up, across'); near(up.y, -2, 'up'); near(up.s, 0.99, 'its scale'); near(up.r, 3.2 / 7, 'its turn');
+    assert.equal(t(0), null, 'the card let go is the last of six, past the fan: it goes at once, as today\'s does');
+    // The fan moves up a seat: each card has one seat to travel (15 across, 7 up, 1.6 degrees, and the seats' ratio).
+    const two = t(2)!, three = t(3)!;
+    near(two.x, 15, 'the third card across'); near(two.y, -7, 'up'); near(two.r, 1.6, 'its turn'); near(two.s, 0.93 / 0.965, 'its scale');
+    near(three.x, 15, 'the fourth card across'); near(three.s, 0.895 / 0.93, 'its scale');
+    // The card that takes the fan's last seat comes out from behind the top card's place.
+    const four = t(4)!;
+    near(four.x, -45, 'the fifth card across'); near(four.y, 21, 'up'); near(four.s, 1 / 0.895, 'its scale'); near(four.r, -4.8, 'its turn');
+    assert.equal(t(5), null, 'the sixth card is not drawn before or after');
+    // Going back, 100 points to the right: the sixth card comes up from 0.92 + 0.08 × 5/7 of its size, and the card
+    // let go takes the fan's first seat from where the finger left it (100 across, 100/26 of a degree).
+    const b = (k: number) => travelOf(k, 0, 5, 6, 100, 3, 140);
+    near(b(5)!.s, 0.92 + 0.08 * 5 / 7, 'the card before, coming up'); assert.deepStrictEqual([b(5)!.x, b(5)!.y, b(5)!.r], [0, 0, 0]);
+    near(b(0)!.x, 85, 'the card let go, across to the first seat'); near(b(0)!.y, 7, 'down to it'); near(b(0)!.s, 1 / 0.965, 'its scale'); near(b(0)!.r, 100 / 26 - 1.6, 'its turn');
+    near(b(1)!.x, -15, 'the fan moves back a seat');
+    assert.equal(b(3), null, 'the card that leaves the fan goes at once');
+    // Three cards: the card let go to the left stays in sight, and eases to the fan's second seat.
+    const small = travelOf(0, 0, 1, 3, -100, 3, 140)!;
+    near(small.x, -130, 'three cards, the card let go across'); near(small.y, 14, 'down'); near(small.r, -100 / 26 - 3.2, 'its turn');
+    // A dot pressed (no drag): the card two seats back comes straight to the top from its seat.
+    const dot = travelOf(2, 0, 2, 6, 0, 3, 140)!;
+    assert.deepStrictEqual([dot.x, dot.y, dot.r], [30, -14, 3.2]); near(dot.s, 0.93, 'its scale');
+    assert.equal(travelOf(0, 0, 0, 6, 0, 3, 140), null, 'a card that does not move has nothing to travel');
+  });
+
+  test('the settle is today\'s numbers, none of it plays under Reduce Motion, and the done motion still lands at once', () => {
+    assert.ok(code.includes('const SETTLE_TOP = { duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1) };'), 'the card coming to the top: 290 ms');
+    assert.ok(code.includes('const SETTLE_FAN = { duration: 260, easing: Easing.bezier(0.25, 0.1, 0.25, 1) };'), 'every other card: 260 ms on CSS ease');
+    assert.ok(code.includes('if (g.dx < -SWIPE) go(at.current + 1, g.dx);') && code.includes('else if (g.dx > SWIPE) go(at.current - 1, g.dx);'), 'a swipe let go hands on where it was let go');
+    assert.ok(code.includes('if (letGo !== undefined && !calmNow.current && to !== at.current) {') && code.includes('} else setSettle(null);'), 'still under Reduce Motion');
+    assert.ok(code.includes('travelOf(j, at.current, to, n, letGo, FAN, PEEK)'), 'from the fan and the rise the drag itself uses');
+    assert.ok(code.includes('const v = k === i ? settle!.top : settle!.fan;'), 'the top card on its own curve');
+    assert.ok(code.includes('later(() => go(at.current + 1), 200);') && code.includes('          go(at.current + 1);\n'), 'Done, next one lands at once, as today\'s snap does: still, and after the tuck');
+    // The values are new for every move and started once they are on the screen.
+    assert.ok(code.includes('top: new Animated.Value(0), fan: new Animated.Value(0) }') && code.includes("Animated.timing(settle.top, { toValue: 1, ...SETTLE_TOP, useNativeDriver: true }).start();"));
   });
 
   // IA Next build 109, Mario's phone, 2026-11-15: after a swipe whose finger rested before it lifted, the card it
