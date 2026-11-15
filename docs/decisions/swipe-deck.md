@@ -589,3 +589,87 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
     the deck. In the beta Reopen takes no press yet: it waits for the session sheet.
   - **Not reported, so not recorded as the same:** a load typed with the field under the keyboard, the motion of
     Done, next one, Call it's slider and notes, and a backup loaded over the day. Asked again on the next build.
+
+## D275 and D283 in the Expo app: the swap sheet (Post-v0.262.3, the migration's phase 3, its third session)
+
+- **Date:** 2026-11-15. **Ruled by:** no new ruling. The sheet's words and behaviour are today's, carried unchanged,
+  so its rulings keep their names (D177's rep window and its toast, D192's chain and chip, D193 and D194's injury
+  hold, V162's and V164's rulings on its lists); what it stores is ruled by D289 (`docs/decisions/data-backup.md`). The cut was put to
+  Mario after the measure and he took it ("agreed"). **Bump:** none, the page and core do not move (a
+  Post-v0.262.3 pass, standing ruling 1). **Shipped:** Post-v0.262.3, no build of today's app; the beta's next build
+  carries it once Mario merges it.
+- **The finding (measured before any edit, `tests/measure/native-deck-swap_writes.md`):**
+  - *Where the sheet comes from.* Its words are `swap-sheet.ts`, what it shows is `swap-sheet-model.ts`, with no
+    Angular in it. Its list is page code (`swaps-edits.ts`: `swapCandidates`, `auxSwapCandidates`, `swapLoadNote`,
+    `swapUniverseFor`) over functions core already has, and the universe is on the program a launch hands back (50
+    launches of 50). Nothing in core had to change.
+  - *How often.* 12,131 of 15,261 moves on 2,723 decks offer a swap: 4,461 on a single lift's own card, 7,670 on a
+    move's row inside a round, a block or the cool down. 9,279 list by pattern, 2,852 by aux family; 46 sheets hold
+    no row; 125,573 rows in all.
+  - *What each tap writes.* The sheet opening or closing: nothing. A pick: `ia_swaps_`, `ia_swapct_`, and
+    `ia_hist_` on a day already touched. Put it back: `ia_swaps_` and `ia_hist_`; the count is not taken back.
+  - *What a swap does to the card.* The card keeps its place and key; the move's lift log key changes, being the
+    lift's name. A draft stays stored under the lift it was made on, the new lift's fields start at their targets,
+    and put it back brings the draft back. A lift logged then swapped keeps its entry, out of sight. A second pick
+    chains, and put it back steps back one pick at a time.
+  - *What differed from the cut Mario expected.* Remove cannot be reached on today's deck: an added move is a
+    single lift's card (40 of 40), whose chip `deck.css` hides, and nothing stands in for it. Add is its own sheet,
+    opened from the session sheet's header. Both stay out.
+  - *The nudge.* The third pick running of one pair raises "Noticed something"; Make the change writes the
+    preference into the program and rebuilds it. It is a pop-up, and waits for the pop-ups.
+- **What is built (the cut Mario agreed):**
+  - `frontends/native/src/swap-sheet/swap-sheet-model.ts`: today's file, copied, held to the byte.
+  - `frontends/native/src/deck/deck-swaps.ts`: the page's four list functions, line for line, and `swapSheetOf`, the
+    Angular sheet's `open()`.
+  - `frontends/native/src/deck/deck-writes.ts`: `swapMove` and `undoSwap`, the page's `applySwapChoice` and
+    `undoSwap` with the page's globals as arguments, ending in core's `addSwapRecord`, `countSwap`,
+    `dropSwapRecord` and `refreshDaySnapshot`. Twelve of core's writers now, and no key written by hand.
+  - `frontends/native/src/swap-sheet/SwapSheet.tsx`: the sheet, a full screen over the deck, every word today's,
+    sliding up in 400 ms and away in 360 (`motion.css`), at once under Reduce Motion. It writes nothing itself.
+  - `Deck.tsx`: the swap mark on a single lift's card and on a move's row opens the sheet; a pick swaps the lift and
+    draws the day again under the sheet as it slides away; Put it back, on the card's strip and on a row's line,
+    undoes the lift it names. Each takes the keyboard off its field first, as a tap on the page does.
+- **Found by the proof, and made today's (the beta only):** a card draws a logged move's set summary and its load's
+  label from the day's entry, and today's page restates them from the cells only when the move is next touched
+  (`refreshSetSummary`: a step, a typed rep, Log, and, on a move with a load cell per set, its sets opening or a
+  load changing). The beta restated them at once. The two differ where the entry holds other sets than the card has
+  rows: a lift logged on one card and then swapped in on a card of fewer sets, and an entry from before v0.262.3
+  that holds another move's sets (D290). `set-fields.ts` now keeps them as drawn until the page would restate them.
+- **Deliberately not built, and why:** the nudge (a swap is counted as today's counts it, so `ia_swapct_` is
+  equal; the nudge is not raised, and a pair that came due stays not offered, so it comes due again on its next
+  pick once the nudge is built); remove and add (above); the opening out of the card and the up and down pager
+  (motion that needs the phone, a session of their own).
+- **Does not change:** today's app, the page, core, what any program prescribes, any golden record of stored state.
+- **Proof:**
+  - *The sheet's list equals today's for every card.* `tests/sweeps/native-deck-swap.test.ts` (CI): the ten seeded
+    programs, 50 launches, **12,131 sheets and 125,573 rows, each sheet whole against the Angular sheet's over the
+    page, 46 of them empty**: the measure's own counts. `tests/integration/native-deck-swap.test.ts` (the 60-second
+    check): HALF_MANNY, 1,408 sheets, 15,166 rows.
+  - *After the same taps the stores are equal.* `tests/support/native-deck-swap.ts` works a day through its deck on
+    both apps with swaps among the logging: a sheet on every move that offers one, a pick of a first, a later and
+    another job's row, a draft or a Log before the pick, a second pick on the same place, work on the lift swapped
+    in, put it back one pick or all the way, a lift left swapped, and the same pair three times running. After
+    every tap: every `ia_` key equal value for value but the pop-ups' five families, every field, the cards whole,
+    the toasts. HALF_MANNY: 24 days, 476 taps, 115 picks, 63 put backs, 10 nudges due on both. The ten programs:
+    **257 days, 4,677 taps, 1,155 picks, 619 put backs, 110 nudges due**; toasts 1,083 that keep their numbers, 59
+    with no load to add, 12 whose window moves the reps, 1 held by an injury plan. Each launch after swapped days
+    is a launch of the beta's seam too, held equal (`tests/support/native-launch.ts`).
+  - *A backup loaded after a swap* leaves the store the file's, key for key and hash for hash (the integration file).
+  - *By hand:* `tests/unit/native-deck-swap.test.ts` (D177's box squat to goblet squat, the record, the count, the
+    snapshot, the chain, put it back, the third pick, the sheet's tags and words) and the integration file's first
+    Monday (Barbell Romanian deadlift for Deadlift, each key typed out).
+  - *Every golden record of stored state identical:* `tests/snapshots/` has no diff.
+  - *A break per rule,* in four copies of the tree from the first run
+    (`tests/measure/native-deck-swap_breaks.md`): **75 breaks, and every one turns a file red.** Six were let through at first. One took out half of a rule the page's code keeps twice (the lift going out is kept off the list by name and again with the card's lifts) and was fixed in the break. Five were rules no test held: a round's partner asked for an aux family's list, the two held toasts' words, a stored dose and a place that now holds another lift, and Varied as drawn. Each is now held by a hand-typed test in `tests/unit/native-deck-swap.test.ts` or `native-deck-logging.test.ts`.
+  - *Where the Expo app's packages are not installed* (`tools/tree-at.mjs --working`, the copies the breaks ran
+    in): the new and changed files pass there before any break is made.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios` for the blank card's fix, then `npm run sim-ios:fast` for the sheet, the Release build under Hermes, the copy of
+  Mario's backup): Thursday, Front squat's swap mark opens the sheet: Swap out, Front squat, Squat, Leg day, Heavy
+  compound, "Whatever you pick keeps 3×12 at RPE 5.", Back squat and Jump squats under Same job, five rows under
+  Different job, same day, and the foot. Back squat picked: the sheet slides away, the card reads Back squat with
+  "Swapped in for Front squat" and its arrow, 3 × 12, its own reuse pill, not logged. The arrow: Front squat is
+  back, logged, with its ring and check. Friday's deck of two cards (the shape of Mario's Monday): the resting
+  swipe that blanked a card on build 109 shows Call it whole, and Dumbbell bench press whole on the way back.
+  Not seen there: a swap from a move's row and its put it back line (no row of the days opened offers one), and
+  the sheet's slide in motion (stills only).
+- **Not seen yet:** Mario's phone.

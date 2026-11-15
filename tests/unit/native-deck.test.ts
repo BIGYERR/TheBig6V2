@@ -267,9 +267,10 @@ describe('native deck: the screen', () => {
     const presses = [...new Set([...code.matchAll(/onPress=\{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]!.trim()))].sort();
     assert.deepStrictEqual(presses, [
       '() => edit(c.undo!, false)', '() => h.fill(x.exKey, load.fill!.value)', '() => h.log(x)', '() => h.reuse(x.exKey, reuse.value)', '() => h.skip(x.name)',
-      '() => h.step(x.exKey, r.s, -r.step)', '() => h.step(x.exKey, r.s, r.step)', '() => h.unskip(x.name)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)',
-      '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k); }', '() => { leave(); onClose(); }',
-      "() => { leave(); setSheet('map'); }", 'advance', 'onRpe',
+      '() => h.step(x.exKey, r.s, -r.step)', '() => h.step(x.exKey, r.s, r.step)', '() => h.swap(x.swap!.secIdx, x.swap!.itemIdx)', '() => h.unskip(x.name)',
+      '() => h.unswap(x.swappedFrom!)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)', '() => openSwap(c.swap!.secIdx, c.swap!.itemIdx)',
+      '() => putBack(c.swappedFrom!)', '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k); }',
+      '() => { leave(); onClose(); }', "() => { leave(); setSheet('map'); }", 'advance', 'onRpe',
     ]);
   });
 

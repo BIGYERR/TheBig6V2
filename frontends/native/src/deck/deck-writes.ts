@@ -1,7 +1,8 @@
-// What the Expo deck writes (MIGRATION.md phase 3, the deck's second session; D289 P-NATIVEWRITES,
-// docs/decisions/data-backup.md): a set draft, a logged lift, Call it and the day marked done, a skip and its undo.
-// Every write ends in one of core's own writers (state-day-log.ts, state-lift-log.ts, state-day-history.ts,
-// state-day-status.ts, state-day-edits.ts). What stands here is the page's code around them, line for line, with the
+// What the Expo deck writes (MIGRATION.md phase 3, the deck's second and third sessions; D289 P-NATIVEWRITES,
+// docs/decisions/data-backup.md): a set draft, a logged lift, Call it and the day marked done, a skip and its undo,
+// a swap and its put it back. Every write ends in one of core's own writers (state-day-log.ts, state-lift-log.ts,
+// state-day-history.ts, state-day-status.ts, state-day-edits.ts, state-swaps.ts). What stands here is the page's
+// code around them, line for line, with the
 // page's globals (the store, the active program, the week and day in hand, the clock) taken as arguments and the
 // fields read from set-fields.ts instead of the screen:
 //
@@ -10,21 +11,28 @@
 //   snapshotDay, resnapshotDayEdit                storage.ts
 //   markDay (the deck's), markDayComplete         deck.ts, day-status.ts
 //   skipExercise, unskipExercise, skipSuperset,
-//   unskipSuperset                                swap-sheet.ts
+//   unskipSuperset, applySwapChoice, undoSwap     swap-sheet.ts
 //
-// The store is this app's own SQLite store and nothing else. tests/integration/native-deck-logging.test.ts holds it
-// equal to today's page, key for key, after the same taps on the same keys. Not here, with their own screens: the
-// completion pop-up and the day-after reminder (the page's ia_pop_ and ia_remind keys), swap and its undo, remove.
-import type { Day } from '@ia/core';
+// The store is this app's own SQLite store and nothing else. tests/integration/native-deck-logging.test.ts and
+// native-deck-swap.test.ts hold it equal to today's page, key for key, after the same taps on the same keys. Not
+// here, with their own screens: the completion pop-up and the day-after reminder (the page's ia_pop_ and ia_remind
+// keys); the coach's nudge after the third swap running of one pair (a swap is counted here as today's counts it,
+// and the nudge is not raised); add and remove, which today's deck does not reach.
+import type { Cfg, Day, Section } from '@ia/core';
+import { _stripCapCue, applyInjuryFilter } from '@ia/core/engine/injury.ts';
 import { addSkipEdit, dropSkipEdit, ssSkipToken } from '@ia/core/engine/state-day-edits.ts';
 import { recordDaySnapshot, refreshDaySnapshot } from '@ia/core/engine/state-day-history.ts';
 import { dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, writeDayLogs } from '@ia/core/engine/state-day-log.ts';
 import { setDayStatus } from '@ia/core/engine/state-day-status.ts';
 import { entryDay, readLiftLog, recordLift, writeLiftLog } from '@ia/core/engine/state-lift-log.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
+import { type SwapPlace, _dayPlanCfg, addSwapRecord, countSwap, dropSwapRecord, readSwaps } from '@ia/core/engine/state-swaps.ts';
+import { _swapDetailFor, applySwapPrefs } from '@ia/core/engine/swap-prefs.ts';
 
+import type { ExItem } from '../day-detail/session-sections-model';
 import { type CardAct, type CardMove, type DayLog, callItLog } from './deck-model';
 import type { DeckDay, DeckProgram, Fields } from './deck-screen';
+import type { SwapCtx } from './deck-swaps';
 import { type MoveFields, afterLog, fillLoads, loadVals, rawLoads, rawReps, repVals, reuseLoad, stepRep } from './set-fields';
 
 /** The page's globals a write reads: the store, the program a launch handed back, the week and the day in hand. */
@@ -170,6 +178,107 @@ export function act(s: Session, a: CardAct, off: boolean): string | null {
   let toast: string | null = null;
   for (const n of a.names) toast = skipMove(s, n, off) ?? toast;
   return toast;
+}
+
+// ── Swap and put it back (swap-sheet.ts applySwapChoice and undoSwap) ───────────────────────────────────────────
+/** The plan that governs the day in hand (core's _dayPlanCfg): the program's config, with the day's own injury. */
+const planOf = (s: Session, day: DeckDay): Cfg => _dayPlanCfg(s.prog as unknown as { cfg?: Cfg | null }, day as unknown as { _ovKey?: unknown });
+
+/** What a pick did: the toast it raises, and whether the coach's nudge is now due (the third pick running of one pair). */
+export interface Swapped { toast: string; nudge: boolean }
+
+/**
+ * The page's applySwapChoice: the lift the sheet was opened on becomes `to` on the day in hand. Every place `from`
+ * stood is kept for put it back (D177 R4, with the dose kept before an injury's hold, D193); the dose carries, read
+ * beneath the plan's cue, and only a lift with no load to move or a wave Main under the candidate's window is
+ * prescribed again (_swapDetailFor); on an injured day the plan's filter decides what the card shows and the dose
+ * before it is kept beside the card; a label naming the lift names the new one. Then the record, the count and the
+ * snapshot. Null where the sheet's lift is no longer there, as the page closes the sheet and does nothing.
+ */
+export function swapMove(s: Session, ctx: SwapCtx, to: string, now: number): Swapped | null {
+  if (!ctx || !s.prog || !s.prog.id) return null;
+  const day = dayOf(s);
+  const sec = day && day.sections && day.sections[ctx.secIdx];
+  const item = sec && sec.items && (sec.items[ctx.itemIdx] as ExItem | undefined);
+  if (!day || !sec || !item) return null;
+  const from = ctx.name;
+  const undoRx: SwapPlace[] = [];
+  (day.sections || []).forEach((sx, si) => ((sx && sx.items) || []).forEach((it, ii) => {
+    if (it && it.name === from && typeof it.detail === 'string') {
+      const e: SwapPlace = { s: si, i: ii, d: it.detail };
+      if (typeof it['_preHold'] === 'string') e.ph = it['_preHold'];
+      undoRx.push(e);
+    }
+  }));
+  item.name = to;
+  const wasDetail = item.detail;
+  const base = _stripCapCue(typeof item['_preHold'] === 'string' ? (item['_preHold'] as string) : wasDetail) as string;
+  const rx: { win?: [number, number] } = {};
+  item.detail = _swapDetailFor(to, base, rx);
+  const reRx = item.detail !== base;
+  const preF = item.detail;
+  let held = false;
+  if (planOf(s, day).injury) {
+    item['_preHold'] = preF;
+    try {
+      const fs = applyInjuryFilter([{ label: 'x', items: [{ name: to, detail: item.detail }] }] as unknown as Section[], planOf(s, day));
+      const fi = fs && fs[0] && fs[0].items && fs[0].items[0];
+      if (fi && fi.name === to) { held = /RPE/.test(preF) && fi.detail !== preF; item.detail = fi.detail; }
+    } catch { /* as the page: a filter that throws leaves the card as the carry wrote it */ }
+  }
+  if (sec.label && sec.label.indexOf(from) >= 0) sec.label = sec.label.split(from).join(to);
+  addSwapRecord(s.store, s.prog.id, s.week, s.dayKey, from, to, undoRx, now);
+  const nudge = !!countSwap(s.store, s.prog.id, from, to);
+  resnapshotDay(s);
+  const lead = to + ' in, ' + from.toLowerCase() + ' out. ';
+  const toast = held
+    ? (rx.win
+      ? lead + 'The load runs out before the reps do here. Reps move to ' + rx.win[0] + ' to ' + rx.win[1] + '. Your injury plan holds this one at RPE 7.'
+      : reRx
+        ? lead + 'No load to add here. Your injury plan holds this one at RPE 7.'
+        : lead + 'Same sets, same reps. Your injury plan holds this one at RPE 7.')
+    : rx.win
+      ? lead + 'The load runs out before the reps do here. Same sets, same effort. Reps move to ' + rx.win[0] + ' to ' + rx.win[1] + '.'
+      : reRx
+        ? lead + 'No load to add here, so take the sets to the same effort.'
+        : lead + 'Same job, same numbers.';
+  return { toast, nudge };
+}
+
+/**
+ * The page's undoSwap: the day's record of `from` gives the lift it became, which takes its name back; each stored
+ * place gets its own prescription back, at its place where `from` stands there again, else on the first `from` not
+ * yet written; a record from before D177 has no places, and the name alone comes back. Then the record goes and the
+ * snapshot is renewed. The count is not taken back. Null where the day holds no record of `from`.
+ */
+export function undoSwap(s: Session, from: string): string | null {
+  if (!s.prog || !s.prog.id) return null;
+  const day = dayOf(s);
+  if (!day) return null;
+  const list = readSwaps(s.store, s.prog.id)['w' + s.week + '_' + s.dayKey] || [];
+  const hit = list.filter((e) => e && e.from === from)[0];
+  if (!hit) return null;
+  const back: Record<string, string> = {};
+  back[hit.to] = from;
+  applySwapPrefs(day.sections as unknown as Section[], back);
+  if (Array.isArray(hit.rx)) {
+    const put: ExItem[] = [];
+    hit.rx.forEach((p) => {
+      if (!p || typeof p.d !== 'string') return;
+      const ps = (day.sections || [])[p.s], at = ps && ps.items && ps.items[p.i];
+      let it: ExItem | null = at && at.name === from && put.indexOf(at) < 0 ? at : null;
+      if (!it) (day.sections || []).some((sx) => ((sx && sx.items) || []).some((x) => { if (x && x.name === from && put.indexOf(x) < 0) { it = x; return true; } return false; }));
+      const got = it as ExItem | null;
+      if (got) {
+        got.detail = p.d;
+        if (typeof p.ph === 'string') got['_preHold'] = p.ph; else delete got['_preHold'];
+        put.push(got);
+      }
+    });
+  }
+  dropSwapRecord(s.store, s.prog.id, s.week, s.dayKey, from);
+  resnapshotDay(s);
+  return from + ' is back on the card.';
 }
 
 // ── The deck's taps: each one the fields of every move after it (the screen's handlers, Deck.tsx) ───────────────

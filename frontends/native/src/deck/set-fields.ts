@@ -24,11 +24,19 @@ export interface MoveFields {
   logged: boolean;
   /** The reuse pill's words once Log has rewritten them in place, or null while they are the card's own. */
   reuse: { text: string; rec: string } | null;
+  /**
+   * The set summary and the load's label as the card drew them, until the page would restate them from the cells
+   * (refreshSetSummary: after a step or a typed rep, after Log, and, on a move with a load cell per set, after its
+   * sets open or a load changes). The two differ where today's entry holds other sets than the card has rows: the
+   * card draws the entry's, the cells give the rows'. Null once restated. A move with no set rows is never restated.
+   */
+  drawn: { head: string; sub: string; varied: boolean; label: string } | null;
 }
 
 /** The fields as the template draws them from a card (session-sections.ts): each input's value and placeholder. */
 export function fieldsOf(card: ExCard): MoveFields {
-  const rows = card.log && card.log.sets ? card.log.sets.rows : [];
+  const sets = card.log ? card.log.sets : null;
+  const rows = sets ? sets.rows : [];
   const ld = card.log ? card.log.load : null;
   return {
     reps: rows.map((r) => ({ value: r.value, placeholder: r.placeholder, rx: r.rx, step: r.step })),
@@ -36,7 +44,16 @@ export function fieldsOf(card: ExCard): MoveFields {
     load: ld ? { value: ld.value, placeholder: '' } : null,
     logged: card.logged,
     reuse: null,
+    drawn: card.log ? { head: sets ? sets.head : '', sub: sets ? sets.sub : '', varied: sets ? sets.varied : false, label: ld ? ld.label : 'Load' } : null,
   };
+}
+
+/** The page's markTopSet ends in refreshSetSummary only on a move with a load cell per set. */
+const restated = (f: MoveFields): MoveFields => (f.loads.length && f.drawn ? { ...f, drawn: null } : f);
+
+/** A move's sets opened (the page's toggleSets, which marks the top set as they open). */
+export function openedSets(f: MoveFields): MoveFields {
+  return restated(f);
 }
 
 const at = <T>(list: T[], i: number, next: T): T[] => list.map((x, k) => (k === i ? next : x));
@@ -50,26 +67,26 @@ export function stepRep(f: MoveFields, s: number, step: number): MoveFields {
   if (isNaN(v)) v = 0;
   v += step;
   if (v < 0) v = 0;
-  return { ...f, reps: at(f.reps, s, { ...el, value: String(v) }) };
+  return { ...f, drawn: null, reps: at(f.reps, s, { ...el, value: String(v) }) };
 }
 
 /** A rep typed into a row. */
 export function typeRep(f: MoveFields, s: number, text: string): MoveFields {
   const el = f.reps[s];
-  return el ? { ...f, reps: at(f.reps, s, { ...el, value: text }) } : f;
+  return el ? { ...f, drawn: null, reps: at(f.reps, s, { ...el, value: text }) } : f;
 }
 
 /** A set's load typed (the page's onSetWeight): the cell inherits the load field again only while it is blank. */
 export function typeSetLoad(f: MoveFields, s: number, text: string): MoveFields {
   const el = f.loads[s];
-  return el ? { ...f, loads: at(f.loads, s, { ...el, value: text, inherit: text === '' }) } : f;
+  return el ? restated({ ...f, loads: at(f.loads, s, { ...el, value: text, inherit: text === '' }) }) : f;
 }
 
 /** The page's cascadeSetWeights: the load field's number shows in every set's cell that still inherits it. */
 function cascade(f: MoveFields): MoveFields {
   if (!f.load) return f;
   const v = (f.load.value !== '' ? f.load.value : f.load.placeholder) || '';
-  return { ...f, loads: f.loads.map((el) => (el.inherit ? { ...el, placeholder: v } : el)) };
+  return restated({ ...f, loads: f.loads.map((el) => (el.inherit ? { ...el, placeholder: v } : el)) });
 }
 
 /** The load typed into the load field. */
@@ -84,13 +101,14 @@ export function reuseLoad(f: MoveFields, value: number): MoveFields | null {
 
 /** The page's fillAllSetWeights: the pill's number into every set's cell, none of them inheriting any longer. */
 export function fillLoads(f: MoveFields, value: number): MoveFields {
-  return { ...f, loads: f.loads.map((el) => ({ ...el, value: String(value), inherit: false })) };
+  return restated({ ...f, loads: f.loads.map((el) => ({ ...el, value: String(value), inherit: false })) });
 }
 
 /** What saveExWeight leaves on the card once it has logged: the card logged, the load solid in its field, the pill restated. */
 export function afterLog(f: MoveFields, hasW: boolean, dispW: number, unit: string): MoveFields {
-  if (!f.load || !hasW) return { ...f, logged: true };
-  return { ...f, logged: true, load: { value: String(dispW), placeholder: String(dispW) }, reuse: { text: dispW + ' ' + unit, rec: 'earlier today' } };
+  const drawn = f.reps.length ? null : f.drawn;
+  if (!f.load || !hasW) return { ...f, logged: true, drawn };
+  return { ...f, logged: true, drawn, load: { value: String(dispW), placeholder: String(dispW) }, reuse: { text: dispW + ' ' + unit, rec: 'earlier today' } };
 }
 
 // ── What the handlers read (set-logging.ts) ──────────────────────────────────────────────────────────────────────
@@ -141,10 +159,10 @@ export function fieldsView(f: MoveFields, rx: Rx | null, unit: string): FieldsVi
   const vary = setsVaried(a);
   const max = a.length ? Math.max(...a) : 0;
   return {
-    head: setsSummary(rx, a, r),
-    sub: setsSubLabel(rx, a, r, f.logged),
-    varied: vary || setsVaried(r),
-    loadLabel: vary ? 'Top set' : 'Load',
+    head: f.drawn ? f.drawn.head : setsSummary(rx, a, r),
+    sub: f.drawn ? f.drawn.sub : setsSubLabel(rx, a, r, f.logged),
+    varied: f.drawn ? f.drawn.varied : vary || setsVaried(r),
+    loadLabel: f.drawn ? f.drawn.label : vary ? 'Top set' : 'Load',
     footLabel: vary ? 'Top set' : 'Every set',
     footValue: max > 0 ? max + ' ' + unit : '—',
     top: a.map((v) => vary && v === max),
