@@ -612,4 +612,7 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
     `ia_parts` as the file's. **Test:** `tests/unit/native-this-week.test.ts`, "a mark that turns is handed a
     transform in each case, never none": red on the commit before (1 failed of 47, naming the expression), green
     here. It reads the source, since no test here draws a native view; the simulator is what saw the mark.
-  - **Not seen yet:** the fix on his phone. The next IA Next build carries it (a build number above 105).
+  - **Seen on his phone, IA Next build 107** (run 43673451809 on `main`, merge 249af41; his report, 2026-11-14,
+    asked for the dumbbell with Friday tapped and then Saturday in week 12: "Both same", the other half being the
+    deck). The dumbbell beside Then lift is whole after a skipped lift's day, as in today's app. No screenshot came
+    with it, so the record is his words.

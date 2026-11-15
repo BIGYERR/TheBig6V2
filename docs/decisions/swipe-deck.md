@@ -426,4 +426,7 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   **Front squat** with the reuse pill "135 lbs · 2 months…" dashed and "That 135 lbs is about 2 months old. Still
   where you are?"; the plum **Foot & ankle** card, "Straight through · 60 to 90 sec rest", two moves; the session map
   with its three tiles. Back closes to This Week as it was. Afterwards the store held its 36 keys.
-- **Not seen yet:** Mario's phone, and today's deck beside it on the same day.
+- **Seen on Mario's phone, IA Next build 107 beside today's app** (run 43673451809 on `main`, merge 249af41; his
+  report, 2026-11-14, asked for the deck beside today's deck on the same day: "Both same", the other half being
+  the dumbbell). The deck's cards, read only, are today's on his phone. No screenshot came with it, so the record
+  is his words. What a card does when it is pressed was not in that build; it is the next entry's.

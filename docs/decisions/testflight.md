@@ -171,3 +171,17 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   the next PATCH)` and `testflight next 0.262.2 (105) processed`. The run ended green, every job passed or skipped by
   rule. This is the first run where one lane went up and the other held, which is D288's point: neither waits on the
   other, and a merge that moves only the beta leaves today's app as it was.
+- **Seen on `main`, the sixth run, the beta's lane alone again** (run 43673451809, merge 249af41, pull request 43,
+  2026-11-14 22:41 EST; the merge carried no version: d106239, the dumbbell's fix, 67017d4, the swipe deck's cards
+  read only, a8cf07e, docs, and 81beff7, rule wording): the two gates went together (10 s and 13 s). Today's lane
+  skipped its upload and its processed job: App Store Connect already holds `0.262.2`. The beta's lane archived,
+  signed and uploaded `0.262.2 (107)` (558 s, done 22:51:24) and read it back as processed (132 s, done 22:53:39).
+  The build number moved from 105 to 107 because two commits of the merge changed its inputs, d106239 and 67017d4
+  (both `frontends/native`); a8cf07e and 81beff7 changed neither `frontends/native`, `core` nor `tests/semver.js`,
+  and did not count. There is no build 106: a number is a count of commits, and only a merge goes up. The legs read
+  `testflight 0.262.2 processed (uploaded before this run; a version goes up once, a fix is the next PATCH)` and
+  `testflight next 0.262.2 (107) processed`. The run ended green, every job passed or skipped by rule.
+- **On Mario's phone, build 107** (his report, 2026-11-14, asked for the dumbbell after Friday then Saturday in week
+  12 and for the deck beside today's deck on the same day: "Both same"). No screenshot came with it, so the record
+  is his words. The dumbbell's entry is in `docs/decisions/this-week.md`, the deck's in
+  `docs/decisions/swipe-deck.md`.
