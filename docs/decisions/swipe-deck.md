@@ -884,3 +884,19 @@ gave way to the engine's shared items are taken back. `both` hands the walks the
 it, never a copy. After Make the change the program in hand is held equal to the page the tap was made on. A nudge
 on a core, trunk or carry move is answered both ways like any other: 87 due over the ten programs, 44 Make the
 change (34 moving a day of the grid), 43 Leave the plan alone, none spared. The tallies `leaked` and `spared` are gone.
+
+## D275 in the Expo app: Mario's phone on IA Next build 114 (Post-v0.262.4, the migration's phase 3, its fifth session)
+
+- **Date:** 2026-11-15. **Who:** Mario's report from his phone, by a written brief that said to record it first.
+  **Ruling carried:** D275, D283; no new D-code. **Release:** no version; `ia-version` stays 0.262.4.
+- **What was asked, on IA Next build 114 beside today's app:** the swipe's feel; the three pop-ups; a card after Log
+  and then a swipe or a skip; the swap sheet; a typed load under the keyboard; Done, next one; the skip punch; Call
+  it; Mark the day done; a backup loaded over it; and, in today's app at 0.262.4, a skip on a core move staying on
+  its day.
+- **His report, whole:** "All same as today's". It is the answer the chat offered as a button, so the record is
+  that one sentence for the whole list: no item was named apart, and no screenshot came with it. Nothing differed,
+  so nothing was proved on the simulator or fixed before the measure.
+- **Closed by it:** the swipe's settle after build 111 (the entry above), the blank card after build 109, the swap
+  sheet and the three pop-ups stand as seen on his phone. **Still open from build 111, as not built:** the double
+  tap and the up and down pager (this session), Reopen (the session sheet). **Still not ruled:** Mark the day done
+  closing the run's card too (D276 item 7).

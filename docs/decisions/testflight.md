@@ -233,3 +233,6 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   number moved from 113 to 114 on one commit, 62b9b7b, which changed `core`. The legs read `testflight 0.262.4
   processed` and `testflight next 0.262.4 (114) processed`. The run ended green: 8 jobs passed and 6 skipped by
   rule. Both lanes went up in one merge, each on its own jobs.
+- **On Mario's phone, build 114** (his report, 2026-11-15, one sentence, no screenshot): "All same as today's", to
+  the list the pager's session asked about on IA Next build 114 beside today's app at 0.262.4
+  (`docs/decisions/swipe-deck.md`, the build 114 entry). Nothing differed, so nothing was fixed from it.
