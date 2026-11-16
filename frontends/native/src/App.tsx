@@ -1,19 +1,23 @@
 // The Expo app (MIGRATION.md phases 2 and 3). Two tabs, as today's app names them: This Week (phase 2, session 4),
 // drawn from the stored state, whose Start lift opens the swipe deck (phase 3, its first screen), which logs into
-// this app's own SQLite store (D289); and Bugs: the engine check under Hermes (session 1), the Backup row, a backup
+// this app's own SQLite store (D289), with the pop-ups today's app raises over it (the completion pop-up after Mark
+// the day done, the day-after reminder 600 ms after a launch, and its answer); and Bugs: the engine check under Hermes (session 1), the Backup row, a backup
 // loaded into that store in place of everything in it (session 2), and one line saying whether the app's own Swift
 // module answered (session 3, the native spike). Programs and Progress are today's app's still (phase 3).
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VERSION } from '@ia/core';
 
 import { BackupLoad } from './BackupLoad';
 import { Deck } from './deck/Deck';
-import type { DeckOpen } from './deck/deck-screen';
+import type { DeckOpen, DeckProgram } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
 import { SWIFT_ANSWER } from './native-spike';
+import { PopUp } from './pop-up/PopUp';
+import type { PopView } from './pop-up/pop-up-model';
+import { type PopSession, type Reminder, fireCompletionPopup, maybeShowReminder, popOf, resolveReminder } from './pop-up/pop-ups';
 import { swiftLine } from './spike-line';
 import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
@@ -50,19 +54,60 @@ function Shell() {
   const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
   const say = (text: string): void => setToast((t) => ({ text, n: t ? t.n + 1 : 1 }));
   const go = (t: Tab): void => {
-    if (t === 'week' && tab !== 'week') setTick((n) => n + 1);
+    if (t === 'week' && tab !== 'week') { setTick((n) => n + 1); setHeld(null); }
     setTab(t);
+  };
+  // The program Make the change handed back (the coach's nudge), which This Week holds until its next launch.
+  const [held, setHeld] = useState<DeckProgram | null>(null);
+  // A card the deck hands up to be drawn over the toast (the coach's nudge), or none.
+  const [over, setOver] = useState<React.ReactNode>(null);
+
+  // ── The pop-ups (popups-streaks-reminders.ts; ./pop-up/pop-ups.ts) ──
+  const [calm, setCalm] = useState(false);
+  useEffect(() => { AccessibilityInfo.isReduceMotionEnabled().then(setCalm, () => {}); }, []);
+  // The pop-up on screen, the reminder it asks about when it is one, and a count so each is a card of its own.
+  const [pop, setPop] = useState<{ view: PopView; s: PopSession; ask: Reminder | null; n: number } | null>(null);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
+  const raise = (s: PopSession, view: PopView, ask: Reminder | null): void => setPop((was) => ({ view, s, ask, n: was ? was.n + 1 : 1 }));
+  /** A day just marked done: the season on the program's last day, a streak milestone, or the workout line. */
+  const complete = (s: PopSession, week: number, dayKey: string): void => {
+    const now = new Date();
+    raise(s, popOf(s, fireCompletionPopup(s, week, dayKey, now), now, Math.random), null);
+  };
+  /** Each launch: 600 ms on, the day-after reminder, once a calendar day, when a past day stands unmarked. */
+  const launched = useCallback((prog: DeckProgram | null): void => {
+    if (!prog) return;
+    timers.current.push(setTimeout(() => {
+      const s = { store: phoneStore, prog } as unknown as PopSession, now = new Date();
+      const ask = maybeShowReminder(s, now, Math.random);
+      if (ask) raise(s, popOf(s, ask.call, now, Math.random), ask);
+    }, 600));
+  }, []);
+  /** A button of the card: the reminder's Done or Skip, or the one that closes it. */
+  const answer = (index: number): void => {
+    const was = pop;
+    setPop(null);
+    if (!was || !was.ask) return;
+    const done = index === 0, ask = was.ask;
+    say(resolveReminder(was.s, ask.week, ask.dayKey, ask.title, done ? 'complete' : 'skipped', Date.now()));
+    if (done) timers.current.push(setTimeout(() => complete(was.s, ask.week, ask.dayKey), 380));
   };
   return (
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
-      {tab === 'week' ? <ThisWeek palette={p} store={phoneStore} tick={tick} onDeck={setDeck} /> : <Bugs palette={p} />}
+      {tab === 'week' ? <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={setDeck} onLaunch={launched} /> : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
         <TabButton id="tab-week" label="This Week" on={tab === 'week'} palette={p} onPress={() => go('week')} icon={(c) => <Calendar color={c} size={22} />} />
         <TabButton id="tab-bugs" label="Bugs" on={tab === 'bugs'} palette={p} onPress={() => go('bugs')} icon={(c) => <Bug color={c} />} />
       </View>
-      {deck && <Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} say={say} />}
+      {deck && (
+        <Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}
+          onDone={(prog, week, dayKey) => { setDeck(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
+      )}
       {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
+      {over}
+      {pop && <PopUp key={pop.n} palette={p} view={pop.view} calm={calm} onAct={answer} onClose={() => setPop(null)} />}
     </View>
   );
 }

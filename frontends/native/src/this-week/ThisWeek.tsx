@@ -38,7 +38,14 @@ const TAB_ROOM = 96;
 
 type Tint = keyof Pick<Palette, 'run' | 'bike' | 'swim' | 'lift' | 'signal' | 'dim'>;
 
-export function ThisWeek({ palette: p, store, tick, onDeck }: { palette: Palette; store: StateStore; tick: number; onDeck: (deck: DeckOpen) => void }) {
+export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
+  palette: Palette; store: StateStore; tick: number;
+  /** The program Make the change handed back since the launch, to hold in place of the launch's own; null for none. */
+  held: DeckProgram | null;
+  onDeck: (deck: DeckOpen) => void;
+  /** Each launch, with the program it handed back: the app raises the day-after reminder 600 ms on (bug-report-init.ts). */
+  onLaunch: (prog: DeckProgram | null) => void;
+}) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -46,7 +53,9 @@ export function ThisWeek({ palette: p, store, tick, onDeck }: { palette: Palette
   // One launch when the screen mounts and one on each return to it (a backup may have been loaded on Bugs), as
   // today's app makes one at boot: the rebuild is about 55 ms under Hermes on the simulator.
   const launched = useMemo(() => launch(store, Date.now()), [store, tick]);
-  const prog = launched.prog;
+  const prog = held && launched.prog && held.id === launched.prog.id ? (held as unknown as typeof launched.prog) : launched.prog;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { onLaunch(launched.prog as unknown as DeckProgram | null); }, [launched]);
   const [shownPick, setShown] = useState<number | null>(null);
   const picks = useRef(new Map<number, number>());
   const [, redraw] = useState(0);

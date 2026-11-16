@@ -72,3 +72,16 @@ and `tests/measure/v221_rulings/p_active_ruling.md`). The switch is `setActive` 
   marked, week 5 Monday to Thursday unmarked, Friday 2026-10-09 marked, Saturday 2026-10-10 unmarked: the reminder asks
   about Saturday, Wk 5. With Saturday marked as well, it asks nothing (before: Thursday, Wk 5). With nothing marked after
   week 4, it asks about Saturday, Wk 5, then the next day (Saturday asked) about Friday, Wk 5.
+
+## D240 in the Expo app: the day-after reminder (Post-v0.262.3, the migration's phase 3, the deck's fourth session)
+
+- **Date:** 2026-11-15. **Who:** Mario's brief, the pop-ups' cut ("i concur with pop ups as briefed"). **Ruling
+  carried:** D240, unchanged: the walk stops at a marked day, and the days before it are never asked about. **Release:**
+  no version; `ia-version` stays 0.262.3.
+- **What is built:** `frontends/native/src/pop-up/pop-ups.ts` `maybeShowReminder` and `resolveReminder`, the page's
+  functions line for line, raised 600 ms after each launch (`App.tsx`). The whole record, with the completion pop-up
+  and the nudge, is `docs/decisions/swipe-deck.md`, the pop-ups' entry.
+- **Not built:** D238's part, a switched program's past days marked as asked (`markPastAsked`): the Expo app has no
+  program switch yet. It comes with the program list.
+- **Tests:** `tests/unit/native-pop-ups.test.ts` ("a marked day ends the walk", typed by hand) and the walks of
+  `tests/integration/native-pop-ups.test.ts` and its sweep, against today's page at every launch.

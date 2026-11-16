@@ -18,9 +18,10 @@
 // swapMove and undoSwap, the page's applySwapChoice and undoSwap), each drawing the day again as a skip does.
 //
 // Not here yet: remove on an added move (drawn, taking no press: today's deck hides it on the card an added move
-// gets, and the add sheet is the session sheet's); the coach's nudge after the third swap running of one pair; the
-// opening out of the card (call 16) and the up and down pager (call 1); the completion pop-up, in whose place Mark
-// the day done raises the toast today's app raises when no pop-up shows.
+// gets, and the add sheet is the session sheet's); the opening out of the card (call 16) and the up and down pager
+// (call 1). The coach's nudge is raised here, 1.4 s after the third pick running of one pair (swap-sheet.ts), and
+// answered through deck-writes.ts; Make the change hands back the rebuilt program, which this screen and This Week
+// then hold. Mark the day done hands the day to the app, which closes the deck and raises the completion pop-up.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Keyboard, PanResponder, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -35,10 +36,12 @@ import {
   CALL_IT_WORDS, type CardAct, type DeckCard, PIP_THRESHOLD, ctaText, numeral, openAfterSetsTap, restOpen, rpeBubble, rxLine, stateOf,
 } from './deck-model';
 import { parseRx } from './deck-readers';
+import { SwapNudge } from '../swap-nudge/SwapNudge';
 import { SwapSheet } from '../swap-sheet/SwapSheet';
-import { type CoverKind, type DeckOpen, type Fields, type Travel, coverOf, deckView, freshFields, loggedCards, movesOf, toneColor, travelOf } from './deck-screen';
+import { PLAN_CHANGE_FAILED } from '../this-week/week-screen';
+import { type CoverKind, type DeckOpen, type DeckProgram, type Fields, type Travel, coverOf, deckView, freshFields, loggedCards, movesOf, toneColor, travelOf } from './deck-screen';
 import { type SwapOpen, swapSheetOf } from './deck-swaps';
-import { type Session, act, leftField, markDay, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from './deck-writes';
+import { type Session, acceptNudge, act, dismissNudge, leftField, markDay, nudgeWords, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from './deck-writes';
 import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from './set-fields';
 
 /** A card's sizes (D283, Mario's "Auto"): Roomy on a screen 700 points tall or more, Tight below it. */
@@ -91,12 +94,23 @@ interface Handlers {
   unswap: (from: string) => void;
 }
 
-export function Deck({ palette: p, store, open, onClose, say }: { palette: Palette; store: StateStore; open: DeckOpen; onClose: () => void; say: (toast: string) => void }) {
+export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOver, say }: {
+  palette: Palette; store: StateStore; open: DeckOpen; onClose: () => void;
+  /** A card the app draws over the toast, as today's overlay stands over it (z-index 2000 over 999): the nudge, or none. */
+  onOver: (card: React.ReactNode) => void;
+  /** Mark the day done: the day is stored; the app closes the deck and raises the completion pop-up over This Week. */
+  onDone: (prog: DeckProgram, week: number, dayKey: string) => void;
+  /** Make the change: the program rebuilt around the preference, for This Week to hold in place of the one it has. */
+  onProgram: (prog: DeckProgram) => void;
+  say: (toast: string) => void;
+}) {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const z = height >= 700 ? ROOMY : TIGHT;
-  const session: Session = { store, prog: open.prog, week: open.week, dayKey: open.dayKey };
-  const unit = open.prog.cfg && open.prog.cfg.unit === 'kg' ? 'kg' : 'lbs';
+  /** The program in hand: the one the deck opened on, or the one Make the change handed back. */
+  const [prog, setProg] = useState(open.prog);
+  const session: Session = { store, prog, week: open.week, dayKey: open.dayKey };
+  const unit = prog.cfg && prog.cfg.unit === 'kg' ? 'kg' : 'lbs';
 
   // ── What the deck holds: the day as drawn, each move's fields, and what was done in this open ──
   const [view, setView] = useState(open.view);
@@ -251,8 +265,8 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
 
   // ── Skip and put it back (deck.ts act, skip and redraw) ──
   /** The day drawn again after an edit: every move's fields afresh, the reader kept on their card. */
-  const redraw = (): void => {
-    const next = deckView(store, open.prog, open.week, open.dayKey, Date.now(), open.warn);
+  const redraw = (g: DeckProgram = prog): void => {
+    const next = deckView(store, g, open.week, open.dayKey, Date.now(), open.warn);
     if (!next) return;
     const key = (cards[at.current] || { key: '' }).key;
     const k = next.cards.findIndex((c) => c.key === key);
@@ -273,17 +287,47 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
   const [swap, setSwap] = useState<SwapOpen | null>(null);
   function openSwap(secIdx: number, itemIdx: number): void {
     leave();
-    const sheet = swapSheetOf(open.prog, open.week, open.dayKey, secIdx, itemIdx);
+    const sheet = swapSheetOf(prog, open.week, open.dayKey, secIdx, itemIdx);
     if (sheet) setSwap(sheet); else say('Nothing to swap here');
   }
-  /** A pick: the lift swapped, the day drawn again under the sheet as it slides away, the toast. The nudge is not raised yet. */
+  /** A pick: the lift swapped, the day drawn again under the sheet as it slides away, the toast; the nudge 1.4 s on, when it is due. */
   const pick = (to: string): void => {
     if (!swap) return;
+    const from = swap.ctx.name;
     const r = swapMove(session, swap.ctx, to, Date.now());
     if (!r) return;
     redraw();
     say(r.toast);
+    if (r.nudge) later(() => setNudge({ from, to }), 1400);
   };
+  // ── The coach's nudge (day-status.ts showSwapNudge, dismissSwapNudge, acceptSwapNudge) ──
+  const [nudge, setNudge] = useState<{ from: string; to: string } | null>(null);
+  /** Leave the plan alone: the pair is marked offered, and never asked again. */
+  const leavePlan = (): void => {
+    if (nudge) dismissNudge(session, nudge.from);
+    setNudge(null);
+  };
+  /** Make the change: the preference into the program, the program rebuilt, the day drawn again from it, today's toast. */
+  const changePlan = (): void => {
+    if (!nudge) return;
+    const r = acceptNudge(session, nudge.from, nudge.to, Date.now(), {
+      overlay: (ov, e) => { console.error('overlay apply failed', ov && ov.id, e); say(PLAN_CHANGE_FAILED); },
+      freeze: (e) => { console.error('week freeze failed; showing fully rebuilt weeks', e); },
+      rebuild: (e) => { console.error('refreshProgram failed; using stored program', e); },
+    });
+    setNudge(null);
+    if (r.prog) {
+      setProg(r.prog);
+      onProgram(r.prog);
+      redraw(r.prog);
+    }
+    say(r.toast);
+  };
+  useEffect(() => {
+    onOver(nudge ? <SwapNudge palette={p} text={nudgeWords(nudge.from, nudge.to)} calm={calm} onYes={changePlan} onNo={leavePlan} /> : null);
+    return () => onOver(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nudge]);
   function putBack(from: string): void {
     leave();
     const toast = undoSwap(session, from);
@@ -312,12 +356,14 @@ export function Deck({ palette: p, store, open, onClose, say }: { palette: Palet
   const cta = top ? ctaText(top, !!doneLocal[top.key], dayDone) : '';
   const quiet = !!top && (top.kind === 'finish' ? dayDone : top.skipped || top.logged || !!doneLocal[top.key]);
 
-  /** Mark the day done: the day's effort (only once the slider is moved, D219) and notes, the day complete, the deck closed. */
+  /**
+   * Mark the day done: the day's effort (only once the slider is moved, D219) and notes, the day complete; the app
+   * then closes the deck and raises the completion pop-up over This Week, where today's toast would stand (D179).
+   */
   const mark = (): void => {
     markDay(session, view.title, rpeTouched.current ? rpe : null, notes, Date.now());
     setDayDone(true);
-    onClose();
-    say('Done ✓');
+    onDone(prog, open.week, open.dayKey);
   };
   /** Done, next one logs what the card shows and sends it behind the deck; on a card logged or skipped it moves on. */
   const advance = (): void => {

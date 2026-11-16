@@ -192,9 +192,10 @@ describe('native shell: the engine check is core\'s, as it is', () => {
     // The app reads the date to say what day it is and to stamp what it stores, never to time anything: the instant
     // This Week's launch is handed (core's refreshStoredProgram, as today's page hands it Date.now()), the instant a
     // deck is drawn, which says how old a logged load is (the page's recencyBucket reads the same clock), and the
-    // instant of each write the deck makes (the page stamps a draft, a lift and a day's status with Date.now()).
+    // instant of each write the deck makes (the page stamps a draft, a lift and a day's status with Date.now()), and
+    // the instant the reminder's answer is stored at (App.tsx: the page's resolveReminder stamps the day's status).
     const dated = files.filter((f) => /Date\.now\(\)/.test(readFileSync(f, 'utf8'))).map((f) => f.slice(NATIVE.length + 1)).sort();
-    assert.deepStrictEqual(dated, [join('src', 'deck', 'Deck.tsx'), join('src', 'this-week', 'ThisWeek.tsx')]);
+    assert.deepStrictEqual(dated, [join('src', 'App.tsx'), join('src', 'deck', 'Deck.tsx'), join('src', 'this-week', 'ThisWeek.tsx')]);
     assert.doesNotMatch(all, /Date\.now\(\)\s*-|-\s*Date\.now\(\)/, 'no span of time is taken from the date');
   });
 });

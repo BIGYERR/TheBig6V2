@@ -8,7 +8,7 @@
 //                move that offers one, a pick from it (the first row, a later row, a row of the other job), a draft
 //                or a Log before the pick, a second pick on the same place, work on the lift swapped in, put it back
 //                one pick at a time or all the way, a lift left swapped, the same pair picked three times running
-//                (the nudge comes due on both, and is raised on neither), then Call it.
+//                (the nudge comes due on both, and is answered on both), then Call it.
 //
 // The expected value of every comparison is today's page, on purpose: the page stays the reference until the
 // cutover. The hand-typed values are in tests/unit/native-deck-swap.test.ts.
@@ -18,6 +18,8 @@ import { type DeckProgram, dayCards, movesOf } from '../../frontends/native/src/
 import { type SwapOpen, swapSheetOf } from '../../frontends/native/src/deck/deck-swaps.ts';
 import { DAYS7 } from './native-deck.ts';
 import { type Tally, TwoDecks, held, pageSheet } from './native-deck-logging.ts';
+import type { PopSession } from '../../frontends/native/src/pop-up/pop-ups.ts';
+import { pops, sameReminder, seedBoth } from './native-pop-ups.ts';
 import { launchNow, nativeGrid } from './native-this-week.ts';
 import { sqliteTestStore } from './sqlite-kv.ts';
 import { Phone } from './stored-state.ts';
@@ -26,9 +28,12 @@ const plain = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 const pad = (n: number): string => String(n).padStart(2, '0');
 export const iso = (d: Date): string => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
+let launched = 0;
 /**
  * Both apps on one set of keys: a second phone launched on them at the first one's instant (today's page), and the
- * beta launched on the same keys into its own SQLite store. After the two launches the stores are equal.
+ * beta launched on the same keys into its own SQLite store. After the two launches the stores are equal. Then the
+ * launch's reminder, which today's raises 600 ms in: the same pop-up on both, or none, left unanswered, and the
+ * stores equal after it (support/native-pop-ups.ts answers one, over whole programs).
  */
 export function both(P: Phone): { Q: Phone; store: StateStore; grid: DeckProgram } {
   const pre = P.dump();
@@ -39,6 +44,8 @@ export function both(P: Phone): { Q: Phone; store: StateStore; grid: DeckProgram
   for (const [k, v] of Object.entries(pre)) store.set(k, v);
   const grid = nativeGrid(Q, store) as unknown as DeckProgram;
   assert.deepStrictEqual(held(store), Q.dump(), 'after its own launch the beta holds the keys today\'s launch left');
+  pops(Q);
+  sameReminder(Q, { store, prog: grid } as unknown as PopSession, seedBoth(Q, (++launched * 69069 + 1) % 4294967296), null, 'the launch both apps made');
   return { Q, store, grid };
 }
 

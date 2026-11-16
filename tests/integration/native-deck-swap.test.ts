@@ -9,8 +9,8 @@
 //    (support/native-deck-swap.ts swapDay), checked after every tap; and the next morning's launch on what was left.
 // 3. A backup loaded after a swap leaves the store the file's, key for key and hash for hash.
 //
-// The reference is today's page, on purpose. The one exception is the logging file's: the pop-ups' five key
-// families, which the page writes and the beta must leave as they stood.
+// The reference is today's page, on purpose. No key is left out: the pop-ups' five families are compared like every
+// other since the beta built its pop-ups, and each nudge that comes due is answered on both apps.
 //
 // Imported first: every launch a phone makes here is a launch of the beta's seam too, held equal key for key
 // (support/native-launch.ts), so a launch after a swap replays the swap on both.
@@ -66,7 +66,7 @@ test('HALF_MANNY through the standard history: every training day of the week in
   // Each kind of tap was made and compared. The floors sit under what was measured when this was written.
   assert.ok(T.days >= 20 && T.checks >= T.taps, 'days and checks: ' + JSON.stringify(T));
   assert.ok(T.sheets >= 100 && T.picks >= 60 && T.unswaps >= 40, 'sheets, picks and put backs: ' + JSON.stringify(T));
-  assert.ok(T.nudges >= 5, 'the nudge came due on both apps: ' + JSON.stringify(T));
+  assert.ok(T.nudges >= 5 && T.accepted >= 2 && T.declined >= 2 && T.moved >= 1, 'the nudge came due on both apps, and was answered both ways on both: ' + JSON.stringify(T));
   assert.ok((T.swapToasts['same'] || 0) >= 20, 'a pick that keeps its numbers: ' + JSON.stringify(T.swapToasts));
   assert.ok(T.logs >= 10 && T.drafts >= 30 && T.marks >= 20, 'logging among the swaps: ' + JSON.stringify(T));
 });

@@ -736,3 +736,143 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   was.
 - **Not seen yet:** his phone, which is the only place the feel is judged. A deck of five cards or more, where the
   card let go to the left goes at once as today's does, was not opened on the simulator (Thursday holds three).
+
+## The pop-ups in the Expo app: the completion pop-up, the day-after reminder and the swap nudge (Post-v0.262.3, the migration's phase 3, its fourth session)
+
+- **Date:** 2026-11-15. **Who:** Mario, by a written brief ("The pop-ups: the completion pop-up, the day-after
+  reminder and the swap nudge"); the cut put to him after the measure, with the up and down pager as the other
+  choice: "i concur with pop ups as briefed". **Rulings carried, each under its own D-code:** the pop-up's tiers,
+  lines and tags (V181 D1 to D4, V195 D71, V220 D174 and D175), the pop-up over the closed day (D179), the
+  reminder's walk (D238, D240, `docs/decisions/active-program.md`), the reminder's answer taking the day whole
+  (D284), the nudge (the coach nudge of the swap sheet, `docs/decisions/stored-state.md` for its stores). No new
+  D-code: no word and no behaviour changes. **Release:** no version; `ia-version` stays 0.262.3. The page and core
+  are not touched.
+- **Measure first** (`tests/measure/native-deck-popups_raises.md` and `native-deck-popups_reach.md`):
+  - *Where they live.* The lines, the tags, the picker, the streak, the dispatcher and the reminder's walk are the
+    page's (`popups-streaks-reminders.ts`); what a pop-up shows from a tier and its caller's options is today's
+    Angular model (`screens/pop-up/pop-up-model.ts`), and the nudge's words are `screens/swap-nudge/
+    swap-nudge-model.ts`. The nudge's count, its offered mark, the preference written into the program and the
+    rebuild are core's already. None of the five pop-up key families has a writer in core: the page writes them.
+  - *What raises each, and what it writes.* The completion pop-up: Mark the day done and the reminder's Done; it
+    writes `ia_pop_idx_` (the line picked, so the next is another), `ia_pop_dismiss_` (the button's words for the
+    day) and, on the final scheduled day, `ia_season_shown_`. The reminder: 600 ms after a launch, once a calendar
+    day, about the latest past day not marked, back to the last marked one; it writes `ia_remind_last_`,
+    `ia_reminded_` and, for a gap under seven days, `ia_pop_idx_`. Its answer writes `ia_comp_`, `ia_hist_` and
+    `ia_reminded_`, and Done raises the completion pop-up 380 ms later. The nudge: the third pick running of one
+    pair, 1,400 ms after the pick; Leave the plan alone writes `ia_swapct_`, Make the change `ia_programs` too.
+  - *How often.* The ten standard histories raise 87: 35 workout, 15 streak, 27 reminders, 10 injury check-ins.
+    THE HALF MANNY start to finish raises 68: 49 workout, 10 streak, 9 reminders.
+  - *Make the change.* The preference goes into the program's config and nothing else in `ia_programs` moves: the
+    stored grid is the same to the byte; `ia_hist_`, `ia_swaps_` and `ia_edits_` are not written. The rebuild is in
+    hand only: 0 to 5 days changed in four cases, none marked, none in a past week. Core's
+    `recordSwapPreference`, `markSwapNudged` and `refreshStoredProgram` over the beta's store gave the page's grid
+    whole and an equal store in 4 of 4.
+  - *Pairs that came due while the nudge was not built.* The store holds the count at 3, not offered; the next
+    pick of the pair counts 4 and is due again; a pick of another lift starts at 1. None is stranded.
+  - *The season pop-up* is the completion pop-up's top tier, raised once when the final scheduled day is done. The
+    final day opens a deck on 5 of the 10 programs; on a race program it is Race Day, reached by the reminder's
+    Done the day after.
+- **The cut:** the three pop-ups, the completion pop-up with its workout, streak and season tiers, and the
+  exception closed: every `ia_` key equal after the same taps, no family left out.
+- **Deliberately not built, and why:** the injury check-ins and the Wildcard's pop-up (their flows are not in the
+  beta); marking a switched program's past days as asked and releasing the season mark on an unmark (a program
+  switch and an unmark are not in the beta); the up and down pager and the opening out of the card (next, first in
+  line). The five families are written by the beta's own port of the page's lines, in one file; lifting them into
+  core moves the page, which is a version, and waits.
+- **Today's words carried as they are, raised to Mario, not ruled:** the nudge prints the pattern's raw name
+  ("your hpress from here"); the reminder's Skip toast carries a dash ("Skipped ✕ — the week moves on"); three
+  picks on one day, put back between, count as "three sessions running".
+- **What is built (the beta only):**
+  - `frontends/native/src/pop-up/pop-up-model.ts` and `swap-nudge/swap-nudge-model.ts`: today's two files, copied,
+    held to the byte.
+  - `frontends/native/src/pop-up/pop-ups.ts`: the page's lines (lifted from its file as they stand, 74 lines), the
+    tags, the picker, the button's words, the streak's milestones, the dispatcher (season, then a milestone, then the
+    workout line), the reminder's walk and its answer, each with the page's globals as arguments: the store, the
+    program a launch handed back, the clock and the random draw. It writes the five families itself, five writes,
+    and the reminder's answer ends in core's `recordDaySnapshot`, `clearDayParts` and `setDayStatus`.
+  - `frontends/native/src/deck/deck-writes.ts`: `nudgeWords`, `dismissNudge` and `acceptNudge`, the page's
+    `showSwapNudge`, `dismissSwapNudge` and `acceptSwapNudge`, ending in core's `markSwapNudged`,
+    `recordSwapPreference` and `refreshStoredProgram`. Fifteen of core's writers now, and no key written by hand
+    in the deck.
+  - `pop-up/PopUp.tsx` and `swap-nudge/SwapNudge.tsx`: the two cards, every word today's. The card comes in from
+    nine tenths over 280 ms and the scrim over 220 (`motion.css`), both still under Reduce Motion; the icon bounces
+    and the confetti falls in the page's three colours, 72, 100 or 200 pieces.
+  - `App.tsx`: the reminder 600 ms after each launch; its Done or Skip, the toast, and after Done the completion
+    pop-up 380 ms on; the completion pop-up after Mark the day done, where the toast stood. The deck, the toast,
+    the nudge and the pop-up are drawn in that order, each over the last, as today's z-indexes stack them.
+  - `Deck.tsx`: the nudge 1.4 s after the pick that makes it due; Make the change puts the rebuilt program in the
+    deck's hands and This Week's (`ThisWeek.tsx` holds it until its next launch), draws the day again and says
+    today's toast.
+- **Found by the proof, and carried to Mario (today's, core's, not changed here):** the engine hands back some
+  core, trunk and carry items as one object on several days of a program and in every build of a process
+  (`tests/measure/day-edits_shared-items.md`: 37 such objects in 95 places over the ten programs, THE HALF MANNY's
+  10 in 26). A write to one is a write to all of them. On today's page, Suitcase carry skipped on week 1 Tuesday is
+  skipped on week 6 Friday and week 7 Tuesday too, and still is after a fresh launch while the edit is kept. A swap
+  of one, then Make the change in the same launch, leaves the page holding the swapped lift on the item's other
+  days. A preference that names one makes the rebuild rename the engine's own item for every later build in the
+  process. The earlier walks never met it because they hold a copy of the grid (`nativeGrid`); the app holds the
+  grid as the launch hands it back, as today's page does. Three consequences for this proof, each named where it
+  stands: the program after Make the change is held equal to a fresh launch of today's page on the same keys, not
+  to the page the tap was made on (they differed once in 40); a nudge on such a move is answered Leave the plan
+  alone (4 of 87), so Make the change on a core, trunk or carry move is not proved equal; and the walk's grid is
+  still a copy. The fix is core's (a build hands every day items of its own) and is a version.
+- **Found on the way, today's, carried:** the reminder's notebook icon takes the page's text colour, which by day
+  is the card's own ground, so it is not seen by day; today's season card does not shake (`motion.css` wins over
+  the shake of `detail-sheet.css`). The beta draws both as today's does.
+- **Does not change:** today's app, the page, core, what any program prescribes, any golden record of stored state.
+- **Proof:**
+  - *Each pop-up's words equal today's on every day it fires, over whole histories, the clock pinned.*
+    `tests/support/native-pop-ups.ts` `popLife` takes a program from its first whole week to the day after its last
+    on both apps: every scheduled day opened at its own date, a quarter of them before nine, a seventh not opened,
+    two whole weeks not opened; at each launch the reminder compared and answered (Done three times in five, Skip
+    once, left once), each day whose deck opens marked done through it. Today's side is the Angular PopUp's own
+    `fire` over the page; both apps draw from one pinned sequence. Every pop-up is compared whole: icon, kicker,
+    line, sub line, stats, buttons with their handler code, classes, confetti count. `tests/integration/
+    native-pop-ups.test.ts`, HALF_MANNY: 53 launches, 14 reminders (10 Done, 2 Skip, 2 left, 1 after more than a
+    week), 46 workout, 8 streak and 1 season pop-up, 110 comparisons of the stores. `tests/sweeps/
+    native-pop-ups.test.ts`, the ten programs: **383 launches, 86 reminders (58 Done, 14 Skip, 14 left, 10 long
+    gaps), 326 workout, 62 streak and 10 season pop-ups (one a program), 795 comparisons of the stores, 44 different
+    lines drawn.** The lines, the tier config, the button's words and the colours are the page's own, value for value.
+  - *After the same taps every `ia_` key is equal, no family left out.* The exception is gone from
+    `tests/support/native-deck-logging.ts`: after every tap of the logging and swap walks the two stores are
+    compared on every key, the launch's reminder is compared at each launch (`both`), Mark the day done raises the
+    same pop-up on both, and every nudge that comes due is answered on both. The sweeps: logging 257 days and
+    11,818 taps, swaps 257 days and 4,764 taps, 257 pop-ups in each. In `popLife` the beta's store is its own from
+    the first day and is never copied from the page again.
+  - *After a nudge is accepted the program and the store are equal.* 87 nudges due over the ten programs: 40
+    answered Make the change (30 moved a day of the grid), 47 Leave the plan alone. The store is compared after
+    each; the program is the one a fresh launch of today's page hands back, whole (above).
+  - *A backup loaded after a pop-up and after an accepted nudge* leaves the store the file's, key for key and hash
+    for hash (`tests/integration/native-pop-ups.test.ts`: the program, the count and the pop-up's pick differ before
+    the load, the preference is in the stored program, nothing differs after).
+  - *By hand:* `tests/unit/native-pop-ups.test.ts`, 25 tests: the copies to the byte; the tags; the pick and the
+    button's words with their stored values; the milestones; the three tiers; the reminder's walk, its once a day,
+    D240, the long gap, an apostrophe in a title; its answer's five stored things; the nudge's words and its two
+    answers; which files write; the screens' words, timers and motions.
+  - *Every golden record of stored state identical:* `tests/snapshots/` has no diff. The whole suite: 143 files,
+    2,309 tests.
+  - *Red on the commit before:* the three new files import `frontends/native/src/pop-up/pop-ups.ts`, which the
+    commit before does not hold (`git cat-file -e`), and so do the walks' support files, so every file that stands
+    on them fails there by construction. The five tests changed in `tests/unit/native-deck-logging.test.ts`,
+    `native-deck.test.ts` and `native-shell.test.ts` were run on the commit before (`tools/tree-at.mjs`) and all
+    five fail.
+  - *Where the Expo app's packages are not installed* (`tools/tree-at.mjs --working`, the copies the breaks ran
+    in): the new and changed files pass and the tests' type check passes there before any break is made.
+  - *A break per rule,* in four copies of the tree from the first run (`tests/measure/native-deck-popups_breaks.md`):
+    **84 breaks, and every one turns a file red.** Sixteen were let through at first. Two were rules no test held:
+    a tagged line on a day with nothing read of it, and the long gap beginning at six days where the walks' gaps
+    were shorter or longer. Fourteen were the screens' wiring: each button of the two cards, the reminder raised at
+    all, its Skip stored as a skip, the nudge handed up to be drawn, This Week told of a launch and holding the
+    rebuilt program. Each is now held by a test in `tests/unit/native-pop-ups.test.ts`, and each was run again
+    alone and is red.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios:fast`, the Release build under Hermes, the
+  copy of Mario's backup): Friday's deck, Mark the day done: the deck closes and the pop-up stands over This Week,
+  the party icon, "Workout complete", a line of the pool, 4 and "Day Streak" with its flame, the button's words,
+  "The Asylum", confetti in blue, orange and silver; its button closes it and both of Friday's cards read Closed
+  out. Thursday: Front squat traded for Back squat a third time running raises "Noticed something" with both
+  paragraphs and both buttons 1.4 s on; Make the change closes it, says "Done. Back squat is your squat from here."
+  and draws the day again; after a relaunch on the final build the day is as it was left. A second nudge (Jump
+  squats) stands over the toast, and Leave the plan alone closes it. The simulator's copy now holds that preference
+  and Friday marked done. Not seen there: the reminder (no past day stands unmarked in the copy), the streak and
+  season cards, the long gap's words, day mode, and the cards' motion (stills only).
+- **Not seen yet:** Mario's phone.

@@ -337,16 +337,20 @@ describe('native deck logging: which files write', () => {
     assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/swap-sheet')).sort(), ['SwapSheet.tsx', 'swap-sheet-model.ts']);
   });
 
-  // The twelve of core's writers the deck's taps end in (tests/measure/native-deck-logging_writes.md and
-  // native-deck-swap_writes.md): the day's snapshot and its renewal, a set draft and its drop, the lift log, the
-  // day's log, the day's status, a skip and its undo, a swap's record, its count and its undo. setDraftOf is a
-  // reader. The nudge's two writers (markSwapNudged, recordSwapPreference) are called nowhere: it is not built.
-  test('deck-writes.ts alone calls core\'s writers, and exactly the twelve the measures named; nothing writes a key by hand', () => {
-    assert.deepStrictEqual(writers(code('deck-writes.ts')), ['addSkipEdit', 'addSwapRecord', 'countSwap', 'dropSetDraft', 'dropSkipEdit', 'dropSwapRecord', 'recordDaySnapshot', 'recordSetDraft', 'refreshDaySnapshot', 'setDayStatus', 'writeDayLogs', 'writeLiftLog']);
+  // The fifteen of core's writers the deck's taps end in (tests/measure/native-deck-logging_writes.md,
+  // native-deck-swap_writes.md and native-deck-popups_raises.md): the day's snapshot and its renewal, a set draft and
+  // its drop, the lift log, the day's log, the day's status, a skip and its undo, a swap's record, its count and its
+  // undo; and the nudge's three: the pair marked offered, the preference written into the program, and the rebuild,
+  // which stores what a launch's rebuild stores. setDraftOf is a reader.
+  test('deck-writes.ts alone calls core\'s writers, and exactly the fifteen the measures named; nothing writes a key by hand', () => {
+    assert.deepStrictEqual(writers(code('deck-writes.ts')), ['addSkipEdit', 'addSwapRecord', 'countSwap', 'dropSetDraft', 'dropSkipEdit', 'dropSwapRecord', 'markSwapNudged', 'recordDaySnapshot', 'recordSetDraft', 'recordSwapPreference', 'refreshDaySnapshot', 'refreshStoredProgram', 'setDayStatus', 'writeDayLogs', 'writeLiftLog']);
     for (const f of files.filter((x) => x !== 'deck-writes.ts')) assert.deepStrictEqual(writers(code(f)), [], f + ' calls none of core\'s writers');
     const sheet = ['SwapSheet.tsx', 'swap-sheet-model.ts'].map((f) => strip(readFileSync(join(REPO, 'frontends/native/src/swap-sheet', f), 'utf8'))).join('\n');
     assert.deepStrictEqual(writers(sheet), [], 'the swap sheet calls none of core\'s writers');
-    assert.doesNotMatch(files.map(code).join('\n') + sheet, /markSwapNudged|recordSwapPreference/, 'the nudge is not built');
+    // The nudge's card draws and writes nothing: its two answers are deck-writes.ts dismissNudge and acceptNudge.
+    const nudge = ['SwapNudge.tsx', 'swap-nudge-model.ts'].map((f) => strip(readFileSync(join(REPO, 'frontends/native/src/swap-nudge', f), 'utf8'))).join('\n');
+    assert.deepStrictEqual(writers(nudge), [], 'the nudge\'s card calls none of core\'s writers');
+    assert.doesNotMatch(files.filter((x) => x !== 'deck-writes.ts').map(code).join('\n') + sheet + nudge, /markSwapNudged|recordSwapPreference|refreshStoredProgram/, 'the nudge\'s writers are called from deck-writes.ts alone');
     const all = files.map(code).join('\n') + sheet + strip(readFileSync(join(REPO, 'frontends/native/src/day-detail/session-sections-model.ts'), 'utf8'));
     assert.doesNotMatch(all, /\b\w*[sS]tore\.(set|remove)\(/, 'no key is written or removed by hand');
     assert.doesNotMatch(all, /localStorage|AsyncStorage/, 'no other storage');
@@ -357,7 +361,7 @@ describe('native deck logging: which files write', () => {
     const deck = code('Deck.tsx');
     assert.deepStrictEqual([...deck.matchAll(/from '(@ia\/core[^']*)'/g)].map((m) => m[1]), ['@ia/core/engine/icons.ts', '@ia/core/engine/state-store.ts']);
     assert.match(deck, /import type \{ StateStore \} from '@ia\/core\/engine\/state-store\.ts'/);
-    assert.match(deck, /import \{ type Session, act, leftField, markDay, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap \} from '\.\/deck-writes'/);
+    assert.match(deck, /import \{ type Session, acceptNudge, act, dismissNudge, leftField, markDay, nudgeWords, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap \} from '\.\/deck-writes'/);
     const body = deck.replace(/^import [^\n]*\n/gm, '');
     assert.deepStrictEqual([...new Set([...body.matchAll(/\bstore\b[^,;)\]}\n]*/g)].map((m) => m[0].trim()))].sort(), ['store', 'store: StateStore'].sort(), 'the store is only handed on');
   });
@@ -421,7 +425,8 @@ describe('native deck logging: which files write', () => {
     assert.ok(app.includes('}).start(onDone), 2200);') && app.includes("backgroundColor: p.run") && app.includes("color: '#0a0a0a'"), 'the toast: the run colour, ink type, 2.2 s');
     const writes = readFileSync(join(dir, 'deck-writes.ts'), 'utf8');
     for (const words of ["'Nothing to log here'", "' logged ✓'", "'Logged ✓'", "' is off today. Tap to put it back.'", "' is back on the card.'", "'Round is off today. Tap to put it back.'", "'Round is back on the card.'"]) assert.ok(writes.includes(words), words);
-    assert.ok(readFileSync(join(dir, 'Deck.tsx'), 'utf8').includes("say('Done ✓');"));
+    // Mark the day done raises the completion pop-up where the toast stood (D179; tests/unit/native-pop-ups.test.ts).
+    assert.ok(!readFileSync(join(dir, 'Deck.tsx'), 'utf8').includes("say('Done ✓');"), 'no toast stands in for the pop-up any more');
     const bugs = readFileSync(join(REPO, 'frontends/native/src/BackupLoad.tsx'), 'utf8');
     assert.ok(bugs.includes('>Loads a backup file into this app and checks every key. Writes nothing back.<'));
     assert.ok(bugs.includes(">Sets you log here stay in this app. Today's app does not see them. Loading a backup replaces everything here.<"));

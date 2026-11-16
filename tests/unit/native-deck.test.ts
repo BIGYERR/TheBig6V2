@@ -392,7 +392,9 @@ describe('native deck: the screen', () => {
     assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={() => onStart(k.week, k.key)}'));
     assert.ok(week.includes('const view = deckView(store, grid, week, key, Date.now(), warn);') && week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn });'));
     const app = strip(readFileSync(join(REPO, 'frontends/native/src/App.tsx'), 'utf8'));
-    assert.ok(app.includes('onDeck={setDeck}') && app.includes('{deck && <Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} say={say} />}'));
+    assert.ok(app.includes('onDeck={setDeck}') && app.includes('<Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}'));
+    // Today's toast stands at z-index 999 and its pop-up overlays at 2000: the nudge and the pop-up are drawn after the toast, so over it.
+    assert.ok(app.indexOf('{over}') > app.indexOf('<Toast ') && app.indexOf('<PopUp ') > app.indexOf('{over}'), 'the deck, the toast, the nudge, the pop-up, each over the last');
     assert.ok(app.indexOf('<Toast ') > app.indexOf('<Deck '), 'the toast is drawn after the deck, so over it');
     assert.ok(app.indexOf('<Deck ') > app.indexOf('testID="tab-bar"'), 'the deck is drawn after the tab bar, so over it');
   });

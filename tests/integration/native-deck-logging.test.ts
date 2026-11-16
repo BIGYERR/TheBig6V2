@@ -7,8 +7,8 @@
 // every field and every toast after each one. This file walks whole histories through it: at each of the five
 // stretches of the standard history (support/stored-state.ts life), a second phone is launched on the keys as they
 // stand, the beta launches on the same keys into its own SQLite store, and every training day of the week in view is
-// worked through its deck on both. The reference is today's page, on purpose. The one exception is named there: the
-// pop-ups' keys, which the page writes and the beta must leave as they stood.
+// worked through its deck on both. The reference is today's page, on purpose. No key is left out: the pop-ups' five
+// families were the one exception until the beta built its pop-ups, and are compared like every other now.
 //
 // Imported first: every launch a phone makes here is a launch of the beta's seam too, held equal key for key
 // (support/native-launch.ts), so each launch after a logged day is compared as well.
@@ -17,16 +17,14 @@ import assert from 'node:assert/strict';
 import { writeFileSync } from 'node:fs';
 import { test } from 'vitest';
 import type { Cfg } from '@ia/core';
-import type { StateStore } from '@ia/core/engine/state-store.ts';
-import type { DeckProgram } from '../../frontends/native/src/deck/deck-screen.ts';
 import { importBackup, misses } from '../../frontends/native/src/store/backup-import.ts';
 import { fixtures } from '../support/app.ts';
 import { DAYS7 } from '../support/native-deck.ts';
 import { POPUP_KEYS, TwoDecks, held, tally, workDay } from '../support/native-deck-logging.ts';
+import { both } from '../support/native-deck-swap.ts';
 import { launches } from '../support/native-launch.ts';
-import { launchNow, nativeGrid } from '../support/native-this-week.ts';
+import { launchNow } from '../support/native-this-week.ts';
 import { PROGRAMS } from '../support/programs.ts';
-import { sqliteTestStore } from '../support/sqlite-kv.ts';
 import { Phone, at, firstWeek, life, training } from '../support/stored-state.ts';
 
 process.env['TZ'] = 'America/New_York';
@@ -34,21 +32,6 @@ const CREATED = '2026-08-29T09:00:00';
 const pad = (n: number): string => String(n).padStart(2, '0');
 const iso = (d: Date): string => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
-/**
- * Both apps on one set of keys: a second phone launched on them at the first one's instant (today's page), and the
- * beta launched on the same keys into its own SQLite store. After the two launches the stores are equal.
- */
-function both(P: Phone): { Q: Phone; store: StateStore; grid: DeckProgram } {
-  const pre = P.dump();
-  const Q = new Phone();
-  for (const [k, v] of Object.entries(pre)) Q.damage(k, v);
-  Q.launch(iso(launchNow(P)));
-  const store = sqliteTestStore();
-  for (const [k, v] of Object.entries(pre)) store.set(k, v);
-  const grid = nativeGrid(Q, store) as unknown as DeckProgram;
-  assert.deepStrictEqual(held(store), Q.dump(), 'after its own launch the beta holds the keys today\'s launch left');
-  return { Q, store, grid };
-}
 
 test('HALF_MANNY through the standard history: every training day of the week in view worked through its deck on both apps, the stores equal after every tap', () => {
   const T = tally();
@@ -75,7 +58,7 @@ test('HALF_MANNY through the standard history: every training day of the week in
   assert.ok(T.steps >= 150 && T.typed >= 300 && T.pills >= 10, 'steppers, typed fields and pills: ' + JSON.stringify(T));
   assert.ok(T.drafts >= 400 && T.logs >= 20 && T.dones >= 60 && T.commits >= 60, 'drafts, Log, Done next one, changes after Log: ' + JSON.stringify(T));
   assert.ok(T.skips >= 25 && T.undos >= 20 && T.marks >= 20 && T.loaded >= 80 && T.toasts >= 80, 'skips, put backs, days marked, loaded moves, toasts: ' + JSON.stringify(T));
-  assert.ok(T.popups >= 20, 'the page\'s pop-up wrote its keys, and the beta left them as they stood: ' + JSON.stringify(T));
+  assert.ok(T.popups >= 20, 'the pop-up after Mark the day done stored its pick, on both: ' + JSON.stringify(T));
 });
 
 test('a backup loaded after logged sets leaves the beta\'s store the file\'s, key for key and hash for hash', () => {
@@ -161,8 +144,8 @@ test('two moves on one day whose keys start alike: each one\'s Log stores its ow
   D.close();
 });
 
-test('nothing the beta stores is a pop-up\'s key unless the keys it was handed held it', () => {
-  // A phone with nothing marked yet: the page's first pop-up writes its keys, and the beta's store holds none.
+test('the first pop-up stores its pick and the button\'s words for the day, in the beta as on the page', () => {
+  // A phone with nothing marked yet: no pop-up's key on either, then the first day marked done writes two on both.
   const P = new Phone().launch(CREATED);
   P.generate(fixtures.HALF_MANNY);
   const { first, start } = firstWeek(P, CREATED);
@@ -173,9 +156,11 @@ test('nothing the beta stores is a pop-up\'s key unless the keys it was handed h
   const T = tally();
   assert.ok(workDay(Q, store, grid, first, days[0]!, 0, T));
   assert.equal(T.marks, 1);
-  assert.ok(Object.keys(Q.dump()).filter((k) => POPUP_KEYS.test(k)).length >= 1, 'today\'s pop-up stored its pick');
-  assert.deepStrictEqual(Object.keys(held(store)).filter((k) => POPUP_KEYS.test(k)), []);
-  // Every other key the beta holds is the page's, and the page holds no other.
-  const page = Q.dump();
-  assert.deepStrictEqual(held(store), Object.fromEntries(Object.keys(page).filter((k) => !POPUP_KEYS.test(k)).map((k) => [k, page[k]])));
+  const id: string = Q.ev('activeProgId');
+  assert.deepStrictEqual(Object.keys(held(store)).filter((k) => POPUP_KEYS.test(k)), ['ia_pop_dismiss_' + id, 'ia_pop_idx_' + id], 'the beta\'s pop-up stored its pick and the button\'s words');
+  // The pick is one line of the workout pool, the words one of the seven, dated the day of the tap.
+  const idx = JSON.parse(store.get('ia_pop_idx_' + id)!) as { workout: number }, dis = JSON.parse(store.get('ia_pop_dismiss_' + id)!) as { date: string; idx: number };
+  assert.ok(Number.isInteger(idx.workout) && idx.workout >= 0 && Number.isInteger(dis.idx) && dis.idx >= 0 && dis.idx < 7 && /^\d{4}-\d{1,2}-\d{1,2}$/.test(dis.date), JSON.stringify([idx, dis]));
+  // Every key the beta holds is the page's, and the page holds no other.
+  assert.deepStrictEqual(held(store), Q.dump());
 });

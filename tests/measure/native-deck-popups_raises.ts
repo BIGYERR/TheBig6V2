@@ -162,6 +162,7 @@ function nudgeCase(name: string, P: any): void {
       if (!day || day.rest || !Array.isArray(day.sections) || !day.sections.length) continue;
       if (Q.ev(`statusOf(${w},${J(d)})`)) continue;
       const D = new TwoDecks(Q, store, grid, w, d, T, name + ' week ' + w + ' ' + d);
+      D.answers = false;   // the measure reads the nudge unanswered, then answers it itself (the walk answers it since the pop-ups were built)
       if (!D.open()) continue;
       let spot: { secIdx: number; itemIdx: number } | null = null; let to: string | null = null; let from: string | null = null;
       for (const c of D.cards()) {

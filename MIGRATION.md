@@ -157,7 +157,8 @@ Each phase starts only on Mario's GO, one phase step per session.
   `deck-writes.ts`; measured first, `tests/measure/native-deck-logging_writes.md`). Held equal to today's page key
   for key after every tap of whole histories and after every launch (`tests/support/native-deck-logging.ts`,
   `native-launch.ts`): 1,246 taps for HALF_MANNY inside the 60-second check, 11,818 across the ten programs in CI.
-  The one difference, on purpose: the beta writes none of the pop-ups' keys, since neither pop-up is built.
+  The one difference then, on purpose: the beta wrote none of the pop-ups' keys, since neither pop-up was built
+  (closed in the fourth session, below).
 - **Done, phase 3's third session, the swap sheet (Post-v0.262.3, no build):** first, a card left blank after a
   swipe on IA Next build 109, proved on the simulator on Mario's backup and fixed (the words carry no opacity; the
   cards behind wear a cover). Then the sheet, opened from a single lift's card and from a move's row, a pick and put
@@ -166,9 +167,17 @@ Each phase starts only on Mario's GO, one phase step per session.
   `tests/measure/native-deck-swap_writes.md`). Held equal to today's: 12,131 sheets across the ten programs, and
   4,677 taps with every key equal after each. Out of the cut, by the measure: remove and add (today's deck reaches
   neither), and the nudge, which waits for the pop-ups.
-- **Next:** Mario's phone on the next IA Next build. Then the opening out of the card and the up and down pager,
-  the completion pop-up, the day-after reminder and the swap nudge, and the deck's ledger rows. Then the session
-  sheet, which brings add, remove and Reopen. Still not
+- **Done, phase 3's fourth session, the swipe's settle and the pop-ups (Post-v0.262.3, no build):** first, Mario's
+  phone on IA Next build 111: the swipe felt off because the beta's cards jumped to their places where today's ease
+  there, fixed (`poseOf`, `travelOf`); the pager and Reopen he also missed are parts not built. Then the three
+  pop-ups: the completion pop-up with its streak and season tiers, the day-after reminder and its answer, and the
+  nudge with Make the change, through three more of core's writers (fifteen now). The pop-ups' code is the page's,
+  line for line (`pop-up/pop-ups.ts`, measured first, `tests/measure/native-deck-popups_raises.md`); the two models
+  are today's files. Held equal to today's over whole programs: 383 launches and 484 pop-ups across the ten, and
+  every `ia_` key equal after every tap with no family left out. Found by the proof, core's and not changed: the
+  engine shares item objects between days and builds (`tests/measure/day-edits_shared-items.md`).
+- **Next:** Mario's phone on the next IA Next build. Then the up and down pager with the opening out of the card,
+  and the deck's ledger rows. Then the session sheet, which brings add, remove and Reopen. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
