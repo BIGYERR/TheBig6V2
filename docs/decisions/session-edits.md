@@ -159,5 +159,5 @@ the history before this file. Tests: `tests/integration/session-edits.test.ts`. 
   change again, and a nudge on a core move is answered both ways (87 due over the ten programs: 44 Make the change,
   34 of them moving a day, 43 Leave the plan alone). Run on the commit before (`tools/tree-at.mjs`), that walk is
   red at the first launch after a swap.
-- **Proof:** the whole suite and every sweep pass (143 files); `tests/snapshots/` untouched; the page's diff is the
-  three hunks above.
+- **Proof:** the whole suite passes in two runs: the unit and integration tests, 105 files and 2,055 tests, and the sweeps, 38 files and 269 tests;
+  `tests/snapshots/` untouched; the page's diff is the three hunks above.
