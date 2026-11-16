@@ -143,7 +143,11 @@ function getDynamicCoreBlock(week: number, role: string, isHardRunToday: boolean
         : [rotOn(T3,_pi(key),T3), rotOn(T3,_pi(key),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
     }
   }
-  return {label:'', core:true, pillar, coreHeader:'Core — '+P[pillar].name, items: items.slice(0,2)};
+  // v0.262.4 (D291, P-OWNITEMS): a copy of each member, never the table's own object. The table holds one object per
+  // member, so the block used to put one Side plank on every day that drew it, and in every program built after: a
+  // skip, a swap or a preference written to it on one day was written on them all, and to the table itself. The
+  // dedup above compares the table's objects, so the copy is made last.
+  return {label:'', core:true, pillar, coreHeader:'Core — '+P[pillar].name, items: items.slice(0,2).map(it=>({...it}))};
 }
 
 // Lift roles that heavily tax legs/posterior chain — the squat day ('legs') and the

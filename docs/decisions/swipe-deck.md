@@ -876,3 +876,11 @@ Tests: `tests/unit/swipe-deck.test.ts`, `tests/integration/swipe-deck.test.ts` a
   and Friday marked done. Not seen there: the reminder (no past day stands unmarked in the copy), the streak and
   season cards, the long gap's words, day mode, and the cards' motion (stills only).
 - **Not seen yet:** Mario's phone.
+
+### The pop-ups' proof after D291 (v0.262.4, 2026-11-15)
+
+D291 P-OWNITEMS (`docs/decisions/session-edits.md`) gave every day items of its own, and the three places this proof
+gave way to the engine's shared items are taken back. `both` hands the walks the launch's own grid, as the app holds
+it, never a copy. After Make the change the program in hand is held equal to the page the tap was made on. A nudge
+on a core, trunk or carry move is answered both ways like any other: 87 due over the ten programs, 44 Make the
+change (34 moving a day of the grid), 43 Leave the plan alone, none spared. The tallies `leaked` and `spared` are gone.

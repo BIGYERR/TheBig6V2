@@ -14,6 +14,7 @@ import { checkCfg, checkLogBook, checkLogEntry, checkProgram, isProgram } from '
 import type { Program } from '@ia/core';
 import { fixtures, loadApp, pinClock } from '../support/app.ts';
 import { PROGRAMS } from '../support/programs.ts';
+import { sharedObjects } from '../support/shared-objects.ts';
 import { stopwatchRig } from '../support/rest-timer.ts';
 
 const TODAY = new Date(2026, 9, 11, 12, 0, 0);
@@ -130,4 +131,34 @@ describe('the session log the app writes has the LogEntry shape', () => {
     ]);
     assert.deepEqual(checkLogBook({ 'week1-mon': {} }).problems, ['log: key "week1-mon" is not w<week>_<day>']);
   });
+});
+
+// D291 P-OWNITEMS (docs/decisions/session-edits.md): a built program hands every day items of its own. The core block
+// drew two members of a pillar and handed back the table's own objects, so one Suitcase carry stood on three days of
+// Mario's program and in every program built after it. Identity only: what each item holds is the golden files'.
+describe('D291: every item of a built program is an object of its own', () => {
+  test('HALF_MANNY: Suitcase carry stands in the core block of three days, as three objects with one name and dose', () => {
+    const p = IA.buildProgram(fixtures.HALF_MANNY) as { weeks: Record<string, Record<string, { sections: { items: { name: string; detail: string }[] }[] }>> };
+    // Read off the build (tests/measure/day-edits_shared-items.md): week 1 Tuesday, week 6 Friday, week 7 Tuesday.
+    const three = [p.weeks['1']!['tue']!.sections[3]!.items[0]!, p.weeks['6']!['fri']!.sections[2]!.items[1]!, p.weeks['7']!['tue']!.sections[3]!.items[1]!];
+    assert.deepEqual(three.map((it) => [it.name, it.detail]), [['Suitcase carry', '3×40 yd each'], ['Suitcase carry', '3×40 yd each'], ['Suitcase carry', '3×40 yd each']]);
+    assert.equal(new Set(three).size, 3, 'three days, three objects');
+    // A mark made on one is on that one alone.
+    (three[0] as { _skipped?: boolean })._skipped = true;
+    assert.deepEqual(three.map((it) => !!(it as { _skipped?: boolean })._skipped), [true, false, false]);
+    // And the next build of the same config does not carry it: the engine's table was not written to.
+    const again = IA.buildProgram(fixtures.HALF_MANNY) as typeof p;
+    assert.equal((again.weeks['1']!['tue']!.sections[3]!.items[0] as { _skipped?: boolean })._skipped, undefined);
+  });
+
+  // Two of the ten held none before the fix (the 10k on home basic and the bodyweight run base, whose later passes
+  // rebuild their items): their two tests pass on the release before too, and stay as the guard for those tiers.
+  for (const [name, cfg] of [['half-manny, the fixture', fixtures.HALF_MANNY] as const, ...Object.entries(PROGRAMS)]) {
+    test(name + ': no object stands in two places, and none is in the next build', () => {
+      const s = sharedObjects({ weeks: IA.buildProgram(cfg).weeks }, { weeks: IA.buildProgram(cfg).weeks });
+      assert.ok(s.objects > 500, 'the walk reached the grid: ' + s.objects + ' objects');
+      assert.deepEqual(s.twice, [], 'an object reached by two paths of one build');
+      assert.deepEqual(s.ours, [], 'an object of one build found in the next');
+    });
+  }
 });

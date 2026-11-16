@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F3F1">
-<meta name="ia-version" content="0.262.3">
+<meta name="ia-version" content="0.262.4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -9280,7 +9280,11 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
         : [rotOn(T3,_pi(key),T3), rotOn(T3,_pi(key),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
     }
   }
-  return {label:'', core:true, pillar, coreHeader:'Core — '+P[pillar].name, items: items.slice(0,2)};
+  
+  
+  
+  
+  return {label:'', core:true, pillar, coreHeader:'Core — '+P[pillar].name, items: items.slice(0,2).map(it=>({...it}))};
 }
 
 

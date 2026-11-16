@@ -174,8 +174,10 @@ Each phase starts only on Mario's GO, one phase step per session.
   nudge with Make the change, through three more of core's writers (fifteen now). The pop-ups' code is the page's,
   line for line (`pop-up/pop-ups.ts`, measured first, `tests/measure/native-deck-popups_raises.md`); the two models
   are today's files. Held equal to today's over whole programs: 383 launches and 484 pop-ups across the ten, and
-  every `ia_` key equal after every tap with no family left out. Found by the proof, core's and not changed: the
-  engine shares item objects between days and builds (`tests/measure/day-edits_shared-items.md`).
+  every `ia_` key equal after every tap with no family left out. Found by the proof, core's: the engine shared
+  item objects between days and builds (`tests/measure/day-edits_shared-items.md`). Fixed on Mario's word in the
+  same chat as v0.262.4 (D291 P-OWNITEMS, `docs/decisions/session-edits.md`): the core block hands back copies, no
+  program's output moved, and the walks run on the launch's own grid again.
 - **Next:** Mario's phone on the next IA Next build. Then the up and down pager with the opening out of the card,
   and the deck's ledger rows. Then the session sheet, which brings add, remove and Reopen. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a

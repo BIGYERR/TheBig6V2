@@ -20,7 +20,8 @@ import { DAYS7 } from './native-deck.ts';
 import { type Tally, TwoDecks, held, pageSheet } from './native-deck-logging.ts';
 import type { PopSession } from '../../frontends/native/src/pop-up/pop-ups.ts';
 import { pops, sameReminder, seedBoth } from './native-pop-ups.ts';
-import { launchNow, nativeGrid } from './native-this-week.ts';
+import { liveProgram } from '../../frontends/native/src/this-week/week-screen.ts';
+import { launchNow } from './native-this-week.ts';
 import { sqliteTestStore } from './sqlite-kv.ts';
 import { Phone } from './stored-state.ts';
 
@@ -31,7 +32,9 @@ export const iso = (d: Date): string => `${d.getFullYear()}-${pad(d.getMonth() +
 let launched = 0;
 /**
  * Both apps on one set of keys: a second phone launched on them at the first one's instant (today's page), and the
- * beta launched on the same keys into its own SQLite store. After the two launches the stores are equal. Then the
+ * beta launched on the same keys into its own SQLite store. After the two launches the stores are equal. The grid
+ * handed back is the launch's own, as the app holds it, never a copy: an edit the walk makes is made on the objects
+ * the engine built (D291; a copy hid that the engine once shared some of them between days and builds). Then the
  * launch's reminder, which today's raises 600 ms in: the same pop-up on both, or none, left unanswered, and the
  * stores equal after it (support/native-pop-ups.ts answers one, over whole programs).
  */
@@ -42,7 +45,8 @@ export function both(P: Phone): { Q: Phone; store: StateStore; grid: DeckProgram
   Q.launch(iso(launchNow(P)));
   const store = sqliteTestStore();
   for (const [k, v] of Object.entries(pre)) store.set(k, v);
-  const grid = nativeGrid(Q, store) as unknown as DeckProgram;
+  const grid = liveProgram(store, launchNow(Q).getTime(), { overlay: () => {}, freeze: () => {}, rebuild: () => {} }) as unknown as DeckProgram;
+  assert.ok(grid, 'the store holds an active program');
   assert.deepStrictEqual(held(store), Q.dump(), 'after its own launch the beta holds the keys today\'s launch left');
   pops(Q);
   sameReminder(Q, { store, prog: grid } as unknown as PopSession, seedBoth(Q, (++launched * 69069 + 1) % 4294967296), null, 'the launch both apps made');

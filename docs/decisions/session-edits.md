@@ -78,7 +78,7 @@ the history before this file. Tests: `tests/integration/session-edits.test.ts`. 
 
 - **Date:** 2026-11-15. **Who ruled:** Mario, on the finding put to him after the pop-ups' proof met it ("what shared
   items fix", then "yeah lets fix that !"). The session recommended it ahead of the pager, as its own release.
-  **Bump:** asked of him before the first edit. **Release:** filled in when it ships.
+  **Bump:** PATCH, his pick of three ("PATCH, 0.262.4 (Recommended)"). **Release:** v0.262.4 (2026-11-15).
 - **The finding** (`tests/measure/day-edits_shared-items.md`, `tests/measure/day-edits_shared-objects.md`):
   - *The cause.* The core block hands out its table's own objects. `getDynamicCoreBlock`
     (`core/src/engine/core-legs.ts`) draws two members of a pillar of `CORE_PILLARS` (`prehab.ts`) and returns them
@@ -128,3 +128,36 @@ the history before this file. Tests: `tests/integration/session-edits.test.ts`. 
 - **Then, in the walks:** the three places the pop-ups' proof gave way to this (`docs/decisions/swipe-deck.md`) are
   taken back: the program after Make the change is held equal to the page the tap was made on, a nudge on a core
   move is answered both ways, and one walk runs on the grid as the app holds it.
+
+## D291 as built (v0.262.4, 2026-11-15)
+
+- **The change:** one line of `core/src/engine/core-legs.ts`: `getDynamicCoreBlock` returns
+  `items.slice(0,2).map(it=>({...it}))`, after its dedup, which compares the table's objects. On the page: that line,
+  four blank lines where its comment stood, and the version.
+- **What moved, against the ruling's three:**
+  1. *In hand:* as ruled. Suitcase carry skipped on week 1 Tuesday of THE HALF MANNY is skipped there and not on
+     week 6 Friday or week 7 Tuesday, in the launch it was made in and after a fresh one; swapped, it keeps its name
+     on the other two.
+  2. *Golden records of stored state:* none moved. No history of the records skips or swaps one of these moves on a
+     day whose mark reached a recorded grid. `tests/snapshots/` has no diff.
+  3. *A preference for one of these moves* (`tests/measure/day-edits_core-preference.md`, each config on a fresh
+     page of 0.262.3 and of this release): 162 preferences tried over HALF_MANNY and the ten programs; 149 build the
+     same program on both, 13 differ on one or two days. What a preference is ruled to give is the plain program
+     with the trade made wherever the move stands: 148 of 162 before, 161 of 162 now. The 13 were the table renamed
+     part way through a build: Windshield wipers at Suitcase carry's 3×40 yd each on week 14 Wednesday of the
+     marathon program, a second member drawn into week 2 Tuesday's block of THE HALF MANNY that the plain program
+     does not hold. The one left is the bodyweight tier's later substitution (not ruled, above).
+- **Does not change:** all 864 digests of the lattice and HALF_MANNY's; with no preference all eleven programs are
+  the same on both pages.
+- **Tests:** `tests/integration/program-shape.test.ts` (D291: Suitcase carry on three days as three objects, a mark
+  on one alone, the next build clean; no object shared in HALF_MANNY and each of the ten programs),
+  `tests/sweeps/program-shape.test.ts` (the 864 lattice programs: 1,010,495 objects, none shared),
+  `tests/integration/session-edits.test.ts` (the skip and the swap on today's page, in the launch and after a fresh
+  one), with `tests/support/shared-objects.ts`. On the 0.262.3 page (`IA_APP`): 13 of the 15 fail; the two that
+  pass are the two programs that held none (said in the file). The walks: `tests/support/native-deck-swap.ts`
+  `both` hands the launch's own grid, never a copy, the page the tap was made on is the reference after Make the
+  change again, and a nudge on a core move is answered both ways (87 due over the ten programs: 44 Make the change,
+  34 of them moving a day, 43 Leave the plan alone). Run on the commit before (`tools/tree-at.mjs`), that walk is
+  red at the first launch after a swap.
+- **Proof:** the whole suite and every sweep pass (143 files); `tests/snapshots/` untouched; the page's diff is the
+  three hunks above.
