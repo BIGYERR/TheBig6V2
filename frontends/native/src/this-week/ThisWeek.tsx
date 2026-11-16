@@ -17,6 +17,7 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Bag, Calendar, Check, CoreIcon, Cross, Die, Dumbbell, Fade, Flag, Glow, Play, RecDot, Runner, WildcardMark } from './marks';
+import { type SheetOpen, type SheetProgram, sheetView } from '../day-detail/sheet-screen';
 import { type DeckOpen, type DeckProgram, deckView } from '../deck/deck-screen';
 import type { GrowBox } from '../deck/grow-motion';
 import { BLANK, PLAN_CHANGE_FAILED, drawWeek, launch, launchTitle, pillArrow, pillParts, tokenOf } from './week-screen';
@@ -39,12 +40,14 @@ const TAB_ROOM = 96;
 
 type Tint = keyof Pick<Palette, 'run' | 'bike' | 'swim' | 'lift' | 'signal' | 'dim'>;
 
-export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
+export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLaunch }: {
   palette: Palette; store: StateStore; tick: number;
   /** The program Make the change handed back since the launch, to hold in place of the launch's own; null for none. */
   held: DeckProgram | null;
   /** Start lift, Start session: the day as a deck, and the card it opens out of (call 16) when its place is known. */
   onDeck: (deck: DeckOpen, from: DeckFrom | null) => void;
+  /** Reopen on a done lift, and Start where the day opens no deck: the day's session sheet (D278 item 4; deck.ts open()). */
+  onSheet: (sheet: SheetOpen) => void;
   /** Each launch, with the program it handed back: the app raises the day-after reminder 600 ms on (bug-report-init.ts). */
   onLaunch: (prog: DeckProgram | null) => void;
 }) {
@@ -159,14 +162,21 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
   const [headH, setHeadH] = useState(0);
   const [stripH, setStripH] = useState(0);
   const pill = pillParts(view.pill.html);
-  // Start lift, Start session: the day opened as a deck, or nothing where today's app opens the day sheet instead (a
-  // day whose only card is its cool down), which this app does not draw yet.
+  // The day's session sheet, whole (week-view.ts openDay).
+  const openSheet = (week: number, key: string): void => {
+    if (!prog) return;
+    const grid = prog as unknown as SheetProgram;
+    const view = sheetView(store, grid, week, key, Date.now());
+    if (view) onSheet({ prog: grid, week, dayKey: key, view });
+  };
+  // Start lift, Start session: the day opened as a deck, or as its session sheet where today's app opens that instead
+  // (a day whose only card is its cool down; deck.ts open()).
   const startDeck = (week: number, key: string, from: DeckFrom | null): void => {
     if (!prog) return;
     const grid = prog as unknown as DeckProgram;
     const warn = { shown: false, src: '' };
     const view = deckView(store, grid, week, key, Date.now(), warn);
-    if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from);
+    if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from); else openSheet(week, key);
   };
 
   const pillInk = view.pill.cls.includes('recovery');
@@ -245,7 +255,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
         )}
 
         <View style={s.days}>
-          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} />}
+          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} onReopen={openSheet} />}
         </View>
 
         <View style={s.settings}>
@@ -263,7 +273,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
   );
 }
 
-function Days({ d, p, onPick, onStart }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string, from: DeckFrom | null) => void }) {
+function Days({ d, p, onPick, onStart, onReopen }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string, from: DeckFrom | null) => void; onReopen: (week: number, key: string) => void }) {
   const s = styles;
   const first = d.cards[0];
   return (
@@ -271,7 +281,7 @@ function Days({ d, p, onPick, onStart }: { d: DaysView; p: Palette; onPick: (col
       <View testID="week-days" accessibilityLabel="Pick a day" style={[s.week, { backgroundColor: p.surface }]}>
         {d.strip.map((c, i) => <Col key={i} c={c} i={i} p={p} onPick={onPick} />)}
       </View>
-      {d.cards.map((k) => <Card key={k.kind} k={k} p={p} onStart={onStart} />)}
+      {d.cards.map((k) => <Card key={k.kind} k={k} p={p} onStart={onStart} onReopen={onReopen} />)}
       {d.rest && (
         <View testID="week-card-rest" style={[s.card, s.cardFirst, { backgroundColor: p.surface }]}>
           <View style={s.head}><Text numberOfLines={1} style={[s.label, { color: p.muted }]}>{d.rest.when}</Text></View>
@@ -357,7 +367,7 @@ export interface DeckFrom { box: GrowBox; card: DayCard }
  * A card of the day. With `copy` it is the copy the deck opens out of (grow-motion.ts growCopy): its label, name and
  * summary on no ground of its own, without its skip pill, its button or Reopen.
  */
-export function Card({ k, p, onStart, copy }: { k: DayCard; p: Palette; onStart?: (week: number, key: string, from: DeckFrom | null) => void; copy?: boolean }) {
+export function Card({ k, p, onStart, onReopen, copy }: { k: DayCard; p: Palette; onStart?: (week: number, key: string, from: DeckFrom | null) => void; onReopen?: (week: number, key: string) => void; copy?: boolean }) {
   const s = styles;
   const box = useRef<ComponentRef<typeof View>>(null);
   /** Start: the card's place on the screen goes with it, or none when the screen cannot say. */
@@ -400,7 +410,8 @@ export function Card({ k, p, onStart, copy }: { k: DayCard; p: Palette; onStart?
               <Text numberOfLines={1} style={[s.doneTitle, { color: p.text }]}>{k.done.title}</Text>
               <Text numberOfLines={1} style={[s.doneLine, { color: p.muted }]}>{k.done.line}</Text>
             </View>
-            {!copy && <Text accessibilityRole="button" style={[s.reopen, { color: p.signal }]}>Reopen</Text>}
+            {/* A done lift reopens the whole day (D278 item 4, cardRoute); a done run reopens its own sheet, which is not built yet. */}
+            {!copy && <Text testID={'week-reopen-' + k.kind} accessibilityRole="button" suppressHighlighting onPress={k.kind === 'lift' && onReopen ? () => onReopen(k.week, k.key) : undefined} style={[s.reopen, { color: p.signal }]}>Reopen</Text>}
           </View>
         )}
         {bt && !copy && (

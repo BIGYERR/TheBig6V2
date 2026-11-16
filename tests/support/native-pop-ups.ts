@@ -66,7 +66,7 @@ export function pops(P: Phone): Raised[] {
 }
 
 /** The beta's pop-up for a call, as plain data, beside the page's. */
-function sameView(s: PopSession, call: PopCall, now: Date, random: () => number, page: Raised | undefined, what: string): PopView {
+export function sameView(s: PopSession, call: PopCall, now: Date, random: () => number, page: Raised | undefined, what: string): PopView {
   const view = plain(popOf(s, call, now, random));
   assert.ok(page, what + ': the beta raises a ' + call.tier + ' pop-up and today\'s raises none');
   assert.equal(call.tier, page.tier, what + ': the tier');

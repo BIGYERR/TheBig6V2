@@ -1,7 +1,8 @@
 // The Expo app (MIGRATION.md phases 2 and 3). Two tabs, as today's app names them: This Week (phase 2, session 4),
 // drawn from the stored state, whose Start lift opens the swipe deck (phase 3, its first screen), which logs into
 // this app's own SQLite store (D289), with the pop-ups today's app raises over it (the completion pop-up after Mark
-// the day done, the day-after reminder 600 ms after a launch, and its answer); and Bugs: the engine check under Hermes (session 1), the Backup row, a backup
+// the day done, the day-after reminder 600 ms after a launch, and its answer), and whose Reopen on a done lift opens the
+// day's session sheet (phase 3, its second screen: day-detail/SessionSheet.tsx); and Bugs: the engine check under Hermes (session 1), the Backup row, a backup
 // loaded into that store in place of everything in it (session 2), and one line saying whether the app's own Swift
 // module answered (session 3, the native spike). Programs and Progress are today's app's still (phase 3).
 import { StatusBar } from 'expo-status-bar';
@@ -11,6 +12,8 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { VERSION } from '@ia/core';
 
 import { BackupLoad } from './BackupLoad';
+import { SessionSheet } from './day-detail/SessionSheet';
+import type { SheetOpen } from './day-detail/sheet-screen';
 import { DeckOpening } from './deck/DeckOpening';
 import type { DeckOpen, DeckProgram } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
@@ -50,6 +53,8 @@ function Shell() {
   const [tick, setTick] = useState(0);
   // The day open as a swipe deck, over the whole screen and the tab bar (deck.css: above the tab bar), or none.
   const [deck, setDeck] = useState<{ open: DeckOpen; from: DeckFrom | null } | null>(null);
+  // The day open as its session sheet, over the whole screen and the tab bar, or none.
+  const [sheet, setSheet] = useState<SheetOpen | null>(null);
   // This Week's size under the deck (D275 call 16): 96% while the deck is open, its own again as it closes.
   const under = useRef(new Animated.Value(1)).current;
   // Today's toast (rest-day-shell.ts showToast): one line over everything, gone after 2.2 s.
@@ -100,7 +105,7 @@ function Shell() {
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
       {tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
-          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={(open, from) => setDeck({ open, from })} onLaunch={launched} />
+          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={setSheet} onLaunch={launched} />
         </Animated.View>
       ) : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
@@ -110,6 +115,10 @@ function Shell() {
       {deck && (
         <DeckOpening palette={p} store={phoneStore} open={deck.open} from={deck.from} calm={calm} under={under} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}
           onDone={(prog, week, dayKey) => { setDeck(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
+      )}
+      {sheet && (
+        <SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
+          onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
       {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
       {over}
