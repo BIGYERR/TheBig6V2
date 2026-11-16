@@ -178,8 +178,18 @@ Each phase starts only on Mario's GO, one phase step per session.
   item objects between days and builds (`tests/measure/day-edits_shared-items.md`). Fixed on Mario's word in the
   same chat as v0.262.4 (D291 P-OWNITEMS, `docs/decisions/session-edits.md`): the core block hands back copies, no
   program's output moved, and the walks run on the launch's own grid again.
-- **Next:** Mario's phone on the next IA Next build. Then the up and down pager with the opening out of the card,
-  and the deck's ledger rows. Then the session sheet, which brings add, remove and Reopen. Still not
+- **Done, phase 3's fifth session, the pager and the opening (Post-v0.262.4, no build):** first, Mario's phone on
+  IA Next build 114, "All same as today's" to the whole list. Then D275's call 1 and call 16 in the Expo app, with
+  today's numbers: two taps inside 320 ms turn the deck between sideways and an up and down pager (no fan, a slide
+  of 290 ms past 80 points, the dots in a column, Done, next one up and away over 760 ms), and the deck opens out
+  of the card that started it and closes back into it (lift 168 ms, open 420, close 357). Found by reading and
+  fixed: a deck of two cards pulled to the right jumped as it was let go. Found by the simulator and fixed: a
+  lift that never showed, and a dot after a slide that left the card before on the screen. Nothing built writes;
+  87 breaks, none let through. The deck's four ledger rows are filled (`docs/decisions/swipe-deck.md`, the entry of
+  that name).
+- **Next:** Mario's phone on the next IA Next build: the double tap, the pager and the opening are judged there, and
+  so is the done motion, which the simulator's recordings stall in and cannot place
+  (`tests/measure/native-deck-pager_frames.md`). Then the session sheet, which brings add, remove and Reopen. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,

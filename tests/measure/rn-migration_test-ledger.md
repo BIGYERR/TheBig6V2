@@ -22,7 +22,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/unit/page-comments.test.ts` | 10 | 13 | source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/semver.test.ts` | 20 | 79 | @ia/core, source read | KEEP: repo tooling, while the tool exists | | |
 | `tests/unit/stored-state.test.ts` | 37 | 144 | page, script text, @ia/core | RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1) | | |
-| `tests/unit/swipe-deck.test.ts` | 31 | 130 | Angular source, source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
+| `tests/unit/swipe-deck.test.ts` | 31 | 130 | Angular source, source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | `tests/unit/native-deck.test.ts` (the Expo deck's readers, seam and screen: the cards, the swipe, the double tap, the pager, the opening). The model's own assertions stay on this file until cutover: the Expo app's copy of `deck-model.ts` is held equal to it byte for byte. Red on its breaks: `native-deck-pager_breaks.md` (87 of 87), `native-deck-logging_breaks.md`, `native-deck-swap_breaks.md` | 44 / 280 |
 | `tests/unit/tab-bar.test.ts` | 31 | 74 | lifted fn, script text, source read | RETIRE at cutover: the web view or stylesheet it tests is gone; behaviour that survives gets a screen test | | |
 | `tests/unit/this-week-hero.test.ts` | 14 | 77 | Angular source | KEEP: drives no page | | |
 | `tests/unit/tree-at.test.ts` | 4 | 18 | Angular source, source read | KEEP: repo tooling, while the tool exists | | |
@@ -83,7 +83,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/integration/swap-durability.test.ts` | 9 | 30 | page | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/integration/swaps.test.ts` | 39 | 145 | page, script text | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/integration/swim.test.ts` | 35 | 115 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
-| `tests/integration/swipe-deck.test.ts` | 8 | 32 | page, Angular source | RE-POINT at `@ia/core`: same assertions, no page booted | | |
+| `tests/integration/swipe-deck.test.ts` | 8 | 32 | page, Angular source | RE-POINT at `@ia/core`: same assertions, no page booted | `tests/integration/native-deck.test.ts` (every day's cards and deck equal to today's over the standard history), with `tests/integration/native-deck-logging.test.ts` (5 tests, 32 assertions: a skip, a log and Call it against the page, every `ia_` key equal). Fewer tests, each over a whole history | 4 / 33 |
 | `tests/integration/test-length.test.ts` | 26 | 103 | page, script text | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/integration/test-week.test.ts` | 29 | 104 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/integration/this-week-hero.test.ts` | 12 | 26 | page, Angular source | RE-POINT at `@ia/core`: same assertions, no page booted | | |
@@ -118,7 +118,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/sweeps/stored-state.test.ts` | 3 | 9 | page | RE-POINT at `@ia/core`: the golden records of stored state; the same histories driven through core once the logic has moved (confirmed by hand, phase 1) | | |
 | `tests/sweeps/swaps.test.ts` | 18 | 47 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/sweeps/swim.test.ts` | 9 | 28 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
-| `tests/sweeps/swipe-deck.test.ts` | 3 | 6 | page, Angular source | RE-POINT at `@ia/core`: same assertions, no page booted | | |
+| `tests/sweeps/swipe-deck.test.ts` | 3 | 6 | page, Angular source | RE-POINT at `@ia/core`: same assertions, no page booted | `tests/sweeps/native-deck.test.ts` (the ten seeded programs, 50 launches, every training day). One test walks all ten, where this file has three | 1 / 9 |
 | `tests/sweeps/test-length.test.ts` | 4 | 10 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/sweeps/test-week.test.ts` | 5 | 16 | page | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/sweeps/week-view.test.ts` | 5 | 7 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
@@ -131,7 +131,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `frontends/app/test/unit/cardio-sheet.test.ts` | 11 | 29 | source read | REPLACE by a React Native screen test (phase 2 or 3): model assertions kept, template reads rewritten | | |
 | `frontends/app/test/unit/change-sheet.test.ts` | 8 | 29 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/day-detail.test.ts` | 9 | 22 | own code | KEEP: a pure model the new screen reuses | | |
-| `frontends/app/test/unit/deck.test.ts` | 10 | 26 | source read | REPLACE by a React Native screen test (phase 2 or 3): model assertions kept, template reads rewritten | | |
+| `frontends/app/test/unit/deck.test.ts` | 10 | 26 | source read | REPLACE by a React Native screen test (phase 2 or 3): model assertions kept, template reads rewritten | `tests/unit/native-deck.test.ts` (the screen's text: a card, the fold, the motions, the opening at Lift first, 420 ms) and `tests/unit/native-deck-logging.test.ts` (26 tests, 144 assertions: Call it's write, the taps). A screen test by Jest waits for the session that sets that runner up (MIGRATION.md 3.2) | 44 / 280 |
 | `frontends/app/test/unit/dot-chart.test.ts` | 4 | 13 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/goal-sheet.test.ts` | 6 | 13 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/ledger.test.ts` | 7 | 24 | own code | KEEP: a pure model the new screen reuses | | |

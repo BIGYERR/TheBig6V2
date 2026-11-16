@@ -19,6 +19,7 @@ import {
 import {
   DOUBLE_TAP, type DeckProgram, PAGER_GAP, TAP_SLOP, coverOf, dayCards, deckView, isTap, pagerPose, pagerTakes, pagerY, poseOf, shaded, slotsFrom, swipeTo, tapped, toneColor, travelOf,
 } from '../../frontends/native/src/deck/deck-screen.ts';
+import { GROW_LAYOUT, GROW_START, GROW_STILL, growCurve, growFrames, growPlan } from '../../frontends/native/src/deck/grow-motion.ts';
 
 const DAY = 86400000;
 const NOW = new Date(2026, 10, 14, 12, 0, 0).getTime();
@@ -227,7 +228,7 @@ describe('native deck: a day opened as a deck', () => {
 describe('native deck: drawing writes nothing', () => {
   const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
   test('the readers, the seam, the models and the fields call none of core\'s writers and write no key', () => {
-    const files = ['deck/deck-model.ts', 'deck/deck-readers.ts', 'deck/deck-screen.ts', 'deck/set-fields.ts', 'day-detail/session-sections-model.ts'];
+    const files = ['deck/deck-model.ts', 'deck/deck-readers.ts', 'deck/deck-screen.ts', 'deck/set-fields.ts', 'deck/grow-motion.ts', 'deck/DeckOpening.tsx', 'day-detail/session-sections-model.ts'];
     const code = strip(files.map((f) => readFileSync(join(REPO, 'frontends/native/src', f), 'utf8')).join('\n'));
     assert.ok(code.length > 30000, 'the files were read');
     assert.doesNotMatch(code, /\b\w*[sS]tore\.(set|remove)\(/, 'no store write');
@@ -395,14 +396,14 @@ describe('native deck: the screen', () => {
   test('This Week\'s Start lift and Start session open it, over the tab bar; a sunk button and the run\'s buttons open nothing', () => {
     const week = strip(readFileSync(join(REPO, 'frontends/native/src/this-week/ThisWeek.tsx'), 'utf8'));
     assert.ok(week.includes("const starts = !!bt && bt.act === 'deck' && !bt.sunk;"));
-    assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={() => onStart(k.week, k.key)}'));
-    assert.ok(week.includes('const view = deckView(store, grid, week, key, Date.now(), warn);') && week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn });'));
+    assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={start}'));
+    assert.ok(week.includes('const view = deckView(store, grid, week, key, Date.now(), warn);') && week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from);'));
     const app = strip(readFileSync(join(REPO, 'frontends/native/src/App.tsx'), 'utf8'));
-    assert.ok(app.includes('onDeck={setDeck}') && app.includes('<Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}'));
+    assert.ok(app.includes('onDeck={(open, from) => setDeck({ open, from })}') && app.includes('<DeckOpening palette={p} store={phoneStore} open={deck.open} from={deck.from} calm={calm} under={under} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}'));
     // Today's toast stands at z-index 999 and its pop-up overlays at 2000: the nudge and the pop-up are drawn after the toast, so over it.
     assert.ok(app.indexOf('{over}') > app.indexOf('<Toast ') && app.indexOf('<PopUp ') > app.indexOf('{over}'), 'the deck, the toast, the nudge, the pop-up, each over the last');
-    assert.ok(app.indexOf('<Toast ') > app.indexOf('<Deck '), 'the toast is drawn after the deck, so over it');
-    assert.ok(app.indexOf('<Deck ') > app.indexOf('testID="tab-bar"'), 'the deck is drawn after the tab bar, so over it');
+    assert.ok(app.indexOf('<Toast ') > app.indexOf('<DeckOpening '), 'the toast is drawn after the deck, so over it');
+    assert.ok(app.indexOf('<DeckOpening ') > app.indexOf('testID="tab-bar"'), 'the deck is drawn after the tab bar, so over it');
   });
 
   // Found reading the beta against today's for the pager (tests/measure/native-deck-pager_today.md): on a deck of two
@@ -596,5 +597,87 @@ describe('native deck: the double tap and the up and down pager (D275 call 1)', 
     const turn = code.slice(code.indexOf('const cardTap = '), code.indexOf('const foldOf = '));
     assert.ok(turn.includes('liftV.setValue(0);') && turn.includes('glowV.setValue(0);'));
     assert.doesNotMatch(code, /leaveV\.interpolate\(\{ inputRange: \[0, 2\], outputRange: \[(stride|-10)/, 'no card is moved by a value of its own up and down');
+  });
+});
+
+// D275 call 16 (Mario, 2026-11-08, on the canvas's THE MOCKUP): "i like the lift first at 420 ms". Every number is
+// typed by hand from the ruling's own list (docs/decisions/swipe-deck.md, call 16), which today's grow-motion.ts
+// plays: lift 168 ms, open 420, close 357, the deck's fade 294 after 84, the copy's 126, and back from 161 to 286.
+describe('native deck: the opening out of the card, Lift first at 420 ms (D275 call 16)', () => {
+  const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+  const read = (f: string): string => strip(readFileSync(join(REPO, 'frontends/native/src', f), 'utf8'));
+  const opening = read('deck/DeckOpening.tsx');
+
+  test('the frame rests on the card, on the card lifted, and on the whole screen', () => {
+    // A card 370 by 220 at 16 across and 300 down, on Mario's phone (402 by 874).
+    assert.deepStrictEqual(growFrames({ t: 300, l: 16, w: 370, h: 220 }, 402, 874), {
+      card: { t: 300, l: 16, w: 370, h: 220, r: 24 },
+      lifted: { t: 290, l: 8, w: 386, h: 240, r: 28 },
+      full: { t: 0, l: 0, w: 402, h: 874, r: 0 },
+    });
+  });
+
+  test('before anything moves the deck is drawn at the card\'s place, hidden at 94%, under the copy', () => {
+    assert.deepStrictEqual(GROW_START, { frame: 0, shut: 0, scrim: 0, week: 1, copyFade: 1, copyScale: 1, copyFill: 0, deckFade: 0, deckScale: 0.94 });
+    assert.deepStrictEqual(GROW_STILL, { frame: 2, shut: 0, scrim: 0, week: 1, copyFade: 0, copyScale: 1, copyFill: 0, deckFade: 1, deckScale: 1 });
+  });
+
+  test('the lift, the open and the close move each part by the ruling\'s numbers', () => {
+    const P = growPlan();
+    const row = (s: { part: string; to: number; ms: number; delay: number; ease: string }): string => [s.part, s.to, s.ms, s.delay, s.ease].join(' ');
+    // Lift, 168 ms: the scrim to 30%; the copy to 1.04 and one step lighter; the frame to the card lifted.
+    assert.deepStrictEqual(P.lift.map(row), ['scrim 0.3 168 0 ease', 'copyScale 1.04 168 0 lift', 'copyFill 1 168 0 lift', 'frame 1 168 0 lift']);
+    // Open, 420 ms: This Week to 96%; the scrim to 55%; the copy out over 126; the frame to the whole screen; the
+    // deck in over 294 after 84, and to full size.
+    assert.deepStrictEqual(P.open.map(row), ['week 0.96 420 0 open', 'scrim 0.55 420 0 open', 'copyFade 0 126 0 ease', 'frame 2 420 0 open', 'deckFade 1 294 84 ease', 'deckScale 1 420 0 open']);
+    // Close, 357 ms: This Week and the scrim back; the copy back from 161 ms to 286, flat, on a card's own ground;
+    // the frame straight back to the card; the deck out over 143 and back to 94%.
+    assert.deepStrictEqual(P.close.map(row), ['week 1 357 0 close', 'scrim 0 357 0 close', 'copyFade 1 125 161 ease', 'copyScale 1 357 0 close', 'copyFill 2 357 0 ease', 'shut 1 357 0 close', 'deckFade 0 143 0 ease', 'deckScale 0.94 357 0 close']);
+    assert.equal(161 + 125, 286);
+    assert.equal(168 + 420, 588, 'open to settled');
+    // The curves: the ruling's three, and CSS ease.
+    assert.deepStrictEqual([growCurve('lift'), growCurve('open'), growCurve('close'), growCurve('ease')], [[0.3, 0, 0.2, 1], [0.05, 0.7, 0.1, 1], [0.3, 0, 0.8, 0.15], [0.25, 0.1, 0.25, 1]]);
+    // No stage moves a part twice.
+    for (const steps of [P.lift, P.open, P.close]) assert.equal(new Set(steps.map((s) => s.part)).size, steps.length);
+    assert.deepStrictEqual(GROW_LAYOUT, ['frame', 'shut', 'copyFill'], 'a box or a colour is moved by the screen; a fade or a size by the phone');
+  });
+
+  test('the screen: drawn first, then the lift, then the open; Back and Mark the day done play it back before the app takes the deck away', () => {
+    assert.ok(opening.includes('waits.current = { frame: requestAnimationFrame(() => requestAnimationFrame(lift)), held: setTimeout(lift, 64) };'), 'two frames, or 64 ms when frames are held back');
+    assert.ok(opening.includes('<Animated.View testID="deck-frame" onLayout={drawn} style={{') && opening.includes('if (!moves || waits.current) return;'), 'counted from the frame being on the screen, once');
+    assert.ok(opening.includes("run(plan.lift, () => run(plan.open, () => setStage('open')));"));
+    // The deck is drawn once: drawing every card takes longer than the lift lasts (seen in the simulator's frames,
+    // where a deck drawn again at each stage showed no lift at all).
+    assert.ok(opening.includes('const body = useMemo(() => (') && opening.includes('), [palette, store, open, onProgram, onOver, say]);'));
+    assert.doesNotMatch(opening, /setStage\('(pre|lift|in)'\)/, 'no stage is set between drawn and open');
+    assert.ok(opening.includes('toValue: s.to, duration: s.ms, delay: s.delay, easing: Easing.bezier(...growCurve(s.ease)), useNativeDriver: !GROW_LAYOUT.includes(s.part),'));
+    assert.ok(opening.includes('onClose={() => way.current.close(way.current.onClose)}') && opening.includes('onDone={(prog, week, dayKey) => way.current.close(() => way.current.onDone(prog, week, dayKey))}'), 'both close the same way, and the pop-up waits for it');
+    assert.ok(opening.includes("setStage('out');\n    run(growPlan().close, then);"));
+    assert.ok(opening.includes("if (stageNow.current !== 'open') return;"), 'a close before it is open, or a second one while it closes, does nothing');
+    assert.ok(opening.indexOf('Keyboard.dismiss();') > 0 && opening.indexOf('Keyboard.dismiss();') < opening.indexOf("setStage('out');"), 'D285: the keyboard goes as it starts to close');
+    // Reduce Motion, or a card whose place is not known: at once, both ways.
+    assert.ok(opening.includes('const [moves] = useState(!calm && !!from);') && opening.includes("useState<Stage>(moves ? 'opening' : 'open')"));
+    assert.ok(opening.includes('if (!moves) {\n      then();\n      return;\n    }'));
+    // The deck takes no press until it is open, and the copy is not there once it is.
+    assert.ok(opening.includes("pointerEvents={stage === 'open' ? 'auto' : 'none'}") && opening.includes("{stage !== 'open' && ("));
+    // The frame keeps its moving value while it is open, and the close starts one of its own from the same place.
+    assert.ok(opening.includes("const shut = stage === 'out';") && opening.includes('v.shut.interpolate({ inputRange: [0, 1], outputRange: [full, card] })') && opening.includes('v.frame.interpolate({ inputRange: [0, 1, 2], outputRange: [card, lifted, full] })'));
+    assert.ok(opening.includes('v.frame.interpolate({ inputRange: [0, 1, 2], outputRange: [p.surface, p.surface2, p.bg] })') && opening.includes('v.shut.interpolate({ inputRange: [0, 1], outputRange: [p.bg, p.surface] })'), 'the fill: a card\'s, one step lighter, the ground; and back');
+    assert.ok(opening.includes('outputRange: [clear(p.surface2), p.surface2, p.surface]'), 'the copy\'s ground: none, one step lighter, a card\'s own');
+    assert.ok(opening.includes("backgroundColor: '#000000', opacity: v.scrim"));
+    // The deck paints no ground of its own: the frame's fill is its ground, as today's.
+    assert.doesNotMatch(read('deck/Deck.tsx'), /testID="deck" accessibilityViewIsModal style=\{\[StyleSheet\.absoluteFill, \{ backgroundColor/);
+  });
+
+  test('the copy is the card without its skip pill, its button or Reopen, and This Week shrinks under the deck', () => {
+    const week = read('this-week/ThisWeek.tsx');
+    assert.ok(week.includes("backgroundColor: copy ? 'transparent' : off ? p.cardOff : p.surface }, copy && s.cardCopy]"));
+    assert.ok(week.includes('{k.skip && !copy && (') && week.includes('{bt && !copy && (') && week.includes('{!copy && <Text accessibilityRole="button" style={[s.reopen, { color: p.signal }]}>Reopen</Text>}'));
+    assert.ok(week.includes("cardCopy: { width: '100%', height: '100%' },"));
+    assert.ok(week.includes('el.measureInWindow((x, y, w, h) => onStart(k.week, k.key, w > 0 && h > 0 ? { box: { t: y, l: x, w, h }, card: k } : null));'), 'the card\'s place on the screen goes with Start, or none');
+    assert.ok(opening.includes('<Card k={from.card} p={p} copy />'));
+    const app = read('App.tsx');
+    assert.ok(app.includes('const under = useRef(new Animated.Value(1)).current;') && app.includes('<Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>'));
+    assert.ok(opening.includes('v.week = under;'));
   });
 });

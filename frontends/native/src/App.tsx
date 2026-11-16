@@ -11,7 +11,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { VERSION } from '@ia/core';
 
 import { BackupLoad } from './BackupLoad';
-import { Deck } from './deck/Deck';
+import { DeckOpening } from './deck/DeckOpening';
 import type { DeckOpen, DeckProgram } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
 import { SWIFT_ANSWER } from './native-spike';
@@ -22,7 +22,7 @@ import { swiftLine } from './spike-line';
 import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
 import { Bug, Calendar } from './this-week/marks';
-import { ThisWeek } from './this-week/ThisWeek';
+import { type DeckFrom, ThisWeek } from './this-week/ThisWeek';
 import { storedProgram } from './this-week/week-screen';
 
 /** Which JavaScript engine runs this bundle: Hermes sets HermesInternal on the global object. */
@@ -49,7 +49,9 @@ function Shell() {
   // Counts the visits to This Week, so it reads the store again after a backup is loaded on Bugs.
   const [tick, setTick] = useState(0);
   // The day open as a swipe deck, over the whole screen and the tab bar (deck.css: above the tab bar), or none.
-  const [deck, setDeck] = useState<DeckOpen | null>(null);
+  const [deck, setDeck] = useState<{ open: DeckOpen; from: DeckFrom | null } | null>(null);
+  // This Week's size under the deck (D275 call 16): 96% while the deck is open, its own again as it closes.
+  const under = useRef(new Animated.Value(1)).current;
   // Today's toast (rest-day-shell.ts showToast): one line over everything, gone after 2.2 s.
   const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
   const say = (text: string): void => setToast((t) => ({ text, n: t ? t.n + 1 : 1 }));
@@ -96,13 +98,17 @@ function Shell() {
   return (
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
-      {tab === 'week' ? <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={setDeck} onLaunch={launched} /> : <Bugs palette={p} />}
+      {tab === 'week' ? (
+        <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
+          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={(open, from) => setDeck({ open, from })} onLaunch={launched} />
+        </Animated.View>
+      ) : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
         <TabButton id="tab-week" label="This Week" on={tab === 'week'} palette={p} onPress={() => go('week')} icon={(c) => <Calendar color={c} size={22} />} />
         <TabButton id="tab-bugs" label="Bugs" on={tab === 'bugs'} palette={p} onPress={() => go('bugs')} icon={(c) => <Bug color={c} />} />
       </View>
       {deck && (
-        <Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}
+        <DeckOpening palette={p} store={phoneStore} open={deck.open} from={deck.from} calm={calm} under={under} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}
           onDone={(prog, week, dayKey) => { setDeck(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
       {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}

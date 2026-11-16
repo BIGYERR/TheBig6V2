@@ -18,6 +18,7 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Bag, Calendar, Check, CoreIcon, Cross, Die, Dumbbell, Fade, Flag, Glow, Play, RecDot, Runner, WildcardMark } from './marks';
 import { type DeckOpen, type DeckProgram, deckView } from '../deck/deck-screen';
+import type { GrowBox } from '../deck/grow-motion';
 import { BLANK, PLAN_CHANGE_FAILED, drawWeek, launch, launchTitle, pillArrow, pillParts, tokenOf } from './week-screen';
 import { type StripClock, type StripEl, StripPlacer } from './week-strip';
 import { type Column, type DayCard, type DaysView, TITLE_W, type WeekView } from './week-view-model';
@@ -42,7 +43,8 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
   palette: Palette; store: StateStore; tick: number;
   /** The program Make the change handed back since the launch, to hold in place of the launch's own; null for none. */
   held: DeckProgram | null;
-  onDeck: (deck: DeckOpen) => void;
+  /** Start lift, Start session: the day as a deck, and the card it opens out of (call 16) when its place is known. */
+  onDeck: (deck: DeckOpen, from: DeckFrom | null) => void;
   /** Each launch, with the program it handed back: the app raises the day-after reminder 600 ms on (bug-report-init.ts). */
   onLaunch: (prog: DeckProgram | null) => void;
 }) {
@@ -159,12 +161,12 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
   const pill = pillParts(view.pill.html);
   // Start lift, Start session: the day opened as a deck, or nothing where today's app opens the day sheet instead (a
   // day whose only card is its cool down), which this app does not draw yet.
-  const startDeck = (week: number, key: string): void => {
+  const startDeck = (week: number, key: string, from: DeckFrom | null): void => {
     if (!prog) return;
     const grid = prog as unknown as DeckProgram;
     const warn = { shown: false, src: '' };
     const view = deckView(store, grid, week, key, Date.now(), warn);
-    if (view) onDeck({ prog: grid, week, dayKey: key, view, warn });
+    if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from);
   };
 
   const pillInk = view.pill.cls.includes('recovery');
@@ -261,7 +263,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onLaunch }: {
   );
 }
 
-function Days({ d, p, onPick, onStart }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string) => void }) {
+function Days({ d, p, onPick, onStart }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string, from: DeckFrom | null) => void }) {
   const s = styles;
   const first = d.cards[0];
   return (
@@ -348,15 +350,30 @@ function Col({ c, i, p, onPick }: { c: Column; i: number; p: Palette; onPick: (c
   );
 }
 
-function Card({ k, p, onStart }: { k: DayCard; p: Palette; onStart: (week: number, key: string) => void }) {
+/** The card a deck opens out of (D275 call 16): where it sits on the screen, and what it shows. */
+export interface DeckFrom { box: GrowBox; card: DayCard }
+
+/**
+ * A card of the day. With `copy` it is the copy the deck opens out of (grow-motion.ts growCopy): its label, name and
+ * summary on no ground of its own, without its skip pill, its button or Reopen.
+ */
+export function Card({ k, p, onStart, copy }: { k: DayCard; p: Palette; onStart?: (week: number, key: string, from: DeckFrom | null) => void; copy?: boolean }) {
   const s = styles;
+  const box = useRef<ComponentRef<typeof View>>(null);
+  /** Start: the card's place on the screen goes with it, or none when the screen cannot say. */
+  const start = (): void => {
+    if (!onStart) return;
+    const el = box.current;
+    if (!el) { onStart(k.week, k.key, null); return; }
+    el.measureInWindow((x, y, w, h) => onStart(k.week, k.key, w > 0 && h > 0 ? { box: { t: y, l: x, w, h }, card: k } : null));
+  };
   const off = !!(k.skip && k.skip.on);
   const bt = k.button;
   const btColor = bt ? (bt.sunk ? p.muted : bt.glow ? p.onSignal : p.text) : p.text;
   const starts = !!bt && bt.act === 'deck' && !bt.sunk;
   return (
-    <View testID={'week-card-' + k.kind} style={[s.card, k.first ? s.cardFirst : s.cardSecond, { backgroundColor: off ? p.cardOff : p.surface }]}>
-      {k.skip && (
+    <View ref={box} collapsable={false} testID={copy ? undefined : 'week-card-' + k.kind} style={[s.card, k.first ? s.cardFirst : s.cardSecond, { backgroundColor: copy ? 'transparent' : off ? p.cardOff : p.surface }, copy && s.cardCopy]}>
+      {k.skip && !copy && (
         <View
           testID={'week-skip-' + k.kind}
           accessibilityRole="button"
@@ -383,16 +400,16 @@ function Card({ k, p, onStart }: { k: DayCard; p: Palette; onStart: (week: numbe
               <Text numberOfLines={1} style={[s.doneTitle, { color: p.text }]}>{k.done.title}</Text>
               <Text numberOfLines={1} style={[s.doneLine, { color: p.muted }]}>{k.done.line}</Text>
             </View>
-            <Text accessibilityRole="button" style={[s.reopen, { color: p.signal }]}>Reopen</Text>
+            {!copy && <Text accessibilityRole="button" style={[s.reopen, { color: p.signal }]}>Reopen</Text>}
           </View>
         )}
-        {bt && (
+        {bt && !copy && (
           <Pressable
             testID={'week-button-' + k.kind}
             accessibilityRole="button"
             // Start lift and Start session open the deck (D275, cardRoute); Record run and the hand log are not built yet.
             disabled={!starts}
-            onPress={() => onStart(k.week, k.key)}
+            onPress={start}
             accessibilityState={{ disabled: !starts }}
             style={[
               s.btn, { borderColor: p.border2 },
@@ -454,6 +471,7 @@ const styles = StyleSheet.create({
 
   // The cards
   card: { borderRadius: 24 },
+  cardCopy: { width: '100%', height: '100%' },
   cardFirst: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 18, gap: 10 },
   cardSecond: { padding: 18, paddingHorizontal: 20, gap: 8 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 24 },

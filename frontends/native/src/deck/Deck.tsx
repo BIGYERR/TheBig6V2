@@ -21,8 +21,8 @@
 // and an up and down pager, either way, with no toast and no hint (call 15); every open starts sideways. Up and down
 // there is no fan: the top card follows the finger, the card coming in stands a card height and 14 points away, a
 // drag let go past 80 points slides both over 290 ms, the dots stand in a column at the right, and Done, next one
-// sends the card up and away. A tall card's body scrolls first. The opening out of the card (call 16) is not here
-// yet: the deck opens and closes at once.
+// sends the card up and away. A tall card's body scrolls first. The opening out of the card (call 16) is
+// DeckOpening.tsx, which holds this screen and paints its ground: the deck has none of its own, as today's has none.
 //
 // Not here yet: remove on an added move (drawn, taking no press: today's deck hides it on the card an added move
 // gets, and the add sheet is the session sheet's). The coach's nudge is raised here, 1.4 s after the third pick running of one pair (swap-sheet.ts), and
@@ -636,7 +636,7 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
       style={[s.dot, { backgroundColor: k === i ? p.text : states[k] === 'Logged' ? p.signal : p.border2 }, k === i && (vert ? { height: 22 } : { width: 22 })]} />
   ));
   return (
-    <View testID="deck" accessibilityViewIsModal style={[StyleSheet.absoluteFill, { backgroundColor: p.bg, paddingTop: Math.max(12, insets.top), paddingBottom: Math.max(14, insets.bottom) }]}>
+    <View testID="deck" accessibilityViewIsModal style={[StyleSheet.absoluteFill, { paddingTop: Math.max(12, insets.top), paddingBottom: Math.max(14, insets.bottom) }]}>
       <View style={s.head}>
         <Pressable testID="deck-back" accessibilityRole="button" accessibilityLabel="Back to This Week" onPress={() => { leave(); onClose(); }} style={s.round44}>
           <Icon name="chevronLeft" size={22} color={p.text} />
