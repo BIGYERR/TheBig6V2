@@ -524,6 +524,14 @@ before a merge into `main` touches the build).
   of a run of taps waits for the one before, by a screenshot or a call that changes nothing between them, and the
   run's end is read from a screenshot before it is trusted (Post-v0.262.3: a swap mark tapped right after put it
   back opened no sheet).
+  Two taps sent by the tool are not a double tap: they land more than 320 ms apart as often as not. Three taps in a
+  row turn the deck once, and the turn is read from a screenshot before the next step (Post-v0.262.4: the deck's
+  double tap).
+  A motion on the simulator is read from its frames (`xcrun simctl io booted recordVideo`, cut to frames and compared
+  frame against frame), and the motion the last build already has is recorded first, as the control: a stall is the
+  app's only when it moves with the code, and one that moves with how the tap is sent is the instrument's
+  (Post-v0.262.4: three rebuilds went to a stall in the deck's done motion that the unchanged sideways motion showed
+  too).
   A bug on the beta's screen is proved on the simulator, on a copy of the reporter's backup, with a drag that holds
   still before it lifts (`touch_path`, its last step 250 ms): a simulated swipe never rests and a finger does, and
   what React Native leaves on the screen can depend on that rest (Post-v0.262.3: a deck card left blank on IA Next
