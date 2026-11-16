@@ -187,10 +187,25 @@ Each phase starts only on Mario's GO, one phase step per session.
   lift that never showed, and a dot after a slide that left the card before on the screen. Nothing built writes;
   87 breaks, none let through. The deck's four ledger rows are filled (`docs/decisions/swipe-deck.md`, the entry of
   that name).
-- **Next:** Mario's phone on IA Next build 116, which carries the fifth session (merged 2026-11-16, `main` 691253e;
-  uploaded by run 43870419495, not yet read as processed): the double tap, the pager and the opening are judged there, and
-  so is the done motion, which the simulator's recordings stall in and cannot place
-  (`tests/measure/native-deck-pager_frames.md`). Then the session sheet, which brings add, remove and Reopen. Still not
+- **Seen on Mario's phone, IA Next build 116** (2026-11-16; the fifth session, merged that day as `main` 691253e,
+  uploaded by run 43870419495 and read back as processed, `docs/decisions/testflight.md`): "Yep all good, can't
+  reopen though not sure if that's just because you didn't build it out". The double tap, the pager, the opening,
+  the close and Done, next one stand; Reopen waits for the session sheet (`docs/decisions/swipe-deck.md`, the build
+  116 entry).
+- **Done, phase 3's sixth session, the session sheet's first (Post-v0.262.4, no build):** today's sheet measured
+  (`tests/measure/native-session-sheet_today.md`), the cut put to Mario and taken ("Concur build"), then built:
+  Reopen on a done lift, and Start where the day opens no deck, open the day's session sheet in the Expo app
+  (`frontends/native/src/day-detail/`; `docs/decisions/session-sheet.md`). The header, the run's workout as words,
+  every exercise card with every set (the cards' taps are the deck's own writers), the range nudge and the never
+  marked nudge, the effort slider and the notes saved as they change, Done and Skip with each one's undo, the
+  completion pop-up after Done. The view is today's own six models, copied and held to the byte; the page's
+  `persistLogFields` and `handleDayStatus` are ported line for line over a model of the log's form. Held equal to
+  today's page: 2,755 sheets across the ten programs drawn the same, whole, and every `ia_` key equal after each of
+  1,331 sheet taps. Nothing is written but to the beta's own store.
+- **Next:** Mario's phone on the next IA Next build (Reopen, the sheet, Done and its undo, Skip). Then the sheet's
+  second session: add and remove, the Wildcard tag, a double day's jog, the 1RM card and the day's note, and the
+  sheet's ledger rows. The run's log, its wheels and its sport picker come with the cardio sheet (row 3 of phase 3):
+  they are the same piece, and the sheet's form already holds their fields as drawn. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
@@ -468,6 +483,9 @@ The order is the session's reading of what Mario uses daily (no usage numbers ex
 | 5 | The program list and its sheets (goal, mile, mile lock, injury and travel, rest day) | 2 to 3 |
 | 6 | The wizard and generating | 2 |
 | 7 | Swap, add, Random Workout, pop-ups, the toast, the Bugs tab, backup, theme | 1 to 2 |
+
+The session sheet is taken in two sessions, not three (Mario, 2026-11-16, "Concur build", on the measure's
+proposal): its log's run fields and wheels move to row 3 with the cardio sheet, which is the same piece.
 
 Each screen: built from the lifted logic and the Angular screen's pure model where one exists, its tests written from
 the ledger, then **checked against the old build** on the same backup (section 3.3).

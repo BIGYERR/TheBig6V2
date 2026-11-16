@@ -18,7 +18,8 @@
 // core's own writers. tests/integration/native-pop-ups.test.ts holds every line and every key equal to today's page.
 //
 // Not here: the injury check-ins and the Wildcard's pop-up, a switched program's past days marked as asked
-// (markPastAsked) and the season mark released by an unmark (releaseSeasonShown): none of those flows is in this app.
+// (markPastAsked): that flow is not in this app. The season mark released by an unmark (releaseSeasonShown) is the
+// session sheet's (day-detail/sheet-writes.ts).
 import { ASY_ICON_PATHS, asyIcon } from '@ia/core/engine/icons.ts';
 import { dayStoreKey } from '@ia/core/engine/state-day-log.ts';
 import { recordDaySnapshot } from '@ia/core/engine/state-day-history.ts';
@@ -229,6 +230,8 @@ export function fireStreakPopup(streak: number): PopCall {
 export function finalScheduledDay(s: PopSession): { week: number; d: string; date: Date } | null { const a = scheduledDays(s.prog); return a.length ? a[a.length - 1]! : null; }
 const seasonShown = (s: PopSession): boolean => s.store.get('ia_season_shown_' + s.prog.id) === '1';
 function markSeasonShown(s: PopSession): void { try { s.store.set('ia_season_shown_' + s.prog.id, '1'); } catch { /* a full store shows it again */ } }
+/** The page's releaseSeasonShown (V181 D2): the last day unmarked lets the season's pop-up show again when it is next done. */
+export function releaseSeasonShown(s: PopSession): void { try { s.store.remove('ia_season_shown_' + s.prog.id); } catch { /* as the page: a store that cannot drop it keeps it */ } }
 export function fireSeasonPopup(s: PopSession): PopCall {
   return { tier: 'season', opts: {
     stats: [

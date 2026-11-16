@@ -672,7 +672,7 @@ describe('native deck: the opening out of the card, Lift first at 420 ms (D275 c
   test('the copy is the card without its skip pill, its button or Reopen, and This Week shrinks under the deck', () => {
     const week = read('this-week/ThisWeek.tsx');
     assert.ok(week.includes("backgroundColor: copy ? 'transparent' : off ? p.cardOff : p.surface }, copy && s.cardCopy]"));
-    assert.ok(week.includes('{k.skip && !copy && (') && week.includes('{bt && !copy && (') && week.includes('{!copy && <Text accessibilityRole="button" style={[s.reopen, { color: p.signal }]}>Reopen</Text>}'));
+    assert.ok(week.includes('{k.skip && !copy && (') && week.includes('{bt && !copy && (') && week.includes("{!copy && <Text testID={'week-reopen-' + k.kind} accessibilityRole=\"button\""));
     assert.ok(week.includes("cardCopy: { width: '100%', height: '100%' },"));
     assert.ok(week.includes('el.measureInWindow((x, y, w, h) => onStart(k.week, k.key, w > 0 && h > 0 ? { box: { t: y, l: x, w, h }, card: k } : null));'), 'the card\'s place on the screen goes with Start, or none');
     assert.ok(opening.includes('<Card k={from.card} p={p} copy />'));

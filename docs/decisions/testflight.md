@@ -236,3 +236,17 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
 - **On Mario's phone, build 114** (his report, 2026-11-15, one sentence, no screenshot): "All same as today's", to
   the list the pager's session asked about on IA Next build 114 beside today's app at 0.262.4
   (`docs/decisions/swipe-deck.md`, the build 114 entry). Nothing differed, so nothing was fixed from it.
+- **Seen on `main`, the eleventh run, the beta's lane alone** (run 43870419495, merge 691253e, pull request 48,
+  2026-11-16 07:51 EST; the merge carried no version: 575f6a1, the double tap and the pager, 75ae30a, the opening,
+  and three docs and rule wording commits; read and recorded by the next session, the session sheet's): the two
+  gates went together (12 s today's, 10 s the beta's). Today's lane skipped its upload, as ruled: App Store
+  Connect already holds `0.262.4`, and a version goes up once. The beta's lane archived, signed and uploaded
+  `0.262.4 (116)` (521 s, done 08:06:44) and read it back as processed (132 s, done 08:08:58). The build number
+  moved from 114 to 116 because two commits of the merge changed `frontends/native`, 575f6a1 and 75ae30a; there
+  is no build 115. The notices read `testflight 0.262.4 processed (uploaded before this run; a version goes up
+  once, a fix is the next PATCH)` and `testflight next 0.262.4 (116) processed`. The run ended green: 6 jobs
+  passed and 8 skipped by rule.
+- **On Mario's phone, build 116** (his report, 2026-11-16, one sentence, no screenshot): "Yep all good, can't
+  reopen though not sure if that's just because you didn't build it out", to the double tap, the up and down
+  pager, the opening, the close and Done, next one. Reopen is not built yet: it opens the session sheet, which
+  starts with this session (`docs/decisions/swipe-deck.md`, the build 116 entry). Nothing was fixed from it.

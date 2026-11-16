@@ -50,7 +50,7 @@ export interface DeckProgram {
 export interface StaleWarn { shown: boolean; src: string }
 
 /** The lift log as the page holds it after its launch: old keys folded into today's, on a copy. */
-function liftLog(store: StateStore, programId: string): Record<string, { entries?: ExEntry[] } | undefined> {
+export function liftLog(store: StateStore, programId: string): Record<string, { entries?: ExEntry[] } | undefined> {
   const log = JSON.parse(JSON.stringify(readLiftLog(store, programId) || {})) as Record<string, { entries?: ExEntry[] } | undefined>;
   // Today's page folds the active program's log as it launches and stores it (bug-report-init.ts), and so does this
   // app's launch (week-screen.ts foldLiftLog). A log already folded comes through this unchanged; it stays for a
@@ -136,7 +136,7 @@ export interface DeckOpen { prog: DeckProgram; week: number; dayKey: string; vie
 
 /**
  * The deck for a day, or null when Start does not open one: a rest day, a day the grid does not hold, or a day whose
- * only card is its cool down (today's app opens the day sheet there, which this app does not draw yet).
+ * only card is its cool down (today's app opens the day's session sheet there, and so does this one: ThisWeek.tsx).
  */
 export function deckView(store: StateStore, prog: DeckProgram, week: number, dayKey: string, nowMs: number, warn?: StaleWarn): DeckView | null {
   const wk = prog.weeks[week];

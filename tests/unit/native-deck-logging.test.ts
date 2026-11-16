@@ -333,7 +333,8 @@ describe('native deck logging: which files write', () => {
 
   test('the deck\'s folder holds the screen, its opening, its seam, its readers, its fields, its writes and the model\'s copy', () => {
     assert.deepStrictEqual(files, ['Deck.tsx', 'DeckOpening.tsx', 'deck-model.ts', 'deck-readers.ts', 'deck-screen.ts', 'deck-swaps.ts', 'deck-writes.ts', 'grow-motion.ts', 'set-fields.ts']);
-    assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/day-detail')), ['session-sections-model.ts']);
+    // The session sheet's folder holds the card model the deck stands on, and the sheet (tests/unit/native-session-sheet.test.ts).
+    assert.ok(readdirSync(join(REPO, 'frontends/native/src/day-detail')).includes('session-sections-model.ts'));
     assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/swap-sheet')).sort(), ['SwapSheet.tsx', 'swap-sheet-model.ts']);
   });
 

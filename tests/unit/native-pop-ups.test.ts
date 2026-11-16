@@ -295,7 +295,8 @@ describe('native pop-ups: which files write, and what the screens say', () => {
   test('pop-ups.ts alone names the pop-ups\' five key families, and writes each one itself; the reminder\'s answer ends in core\'s writers', () => {
     assert.deepStrictEqual([...new Set([...popUps.matchAll(/'(ia_[a-z_]+_)'/g)].map((m) => m[1]!))].sort(), ['ia_pop_dismiss_', 'ia_pop_idx_', 'ia_remind_last_', 'ia_reminded_', 'ia_season_shown_']);
     assert.equal([...popUps.matchAll(/\bs\.store\.set\(/g)].length, 5, 'five writes by hand: the button\'s words, the pick, the season\'s mark, the reminder\'s day, the days asked about');
-    assert.doesNotMatch(popUps, /\.store\.remove\(/, 'none is removed here: an unmark is not in this app');
+    assert.equal([...popUps.matchAll(/\.store\.remove\(/g)].length, 1, 'one is removed here: the season\'s mark, let go when the last day is unmarked (the session sheet\'s undo)');
+    assert.ok(popUps.includes("export function releaseSeasonShown(s: PopSession): void { try { s.store.remove('ia_season_shown_' + s.prog.id); }"));
     assert.deepStrictEqual([...new Set([...popUps.matchAll(/\b(recordDaySnapshot|clearDayParts|setDayStatus)\(s\.store/g)].map((m) => m[1]!))].sort(), ['clearDayParts', 'recordDaySnapshot', 'setDayStatus']);
     for (const [name, text] of [['PopUp.tsx', card], ['SwapNudge.tsx', nudge], ['App.tsx', app], ['Deck.tsx', deck]] as const) {
       assert.doesNotMatch(text, /ia_(pop|remind|season)/, name + ' names no pop-up key');
@@ -341,7 +342,7 @@ describe('native pop-ups: which files write, and what the screens say', () => {
     const week = read('this-week/ThisWeek.tsx');
     assert.ok(week.includes('useEffect(() => { onLaunch(launched.prog as unknown as DeckProgram | null); }, [launched]);'));
     assert.ok(week.includes('const prog = held && launched.prog && held.id === launched.prog.id ? (held as unknown as typeof launched.prog) : launched.prog;'));
-    assert.ok(app.includes('held={held} onDeck={(open, from) => setDeck({ open, from })} onLaunch={launched}') && app.includes("if (t === 'week' && tab !== 'week') { setTick((n) => n + 1); setHeld(null); }"), 'and let go at the next launch');
+    assert.ok(app.includes('held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={setSheet} onLaunch={launched}') && app.includes("if (t === 'week' && tab !== 'week') { setTick((n) => n + 1); setHeld(null); }"), 'and let go at the next launch');
   });
 
   test('the motions are today\'s numbers: the card and the scrim still under Reduce Motion, the icon and the confetti not', () => {
