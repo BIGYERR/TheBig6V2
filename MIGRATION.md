@@ -187,7 +187,8 @@ Each phase starts only on Mario's GO, one phase step per session.
   lift that never showed, and a dot after a slide that left the card before on the screen. Nothing built writes;
   87 breaks, none let through. The deck's four ledger rows are filled (`docs/decisions/swipe-deck.md`, the entry of
   that name).
-- **Next:** Mario's phone on the next IA Next build: the double tap, the pager and the opening are judged there, and
+- **Next:** Mario's phone on IA Next build 116, which carries the fifth session (merged 2026-11-16, `main` 691253e;
+  uploaded by run 43870419495, not yet read as processed): the double tap, the pager and the opening are judged there, and
   so is the done motion, which the simulator's recordings stall in and cannot place
   (`tests/measure/native-deck-pager_frames.md`). Then the session sheet, which brings add, remove and Reopen. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
@@ -471,6 +472,10 @@ The order is the session's reading of what Mario uses daily (no usage numbers ex
 Each screen: built from the lifted logic and the Angular screen's pure model where one exists, its tests written from
 the ledger, then **checked against the old build** on the same backup (section 3.3).
 
+**Motion is not held to today's (Mario, 2026-11-16, section 6 decision 14).** A screen's words, numbers and behaviour
+are today's, and its proof is as before. Its motion is built once and judged on his phone: no frame by frame
+recording, no break and no test is owed for how a thing moves, and a motion he names is fixed.
+
 **Exit gate, per screen:** its ledger rows filled (replacement named, counts after, red on its break). Its numbers
 match the old build's on the rehearsal backup and on the 10 seeded programs. Mario has used it on the phone.
 
@@ -747,6 +752,14 @@ Each with the session's pick first.
     moving"). The freeze slice (phase 1 step 3), the cutover (phase 5) and moving Mario's real data no longer wait for
     2026-12-07. A backup saved before each install still guards his logs, and each phase still starts on his GO.
     Decision 3's "the freeze slice still waits" and decision 12's "after 2026-12-06" are superseded by this one.
+14. **What may be cut to shorten the rest.** **Answered 2026-11-16: one cut, motion** ("just kill number one for
+    motion matches, and we'll keep the rest of the stuff"). Asked after the deck's fifth session, which was all motion,
+    with about 16 to 21 sessions left to cutover by this plan's estimates. Five cuts were put to him. Taken: the
+    beta's motion is no longer held to today's (phase 3, above). Words, numbers and behaviour stay today's. Kept as
+    they were: a break per rule for every screen (decision 9), the wizard and the whole of Progress before cutover,
+    the GPS recorder in phase 4, Random Workout. The session's reading, his to overrule: a number a ruling set for a
+    motion (D275 call 16's 420 ms) is still carried where a screen has one, since it costs nothing, and nothing is
+    owed to prove it. Motion already built and tested (the deck's swipe, pager and opening) stays as it is.
 
 ---
 
