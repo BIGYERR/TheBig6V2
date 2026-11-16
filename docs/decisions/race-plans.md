@@ -6,13 +6,15 @@ speed runs and the recovery runs. The pace chart, plan lengths and floors, race 
 week's shape (D243, D244, D252 in `run-week-layout.md`) are ruled elsewhere. Measure: `tests/measure/race-plans_source-fingerprint.md`.
 Tests: `tests/integration/race-plans.test.ts`, `tests/integration/run-names.test.ts`.
 
-## D270 P-OWNPLANS: the four race plans are the app's own arrangement (PROPOSED, awaiting Mario's concurrence)
+## D270 P-OWNPLANS: the four race plans are the app's own arrangement (CONCURRED 2026-11-15, awaiting Mario's bump and the build)
 
 - **Date:** 2026-11-01. **Ruled by:** the main session in the coach hat, on Mario's "Yes, rule it" (2026-11-01), after
   the measure he asked for first ("Yes, measure first"). Amended in place 2026-11-11, still proposed: the 5K is
   re-authored for a first time runner, on Mario's question ("should not the 5k plan be a little more catered to a first
   time runner? 5k is small potatoes and a marathon plan i feel like could safely assume a first time runner isnt trying to
-  do that off the couch"), which he concurred with ("i concur with the 5k rewrite"). Mario concurs or pushes back on the grids below before a line of
+  do that off the couch"), which he concurred with ("i concur with the 5k rewrite"). **Mario concurred with all four plans on 2026-11-15 ("Concur,
+  all four")**, after the backing and the volume count below; the bump and the build wait on his go (he is holding the
+  numbering while the React Native migration lands). Until then: Mario concurs or pushes back on the grids below before a line of
   code moves; the release line is filled in at ship time.
 - **Finding (the measure):** the four tables hold 48 weeks and 75 speed-run slots filled by 39 distinct sessions, and
   every one of the 39 is a classic format: 13 mixed-pace sets, 6 sets of reps at one pace, 6 ladders or pyramids, 5
