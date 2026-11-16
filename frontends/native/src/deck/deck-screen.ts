@@ -165,8 +165,11 @@ export function deckView(store: StateStore, prog: DeckProgram, week: number, day
  * is going on, so its words always show. The screen draws a fresh cover whenever the kind changes.
  */
 export type CoverKind = 'rest' | 'drag' | 'leave';
-export function coverOf(k: number, top: number, peek: number, done: 'lift' | 'leave' | null): CoverKind | null {
+export function coverOf(k: number, top: number, peek: number, done: 'lift' | 'leave' | null, vert = false): CoverKind | null {
   if (k === top) return null;
+  // Up and down every card is drawn in full on its own slot (deck.ts faceStyle: opacity 1), a stride from the next,
+  // and only the top card is in the stage at rest: no card wears a cover.
+  if (vert) return null;
   if (k !== peek) return 'rest';
   if (done === 'leave') return 'leave';
   return done ? 'rest' : 'drag';
@@ -208,6 +211,90 @@ export function travelOf(k: number, from: number, to: number, n: number, dx: num
   if (!b.shown) return null;
   const t = { x: a.x - b.x, y: a.y - b.y, s: a.s / b.s, r: a.r - b.r };
   return t.x || t.y || t.s !== 1 || t.r ? t : null;
+}
+
+// ── The double tap and the up and down pager (D275 call 1; deck.ts down, move, up, slide and cardStyle, vert) ──
+
+/** Two taps inside this many milliseconds switch the deck between sideways and up and down (deck.ts DOUBLE_TAP). */
+export const DOUBLE_TAP = 320;
+/** A press is a tap when it ends within this many points of where it began, across and down (deck.ts up). */
+export const TAP_SLOP = 6;
+/** Up and down, the card coming in stands one card height and this many points from the top card (deck.ts cardStyle). */
+export const PAGER_GAP = 14;
+
+/** Whether a press that moved `dx` across and `dy` down by the time it ended is a tap. */
+export function isTap(dx: number, dy: number): boolean {
+  return Math.abs(dx) < TAP_SLOP && Math.abs(dy) < TAP_SLOP;
+}
+
+/**
+ * A tap at `now` milliseconds, the tap before it at `last` (null when there is none to pair with): whether the two
+ * turn the deck, and the tap to remember. A turn clears the clock, so a third tap begins a pair of its own.
+ */
+export function tapped(last: number | null, now: number): { turn: boolean; last: number | null } {
+  return last !== null && now - last < DOUBLE_TAP ? { turn: true, last: null } : { turn: false, last: now };
+}
+
+/** Where a card stands up and down: its shift down the stage in points, and whether it is drawn. */
+export interface PagerPose { y: number; shown: boolean }
+/**
+ * Where card k stands, up and down, with card `top` on top of `n`, the top card dragged `dy` points down a stage `h`
+ * points tall: the top card under the finger, with no turn; the card a drag of more than two points brings in, one
+ * card height and 14 points below the top card going on and above it going back, following the finger; no fan, so
+ * every other card is not drawn. On a deck of two the other card is both the next and the one before: it comes from
+ * below on a pull up and from above on a pull down (today's keeps it below either way, and the two cross as the top
+ * card is let go; not carried, docs/decisions/swipe-deck.md).
+ */
+export function pagerPose(k: number, top: number, n: number, dy: number, h: number): PagerPose {
+  const pos = (((k - top) % n) + n) % n;
+  if (pos === 0) return { y: dy, shown: true };
+  const peek = n > 1 && Math.abs(dy) > 2 ? (top + (dy < 0 ? 1 : -1) + n) % n : -1;
+  if (k !== peek) return { y: 0, shown: false };
+  return { y: (dy < 0 ? h + PAGER_GAP : -(h + PAGER_GAP)) + dy, shown: true };
+}
+
+/**
+ * Where a card stands while the pager slides (deck.ts slide: 290 ms on the settle's curve): the screen keeps each
+ * card on a slot, a card height and the gap apart, and the pager at a page; a card `slots` slots past the page the
+ * pager is on stands that many strides down, plus the drag. A slide takes the page on by one and the drag to
+ * nothing together, so the top card goes from where it was let go to one stride away and the card coming in lands
+ * on nothing, and when the slide ends no card has anywhere left to move.
+ */
+export function pagerY(slots: number, h: number, drag: number): number {
+  return slots * (h + PAGER_GAP) + drag;
+}
+
+/**
+ * How many slots card `k` stands from the top card `top` of `n`, up and down: 0 itself, 1 the next card, -1 the one
+ * before, and so on, the nearer way round. On a deck of two the other card is both the next and the one before, and
+ * stands `two` slots on: 1, or -1 while the finger pulls down. It is also how far the page goes for a jump from
+ * card `top` to card `k` (a dot, a tile of the map): the page moves and every card keeps the slot it stands on, so
+ * the cards in sight are moved by the page alone.
+ */
+export function slotsFrom(k: number, top: number, n: number, two = 1): number {
+  const o = (((k - top) % n) + n) % n;
+  if (o === 0) return 0;
+  if (n === 2) return two;
+  return o > n / 2 ? o - n : o;
+}
+
+/** A drag let go `d` points from where it began: on to the next card (1), back to the one before (-1), or neither (0). */
+export function swipeTo(d: number, line: number): 1 | -1 | 0 {
+  return d < -line ? 1 : d > line ? -1 : 0;
+}
+
+/** How far a card's body is scrolled, and how far it can scroll: both 0 for a card that fits its box. */
+export interface BodyScroll { y: number; max: number }
+/**
+ * Whether the pager takes a drag that has moved `dx` across and `dy` down. It takes one that has gone 8 points and
+ * is more down than across (the sideways swipe's own test, turned). A tall card's body scrolls first (deck.ts move:
+ * taller than its box by more than 2 points): the pager takes the drag only where the body has no further to go
+ * that way, at its foot for a pull up and at its head for a pull down.
+ */
+export function pagerTakes(dx: number, dy: number, body: BodyScroll): boolean {
+  if (Math.abs(dy) <= 8 || Math.abs(dy) <= Math.abs(dx) * 1.2) return false;
+  if (body.max <= 2) return true;
+  return dy < 0 ? body.y >= body.max - 1 : body.y <= 1;
 }
 
 /** Every move's fields of a deck, by the move's key. */

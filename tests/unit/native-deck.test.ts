@@ -16,7 +16,10 @@ import {
   STALE_LOAD_DAYS, crossProgLastEntry, exControlFlags, isKBExercise, isStaleTs, parseRx, recencyLabel, rxSuffix, setsSubLabel, setsSummary,
   setsVaried, stripLeadingSets, swapOriginOf, toDispW,
 } from '../../frontends/native/src/deck/deck-readers.ts';
-import { type DeckProgram, coverOf, dayCards, deckView, poseOf, shaded, toneColor, travelOf } from '../../frontends/native/src/deck/deck-screen.ts';
+import {
+  DOUBLE_TAP, type DeckProgram, PAGER_GAP, TAP_SLOP, coverOf, dayCards, deckView, isTap, pagerPose, pagerTakes, pagerY, poseOf, shaded, slotsFrom, swipeTo, tapped, toneColor, travelOf,
+} from '../../frontends/native/src/deck/deck-screen.ts';
+import { GROW_LAYOUT, GROW_START, GROW_STILL, growCurve, growFrames, growPlan } from '../../frontends/native/src/deck/grow-motion.ts';
 
 const DAY = 86400000;
 const NOW = new Date(2026, 10, 14, 12, 0, 0).getTime();
@@ -225,7 +228,7 @@ describe('native deck: a day opened as a deck', () => {
 describe('native deck: drawing writes nothing', () => {
   const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
   test('the readers, the seam, the models and the fields call none of core\'s writers and write no key', () => {
-    const files = ['deck/deck-model.ts', 'deck/deck-readers.ts', 'deck/deck-screen.ts', 'deck/set-fields.ts', 'day-detail/session-sections-model.ts'];
+    const files = ['deck/deck-model.ts', 'deck/deck-readers.ts', 'deck/deck-screen.ts', 'deck/set-fields.ts', 'deck/grow-motion.ts', 'deck/DeckOpening.tsx', 'day-detail/session-sections-model.ts'];
     const code = strip(files.map((f) => readFileSync(join(REPO, 'frontends/native/src', f), 'utf8')).join('\n'));
     assert.ok(code.length > 30000, 'the files were read');
     assert.doesNotMatch(code, /\b\w*[sS]tore\.(set|remove)\(/, 'no store write');
@@ -270,12 +273,11 @@ describe('native deck: the screen', () => {
       '() => h.step(x.exKey, r.s, -r.step)', '() => h.step(x.exKey, r.s, r.step)', '() => h.swap(x.swap!.secIdx, x.swap!.itemIdx)', '() => h.unskip(x.name)',
       '() => h.unswap(x.swappedFrom!)', '() => onFold(x.exKey)', '() => onPip(r.s)', '() => onSets(x.exKey)', '() => openSwap(c.swap!.secIdx, c.swap!.itemIdx)',
       '() => putBack(c.swappedFrom!)', '() => setBubble(null)', '() => setSheet(null)', '() => skip(c)', '() => { go(k); setSheet(null); }', '() => { leave(); go(k, 0); }',
-      '() => { leave(); onClose(); }', "() => { leave(); setSheet('map'); }", 'advance', 'onRpe',
+      '() => { leave(); onClose(); }', "() => { leave(); setSheet('map'); }", '(e) => cardTap(e.nativeEvent.pageX, e.nativeEvent.pageY)', 'advance', 'onRpe',
     ]);
   });
 
-  test('the deck opens and closes at once, as today\'s does under Reduce Motion, and swipes by today\'s numbers', () => {
-    assert.doesNotMatch(code, /growBox|openMotion|deck-ghost/, 'the opening out of the card (call 16) is not built yet');
+  test('the deck swipes by today\'s numbers', () => {
     assert.ok(code.includes('const FAN = 3;') && code.includes('const SWIPE = 80;') && code.includes('const PEEK = 140;'));
     assert.ok(code.includes('{ x: 15, y: -7, s: 0.965, r: \'1.6deg\' }') && code.includes('{ x: 0, y: 0, s: 0.92, r: \'0deg\' }'), 'the card that rises: from the fan going on, from behind going back');
     assert.ok(code.includes('{ translateX: pos * 15 }, { translateY: pos * -7 }, { scale: 1 - pos * 0.035 }, { rotate: pos * 1.6 + \'deg\' }'), 'the fan');
@@ -354,7 +356,7 @@ describe('native deck: the screen', () => {
     assert.ok(code.includes('const SETTLE_TOP = { duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1) };'), 'the card coming to the top: 290 ms');
     assert.ok(code.includes('const SETTLE_FAN = { duration: 260, easing: Easing.bezier(0.25, 0.1, 0.25, 1) };'), 'every other card: 260 ms on CSS ease');
     assert.ok(code.includes('if (g.dx < -SWIPE) go(at.current + 1, g.dx);') && code.includes('else if (g.dx > SWIPE) go(at.current - 1, g.dx);'), 'a swipe let go hands on where it was let go');
-    assert.ok(code.includes('if (letGo !== undefined && !calmNow.current && to !== at.current) {') && code.includes('} else setSettle(null);'), 'still under Reduce Motion');
+    assert.ok(code.includes('if (letGo !== undefined && !vertNow.current && !calmNow.current && to !== at.current) {') && code.includes('} else setSettle(null);'), 'still under Reduce Motion, and up and down, where a dot goes at once');
     assert.ok(code.includes('travelOf(j, at.current, to, n, letGo, FAN, PEEK)'), 'from the fan and the rise the drag itself uses');
     assert.ok(code.includes('const v = k === i ? settle!.top : settle!.fan;'), 'the top card on its own curve');
     assert.ok(code.includes('later(() => go(at.current + 1), 200);') && code.includes('          go(at.current + 1);\n'), 'Done, next one lands at once, as today\'s snap does: still, and after the tuck');
@@ -381,7 +383,12 @@ describe('native deck: the screen', () => {
     // so a card that comes to the top loses its cover and a cover never passes from a moving value to a plain one.
     assert.ok(code.includes('<View style={s.face}>'), 'the words sit in a plain view');
     assert.doesNotMatch(code, /s\.face, \{ opacity|faceOpacity/, 'the words carry no opacity of their own');
-    assert.ok(code.includes('const cover = coverOf(k, i, peek, done ? done.phase : null);'));
+    assert.ok(code.includes('const cover = coverOf(k, i, peek, done ? done.phase : null, vert);'));
+    // Up and down every card is drawn in full on a slot of its own (deck.ts faceStyle: opacity 1): none wears a cover.
+    assert.equal(coverOf(1, 1, 2, null, true), null, 'up and down, the top card');
+    assert.equal(coverOf(2, 1, 2, null, true), null, 'up and down, the card coming in wears no cover');
+    assert.equal(coverOf(2, 1, 2, 'leave', true), null, 'nor as Done, next one brings it in');
+    assert.equal(coverOf(0, 1, 2, null, true), null, 'nor any card out of the stage');
     assert.ok(code.includes("{cover && <Animated.View key={cover} testID={'deck-cover-' + k} pointerEvents=\"none\" style={[StyleSheet.absoluteFill, { backgroundColor: toneColor(p, c.tone), opacity: coverOpacity(cover) }]} />}"), 'the cover is the card\'s own colour, takes no touch, and is keyed by its kind');
     assert.ok(code.includes("if (kind === 'rest') return 1;"), 'a plain card is covered whole');
   });
@@ -389,13 +396,288 @@ describe('native deck: the screen', () => {
   test('This Week\'s Start lift and Start session open it, over the tab bar; a sunk button and the run\'s buttons open nothing', () => {
     const week = strip(readFileSync(join(REPO, 'frontends/native/src/this-week/ThisWeek.tsx'), 'utf8'));
     assert.ok(week.includes("const starts = !!bt && bt.act === 'deck' && !bt.sunk;"));
-    assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={() => onStart(k.week, k.key)}'));
-    assert.ok(week.includes('const view = deckView(store, grid, week, key, Date.now(), warn);') && week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn });'));
+    assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={start}'));
+    assert.ok(week.includes('const view = deckView(store, grid, week, key, Date.now(), warn);') && week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from);'));
     const app = strip(readFileSync(join(REPO, 'frontends/native/src/App.tsx'), 'utf8'));
-    assert.ok(app.includes('onDeck={setDeck}') && app.includes('<Deck palette={p} store={phoneStore} open={deck} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}'));
+    assert.ok(app.includes('onDeck={(open, from) => setDeck({ open, from })}') && app.includes('<DeckOpening palette={p} store={phoneStore} open={deck.open} from={deck.from} calm={calm} under={under} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}'));
     // Today's toast stands at z-index 999 and its pop-up overlays at 2000: the nudge and the pop-up are drawn after the toast, so over it.
     assert.ok(app.indexOf('{over}') > app.indexOf('<Toast ') && app.indexOf('<PopUp ') > app.indexOf('{over}'), 'the deck, the toast, the nudge, the pop-up, each over the last');
-    assert.ok(app.indexOf('<Toast ') > app.indexOf('<Deck '), 'the toast is drawn after the deck, so over it');
-    assert.ok(app.indexOf('<Deck ') > app.indexOf('testID="tab-bar"'), 'the deck is drawn after the tab bar, so over it');
+    assert.ok(app.indexOf('<Toast ') > app.indexOf('<DeckOpening '), 'the toast is drawn after the deck, so over it');
+    assert.ok(app.indexOf('<DeckOpening ') > app.indexOf('testID="tab-bar"'), 'the deck is drawn after the tab bar, so over it');
+  });
+
+  // Found reading the beta against today's for the pager (tests/measure/native-deck-pager_today.md): on a deck of two
+  // cards the other card is both the next and the one before, and today's always raises it from the fan's first seat
+  // (deck.ts cardStyle, dirUp = pos === 1). The beta's drag drew it from 92% under the top card on a pull to the
+  // right, and its settle began from the seat, so the card jumped as the finger let go.
+  test('a deck of two cards: the card behind rises from the fan\'s seat whichever way the finger goes, and the settle begins where the drag left it', () => {
+    // Two cards, pulled 70 to the right, half of the rise: half way in from the seat (7.5, -3.5, 0.9825, 0.8).
+    const up = poseOf(1, 0, 2, 70, 3, 140);
+    near(up.x, 7.5, 'across'); near(up.y, -3.5, 'up'); near(up.s, 0.9825, 'its scale'); near(up.r, 0.8, 'its turn');
+    assert.deepStrictEqual(poseOf(1, 0, 2, -70, 3, 140), up, 'the same card, the same way in, on a pull to the left');
+    // Let go at 100 to the right: it has 2/7 of the seat left to travel, and nothing more.
+    const t = travelOf(1, 0, 1, 2, 100, 3, 140)!;
+    near(t.x, 30 / 7, 'what it has left, across'); near(t.y, -2, 'up'); near(t.s, 0.99, 'its scale'); near(t.r, 3.2 / 7, 'its turn');
+    // The screen's drag asks the same question the settle does: is the card coming up the next one.
+    assert.ok(code.includes("const f = (peek - i + n) % n === 1 ? { x: 15, y: -7, s: 0.965, r: '1.6deg' } : { x: 0, y: 0, s: 0.92, r: '0deg' };"));
+    assert.doesNotMatch(code, /const f = dir > 0 \?/, 'not by the way the finger is going');
+  });
+});
+
+// D275 call 1 (Mario, on the canvas): "Double tap a card to switch between sideways and up and down; up and down is a
+// smooth pager." Every number is typed by hand from today's deck (deck.ts DOUBLE_TAP, down, move, up, slide and
+// cardStyle; deck.css .deck-stage.vert, .deck-dots.v, deckPagerLeave and deckPagerRise), as
+// tests/measure/native-deck-pager_today.md sets them out.
+describe('native deck: the double tap and the up and down pager (D275 call 1)', () => {
+  const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+  const deck = readFileSync(join(REPO, 'frontends/native/src/deck/Deck.tsx'), 'utf8');
+  const code = strip(deck);
+
+  test('a press that ends within 6 points of where it began is a tap, and two taps inside 320 ms turn the deck', () => {
+    assert.deepStrictEqual([DOUBLE_TAP, TAP_SLOP], [320, 6]);
+    assert.deepStrictEqual([isTap(0, 0), isTap(5, 5), isTap(-5, 5), isTap(6, 0), isTap(0, 6), isTap(0, -6), isTap(-6, 0)], [true, true, true, false, false, false, false]);
+    assert.deepStrictEqual(tapped(null, 1000), { turn: false, last: 1000 }, 'a first tap is remembered');
+    assert.deepStrictEqual(tapped(1000, 1319), { turn: true, last: null }, 'a second tap 319 ms on turns the deck and clears the clock');
+    assert.deepStrictEqual(tapped(1000, 1320), { turn: false, last: 1320 }, 'at 320 ms it is a first tap again');
+    assert.deepStrictEqual(tapped(null, 100), { turn: false, last: 100 }, 'a tap in the app\'s first 320 ms pairs with nothing');
+    // Tap, tap, tap: the third begins a pair of its own, so three quick taps turn the deck once.
+    const one = tapped(null, 0), two = tapped(one.last, 200), three = tapped(two.last, 400);
+    assert.deepStrictEqual([one.turn, two.turn, three.turn], [false, true, false]);
+  });
+
+  test('the tap is read on the card and not on a control, turns the deck either way, and says nothing', () => {
+    // The card's body sits in one press of its own: a control inside it takes its own press, as a button on the page
+    // is passed over (deck.ts down), and it is no element of its own to a screen reader.
+    assert.ok(deck.includes("testID={'deck-tap-' + k} accessible={false} style={{ flexGrow: 1, padding: z.pad, paddingBottom: z.pad - 2 }}"));
+    assert.ok(code.includes('onPressIn={(e) => { pressAt.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY }; }}') && code.includes('onPress={(e) => cardTap(e.nativeEvent.pageX, e.nativeEvent.pageY)}'));
+    const tap = code.slice(code.indexOf('const cardTap = '), code.indexOf('const foldOf = '));
+    assert.ok(tap.includes('if (busy.current || !isTap(x - pressAt.current.x, y - pressAt.current.y)) return;'), 'no tap while a card is on its way out, and none that moved');
+    assert.ok(tap.includes('const t = tapped(lastTap.current, performance.now());') && tap.includes('lastTap.current = t.last;') && tap.includes('if (!t.turn) return;'));
+    assert.ok(tap.includes('setVert((v) => !v);'), 'either way');
+    assert.doesNotMatch(tap, /say\(|Toast|hint/, 'no toast and no hint (call 15)');
+    assert.doesNotMatch(tap, /Date\.now/, 'the clock is the one a pinned date does not stop');
+    assert.ok(tap.includes('leave();'), 'a tap takes the keyboard off its field, which saves the field as any press does');
+    assert.ok(code.includes('const [vert, setVert] = useState(false);'), 'every open starts sideways: the choice is not kept');
+    assert.doesNotMatch(code, /store\.(get|set)\([^)]*vert/i, 'and nothing stores it');
+  });
+
+  test('where each card stands up and down: the top card under the finger, the card coming in a card height and 14 points away, and no fan', () => {
+    assert.equal(PAGER_GAP, 14);
+    // Six cards on a stage 600 points tall, the first on top, at rest: only the top card is drawn.
+    assert.deepStrictEqual(pagerPose(0, 0, 6, 0, 600), { y: 0, shown: true });
+    assert.deepStrictEqual([1, 2, 3, 4, 5].map((k) => pagerPose(k, 0, 6, 0, 600).shown), [false, false, false, false, false], 'no fan');
+    // Pulled 100 up: the top card 100 up, the next one 614 below it less the 100, nothing else.
+    assert.deepStrictEqual(pagerPose(0, 0, 6, -100, 600), { y: -100, shown: true });
+    assert.deepStrictEqual(pagerPose(1, 0, 6, -100, 600), { y: 514, shown: true });
+    assert.deepStrictEqual([2, 3, 4, 5].map((k) => pagerPose(k, 0, 6, -100, 600).shown), [false, false, false, false]);
+    // Pulled 100 down: the card before comes from 614 above, and the next one is not drawn.
+    assert.deepStrictEqual(pagerPose(5, 0, 6, 100, 600), { y: -514, shown: true });
+    assert.equal(pagerPose(1, 0, 6, 100, 600).shown, false);
+    // Two points of drag bring nothing in; the third does.
+    assert.equal(pagerPose(1, 0, 6, -2, 600).shown, false);
+    assert.deepStrictEqual(pagerPose(1, 0, 6, -3, 600), { y: 611, shown: true });
+    // It wraps, as sideways does: on from the last card is the first, back from the first is the last.
+    assert.deepStrictEqual(pagerPose(0, 5, 6, -100, 600), { y: 514, shown: true });
+    // A shorter stage: the stride is the stage and the gap (480 and 14).
+    assert.deepStrictEqual(pagerPose(1, 0, 3, -50, 480), { y: 444, shown: true });
+    // A deck of two: the other card comes from below on a pull up and from above on a pull down.
+    assert.deepStrictEqual(pagerPose(1, 0, 2, -100, 600), { y: 514, shown: true });
+    assert.deepStrictEqual(pagerPose(1, 0, 2, 100, 600), { y: -514, shown: true });
+  });
+
+  test('a drag let go past 80 points pages, and both cards slide a stride: the top card away, the card coming in onto nothing', () => {
+    assert.deepStrictEqual([swipeTo(-81, 80), swipeTo(-80, 80), swipeTo(0, 80), swipeTo(80, 80), swipeTo(81, 80)], [1, 0, 0, 0, -1]);
+    // The screen keeps each card on a slot and the pager on a page. Let go 100 up on a stage of 600: the top card is
+    // on the page's slot, 100 up, and the next card one slot on, 514 down.
+    assert.equal(pagerY(0, 600, -100), -100);
+    assert.equal(pagerY(1, 600, -100), 514);
+    assert.equal(pagerY(-1, 600, 100), -514);
+    // When the slide ends the page is one on and the drag is nothing: the card let go is one slot back, 614 up and
+    // out of the stage, and the card that came in stands on nothing.
+    assert.equal(pagerY(-1, 600, 0), -614);
+    assert.equal(pagerY(0, 600, 0), 0);
+    // Half way through, on any curve, both have covered half of what they had: -100 to -614 and 514 to 0.
+    assert.equal(pagerY(-0.5, 600, -50), -357);
+    assert.equal(pagerY(0.5, 600, -50), 257);
+    // The screen: one stride per slot, the page and the drag moved together over the settle's 290 ms, and nothing set
+    // back when it ends: the deck is then on that card's slot.
+    assert.ok(code.includes('const stride = stageH + PAGER_GAP;'));
+    assert.ok(code.includes('const pagerAt = (on: number) => Animated.add(pageV.interpolate({ inputRange: [on - 1, on + 1], outputRange: [stride, -stride] }), dy);'));
+    assert.ok(code.includes('const lifted = [{ translateY: Animated.add(pagerAt(slot), liftV.interpolate({ inputRange: [0, 1], outputRange: [0, -10] })) }, { scale: liftV.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] }) }];')
+      && code.includes('if (vert) return { zIndex: 20, transform: lifted };'), 'the top card on the page\'s slot, with its lift, which is nothing at rest');
+    assert.ok(code.includes('if (vert) return { zIndex: 15, transform: [{ translateY: pagerAt(slot + slotsFrom(k, i, n, dir)) }] };'), 'every other card on a slot of its own: the next one on, the one before back');
+    // Both stand ready, so a pull the other way draws nothing again while the cards are under the finger.
+    assert.ok(code.includes('if (d !== dirNow.current) { dirNow.current = d; if (!vertNow.current || n === 2) setDir(d); }'));
+    const slide = code.slice(code.indexOf('const slide = '), code.indexOf('const pan = '));
+    assert.ok(slide.length > 300 && slide.length < 1200, 'the slide was read, and nothing after it');
+    assert.ok(slide.includes('Animated.timing(pageV, { toValue: slotNow.current + to, ...SETTLE_TOP, useNativeDriver: true }),') && slide.includes('Animated.timing(dy, { toValue: 0, ...SETTLE_TOP, useNativeDriver: true }),'));
+    assert.ok(code.includes('const SETTLE_TOP = { duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1) };'));
+    // The page is never set back: when the slide ends it is said again where it came to rest, and the deck is on
+    // that slot.
+    assert.ok(slide.includes('      busy.current = false;\n      landed(slotNow.current + to);\n      go(at.current + to);'));
+    assert.ok(code.includes('  const landed = (s: number): void => {\n    slid.current = true;\n    slotNow.current = s;') && code.includes('    pageV.setValue(s);\n    setSlot(s);\n  };'));
+    assert.doesNotMatch(slide, /pageV\.setValue/, 'the slide sets the page nowhere itself');
+    assert.ok(slide.includes('busy.current = true;'), 'a press inside the slide is refused');
+    assert.ok(slide.includes('if (calmNow.current) {\n      dy.setValue(0);\n      go(at.current + to);\n      return;'), 'no slide under Reduce Motion: the card changes at once');
+    assert.ok(code.includes('const to = swipeTo(g.dy, SWIPE);') && code.includes('if (to) slide(to);') && code.includes('else Animated.timing(dy, { toValue: 0, ...SETTLE_TOP, useNativeDriver: true }).start(rest);'), 'short of the line it goes back over the same 290 ms');
+  });
+
+  // Seen on the simulator: up and down, a dot pressed after a slide lit its dot and left the card before on the
+  // screen until the next pull. A card handed a new place is not moved there until a value its place hangs on
+  // changes (saying the same value again moved nothing, and nor did a thousandth of a point set as the cards were
+  // drawn). So a jump moves the page and every card keeps its slot: the cards in sight are moved by the page alone.
+  test('a dot or a tile of the map moves the page the nearer way round, and every card keeps the slot it stands on', () => {
+    // Six cards, the first on top: the next is one slot on, the last one back, the fourth three on, the fifth two back.
+    assert.deepStrictEqual([0, 1, 2, 3, 4, 5].map((k) => slotsFrom(k, 0, 6)), [0, 1, 2, 3, -2, -1]);
+    assert.deepStrictEqual([0, 1, 2].map((k) => slotsFrom(k, 0, 3)), [0, 1, -1]);
+    assert.deepStrictEqual([0, 1, 2, 3].map((k) => slotsFrom(k, 2, 4)), [2, -1, 0, 1]);
+    // A deck of two: the other card is one slot on, or one back while the finger pulls down.
+    assert.deepStrictEqual([slotsFrom(1, 0, 2), slotsFrom(1, 0, 2, 1), slotsFrom(1, 0, 2, -1), slotsFrom(0, 0, 2, -1)], [1, 1, -1, 0]);
+    // The second of three cards on top, the page on slot 10: the first card stands on slot 9, the third on 11. A
+    // dot takes the deck to the first card: the page goes one slot back, to 9, and the first two cards stand on
+    // the slots they stood on, 9 and 10, so the page alone has moved them. The third goes round, out of sight.
+    const on = (k: number, top: number, slot: number): number => slot + slotsFrom(k, top, 3);
+    assert.deepStrictEqual([on(0, 1, 10), on(1, 1, 10), on(2, 1, 10)], [9, 10, 11]);
+    const page = 10 + slotsFrom(0, 1, 3);
+    assert.equal(page, 9);
+    assert.deepStrictEqual([on(0, 0, page), on(1, 0, page), on(2, 0, page)], [9, 10, 8]);
+    // A slide is the same: on to the third card, the page on 11, and the second and third cards stand where they stood.
+    assert.deepStrictEqual([on(1, 2, 11), on(2, 2, 11)], [10, 11]);
+    const go = code.slice(code.indexOf('const go = '), code.indexOf('const slide = '));
+    assert.ok(go.includes('      if (!slid.current) {\n        const s = slotNow.current + slotsFrom(to, at.current, n);\n        slotNow.current = s;\n        pageV.setValue(s);\n        setSlot(s);\n      }\n      slid.current = false;'));
+    assert.doesNotMatch(code, /opacity: 0 \};\n    \}\n    if \(k === peek && leaving\)/, 'no card is left undrawn up and down');
+  });
+
+  test('a tall card\'s body scrolls first, and the pager takes only what the body cannot', () => {
+    const fits = { y: 0, max: 0 };
+    assert.deepStrictEqual([pagerTakes(0, -9, fits), pagerTakes(0, -8, fits), pagerTakes(0, 9, fits)], [true, false, true], 'past 8 points');
+    assert.deepStrictEqual([pagerTakes(5, -9, fits), pagerTakes(10, -12, fits), pagerTakes(10, -13, fits)], [true, false, true], 'and more down than across, by a fifth');
+    assert.equal(pagerTakes(0, -20, { y: 0, max: 2 }), true, 'a body 2 points taller than its box fits');
+    // A body with 200 points to scroll: at its head a pull down pages and a pull up scrolls; at its foot the other
+    // way round; in between it scrolls both ways.
+    assert.deepStrictEqual([pagerTakes(0, 20, { y: 0, max: 200 }), pagerTakes(0, -20, { y: 0, max: 200 })], [true, false]);
+    assert.deepStrictEqual([pagerTakes(0, 20, { y: 200, max: 200 }), pagerTakes(0, -20, { y: 200, max: 200 })], [false, true]);
+    assert.deepStrictEqual([pagerTakes(0, 20, { y: 100, max: 200 }), pagerTakes(0, -20, { y: 100, max: 200 })], [false, false]);
+    assert.ok(code.includes('if (vertNow.current) return pagerTakes(g.dx, g.dy, bodyOf(topKey.current));'), 'the screen asks it of the top card\'s body');
+    assert.ok(code.includes('return Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2;'), 'sideways the swipe is taken as before');
+    assert.ok(code.includes('scrollEnabled={!vert || !!tall[c.key] || keys} bounces={!vert}'), 'up and down a body that fits does not move, and a tall one does not bounce');
+    assert.ok(code.includes('const is = b.box > 0 && b.content > b.box + 2;'), 'tall is taller than its box by more than 2 points (deck.ts move)');
+  });
+
+  test('up and down the stage, the dots and the done motion are today\'s', () => {
+    // deck.css .deck-stage.vert: 34 points at the right where sideways has 20, the cards cut off at its head and foot.
+    assert.ok(deck.includes('stage: { flex: 1, marginHorizontal: 20 },') && deck.includes('stageV: { marginRight: 34 },') && deck.includes("clipV: { overflow: 'hidden' },") && deck.includes('clip: { flex: 1, marginTop: 16 },'));
+    assert.ok(code.includes('<View style={[s.clip, vert && s.clipV]}>') && code.includes('style={[s.stage, vert && s.stageV]}'));
+    // .deck-dots.v: a column 24 points past the stage's right edge (34 less 24 is 10 from the screen's), the lit dot 8 by 22.
+    assert.ok(deck.includes("dotsV: { position: 'absolute', right: 10, top: 0, bottom: 0, width: 8, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6 },"));
+    assert.ok(code.includes('k === i && (vert ? { height: 22 } : { width: 22 })'));
+    assert.ok(code.includes('{vert && <View testID="deck-dots" style={s.dotsV}>{dots}</View>}') && code.includes('{!vert && <View testID="deck-dots" style={s.dots}>{dots}</View>}'), 'one set of dots, where the deck\'s direction puts it');
+    assert.ok(code.includes("transformOrigin: vert ? 'center bottom' : 'left bottom'"), '.deck-stage.vert .deck-card: it grows from its foot\'s middle');
+    // deckPagerLeave and deckPagerRise: 760 ms on the tuck's curve, from 10 up at 103% to a stride up at its own size,
+    // while the next card rises from a stride below.
+    // The page goes on a slot over the 760 ms while the lift lets go, so the card leaves from where the lift held
+    // it and the next one lands where the top card stands.
+    assert.ok(deck.includes('const PAGER_LEAVE = 760;') && code.includes('Animated.timing(pageV, { toValue: slotNow.current + 1, duration: PAGER_LEAVE, easing: TUCK, useNativeDriver: true }),')
+      && code.includes('Animated.timing(liftV, { toValue: 0, duration: PAGER_LEAVE, easing: TUCK, useNativeDriver: true }),'));
+    // Up and down nothing is drawn again between the tap and the end: the lift, the glow and the page are values the
+    // cards already wear, so nothing the screen is asked to draw can land in the middle of the motion.
+    const done = code.slice(code.indexOf('glowV.setValue(marking ? 1 : 0);'), code.indexOf("setDone({ phase: 'lift', glow: marking, tucked: false });"));
+    assert.ok(done.length > 400, 'the up and down done motion was read');
+    assert.doesNotMatch(done, /setDone\(|setFields\(|setI\(/, 'no state is set between the tap and the end');
+    assert.ok(done.includes('Animated.timing(liftV, { toValue: 1, duration: 340, easing: Easing.bezier(0.2, 0.8, 0.2, 1), useNativeDriver: true }).start();') && done.includes('}, marking ? 560 : 220);'), 'the lift and its hold are the sideways motion\'s');
+    assert.ok(done.includes('glowV.setValue(marking ? 1 : 0);') && done.includes('      later(() => {\n        glowV.setValue(0);'), 'the glow is the lift\'s alone');
+    assert.ok(code.includes("{vert && top && <Animated.View testID=\"deck-glow\" pointerEvents=\"none\" style={[s.card, { transformOrigin: 'center bottom', zIndex: 19, boxShadow: glowOf(top), opacity: glowV, transform: lifted }]} />}"), 'on a layer of its own, moving with the card');
+    assert.ok(code.includes("return '0 0 0 2px rgba(' + g + ',0.9), 0 0 42px 8px rgba(' + g + ',0.6), 0 20px 44px rgba(0,0,0,0.26)';"));
+    // Lifted, the card is 10 up on its slot; as the page reaches the next slot and the lift reaches nothing, it is a
+    // stride up at its own size, and the next card, one slot on, is on nothing.
+    assert.equal(pagerY(0, 600, 0) - 10, -10);
+    assert.equal(pagerY(-1, 600, 0), -614);
+    assert.ok(code.includes('          liftV.setValue(0);\n          landed(slotNow.current + 1);\n          go(at.current + 1);'), 'and the deck is then on that slot, each value said again where it came to rest');
+    assert.ok(code.includes('          busy.current = false;\n          liftV.setValue(0);\n          setDone(null);'), 'sideways the lift is let go when the card has gone, so a deck turned afterwards rests flat');
+    const turn = code.slice(code.indexOf('const cardTap = '), code.indexOf('const foldOf = '));
+    assert.ok(turn.includes('liftV.setValue(0);') && turn.includes('glowV.setValue(0);'));
+    assert.doesNotMatch(code, /leaveV\.interpolate\(\{ inputRange: \[0, 2\], outputRange: \[(stride|-10)/, 'no card is moved by a value of its own up and down');
+  });
+});
+
+// D275 call 16 (Mario, 2026-11-08, on the canvas's THE MOCKUP): "i like the lift first at 420 ms". Every number is
+// typed by hand from the ruling's own list (docs/decisions/swipe-deck.md, call 16), which today's grow-motion.ts
+// plays: lift 168 ms, open 420, close 357, the deck's fade 294 after 84, the copy's 126, and back from 161 to 286.
+describe('native deck: the opening out of the card, Lift first at 420 ms (D275 call 16)', () => {
+  const strip = (t: string): string => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+  const read = (f: string): string => strip(readFileSync(join(REPO, 'frontends/native/src', f), 'utf8'));
+  const opening = read('deck/DeckOpening.tsx');
+
+  test('the frame rests on the card, on the card lifted, and on the whole screen', () => {
+    // A card 370 by 220 at 16 across and 300 down, on Mario's phone (402 by 874).
+    assert.deepStrictEqual(growFrames({ t: 300, l: 16, w: 370, h: 220 }, 402, 874), {
+      card: { t: 300, l: 16, w: 370, h: 220, r: 24 },
+      lifted: { t: 290, l: 8, w: 386, h: 240, r: 28 },
+      full: { t: 0, l: 0, w: 402, h: 874, r: 0 },
+    });
+  });
+
+  test('before anything moves the deck is drawn at the card\'s place, hidden at 94%, under the copy', () => {
+    assert.deepStrictEqual(GROW_START, { frame: 0, shut: 0, scrim: 0, week: 1, copyFade: 1, copyScale: 1, copyFill: 0, deckFade: 0, deckScale: 0.94 });
+    assert.deepStrictEqual(GROW_STILL, { frame: 2, shut: 0, scrim: 0, week: 1, copyFade: 0, copyScale: 1, copyFill: 0, deckFade: 1, deckScale: 1 });
+  });
+
+  test('the lift, the open and the close move each part by the ruling\'s numbers', () => {
+    const P = growPlan();
+    const row = (s: { part: string; to: number; ms: number; delay: number; ease: string }): string => [s.part, s.to, s.ms, s.delay, s.ease].join(' ');
+    // Lift, 168 ms: the scrim to 30%; the copy to 1.04 and one step lighter; the frame to the card lifted.
+    assert.deepStrictEqual(P.lift.map(row), ['scrim 0.3 168 0 ease', 'copyScale 1.04 168 0 lift', 'copyFill 1 168 0 lift', 'frame 1 168 0 lift']);
+    // Open, 420 ms: This Week to 96%; the scrim to 55%; the copy out over 126; the frame to the whole screen; the
+    // deck in over 294 after 84, and to full size.
+    assert.deepStrictEqual(P.open.map(row), ['week 0.96 420 0 open', 'scrim 0.55 420 0 open', 'copyFade 0 126 0 ease', 'frame 2 420 0 open', 'deckFade 1 294 84 ease', 'deckScale 1 420 0 open']);
+    // Close, 357 ms: This Week and the scrim back; the copy back from 161 ms to 286, flat, on a card's own ground;
+    // the frame straight back to the card; the deck out over 143 and back to 94%.
+    assert.deepStrictEqual(P.close.map(row), ['week 1 357 0 close', 'scrim 0 357 0 close', 'copyFade 1 125 161 ease', 'copyScale 1 357 0 close', 'copyFill 2 357 0 ease', 'shut 1 357 0 close', 'deckFade 0 143 0 ease', 'deckScale 0.94 357 0 close']);
+    assert.equal(161 + 125, 286);
+    assert.equal(168 + 420, 588, 'open to settled');
+    // The curves: the ruling's three, and CSS ease.
+    assert.deepStrictEqual([growCurve('lift'), growCurve('open'), growCurve('close'), growCurve('ease')], [[0.3, 0, 0.2, 1], [0.05, 0.7, 0.1, 1], [0.3, 0, 0.8, 0.15], [0.25, 0.1, 0.25, 1]]);
+    // No stage moves a part twice.
+    for (const steps of [P.lift, P.open, P.close]) assert.equal(new Set(steps.map((s) => s.part)).size, steps.length);
+    assert.deepStrictEqual(GROW_LAYOUT, ['frame', 'shut', 'copyFill'], 'a box or a colour is moved by the screen; a fade or a size by the phone');
+  });
+
+  test('the screen: drawn first, then the lift, then the open; Back and Mark the day done play it back before the app takes the deck away', () => {
+    assert.ok(opening.includes('waits.current = { frame: requestAnimationFrame(() => requestAnimationFrame(lift)), held: setTimeout(lift, 64) };'), 'two frames, or 64 ms when frames are held back');
+    assert.ok(opening.includes('<Animated.View testID="deck-frame" onLayout={drawn} style={{') && opening.includes('if (!moves || waits.current) return;'), 'counted from the frame being on the screen, once');
+    assert.ok(opening.includes("run(plan.lift, () => run(plan.open, () => setStage('open')));"));
+    // The deck is drawn once: drawing every card takes longer than the lift lasts (seen in the simulator's frames,
+    // where a deck drawn again at each stage showed no lift at all).
+    assert.ok(opening.includes('const body = useMemo(() => (') && opening.includes('), [palette, store, open, onProgram, onOver, say]);'));
+    assert.doesNotMatch(opening, /setStage\('(pre|lift|in)'\)/, 'no stage is set between drawn and open');
+    assert.ok(opening.includes('toValue: s.to, duration: s.ms, delay: s.delay, easing: Easing.bezier(...growCurve(s.ease)), useNativeDriver: !GROW_LAYOUT.includes(s.part),'));
+    assert.ok(opening.includes('onClose={() => way.current.close(way.current.onClose)}') && opening.includes('onDone={(prog, week, dayKey) => way.current.close(() => way.current.onDone(prog, week, dayKey))}'), 'both close the same way, and the pop-up waits for it');
+    assert.ok(opening.includes("setStage('out');\n    run(growPlan().close, then);"));
+    assert.ok(opening.includes("if (stageNow.current !== 'open') return;"), 'a close before it is open, or a second one while it closes, does nothing');
+    assert.ok(opening.indexOf('Keyboard.dismiss();') > 0 && opening.indexOf('Keyboard.dismiss();') < opening.indexOf("setStage('out');"), 'D285: the keyboard goes as it starts to close');
+    // Reduce Motion, or a card whose place is not known: at once, both ways.
+    assert.ok(opening.includes('const [moves] = useState(!calm && !!from);') && opening.includes("useState<Stage>(moves ? 'opening' : 'open')"));
+    assert.ok(opening.includes('if (!moves) {\n      then();\n      return;\n    }'));
+    // The deck takes no press until it is open, and the copy is not there once it is.
+    assert.ok(opening.includes("pointerEvents={stage === 'open' ? 'auto' : 'none'}") && opening.includes("{stage !== 'open' && ("));
+    // The frame keeps its moving value while it is open, and the close starts one of its own from the same place.
+    assert.ok(opening.includes("const shut = stage === 'out';") && opening.includes('v.shut.interpolate({ inputRange: [0, 1], outputRange: [full, card] })') && opening.includes('v.frame.interpolate({ inputRange: [0, 1, 2], outputRange: [card, lifted, full] })'));
+    assert.ok(opening.includes('v.frame.interpolate({ inputRange: [0, 1, 2], outputRange: [p.surface, p.surface2, p.bg] })') && opening.includes('v.shut.interpolate({ inputRange: [0, 1], outputRange: [p.bg, p.surface] })'), 'the fill: a card\'s, one step lighter, the ground; and back');
+    assert.ok(opening.includes('outputRange: [clear(p.surface2), p.surface2, p.surface]'), 'the copy\'s ground: none, one step lighter, a card\'s own');
+    assert.ok(opening.includes("backgroundColor: '#000000', opacity: v.scrim"));
+    // The deck paints no ground of its own: the frame's fill is its ground, as today's.
+    assert.doesNotMatch(read('deck/Deck.tsx'), /testID="deck" accessibilityViewIsModal style=\{\[StyleSheet\.absoluteFill, \{ backgroundColor/);
+  });
+
+  test('the copy is the card without its skip pill, its button or Reopen, and This Week shrinks under the deck', () => {
+    const week = read('this-week/ThisWeek.tsx');
+    assert.ok(week.includes("backgroundColor: copy ? 'transparent' : off ? p.cardOff : p.surface }, copy && s.cardCopy]"));
+    assert.ok(week.includes('{k.skip && !copy && (') && week.includes('{bt && !copy && (') && week.includes('{!copy && <Text accessibilityRole="button" style={[s.reopen, { color: p.signal }]}>Reopen</Text>}'));
+    assert.ok(week.includes("cardCopy: { width: '100%', height: '100%' },"));
+    assert.ok(week.includes('el.measureInWindow((x, y, w, h) => onStart(k.week, k.key, w > 0 && h > 0 ? { box: { t: y, l: x, w, h }, card: k } : null));'), 'the card\'s place on the screen goes with Start, or none');
+    assert.ok(opening.includes('<Card k={from.card} p={p} copy />'));
+    const app = read('App.tsx');
+    assert.ok(app.includes('const under = useRef(new Animated.Value(1)).current;') && app.includes('<Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>'));
+    assert.ok(opening.includes('v.week = under;'));
   });
 });

@@ -17,9 +17,15 @@
 // (swap-sheet/SwapSheet.tsx over deck-swaps.ts); a pick swaps the lift and Put it back undoes it (deck-writes.ts
 // swapMove and undoSwap, the page's applySwapChoice and undoSwap), each drawing the day again as a skip does.
 //
+// UP AND DOWN (the deck's fifth session; D275 call 1). Two taps on a card inside 320 ms turn the deck between sideways
+// and an up and down pager, either way, with no toast and no hint (call 15); every open starts sideways. Up and down
+// there is no fan: the top card follows the finger, the card coming in stands a card height and 14 points away, a
+// drag let go past 80 points slides both over 290 ms, the dots stand in a column at the right, and Done, next one
+// sends the card up and away. A tall card's body scrolls first. The opening out of the card (call 16) is
+// DeckOpening.tsx, which holds this screen and paints its ground: the deck has none of its own, as today's has none.
+//
 // Not here yet: remove on an added move (drawn, taking no press: today's deck hides it on the card an added move
-// gets, and the add sheet is the session sheet's); the opening out of the card (call 16) and the up and down pager
-// (call 1). The coach's nudge is raised here, 1.4 s after the third pick running of one pair (swap-sheet.ts), and
+// gets, and the add sheet is the session sheet's). The coach's nudge is raised here, 1.4 s after the third pick running of one pair (swap-sheet.ts), and
 // answered through deck-writes.ts; Make the change hands back the rebuilt program, which this screen and This Week
 // then hold. Mark the day done hands the day to the app, which closes the deck and raises the completion pop-up.
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -39,7 +45,10 @@ import { parseRx } from './deck-readers';
 import { SwapNudge } from '../swap-nudge/SwapNudge';
 import { SwapSheet } from '../swap-sheet/SwapSheet';
 import { PLAN_CHANGE_FAILED } from '../this-week/week-screen';
-import { type CoverKind, type DeckOpen, type DeckProgram, type Fields, type Travel, coverOf, deckView, freshFields, loggedCards, movesOf, toneColor, travelOf } from './deck-screen';
+import {
+  type BodyScroll, type CoverKind, type DeckOpen, type DeckProgram, type Fields, PAGER_GAP, type Travel, coverOf, deckView, freshFields, isTap, loggedCards, movesOf, pagerTakes,
+  slotsFrom, swipeTo, tapped, toneColor, travelOf,
+} from './deck-screen';
 import { type SwapOpen, swapSheetOf } from './deck-swaps';
 import { type Session, acceptNudge, act, dismissNudge, leftField, markDay, nudgeWords, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from './deck-writes';
 import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from './set-fields';
@@ -59,6 +68,8 @@ const SETTLE_FAN = { duration: 260, easing: Easing.bezier(0.25, 0.1, 0.25, 1) };
 const TUCK = Easing.bezier(0.45, 0, 0.2, 1);
 const TUCK_OUT = 319;
 const TUCK_IN = 441;
+/** Up and down the card leaves in one run of the same 760 ms (deck.css deckPagerLeave and deckPagerRise). */
+const PAGER_LEAVE = 760;
 
 /** Type and tints on a card: white at an alpha (rgba(var(--on-band-rgb), a)). */
 const on = (a: number): string => 'rgba(255,255,255,' + a + ')';
@@ -150,6 +161,39 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
   /** A finger on Call it's slider keeps the deck from taking the drag. */
   const sliding = useRef(false);
 
+  // ── Up and down (call 1): a double tap turns the deck, either way; every open starts sideways ──
+  const [vert, setVert] = useState(false);
+  const vertNow = useRef(false);
+  vertNow.current = vert;
+  // Each card stands on a slot, a card height and 14 points apart, and the pager on a page: the top card's slot. A
+  // drag moves `dy`; a slide takes the page on by one and the drag to nothing together, so when it ends the card
+  // that came in is already where the top card stands and nothing is set back (deck-screen.ts pagerY).
+  const [slot, setSlot] = useState(0);
+  const slotNow = useRef(0);
+  slotNow.current = slot;
+  const pageV = useRef(new Animated.Value(0)).current;
+  const dy = useRef(new Animated.Value(0)).current;
+  const [stageH, setStageH] = useState(0);
+  /** Each card's body: how far it is scrolled, its box and its content, so a tall card scrolls before the pager pages. */
+  const bodies = useRef<Record<string, { y: number; box: number; content: number }>>({});
+  const [tall, setTall] = useState<Record<string, boolean>>({});
+  const bodyOf = (key: string): BodyScroll => { const b = bodies.current[key]; return b ? { y: b.y, max: Math.max(0, b.content - b.box) } : { y: 0, max: 0 }; };
+  const sized = (key: string, part: { box?: number; content?: number }): void => {
+    const b = { ...(bodies.current[key] ?? { y: 0, box: 0, content: 0 }), ...part };
+    bodies.current[key] = b;
+    const is = b.box > 0 && b.content > b.box + 2;
+    setTall((m) => (!!m[key] === is ? m : { ...m, [key]: is }));
+  };
+  const topKey = useRef('');
+  /** The keyboard is up: the card's body keeps its own scroll, so a field can come out from under it. */
+  const [keys, setKeys] = useState(false);
+  useEffect(() => {
+    const up = Keyboard.addListener('keyboardWillShow', () => setKeys(true)), down = Keyboard.addListener('keyboardDidHide', () => setKeys(false));
+    return () => { up.remove(); down.remove(); };
+  }, []);
+  const lastTap = useRef<number | null>(null);
+  const pressAt = useRef({ x: 0, y: 0 });
+
   // ── Motion (call 10 and call 5), still under Reduce Motion ──
   const [calm, setCalm] = useState(false);
   useEffect(() => { AccessibilityInfo.isReduceMotionEnabled().then(setCalm, () => {}); }, []);
@@ -168,6 +212,8 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
   const busy = useRef(false);
   const liftV = useRef(new Animated.Value(0)).current;
   const leaveV = useRef(new Animated.Value(0)).current;
+  /** Up and down the glow is a layer of its own, shown and hidden by this value, so the card is not drawn again for it. */
+  const glowV = useRef(new Animated.Value(0)).current;
   const [hit, setHit] = useState<string | null>(null);
   const hitV = useRef(new Animated.Value(0)).current;
   const holeV = useRef(new Animated.Value(1)).current;
@@ -183,29 +229,102 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
   const go = (k: number, letGo?: number): void => {
     if (!n) return;
     const to = ((k % n) + n) % n;
-    if (letGo !== undefined && !calmNow.current && to !== at.current) {
+    if (letGo !== undefined && !vertNow.current && !calmNow.current && to !== at.current) {
       setSettle({ travel: Array.from({ length: n }, (_x, j) => travelOf(j, at.current, to, n, letGo, FAN, PEEK)), top: new Animated.Value(0), fan: new Animated.Value(0) });
     } else setSettle(null);
     dx.setValue(0);
+    if (vertNow.current) {
+      // Up and down a jump (a dot, a tile of the map) moves the page, the nearer way round, and every card keeps the
+      // slot it stands on: the cards in sight are moved by the page's value alone. Seen on the simulator: a card
+      // handed a new place instead is not moved there until a value changes (a dot lit and the card before stayed).
+      if (!slid.current) {
+        const s = slotNow.current + slotsFrom(to, at.current, n);
+        slotNow.current = s;
+        pageV.setValue(s);
+        setSlot(s);
+      }
+      slid.current = false;
+      dy.setValue(0);
+    }
     rest();
     setI(to);
   };
+  /** A slide or the done motion has taken the page to its slot already: the jump that follows moves it no further. */
+  const slid = useRef(false);
+  const landed = (s: number): void => {
+    slid.current = true;
+    slotNow.current = s;
+    // Said again where it came to rest, so the value the screen is next told is the one it shows.
+    pageV.setValue(s);
+    setSlot(s);
+  };
+  /** Up and down, a drag let go past the line: both cards slide a stride over 290 ms (deck.ts slide), then the deck is on that card. */
+  const slide = (to: 1 | -1): void => {
+    if (calmNow.current) {
+      dy.setValue(0);
+      go(at.current + to);
+      return;
+    }
+    busy.current = true;
+    Animated.parallel([
+      Animated.timing(pageV, { toValue: slotNow.current + to, ...SETTLE_TOP, useNativeDriver: true }),
+      Animated.timing(dy, { toValue: 0, ...SETTLE_TOP, useNativeDriver: true }),
+    ]).start(() => {
+      busy.current = false;
+      landed(slotNow.current + to);
+      go(at.current + to);
+    });
+  };
   const pan = useMemo(() => PanResponder.create({
     // A sideways drag moves the deck; an up and down one is the card's own scroll (deck.css touch-action: pan-y).
-    onMoveShouldSetPanResponderCapture: (_e, g) => n > 1 && !busy.current && !sliding.current && Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2,
+    // Up and down the pager owns the finger, and a tall card's body scrolls first (deck-screen.ts pagerTakes).
+    onMoveShouldSetPanResponderCapture: (_e, g) => {
+      if (n < 2 || busy.current || sliding.current) return false;
+      if (vertNow.current) return pagerTakes(g.dx, g.dy, bodyOf(topKey.current));
+      return Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2;
+    },
     onPanResponderMove: (_e, g) => {
-      const d = g.dx < 0 ? 1 : -1;
-      if (d !== dirNow.current) { dirNow.current = d; setDir(d); }
-      dx.setValue(g.dx);
+      const along = vertNow.current ? g.dy : g.dx;
+      const d = along < 0 ? 1 : -1;
+      // Up and down the card before and the card after both stand ready, so a pull the other way draws nothing
+      // again; a deck of two has one other card, which is put where the finger is going.
+      if (d !== dirNow.current) { dirNow.current = d; if (!vertNow.current || n === 2) setDir(d); }
+      (vertNow.current ? dy : dx).setValue(along);
     },
     onPanResponderRelease: (_e, g) => {
+      if (vertNow.current) {
+        const to = swipeTo(g.dy, SWIPE);
+        if (to) slide(to);
+        else Animated.timing(dy, { toValue: 0, ...SETTLE_TOP, useNativeDriver: true }).start(rest);
+        return;
+      }
       if (g.dx < -SWIPE) go(at.current + 1, g.dx);
       else if (g.dx > SWIPE) go(at.current - 1, g.dx);
       else Animated.timing(dx, { toValue: 0, duration: 290, easing: Easing.bezier(0.22, 0.61, 0.36, 1), useNativeDriver: true }).start(rest);
     },
-    onPanResponderTerminate: () => { dx.setValue(0); rest(); },
+    onPanResponderTerminate: () => { dx.setValue(0); dy.setValue(0); rest(); },
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [n]);
+
+  /**
+   * A press on a card that is not on a control (deck.ts down and up): one that ends within 6 points of where it began
+   * is a tap, and two inside 320 ms turn the deck between sideways and up and down. Nothing says so (call 15). A tap
+   * takes the keyboard off its field, as a tap beside a field does.
+   */
+  const cardTap = (x: number, y: number): void => {
+    if (busy.current || !isTap(x - pressAt.current.x, y - pressAt.current.y)) return;
+    leave();
+    const t = tapped(lastTap.current, performance.now());
+    lastTap.current = t.last;
+    if (!t.turn) return;
+    setSettle(null);
+    dx.setValue(0);
+    dy.setValue(0);
+    liftV.setValue(0);
+    glowV.setValue(0);
+    rest();
+    setVert((v) => !v);
+  };
 
   // ── Sets open in place, the other moves fold (D283; deck.ts foldOf, setsTapped, foldTapped) ──
   const foldOf = (c: DeckCard): string | null => openMove[c.key] || restOpen(c);
@@ -351,6 +470,7 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
 
   // ── The big button (deck.ts advance and markDay) ──
   const top = cards[i];
+  topKey.current = top ? top.key : '';
   const isLogged = (c: DeckCard): boolean => !c.skipped && (c.logged || !!doneLocal[c.key]) && (c.kind !== 'finish' || dayDone);
   const states = cards.map((c, k) => stateOf(c, k, i, !!doneLocal[c.key] || (c.kind === 'finish' && dayDone)));
   const cta = top ? ctaText(top, !!doneLocal[top.key], dayDone) : '';
@@ -390,6 +510,28 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
     busy.current = true;
     liftV.setValue(0);
     leaveV.setValue(0);
+    if (vertNow.current) {
+      // Up and down (deck.css deckPagerLeave and deckPagerRise): the card lifts on its slot, then goes up and away
+      // while the next rises into its place, one run of the 760 ms. The page goes on a slot, as a slide takes it,
+      // and the lift lets go. Nothing is drawn again between the tap and the end: the lift, the glow and the page
+      // are values the cards already wear, so nothing the screen is asked to draw can land in the middle of the
+      // motion, and when it ends the card that came in is already where the top card stands.
+      glowV.setValue(marking ? 1 : 0);
+      Animated.timing(liftV, { toValue: 1, duration: 340, easing: Easing.bezier(0.2, 0.8, 0.2, 1), useNativeDriver: true }).start();
+      later(() => {
+        glowV.setValue(0);
+        Animated.parallel([
+          Animated.timing(pageV, { toValue: slotNow.current + 1, duration: PAGER_LEAVE, easing: TUCK, useNativeDriver: true }),
+          Animated.timing(liftV, { toValue: 0, duration: PAGER_LEAVE, easing: TUCK, useNativeDriver: true }),
+        ]).start(() => {
+          busy.current = false;
+          liftV.setValue(0);
+          landed(slotNow.current + 1);
+          go(at.current + 1);
+        });
+      }, marking ? 560 : 220);
+      return;
+    }
     setDone({ phase: 'lift', glow: marking, tucked: false });
     Animated.timing(liftV, { toValue: 1, duration: 340, easing: Easing.bezier(0.2, 0.8, 0.2, 1), useNativeDriver: true }).start();
     later(() => {
@@ -398,6 +540,7 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
         setDone({ phase: 'leave', glow: false, tucked: true });
         Animated.timing(leaveV, { toValue: 2, duration: TUCK_IN, easing: TUCK, useNativeDriver: true }).start(() => {
           busy.current = false;
+          liftV.setValue(0);
           setDone(null);
           go(at.current + 1);
         });
@@ -417,6 +560,15 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
     const l = (a: number, b: number) => v.interpolate({ inputRange: [0, 1], outputRange: [a, b] });
     return { zIndex: place.zIndex, transform: [{ translateX: l(t.x, 0) }, { translateY: l(t.y, 0) }, ...place.transform, { scale: l(t.s, 1) }, { rotate: v.interpolate({ inputRange: [0, 1], outputRange: [t.r + 'deg', '0deg'] }) }] };
   };
+  /** Up and down, a card on a slot stands its strides from the page, plus the drag (deck-screen.ts pagerY). */
+  const stride = stageH + PAGER_GAP;
+  const pagerAt = (on: number) => Animated.add(pageV.interpolate({ inputRange: [on - 1, on + 1], outputRange: [stride, -stride] }), dy);
+  // Up and down the top card always wears its lift, which is nothing while it rests: 10 points up and 103% lifted.
+  const lifted = [{ translateY: Animated.add(pagerAt(slot), liftV.interpolate({ inputRange: [0, 1], outputRange: [0, -10] })) }, { scale: liftV.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] }) }];
+  const glowOf = (c: DeckCard): string => {
+    const g = rgbOf(c.tone === 'hip' ? p.hip : c.tone === 'core' ? p.core : c.tone === 'finish' ? p.onBand : p.lift);
+    return '0 0 0 2px rgba(' + g + ',0.9), 0 0 42px 8px rgba(' + g + ',0.6), 0 20px 44px rgba(0,0,0,0.26)';
+  };
   const cardStyle = (k: number): object => {
     const pos = (k - i + n) % n;
     if (pos === 0) {
@@ -429,10 +581,12 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
           { rotate: hitV.interpolate({ inputRange: f, outputRange: ['0deg', '-2deg', '1.6deg', '-1.1deg', '0.7deg', '-0.4deg', '0.2deg', '0deg'] }) },
         ] };
       }
+      // Up and down the card stays on its slot, lifted, and leaves with the page (deck.css deckPagerLeave: from 10
+      // points up at 103% to a card height and 14 points up at its own size).
+      if (vert) return { zIndex: 20, transform: lifted };
       if (done && done.phase === 'lift') {
-        const g = rgbOf(c.tone === 'hip' ? p.hip : c.tone === 'core' ? p.core : c.tone === 'finish' ? p.onBand : p.lift);
         return [{ zIndex: 20, transform: [{ translateY: liftV.interpolate({ inputRange: [0, 1], outputRange: [0, -10] }) }, { scale: liftV.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] }) }] },
-          done.glow && { boxShadow: '0 0 0 2px rgba(' + g + ',0.9), 0 0 42px 8px rgba(' + g + ',0.6), 0 20px 44px rgba(0,0,0,0.26)' }];
+          done.glow && { boxShadow: glowOf(c) }];
       }
       if (leaving) {
         const t = [0, 1, 2];
@@ -445,12 +599,16 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
       }
       return settling(k, { zIndex: 20, transform: [{ translateX: dx }, { rotate: dx.interpolate({ inputRange: [-260, 260], outputRange: ['-10deg', '10deg'] }) }] });
     }
+    // No fan up and down: every card stands on a slot of its own, a stride from the next, so only the top card is in
+    // the stage at rest, the next one a stride below and the one before a stride above. On a deck of two the other
+    // card is both, and stands where the finger is going.
+    if (vert) return { zIndex: 15, transform: [{ translateY: pagerAt(slot + slotsFrom(k, i, n, dir)) }] };
     if (k === peek && leaving) {
       const l = (a: number, b: number) => leaveV.interpolate({ inputRange: [0, 2], outputRange: [a, b] });
       return { zIndex: 15, transform: [{ translateX: l(15, 0) }, { translateY: l(-7, 0) }, { scale: l(0.965, 1) }, { rotate: leaveV.interpolate({ inputRange: [0, 2], outputRange: ['1.6deg', '0deg'] }) }] };
     }
     if (k === peek && !done) {
-      const f = dir > 0 ? { x: 15, y: -7, s: 0.965, r: '1.6deg' } : { x: 0, y: 0, s: 0.92, r: '0deg' };
+      const f = (peek - i + n) % n === 1 ? { x: 15, y: -7, s: 0.965, r: '1.6deg' } : { x: 0, y: 0, s: 0.92, r: '0deg' };
       const l = (a: number, b: number) => q.interpolate({ inputRange: [0, 1], outputRange: [a, b] });
       return settling(k, { zIndex: 15, transform: [{ translateX: l(f.x, 0) }, { translateY: l(f.y, 0) }, { scale: l(f.s, 1) }, { rotate: q.interpolate({ inputRange: [0, 1], outputRange: [f.r, '0deg'] }) }] });
     }
@@ -472,8 +630,13 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
   };
 
   const s = styles;
+  // The dots: in a row under the stage sideways, in a column at its right up and down, the lit one long the way they run.
+  const dots = cards.map((c, k) => (
+    <Pressable key={c.key} testID={'deck-dot-' + k} accessibilityRole="button" accessibilityLabel={'Card ' + (k + 1) + ', ' + states[k]} hitSlop={8} onPress={() => { leave(); go(k, 0); }}
+      style={[s.dot, { backgroundColor: k === i ? p.text : states[k] === 'Logged' ? p.signal : p.border2 }, k === i && (vert ? { height: 22 } : { width: 22 })]} />
+  ));
   return (
-    <View testID="deck" accessibilityViewIsModal style={[StyleSheet.absoluteFill, { backgroundColor: p.bg, paddingTop: Math.max(12, insets.top), paddingBottom: Math.max(14, insets.bottom) }]}>
+    <View testID="deck" accessibilityViewIsModal style={[StyleSheet.absoluteFill, { paddingTop: Math.max(12, insets.top), paddingBottom: Math.max(14, insets.bottom) }]}>
       <View style={s.head}>
         <Pressable testID="deck-back" accessibilityRole="button" accessibilityLabel="Back to This Week" onPress={() => { leave(); onClose(); }} style={s.round44}>
           <Icon name="chevronLeft" size={22} color={p.text} />
@@ -486,20 +649,33 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
         </Pressable>
       </View>
 
-      <View testID="deck-stage" style={s.stage} onLayout={(e) => setStageW(e.nativeEvent.layout.width)} {...pan.panHandlers}>
-        {cards.map((c, k) => { const cover = coverOf(k, i, peek, done ? done.phase : null); return (
+      <View style={[s.clip, vert && s.clipV]}>
+      <View testID="deck-stage" style={[s.stage, vert && s.stageV]} onLayout={(e) => { setStageW(e.nativeEvent.layout.width); setStageH(e.nativeEvent.layout.height); }} {...pan.panHandlers}>
+        {cards.map((c, k) => { const cover = coverOf(k, i, peek, done ? done.phase : null, vert); return (
           <Animated.View
             key={c.key}
             testID={'deck-card-' + k}
             pointerEvents={k === i ? 'auto' : 'none'}
             accessibilityElementsHidden={k !== i}
             importantForAccessibility={k === i ? 'auto' : 'no-hide-descendants'}
-            style={[s.card, { backgroundColor: toneColor(p, c.tone), transformOrigin: 'left bottom' },
+            style={[s.card, { backgroundColor: toneColor(p, c.tone), transformOrigin: vert ? 'center bottom' : 'left bottom' },
               isLogged(c) && { boxShadow: '0 0 0 3px ' + p.signal + ', 0 14px 38px rgba(' + p.signalRgb + ',0.40), 0 8px 24px rgba(0,0,0,0.14)' },
               c.skipped && k === i && { opacity: 0.72 }, cardStyle(k)]}
           >
             <View style={s.face}>
-              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: z.pad, paddingBottom: z.pad - 2 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
+              <ScrollView
+                style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets
+                // Up and down a body that fits its box does not move, so the pager has the finger; a tall one scrolls, without a bounce.
+                scrollEnabled={!vert || !!tall[c.key] || keys} bounces={!vert} scrollEventThrottle={16}
+                onScroll={(e) => { const b = bodies.current[c.key]; if (b) b.y = e.nativeEvent.contentOffset.y; }}
+                onLayout={(e) => sized(c.key, { box: e.nativeEvent.layout.height })}
+                onContentSizeChange={(_w, h) => sized(c.key, { content: h })}
+              >
+              <Pressable
+                testID={'deck-tap-' + k} accessible={false} style={{ flexGrow: 1, padding: z.pad, paddingBottom: z.pad - 2 }}
+                onPressIn={(e) => { pressAt.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY }; }}
+                onPress={(e) => cardTap(e.nativeEvent.pageX, e.nativeEvent.pageY)}
+              >
                 {isLogged(c) && <View pointerEvents="none" style={s.bigcheck}><Tick size={240} color={on(1)} /></View>}
                 <View style={[s.top, { minHeight: z.ic }]}>
                   <View style={s.numRow}>
@@ -547,6 +723,7 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
                     })}
                   </View>
                 )}
+              </Pressable>
               </ScrollView>
             </View>
             {cover && <Animated.View key={cover} testID={'deck-cover-' + k} pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: toneColor(p, c.tone), opacity: coverOpacity(cover) }]} />}
@@ -568,14 +745,12 @@ export function Deck({ palette: p, store, open, onClose, onDone, onProgram, onOv
             ))}
           </Animated.View>
         ); })}
+        {vert && top && <Animated.View testID="deck-glow" pointerEvents="none" style={[s.card, { transformOrigin: 'center bottom', zIndex: 19, boxShadow: glowOf(top), opacity: glowV, transform: lifted }]} />}
+      </View>
+      {vert && <View testID="deck-dots" style={s.dotsV}>{dots}</View>}
       </View>
 
-      <View testID="deck-dots" style={s.dots}>
-        {cards.map((c, k) => (
-          <Pressable key={c.key} testID={'deck-dot-' + k} accessibilityRole="button" accessibilityLabel={'Card ' + (k + 1) + ', ' + states[k]} hitSlop={8} onPress={() => { leave(); go(k, 0); }}
-            style={[s.dot, { backgroundColor: k === i ? p.text : states[k] === 'Logged' ? p.signal : p.border2 }, k === i && { width: 22 }]} />
-        ))}
-      </View>
+      {!vert && <View testID="deck-dots" style={s.dots}>{dots}</View>}
       <View style={s.foot}>
         <Pressable
           testID="deck-cta" accessibilityRole="button" onPress={advance}
@@ -871,7 +1046,12 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingTop: 4, paddingRight: 14, paddingBottom: 2, paddingLeft: 10 },
   round44: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   title: { flex: 1, fontFamily: DISPLAY, fontSize: 24, fontWeight: '700', letterSpacing: -0.72, lineHeight: 26.4 },
-  stage: { flex: 1, marginTop: 16, marginHorizontal: 20 },
+  // The stage in its box. Up and down the box cuts the cards off at the stage's head and foot (deck.css clip-path
+  // inset 0 -40px 0 -24px), the stage gives 14 more points at the right, and the dots stand 24 points past it.
+  clip: { flex: 1, marginTop: 16 },
+  clipV: { overflow: 'hidden' },
+  stage: { flex: 1, marginHorizontal: 20 },
+  stageV: { marginRight: 34 },
   card: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', borderRadius: 24, overflow: 'hidden', boxShadow: '0 10px 28px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08)' },
   face: { flex: 1 },
   bigcheck: { position: 'absolute', top: 88, right: -46, opacity: 0.18 },
@@ -972,6 +1152,7 @@ const styles = StyleSheet.create({
   notesText: { fontFamily: TEXT, fontSize: 16, lineHeight: 20 },
 
   dots: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingTop: 14, paddingHorizontal: 20 },
+  dotsV: { position: 'absolute', right: 10, top: 0, bottom: 0, width: 8, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   foot: { paddingTop: 12, paddingHorizontal: 20 },
   cta: { height: 54, borderRadius: 27, alignItems: 'center', justifyContent: 'center' },

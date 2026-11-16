@@ -331,8 +331,8 @@ describe('native deck logging: which files write', () => {
   const files = readdirSync(dir).filter((f) => /\.tsx?$/.test(f)).sort();
   const writers = (t: string): string[] => [...new Set([...t.matchAll(/\b((?:write|record|refresh|clear|drop|set|add|count|mark)[A-Z]\w*)\(\s*(?:s\.)?store\b/g)].map((m) => m[1]!))].filter((n) => n !== 'setDraftOf').sort();
 
-  test('the deck\'s folder holds the screen, its seam, its readers, its fields, its writes and the model\'s copy', () => {
-    assert.deepStrictEqual(files, ['Deck.tsx', 'deck-model.ts', 'deck-readers.ts', 'deck-screen.ts', 'deck-swaps.ts', 'deck-writes.ts', 'set-fields.ts']);
+  test('the deck\'s folder holds the screen, its opening, its seam, its readers, its fields, its writes and the model\'s copy', () => {
+    assert.deepStrictEqual(files, ['Deck.tsx', 'DeckOpening.tsx', 'deck-model.ts', 'deck-readers.ts', 'deck-screen.ts', 'deck-swaps.ts', 'deck-writes.ts', 'grow-motion.ts', 'set-fields.ts']);
     assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/day-detail')), ['session-sections-model.ts']);
     assert.deepStrictEqual(readdirSync(join(REPO, 'frontends/native/src/swap-sheet')).sort(), ['SwapSheet.tsx', 'swap-sheet-model.ts']);
   });

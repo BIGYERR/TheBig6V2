@@ -216,3 +216,23 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   D275's call 1); one is today's ruling (D276 item 7). `docs/decisions/swipe-deck.md`, the build 111 entry. The fix
   reaches his phone with the next merge that changes `frontends/native`. He did not report on the blank card, the
   swap sheet or today's app 0.262.3, so none is recorded as seen.
+- **Seen on `main`, the ninth run, the beta's lane alone** (run 43786033465, merge b995321, pull request 46,
+  2026-11-15 20:23 EST; the merge carried no version: ec4e357, the swipe's settle, 62d9d5d, the pop-ups, and two
+  rule wording commits; read and recorded by the next session, the pager's): the two gates went together (15 s and
+  11 s). Today's lane skipped its upload, as ruled: App Store Connect already holds `0.262.3`. The beta's lane
+  archived, signed and uploaded `0.262.3 (113)` (425 s, done 20:32:12) and read it back as processed (164 s, done
+  20:34:59). The build number moved from 111 to 113 because two commits of the merge changed `frontends/native`,
+  ec4e357 and 62d9d5d; there is no build 112. The notices read `testflight 0.262.3 processed (uploaded before this
+  run; a version goes up once, a fix is the next PATCH)` and `testflight next 0.262.3 (113) processed`. The run
+  ended green: 6 jobs passed and 8 skipped by rule.
+- **Seen on `main`, the tenth run, both lanes** (run 43790686756, merge 2b31923, pull request 47, 2026-11-15 21:11
+  EST; the merge carried v0.262.4, D291 P-OWNITEMS: cd50eea its ruling, 62b9b7b the release, 407c274 rule wording):
+  the two gates went together (16 s today's, 10 s the beta's). Today's lane archived, signed and uploaded `0.262.4`
+  (301 s, done 21:18:18) and read it back as processed (100 s, done 21:20:00). The beta's lane archived, signed and
+  uploaded `0.262.4 (114)` (307 s, done 21:18:17) and read it back as processed (135 s, done 21:20:34). The build
+  number moved from 113 to 114 on one commit, 62b9b7b, which changed `core`. The legs read `testflight 0.262.4
+  processed` and `testflight next 0.262.4 (114) processed`. The run ended green: 8 jobs passed and 6 skipped by
+  rule. Both lanes went up in one merge, each on its own jobs.
+- **On Mario's phone, build 114** (his report, 2026-11-15, one sentence, no screenshot): "All same as today's", to
+  the list the pager's session asked about on IA Next build 114 beside today's app at 0.262.4
+  (`docs/decisions/swipe-deck.md`, the build 114 entry). Nothing differed, so nothing was fixed from it.

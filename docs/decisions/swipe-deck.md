@@ -884,3 +884,114 @@ gave way to the engine's shared items are taken back. `both` hands the walks the
 it, never a copy. After Make the change the program in hand is held equal to the page the tap was made on. A nudge
 on a core, trunk or carry move is answered both ways like any other: 87 due over the ten programs, 44 Make the
 change (34 moving a day of the grid), 43 Leave the plan alone, none spared. The tallies `leaked` and `spared` are gone.
+
+## D275 in the Expo app: Mario's phone on IA Next build 114 (Post-v0.262.4, the migration's phase 3, its fifth session)
+
+- **Date:** 2026-11-15. **Who:** Mario's report from his phone, by a written brief that said to record it first.
+  **Ruling carried:** D275, D283; no new D-code. **Release:** no version; `ia-version` stays 0.262.4.
+- **What was asked, on IA Next build 114 beside today's app:** the swipe's feel; the three pop-ups; a card after Log
+  and then a swipe or a skip; the swap sheet; a typed load under the keyboard; Done, next one; the skip punch; Call
+  it; Mark the day done; a backup loaded over it; and, in today's app at 0.262.4, a skip on a core move staying on
+  its day.
+- **His report, whole:** "All same as today's". It is the answer the chat offered as a button, so the record is
+  that one sentence for the whole list: no item was named apart, and no screenshot came with it. Nothing differed,
+  so nothing was proved on the simulator or fixed before the measure.
+- **Closed by it:** the swipe's settle after build 111 (the entry above), the blank card after build 109, the swap
+  sheet and the three pop-ups stand as seen on his phone. **Still open from build 111, as not built:** the double
+  tap and the up and down pager (this session), Reopen (the session sheet). **Still not ruled:** Mark the day done
+  closing the run's card too (D276 item 7).
+
+## D275 in the Expo app: the double tap, the up and down pager and the opening out of the card (Post-v0.262.4, the migration's phase 3, its fifth session)
+
+- **Date:** 2026-11-15. **Ruled by:** no new ruling. The double tap and the pager are D275's call 1, the opening its
+  call 16 (Lift first at 420 ms), carried into the Expo app with today's numbers, so they keep their D-code. The cut
+  was put to Mario after the measure and he took it ("Concur, build it"). **Bump:** none, the page and core do not
+  move (a Post-v0.262.4 pass, standing ruling 1). **Shipped:** Post-v0.262.4, no build of today's app; the beta's
+  next build carries it once Mario merges it.
+- **The finding (measured before any edit, `tests/measure/native-deck-pager_today.md`, read from the code):**
+  - *The double tap.* A press that ends within 6 points of where it began is a tap; two inside 320 ms turn the deck
+    between sideways and up and down, either way. A press on a control never counts. No toast, no hint (call 15).
+    Every open starts sideways.
+  - *Up and down.* No fan. The card follows the finger; the card coming in stands a card height and 14 points
+    away, drawn in full. A tall card's body scrolls first. Past 80 points both cards slide over 290 ms on
+    cubic-bezier(0.22, 0.61, 0.36, 1). It wraps. The dots stand in a column 24 points past the stage, the lit one 8
+    by 22. Done, next one sends the card up and away over 760 ms while the next rises.
+  - *The opening.* Lift 168 ms, open 420, close 357, with the ruling's fades and sizes.
+  - *Found in the beta by reading.* On a deck of two cards pulled to the right, the beta's drag drew the card
+    behind from 92% under the top card, where today's draws it from the fan's first seat, and its settle began at
+    the seat: a jump of about 4 points as the finger let go.
+  - *The ledger.* The deck's four rows were unfilled.
+- **What is built (the cut Mario agreed):**
+  - `frontends/native/src/deck/deck-screen.ts`: the tap and the pair of taps (`isTap`, `tapped`), where a card
+    stands up and down (`pagerPose`, `pagerY`, `slotsFrom`), where a drag let go lands (`swipeTo`), and which drag
+    the pager takes (`pagerTakes`). Plain numbers, typed by hand in the tests.
+  - `Deck.tsx`: a card's body is one press of its own, read for the pair of taps; a control inside it takes its own
+    press. Up and down each card stands on a slot, a stride apart, and the pager on a page: a drag moves the drag's
+    value, a slide takes the page on by one and the drag to nothing together, and a dot or a tile of the map moves
+    the page the nearer way round. The dots stand in their column. Done, next one lifts the card on its slot and
+    takes the page on over the 760 ms; its glow is a layer of its own.
+  - `frontends/native/src/deck/grow-motion.ts` and `DeckOpening.tsx`: the opening as plain numbers (`growPlan`,
+    `growFrames`, the curves read from `openMotion`, the model today's deck reads), and the screen that plays it:
+    This Week under it at 96%, a scrim, a frame that opens from the card's box to the whole screen with the deck
+    held still inside, and a copy of the card. Back and Mark the day done play it back before the app takes the
+    deck away, and the completion pop-up waits for it. At once under Reduce Motion, or when the card's place is not
+    known.
+  - `this-week/ThisWeek.tsx`: Start hands on the card's place on the screen, and the card can be drawn as the copy
+    (no skip pill, no button, no Reopen, no ground). `App.tsx`: This Week wears the size the opening gives it.
+  - The deck of two cards: the card behind rises from the fan's seat whichever way the finger goes, as today's.
+- **Where the beta differs from today's, on purpose:**
+  - *The frame.* Today's is a CSS clip-path. React Native has none, so the frame is a box that cuts the deck off,
+    moved by the screen itself (a box and a colour cannot be handed to the phone to move); the fades and sizes are
+    handed to the phone. Same numbers.
+  - *A deck of two, up and down.* Today's keeps the other card below whichever way the finger goes, so on a pull
+    down nothing comes from above and the two cross as the top card is let go. The beta brings it from above. Not
+    carried, as a fault no one would ask for; Mario can overrule.
+  - *A tall card.* Today's scrolls the body and pages with what is left in one drag. Here a drag either scrolls the
+    body or pages: the pager takes it only where the body has no further to go that way.
+  - *The drag.* The pager takes the finger after 8 points, as the beta's sideways swipe does; today's follows from
+    the first point.
+  - *The wheel* is not built: no phone has one.
+- **Found by the simulator, and fixed before the commit (`tests/measure/native-deck-pager_frames.md`):**
+  - The first build's opening showed no lift: the copy stood still, then the frame was already opening. It set a
+    stage at each step, which drew the deck again each time, and counted its two frames from the moment the screen
+    was asked for. The deck is now drawn once and the lift is counted from the frame's layout; the lift shows.
+    Which of the two changes it took was not told apart.
+  - Up and down, a dot pressed after a slide lit its dot and left the card before on the screen until the next
+    pull. A card handed a new place is not moved there until a value its place hangs on changes; saying the same
+    value again moved nothing, and nor did a thousandth of a point set as the cards were drawn (a build each). So
+    a jump moves the page and every card keeps its slot. Seen after it: the dot shows its card.
+- **Seen and not explained:** every recording of the done motion holds still for 170 to 280 ms somewhere inside it:
+  the sideways motion build 114 already has, and all three builds of the up and down one, the last of which draws
+  nothing between the tap and the end. Its place moves with how the simulator's tap is sent, not with the code,
+  which points at the instrument. Not known to be the app's or the simulator's. Mario's phone decides.
+- **Does not change:** today's app, the page, core, what any program prescribes, any golden record of stored state,
+  any `ia_` key. Nothing built here writes: the tap takes the keyboard off its field, which saves the field as any
+  press on the deck already does.
+- **Proof:**
+  - *Typed by hand* (`tests/unit/native-deck.test.ts`, 44 tests and 280 assertions by the ledger's count): the tap
+    and the pair; where each card stands up and down on six, three and two cards; the slide's two ends and its half
+    way; which drag the pager takes at a body's head, foot and middle; a jump's page and each card's slot; the
+    opening's frame at a card 370 by 220 on a 402 by 874 screen (the card, lifted to 386 by 240 with 28 point
+    corners, the whole screen); every step of the lift, the open and the close; the four curves; the deck of two.
+    The screens' wiring is held by their text.
+  - *On the commit before* (`tools/tree-at.mjs`): `native-deck.test.ts` cannot load there, by construction
+    (`grow-motion.ts` and `DeckOpening.tsx` are not in that commit); each changed assertion's text is in that
+    commit's files 0 times (six counted); `native-deck-logging.test.ts` and `native-pop-ups.test.ts`, whose wiring
+    did not change, each fail one test there, the changed one.
+  - *The breaks* (`tests/measure/native-deck-pager_breaks.md`, four parts on four copies of the tree): 87 breaks,
+    one rule each, and every one turns a test red; none let through.
+  - *Every `ia_` key equal to today's page after every tap, no family left out:* the walks did not change and
+    stand: the unit and integration run, 105 files, 2,068 tests passed and 2 skipped; the Expo app's six sweep
+    files, 14 passed and 1 skipped.
+  - *Where the Expo app's packages are not installed* (`node tools/tree-at.mjs --working`): the six unit files of
+    the Expo app, 192 tests, and `tsc -p .` clean.
+  - *The Expo type check:* clean.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5, `npm run sim-ios`, the Release build under Hermes, the copy of
+  Mario's backup, Thursday of week 13; the final code built once more before the last pass): the opening with its
+  lift; three taps turning the deck up and down, the fan gone, the dots in their column; a pull up and a pull down
+  each sliding the next card in over 17 frames with no frame of the wrong card; a dot after a slide; Done, next
+  one; Back closing into the card. Nothing was logged or marked: the store is as it was.
+- **Not seen yet:** his phone, the only place the feel is judged. On the simulator: a deck of two cards, Done, next
+  one with its glow, Mark the day done's close with the pop-up after it, a tall card's scroll, a typed load under
+  the keyboard up and down, Reduce Motion.
+- **The ledger** (`tests/measure/rn-migration_test-ledger.md`): the deck's four rows are filled.
