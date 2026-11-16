@@ -12,6 +12,7 @@ import { checkProgram } from '@ia/core';
 import type { CardioGoal, Cfg, Equipment, Experience, LiftingFocus } from '@ia/core';
 import { fixtures, loadApp, pinClock } from '../support/app.ts';
 import { DAYS, RUN } from '../support/programs.ts';
+import { sharedObjects } from '../support/shared-objects.ts';
 
 interface LatticeCell {
   tag: string;
@@ -85,4 +86,23 @@ test('every cardio goal and lifting focus, alone and mixed, builds a program wit
   assert.deepEqual(problems, []);
   assert.equal(walked['program'], 140);
   assert.deepEqual([...goalIds].sort(), Object.keys(GOALS).sort(), 'every goal put at least one session on the calendar');
+});
+
+// D291 P-OWNITEMS (docs/decisions/session-edits.md), swept: over the whole lattice no object of a built program
+// stands in two places of it, and none is in the next build of the same config. Measured before the fix
+// (tests/measure/day-edits_shared-objects.md): 739 of the engine's own objects in 75 of the 864 programs, and 866
+// objects reached twice, every one an item of a core block.
+test('the 864 lattice programs: every object of a build is its own, and the engine hands out none of its own', () => {
+  let objects = 0;
+  const twice: string[] = [], ours: string[] = [];
+  for (const { tag, over } of LATTICE.FULL) {
+    const cfg = { ...fixtures.HALF_MANNY, ...over } as Cfg;
+    const s = sharedObjects({ weeks: IA.buildProgram(cfg).weeks }, { weeks: IA.buildProgram(cfg).weeks });
+    objects += s.objects;
+    for (const x of s.twice) if (twice.length < 10) twice.push(tag + ': ' + x);
+    for (const x of s.ours) if (ours.length < 10) ours.push(tag + ': ' + x);
+  }
+  assert.ok(objects >= 1000000, 'the walk reached every grid: ' + objects + ' objects (1,010,495 when this was written)');
+  assert.deepEqual(twice, [], 'an object reached by two paths of one build');
+  assert.deepEqual(ours, [], 'an object of one build found in the next');
 });

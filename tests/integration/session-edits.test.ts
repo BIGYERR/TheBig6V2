@@ -7,6 +7,7 @@
 import { describe, test } from 'vitest';
 import assert from 'node:assert/strict';
 import { fixtures, loadApp, pinClock } from '../support/app.ts';
+import { Phone, at, firstWeek } from '../support/stored-state.ts';
 import { type ExCard, type ExSection, sectionsView } from '../../frontends/app/src/app/screens/day-detail/session-sections-model.ts';
 import { sectionReads } from '../../frontends/app/src/app/screens/day-detail/session-sections-reads.ts';
 
@@ -181,5 +182,51 @@ describe('D250: the Wildcard edits the Wildcard', () => {
     assert.deepEqual([card().name, card().swappedFrom], [pick, 'Barbell bench press']);
     const own = sectionReads(bridge).daySection(0) as ExSection;
     assert.equal(own, X.ctx.__P.weeks[1].mon.sections[0], "the session sheet's reads stay on Monday");
+  });
+});
+
+// D291 P-OWNITEMS: an edit to a core, trunk or carry move stays on its day. The engine handed one Suitcase carry to
+// three days of Mario's program, so a skip of it on week 1 Tuesday marked week 6 Friday and week 7 Tuesday too, in the
+// same launch and, through the launch's own replay of the edit, after a fresh one. A test phone
+// (support/stored-state.ts), today's own handlers; the days are typed from the build (tests/measure/
+// day-edits_shared-items.md), the expected marks from the ruling.
+describe('D291: an edit to a core move stays on the day it was made on', () => {
+  const CREATED = '2026-08-29T09:00:00';
+  const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  /** Suitcase carry of a day's core block: whether it is there, its name as the day holds it, and whether it is skipped. */
+  const carry = (P: Phone, w: number, d: string, i: number): { name: string; skipped: boolean } => JSON.parse(P.ev(`(function(){var day=activeProg.weeks[${w}][${JSON.stringify(d)}];var core=day.sections.filter(function(s){return s.core;})[0];var it=core.items[${i}];return JSON.stringify({name:it.name,skipped:!!it._skipped});})()`) as string);
+  const phone = (): { P: Phone; start: string } => {
+    const P = new Phone().launch(CREATED);
+    P.generate(fixtures.HALF_MANNY);
+    const { first, start } = firstWeek(P, CREATED);
+    assert.equal(first, 1);
+    P.launch(at(start, DAYS.indexOf('tue')));
+    return { P, start };
+  };
+
+  test('Suitcase carry skipped on week 1 Tuesday is not skipped on week 6 Friday or week 7 Tuesday, in that launch or the next', () => {
+    const { P, start } = phone();
+    assert.deepEqual([carry(P, 1, 'tue', 0), carry(P, 6, 'fri', 1), carry(P, 7, 'tue', 1)].map((x) => [x.name, x.skipped]), [['Suitcase carry', false], ['Suitcase carry', false], ['Suitcase carry', false]]);
+    P.open(1, 'tue' as never);
+    P.ev("skipExercise('Suitcase carry');");
+    P.settle();
+    assert.equal(P.toasts[P.toasts.length - 1], 'Suitcase carry is off today. Tap to put it back.');
+    assert.deepEqual([carry(P, 1, 'tue', 0), carry(P, 6, 'fri', 1), carry(P, 7, 'tue', 1)].map((x) => x.skipped), [true, false, false], 'in the launch the skip was made in');
+    // The launch lays the stored edit back on the grid it builds: on Tuesday of week 1, and nowhere else.
+    P.launch(at(start, DAYS.indexOf('tue'), '21:00'));
+    assert.deepEqual(JSON.parse(P.dump()['ia_edits_' + P.ev('activeProgId')]!), { w1_tue: { add: [], skip: ['Suitcase carry'] } });
+    assert.deepEqual([carry(P, 1, 'tue', 0), carry(P, 6, 'fri', 1), carry(P, 7, 'tue', 1)].map((x) => x.skipped), [true, false, false], 'after a fresh launch on the keys the skip left');
+  });
+
+  test('Suitcase carry swapped on week 1 Tuesday keeps its name on week 6 Friday and week 7 Tuesday', () => {
+    const { P } = phone();
+    P.open(1, 'tue' as never);
+    // The lift in hand, as the swap sheet holds it, and the first move its family offers.
+    const to = P.ev(`(function(){var day=activeProg.weeks[1].tue;var si=day.sections.map(function(s){return !!s.core;}).indexOf(true);_swapCtx={secIdx:si,itemIdx:0,name:'Suitcase carry',detail:day.sections[si].items[0].detail};return auxSwapCandidates('Suitcase carry',day,activeProg)[0];})()`) as string;
+    assert.ok(to && to !== 'Suitcase carry', 'its family offers another move: ' + to);
+    (P.IA.ctx as Record<string, unknown>)['__to'] = to;
+    P.ev('applySwapChoice(__to);');
+    P.settle();
+    assert.deepEqual([carry(P, 1, 'tue', 0).name, carry(P, 6, 'fri', 1).name, carry(P, 7, 'tue', 1).name], [to, 'Suitcase carry', 'Suitcase carry']);
   });
 });
