@@ -187,10 +187,13 @@ Each phase starts only on Mario's GO, one phase step per session.
   lift that never showed, and a dot after a slide that left the card before on the screen. Nothing built writes;
   87 breaks, none let through. The deck's four ledger rows are filled (`docs/decisions/swipe-deck.md`, the entry of
   that name).
-- **Next:** Mario's phone on IA Next build 116, which carries the fifth session (merged 2026-11-16, `main` 691253e;
-  uploaded by run 43870419495 and read back as processed, `docs/decisions/testflight.md`): the double tap, the pager and the opening are judged there, and
-  so is the done motion, which the simulator's recordings stall in and cannot place
-  (`tests/measure/native-deck-pager_frames.md`). Then the session sheet, which brings add, remove and Reopen. Still not
+- **Seen on Mario's phone, IA Next build 116** (2026-11-16; the fifth session, merged that day as `main` 691253e,
+  uploaded by run 43870419495 and read back as processed, `docs/decisions/testflight.md`): "Yep all good, can't
+  reopen though not sure if that's just because you didn't build it out". The double tap, the pager, the opening,
+  the close and Done, next one stand; Reopen waits for the session sheet (`docs/decisions/swipe-deck.md`, the build
+  116 entry).
+- **Next:** the session sheet, which brings add, remove and Reopen; today's sheet is measured
+  (`tests/measure/native-session-sheet_today.md`), and the cut waits on Mario's word. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,

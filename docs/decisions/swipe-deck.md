@@ -995,3 +995,17 @@ change (34 moving a day of the grid), 43 Leave the plan alone, none spared. The 
   one with its glow, Mark the day done's close with the pop-up after it, a tall card's scroll, a typed load under
   the keyboard up and down, Reduce Motion.
 - **The ledger** (`tests/measure/rn-migration_test-ledger.md`): the deck's four rows are filled.
+
+## D275 in the Expo app: Mario's phone on IA Next build 116 (Post-v0.262.4, the migration's phase 3, the session sheet's first session)
+
+Mario, 2026-11-16, one sentence, no screenshot. No ruling: his report, recorded as he gave it.
+
+- **What was asked, on IA Next build 116:** the double tap, the up and down pager, the opening and the close, and
+  Done, next one (the fifth session's build, `main` 691253e).
+- **His answer:** "Yep all good, can't reopen though not sure if that's just because you didn't build it out".
+- **Read as:** the double tap, the pager, the opening, the close and Done, next one are judged on his phone and
+  stand; no motion was named, so nothing is fixed from it (decision 14, `MIGRATION.md` section 6). Reopen is the
+  part not built: on a done card it takes no press in the Expo app, because the page it opens today is the session
+  sheet (D278 item 4), which this session starts. It is the same remark as on build 111, and no defect.
+- **Not said, so not recorded as seen:** a deck of two cards up and down, a tall card's scroll, the done motion's
+  stall the simulator's recordings showed (`tests/measure/native-deck-pager_frames.md`).

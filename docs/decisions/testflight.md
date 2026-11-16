@@ -246,3 +246,7 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   is no build 115. The notices read `testflight 0.262.4 processed (uploaded before this run; a version goes up
   once, a fix is the next PATCH)` and `testflight next 0.262.4 (116) processed`. The run ended green: 6 jobs
   passed and 8 skipped by rule.
+- **On Mario's phone, build 116** (his report, 2026-11-16, one sentence, no screenshot): "Yep all good, can't
+  reopen though not sure if that's just because you didn't build it out", to the double tap, the up and down
+  pager, the opening, the close and Done, next one. Reopen is not built yet: it opens the session sheet, which
+  starts with this session (`docs/decisions/swipe-deck.md`, the build 116 entry). Nothing was fixed from it.
