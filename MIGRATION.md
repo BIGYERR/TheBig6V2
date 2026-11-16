@@ -188,7 +188,7 @@ Each phase starts only on Mario's GO, one phase step per session.
   87 breaks, none let through. The deck's four ledger rows are filled (`docs/decisions/swipe-deck.md`, the entry of
   that name).
 - **Next:** Mario's phone on IA Next build 116, which carries the fifth session (merged 2026-11-16, `main` 691253e;
-  uploaded by run 43870419495, not yet read as processed): the double tap, the pager and the opening are judged there, and
+  uploaded by run 43870419495 and read back as processed, `docs/decisions/testflight.md`): the double tap, the pager and the opening are judged there, and
   so is the done motion, which the simulator's recordings stall in and cannot place
   (`tests/measure/native-deck-pager_frames.md`). Then the session sheet, which brings add, remove and Reopen. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
