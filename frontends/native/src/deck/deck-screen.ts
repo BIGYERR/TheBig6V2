@@ -172,6 +172,44 @@ export function coverOf(k: number, top: number, peek: number, done: 'lift' | 'le
   return done ? 'rest' : 'drag';
 }
 
+/** Where a card stands on the stage: its shift in points, its scale, its turn in degrees, and whether it is drawn. */
+export interface Pose { x: number; y: number; s: number; r: number; shown: boolean }
+/**
+ * Where card k stands, sideways, with card `top` on top of `n` and the top card dragged `dx` points (deck.ts
+ * cardStyle): the top card under the finger, turned a degree for every 26 points; the card a drag of more than two
+ * points raises, on its way to the top card's place as the drag covers `rise` points (the next card from the fan's
+ * first seat, the one before from 92% behind the top card); `fan` cards fanned behind, each 15 points across, 7 up,
+ * 3.5% smaller and 1.6 degrees round; every other card not drawn, standing where the top card stands (today's
+ * visibility: hidden; transform: none).
+ */
+export function poseOf(k: number, top: number, n: number, dx: number, fan: number, rise: number): Pose {
+  const pos = (((k - top) % n) + n) % n;
+  if (pos === 0) return { x: dx, y: 0, s: 1, r: dx / 26, shown: true };
+  const peek = n > 1 && Math.abs(dx) > 2 ? (top + (dx < 0 ? 1 : -1) + n) % n : -1;
+  if (k === peek) {
+    const q = Math.min(1, Math.abs(dx) / rise);
+    const f = pos === 1 ? { x: 15, y: -7, s: 0.965, r: 1.6 } : { x: 0, y: 0, s: 0.92, r: 0 };
+    const l = (a: number, b: number): number => a + (b - a) * q;
+    return { x: l(f.x, 0), y: l(f.y, 0), s: l(f.s, 1), r: l(f.r, 0), shown: true };
+  }
+  if (pos <= fan) return { x: pos * 15, y: pos * -7, s: 1 - pos * 0.035, r: pos * 1.6, shown: true };
+  return { x: 0, y: 0, s: 1, r: 0, shown: false };
+}
+
+/** What a card has left to travel to where it comes to rest: points across and up, its scale as a ratio, degrees. */
+export interface Travel { x: number; y: number; s: number; r: number }
+/**
+ * A card's travel as the deck goes from card `from` on top to card `to`, the top card let go at `dx` (deck.ts go:
+ * today's cards ease to their new places by cardStyle's transitions, they do not jump). Null for a card that is not
+ * drawn where it comes to rest, which goes at once as today's does, and for one that does not move.
+ */
+export function travelOf(k: number, from: number, to: number, n: number, dx: number, fan: number, rise: number): Travel | null {
+  const a = poseOf(k, from, n, dx, fan, rise), b = poseOf(k, to, n, 0, fan, rise);
+  if (!b.shown) return null;
+  const t = { x: a.x - b.x, y: a.y - b.y, s: a.s / b.s, r: a.r - b.r };
+  return t.x || t.y || t.s !== 1 || t.r ? t : null;
+}
+
 /** Every move's fields of a deck, by the move's key. */
 export type Fields = Record<string, MoveFields>;
 

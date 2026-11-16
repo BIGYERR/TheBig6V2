@@ -3,7 +3,8 @@
 // (support/stored-state.ts life), and at each of its five stretches: every swap sheet of every day of the live grid
 // is today's, whole; and every training day of the week in view is worked through its deck on both apps with swaps
 // among the logging, the stores, the fields, the cards and the toasts held equal after every tap
-// (support/native-deck-swap.ts). Every launch a phone makes here is a launch of the beta's seam too
+// (support/native-deck-swap.ts), each nudge that comes due answered on both and each day marked done raising the same
+// pop-up on both. Every launch a phone makes here is a launch of the beta's seam too
 // (support/native-launch.ts), so each launch after swapped days is compared as well.
 import '../support/native-launch.ts';
 import assert from 'node:assert/strict';
@@ -45,6 +46,11 @@ test('the ten seeded programs: every swap sheet of the live grid at each stretch
   // them with no row to pick. The floors sit under what was measured when this was written.
   assert.ok(S.sheets >= 12000 && S.rows >= 120000 && S.empty >= 40, 'every sheet: ' + JSON.stringify({ sheets: S.sheets, rows: S.rows, empty: S.empty }));
   assert.ok(T.days >= 100 && T.checks >= T.taps && T.picks >= 400 && T.unswaps >= 250 && T.nudges >= 30, 'the walk: ' + JSON.stringify(T));
+  // The nudge answered on both apps (measured: 87 came due, 40 answered Make the change, 30 of which moved a day of
+  // the grid, 47 Leave the plan alone, 4 of those on a move of the engine's own tables; and once today's page, in the
+  // launch the nudge was answered in, held another program than a fresh launch on the same keys: the shared items of
+  // tests/measure/day-edits_shared-items.md).
+  assert.ok(T.accepted >= 25 && T.declined >= 25 && T.moved >= 15 && T.popups >= 100, 'the nudge\'s answers and the pop-ups after Mark the day done: ' + JSON.stringify(T));
   // Measured: 1,083 picks that keep their numbers, 59 onto a lift with no load, 12 onto a lift whose window moves the
   // reps, and 1 held by an injury plan.
   assert.ok((T.swapToasts['same'] || 0) >= 300 && (T.swapToasts['no load'] || 0) >= 10 && (T.swapToasts['window'] || 0) >= 5, 'the toasts: ' + JSON.stringify(T.swapToasts));

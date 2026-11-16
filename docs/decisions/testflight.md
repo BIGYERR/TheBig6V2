@@ -199,3 +199,20 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   (`docs/decisions/swipe-deck.md`, the build 109 entry). The fix reaches his phone with the next merge that
   changes `frontends/native`, as build 110. Today's app 0.262.3 came down from this run too; his one remark on it
   is Reopen opening the session sheet, which is D278 item 4.
+- **Seen on `main`, the eighth run, the beta's lane alone** (run 43768135478, merge 03d7498, pull request 45,
+  2026-11-15 17:14 EST; the merge carried no version: 6e1aa75, the blank card fixed, 4373c5a, the swap sheet, and
+  6eb096e, rule wording): the two gates went together (14 s and 12 s). Today's lane skipped its upload, as ruled:
+  App Store Connect already holds `0.262.3`, and a version goes up once. The beta's lane archived, signed and
+  uploaded `0.262.3 (111)` (447 s, done 17:22:40) and read it back as processed (162 s, done 17:25:24). The build
+  number moved from 109 to 111 because two commits of the merge changed `frontends/native`, 6e1aa75 and 4373c5a;
+  there is no build 110, so the blank card's fix reached the phone as build 111, not as the 110 the entry above
+  expected. The legs read `testflight 0.262.3 processed (uploaded before this run; a version goes up once, a fix is
+  the next PATCH)` and `testflight next 0.262.3 (111) processed`. The run ended green, every job passed or skipped
+  by rule.
+- **On Mario's phone, build 111** (his report, 2026-11-15, his words, no screenshot): Reopen does nothing on a done
+  session, the lift marked done closed the run too, a double tap does not turn the deck up and down, and "the swipe
+  feels off and less natural". One is the beta's own and is fixed (the cards jumped to their places when a swipe was
+  let go, where today's ease there); two are parts not built yet (Reopen waits for the session sheet, the pager is
+  D275's call 1); one is today's ruling (D276 item 7). `docs/decisions/swipe-deck.md`, the build 111 entry. The fix
+  reaches his phone with the next merge that changes `frontends/native`. He did not report on the blank card, the
+  swap sheet or today's app 0.262.3, so none is recorded as seen.

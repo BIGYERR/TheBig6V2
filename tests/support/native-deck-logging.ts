@@ -4,8 +4,9 @@
 //
 //   the page   today's own handlers, run on the page of a test phone (support/stored-state.ts): stepSet, setDelta,
 //              onSetWeight, cascadeSetWeights, reuseWeight, fillAllSetWeights, autoSaveSets, saveExWeight,
-//              skipExercise and its three siblings, applySwapChoice and undoSwap, and the deck's markDay as deck.ts
-//              writes it, with the pop-up that follows. Its fields are placed from today's own card model as the
+//              skipExercise and its three siblings, applySwapChoice and undoSwap, the nudge's two answers
+//              (dismissSwapNudge, acceptSwapNudge), and the deck's markDay as deck.ts writes it, with the pop-up
+//              that follows (support/native-pop-ups.ts: the Angular PopUp's own fire over the page). Its fields are placed from today's own card model as the
 //              session sheet's template draws them (session-sections.ts), and placed again after an edit, as the
 //              template draws the cards afresh. Its swap sheet is the Angular sheet's open() over the page's own
 //              swapCandidates, auxSwapCandidates and swapLoadNote, through today's swap-sheet-model.ts.
@@ -15,8 +16,10 @@
 //
 // After every tap: the two stores hold each ia_ key equal, value for value; every field of every move holds the same
 // text, placeholder and inherit mark; the set summary, its words, Varied and the load's label read the same; and the
-// toast raised is the same. The pop-ups' keys are the one exception (the completion pop-up and the day-after reminder
-// are not built in the beta): the page writes them, and the beta's must stand as they stood before the deck opened.
+// toast raised is the same. No key is left out: the pop-ups' five families were the one exception until the beta
+// built its pop-ups (the deck's fourth session), and are now compared like every other. Mark the day done raises the
+// same pop-up on both, whole; a nudge that comes due carries the same words on both and is answered on both, Make the
+// change and Leave the plan alone in turn, after which the program in hand is the same program, whole.
 //
 // Nothing here writes a key itself, and the expected value of every comparison is today's page, on purpose: the
 // page stays the reference until the cutover. The hand-typed values are in tests/unit/native-deck-logging.test.ts.
@@ -29,12 +32,17 @@ import { type SwapSheetView, swapSheetView } from '../../frontends/app/src/app/s
 import { parseRx } from '../../frontends/native/src/deck/deck-readers.ts';
 import { type DeckProgram, type DeckView, type Fields, deckView, freshFields, loggedCards, movesOf } from '../../frontends/native/src/deck/deck-screen.ts';
 import { type SwapOpen, swapSheetOf } from '../../frontends/native/src/deck/deck-swaps.ts';
-import { type Session, act, leftField, markDay, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from '../../frontends/native/src/deck/deck-writes.ts';
+import { type Session, acceptNudge, act, dismissNudge, leftField, nudgeWords, swapMove, tapDone, tapFill, tapLog, tapReuse, tapStep, undoSwap } from '../../frontends/native/src/deck/deck-writes.ts';
+import type { PopSession } from '../../frontends/native/src/pop-up/pop-ups.ts';
+import { nudgeText } from '../../frontends/app/src/app/screens/swap-nudge/swap-nudge-model.ts';
+import { PLAN_CHANGE_FAILED, liveProgram } from '../../frontends/native/src/this-week/week-screen.ts';
 import { fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from '../../frontends/native/src/deck/set-fields.ts';
 import { nativeDay, pageDay } from './native-deck.ts';
-import type { Phone } from './stored-state.ts';
+import { markBoth, seedBoth } from './native-pop-ups.ts';
+import { sqliteTestStore } from './sqlite-kv.ts';
+import { Phone } from './stored-state.ts';
 
-/** The keys only the page's pop-ups write (popups-streaks-reminders.ts): the beta builds neither pop-up. */
+/** The keys only the pop-ups write (popups-streaks-reminders.ts; the beta's pop-up/pop-ups.ts), to count what a pop-up stored. */
 export const POPUP_KEYS = /^ia_(pop_idx|pop_dismiss|season_shown|remind_last|reminded)_/;
 
 const J = JSON.stringify;
@@ -70,9 +78,15 @@ export interface Tally {
   skips: number; undos: number; marks: number; drafts: number; loaded: number; toasts: number; popups: number;
   /** The swap sheet: sheets compared, their rows, sheets with no row, picks, put backs, nudges that came due, and each toast's kind. */
   sheets: number; rows: number; empty: number; picks: number; unswaps: number; nudges: number; swapToasts: Record<string, number>;
+  /** The nudge answered on both apps: Make the change, Leave the plan alone, and the days of the grid a change moved. */
+  accepted: number; declined: number; moved: number;
+  /** Make the change after which today's page, in the launch it was tapped in, holds another program than a fresh launch on the same keys. */
+  leaked: number;
+  /** A nudge whose turn was Make the change, answered Leave the plan alone because its lift is one of the engine's shared items. */
+  spared: number;
 }
 export const tally = (): Tally => ({ days: 0, taps: 0, checks: 0, steps: 0, typed: 0, pills: 0, logs: 0, dones: 0, commits: 0, skips: 0, undos: 0, marks: 0, drafts: 0, loaded: 0, toasts: 0, popups: 0,
-  sheets: 0, rows: 0, empty: 0, picks: 0, unswaps: 0, nudges: 0, swapToasts: {} });
+  sheets: 0, rows: 0, empty: 0, picks: 0, unswaps: 0, nudges: 0, swapToasts: {}, accepted: 0, declined: 0, moved: 0, leaked: 0, spared: 0 });
 
 /**
  * Today's swap sheet for one lift of a day, as the Angular sheet's open() builds it (swap-sheet.ts): the page's own
@@ -101,6 +115,25 @@ export function swapToastKind(t: string): string {
   return kind + (hold ? ', held' : '');
 }
 
+/**
+ * The names of the items core hands back as one object in two builds of the stored program: its own tables' items,
+ * which a build that renames one (a preference from the nudge) renames for every later build in the process
+ * (tests/measure/day-edits_shared-items.md; today's defect, not ruled). Read on copies of the store.
+ */
+function sharedItems(store: StateStore, now: number): Set<string> {
+  const fill = (): StateStore => { const c = sqliteTestStore(); for (const [k, v] of Object.entries(held(store))) c.set(k, v); return c; };
+  const quiet = { overlay: () => {}, freeze: () => {}, rebuild: () => {} };
+  type G = { weeks: Record<string, Record<string, { sections?: { items?: { name?: string }[] }[] } | undefined> | undefined> } | null;
+  const a = liveProgram(fill(), now, quiet) as unknown as G, b = liveProgram(fill(), now, quiet) as unknown as G;
+  const out = new Set<string>();
+  if (!a || !b) return out;
+  for (const w of Object.keys(a.weeks)) for (const d of Object.keys(a.weeks[w] || {})) {
+    const sa = (a.weeks[w]![d] || {}).sections || [], sb = ((b.weeks[w] || {})[d] || {}).sections || [];
+    sa.forEach((sec, i) => (sec.items || []).forEach((it, j) => { if (sb[i] && sb[i]!.items && sb[i]!.items![j] === it && it.name) out.add(it.name); }));
+  }
+  return out;
+}
+
 /** One day's deck, open on today's page and in the Expo app, over the same keys. */
 export class TwoDecks {
   /** The beta's side: its session, the day as drawn, each move's fields, the once-per-open stale warning. */
@@ -113,8 +146,8 @@ export class TwoDecks {
   private readonly topped = new Set<string>();
   /** The moves whose sets stand open (the page's exset-open class), which a redraw closes again. */
   private readonly setsOpen = new Set<string>();
-  /** Every key of the beta's store as it stood before the deck opened. */
-  private readonly pre: Record<string, string>;
+  /** Whether a nudge that comes due is answered (in turn: Make the change, Leave the plan alone). A measure that reads it unanswered sets this off. */
+  answers = true;
   private readonly now: number;
   private readonly unit: string;
 
@@ -132,11 +165,8 @@ export class TwoDecks {
     this.what = what;
     this.s = { store, prog: grid, week, dayKey };
     this.now = P.ev('Date.now()') as number;
-    // The beta's keys as the deck opens. They are the page's, but for the pop-ups' keys of days marked before this one.
-    this.pre = held(store);
     this.unit = grid.cfg && grid.cfg.unit === 'kg' ? 'kg' : 'lbs';
-    const page = P.dump();
-    assert.deepStrictEqual(this.pre, Object.fromEntries(Object.keys(page).filter((k) => !POPUP_KEYS.test(k) || k in this.pre).map((k) => [k, POPUP_KEYS.test(k) ? this.pre[k] : page[k]])), what + ': both apps start from the same keys');
+    assert.deepStrictEqual(held(store), P.dump(), what + ': both apps start from the same keys');
   }
 
   private get els(): Map<string, El> { return (this.P as unknown as { fields: Map<string, El> }).fields; }
@@ -229,10 +259,7 @@ export class TwoDecks {
     this.T.checks++;
     // 1. The stores, key for key.
     const beta = held(this.s.store), page = this.P.dump();
-    for (const k of new Set([...Object.keys(beta), ...Object.keys(page), ...Object.keys(this.pre)])) {
-      if (POPUP_KEYS.test(k)) assert.equal(beta[k], this.pre[k], what + ': the beta wrote ' + k + ', a pop-up\'s key');
-      else assert.equal(beta[k], page[k], what + ': ' + k + ' differs');
-    }
+    for (const k of new Set([...Object.keys(beta), ...Object.keys(page)])) assert.equal(beta[k], page[k], what + ': ' + k + ' differs');
     // 2. The cards, whole, with what was logged since they were drawn.
     const drawn = plain(this.view.cards).map((c) => ({ ...c, moves: [], logged: false, views: [] }));
     assert.deepStrictEqual(drawn.map((c) => c.key), this.pageCards.map((c) => c.key), what + ': the cards');
@@ -387,7 +414,7 @@ export class TwoDecks {
   /**
    * A pick: today's sheet writes the lift in hand as the Angular sheet does (LegacyBridge.set of _swapCtx), then
    * applySwapChoice, which draws the cards afresh; the beta's swapMove, then its own redraw. The nudge that comes due
-   * on the third pick running of one pair is compared and left unanswered on the page, as the beta raises none.
+   * on the third pick running of one pair is due on both, and is then answered on both (answerNudge).
    */
   swap(open: SwapOpen, to: string): void {
     let due = false;
@@ -408,7 +435,64 @@ export class TwoDecks {
       return [r.toast];
     });
     this.T.picks++;
-    if (due) this.T.nudges++;
+    if (!due) return;
+    this.T.nudges++;
+    if (!this.answers) return;
+    // Make the change and Leave the plan alone in turn. A lift that is one of the engine's shared items is left
+    // alone on its turn too: a preference that names one makes the rebuild rename the engine's own item, for every
+    // program built after it in this process, which is today's defect and would turn every later launch here red.
+    // So is a move the engine gives no pattern (a core, trunk or carry move, the kind its tables hold): one of them
+    // (Bird dogs for Ab wheel rollouts, the bodyweight program) was renamed that way on a day no two builds shared.
+    let accept = (this.T.accepted + this.T.declined) % 2 === 0;
+    if (accept && (!this.page(`_pattern(${J(open.ctx.name)})`) || sharedItems(this.s.store, this.now).has(open.ctx.name))) { accept = false; this.T.spared++; }
+    this.answerNudge(open.ctx.name, to, accept);
+  }
+  /**
+   * The nudge, on both apps: the card's words (the Angular SwapNudge's nudgeText over the page's _pattern; the beta's
+   * nudgeWords), then its answer. Leave the plan alone marks the pair offered. Make the change writes the preference
+   * into the program, marks the pair offered and rebuilds the program: the page redraws the day (acceptSwapNudge's
+   * openDetail, the deck's own redraw in the app), the beta takes the program handed back in place of the one it
+   * holds, and that program is the one a launch of today's page on the same keys hands back, whole.
+   *
+   * The reference is a fresh launch of the page, not the page the tap was made on. The engine hands back some core
+   * and trunk items as one object on several days and in every build of a launch (tests/measure/
+   * day-edits_shared-items.md), so a swap made earlier in that launch on one of them is still in the page's memory
+   * when the nudge rebuilds, and its program then carries the swapped lift on the item's other days until the next
+   * launch. That is today's defect, raised to Mario and not ruled; `leaked` counts how often the walk meets it.
+   */
+  answerNudge(from: string, to: string, accept: boolean): void {
+    assert.deepStrictEqual(nudgeWords(from, to), nudgeText(from, to, this.page(`_pattern(${J(from)})`) as string | null), this.what + ': the nudge\'s words');
+    (this.P.IA.ctx as Record<string, unknown>)['__n'] = { from, to };
+    const before = accept ? JSON.stringify(this.P.prog.weeks) : '';
+    this.tap(accept ? 'Make the change' : 'Leave the plan alone', () => {
+      if (!accept) { this.page('_nudgeCtx=__n;dismissSwapNudge();'); return; }
+      this.redrawn(() => { this.page('_nudgeCtx=__n;acceptSwapNudge();'); this.P.settle(); });
+      this.pagePlace();
+    }, () => {
+      if (!accept) { dismissNudge(this.s, from); return []; }
+      const said: string[] = [];
+      const r = acceptNudge(this.s, from, to, this.now, { overlay: () => { said.push(PLAN_CHANGE_FAILED); }, freeze: () => {}, rebuild: () => {} });
+      assert.ok(r.prog, this.what + ': Make the change hands back the program');
+      // The screen holds the new program in place of the old one. Here every holder of the grid has the one object
+      // (the test that made it, the walk of the next day), so its contents are replaced where it stands, as plain
+      // data, which is what the walk's grid has been from its launch (support/native-this-week.ts nativeGrid). The
+      // engine hands back some core and trunk items as one object on several days and in every build of a process
+      // (tests/measure/day-edits_shared-items.md); an edit made on a grid that is not a copy reaches them all.
+      const g = this.s.prog as unknown as Record<string, unknown>;
+      for (const k of Object.keys(g)) delete g[k];
+      Object.assign(g, plain(r.prog));
+      this.nativeDraw();
+      this.sameCards('drawn again after Make the change');
+      const fresh = new Phone();
+      for (const [k, v] of Object.entries(this.P.dump())) fresh.damage(k, v);
+      const t = new Date(this.now), p2 = (x: number): string => String(x).padStart(2, '0');
+      fresh.launch(`${t.getFullYear()}-${p2(t.getMonth() + 1)}-${p2(t.getDate())}T${p2(t.getHours())}:${p2(t.getMinutes())}:${p2(t.getSeconds())}`);
+      const launched = plain(fresh.prog);
+      assert.deepStrictEqual(plain(this.s.prog), launched, this.what + ': the program in hand after Make the change is the one a launch on these keys hands back');
+      if (JSON.stringify(plain(this.P.prog)) !== JSON.stringify(launched)) this.T.leaked++;
+      return [...said, r.toast];
+    });
+    if (accept) { this.T.accepted++; if (JSON.stringify(this.P.prog.weeks) !== before) this.T.moved++; } else this.T.declined++;
   }
   /** Put it back: today's undoSwap, which draws the cards afresh; the beta's, then its own redraw. */
   unswap(from: string): void {
@@ -423,16 +507,13 @@ export class TwoDecks {
 
   /** Mark the day done, as deck.ts markDay writes it, with the deck's close and the pop-up over This Week. */
   mark(rpe: number | null, notes: string): void {
-    const w = this.week, d = this.dayKey, title = this.view.title;
-    const before = this.P.dump();
-    this.tap('Mark the day done', () => {
-      this.page(`snapshotDay(${w},${J(d)});`);
-      const logs = plain(this.page('getLogs()')) as Record<string, Record<string, unknown>>;
-      const key = this.page(`logKey(${w},${J(d)})`) as string;
-      logs[key] = callItLog(logs[key], rpe, notes, w, this.now);
-      this.P.IA.ctx['__logs'] = logs;
-      this.page(`saveLogs(__logs);markDayComplete(${w},${J(d)},${J(title)});ruReset();renderWeekView();fireCompletionPopup(${w},${J(d)});`);
-    }, () => { markDay(this.s, title, rpe, notes, this.now); return []; });
+    const before = this.P.dump(), toasts = this.P.toasts.length;
+    // Both apps draw the pop-up's line from the start of one pinned sequence, another one for each day marked.
+    const random = seedBoth(this.P, (this.T.marks * 69069 + 12345) % 4294967296);
+    markBoth(this.P, { store: this.s.store, prog: this.s.prog } as unknown as PopSession, this.week, this.dayKey, this.view.title, rpe, notes, random, null, this.what);
+    assert.equal(this.P.toasts.length, toasts, this.what + ': the pop-up stands where the toast would, and no toast is raised');
+    this.T.taps++;
+    this.check('Mark the day done');
     this.T.marks++;
     const after = this.P.dump();
     if (Object.keys(after).some((k) => POPUP_KEYS.test(k) && after[k] !== before[k])) this.T.popups++;

@@ -13,23 +13,29 @@
 //   skipExercise, unskipExercise, skipSuperset,
 //   unskipSuperset, applySwapChoice, undoSwap     swap-sheet.ts
 //
-// The store is this app's own SQLite store and nothing else. tests/integration/native-deck-logging.test.ts and
-// native-deck-swap.test.ts hold it equal to today's page, key for key, after the same taps on the same keys. Not
-// here, with their own screens: the completion pop-up and the day-after reminder (the page's ia_pop_ and ia_remind
-// keys); the coach's nudge after the third swap running of one pair (a swap is counted here as today's counts it,
-// and the nudge is not raised); add and remove, which today's deck does not reach.
+//   showSwapNudge, dismissSwapNudge,
+//   acceptSwapNudge                                day-status.ts (the coach's nudge; the words are swap-nudge-model.ts)
+//
+// The store is this app's own SQLite store and nothing else. tests/integration/native-deck-logging.test.ts,
+// native-deck-swap.test.ts and native-pop-ups.test.ts hold it equal to today's page, key for key, after the same
+// taps on the same keys. Not here: the completion pop-up and the day-after reminder, which are ../pop-up/pop-ups.ts;
+// add and remove, which today's deck does not reach.
 import type { Cfg, Day, Section } from '@ia/core';
 import { _stripCapCue, applyInjuryFilter } from '@ia/core/engine/injury.ts';
 import { addSkipEdit, dropSkipEdit, ssSkipToken } from '@ia/core/engine/state-day-edits.ts';
 import { recordDaySnapshot, refreshDaySnapshot } from '@ia/core/engine/state-day-history.ts';
 import { dayStoreKey, dropSetDraft, readDayLogs, recordSetDraft, writeDayLogs } from '@ia/core/engine/state-day-log.ts';
 import { setDayStatus } from '@ia/core/engine/state-day-status.ts';
+import { _pattern } from '@ia/core/engine/region-caps.ts';
 import { entryDay, readLiftLog, recordLift, writeLiftLog } from '@ia/core/engine/state-lift-log.ts';
+import { recordSwapPreference } from '@ia/core/engine/state-programs.ts';
+import { type RefreshReport, type StoredProgram, refreshStoredProgram } from '@ia/core/engine/state-refresh.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
-import { type SwapPlace, _dayPlanCfg, addSwapRecord, countSwap, dropSwapRecord, readSwaps } from '@ia/core/engine/state-swaps.ts';
+import { type SwapPlace, _dayPlanCfg, addSwapRecord, countSwap, dropSwapRecord, markSwapNudged, readSwaps } from '@ia/core/engine/state-swaps.ts';
 import { _swapDetailFor, applySwapPrefs } from '@ia/core/engine/swap-prefs.ts';
 
 import type { ExItem } from '../day-detail/session-sections-model';
+import { type NudgeText, nudgeSlot, nudgeText } from '../swap-nudge/swap-nudge-model';
 import { type CardAct, type CardMove, type DayLog, callItLog } from './deck-model';
 import type { DeckDay, DeckProgram, Fields } from './deck-screen';
 import type { SwapCtx } from './deck-swaps';
@@ -330,3 +336,34 @@ export function tapDone(s: Session, F: Fields, moves: CardMove[], now: number): 
   return { fields, toasts, tried: open.length };
 }
 
+// ── COACH NUDGE (day-status.ts) ──────────────────────────────────────────────────────────────────────────────────
+// Third time in a row is a preference, not a bad night's sleep. Offered once, and only once: either answer marks the
+// pair offered, so the athlete is never asked again. swapMove says when it is due (state-swaps.ts countSwap).
+
+/** The page's showSwapNudge: the card's two paragraphs for the pair, today's words (swap-nudge-model.ts). */
+export function nudgeWords(from: string, to: string): NudgeText {
+  return nudgeText(from, to, _pattern(from));
+}
+
+/** The page's dismissSwapNudge, Leave the plan alone: the pair is marked offered. */
+export function dismissNudge(s: Session, from: string): void {
+  if (s.prog && s.prog.id) markSwapNudged(s.store, s.prog.id, from);
+}
+
+/**
+ * The page's acceptSwapNudge, Make the change: the preference written into the program's config, the pair marked
+ * offered, and the program rebuilt from what is stored, as a launch rebuilds it (the preference lives in the config,
+ * so this rebuild and every one after it makes the trade with no patch to lay back on). It hands back the program
+ * for the screen to hold in place of the one it has, null where the stored program is gone, and today's toast.
+ */
+export function acceptNudge(s: Session, from: string, to: string, now: number, failed: RefreshReport): { prog: DeckProgram | null; toast: string } {
+  let prog: DeckProgram | null = null;
+  if (s.prog && s.prog.id) {
+    const stored = recordSwapPreference(s.store, s.prog.id, from, to);
+    if (stored) {
+      markSwapNudged(s.store, s.prog.id, from);
+      prog = refreshStoredProgram(s.store, stored as unknown as StoredProgram, now, failed) as unknown as DeckProgram;
+    }
+  }
+  return { prog, toast: 'Done. ' + to + ' is your ' + nudgeSlot(_pattern(from)) + ' from here.' };
+}

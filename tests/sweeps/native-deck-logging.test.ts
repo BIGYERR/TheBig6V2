@@ -8,13 +8,12 @@ import assert from 'node:assert/strict';
 import { writeFileSync } from 'node:fs';
 import { test } from 'vitest';
 import type { Cfg } from '@ia/core';
-import type { DeckProgram } from '../../frontends/native/src/deck/deck-screen.ts';
-import { held, tally, workDay } from '../support/native-deck-logging.ts';
+import { tally, workDay } from '../support/native-deck-logging.ts';
+import { both } from '../support/native-deck-swap.ts';
 import { launches } from '../support/native-launch.ts';
-import { launchNow, nativeGrid } from '../support/native-this-week.ts';
+import { launchNow } from '../support/native-this-week.ts';
 import { PROGRAMS } from '../support/programs.ts';
-import { sqliteTestStore } from '../support/sqlite-kv.ts';
-import { Phone, life, training } from '../support/stored-state.ts';
+import { life, training } from '../support/stored-state.ts';
 
 process.env['TZ'] = 'America/New_York';
 const CREATED = '2026-08-29T09:00:00';
@@ -31,14 +30,9 @@ test('the ten seeded programs: every training day of the week in view, at each s
     const cfg: Cfg = seeded.cardioGoals.swim ? { ...seeded, cardioGoals: { ...seeded.cardioGoals, swim: { ...seeded.cardioGoals.swim, baseMins: '10', baseSecs: '30' } } } : seeded;
     let n = 0;
     life(cfg, CREATED, undefined, (stage, P) => {
-      const pre = P.dump();
-      const Q = new Phone();
-      for (const [k, v] of Object.entries(pre)) Q.damage(k, v);
-      Q.launch(iso(launchNow(P)));
-      const store = sqliteTestStore();
-      for (const [k, v] of Object.entries(pre)) store.set(k, v);
-      const grid = nativeGrid(Q, store) as unknown as DeckProgram;
-      assert.deepStrictEqual(held(store), Q.dump(), name + ', ' + stage + ': after its own launch the beta holds the keys today\'s launch left');
+      // Both apps launched on the keys as they stand, and the launch's reminder compared (support/native-deck-swap.ts).
+      void name; void stage;
+      const { Q, store, grid } = both(P);
       const week: number = Q.ev('calcCurrentWeek()');
       for (const d of training(Q, week)) workDay(Q, store, grid, week, d, n++, T);
       Q.launch(iso(new Date(launchNow(Q).getTime() + 86400000)));
