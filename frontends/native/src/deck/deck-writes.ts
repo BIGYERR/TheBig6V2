@@ -19,7 +19,7 @@
 // The store is this app's own SQLite store and nothing else. tests/integration/native-deck-logging.test.ts,
 // native-deck-swap.test.ts and native-pop-ups.test.ts hold it equal to today's page, key for key, after the same
 // taps on the same keys. Not here: the completion pop-up and the day-after reminder, which are ../pop-up/pop-ups.ts;
-// add and remove, which today's deck does not reach.
+// add and remove, which today's deck does not reach and the session sheet does (../day-detail/sheet-writes.ts).
 import type { Cfg, Day, Section } from '@ia/core';
 import { _stripCapCue, applyInjuryFilter } from '@ia/core/engine/injury.ts';
 import { addSkipEdit, dropSkipEdit, ssSkipToken } from '@ia/core/engine/state-day-edits.ts';
@@ -62,8 +62,8 @@ export function snapshotDay(s: Session, log: (...a: unknown[]) => void = console
   } catch (e) { log('day snapshot failed', s.week, s.dayKey, e); }
 }
 
-/** The page's resnapshotDayEdit: the snapshot takes in the athlete's own edit. */
-function resnapshotDay(s: Session, log: (...a: unknown[]) => void = console.error): void {
+/** The page's resnapshotDayEdit: the snapshot takes in the athlete's own edit. The sheet's add and remove call it too. */
+export function resnapshotDay(s: Session, log: (...a: unknown[]) => void = console.error): void {
   try {
     if (!s.prog || !s.prog.weeks || !s.week || !s.dayKey) return;
     const wk = s.prog.weeks[s.week];

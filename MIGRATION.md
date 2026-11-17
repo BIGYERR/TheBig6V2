@@ -206,10 +206,21 @@ Each phase starts only on Mario's GO, one phase step per session.
   uploaded by run 43978885142 and read back as processed, `docs/decisions/testflight.md`): "1. yes its slides up 2.
   yes 3. yes 4. yes 5. yes all same as todays", to Reopen, the sheet and its cards, the slider and notes, Done and
   its undo, Skip. Nothing fixed from it (`docs/decisions/session-sheet.md`, the build 117 entry).
-- **Next:** the sheet's
-  second session: add and remove, the Wildcard tag, a double day's jog, the 1RM card and the day's note, and the
-  sheet's ledger rows (measured, `tests/measure/native-sheet-add_today.md`; the cut waits for Mario's word). The run's log, its wheels and its sport picker come with the cardio sheet (row 3 of phase 3):
-  they are the same piece, and the sheet's form already holds their fields as drawn. Still not
+- **Done, phase 3's seventh session, the session sheet's second (Post-v0.262.4, no build):** today's add sheet,
+  remove, the Wildcard tag, the jog, the 1RM card and the day's note measured
+  (`tests/measure/native-sheet-add_today.md`), the cut put to Mario and taken whole ("Yeah"), then built
+  (`docs/decisions/session-sheet.md`, the entry of that name). The header's add button opens the add sheet
+  (`frontends/native/src/add-sheet/`, over today's own model; its list is the page's `addCandidates` and
+  `addedDetailFor`, line for line, `day-detail/sheet-adds.ts`); a pick and an added move's remove are the page's
+  `applyAddChoice` and `removeAddedExercise`; the 1RM card saves through the Angular card's `save()`; the jog, the
+  Wildcard tag and the note are drawn. Three more of core's writers (`addAddEdit`, `dropAddEdit`, `writePrograms`).
+  Held equal to today's page: 2,755 add sheets across the ten programs, and every `ia_` key equal
+  after each of 1,812 sheet taps. The sheet's ledger rows are filled. Carried, today's behaviour: a move added to a
+  day touched in no other way is gone once its week has passed (the launch drops the record and no snapshot holds
+  it). The jog's Edit cardio takes no press until the rest sheet is built.
+- **Next:** Mario's phone on the next IA Next build (the add button, a pick, remove; the 1RM card only on a
+  program that has a test week). Then the cardio sheet (row 3 of phase 3): the run's log, its wheels and its sport
+  picker are the same piece, and the sheet's form already holds their fields as drawn. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,

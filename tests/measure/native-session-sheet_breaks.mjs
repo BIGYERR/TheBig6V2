@@ -2,7 +2,9 @@
 // Read-only on this checkout (measure). Each break changes one rule in a copy of the tree: a rule of what the sheet
 // reads (frontends/native/src/day-detail/sheet-readers.ts), of how it draws the day (sheet-screen.ts), of what its
 // log, its Done and its Skip write (sheet-writes.ts, pop-up/pop-ups.ts), of a model's copy, or of the screens' wiring
-// (day-detail/SessionSheet.tsx, this-week/ThisWeek.tsx, App.tsx). The fast files are run on each; the ten-program
+// (day-detail/SessionSheet.tsx, this-week/ThisWeek.tsx, App.tsx). The sheet's second session added the rules of what
+// the add sheet lists and the dose an added move takes (sheet-adds.ts), of add, remove and the 1RM card's save
+// (sheet-writes.ts), and of the add sheet's own screen and model (add-sheet/). The fast files are run on each; the ten-program
 // sweep is run only on a break the fast files let through. A break no file turns red on is a rule no test holds.
 //
 // The page is not broken: these are the Expo app's own files, so the tests that hold the beta against today's page
@@ -32,7 +34,8 @@ const TESTS = tree ? join(tree, 'tests') : '';
 const FAST = ['unit/native-session-sheet.test.ts', 'integration/native-session-sheet.test.ts', 'unit/native-pop-ups.test.ts', 'unit/native-deck.test.ts', 'unit/native-deck-logging.test.ts', 'unit/native-shell.test.ts'];
 const SLOW = ['sweeps/native-session-sheet.test.ts'];
 const D = 'frontends/native/src/day-detail/';
-const READERS = D + 'sheet-readers.ts', SCREEN = D + 'sheet-screen.ts', WRITES = D + 'sheet-writes.ts', SHEET = D + 'SessionSheet.tsx';
+const READERS = D + 'sheet-readers.ts', SCREEN = D + 'sheet-screen.ts', WRITES = D + 'sheet-writes.ts', SHEET = D + 'SessionSheet.tsx', ADDS = D + 'sheet-adds.ts';
+const ADDSHEET = 'frontends/native/src/add-sheet/AddSheet.tsx', ADDMODEL = 'frontends/native/src/add-sheet/add-sheet-model.ts';
 const POPS = 'frontends/native/src/pop-up/pop-ups.ts', APP = 'frontends/native/src/App.tsx', WEEK = 'frontends/native/src/this-week/ThisWeek.tsx';
 
 /**
@@ -90,8 +93,8 @@ const BREAKS = [
   [SCREEN, 'the run is never read as logged', "live: (e, sport) => cardioEntryLogged(e as never, sport),", "live: () => false,"],
   [SCREEN, 'the retest strip is left off the cardio card', "day.cardio ? benchNotes(day.cardio, (wk) => benchmarkEntryFor(store, id, wk), (s) => _clkMS(s)) : []", "[]"],
   [SCREEN, 'the foot drawn again after an undo ignores the status', "  return statusFoot(dayStatus(store, prog.id, week, dayKey));", "  return statusFoot(null);"],
-  [SCREEN, 'the screen draws the day\'s note too', "['nudge', 'sections', 'cardio', 'log', 'logNudge'];", "['nudge', 'sections', 'cardio', 'note', 'log', 'logNudge'];"],
-  [SCREEN, 'the screen draws every block of the view', "export function drawnBlocks(v: SheetView): BodyBlock[] { return v.body.filter((b) => SHEET_DRAWS.includes(b.kind)); }", "export function drawnBlocks(v: SheetView): BodyBlock[] { return v.body; }"],
+  [SCREEN, 'the day\'s note is left undrawn', "'cardio', 'note', 'log', 'logNudge'];", "'cardio', 'log', 'logNudge'];"],
+  [SCREEN, 'the screen draws only the blocks its list leaves out', "export function drawnBlocks(v: SheetView): BodyBlock[] { return v.body.filter((b) => SHEET_DRAWS.includes(b.kind)); }", "export function drawnBlocks(v: SheetView): BodyBlock[] { return v.body.filter((b) => !SHEET_DRAWS.includes(b.kind)); }"],
   [SCREEN, 'a tint is read as a solid colour', "return tint ? { name: tint[1]!, alpha: +tint[2]! } : null;", "return tint ? { name: tint[1]!, alpha: 1 } : null;"],
   [SCREEN, 'the RPE reference reads otherwise', "['7–8', 'Hard — a few words at a time']", "['7–8', 'Hard — a few words']"],
   // Not broken here: the fold of the lift log's old keys as the sheet reads it. The launch folds the log and stores
@@ -189,6 +192,132 @@ const BREAKS = [
   [APP, 'Done on the sheet raises no pop-up', "setSheet(null); complete(", "setSheet(null); void ("],
   [APP, 'the sheet\'s Back does not close it', "open={sheet} calm={calm} onClose={() => setSheet(null)}", "open={sheet} calm={calm} onClose={() => {}}"],
   [APP, 'This Week\'s Reopen reaches no sheet', "onSheet={setSheet} onLaunch", "onSheet={() => {}} onLaunch"],
+  // ── The sheet's second session: what the add sheet lists (sheet-adds.ts) ──
+  [ADDS, 'a move already on the card is offered again', "    if (onCard[n.toLowerCase()]) return;\n", ''],
+  [ADDS, 'the card\'s names are matched to the kit\'s by their exact case', "onCard[it.name.toLowerCase()] = 1;", "onCard[it.name] = 1;"],
+  [ADDS, 'a move with no pattern is offered', "    if (!p) return;\n    if (!_swapInjuryOK(n, cfg)) return;", "    if (!_swapInjuryOK(n, cfg)) return;"],
+  [ADDS, 'the injury plan does not filter the add sheet', "    if (!_swapInjuryOK(n, cfg)) return;\n", ''],
+  [ADDS, 'another region\'s work is listed with the day\'s own', "    if (r && dayRegion && r !== dayRegion) { off.push(n); return; }\n", ''],
+  [ADDS, 'a pattern the day already trains is listed as work it has none of', "if (patsOnCard[p]) more.push(n); else gap.push(n);", "gap.push(n);"],
+  [ADDS, 'the day\'s region is its last move\'s, not its first', "if (!dayRegion) dayRegion = _PATTERN_REGION[p] as string;", "dayRegion = _PATTERN_REGION[p] as string;"],
+  [ADDS, 'the lighter move is listed first', "if (ta !== tb) return tb - ta; return a.localeCompare(b); };", "if (ta !== tb) return ta - tb; return a.localeCompare(b); };"],
+  [ADDS, 'moves of one tier are not put in order by name', "if (ta !== tb) return tb - ta; return a.localeCompare(b); };", "if (ta !== tb) return tb - ta; return b.localeCompare(a); };"],
+  [ADDS, 'seven rows of work the day has none of', "gap: gap.sort(rank).slice(0, 6)", "gap: gap.sort(rank).slice(0, 7)"],
+  [ADDS, 'six rows of more of the same', "more: more.sort(rank).slice(0, 5)", "more: more.sort(rank).slice(0, 6)"],
+  [ADDS, 'seven rows of another region\'s work', "off: off.sort(rank).slice(0, 6)", "off: off.sort(rank).slice(0, 7)"],
+  // ── The dose an added move takes ──
+  [ADDS, 'a dose in yards donates to a rep lift', "if (/\\byards?\\b|\\byd\\b|", "if (/\\byd\\b|"],
+  [ADDS, 'a dose in meters donates to a rep lift', "|\\bmeters?\\b|\\bsec\\b|", "|\\bsec\\b|"],
+  [ADDS, 'a dose in minutes donates to a rep lift', "|\\bsec\\b|\\bmin\\b|\\bhold\\b|", "|\\bsec\\b|\\bhold\\b|"],
+  [ADDS, 'a hold donates to a rep lift', "|\\bmin\\b|\\bhold\\b|max time/i", "|\\bmin\\b|max time/i"],
+  [ADDS, 'a max time donates to a rep lift', "|\\bhold\\b|max time/i", "|\\bhold\\b/i"],
+  [ADDS, 'a time or a distance the parse reads donates to a rep lift', "  if (rx['kind'] === 'dist' || rx['kind'] === 'sec') return null;\n", ''],
+  [ADDS, 'a Main or a primer section donates its dose', "      if (/^(main|primer)/i.test(s.label || '')) return;\n", ''],
+  [ADDS, 'a round donates its dose', "s.hip || s.superset || s.type === 'superset') return;", "s.hip || s.type === 'superset') return;"],
+  [ADDS, 'a round named by its type donates its dose', "s.superset || s.type === 'superset') return;", "s.superset) return;"],
+  [ADDS, 'a core block donates its dose', "if (!s || s._added || s.core || s.hip ||", "if (!s || s._added || s.hip ||"],
+  [ADDS, 'a hip block donates its dose', "s.core || s.hip || s.superset", "s.core || s.superset"],
+  [ADDS, 'the athlete\'s own added work donates its dose', "if (!s || s._added || s.core", "if (!s || s.core"],
+  [ADDS, 'the first match on today\'s card donates, not the last', "for (let i = today.length - 1; i >= 0; i--) if", "for (let i = 0; i < today.length; i++) if"],
+  [ADDS, 'the week is read from its last day back', "order.forEach((k) => { if (wk[k]) days.push(wk[k] as AddDay); });", "order.forEach((k) => { if (wk[k]) days.unshift(wk[k] as AddDay); });"],
+  [ADDS, 'the same pattern elsewhere in the week is never tried', "      for (let j = 0; j < ds.length; j++) if (_pattern(ds[j]!.name as string) === pat) return ds[j]!.detail as string;\n", ''],
+  [ADDS, 'the same region is never tried', "    if (region) for (let i = 0; i < days.length; i++) {", "    if (!region) for (let i = 0; i < days.length; i++) {"],
+  [ADDS, 'the conservative dose is three sets of twelve', "  return '3×10 — RPE 7';", "  return '3×12 — RPE 7';"],
+  // ── The add sheet as drawn (addSheetOf) ──
+  [ADDS, 'a day the grid does not hold still opens an add sheet', "  if (!day || !prog) return null;\n  const c = addCandidates(day, prog);", "  if (!prog) return null;\n  const c = addCandidates(day, prog);"],
+  [ADDS, 'a row of another region is named by its pattern', "regionOf: (n) => (_PATTERN_REGION[_pattern(n) as string] as string | undefined) ?? null,", "regionOf: (n) => (_pattern(n) as string | undefined) ?? null,"],
+  [ADDS, 'a row of more of the same always says three sets', "addedSets: (n) => parseRx(addedDetailFor(day, n, week, prog), n)?.sets ?? null,", "addedSets: () => null,"],
+  [ADDS, 'the sets tag counts the week, not the day', "    week,\n    setCount:", "    week: week + 1,\n    setCount:"],
+  // ── Add and remove (sheet-writes.ts) ──
+  [WRITES, 'an added move takes its donor\'s dose unshaped', "const detail = _swapDetailFor(name, addedDetailFor(day, name, s.week, s.prog));", "const detail = addedDetailFor(day, name, s.week, s.prog);"],
+  [WRITES, 'every add makes a block of its own', "let bucket = (day.sections || []).filter((x) => x._added)[0];", "let bucket = (day.sections || []).filter(() => false)[0];"],
+  [WRITES, 'a move is put in the added block twice', "if (!bucket.items.some((it) => it.name === name)) bucket.items.push(", "bucket.items.push("],
+  [WRITES, 'the added block is not marked as added', "bucket = { label: 'Added by you', _added: true, items: [] };", "bucket = { label: 'Added by you', items: [] };"],
+  [WRITES, 'the added block reads Added', "bucket = { label: 'Added by you', _added: true, items: [] };", "bucket = { label: 'Added', _added: true, items: [] };"],
+  [WRITES, 'an added move is not marked as the athlete\'s', "bucket.items.push({ name, detail, _addedByUser: true });", "bucket.items.push({ name, detail });"],
+  [WRITES, 'an add stores no record', "  addAddEdit(s.store, s.prog.id, s.week, s.dayKey, name, detail, now);\n", ''],
+  [WRITES, 'an add is stamped a millisecond late', "name, detail, now);", "name, detail, now + 1);"],
+  [WRITES, 'an add is stored under the day before its week', "addAddEdit(s.store, s.prog.id, s.week, s.dayKey, name, detail, now);", "addAddEdit(s.store, s.prog.id, s.week - 1, s.dayKey, name, detail, now);"],
+  [WRITES, 'an add does not renew the day\'s snapshot', "name, detail, now);\n  resnapshotDay(s);", "name, detail, now);"],
+  [WRITES, 'an add\'s toast leaves out the dose', "return name + ' added at ' + detail + '.';", "return name + ' added.';"],
+  [WRITES, 'remove takes the move out of the plan too', "    if (!sec._added) return;\n", ''],
+  [WRITES, 'remove empties the added block', "sec.items = (sec.items || []).filter((it) => !(it && it.name === name));", "sec.items = [];"],
+  [WRITES, 'a block left empty stays on the card', "  day.sections = (day.sections || []).filter((sec) => !(sec._added && !(sec.items || []).length));\n", ''],
+  [WRITES, 'remove drops no record', "  dropAddEdit(s.store, s.prog.id, s.week, s.dayKey, name);\n", ''],
+  [WRITES, 'remove does not renew the day\'s snapshot', "name);\n  resnapshotDay(s);\n  return name + ' removed.';", "name);\n  return name + ' removed.';"],
+  [WRITES, 'remove says the move is off the card', "return name + ' removed.';", "return name + ' is off the card.';"],
+  // ── The 1RM card's estimate and its save ──
+  [WRITES, 'no reps is read as three', "parseInt(reps) || 1);", "parseInt(reps) || 3);"],
+  [WRITES, 'the weight is read as a whole number', "return epley(parseFloat(weight) || 0,", "return epley(parseInt(weight) || 0,"],
+  [WRITES, 'a save of nothing still writes and says so', "  if (!(v > 0)) return { estimate: v, saved: null };\n", ''],
+  [WRITES, 'the save leaves the stored program\'s max alone', "    p.cfg[lift] = v;\n", ''],
+  [WRITES, 'the save leaves the program in hand alone', "    if (active && active.cfg) active.cfg[lift] = v;\n", ''],
+  [WRITES, 'the save does not store the programs', "    writePrograms(s.store, programs as never);\n", ''],
+  [WRITES, 'the save writes the first stored program, whichever is in hand', "const p = programs.filter((x) => x && x.id === s.prog.id)[0];", "const p = programs[0];"],
+  [WRITES, 'the saved line always says lbs', "' ' + unit + '.' };", "' lbs.' };"],
+  [WRITES, 'the saved line reads starts from', "saved: 'Saved. Your next block anchors off '", "saved: 'Saved. Your next block starts from '"],
+  // ── The blocks the screen draws (sheet-screen.ts) ──
+  [SCREEN, 'the jog is left undrawn', "['also', 'wildcard', 'nudge',", "['wildcard', 'nudge',"],
+  [SCREEN, 'the Wildcard tag is left undrawn', "['also', 'wildcard', 'nudge',", "['also', 'nudge',"],
+  [SCREEN, 'the 1RM card is left undrawn', "'sections', 'e1rm', 'cardio',", "'sections', 'cardio',"],
+  // ── The second session's wiring (SessionSheet.tsx) ──
+  [SHEET, 'the add button opens nothing', "hitSlop={8} onPress={openAdd}", "hitSlop={8} onPress={() => {}}"],
+  [SHEET, 'the add button reads Add', ">Exercise</Text>", ">Add</Text>"],
+  [SHEET, 'a day with nothing to add to says nothing', "if (sheet) setAdd(sheet); else say('Nothing to add to here');", "if (sheet) setAdd(sheet);"],
+  [SHEET, 'a pick does not draw the sheet again', "const toast = addMove(session, name, Date.now());\n    if (toast === null) return;\n    redraw();\n", "const toast = addMove(session, name, Date.now());\n    if (toast === null) return;\n"],
+  [SHEET, 'a pick raises no toast', "    redraw();\n    say(toast);\n  };\n  const saveMax", "    redraw();\n  };\n  const saveMax"],
+  [SHEET, 'a pick is stamped with no instant of its own', "addMove(session, name, Date.now());", "addMove(session, name, 0);"],
+  [SHEET, 'no add sheet is drawn over the sheet', "      {add && <AddSheet palette={p} view={add} calm={calm} onPick={added} onClose={() => setAdd(null)} />}\n", ''],
+  [SHEET, 'the add sheet\'s pick is handed nowhere', "onPick={added} onClose={() => setAdd(null)}", "onPick={() => {}} onClose={() => setAdd(null)}"],
+  [SHEET, 'the add sheet never closes', "onPick={added} onClose={() => setAdd(null)}", "onPick={added} onClose={() => {}}"],
+  [SHEET, 'an added move\'s remove calls nothing', "onPress={() => h.remove(x.name)}", "onPress={() => {}}"],
+  [SHEET, 'a remove does not draw the sheet again', "const toast = removeAdded(session, name);\n      if (toast === null) return;\n      redraw();\n", "const toast = removeAdded(session, name);\n      if (toast === null) return;\n"],
+  [SHEET, 'an added move\'s remove reads delete', ">remove</Text>", ">delete</Text>"],
+  [SHEET, 'an added move no longer says the athlete added it', "<Text style={[s.bold, { color: p.signal }]}>You added this</Text>{' · not in the plan'}</Text>", "<Text style={[s.bold, { color: p.signal }]}>Added</Text></Text>"],
+  [SHEET, 'the jog\'s Edit cardio takes a press', "<View style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></View>", "<Pressable onPress={() => {}} style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></Pressable>"],
+  [SHEET, 'the jog\'s lines are not drawn', "                {blk.lines.map((l, i) => <Text key={i} style={[s.alsoLine, { color: p.run }]}>{l}</Text>)}\n", ''],
+  [SHEET, 'the jog\'s label is not drawn', "                <Text style={[s.alsoLbl, { color: p.muted }]}>{blk.label}</Text>\n", ''],
+  [SHEET, 'the Wildcard tag reads Wildcard', ">Wildcard done</Text>", ">Wildcard</Text>"],
+  [SHEET, 'the Wildcard tag\'s words are not drawn', "                  <Text style={[s.wcSub, { color: p.muted }]}>{blk.sub}</Text>\n", ''],
+  [SHEET, 'the day\'s note is drawn with its markup', "{plain(blk.html)}</Text>;", "{blk.html}</Text>;"],
+  [SHEET, 'the 1RM card saves the bench, whatever the day tests', "saveMax(blk.card.lift, weight, reps)", "saveMax('bench', weight, reps)"],
+  [SHEET, 'the 1RM card\'s save says pounds on a kilogram program', "return saveTestMax(session, lift, unit, weight, reps); };", "return saveTestMax(session, lift, 'lbs', weight, reps); };"],
+  [SHEET, 'the 1RM card\'s estimate starts at the logged set\'s', "const [estimate, setEstimate] = useState(0);", "const [estimate, setEstimate] = useState(1);"],
+  [SHEET, 'the 1RM card opens on three reps, whatever was logged', "const [reps, setReps] = useState(c.reps);", "const [reps, setReps] = useState(3);"],
+  [SHEET, 'the 1RM card opens with no weight, whatever was logged', "const [weight, setWeight] = useState(c.weight);", "const [weight, setWeight] = useState('');"],
+  [SHEET, 'a weight typed does not move the estimate', "{ setWeight(t); setEstimate(e1rmEstimate(t, String(reps))); };", "{ setWeight(t); };"],
+  [SHEET, 'reps picked do not move the estimate', "{ setReps(n); setEstimate(e1rmEstimate(weight, String(n))); };", "{ setReps(n); };"],
+  [SHEET, 'the card shows its saved line when nothing was saved', "if (r.saved !== null) setSaved(r.saved);", "setSaved(r.saved || 'Saved.');"],
+  [SHEET, 'the save button stays after a save', "{saved\n        ? <Text testID=\"sheet-max-saved\"", "{false\n        ? <Text testID=\"sheet-max-saved\""],
+  [SHEET, 'the 1RM card offers six reps', "{[1, 2, 3, 4, 5].map((n) => (", "{[1, 2, 3, 4, 5, 6].map((n) => ("],
+  [SHEET, 'the save button reads Save max', "{'Save as new ' + c.liftLabel + ' max'}", "{'Save ' + c.liftLabel + ' max'}"],
+  [SHEET, 'the 1RM card\'s hint says RPE 9', "A single at RPE 9.5 works too.", "A single at RPE 9 works too."],
+  [SHEET, 'the 1RM card reads One rep max', ">Estimated 1RM</Text><Text style={[s.e1rmSmall", ">One rep max</Text><Text style={[s.e1rmSmall"],
+  [SHEET, 'the 1RM card\'s number is labelled Estimate', "<Text style={[s.e1rmOutLbl, { color: p.muted }]}>Estimated 1RM</Text>", "<Text style={[s.e1rmOutLbl, { color: p.muted }]}>Estimate</Text>"],
+  // ── The add sheet's screen (add-sheet/AddSheet.tsx) and its model's copy ──
+  [ADDSHEET, 'a row tapped hands no pick on', "onPress={() => leave(() => onPick(r.name))}", "onPress={() => leave()}"],
+  [ADDSHEET, 'a second tap while the add sheet leaves picks again', "    if (leaving.current) return;\n    leaving.current = true;\n    if (before) before();", "    if (before) before();\n    if (leaving.current) return;\n    leaving.current = true;"],
+  [ADDSHEET, 'the add sheet\'s Back does not leave', "hitSlop={12} onPress={() => leave()}>", "hitSlop={12} onPress={() => {}}>"],
+  [ADDSHEET, 'work the day has none of is drawn under more of the same too', "{v.more.map((r, k) => row(r, k, 'more'))}", "{v.gap.map((r, k) => row(r, k, 'more'))}"],
+  [ADDSHEET, 'another region\'s rows are not drawn', "            {v.off.map((r, k) => row(r, k, 'off'))}\n", ''],
+  [ADDSHEET, 'the foot stands on a sheet with nothing to offer in its first list', "const none = !v.gap.length && !v.more.length && !v.off.length;", "const none = !v.gap.length;"],
+  [ADDSHEET, 'the empty words and the foot change places', "{none\n          ? <Text testID=\"add-empty\"", "{!none\n          ? <Text testID=\"add-empty\""],
+  [ADDSHEET, 'a row\'s note is not drawn', "      {!!r.note && <Text style={[s.candNote, { color: p.signal }]}>{r.note}</Text>}\n", ''],
+  [ADDSHEET, 'the add sheet is headed Add a move', ">Add an exercise</Text>", ">Add a move</Text>"],
+  [ADDSHEET, 'the add sheet\'s title is not the day\'s', "{v.title}</Text>", "{v.weekTag}</Text>"],
+  [ADDSHEET, 'the sets tag is not drawn', "          <Text style={tag}>{v.setsTag}</Text>\n", ''],
+  [ADDSHEET, 'the region tag is not drawn', "          <Text style={tag}>{v.regionTag}</Text>\n", ''],
+  [ADDSHEET, 'the line under the tags is gone', ">Added work matches the closest thing to it in your week.</Text>", "></Text>"],
+  [ADDSHEET, 'the first list is headed New work', ">Today isn't training these</Text>", ">New work</Text>"],
+  [ADDSHEET, 'the first list\'s line is gone', "            <Text style={[s.secSub, { color: p.muted }]}>Work your day has no movement for yet.</Text>\n", ''],
+  [ADDSHEET, 'the second list is headed More', "{caution(\"More of what you're already doing\")}", "{caution('More')}"],
+  [ADDSHEET, 'the second list no longer warns of stacked fatigue', "Adding here stacks fatigue on the same tissue.</Text>", "</Text>"],
+  [ADDSHEET, 'the third list is headed Other work', "{caution('Not what today is for')}", "{caution('Other work')}"],
+  [ADDSHEET, 'the third list no longer says what to watch', "Fine once, but watch what it lands next to.</Text>", "</Text>"],
+  [ADDSHEET, 'the empty words are shorter', ">Nothing left in your kit that isn't already on this card.</Text>", ">Nothing left in your kit.</Text>"],
+  [ADDSHEET, 'the foot no longer says next week is unchanged', " Next week says what it always said.</Text>", "</Text>"],
+  [ADDMODEL, 'the add sheet model\'s copy says Sets rise to', "'Your day already has this pattern. Sets go to '", "'Your day already has this pattern. Sets rise to '"],
+  [ADDMODEL, 'the add sheet model\'s copy counts a skipped move\'s sets', "      if (!it || it._skipped) return;\n", "      if (!it) return;\n"],
 ];
 
 /** The files run in the copy: per file, how many tests failed (a file that could not load counts as failed whole). */

@@ -3,8 +3,10 @@
 // here is typed by hand: from the words today's sheet draws (day-detail.ts, session-log.ts and their models), from
 // the rulings the page's handlers carry (V181 D1 and D2: Done and Skip, each undoing itself; V221 D179: a status
 // closes the session; V236 D218: a cardio card that is a draft stores nothing; V236 D219: the effort is a number only
-// once the slider was moved; V148: time, pace and distance, the third derived), or from arithmetic. None is asked of
-// the app: the comparison with today's sheet is tests/integration/native-session-sheet.test.ts.
+// once the slider was moved; V148: time, pace and distance, the third derived; V109: an added move, offered across
+// regions with what it collides with said on the row; V163 D1 to D4: its dose by the nearest match of type, never a
+// distance or a time), or from arithmetic (Epley: weight × (1 + reps / 30)). None is asked of the app: the comparison
+// with today's sheet is tests/integration/native-session-sheet.test.ts.
 process.env['TZ'] = 'America/New_York';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -14,12 +16,13 @@ import { memoryStore } from '@ia/core/engine/state-store.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 import { REPO } from '../support/app.ts';
 import type { CardioFields } from '../../frontends/native/src/day-detail/cardio-fields-model.ts';
+import { addCandidates, addSheetOf, addedDetailFor } from '../../frontends/native/src/day-detail/sheet-adds.ts';
 import {
   IAW_SPEC, MOD_PAL, RPE_LABELS, TAG_META, benchmarkEntryFor, cardioLogLabel, cardioSwapNoteText, doseDerived, doseFromCardio, exLoggable, fmtPaceMi, parseClock, sessionLogProgress,
 } from '../../frontends/native/src/day-detail/sheet-readers.ts';
 import { RPE_INFO, SHEET_DRAWS, type SheetProgram, drawnBlocks, footOf, logOf, sheetDay, sheetFields, sheetMoves, sheetView, tokenOf } from '../../frontends/native/src/day-detail/sheet-screen.ts';
-import { type LogForm, formOf, moveRpe, persistLog, tapStatus, typeNotes } from '../../frontends/native/src/day-detail/sheet-writes.ts';
-import type { Session } from '../../frontends/native/src/deck/deck-writes.ts';
+import { type LogForm, addMove, e1rmEstimate, formOf, moveRpe, persistLog, removeAdded, saveTestMax, tapStatus, typeNotes } from '../../frontends/native/src/day-detail/sheet-writes.ts';
+import { type Session, snapshotDay } from '../../frontends/native/src/deck/deck-writes.ts';
 
 const DAY = 86400000;
 const NOW = new Date(2026, 10, 16, 12, 0, 0).getTime();
@@ -63,11 +66,18 @@ describe('native session sheet: the models are today\'s files', () => {
       assert.ok(copy.equals(today), f + ' differs from today\'s: copy it again (cp), never edit the copy');
     });
   }
-  test('the sheet\'s folder holds the screen, its view, its readers, its writes and the six models', () => {
+  test('add-sheet-model.ts in frontends/native is frontends/app\'s, byte for byte', () => {
+    const today = readFileSync(join(REPO, 'frontends/app/src/app/screens/add-sheet/add-sheet-model.ts'));
+    const copy = readFileSync(join(NATIVE, 'add-sheet/add-sheet-model.ts'));
+    assert.ok(today.length > 2000);
+    assert.ok(copy.equals(today), 'add-sheet-model.ts differs from today\'s: copy it again (cp), never edit the copy');
+  });
+  test('the sheet\'s folder holds the screen, its view, its readers, the add sheet\'s readers, its writes and the six models; the add sheet\'s holds its screen and its model', () => {
     assert.deepStrictEqual(readdirSync(join(NATIVE, 'day-detail')).sort(), [
-      'SessionSheet.tsx', 'cardio-card-model.ts', 'cardio-fields-model.ts', 'day-detail-model.ts', 'session-log-model.ts', 'session-sections-model.ts', 'sheet-marks-model.ts',
+      'SessionSheet.tsx', 'cardio-card-model.ts', 'cardio-fields-model.ts', 'day-detail-model.ts', 'session-log-model.ts', 'session-sections-model.ts', 'sheet-adds.ts', 'sheet-marks-model.ts',
       'sheet-readers.ts', 'sheet-screen.ts', 'sheet-writes.ts',
     ]);
+    assert.deepStrictEqual(readdirSync(join(NATIVE, 'add-sheet')).sort(), ['AddSheet.tsx', 'add-sheet-model.ts']);
   });
 });
 
@@ -282,7 +292,11 @@ describe('native session sheet: a day drawn as a sheet', () => {
     const store = filled({ ia_logs_p1: { w1_mon: { restLog: { run: { mins: 20, rpe: 4 } } } } });
     const v = sheetView(store, program(), 1, 'mon', NOW)!;
     assert.deepStrictEqual(v.body[0], { kind: 'also', label: 'Also on Monday', lines: ['20 min run logged · RPE 4'], week: 1, dayKey: 'mon' });
-    assert.deepStrictEqual(drawnBlocks(v).map((b) => b.kind), ['sections', 'sections', 'cardio', 'log'], 'held in the view, not drawn yet');
+    assert.deepStrictEqual(drawnBlocks(v).map((b) => b.kind), ['also', 'sections', 'sections', 'cardio', 'log'], 'and is drawn there');
+    // Two jogs are two lines; a type with neither a time nor a distance is no line, and no line is no block.
+    const two = sheetView(filled({ ia_logs_p1: { w1_mon: { restLog: { run: { mins: 20, rpe: 4 }, walk: { mins: 45 }, bike: {} } } } }), program(), 1, 'mon', NOW)!;
+    assert.deepStrictEqual((two.body[0] as { lines: string[] }).lines.length, 2);
+    assert.notEqual(sheetView(filled({ ia_logs_p1: { w1_mon: { restLog: { bike: {} } } } }), program(), 1, 'mon', NOW)!.body[0]!.kind, 'also');
   });
   test('a day with no title, no run and no tags: Training, no cardio card, no fields, a foot title of nothing', () => {
     const v = sheetView(memoryStore(), program(), 1, 'sun', NOW)!;
@@ -301,12 +315,25 @@ describe('native session sheet: a day drawn as a sheet', () => {
     assert.deepStrictEqual(v.body.map((b) => b.kind), ['sections', 'e1rm', 'sections', 'cardio', 'note', 'log']);
     assert.deepStrictEqual((v.body[1] as { card: unknown }).card, { lift: 'deadlift', liftLabel: 'deadlift', unit: 'lbs', weight: '315', reps: 2 });
   });
-  test('the screen draws five kinds of block and leaves the rest of the view for its own session', () => {
-    assert.deepStrictEqual([...SHEET_DRAWS], ['nudge', 'sections', 'cardio', 'log', 'logNudge']);
+  test('the screen draws every kind of block the view holds, in the view\'s order', () => {
+    assert.deepStrictEqual([...SHEET_DRAWS], ['also', 'wildcard', 'nudge', 'sections', 'e1rm', 'cardio', 'note', 'log', 'logNudge']);
     const prog = program();
     (prog.weeks[1]!['mon'] as { testLift?: string; note?: string }).testLift = 'deadlift';
     (prog.weeks[1]!['mon'] as { testLift?: string; note?: string }).note = 'Test it, log it.';
-    assert.deepStrictEqual(drawnBlocks(sheetView(memoryStore(), prog, 1, 'mon', NOW)!).map((b) => b.kind), ['sections', 'sections', 'cardio', 'log']);
+    const v = sheetView(memoryStore(), prog, 1, 'mon', NOW)!;
+    assert.deepStrictEqual(drawnBlocks(v).map((b) => b.kind), ['sections', 'e1rm', 'sections', 'cardio', 'note', 'log']);
+    assert.deepStrictEqual(drawnBlocks(v), v.body, 'nothing of the view is left undrawn');
+  });
+  // The view held the tag before the screen drew it (the sheet's first session): this guards what must not change.
+  test('a Wildcard done in the day\'s place: its tag stands above the work, under a jog, with the day named as still on the board', () => {
+    const store = filled({ ia_wild_p1: [{ week: 1, dayKey: 'mon', ts: NOW }], ia_logs_p1: { w1_mon: { restLog: { run: { mins: 20, rpe: 4 } } } } });
+    const v = sheetView(store, program(), 1, 'mon', NOW)!;
+    assert.deepStrictEqual(v.body.slice(0, 2).map((b) => b.kind), ['also', 'wildcard']);
+    assert.deepStrictEqual(v.body[1], { kind: 'wildcard', sub: 'Posterior Chain is still on the board.' });
+    // A day with no title is "Your session"; a Wildcard done on another day shows no tag here.
+    const sun = sheetView(filled({ ia_wild_p1: [{ week: 1, dayKey: 'sun', ts: NOW }] }), program(), 1, 'sun', NOW)!;
+    assert.deepStrictEqual(sun.body[0], { kind: 'wildcard', sub: 'Your session is still on the board.' });
+    assert.ok(!sheetView(filled({ ia_wild_p1: [{ week: 1, dayKey: 'sun', ts: NOW }] }), program(), 1, 'mon', NOW)!.body.some((b) => b.kind === 'wildcard'));
   });
   test('no sheet for a rest day or a day the grid does not hold', () => {
     assert.equal(sheetView(memoryStore(), program(), 1, 'tue', NOW), null);
@@ -499,23 +526,305 @@ describe('native session sheet: Done, Skip, and each one\'s undo', () => {
   });
 });
 
+// ── The sheet's second session: the add sheet, add and remove, the 1RM card's save ────────────────────────────────
+// A week of three days, built by hand. What each move trains is the exercise library's: squats (back, front, goblet,
+// the leg press), hinges (the deadlifts, the swing), lunges and hip thrusts are leg work; presses, pushups and raises
+// are push work; rows, pulldowns and curls are pull work; dead bugs train no pattern. The barbell lifts, the leg press
+// and the lunge are the heavy tier, the goblet squat one under them, and a hip thrust, a curl and pushups the lightest.
+const addProgram = (universe: string[] = ['Front squat', 'Dumbbell goblet squat', 'Deadlift', 'Walking lunges', 'Barbell hip thrust', 'Overhead press', 'Pushups', 'Barbell row', 'Dumbbell curl', 'Dead bugs', 'back squat', 'Leg press']): SheetProgram => ({
+  id: 'p1', cfg: { unit: 'lbs' }, _swapUniverse: universe,
+  weeks: {
+    1: {
+      mon: {
+        title: 'Legs',
+        sections: [
+          { label: 'Main — Squat', items: [lift('Back squat', '4×3 — RPE 8')] },
+          { label: 'Accessory', items: [lift('Leg press', '3×8–12 @ RPE 8'), lift('Romanian deadlift', '2×6–10 each @ RPE 7'), lift('Kettlebell swing', '3×20 sec')] },
+        ],
+      },
+      wed: {
+        title: 'Push',
+        sections: [
+          { label: 'Main — Press', items: [lift('Barbell bench press', '4×5 — RPE 8')] },
+          { label: 'Accessory', items: [lift('Dumbbell lateral raise', '2×15–20 @ RPE 7'), lift('Dumbbell bench press', '3×10 — RPE 7')] },
+        ],
+      },
+      fri: { title: 'Pull', sections: [{ label: 'Accessory', items: [lift('Dumbbell curl', '3×12–15 @ RPE 8')] }] },
+    },
+  },
+} as unknown as SheetProgram);
+const monOf = (prog: SheetProgram) => prog.weeks[1]!['mon'] as unknown as { title?: string; sections: { label?: string; _added?: boolean; items: { name?: string; detail?: string; _addedByUser?: boolean; _skipped?: boolean }[] }[] };
+
+describe('native session sheet: what the add sheet lists', () => {
+  test('a leg day: work it has no pattern for, more of a pattern it has, and another region\'s, each the heavier first and then by name', () => {
+    const prog = addProgram();
+    const c = addCandidates(monOf(prog) as never, prog);
+    assert.equal(c.region, 'legs', 'the day\'s region is its first move\'s');
+    assert.deepStrictEqual({ ...c.pats }, { squat: 2, hinge: 2 });
+    // Lunges and hip thrusts are leg work the day has no pattern for. The lunge is the heavier.
+    assert.deepStrictEqual(c.gap, ['Walking lunges', 'Barbell hip thrust']);
+    // A hinge and two squats, on a day that already hinges and squats: the two barbell lifts by name, then the goblet squat.
+    assert.deepStrictEqual(c.more, ['Deadlift', 'Front squat', 'Dumbbell goblet squat']);
+    // Push and pull work is offered, not hidden: the barbell lifts first, by name, then the light ones.
+    assert.deepStrictEqual(c.off, ['Barbell row', 'Overhead press', 'Dumbbell curl', 'Pushups']);
+  });
+  test('never a move on the card, whatever its case; never a move with no pattern', () => {
+    const prog = addProgram();
+    const c = addCandidates(monOf(prog) as never, prog);
+    const all = [...c.gap, ...c.more, ...c.off];
+    assert.ok(!all.includes('back squat') && !all.includes('Leg press'), 'on the card already');
+    assert.ok(!all.includes('Dead bugs'), 'dead bugs train no pattern');
+    assert.equal(all.length, 9);
+  });
+  test('at most six, five and six; a day with nothing on it has no region, so nothing is another region\'s', () => {
+    const squats = ['Front squat', 'Leg press', 'Dumbbell goblet squat', 'Barbell box squat', 'Back squat', 'Front squat 2'];
+    const many = addProgram([...squats, 'Deadlift', 'Romanian deadlift', 'Trap bar deadlift', 'Walking lunges', 'Barbell hip thrust', 'Overhead press', 'Barbell bench press', 'Dumbbell bench press', 'Pushups', 'Dips',
+      'Dumbbell lateral raise', 'Dumbbell front raise', 'Barbell row', 'Dumbbell row', 'Pullups', 'Chinups', 'Lat pulldown', 'Dumbbell curl']);
+    const mon = monOf(many);
+    mon.sections = [{ label: 'Main — Squat', items: [lift('Kettlebell swing', '3×10')] }];
+    const c = addCandidates(mon as never, many);
+    assert.ok(c.gap.length <= 6 && c.more.length <= 5 && c.off.length === 6, JSON.stringify(c));
+    // Thirteen push and pull moves were on offer: the six kept are the heaviest, so no curl, raise, pushup or dip.
+    for (const light of ['Dumbbell curl', 'Dumbbell lateral raise', 'Dumbbell front raise', 'Pushups']) assert.ok(!c.off.includes(light), light);
+    const empty = addProgram();
+    monOf(empty).sections = [];
+    const e = addCandidates(monOf(empty) as never, empty);
+    assert.deepStrictEqual([e.region, e.more, e.off], [null, [], []]);
+    assert.equal(e.gap.length, 6, 'everything is work the day has none of, cut to six');
+  });
+  test('no program, no universe: nothing to offer', () => {
+    assert.deepStrictEqual({ ...addCandidates(monOf(addProgram()) as never, null), pats: null }, { gap: [], more: [], off: [], region: 'legs', pats: null });
+    assert.deepStrictEqual(addCandidates(monOf(addProgram([])) as never, addProgram([])).gap, []);
+  });
+});
+
+describe('native session sheet: the dose an added move takes', () => {
+  const prog = addProgram();
+  const mon = monOf(prog) as never;
+  test('the same pattern on today\'s card donates, its accessory and never its Main', () => {
+    assert.equal(addedDetailFor(mon, 'Front squat', 1, prog), '3×8–12 @ RPE 8', 'the leg press\'s, not the Main back squat\'s 4×3');
+    assert.equal(addedDetailFor(mon, 'Deadlift', 1, prog), '2×6–10 each @ RPE 7', 'the Romanian deadlift\'s');
+  });
+  test('a dose of time or distance never donates to a rep lift: the swing\'s seconds are passed over', () => {
+    // The swing is the last hinge on the card, and the last match would win. Its 3×20 sec is refused by its words.
+    assert.equal(addedDetailFor(mon, 'Deadlift', 1, prog), '2×6–10 each @ RPE 7');
+    // '3×20s' names no unit the words catch: the parse reads it as seconds, and refuses it.
+    for (const refused of ['3×40 yards heavy', '3×30 yd', '2×100 meters', '3×20 sec', '3×20s', '2×2 min', '3×30 hold', '2×max time']) {
+      const p = addProgram();
+      monOf(p).sections[1]!.items = [lift('Romanian deadlift', '2×8 @ RPE 7'), lift('Kettlebell swing', refused)];
+      assert.equal(addedDetailFor(monOf(p) as never, 'Deadlift', 1, p), '2×8 @ RPE 7', refused);
+    }
+  });
+  test('two accessories of the pattern on today\'s card: the last one donates, since accessories sit lowest', () => {
+    const p = addProgram();
+    monOf(p).sections[1]!.items = [lift('Leg press', '3×8–12 @ RPE 8'), lift('Dumbbell goblet squat', '2×12–15 @ RPE 7')];
+    assert.equal(addedDetailFor(monOf(p) as never, 'Front squat', 1, p), '2×12–15 @ RPE 7');
+  });
+  test('two days of the week hold the pattern, or the region: the earlier day donates', () => {
+    const p = addProgram();
+    (p.weeks[1]!['wed'] as unknown as { sections: { items: unknown[] }[] }).sections[1]!.items.push(lift('Dumbbell curl', '2×10 @ RPE 7'));
+    assert.equal(addedDetailFor(monOf(p) as never, 'Dumbbell curl', 1, p), '2×10 @ RPE 7', 'Wednesday\'s curl, before Friday\'s');
+    assert.equal(addedDetailFor(monOf(p) as never, 'Barbell row', 1, p), '2×10 @ RPE 7', 'pull work: Wednesday\'s curl is the first of the week');
+  });
+  test('no such pattern today: the same pattern anywhere in the week, days in calendar order', () => {
+    assert.equal(addedDetailFor(mon, 'Dumbbell curl', 1, prog), '3×12–15 @ RPE 8', 'Friday\'s curl');
+    assert.equal(addedDetailFor(mon, 'Pushups', 1, prog), '3×10 — RPE 7', 'Wednesday\'s dumbbell bench, a horizontal press; never the Main barbell bench');
+  });
+  test('no such pattern in the week: the same region anywhere in the week, the first donor found', () => {
+    assert.equal(addedDetailFor(mon, 'Walking lunges', 1, prog), '3×8–12 @ RPE 8', 'leg work: Monday\'s leg press is the first');
+    assert.equal(addedDetailFor(mon, 'Overhead press', 1, prog), '2×15–20 @ RPE 7', 'push work: Wednesday\'s lateral raise stands before its bench');
+    assert.equal(addedDetailFor(mon, 'Barbell row', 1, prog), '3×12–15 @ RPE 8', 'pull work: Friday\'s curl');
+  });
+  test('nothing of its type anywhere, a week the grid does not hold, or a move with no pattern: three sets of ten at RPE 7', () => {
+    const lone = addProgram();
+    delete (lone.weeks[1] as Record<string, unknown>)['fri'];
+    assert.equal(addedDetailFor(monOf(lone) as never, 'Barbell row', 1, lone), '3×10 — RPE 7');
+    assert.equal(addedDetailFor(mon, 'Barbell row', 2, prog), '3×10 — RPE 7');
+    assert.equal(addedDetailFor(mon, 'Dead bugs', 1, prog), '3×10 — RPE 7');
+  });
+  test('a round, a core block, a hip block, a primer and the athlete\'s own added work never donate', () => {
+    const p = addProgram();
+    monOf(p).sections = [
+      { label: 'Accessory', items: [lift('Leg press', '2×20')] },
+      { label: 'Round', superset: true, items: [lift('Front squat', '3×8')] } as never,
+      { label: 'Round', type: 'superset', items: [lift('Front squat', '5×5')] } as never,
+      { label: 'Core', core: true, items: [lift('Back squat', '3×9')] } as never,
+      { label: 'Hips', hip: true, items: [lift('Back squat', '3×11')] } as never,
+      { label: 'Primer — Squat', items: [lift('Back squat', '2×3')] },
+      { label: 'Added by you', _added: true, items: [lift('Barbell box squat', '6×6')] },
+    ];
+    assert.equal(addedDetailFor(monOf(p) as never, 'Dumbbell goblet squat', 1, p), '2×20', 'the last squat among the donors is the accessory leg press');
+  });
+});
+
+describe('native session sheet: the add sheet as drawn', () => {
+  test('the header: the day, its week, its region, its working sets, and each row\'s words', () => {
+    const v = addSheetOf(addProgram(), 1, 'mon')!;
+    // 4 sets of back squat, 3 of leg press, 2 of Romanian deadlift, 3 of swings.
+    assert.deepStrictEqual([v.title, v.weekTag, v.regionTag, v.setsTag], ['Legs', 'Week 1', 'Leg day', '12 sets']);
+    assert.deepStrictEqual(v.gap, [{ name: 'Walking lunges', caution: false, note: '' }, { name: 'Barbell hip thrust', caution: false, note: '' }]);
+    // A deadlift adds the Romanian deadlift's 2 sets, a squat the leg press's 3.
+    assert.deepStrictEqual(v.more, [
+      { name: 'Deadlift', caution: true, note: 'Your day already has this pattern. Sets go to 14.' },
+      { name: 'Front squat', caution: true, note: 'Your day already has this pattern. Sets go to 15.' },
+      { name: 'Dumbbell goblet squat', caution: true, note: 'Your day already has this pattern. Sets go to 15.' },
+    ]);
+    assert.deepStrictEqual(v.off, [
+      { name: 'Barbell row', caution: true, note: 'Pull work on a leg day. Check what it sits next to in the week.' },
+      { name: 'Overhead press', caution: true, note: 'Push work on a leg day. Check what it sits next to in the week.' },
+      { name: 'Dumbbell curl', caution: true, note: 'Pull work on a leg day. Check what it sits next to in the week.' },
+      { name: 'Pushups', caution: true, note: 'Push work on a leg day. Check what it sits next to in the week.' },
+    ]);
+  });
+  test('a skipped move\'s sets and open sets are not counted; a push day is a Push day, a day with no title is Training', () => {
+    const p = addProgram();
+    monOf(p).sections[1]!.items[0]!._skipped = true;                    // the leg press's 3
+    monOf(p).sections[1]!.items[2]!.detail = '3 sets — RPE 7';          // the swing: open sets
+    assert.equal(addSheetOf(p, 1, 'mon')!.setsTag, '6 sets');
+    const wed = addSheetOf(addProgram(), 1, 'wed')!;
+    assert.deepStrictEqual([wed.title, wed.regionTag, wed.setsTag], ['Push', 'Push day', '9 sets']);
+    const q = addProgram();
+    delete monOf(q).title;
+    monOf(q).sections = [];
+    assert.deepStrictEqual([addSheetOf(q, 1, 'mon')!.title, addSheetOf(q, 1, 'mon')!.regionTag, addSheetOf(q, 1, 'mon')!.setsTag], ['Training', 'Today', '0 sets']);
+  });
+  test('no day at that place, or no program: no sheet', () => {
+    assert.equal(addSheetOf(addProgram(), 1, 'thu'), null);
+    assert.equal(addSheetOf(addProgram(), 2, 'mon'), null);
+    assert.equal(addSheetOf(null, 1, 'mon'), null);
+  });
+});
+
+describe('native session sheet: add and remove', () => {
+  const edits = (s: StateStore) => json(s, 'ia_edits_p1');
+  test('a pick: the move under "Added by you" with the dose of its nearest type, the record stamped, and its words', () => {
+    const prog = addProgram(), store = memoryStore();
+    assert.equal(addMove(session(store, prog), 'Deadlift', NOW), 'Deadlift added at 2×6–10 each @ RPE 7.');
+    assert.deepStrictEqual(monOf(prog).sections.length, 3);
+    assert.deepStrictEqual(monOf(prog).sections[2], { label: 'Added by you', _added: true, items: [{ name: 'Deadlift', detail: '2×6–10 each @ RPE 7', _addedByUser: true }] });
+    assert.deepStrictEqual(edits(store), { w1_mon: { add: [{ name: 'Deadlift', detail: '2×6–10 each @ RPE 7', ts: NOW }], skip: [] } });
+    assert.deepStrictEqual(Object.keys(held(store)), ['ia_edits_p1'], 'a day touched in no other way has no snapshot, and the add makes none');
+  });
+  test('a second pick joins the same block; a lift with no load to move takes open sets at the same effort', () => {
+    const prog = addProgram(), store = memoryStore();
+    addMove(session(store, prog), 'Deadlift', NOW);
+    assert.equal(addMove(session(store, prog), 'Pushups', NOW + 5), 'Pushups added at 3 sets — RPE 7 (leave 3 or more in reserve).');
+    assert.deepStrictEqual(monOf(prog).sections.length, 3, 'one block for both');
+    assert.deepStrictEqual(monOf(prog).sections[2]!.items.map((i) => [i.name, i.detail]), [['Deadlift', '2×6–10 each @ RPE 7'], ['Pushups', '3 sets — RPE 7 (leave 3 or more in reserve)']]);
+    assert.deepStrictEqual(edits(store)['w1_mon']!['add'], [{ name: 'Deadlift', detail: '2×6–10 each @ RPE 7', ts: NOW }, { name: 'Pushups', detail: '3 sets — RPE 7 (leave 3 or more in reserve)', ts: NOW + 5 }]);
+  });
+  test('a move already in the block is not put there twice', () => {
+    const prog = addProgram(), store = memoryStore();
+    addMove(session(store, prog), 'Deadlift', NOW);
+    addMove(session(store, prog), 'Deadlift', NOW + 9);
+    assert.deepStrictEqual(monOf(prog).sections[2]!.items.map((i) => i.name), ['Deadlift']);
+  });
+  test('the day\'s snapshot takes the add in where the day has one, and none is made where it has none', () => {
+    const prog = addProgram(), store = memoryStore();
+    const s = session(store, prog);
+    snapshotDay(s);
+    assert.ok(!store.get('ia_hist_p1')!.includes('Added by you'));
+    addMove(s, 'Deadlift', NOW);
+    const snap = json(store, 'ia_hist_p1')['w1_mon'] as { sections: { label?: string; items: { name: string }[] }[] };
+    assert.deepStrictEqual(snap.sections[2]!.items.map((i) => i.name), ['Deadlift']);
+    removeAdded(s, 'Deadlift');
+    assert.equal((json(store, 'ia_hist_p1')['w1_mon'] as { sections: unknown[] }).sections.length, 2, 'and the remove out again');
+  });
+  test('remove: the move leaves the block, the record and the card, and says so; the last one out takes the block and the record with it', () => {
+    const prog = addProgram(), store = memoryStore();
+    const s = session(store, prog);
+    addMove(s, 'Deadlift', NOW);
+    addMove(s, 'Pushups', NOW);
+    assert.equal(removeAdded(s, 'Deadlift'), 'Deadlift removed.');
+    assert.deepStrictEqual(monOf(prog).sections[2]!.items.map((i) => i.name), ['Pushups']);
+    assert.deepStrictEqual((edits(store)['w1_mon']!['add'] as { name: string }[]).map((a) => a.name), ['Pushups']);
+    assert.equal(removeAdded(s, 'Pushups'), 'Pushups removed.');
+    assert.deepStrictEqual(monOf(prog).sections.map((x) => x.label), ['Main — Squat', 'Accessory']);
+    assert.deepStrictEqual(edits(store), {}, 'no record is left for the day');
+  });
+  test('remove does not take a logged lift back, and never touches the plan\'s own moves', () => {
+    const prog = addProgram();
+    const log = { deadlift: { name: 'Deadlift', entries: [{ week: 1, day: 'mon', weight: 225, setsDone: [8, 8], ts: NOW }] } };
+    const store = filled({ ia_exw_p1: log });
+    const s = session(store, prog);
+    addMove(s, 'Deadlift', NOW);
+    removeAdded(s, 'Deadlift');
+    assert.deepStrictEqual(json(store, 'ia_exw_p1'), log);
+    const before = JSON.stringify(monOf(prog).sections);
+    removeAdded(s, 'Back squat');
+    assert.equal(JSON.stringify(monOf(prog).sections), before, 'a planned move is not an added one');
+  });
+  test('no day in hand, or a program with no id: nothing is added, removed or stored', () => {
+    const prog = addProgram(), store = memoryStore();
+    assert.equal(addMove(session(store, prog, 'thu'), 'Deadlift', NOW), null);
+    assert.equal(removeAdded(session(store, prog, 'thu'), 'Deadlift'), null);
+    const anon = { ...addProgram(), id: '' } as SheetProgram;
+    assert.equal(addMove(session(store, anon), 'Deadlift', NOW), null);
+    assert.equal(removeAdded(session(store, anon), 'Deadlift'), null);
+    assert.deepStrictEqual(held(store), {});
+    assert.equal(monOf(anon).sections.length, 2);
+  });
+});
+
+describe('native session sheet: the 1RM card\'s estimate and its save', () => {
+  const stored = () => [{ id: 'p1', cfg: { unit: 'lbs', bench: 135, squat: 155 } }, { id: 'p2', cfg: { bench: 100 } }];
+  const inHand = (): SheetProgram => ({ ...program(), cfg: { unit: 'lbs', bench: 135 } } as unknown as SheetProgram);
+  test('Epley: a single is itself, more reps add a thirtieth of the weight each, rounded; no weight is no estimate', () => {
+    assert.equal(e1rmEstimate('315', '1'), 315);
+    assert.equal(e1rmEstimate('225', '3'), 248);      // 225 × 1.1 = 247.5
+    assert.equal(e1rmEstimate('200', '5'), 233);      // 200 × 1.1667 = 233.3
+    assert.equal(e1rmEstimate('112.5', '3'), 124);    // 112.5 × 1.1 = 123.75; the half pound counts (112 would give 123)
+    assert.equal(e1rmEstimate('', '3'), 0);
+    assert.equal(e1rmEstimate('abc', '3'), 0);
+    assert.equal(e1rmEstimate('225', ''), 225, 'no reps is read as one');
+  });
+  test('save: the estimate is the lift\'s max in the stored program and in the one in hand, no other field or program moves, and the card says so', () => {
+    const store = filled({ ia_programs: stored() }), prog = inHand();
+    assert.deepStrictEqual(saveTestMax(session(store, prog), 'bench', 'lbs', '225', '3'), { estimate: 248, saved: 'Saved. Your next block anchors off 248 lbs.' });
+    assert.deepStrictEqual(JSON.parse(store.get('ia_programs')!), [{ id: 'p1', cfg: { unit: 'lbs', bench: 248, squat: 155 } }, { id: 'p2', cfg: { bench: 100 } }]);
+    assert.equal((prog.cfg as { bench?: number }).bench, 248);
+    assert.deepStrictEqual(Object.keys(held(store)), ['ia_programs'], 'nothing else is written');
+    assert.equal(saveTestMax(session(store, prog), 'deadlift', 'kg', '100', '1').saved, 'Saved. Your next block anchors off 100 kg.');
+    assert.equal(JSON.parse(store.get('ia_programs')!)[0].cfg.deadlift, 100);
+  });
+  test('an estimate of nothing saves nothing and says nothing', () => {
+    const store = filled({ ia_programs: stored() }), prog = inHand(), before = held(store);
+    assert.deepStrictEqual(saveTestMax(session(store, prog), 'bench', 'lbs', '', '3'), { estimate: 0, saved: null });
+    assert.deepStrictEqual(held(store), before);
+    assert.equal((prog.cfg as { bench?: number }).bench, 135);
+  });
+  test('a program the store does not hold: nothing is written, as today\'s card writes nothing and still shows its line', () => {
+    const store = filled({ ia_programs: [{ id: 'p2', cfg: { bench: 100 } }] }), prog = inHand(), before = held(store);
+    assert.deepStrictEqual(saveTestMax(session(store, prog), 'bench', 'lbs', '225', '3'), { estimate: 248, saved: 'Saved. Your next block anchors off 248 lbs.' });
+    assert.deepStrictEqual(held(store), before);
+    assert.equal((prog.cfg as { bench?: number }).bench, 135);
+  });
+});
+
 describe('native session sheet: which files write, and what the screen calls', () => {
   const dir = join(NATIVE, 'day-detail');
   const code = (f: string): string => strip(readFileSync(join(dir, f), 'utf8'));
   const writers = (t: string): string[] => [...new Set([...t.matchAll(/\b((?:write|record|refresh|clear|drop|set|settle|add|count|mark|skip)[A-Z]\w*)\(\s*(?:s\.)?store\b/g)].map((m) => m[1]!))].sort();
   const sheet = read('day-detail/SessionSheet.tsx');
-  test('sheet-writes.ts alone calls core\'s writers, and exactly the five the measure named; nothing writes a key by hand', () => {
-    assert.deepStrictEqual(writers(code('sheet-writes.ts')), ['clearDayParts', 'clearDayStatus', 'setDayStatus', 'settleDayParts', 'writeDayLogs']);
+  test('sheet-writes.ts alone calls core\'s writers, and exactly the eight the two measures named; nothing writes a key by hand', () => {
+    // The first session's five, and the second's three: an add, its remove, and the 1RM card's save.
+    assert.deepStrictEqual(writers(code('sheet-writes.ts')), ['addAddEdit', 'clearDayParts', 'clearDayStatus', 'dropAddEdit', 'setDayStatus', 'settleDayParts', 'writeDayLogs', 'writePrograms']);
     for (const f of readdirSync(dir).filter((x) => x !== 'sheet-writes.ts')) assert.deepStrictEqual(writers(code(f)), [], f + ' calls none of core\'s writers');
     for (const f of readdirSync(dir)) {
       assert.doesNotMatch(code(f), /\b\w*[sS]tore\.(set|remove)\(/, f + ' writes no key by hand');
       assert.doesNotMatch(code(f), /localStorage|AsyncStorage/, f + ' names no other storage');
     }
-    // The day's snapshot is the deck's own port, and the season's mark is let go by the pop-ups' own file.
-    assert.ok(code('sheet-writes.ts').includes("import { type Session, snapshotDay } from '../deck/deck-writes';") && code('sheet-writes.ts').includes('releaseSeasonShown(pop)'));
+    // The add sheet's own folder reads and draws: no writer, no store, no clock.
+    for (const f of ['AddSheet.tsx', 'add-sheet-model.ts']) {
+      const t = strip(read('add-sheet/' + f));
+      assert.deepStrictEqual(writers(t), [], f);
+      assert.doesNotMatch(t, /\bstore\b|state-|sheet-writes|Date\.now\(\)/, f + ' reaches no store');
+    }
+    // The day's snapshot, first and renewed, is the deck's own port, and the season's mark is let go by the pop-ups' own file.
+    assert.ok(code('sheet-writes.ts').includes("import { type Session, resnapshotDay, snapshotDay } from '../deck/deck-writes';") && code('sheet-writes.ts').includes('releaseSeasonShown(pop)'));
   });
   test('the view and the readers read only: no tap, no clock of their own', () => {
-    for (const f of ['sheet-screen.ts', 'sheet-readers.ts']) assert.doesNotMatch(code(f), /Date\.now\(\)|Math\.random\(\)/, f);
+    for (const f of ['sheet-screen.ts', 'sheet-readers.ts', 'sheet-adds.ts']) assert.doesNotMatch(code(f), /Date\.now\(\)|Math\.random\(\)/, f);
     assert.doesNotMatch(code('sheet-writes.ts'), /Date\.now\(\)|Math\.random\(\)/, 'every write is stamped with the instant it is handed');
   });
   test('every press on the sheet is one of these: it closes, opens something to read, or calls a tap', () => {
@@ -524,7 +833,9 @@ describe('native session sheet: which files write, and what the screen calls', (
       'session-sheet', 'sheet-', 'sheet-back', 'sheet-body', 'sheet-cardio', 'sheet-counter', 'sheet-fill-', 'sheet-foot', 'sheet-load-', 'sheet-log', 'sheet-log-', 'sheet-lognudge', 'sheet-markdone',
       'sheet-minus-', 'sheet-move-', 'sheet-notes', 'sheet-over', 'sheet-plus-', 'sheet-putback', 'sheet-rangenudge', 'sheet-rep-', 'sheet-reuse-', 'sheet-roundback-', 'sheet-roundminus-', 'sheet-rows-',
       'sheet-rpe', 'sheet-rpeclose', 'sheet-rpeinfo', 'sheet-rpeover', 'sheet-setload-', 'sheet-sets-', 'sheet-slider', 'sheet-swap-', 'sheet-tags', 'sheet-title', 'sheet-unswap-',
-    ]);
+      // The second session's: the add button, an added move's remove, the jog, the Wildcard tag, the note, the 1RM card.
+      'sheet-add', 'sheet-remove-', 'sheet-also', 'sheet-wildcard', 'sheet-note', 'sheet-max', 'sheet-max-weight', 'sheet-max-reps-', 'sheet-max-out', 'sheet-max-save', 'sheet-max-saved',
+    ].sort());
     // The cards' taps are the deck's own writers, each stamped with the instant of the tap.
     for (const call of ['tapStep(session, fieldsNow.current, exKey, k, step, Date.now())', 'tapReuse(session, fieldsNow.current, exKey, value, Date.now())', 'tapFill(session, fieldsNow.current, exKey, value, Date.now())',
       'tapLog(session, fieldsNow.current, x, Date.now())', 'leftField(session, fieldsNow.current, exKey, Date.now())', 'act(session, a, off)', 'undoSwap(session, from)', 'swapMove(session, swap.ctx, to, Date.now())']) {
@@ -564,12 +875,53 @@ describe('native session sheet: which files write, and what the screen calls', (
   test('an edit draws the whole sheet again: every field and the log\'s form afresh', () => {
     assert.ok(sheet.includes('const next = sheetView(store, g, open.week, open.dayKey, Date.now());\n    if (!next) return;\n    setView(next);\n    apply(sheetFields(next));\n    hold(formOf(logOf(next)));\n    setSetsOpen({});'));
   });
-  test('the sheet draws what was agreed and no more: no add button, an added move\'s remove takes no press, the run\'s fields are not drawn', () => {
+  test('the sheet draws every block of the view; the run\'s fields are still not drawn', () => {
     assert.ok(sheet.includes('drawnBlocks(view).map('));
-    assert.doesNotMatch(strip(sheet), /openAddSheet|removeAdded|log_run_|cardioFields|WheelView/);
-    assert.ok(sheet.includes("<Text style={[s.bold, { color: p.signal }]}>You added this</Text>{' · not in the plan'}</Text>}"));
+    assert.doesNotMatch(strip(sheet), /log_run_|cardioFields|WheelView/);
     for (const words of ['‹ Back', 'RPE ⓘ', 'Log This Session', 'How hard was it? — RPE', 'Notes', 'How did it go? Anything to remember next week?', 'You logged this one but never marked it.', 'Mark Done ✓', 'tap to undo',
-      'Time to add weight.', "' Last session you hit the top of the range on every set of '", "'. Go up in weight today and start back at the bottom of the range.'", 'Put it back', 'put it back', 'Swapped in', 'Skipped', 'Varied', "'This is what tracks\\nyour progress'"]) {
+      'Time to add weight.', "' Last session you hit the top of the range on every set of '", "'. Go up in weight today and start back at the bottom of the range.'", 'Put it back', 'put it back', 'Swapped in', 'Skipped', 'Varied', "'This is what tracks\\nyour progress'",
+      '>Exercise</Text>', '>Wildcard done</Text>', '>Edit cardio</Text>', '>remove</Text>', "<Text style={[s.bold, { color: p.signal }]}>You added this</Text>{' · not in the plan'}</Text>"]) {
+      assert.ok(sheet.includes(words), words);
+    }
+  });
+  test('the add button opens the add sheet over the day in hand; a pick adds the move, draws the whole sheet again and says so; remove does the same', () => {
+    assert.ok(sheet.includes('<Pressable testID="sheet-add" accessibilityRole="button" accessibilityLabel="Add an exercise to this day" hitSlop={8} onPress={openAdd}'));
+    assert.ok(sheet.includes("const sheet = addSheetOf(prog, open.week, open.dayKey);\n    if (sheet) setAdd(sheet); else say('Nothing to add to here');"));
+    assert.ok(sheet.includes('const toast = addMove(session, name, Date.now());\n    if (toast === null) return;\n    redraw();\n    say(toast);'));
+    assert.ok(sheet.includes('{add && <AddSheet palette={p} view={add} calm={calm} onPick={added} onClose={() => setAdd(null)} />}'));
+    assert.ok(sheet.includes("<Text testID={'sheet-remove-' + x.exKey} accessibilityRole=\"button\" onPress={() => h.remove(x.name)}"));
+    assert.ok(sheet.includes('const toast = removeAdded(session, name);\n      if (toast === null) return;\n      redraw();\n      say(toast);'));
+    // The add sheet itself: a row is a pick, which is handed on once, as the sheet leaves; Back only leaves.
+    const add = read('add-sheet/AddSheet.tsx');
+    assert.ok(add.includes("onPress={() => leave(() => onPick(r.name))}") && add.includes('<Pressable testID="add-back" accessibilityRole="button" hitSlop={12} onPress={() => leave()}>'));
+    assert.ok(add.includes('if (leaving.current) return;\n    leaving.current = true;\n    if (before) before();'), 'a second tap while the sheet leaves does nothing');
+    assert.ok(add.includes("{v.gap.map((r, k) => row(r, k, 'gap'))}") && add.includes("{v.more.map((r, k) => row(r, k, 'more'))}") && add.includes("{v.off.map((r, k) => row(r, k, 'off'))}"));
+    for (const words of ['‹ Back', '>Add an exercise</Text>', '{v.title}', '{v.weekTag}', '{v.regionTag}', '{v.setsTag}', '>Added work matches the closest thing to it in your week.</Text>',
+      ">Today isn't training these</Text>", '>Work your day has no movement for yet.</Text>', 'caution("More of what you\'re already doing")', '>Your day already trains this pattern. Adding here stacks fatigue on the same tissue.</Text>',
+      "caution('Not what today is for')", '>Different region than this day trains. Fine once, but watch what it lands next to.</Text>', ">Nothing left in your kit that isn't already on this card.</Text>",
+      '>Added work holds for this session only. It logs and counts like anything else on the card. Next week says what it always said.</Text>', '{r.name}', '{r.note}']) {
+      assert.ok(add.includes(words), words);
+    }
+    assert.ok(add.includes('const none = !v.gap.length && !v.more.length && !v.off.length;') && add.includes('{none\n          ? <Text testID="add-empty"'), 'the empty words stand only where all three lists are empty, and the foot only where one is not');
+  });
+  test('the jog\'s Edit cardio takes no press until the rest sheet is built; the Wildcard tag and the note only draw', () => {
+    assert.ok(sheet.includes('<View style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></View>'));
+    assert.ok(sheet.includes('<Text style={[s.alsoLbl, { color: p.muted }]}>{blk.label}</Text>') && sheet.includes('{blk.lines.map((l, i) => <Text key={i} style={[s.alsoLine, { color: p.run }]}>{l}</Text>)}'));
+    assert.ok(sheet.includes('<Text style={[s.wcSub, { color: p.muted }]}>{blk.sub}</Text>'));
+    assert.ok(sheet.includes("if (blk.kind === 'note') return <Text key={k} testID=\"sheet-note\"") && sheet.includes('{plain(blk.html)}</Text>;'));
+    assert.doesNotMatch(strip(sheet), /openRestSheet|RestSheet/);
+  });
+  test('the 1RM card: the estimate reads 0 until a field changes, the save is one call with the card\'s lift and its two fields, and its line stands where the button stood', () => {
+    assert.ok(sheet.includes("if (blk.kind === 'e1rm') return <E1rm key={k} card={blk.card} p={p} onSave={(weight, reps) => saveMax(blk.card.lift, weight, reps)} />;"));
+    assert.ok(sheet.includes('const saveMax = (lift: string, weight: string, reps: string): MaxSaved => { leave(); return saveTestMax(session, lift, unit, weight, reps); };'));
+    assert.ok(sheet.includes('const [weight, setWeight] = useState(c.weight);\n  const [reps, setReps] = useState(c.reps);\n  const [estimate, setEstimate] = useState(0);\n  const [saved, setSaved] = useState(\'\');'));
+    assert.ok(sheet.includes('const typed = (t: string): void => { setWeight(t); setEstimate(e1rmEstimate(t, String(reps))); };'));
+    assert.ok(sheet.includes('const picked = (n: number): void => { setReps(n); setEstimate(e1rmEstimate(weight, String(n))); };'));
+    assert.ok(sheet.includes('const r = onSave(weight, String(reps));\n    setEstimate(r.estimate);\n    if (r.saved !== null) setSaved(r.saved);'));
+    assert.ok(sheet.includes('{[1, 2, 3, 4, 5].map((n) => (') && sheet.includes('onPress={() => picked(n)}') && sheet.includes('value={weight} onChangeText={typed}'));
+    assert.ok(sheet.includes('{saved\n        ? <Text testID="sheet-max-saved"') && sheet.includes('onPress={save}'));
+    for (const words of ['<Text style={[s.e1rmHdText, { color: p.text }]}>Estimated 1RM</Text>', '<Text style={[s.e1rmOutLbl, { color: p.muted }]}>Estimated 1RM</Text>', '>from your test set</Text>', "{'Weight (' + c.unit + ')'}", '>Reps</Text>', "{estimate + ' '}", "{'Save as new ' + c.liftLabel + ' max'}",
+      '>Experienced with heavy singles and have a spotter? A single at RPE 9.5 works too. Enter it at 1 rep.</Text>']) {
       assert.ok(sheet.includes(words), words);
     }
   });
