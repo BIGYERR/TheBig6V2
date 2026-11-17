@@ -267,3 +267,8 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   number moved from 116 to 117 on one commit, 3b60455, which changed `frontends/native`. The notices read
   `testflight 0.262.4 processed (uploaded before this run; a version goes up once, a fix is the next PATCH)` and
   `testflight next 0.262.4 (117) processed`. The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 117** (his report, 2026-11-16, no screenshot): "1. yes its slides up 2. yes 3. yes 4.
+  yes 5. yes all same as todays", to five steps on IA Next build 117: Reopen on a done lift, the sheet with its
+  cards and set rows, the slider and the notes kept over Back and Reopen, Done and its undo with the pop-up, Skip
+  and its undo. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/session-sheet.md`, the build 117 entry).

@@ -123,3 +123,14 @@ record of the sheet as a screen, from the React Native migration on.
   after its next session.
 - **Next for the sheet:** add and remove, the Wildcard tag, a double day's jog, the 1RM card and the day's note. The
   run's log and its wheels come with the cardio sheet.
+
+## On Mario's phone, IA Next build 117 (2026-11-16)
+
+- **The build:** `0.262.4 (117)`, uploaded by run 43978885142 on `main` (merge 612d762, pull request 50) and read
+  back as processed (`docs/decisions/testflight.md`, the thirteenth run). It carries the sheet's first session.
+- **What he was asked,** five steps: Reopen on a done lift (the sheet slides up); the header, the run's workout and
+  each card with its set rows; the effort slider and a note, kept over Back and Reopen; Done ✓ tap to undo, then
+  Done with the sheet sliding away and the pop-up; Skip and its undo.
+- **His report,** one line, no screenshot: "1. yes its slides up 2. yes 3. yes 4. yes 5. yes all same as todays".
+- **What follows:** nothing differed from today's app and no motion was named (`MIGRATION.md` section 6, decision
+  14), so nothing was fixed from it. The sheet's first session stands as built.

@@ -202,9 +202,13 @@ Each phase starts only on Mario's GO, one phase step per session.
   `persistLogFields` and `handleDayStatus` are ported line for line over a model of the log's form. Held equal to
   today's page: 2,755 sheets across the ten programs drawn the same, whole, and every `ia_` key equal after each of
   1,331 sheet taps. Nothing is written but to the beta's own store.
-- **Next:** Mario's phone on the next IA Next build (Reopen, the sheet, Done and its undo, Skip). Then the sheet's
+- **Seen on Mario's phone, IA Next build 117** (2026-11-16; the sixth session, merged that day as `main` 612d762,
+  uploaded by run 43978885142 and read back as processed, `docs/decisions/testflight.md`): "1. yes its slides up 2.
+  yes 3. yes 4. yes 5. yes all same as todays", to Reopen, the sheet and its cards, the slider and notes, Done and
+  its undo, Skip. Nothing fixed from it (`docs/decisions/session-sheet.md`, the build 117 entry).
+- **Next:** the sheet's
   second session: add and remove, the Wildcard tag, a double day's jog, the 1RM card and the day's note, and the
-  sheet's ledger rows. The run's log, its wheels and its sport picker come with the cardio sheet (row 3 of phase 3):
+  sheet's ledger rows (measured, `tests/measure/native-sheet-add_today.md`; the cut waits for Mario's word). The run's log, its wheels and its sport picker come with the cardio sheet (row 3 of phase 3):
   they are the same piece, and the sheet's form already holds their fields as drawn. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
