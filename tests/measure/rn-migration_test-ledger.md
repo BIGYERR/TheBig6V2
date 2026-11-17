@@ -74,7 +74,7 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/integration/runner-armor-circuit.test.ts` | 15 | 55 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/integration/session-budget.test.ts` | 20 | 71 | page, source read | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/integration/session-edits.test.ts` | 8 | 49 | page+DOM, Angular source | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
-| `tests/integration/session-sheet.test.ts` | 10 | 22 | page, Angular source, lifted fn | RE-POINT at `@ia/core`: same assertions, no page booted | | |
+| `tests/integration/session-sheet.test.ts` | 10 | 22 | page, Angular source, lifted fn | RE-POINT at `@ia/core`: same assertions, no page booted | `tests/unit/native-session-sheet.test.ts`, `tests/integration/native-session-sheet.test.ts` and `tests/sweeps/native-session-sheet.test.ts` (the Expo sheet whole, after its two sessions: its view, its add sheet, its writes and what its screen calls; every day's sheet and add sheet equal to today's over whole histories, every `ia_` key equal after each tap). The models' own assertions stay on this file until cutover: the Expo app's copies of the models are held equal to them byte for byte. Red on its breaks: `native-session-sheet_breaks.md` (256 of 256) | 98 / 397 |
 | `tests/integration/sheet-close.test.ts` | 2 | 7 | source read | KEEP: drives no page | | |
 | `tests/integration/skip-pill.test.ts` | 9 | 19 | page+DOM | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/integration/sport-swap.test.ts` | 18 | 76 | page, source read | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
@@ -123,14 +123,14 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `tests/sweeps/test-week.test.ts` | 5 | 16 | page | RE-POINT at `@ia/core`: same assertions, no page booted | | |
 | `tests/sweeps/week-view.test.ts` | 5 | 7 | page | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
 | `tests/sweeps/wildcard.test.ts` | 1 | 3 | page+DOM | REPLACE by a React Native screen test (phase 3): logic assertions move with the logic to core | | |
-| `frontends/app/test/unit/add-sheet.test.ts` | 3 | 8 | own code | KEEP: a pure model the new screen reuses | | |
+| `frontends/app/test/unit/add-sheet.test.ts` | 3 | 8 | own code | KEEP: a pure model the new screen reuses | Kept as it is: the Expo app draws from a copy of this model, held equal to it byte for byte (`tests/unit/native-session-sheet.test.ts`) | 3 / 8 |
 | `frontends/app/test/unit/bug-report.test.ts` | 5 | 22 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/cardio-card.test.ts` | 3 | 7 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/cardio-fields.test.ts` | 5 | 24 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/cardio-goal.test.ts` | 10 | 44 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/cardio-sheet.test.ts` | 11 | 29 | source read | REPLACE by a React Native screen test (phase 2 or 3): model assertions kept, template reads rewritten | | |
 | `frontends/app/test/unit/change-sheet.test.ts` | 8 | 29 | own code | KEEP: a pure model the new screen reuses | | |
-| `frontends/app/test/unit/day-detail.test.ts` | 9 | 22 | own code | KEEP: a pure model the new screen reuses | | |
+| `frontends/app/test/unit/day-detail.test.ts` | 9 | 22 | own code | KEEP: a pure model the new screen reuses | Kept as it is: the Expo app draws from a copy of this model, held equal to it byte for byte (`tests/unit/native-session-sheet.test.ts`) | 9 / 22 |
 | `frontends/app/test/unit/deck.test.ts` | 10 | 26 | source read | REPLACE by a React Native screen test (phase 2 or 3): model assertions kept, template reads rewritten | `tests/unit/native-deck.test.ts` (the screen's text: a card, the fold, the motions, the opening at Lift first, 420 ms) and `tests/unit/native-deck-logging.test.ts` (26 tests, 144 assertions: Call it's write, the taps). A screen test by Jest waits for the session that sets that runner up (MIGRATION.md 3.2) | 44 / 280 |
 | `frontends/app/test/unit/dot-chart.test.ts` | 4 | 13 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/goal-sheet.test.ts` | 6 | 13 | own code | KEEP: a pure model the new screen reuses | | |
@@ -151,9 +151,9 @@ Written by `tests/measure/rn-migration_inventory.mjs`. One row per test file as 
 | `frontends/app/test/unit/run-charts.test.ts` | 9 | 30 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/run-recorder.test.ts` | 10 | 29 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/runlog.test.ts` | 15 | 42 | source read | REPLACE by a React Native screen test (phase 2 or 3): model assertions kept, template reads rewritten | | |
-| `frontends/app/test/unit/session-log.test.ts` | 5 | 17 | own code | KEEP: a pure model the new screen reuses | | |
-| `frontends/app/test/unit/session-sections.test.ts` | 9 | 34 | own code | KEEP: a pure model the new screen reuses | | |
-| `frontends/app/test/unit/sheet-marks.test.ts` | 3 | 12 | own code | KEEP: a pure model the new screen reuses | | |
+| `frontends/app/test/unit/session-log.test.ts` | 5 | 17 | own code | KEEP: a pure model the new screen reuses | Kept as it is: the Expo app draws from a copy of this model, held equal to it byte for byte (`tests/unit/native-session-sheet.test.ts`) | 5 / 17 |
+| `frontends/app/test/unit/session-sections.test.ts` | 9 | 34 | own code | KEEP: a pure model the new screen reuses | Kept as it is: the Expo app draws from a copy of this model, held equal to it byte for byte (`tests/unit/native-deck.test.ts`) | 9 / 34 |
+| `frontends/app/test/unit/sheet-marks.test.ts` | 3 | 12 | own code | KEEP: a pure model the new screen reuses | Kept as it is: the Expo app draws from a copy of this model, held equal to it byte for byte (`tests/unit/native-session-sheet.test.ts`) | 3 / 12 |
 | `frontends/app/test/unit/skip-pill.test.ts` | 14 | 62 | source read | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/swap-nudge.test.ts` | 2 | 3 | own code | KEEP: a pure model the new screen reuses | | |
 | `frontends/app/test/unit/swap-sheet.test.ts` | 6 | 15 | own code | KEEP: a pure model the new screen reuses | | |

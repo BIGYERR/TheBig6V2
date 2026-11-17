@@ -12,17 +12,28 @@
 // The cards' own taps (a set stepped or typed, a load, a pill, Log, a skip, a swap and their undo) are the deck's
 // (../deck/deck-writes.ts): the page runs one handler for both screens, and so does this app.
 //
+// The sheet's second session added the athlete's own edits and the test week's card:
+//
+//   applyAddChoice, removeAddedExercise, _afterEdit                                swap-sheet.ts
+//   save, update (the 1RM card; the legacy saveTestMax and e1rmCalcUpdate)         e1rm-card.ts (the Angular card)
+//
 // The store is this app's own SQLite store and nothing else. tests/integration/native-session-sheet.test.ts holds it
-// equal to today's page, key for key, after the same taps on the same keys. Not here: add and remove, the 1RM card's
-// save, the cardio log's wheels, its Log and its sport picker, which the sheet does not draw yet.
+// equal to today's page, key for key, after the same taps on the same keys. Not here: the cardio log's wheels, its
+// Log and its sport picker, which the sheet does not draw yet.
 import type { Day } from '@ia/core';
+import { addAddEdit, dropAddEdit } from '@ia/core/engine/state-day-edits.ts';
 import { cardioEntryLogged, dayStoreKey, readDayLogs, writeDayLogs } from '@ia/core/engine/state-day-log.ts';
 import { clearDayParts, clearDayStatus, dayStatus, setDayStatus, settleDayParts } from '@ia/core/engine/state-day-status.ts';
+import { readPrograms, writePrograms } from '@ia/core/engine/state-programs.ts';
+import { _swapDetailFor } from '@ia/core/engine/swap-prefs.ts';
 
-import { type Session, snapshotDay } from '../deck/deck-writes';
+import { type Session, resnapshotDay, snapshotDay } from '../deck/deck-writes';
 import { type PopSession, finalScheduledDay, releaseSeasonShown } from '../pop-up/pop-ups';
 import type { CardioFields, Dose } from './cardio-fields-model';
+import { epley } from './day-detail-model';
 import type { SessionLogData } from './session-log-model';
+import type { ExSection } from './session-sections-model';
+import { addedDetailFor } from './sheet-adds';
 import { doseDerived } from './sheet-readers';
 
 /**
@@ -144,4 +155,73 @@ export function tapStatus(s: Session, f: LogForm, dose: Dose | null, title: stri
   const labels: Record<string, string> = { complete: 'Done ✓', skipped: 'Skipped ✕ The week moves on' };
   // Done always raises a pop-up, which stands where the toast would; Skip raises none and keeps its toast.
   return status === 'complete' ? { toast: null, closed: true, popup: true } : { toast: labels[status] || 'Updated ✓', closed: true, popup: false };
+}
+
+// ── Add and remove (swap-sheet.ts applyAddChoice and removeAddedExercise) ───────────────────────────────────────
+/** The day in hand, as an edit changes it in place: its sections. */
+const editDay = (s: Session): { sections: ExSection[] } | null => { const wk = s.prog.weeks[s.week]; return ((wk && wk[s.dayKey]) || null) as { sections: ExSection[] } | null; };
+
+/**
+ * The page's applyAddChoice: the move goes under "Added by you" on the day in hand, the block made on the first add
+ * and the move never put there twice. Its dose is resolved by type against the live week (addedDetailFor, V163 D1),
+ * then shaped for the move as a swap's is: kept as a rep target on a lift with a load to move, open sets at the same
+ * effort on one with none (_swapDetailFor). Then the record, and the day's snapshot renewed where it has one. Returns
+ * the toast, or null where there is no day or no program, as the page closes the sheet and does nothing.
+ */
+export function addMove(s: Session, name: string, now: number): string | null {
+  const day = editDay(s);
+  if (!day || !s.prog.id) return null;
+  const detail = _swapDetailFor(name, addedDetailFor(day, name, s.week, s.prog));
+  let bucket = (day.sections || []).filter((x) => x._added)[0];
+  if (!bucket) { bucket = { label: 'Added by you', _added: true, items: [] }; day.sections.push(bucket); }
+  if (!bucket.items.some((it) => it.name === name)) bucket.items.push({ name, detail, _addedByUser: true });
+  addAddEdit(s.store, s.prog.id, s.week, s.dayKey, name, detail, now);
+  resnapshotDay(s);
+  return name + ' added at ' + detail + '.';
+}
+
+/**
+ * The page's removeAddedExercise: the move leaves every added block of the day in hand, a block left empty goes with
+ * it, the record is dropped and the day's snapshot renewed. A lift already logged keeps its entry in the lift log.
+ * Null where there is no day or no program.
+ */
+export function removeAdded(s: Session, name: string): string | null {
+  const day = editDay(s);
+  if (!day || !s.prog.id) return null;
+  (day.sections || []).forEach((sec) => {
+    if (!sec._added) return;
+    sec.items = (sec.items || []).filter((it) => !(it && it.name === name));
+  });
+  day.sections = (day.sections || []).filter((sec) => !(sec._added && !(sec.items || []).length));
+  dropAddEdit(s.store, s.prog.id, s.week, s.dayKey, name);
+  resnapshotDay(s);
+  return name + ' removed.';
+}
+
+// ── The test week's 1RM card (e1rm-card.ts) ─────────────────────────────────────────────────────────────────────
+/** The Angular card's update(), the legacy e1rmCalcUpdate: the Epley estimate from the card's two fields. */
+export function e1rmEstimate(weight: string, reps: string): number {
+  return epley(parseFloat(weight) || 0, parseInt(reps) || 1);
+}
+
+/** What the card's save did: the estimate it now shows, and the line that stands where its button stood, null when nothing was saved. */
+export interface MaxSaved { estimate: number; saved: string | null }
+
+/**
+ * The Angular card's save(), the legacy saveTestMax: the estimate becomes the lift's max in the stored program's
+ * config and in the program in hand, and the programs are stored. Nothing is rebuilt: the next block anchors off it.
+ * An estimate of nothing saves nothing and says nothing. No toast is raised: the card says it itself.
+ */
+export function saveTestMax(s: Session, lift: string, unit: string, weight: string, reps: string): MaxSaved {
+  const v = e1rmEstimate(weight, reps);
+  if (!(v > 0)) return { estimate: v, saved: null };
+  const programs = readPrograms(s.store) as unknown as { id?: string; cfg?: Record<string, unknown> }[];
+  const p = programs.filter((x) => x && x.id === s.prog.id)[0];
+  if (p && p.cfg) {
+    p.cfg[lift] = v;
+    const active = s.prog as unknown as { cfg?: Record<string, unknown> | null } | null;
+    if (active && active.cfg) active.cfg[lift] = v;
+    writePrograms(s.store, programs as never);
+  }
+  return { estimate: v, saved: 'Saved. Your next block anchors off ' + v + ' ' + unit + '.' };
 }

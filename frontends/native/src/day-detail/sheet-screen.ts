@@ -144,11 +144,11 @@ export function logOf(v: SheetView): SessionLogData {
 
 // ── What the screen draws from the view (SessionSheet.tsx) ───────────────────────────────────────────────────────
 /**
- * The blocks of the body this app draws so far, in the view's own order: the range nudge, the sections with their
- * cards, the cardio card, the log and the never marked nudge. A double day's jog, the Wildcard tag, the 1RM card and
- * the day's note stay in the view and are not drawn until their own session.
+ * The blocks of the body this app draws, in the view's own order: every kind the view holds, since the sheet's
+ * second session. A double day's jog, the Wildcard tag, the range nudge, the sections with their cards, the 1RM card,
+ * the cardio card, the day's note, the log and the never marked nudge.
  */
-export const SHEET_DRAWS: readonly BodyBlock['kind'][] = ['nudge', 'sections', 'cardio', 'log', 'logNudge'];
+export const SHEET_DRAWS: readonly BodyBlock['kind'][] = ['also', 'wildcard', 'nudge', 'sections', 'e1rm', 'cardio', 'note', 'log', 'logNudge'];
 export function drawnBlocks(v: SheetView): BodyBlock[] { return v.body.filter((b) => SHEET_DRAWS.includes(b.kind)); }
 
 /** Every move's card of a sheet, in order. */

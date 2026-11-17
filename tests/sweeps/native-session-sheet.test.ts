@@ -17,6 +17,11 @@ import { life, training } from '../support/stored-state.ts';
 
 process.env['TZ'] = 'America/New_York';
 const CREATED = '2026-08-29T09:00:00';
+/** Floors for the second session's counts, each under what was measured. */
+// Measured: 2,755 add sheets holding 41,093 rows; 40 sheets with the move the history added, 30 with the Wildcard tag;
+// in the walk 198 add sheets (706, 950 and 1,188 rows by tier), 198 picks (89 on the fallback dose, 87 on a donor's,
+// 22 as open sets), 127 removes, 354 sheets drawn holding an added move.
+const ADD_ROWS_FLOOR = 40000, ADDED_FLOOR = 30, WILD_FLOOR = 25;
 /** The seeded swim goal gets the timed 500 the wizard asks for, as tests/sweeps/stored-state.test.ts gives it. */
 const walkable = (seeded: Cfg): Cfg => (seeded.cardioGoals.swim ? { ...seeded, cardioGoals: { ...seeded.cardioGoals, swim: { ...seeded.cardioGoals.swim, baseMins: '10', baseSecs: '30' } } } : seeded);
 
@@ -32,6 +37,9 @@ test('the ten seeded programs: every day\'s sheet drawn by the beta is today\'s,
   assert.ok(seen.kinds['log'] === seen.days && (seen.kinds['sections'] || 0) >= 2600, 'every sheet has its log, and its sections where it lifts: ' + JSON.stringify(seen));
   assert.ok(seen.cardio >= 1800 && seen.live >= 30, 'sheets with a run, a ride or a swim, and with it logged: ' + JSON.stringify(seen));
   assert.ok(seen.done >= 100 && seen.skipped >= 30 && (seen.kinds['nudge'] || 0) >= 10, 'sheets of a day done, of a day skipped, with the range nudge: ' + JSON.stringify(seen));
+  // The sheet's second session: the add sheet of every day, on both, whole. The floors sit under what was measured.
+  assert.ok(seen.addSheets === seen.days && seen.addRows >= ADD_ROWS_FLOOR, 'the add sheet compared for every day: ' + JSON.stringify(seen));
+  assert.ok(seen.added >= ADDED_FLOOR && (seen.kinds['wildcard'] || 0) >= WILD_FLOOR, 'sheets with an added move, and with the Wildcard tag: ' + JSON.stringify(seen));
 });
 
 test('the ten seeded programs: every training day of the week in view, at each stretch, worked through its sheet on both apps', () => {
@@ -56,4 +64,8 @@ test('the ten seeded programs: every training day of the week in view, at each s
   assert.ok(T.days >= 150 && T.taps >= 800 && T.checks >= T.taps, JSON.stringify(T));
   assert.ok(T.slides >= 100 && T.notes >= 150 && T.edits >= 60 && T.dones >= 100 && T.skips >= 50 && T.undone >= 100 && T.reopens >= 150, JSON.stringify(T));
   assert.ok(T.popups >= 100 && T.cardio >= 200 && T.live >= 20 && T.carried >= 15 && T.logNudges >= 30 && T.drawnDone >= 60 && T.drawnSkipped >= 30, JSON.stringify(T));
+  // The sheet's second session: add sheets, picks of every kind of dose, removes.
+  assert.ok(T.addSheets >= 100 && T.adds >= 100 && T.removes >= 60 && T.addedDrawn >= 150, JSON.stringify(T));
+  assert.ok((T.addRows['gap'] || 0) >= 300 && (T.addRows['more'] || 0) >= 300 && (T.addRows['off'] || 0) >= 300, JSON.stringify(T.addRows));
+  assert.ok((T.addDoses['fallback'] || 0) >= 30 && (T.addDoses['a donor\'s'] || 0) >= 20 && (T.addDoses['open sets'] || 0) >= 5, JSON.stringify(T.addDoses));
 });

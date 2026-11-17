@@ -4,7 +4,10 @@
 //
 //   the page   today's own handlers, run on the page of a test phone (support/stored-state.ts): updateRPEDisplay,
 //              persistLogFields, handleDayStatus with the pop-up that follows a Done, skipExercise and
-//              unskipExercise with the redraw they ask for. Its sheet is the Angular sheet's open() over the page
+//              unskipExercise with the redraw they ask for, applyAddChoice and removeAddedExercise (the sheet's
+//              second session), and the Angular 1RM card's save() made on the page's own getPrograms and
+//              savePrograms. Its add sheet is the Angular add sheet's open() over the page, through today's own
+//              add-sheet-model.ts. Its sheet is the Angular sheet's open() over the page
 //              (day-detail.ts), each bridge call made on the page, through today's own models; its log's form is
 //              placed as the Angular templates draw it (session-log.ts, cardio-fields.ts), and placed again after
 //              a redraw, as the template draws the sheet anew.
@@ -21,16 +24,18 @@
 // stays the reference until the cutover. The hand-typed values are in tests/unit/native-session-sheet.test.ts.
 import assert from 'node:assert/strict';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
+import { type AddSheetView, addSheetView, workingSets } from '../../frontends/app/src/app/screens/add-sheet/add-sheet-model.ts';
 import { cardioCard, type CardioRx } from '../../frontends/app/src/app/screens/day-detail/cardio-card-model.ts';
 import { type CardioFields, type Dose, cardioFields } from '../../frontends/app/src/app/screens/day-detail/cardio-fields-model.ts';
 import { fieldReads } from '../../frontends/app/src/app/screens/day-detail/cardio-fields-reads.ts';
-import { alsoJog, detailBody, e1rmCard, hasLogged, liftsFirst, logNudge, loggedCount, rangeNudge, statusFoot } from '../../frontends/app/src/app/screens/day-detail/day-detail-model.ts';
+import { type E1rmCard, alsoJog, detailBody, e1rmCard, epley, hasLogged, liftsFirst, logNudge, loggedCount, rangeNudge, statusFoot } from '../../frontends/app/src/app/screens/day-detail/day-detail-model.ts';
 import { type SessionLogData, sessionLog } from '../../frontends/app/src/app/screens/day-detail/session-log-model.ts';
 import { type ExSection, sectionsView } from '../../frontends/app/src/app/screens/day-detail/session-sections-model.ts';
 import { sectionReads } from '../../frontends/app/src/app/screens/day-detail/session-sections-reads.ts';
 import { benchNotes, modTags, wildcardSub } from '../../frontends/app/src/app/screens/day-detail/sheet-marks-model.ts';
+import { addSheetOf } from '../../frontends/native/src/day-detail/sheet-adds.ts';
 import { type SheetProgram, type SheetView, footOf, logOf, sheetView } from '../../frontends/native/src/day-detail/sheet-screen.ts';
-import { type LogForm, formOf, moveRpe, persistLog, tapStatus, typeNotes } from '../../frontends/native/src/day-detail/sheet-writes.ts';
+import { type LogForm, addMove, formOf, moveRpe, persistLog, removeAdded, saveTestMax, tapStatus, typeNotes } from '../../frontends/native/src/day-detail/sheet-writes.ts';
 import type { DeckProgram } from '../../frontends/native/src/deck/deck-screen.ts';
 import { type Session, act } from '../../frontends/native/src/deck/deck-writes.ts';
 import { type PopSession, fireCompletionPopup } from '../../frontends/native/src/pop-up/pop-ups.ts';
@@ -149,6 +154,32 @@ export function pageSheet(P: Phone, week: number, dayKey: string): SheetView | n
   }) as SheetView;
 }
 
+/**
+ * Today's add sheet for a day, made on the page itself: the Angular add sheet's open() (add-sheet.ts), each bridge
+ * call made on the page, through today's own add-sheet-model.ts. The day is the one in hand, as the sheet's add
+ * button opens it. Null where today's says "Nothing to add to here".
+ */
+export function pageAddSheet(P: Phone, week: number, dayKey: string): AddSheetView | null {
+  const f = <T>(name: string): T => P.ev(name) as T;
+  const call = <R>(name: string, ...args: unknown[]): R => f<(...a: unknown[]) => R>(name)(...args);
+  call('_setCurrentWeek', week);
+  call('_setCurrentDayKey', dayKey);
+  const day = call<{ title?: string; sections?: { items?: ({ name?: string; detail?: string; _skipped?: boolean } | null)[] }[] } | null>('_liveDay');
+  const prog = f<unknown>('activeProg');
+  if (!day || !prog) return null;
+  const c = call<{ gap: string[]; more: string[]; off: string[]; region: string | null }>('addCandidates', day, week, prog);
+  const parseRx = (detail: string, name: string): { sets: number; open?: boolean } | null => call('parseRx', detail, name);
+  const PATTERN_REGION = f<Record<string, string | undefined>>('_PATTERN_REGION');
+  return plain(addSheetView({
+    title: day.title,
+    week,
+    setCount: workingSets(day.sections, parseRx),
+    candidates: c,
+    addedSets: (n) => parseRx(call<string>('addedDetailFor', day, n, week, prog), n)?.sets ?? null,
+    regionOf: (n) => PATTERN_REGION[call<string>('_pattern', n)] ?? null,
+  }));
+}
+
 /** What a walk compared, so a test can say each kind of tap was made and each kind of sheet drawn. */
 export interface SheetTally {
   days: number; draws: number; checks: number; taps: number; slides: number; notes: number; dones: number; skips: number; undone: number; popups: number; toasts: number;
@@ -157,10 +188,15 @@ export interface SheetTally {
   cardio: number; live: number; counters: number; rangeNudges: number; logNudges: number; drawnDone: number; drawnSkipped: number; carried: number;
   /** Saves that wrote the derived pace or distance, and status taps that cleared a day's skipped parts or let the season's pop-up go. */
   parts: number; seasons: number;
+  /** The sheet's second session: add sheets compared and the rows they held by tier, picks, removes, sheets drawn holding an added block, 1RM saves. */
+  addSheets: number; addRows: Record<string, number>; adds: number; removes: number; addedDrawn: number; maxSaves: number;
+  /** Picks by what the dose was: the conservative fallback, open sets on a lift with no load to move, anything else. */
+  addDoses: Record<string, number>;
   kinds: Record<string, number>;
 }
 export const sheetTally = (): SheetTally => ({ days: 0, draws: 0, checks: 0, taps: 0, slides: 0, notes: 0, dones: 0, skips: 0, undone: 0, popups: 0, toasts: 0, edits: 0, reopens: 0,
-  cardio: 0, live: 0, counters: 0, rangeNudges: 0, logNudges: 0, drawnDone: 0, drawnSkipped: 0, carried: 0, parts: 0, seasons: 0, kinds: {} });
+  cardio: 0, live: 0, counters: 0, rangeNudges: 0, logNudges: 0, drawnDone: 0, drawnSkipped: 0, carried: 0, parts: 0, seasons: 0,
+  addSheets: 0, addRows: {}, adds: 0, removes: 0, addedDrawn: 0, maxSaves: 0, addDoses: {}, kinds: {} });
 
 /** One day's sheet, open on today's page and in the Expo app, over the same keys. */
 export class TwoSheets {
@@ -246,6 +282,7 @@ export class TwoSheets {
     if (this.view.counter !== null) T.counters++;
     for (const b of this.view.body) { T.kinds[b.kind] = (T.kinds[b.kind] || 0) + 1; if (b.kind === 'nudge') T.rangeNudges++; if (b.kind === 'logNudge') T.logNudges++; }
     if (this.view.foot[0].undo) { if (this.view.foot[0].status === 'complete') T.drawnDone++; else T.drawnSkipped++; }
+    if (removable(this.view)) T.addedDrawn++;
   }
   /** Every field of the log's form holds the same value on both, and the slider's mark is the same. */
   private sameForm(when: string): void {
@@ -379,6 +416,100 @@ export class TwoSheets {
     this.T.edits++;
     this.T.draws++;
   }
+
+  // ── The sheet's second session: the add sheet, a pick, a remove, the 1RM card's save ───────────────────────────
+  /** The add button: the add sheet both apps open for the day in hand is the same sheet, whole. It writes nothing. */
+  addSheet(): AddSheetView {
+    const before = this.P.dump();
+    const page = pageAddSheet(this.P, this.week, this.dayKey);
+    const beta = addSheetOf(this.s.prog, this.week, this.dayKey);
+    assert.ok(page && beta, this.what + ': both open an add sheet');
+    assert.deepStrictEqual(plain(beta), page, this.what + ': the add sheet as drawn');
+    assert.deepStrictEqual(this.P.dump(), before, this.what + ': opening the add sheet wrote no key');
+    this.T.addSheets++;
+    for (const t of ['gap', 'more', 'off'] as const) this.T.addRows[t] = (this.T.addRows[t] || 0) + page[t].length;
+    this.check('the add sheet opened');
+    return page;
+  }
+  /** A row picked: today's applyAddChoice, whose redraw draws the whole sheet anew; the beta's addMove, then its own redraw. */
+  add(name: string): void {
+    const n0 = this.redraws.length;
+    this.tap('an add of ' + name, () => {
+      this.page(`applyAddChoice(${J(name)});`);
+      assert.equal(this.redraws.length, n0 + 1, this.what + ': the add asks the sheet to draw again');
+      this.pageDraw();
+    }, () => {
+      const t = addMove(this.s, name, this.now);
+      this.nativeDraw();
+      assert.deepStrictEqual(plain(this.view), this.pageView, this.what + ': the sheet drawn again after an add');
+      this.count();
+      return t ? [t] : [];
+    });
+    assert.equal(removable(this.view, name), name, this.what + ': the added move carries its remove');
+    const said = this.P.toasts[this.P.toasts.length - 1] || '';
+    const kind = / added at 3×10 — RPE 7\.$/.test(said) ? 'fallback' : / added at \d+ sets? — /.test(said) ? 'open sets' : 'a donor\'s';
+    this.T.addDoses[kind] = (this.T.addDoses[kind] || 0) + 1;
+    this.T.adds++;
+    this.T.draws++;
+  }
+  /** An added move's remove: today's removeAddedExercise and its redraw; the beta's removeAdded and its own. */
+  remove(name: string): void {
+    const n0 = this.redraws.length;
+    this.tap('a remove of ' + name, () => {
+      this.page(`removeAddedExercise(${J(name)});`);
+      assert.equal(this.redraws.length, n0 + 1, this.what + ': the remove asks the sheet to draw again');
+      this.pageDraw();
+    }, () => {
+      const t = removeAdded(this.s, name);
+      this.nativeDraw();
+      assert.deepStrictEqual(plain(this.view), this.pageView, this.what + ': the sheet drawn again after a remove');
+      this.count();
+      return t ? [t] : [];
+    });
+    assert.equal(removable(this.view, name), null, this.what + ': the move is off the card');
+    this.T.removes++;
+    this.T.draws++;
+  }
+  /** The 1RM card of the sheet as drawn, or null: both apps hold the same card (the sheet was compared whole). */
+  maxCard(): E1rmCard | null {
+    const b = this.view.body.find((x) => x.kind === 'e1rm') as { card: E1rmCard } | undefined;
+    return b ? b.card : null;
+  }
+  /**
+   * The 1RM card's save with these two fields: today's is the Angular card's save() (e1rm-card.ts), made here on the
+   * page's own getPrograms and savePrograms through today's own epley; the beta's is saveTestMax. The line each card
+   * then shows is the same, and so is the max the program in hand carries. No toast on either, no redraw.
+   */
+  saveMax(weight: string, reps: string): string | null {
+    const card = this.maxCard();
+    assert.ok(card, this.what + ': the sheet holds a 1RM card');
+    const P = this.P, lift = card.lift;
+    let pageSaid: string | null = null, betaSaid: string | null = null;
+    this.tap('the 1RM card saved', () => {
+      const v = epley(parseFloat(weight) || 0, parseInt(reps) || 1);
+      if (!(v > 0)) return;
+      const programs = (P.ev('getPrograms') as () => { id?: string; cfg?: Record<string, unknown> }[])();
+      const id = P.ev('activeProgId') as string | null;
+      const p = programs.filter((x) => x && x.id === id)[0];
+      if (p && p.cfg) {
+        p.cfg[lift] = v;
+        const active = P.ev('activeProg') as { cfg?: Record<string, unknown> } | null;
+        if (active && active.cfg) active.cfg[lift] = v;
+        (P.ev('savePrograms') as (ps: unknown) => void)(programs);
+      }
+      pageSaid = 'Saved. Your next block anchors off ' + v + ' ' + card.unit + '.';
+    }, () => { betaSaid = saveTestMax(this.s, lift, card.unit, weight, reps).saved; return []; });
+    assert.equal(betaSaid, pageSaid, this.what + ': the line the card shows after its save');
+    assert.equal((this.s.prog.cfg as Record<string, unknown>)[lift], (P.ev('activeProg') as { cfg: Record<string, unknown> }).cfg[lift], this.what + ': the max the program in hand carries');
+    this.T.maxSaves++;
+    return betaSaid;
+  }
+}
+
+/** The first added move of a sheet (one that carries a remove), or the named one where it is added; null when there is none. */
+export function removable(v: SheetView, name?: string): string | null {
+  for (const b of v.body) if (b.kind === 'sections') for (const sec of b.sections) if (sec.kind === 'section') for (const x of sec.body.items) if (x.kind === 'card' && x.added && (name === undefined || x.name === name)) return x.name;
+  return null;
 }
 
 /** The first move of a day that carries a minus, for an edit, or null. */
@@ -406,6 +537,29 @@ export function workSheet(P: Phone, store: StateStore, grid: DeckProgram, week: 
     S.notes('After a skip, day ' + n);
     S.edit(name, false);
   }
+  // The sheet's second session. A move the history itself added (the page's own applyAddChoice, weeks back) is
+  // removed on every other day that holds one. On two days of five the add sheet is opened and a row picked, the tier
+  // and the row chosen from `n`: on one the move is removed again after notes typed (the redraw forgets the form,
+  // the store keeps the notes); on the other a second move joins the block and the first is removed, so the block
+  // outlives its first move and the day goes on to its status holding an added move.
+  const old = removable(S.view);
+  if (old && n % 2 === 0) S.remove(old);
+  if (n % 5 === 1 || n % 5 === 3) {
+    const a = S.addSheet();
+    const rows = [...a.gap, ...a.more, ...a.off];
+    const row = rows[(n * 7) % (rows.length || 1)];
+    if (row) {
+      S.slide(3 + (n % 5));
+      S.add(row.name);
+      if (n % 5 === 3) { S.notes('Before a remove, day ' + n); S.remove(row.name); }
+      else {
+        const b = S.addSheet();
+        assert.ok(![...b.gap, ...b.more, ...b.off].some((r) => r.name === row.name), 'week ' + week + ', ' + dayKey + ': a move on the card is offered no more');
+        const next = [...b.off, ...b.more, ...b.gap][(n * 3) % ((b.gap.length + b.more.length + b.off.length) || 1)];
+        if (next) { S.add(next.name); S.remove(row.name); }
+      }
+    }
+  }
   const cur = S.view.foot[0].undo ? S.view.foot[0].status : null;
   const other = (st: 'complete' | 'skipped'): 'complete' | 'skipped' => (st === 'complete' ? 'skipped' : 'complete');
   if (cur) {
@@ -421,12 +575,22 @@ export function workSheet(P: Phone, store: StateStore, grid: DeckProgram, week: 
     else { S.status('skipped'); S.reopen(); S.status('complete'); }
   }
   if (!S.open_) S.reopen();
+  // On a day already closed and opened again: a pick, and on every other such day its remove.
+  if (n % 6 === 2) {
+    const a = S.addSheet();
+    const row = [...a.more, ...a.gap, ...a.off][n % ((a.gap.length + a.more.length + a.off.length) || 1)];
+    if (row) { S.add(row.name); if (n % 4 === 0) S.remove(row.name); }
+  }
   return true;
 }
 
 /** What a read of every sheet held. */
-export interface SheetsSeen { days: number; rests: number; kinds: Record<string, number>; cardio: number; live: number; done: number; skipped: number; counters: number }
-export const sheetsSeen = (): SheetsSeen => ({ days: 0, rests: 0, kinds: {}, cardio: 0, live: 0, done: 0, skipped: 0, counters: 0 });
+export interface SheetsSeen {
+  days: number; rests: number; kinds: Record<string, number>; cardio: number; live: number; done: number; skipped: number; counters: number;
+  /** The add sheets compared, the rows they held, and the sheets that held an added move. */
+  addSheets: number; addRows: number; added: number;
+}
+export const sheetsSeen = (): SheetsSeen => ({ days: 0, rests: 0, kinds: {}, cardio: 0, live: 0, done: 0, skipped: 0, counters: 0, addSheets: 0, addRows: 0, added: 0 });
 
 /**
  * Every training day of every week the phone's program holds: the two sheets, compared whole, and the form each
@@ -454,6 +618,13 @@ export function everySheetDrawn(P: Phone, tally: SheetsSeen = sheetsSeen()): She
     if (c) { tally.cardio++; if (c.logged) tally.live++; }
     if (page.counter !== null) tally.counters++;
     if (page.foot[0].undo) { if (page.foot[0].status === 'complete') tally.done++; else tally.skipped++; }
+    if (removable(page)) tally.added++;
+    // The add sheet the day's add button opens, on both: the same sheet, whole.
+    const addPage = pageAddSheet(P, w, d), addBeta = addSheetOf(grid, w, d);
+    assert.ok(addPage && addBeta, what + ': both open an add sheet');
+    assert.deepStrictEqual(plain(addBeta), addPage, what + ': the add sheet');
+    tally.addSheets++;
+    tally.addRows += addPage.gap.length + addPage.more.length + addPage.off.length;
   }
   (P.IA.ctx as Record<string, unknown>)['__was'] = was;
   P.ev('_setCurrentWeek(__was.week);_setCurrentDayKey(__was.day);_setStaleWarnShown(__was.shown);_setStaleWarnSrc(__was.src);');

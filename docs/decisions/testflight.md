@@ -250,3 +250,25 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   reopen though not sure if that's just because you didn't build it out", to the double tap, the up and down
   pager, the opening, the close and Done, next one. Reopen is not built yet: it opens the session sheet, which
   starts with this session (`docs/decisions/swipe-deck.md`, the build 116 entry). Nothing was fixed from it.
+- **Seen on `main`, the twelfth run, neither lane** (run 43958618007, merge 27a68d4, pull request 49, 2026-11-16
+  16:17 EST; the merge carried one docs commit, 9c4707a, the migration's motion cut; read and recorded by the
+  session sheet's second session): the two gates went together (12 s each). Both lanes skipped their uploads, as
+  ruled: App Store Connect already holds `0.262.4`, and no commit of the merge changed `frontends/native`, `core`
+  or `tests/semver.js`, so the beta's build stayed 116. The notices read `testflight 0.262.4 processed (uploaded
+  before this run; a version goes up once, a fix is the next PATCH)` and `testflight next 0.262.4 (116) processed
+  (uploaded before this run; a build goes up once, the next change to the app is the next build)`. The run ended
+  green: 4 jobs passed and 10 skipped by rule.
+- **Seen on `main`, the thirteenth run, the beta's lane alone** (run 43978885142, merge 612d762, pull request 50,
+  2026-11-16 18:23 EST; the merge carried no version: 3b60455, Reopen opens the day's session sheet in the Expo
+  app, and three docs and rule wording commits; read and recorded by the next session, the sheet's second. Run
+  43978883963, named in that session's brief, is the Pages build of the same merge): the two gates went together
+  (11 s today's, 12 s the beta's). Today's lane skipped its upload, as ruled. The beta's lane archived, signed and
+  uploaded `0.262.4 (117)` (695 s, done 18:36:21) and read it back as processed (224 s, done 18:40:08). The build
+  number moved from 116 to 117 on one commit, 3b60455, which changed `frontends/native`. The notices read
+  `testflight 0.262.4 processed (uploaded before this run; a version goes up once, a fix is the next PATCH)` and
+  `testflight next 0.262.4 (117) processed`. The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 117** (his report, 2026-11-16, no screenshot): "1. yes its slides up 2. yes 3. yes 4.
+  yes 5. yes all same as todays", to five steps on IA Next build 117: Reopen on a done lift, the sheet with its
+  cards and set rows, the slider and the notes kept over Back and Reopen, Done and its undo with the pop-up, Skip
+  and its undo. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/session-sheet.md`, the build 117 entry).

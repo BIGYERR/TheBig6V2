@@ -1,19 +1,22 @@
 // The session sheet in the Expo app (MIGRATION.md phase 3, the session sheet's first session), drawn as today's draws
 // it (frontends/app/src/app/screens/day-detail over detail-sheet.css, session-sheet.css and look.css): the day's
 // header on its band (Back, the logged count, the RPE reference, the week and day, the title, the tags), then the
-// body in today's order (the range nudge, the cardio card, the sections with every exercise card and its set rows,
-// the log with its effort slider and notes, the never marked nudge), then Done and Skip at the foot, each undoing
-// itself. Every word, number and order is today's: what the sheet shows is sheet-screen.ts, today's own models held to
-// the byte.
+// body in today's order (a double day's jog, the Wildcard tag, the range nudge, the cardio card, the sections with
+// every exercise card and its set rows, the test week's 1RM card after the first section, the day's note, the log
+// with its effort slider and notes, the never marked nudge), then Done and Skip at the foot, each undoing itself.
+// Every word, number and order is today's: what the sheet shows is sheet-screen.ts, today's own models held to the
+// byte.
 //
 // It is reached as today's is: Reopen on a done lift's card, and Start where the day opens no deck (This Week).
 // The cards' taps are the deck's own (../deck/deck-writes.ts), since today's page runs one handler for both screens;
-// the slider, the notes, Done and Skip are sheet-writes.ts. A skip, a swap and each undo draw the whole sheet again,
-// as today's openDetail does, which starts the log's form afresh. All of it goes to this app's own store (D289).
+// the slider, the notes, Done and Skip are sheet-writes.ts, and so are the add sheet's pick, an added move's remove
+// and the 1RM card's save (the sheet's second session). A skip, a swap, an add, a remove and each undo draw the
+// whole sheet again, as today's openDetail does, which starts the log's form afresh. All of it goes to this app's
+// own store (D289).
 //
-// Not drawn yet, each waiting for its own session: the add button and an added move's remove, a double day's jog,
-// the Wildcard tag, the 1RM card and the day's note; and in the log the run's fields, its wheels, its Log and its
-// sport picker, which come with the cardio sheet. The run's workout is drawn as words.
+// Not drawn yet, each waiting for its own session: in the log the run's fields, its wheels, its Log and its sport
+// picker, which come with the cardio sheet; the run's workout is drawn as words. The jog's Edit cardio is drawn and
+// takes no press until the rest sheet is built. The 1RM card's reps are five buttons where today's is a list of five.
 //
 // The motion is this app's own, built once (MIGRATION.md section 6, decision 14): the sheet slides up and away as
 // the swap sheet does.
@@ -26,6 +29,8 @@ import { SvgXml } from 'react-native-svg';
 import { asyIcon } from '@ia/core/engine/icons.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
+import { AddSheet } from '../add-sheet/AddSheet';
+import type { AddSheetView } from '../add-sheet/add-sheet-model';
 import type { CardAct } from '../deck/deck-model';
 import { parseRx } from '../deck/deck-readers';
 import type { DeckProgram, Fields } from '../deck/deck-screen';
@@ -35,19 +40,23 @@ import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typ
 import { SwapNudge } from '../swap-nudge/SwapNudge';
 import { SwapSheet } from '../swap-sheet/SwapSheet';
 import { DISPLAY, type Palette, TEXT } from '../theme';
+import { WildcardMark } from '../this-week/marks';
 import { PLAN_CHANGE_FAILED } from '../this-week/week-screen';
 import type { CardioCardView } from './cardio-card-model';
-import type { FootButton } from './day-detail-model';
+import type { E1rmCard, FootButton } from './day-detail-model';
 import type { ExCard, ExView, Rx, SectionView } from './session-sections-model';
+import { addSheetOf } from './sheet-adds';
 import { RPE_LABELS } from './sheet-readers';
 import { RPE_INFO, type SheetOpen, type SheetProgram, drawnBlocks, footOf, logOf, sheetFields, sheetMoves, sheetView, tokenOf } from './sheet-screen';
-import { type LogForm, formOf, moveRpe, persistLog, tapStatus, typeNotes } from './sheet-writes';
+import { type LogForm, type MaxSaved, addMove, e1rmEstimate, formOf, moveRpe, persistLog, removeAdded, saveTestMax, tapStatus, typeNotes } from './sheet-writes';
 
 /** motion.css: the overlay's slide, cubic-bezier(.32,.72,0,1), 400 ms in and 360 ms out. */
 const SLIDE = Easing.bezier(0.32, 0.72, 0, 1);
 const SLIDE_IN = 400;
 const SLIDE_OUT = 360;
 
+/** The add button's plus, as today's header draws it (day-detail.ts). */
+const PLUS = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
 /** Type on the header band: white at an alpha (rgba(var(--on-band-rgb), a)). */
 const on = (a: number): string => 'rgba(255,255,255,' + a + ')';
 /** Markup the engine's words may carry, as plain words: a break is a new line, every other tag is dropped. */
@@ -81,6 +90,7 @@ interface Handlers {
   edit: (a: CardAct, off: boolean) => void;
   swap: (secIdx: number, itemIdx: number) => void;
   unswap: (from: string) => void;
+  remove: (name: string) => void;
 }
 
 export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, onProgram, onOver, say }: {
@@ -238,7 +248,29 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
       redraw();
       say(toast);
     },
+    remove: (name) => {
+      leave();
+      const toast = removeAdded(session, name);
+      if (toast === null) return;
+      redraw();
+      say(toast);
+    },
   };
+
+  // ── Add an exercise (openAddSheet and applyAddChoice), and the test week's 1RM card ──
+  const [add, setAdd] = useState<AddSheetView | null>(null);
+  const openAdd = (): void => {
+    leave();
+    const sheet = addSheetOf(prog, open.week, open.dayKey);
+    if (sheet) setAdd(sheet); else say('Nothing to add to here');
+  };
+  const added = (name: string): void => {
+    const toast = addMove(session, name, Date.now());
+    if (toast === null) return;
+    redraw();
+    say(toast);
+  };
+  const saveMax = (lift: string, weight: string, reps: string): MaxSaved => { leave(); return saveTestMax(session, lift, unit, weight, reps); };
 
   // ── The log: the effort and the notes are saved as they change (persistLogFields) ──
   const slid = (v: number): void => {
@@ -330,15 +362,42 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
         </View>
         <Text testID="sheet-over" style={[s.over, { color: p.onBand }]}>{view.over}</Text>
         <Text testID="sheet-title" style={[s.title, { color: p.onBand }]}>{view.title}</Text>
-        {(view.tags.chips.length > 0 || view.tags.travel) && (
+        <View style={s.tagrow}>
           <View testID="sheet-tags" style={s.tags}>
             {view.tags.chips.map((t, k) => <Text key={k} style={[s.tag, { color: tokenColor(p, t.color, p.onBand), backgroundColor: tokenColor(p, t.bg, on(0.12)) }]}>{t.label}</Text>)}
             {view.tags.travel && <View style={[s.tag, s.travel, { borderColor: on(0.3) }]}><Icon name="backpack" size={11} color={p.onBand} /><Text style={[s.travelText, { color: p.onBand }]}>Travel</Text></View>}
           </View>
-        )}
+          <Pressable testID="sheet-add" accessibilityRole="button" accessibilityLabel="Add an exercise to this day" hitSlop={8} onPress={openAdd}
+            style={({ pressed }) => [s.addBtn, { backgroundColor: on(pressed ? 0.2 : 0.1), borderColor: on(0.3) }]}>
+            <SvgXml xml={PLUS} color={p.onBand} width={12} height={12} /><Text style={[s.addBtnText, { color: p.onBand }]}>Exercise</Text>
+          </Pressable>
+        </View>
       </View>
       <ScrollView testID="sheet-body" style={{ flex: 1 }} contentContainerStyle={[s.body, { paddingBottom: 20 + insets.bottom }]} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         {drawnBlocks(view).map((blk, k) => {
+          if (blk.kind === 'also') {
+            return (
+              <View key={k} testID="sheet-also" style={[s.also, { backgroundColor: 'rgba(' + p.inkRgb + ',0.06)', borderColor: p.border2 }]}>
+                <Text style={[s.alsoLbl, { color: p.muted }]}>{blk.label}</Text>
+                {blk.lines.map((l, i) => <Text key={i} style={[s.alsoLine, { color: p.run }]}>{l}</Text>)}
+                {/* The rest sheet is not built yet: the button is drawn and takes no press. */}
+                <View style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></View>
+              </View>
+            );
+          }
+          if (blk.kind === 'wildcard') {
+            return (
+              <View key={k} testID="sheet-wildcard" style={[s.wcTag, { backgroundColor: p.surface, borderLeftColor: p.signal }]}>
+                <WildcardMark color={p.signal} size={16} />
+                <View style={{ flexShrink: 1 }}>
+                  <Text style={[s.wcLbl, { color: p.signal }]}>Wildcard done</Text>
+                  <Text style={[s.wcSub, { color: p.muted }]}>{blk.sub}</Text>
+                </View>
+              </View>
+            );
+          }
+          if (blk.kind === 'e1rm') return <E1rm key={k} card={blk.card} p={p} onSave={(weight, reps) => saveMax(blk.card.lift, weight, reps)} />;
+          if (blk.kind === 'note') return <Text key={k} testID="sheet-note" style={[s.note, { color: p.muted, backgroundColor: 'rgba(' + p.inkRgb + ',0.10)', borderLeftColor: p.accent }]}>{plain(blk.html)}</Text>;
           if (blk.kind === 'nudge') {
             return (
               <Text key={k} testID="sheet-rangenudge" style={[s.progNudge, { color: p.text, backgroundColor: 'rgba(' + p.inkRgb + ',0.06)', borderColor: p.border2 }]}>
@@ -396,7 +455,59 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
         </Pressable>
       )}
       {swap && <SwapSheet palette={p} view={swap.view} calm={calm} onPick={pick} onClose={() => setSwap(null)} />}
+      {add && <AddSheet palette={p} view={add} calm={calm} onPick={added} onClose={() => setAdd(null)} />}
     </Animated.View>
+  );
+}
+
+/**
+ * The test week's 1RM card (e1rm-card.ts): the test set's weight and reps, prefilled from the logged set, the Epley
+ * estimate, and the save. The estimate reads 0 until a field changes, as today's does; once saved, the card's own
+ * line stands where the button stood.
+ */
+function E1rm({ card: c, p, onSave }: { card: E1rmCard; p: Palette; onSave: (weight: string, reps: string) => MaxSaved }) {
+  const s = styles;
+  const [weight, setWeight] = useState(c.weight);
+  const [reps, setReps] = useState(c.reps);
+  const [estimate, setEstimate] = useState(0);
+  const [saved, setSaved] = useState('');
+  const typed = (t: string): void => { setWeight(t); setEstimate(e1rmEstimate(t, String(reps))); };
+  const picked = (n: number): void => { setReps(n); setEstimate(e1rmEstimate(weight, String(n))); };
+  const save = (): void => {
+    const r = onSave(weight, String(reps));
+    setEstimate(r.estimate);
+    if (r.saved !== null) setSaved(r.saved);
+  };
+  return (
+    <View testID="sheet-max" style={[s.e1rm, { backgroundColor: p.surface2, borderColor: p.border2 }]}>
+      <View style={s.e1rmHd}><Text style={[s.e1rmHdText, { color: p.text }]}>Estimated 1RM</Text><Text style={[s.e1rmSmall, { color: p.muted }]}>from your test set</Text></View>
+      <View style={s.e1rmRow}>
+        <View style={s.e1rmField}>
+          <Text style={[s.e1rmLbl, { color: p.muted }]}>{'Weight (' + c.unit + ')'}</Text>
+          <TextInput testID="sheet-max-weight" accessibilityLabel={'Weight (' + c.unit + ')'} keyboardType="decimal-pad" selectTextOnFocus value={weight} onChangeText={typed}
+            style={[s.e1rmInput, { color: p.text, backgroundColor: p.surface, borderColor: p.border2 }]} />
+        </View>
+        <View style={s.e1rmField}>
+          <Text style={[s.e1rmLbl, { color: p.muted }]}>Reps</Text>
+          <View style={s.e1rmReps}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <Pressable key={n} testID={'sheet-max-reps-' + n} accessibilityRole="button" accessibilityLabel={n + ' reps'} accessibilityState={{ selected: n === reps }} onPress={() => picked(n)}
+                style={[s.e1rmRep, { backgroundColor: n === reps ? p.accent : p.surface, borderColor: n === reps ? p.accent : p.border2 }]}>
+                <Text style={[s.e1rmRepText, { color: n === reps ? p.onInk : p.text }]}>{n}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      </View>
+      <View style={[s.e1rmOut, { backgroundColor: 'rgba(' + p.inkRgb + ',0.08)' }]}>
+        <Text style={[s.e1rmOutLbl, { color: p.muted }]}>Estimated 1RM</Text>
+        <Text testID="sheet-max-out" style={[s.e1rmVal, { color: p.text }]}>{estimate + ' '}<Text style={[s.e1rmUnit, { color: p.muted }]}>{c.unit}</Text></Text>
+      </View>
+      {saved
+        ? <Text testID="sheet-max-saved" style={[s.e1rmSaved, { color: p.green, backgroundColor: tint(p.run, 0.15) }]}>{saved}</Text>
+        : <Pressable testID="sheet-max-save" accessibilityRole="button" onPress={save} style={[s.e1rmSave, { backgroundColor: p.signal }]}><Text style={[s.e1rmSaveText, { color: p.onSignal }]}>{'Save as new ' + c.liftLabel + ' max'}</Text></Pressable>}
+      <Text style={[s.e1rmHint, { color: p.muted }]}>Experienced with heavy singles and have a spotter? A single at RPE 9.5 works too. Enter it at 1 rep.</Text>
+    </View>
   );
 }
 
@@ -485,7 +596,12 @@ function Move({ x, p, inBlock, last, open, f, fv, h }: MoveProps) {
         <Text style={[s.badge, { color: p.run }]}>{logged ? '✓' : ''}</Text>
       </View>
       {!!x.detail && <Text style={[s.detail, { color: p.text }]}>{plain(x.detail)}</Text>}
-      {x.added && <Text style={[s.chip, { color: p.muted, borderTopColor: p.border }]}><Text style={[s.bold, { color: p.signal }]}>You added this</Text>{' · not in the plan'}</Text>}
+      {x.added && (
+        <View style={[s.chipRow, { borderTopColor: p.border }]}>
+          <Text style={[s.chipText, { color: p.muted }]}><Text style={[s.bold, { color: p.signal }]}>You added this</Text>{' · not in the plan'}</Text>
+          <Text testID={'sheet-remove-' + x.exKey} accessibilityRole="button" onPress={() => h.remove(x.name)} style={[s.chipUndo, { color: p.muted }]}>remove</Text>
+        </View>
+      )}
       {x.swappedFrom && (
         <View style={[s.chipRow, { borderTopColor: p.border }]}>
           <Text style={[s.chipText, { color: p.muted }]}><Text style={[s.bold, { color: p.signal }]}>Swapped in</Text>{' for ' + x.swappedFrom}</Text>
@@ -584,7 +700,38 @@ const styles = StyleSheet.create({
   rpeBtnText: { fontFamily: DISPLAY, fontSize: 11, fontWeight: '700' },
   over: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '600' },
   title: { fontFamily: DISPLAY, fontSize: 28, fontWeight: '700', lineHeight: 30, marginTop: 1 },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 9 },
+  tagrow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, marginTop: 9 },
+  tags: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  addBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 999, paddingVertical: 5, paddingLeft: 7, paddingRight: 9 },
+  addBtnText: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
+  also: { borderWidth: 1, borderRadius: 16, paddingVertical: 11, paddingHorizontal: 14 },
+  alsoLbl: { fontFamily: DISPLAY, fontSize: 11, fontWeight: '700' },
+  alsoLine: { fontFamily: TEXT, fontSize: 13, fontWeight: '500', marginTop: 6 },
+  alsoBtn: { alignSelf: 'flex-start', marginTop: 10, borderWidth: 1, borderRadius: 999, paddingVertical: 9, paddingHorizontal: 14 },
+  alsoBtnText: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
+  wcTag: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderLeftWidth: 3, borderRadius: 16 },
+  wcLbl: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700', marginBottom: 3 },
+  wcSub: { fontFamily: TEXT, fontSize: 12, lineHeight: 18 },
+  note: { fontFamily: TEXT, fontSize: 13, lineHeight: 13 * 1.5, borderLeftWidth: 3, borderTopRightRadius: 16, borderBottomRightRadius: 16, paddingVertical: 10, paddingHorizontal: 14, overflow: 'hidden' },
+  e1rm: { borderWidth: 1, borderRadius: 16, padding: 14 },
+  e1rmHd: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  e1rmHdText: { fontFamily: TEXT, fontSize: 11, fontWeight: '700' },
+  e1rmSmall: { fontFamily: TEXT, fontSize: 11, fontWeight: '500' },
+  e1rmRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  e1rmField: { flex: 1 },
+  e1rmLbl: { fontFamily: TEXT, fontSize: 10, marginBottom: 4 },
+  e1rmInput: { borderWidth: 1, borderRadius: 6, fontFamily: 'Menlo', fontSize: 15, fontWeight: '600', paddingVertical: 9, paddingHorizontal: 10 },
+  e1rmReps: { flexDirection: 'row', gap: 4 },
+  e1rmRep: { flex: 1, alignItems: 'center', borderWidth: 1, borderRadius: 6, paddingVertical: 9 },
+  e1rmRepText: { fontFamily: 'Menlo', fontSize: 15, fontWeight: '600' },
+  e1rmOut: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 12, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12 },
+  e1rmOutLbl: { fontFamily: TEXT, fontSize: 11 },
+  e1rmVal: { fontFamily: 'Menlo', fontSize: 24, fontWeight: '700' },
+  e1rmUnit: { fontSize: 12, fontWeight: '500' },
+  e1rmSave: { alignItems: 'center', marginTop: 10, borderRadius: 999, padding: 11 },
+  e1rmSaveText: { fontFamily: TEXT, fontSize: 13, fontWeight: '700' },
+  e1rmSaved: { marginTop: 10, borderRadius: 8, padding: 10, fontFamily: TEXT, fontSize: 12.5, fontWeight: '600', textAlign: 'center', overflow: 'hidden' },
+  e1rmHint: { fontFamily: TEXT, fontSize: 11, lineHeight: 11 * 1.45, marginTop: 8 },
   tag: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '600', borderRadius: 999, paddingVertical: 4, paddingHorizontal: 11, overflow: 'hidden' },
   travel: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1.5 },
   travelText: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '600' },
