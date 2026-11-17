@@ -272,3 +272,13 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   cards and set rows, the slider and the notes kept over Back and Reopen, Done and its undo with the pop-up, Skip
   and its undo. Nothing differed and no motion was named, so nothing was fixed from it
   (`docs/decisions/session-sheet.md`, the build 117 entry).
+- **Seen on `main`, the fourteenth run, the beta's lane alone** (run 44185429056, merge 6e9b9bf, pull request 51,
+  2026-11-17 16:59 EST; the merge carried no version: 272488b, the add sheet, remove, the Wildcard tag, the jog,
+  the 1RM card and the day's note in the Expo app's session sheet, and three docs and rule wording commits; read
+  and recorded by the next session, the cardio sheet's, which found the run still uploading and waited for it):
+  the two gates went together (13 s today's, 14 s the beta's). Today's lane skipped its upload, as ruled. The
+  beta's lane archived, signed and uploaded `0.262.4 (118)` (472 s, done 17:08:05) and read it back as processed
+  (104 s, done 17:09:51). The build number moved from 117 to 118 on one commit, 272488b, which changed
+  `frontends/native`. The notices read `testflight 0.262.4 processed (uploaded before this run; a version goes up
+  once, a fix is the next PATCH)` and `testflight next 0.262.4 (118) processed`. The run ended green: 6 jobs
+  passed and 8 skipped by rule.
