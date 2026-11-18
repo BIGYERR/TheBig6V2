@@ -247,3 +247,74 @@
   This Week; Record run opens D267's recorder out of the run card with Ran without the phone? on it. The recording
   screen as R2 over R3, Save behind the gate, the live bar and "Back to your run" build next, then Can't run? (D249),
   in their own releases (Mario, 2026-11-08, "Screen now, rest next").
+
+## D293 P-GPSSMOOTH: the recorder counts a steadied line, and nothing while you stand (proposed 2026-11-17, awaiting Mario)
+
+- **Date:** 2026-11-17, Post-v0.262.4. **Ruled by:** the main session in the coach hat, on the two test runs Mario ran
+  for D272's gate, and his "yeah write it up" after the fix was put to him in plain words. Awaiting his concurrence.
+  **Bump:** Mario picks at the build (PATCH recommended, below). **Shipped:** not yet.
+- **The ask (Mario):** "damn i didnt do the 400m track thing but here is what the app got, STRAVA got and you can look up
+  what my COROS watch got that day" (2026-11-15, the road run); "think we need anything else to make sure the phone is
+  accurate or what?"; the track run (2026-11-17); "huh explain the ruling please", then "yeah write it up".
+- **The measure** (`tests/measure/gps-recording_track-test.md`, its script `gps-recording_track-test.mjs`; the runs'
+  GPX and FIT files are not committed):
+  - **The track (4 laps of lane 1, 1,600 m).** As the recorder counts today, the phone read 1665.9 m for the whole
+    recording (+4.12%) and 1641.8 m for the run alone (+2.61%). Lap by lap: 407, 407, 409 and 409 m. Standing, it
+    counted 13.2 m in the 37 s before the run and 10.9 m in the 68 s after. The watch read 1613.0 m over the run
+    (+0.81%) and logged positions only while moving.
+  - **The road run (2026-11-13).** Over the 3,596 s both recorded, the phone read 9182.1 m against the watch's 9034.0 m
+    (+1.64%).
+  - **The signal was good.** iOS's accuracy on the track: median 2.2 m, worst 7.4 m. No accuracy cut changes the
+    distance, so D267's "no accuracy cut" stands.
+  - **Each fix on the same raw fixes** (the measure's table): positions averaged over 9 fixes with no distance under
+    0.5 m/s read 1613.4 m on the track (+0.84%) and -0.96% against the watch on the road; over 5 fixes, 1626.0 m
+    (+1.62%) and -0.14%; iOS's speed times time, +1.41% and -2.96%. 0.5 m/s and 1 m/s gave the same distance on every
+    row.
+- **The finding.** The recorder is long for two reasons, both in how it counts and neither in the signal. Running, it
+  joins one fix a second, each a little to one side of the true path, into a slight zig-zag that is about 2% longer
+  than the path. Standing, it counts the fixes' drift as distance.
+- **The coaching argument.** D267's still holds: a recorder that reads long writes a pace too fast into every chart that
+  reads the log, the next program's seed included. At Mario's 10:40 a mile, 2.6% long is about 17 s a mile of pace he
+  did not run, and standing at a light or on the start line adds distance he never covered. The fix brings the phone to
+  the watch's own accuracy on the known distance (+0.84% against the watch's +0.81%), which is as close as the
+  reference itself.
+- **What changes (`core/src/gps/`, the math every run is counted by):**
+  1. **A steadied line.** Before distance is summed, each valid fix of a stretch (D267: a stretch is the fixes between
+     Start, a pause and Finish) stands at the mean position of itself and up to 4 valid fixes either side in the same
+     stretch: 9 fixes, fewer near a stretch's ends. Distance is the sum between consecutive steadied positions. No
+     average reaches across a pause.
+  2. **Nothing while standing.** A step into a fix whose iOS speed is valid (0 or more) and under 0.5 m/s adds no
+     distance. A fix with no valid speed (iOS's -1) counts as before. A walk, about 1.4 m/s, still counts.
+  3. **What reads it.** The distance, the average pace, the mile splits and the pace of the mile in progress all come
+     from the new count. While a run records, the last few seconds have fewer later fixes to steady them, so the live
+     distance can settle by a metre or two over the next 4 seconds; a finished run's count is fixed.
+  4. **Every run is counted again.** The raw files do not change, so every run on the phone, Nov 13's and the track's
+     included, shows its new count the next time it is opened.
+  5. **The gate is met on the runs already recorded.** D272's track test judges the recorder, and the recorder is the
+     plugin and this math; the plugin does not change, so the build proves the gate by running the two runs' raw fixes
+     through the new math (the measure's row: track +13.4 m against 32 m allowed; road -0.96% against 2%), and the
+     result goes into `tests/measure/gps-recording_track-test.md`. Save to the day (D272 items 3 to 5) may then build,
+     in its own release.
+- **Where the numbers come from:** 9 fixes and 0.5 m/s are read off the measure, not invented. 5 fixes left the track at
+  +1.62%; 9 is the smaller of the two windows tried that brings the track within the watch's own accuracy. 0.5 m/s is
+  the lower of the two speeds tried, which gave the same distance, so a slow jog never loses distance to it.
+- **What deliberately does not change:** the plugin and the raw file it writes (D267 item 2: record raw, judge later);
+  the GPX the recorder shares, which keeps every raw position so the comparison sees what the phone saw; the run card,
+  the log and the program (no recorded run reaches the log until Save to the day builds behind the gate); the time,
+  which was never wrong. iOS's speed reading is not used for distance: it read 2.96% short on the road.
+- **Blast radius:** the iOS app's Run recorder (the Angular screen and `core/src/gps/`); every recorded run's distance,
+  pace and splits on its screen. The page on Pages, the Expo beta (no recorder yet) and every program are untouched.
+- **Tests (`tests/unit/gps-recording.test.ts`, hand oracles; each new one fails on v0.262.4 but the -1 speed test, which
+  guards behaviour that must not change and says so in its file):** a track north at 3 m/s whose
+  fixes alternate 2 m east and west of the line reads 5 m a second as recorded (a 3, 4, 5 triangle); steadied over 9
+  fixes, an interior step's east wobble is 4/9 m, so each interior step reads √(9 + 16/81) m, about 3.03 m; standing
+  fixes at 0.3 m/s add nothing while a fix at 0.6 m/s counts; a fix whose speed is -1 counts as before; no steadied
+  position draws on a fix across a pause; a mile split falls on the new count. The unchanged D267 tests (the meridian
+  degree, a pause's gap, a straight track's splits, the GPX) keep their oracles: a straight line at a steady speed
+  steadies onto itself.
+- **Recommendation.** Ship it, as a PATCH (0.262.5 if no other chat takes it first): the recorder read long, and this
+  is a fix with no new capability, no stored format and no program output. The strongest case against: two runs are
+  few, and the road column is judged against the watch, not a known distance. Every future run is recorded raw, so if
+  a later run disagrees, the window is re-ruled and every run is counted again without anything lost.
+- **Calls for Mario:** (1) concur with 9 fixes and 0.5 m/s; (2) PATCH for the build, with Save to the day after it in
+  its own release.
