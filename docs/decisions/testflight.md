@@ -282,3 +282,7 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   `frontends/native`. The notices read `testflight 0.262.4 processed (uploaded before this run; a version goes up
   once, a fix is the next PATCH)` and `testflight next 0.262.4 (118) processed`. The run ended green: 6 jobs
   passed and 8 skipped by rule.
+- **On Mario's phone, build 118** (his report, 2026-11-17, no screenshot): "yep all good", to five steps on IA Next
+  build 118: Reopen on a done lift, the add button beside the tags, the add sheet and a pick, the toast and the
+  added card with its remove, the remove and its toast. Nothing differed and no motion was named, so nothing was
+  fixed from it (`docs/decisions/session-sheet.md`, the build 118 entry).

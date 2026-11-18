@@ -231,3 +231,16 @@ record of the sheet as a screen, from the React Native migration on.
   `frontends/app/test/unit` are kept, each model's copy held to the byte.
 - **Next for the sheet:** nothing of its own. The run's log, its wheels, its Log and its sport picker come with the
   cardio sheet; the jog's Edit cardio with the rest sheet.
+
+## On Mario's phone, IA Next build 118 (2026-11-17)
+
+- **The build:** `0.262.4 (118)`, uploaded by run 44185429056 on `main` (merge 6e9b9bf, pull request 51) and read
+  back as processed (`docs/decisions/testflight.md`, the fourteenth run). It carries the sheet's second session.
+- **What he was asked,** five steps: Reopen on a done lift (the sheet slides up); the add button on the header
+  beside the tags; the add sheet and its slide, and a pick; the pick's toast and the added card under Added by you
+  with its remove; the remove and its toast. His program has no test week, so the 1RM card was not asked of him.
+  He first asked which button and which sheet were meant, and was given the five steps with their words.
+- **His report,** one line, no screenshot: "yep all good".
+- **What follows:** nothing differed from today's app and no motion was named (`MIGRATION.md` section 6, decision
+  14), so nothing was fixed from it. The sheet's second session stands as built, and the sheet is whole but for
+  the run's log, which is the cardio sheet's.
