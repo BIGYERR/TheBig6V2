@@ -868,13 +868,13 @@ describe('native session sheet: which files write, and what the screen calls', (
     assert.ok(sheet.includes('const next = moveRpe(f, v);\n    hold(next);\n    persistLog(session, next, cardioNow.current.dose, false, Date.now());'));
     assert.ok(sheet.includes('if (f.touched && f.rpe === String(v)) return;'), 'a drag that stays on its number saves once');
     assert.ok(sheet.includes('const next = typeNotes(formNow.current, text);\n    hold(next);\n    persistLog(session, next, cardioNow.current.dose, false, Date.now());'));
-    assert.ok(sheet.includes('const r = tapStatus(session, formNow.current, cardioNow.current.dose, title, st, Date.now());\n    if (r.closed) rest.reset();\n    if (r.toast) say(r.toast);'), 'the tap\'s toast is raised, and a status set stops the rest clock');
+    assert.ok(sheet.includes('const r = tapStatus(session, formNow.current, cardioNow.current.dose, title, st, Date.now());\n    if (r.toast) say(r.toast);'), 'the tap\'s toast is raised');
     assert.ok(sheet.includes('if (!r.closed) { setView((v) => ({ ...v, foot: footOf(store, prog, open.week, open.dayKey) })); return; }'), 'an undo draws the foot again and nothing else');
     assert.ok(sheet.includes('if (r.popup) away(() => onDone(prog, open.week, open.dayKey)); else away(onClose);'));
     assert.ok(sheet.includes("onPress={() => status(btn.status, view.footTitle)}") && sheet.includes("onPress={() => status('complete', blk.title)}"));
   });
   test('an edit draws the whole sheet again: every field and the log\'s form afresh', () => {
-    assert.ok(sheet.includes('const next = sheetView(store, g, open.week, open.dayKey, Date.now());\n    if (!next) return;\n    setView(next);\n    apply(sheetFields(next));\n    hold(formOf(logOf(next)));\n    holdCardio(cardioOf(next, g));\n    setDrawn((n) => n + 1);\n    rest.resetIfIdle();\n    setSetsOpen({});'));
+    assert.ok(sheet.includes('const next = sheetView(store, g, open.week, open.dayKey, Date.now());\n    if (!next) return;\n    setView(next);\n    apply(sheetFields(next));\n    hold(formOf(logOf(next)));\n    holdCardio(cardioOf(next, g));\n    setDrawn((n) => n + 1);\n    setSetsOpen({});'));
   });
   test('the sheet draws every block of its frame, and the run\'s fields inside its log', () => {
     assert.ok(sheet.includes('drawnBlocks(frame).map('));
@@ -935,6 +935,6 @@ describe('native session sheet: which files write, and what the screen calls', (
     const app = read('App.tsx');
     assert.ok(app.includes('onSheet={setSheet}'));
     assert.ok(app.includes('onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />'), 'Done closes the sheet and raises the completion pop-up over This Week');
-    assert.ok(app.includes('<SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} rest={rest} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}'));
+    assert.ok(app.includes('<SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}'));
   });
 });

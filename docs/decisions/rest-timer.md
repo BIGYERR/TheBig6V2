@@ -77,5 +77,14 @@ Tests: the island and PWA clock tests in `tests/integration/rest-timer.test.ts` 
   is measured.
 - **Amends:** "D233 and D235 in the Expo app" above, as far as it built the floating timer; `MIGRATION.md` section
   6, decision 15, and phase 4's entry gate.
-- **Tests:** written with the build.
-- **Release:** not yet built.
+- **Built the same session** (Progress's, `chat/progress`): `frontends/native/src/rest-timer/` is gone (the model's
+  copy, the clock, the screen); `App.tsx` and `SessionSheet.tsx` name no timer (the clock, where it showed, and the
+  five calls that stopped or zeroed it). Today's model and its test stay with today's app.
+- **Tests:** `tests/unit/native-cardio-sheet.test.ts`, "native rest timer: there is none (D295 P-ISLANDONLY)": no
+  file of it, and neither the app, the day's sheet nor the deck names one; the page's timer and today's model are
+  still there. Its first test fails on the commit before (the folder is there). The timer's six tests and the
+  model's copy check left that file with it, and its 25 breaks left `tests/measure/native-cardio-sheet_breaks.md`,
+  run again whole: 122 breaks, none let through. One break of the session sheet's list named a line the removal
+  changed (the sheet's Back) and was pointed at the line as it stands, its rule unchanged, and run again alone: red.
+- **Seen on the simulator:** no tab on the edge of This Week, Progress or Bugs.
+- **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged.

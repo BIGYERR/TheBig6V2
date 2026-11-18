@@ -228,8 +228,20 @@ Each phase starts only on Mario's GO, one phase step per session.
   ruling of its own: until the recorder is built, Record run opens the run's hand log (D294 P-HANDLOGDOOR,
   `docs/decisions/this-week.md`). No new writer of core. Held equal to today's page: every `ia_` key after each of
   3,906 taps of the cardio log across the ten programs. The row's ledger rows are filled.
-- **Next:** Mario's phone on the next IA Next build (Record run on a run, the wheels, Log, the sport picker, a done
-  run's Reopen, the rest timer). Then Progress (row 4 of phase 3). Still not
+- **Done, phase 3's ninth session, row 4's first of two (Post-v0.262.4, no build):** his phone on IA Next build
+  119 ("All good"), and in the same line his ruling that the beta's floating rest timer comes out and returns on
+  the Dynamic Island in phase 4 (D295 P-ISLANDONLY, decision 15), built at once. Then today's Progress measured
+  (`tests/measure/native-progress_today.md`), the cut put to Mario and taken as two sessions ("Two sessions"), and
+  the first built (`docs/decisions/progress.md`, the Expo app's entry): a Progress tab, the program chips and the
+  archived bar with Restore and Delete Forever, the empty states, the weekly dot charts, the Lift Ledger, the
+  Session Journal and the 1RM estimator, from today's six model files and the page's readers ported line for line
+  (`frontends/native/src/progress/`). The run cards are in the view, held equal to today's, and not drawn yet. No
+  new reader or writer of core. Held equal to today's page: the whole view and every `ia_` key after each of 250,
+  150 and 120 taps across the ten programs (the standard history, runs logged with a pace, a second program
+  archived, restored and deleted). 213 breaks, none let through. The row's ledger rows are filled.
+- **Next:** Mario's phone on the next IA Next build (the Progress tab, a chip, the ledger, the journal, the
+  estimator, an archived program's bar; no rest timer). Then the row's second session: the eight run cards drawn
+  (a card's head, body and footer from the page's markup, its chart through `SvgPicture`). Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
@@ -503,7 +515,7 @@ The order is the session's reading of what Mario uses daily (no usage numbers ex
 | 1 | The swipe deck: cards, set logging, Call it | 2 |
 | 2 | The session sheet and its log (wheels, set rows, the RPE card, the 1RM card) | 3 |
 | 3 | The run card, the cardio sheet, the rest timer (no Live Activity yet; the floating timer taken out again, decision 15) | 1 to 2 (taken in 1) |
-| 4 | Progress: journal, charts, ledger, estimator | 2 to 3 |
+| 4 | Progress: journal, charts, ledger, estimator | 2 to 3 (taken in 2: the run cards' drawing second) |
 | 5 | The program list and its sheets (goal, mile, mile lock, injury and travel, rest day) | 2 to 3 |
 | 6 | The wizard and generating | 2 |
 | 7 | Swap, add, Random Workout, pop-ups, the toast, the Bugs tab, backup, theme | 1 to 2 |

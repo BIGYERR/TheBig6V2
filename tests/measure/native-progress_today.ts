@@ -233,7 +233,7 @@ say();
 // ── C. The estimator ────────────────────────────────────────────────────────
 say('## C. The estimator');
 say();
-say('- It reads the two typed numbers and the picked lift (a page global, `calcLift`, Deadlift at launch), and the viewed program\'s unit for the word after the number. It stores nothing.');
+say('- It reads the two typed numbers and the picked lift (a page global, `calcLift`, Deadlift at launch), and for the word after the number the active program\'s unit, else the wizard\'s draft, else pounds (not the viewed program\'s). It stores nothing.');
 say('- `estimate1RM`: ' + [['185', '5'], ['225', '1'], ['100', '10'], ['', '5'], ['135', '0']].map(([w, r]) => '`' + w + '` × `' + r + '` reads ' + (estimate1RM(w!, r!) ?? 'nothing')).join(', ') + '.');
 say();
 
@@ -248,7 +248,7 @@ say('| The four weekly dot charts | `ia_logs_<id>` (runs, rides, swims, the jog,
 say('| The eight run cards | `ia_logs_<id>`, `ia_hist_<id>`, the program\'s config (goal, mile) | core `readDayLogs`, `readDayHistory`, and `state-progress.ts`: `longestRunByWeek`, `runPacesByClass`, `easyPaceByWeek`, `recoveryPaceByWeek`, `plannedAndLoggedMiles`, `progressCutWeek`, `mileFromRecoveryPace`, `halfFromMilePace`; the page\'s `easyVsPrescribed` and `_steadyCeilingFor` (51 lines, not in core); today\'s model `run-charts-model.ts` | nothing |');
 say('| The Lift Ledger | `ia_exw_<id>`, `ia_hist_<id>`, the unit | core `readLiftLog`, `readDayHistory`, `exStoreKey`; the page\'s `ledgerModel` with `_slotOfEntry`, `_rxRangeFor`, `_setsOf`, `_deadliftLine` (159 lines, not in core); today\'s model `ledger-model.ts` | nothing |');
 say('| The Session Journal | `ia_logs_<id>` | core `readDayLogs`; today\'s model `journalWeeks`; the page\'s `restLogLines` and `RPE_LABELS` | nothing |');
-say('| The 1RM estimator | two typed numbers, the picked lift, the unit | today\'s model `estimate1RM` | nothing (the picked lift is kept in memory until the app closes) |');
+say('| The 1RM estimator | two typed numbers, the picked lift, the active program\'s unit | today\'s model `estimate1RM` | nothing (the picked lift is kept in memory until the app closes) |');
 say();
 say('- Today\'s models the Expo app would hold as today\'s files, byte for byte: `progress-model.ts` (272 lines), `program-chips-model.ts` (64), `charts/dot-chart-model.ts` (70), `charts/chart-card-model.ts` (63), `charts/run-charts-model.ts` (401), `charts/ledger-model.ts` (210).');
 say('- `weeklySums` also works out each week\'s best bench, squat and deadlift load and a session count. Nothing on the screen draws them (V167 took their charts off). Carried as they are.');

@@ -1,9 +1,10 @@
-// native-cardio-sheet: when one rule of the Expo app's cardio sheet or rest timer is broken, which test files go red?
+// native-cardio-sheet: when one rule of the Expo app's cardio sheet is broken, which test files go red? (The floating
+// rest timer's 25 breaks left this list with the timer itself: D295 P-ISLANDONLY, docs/decisions/rest-timer.md.)
 // Read-only on this checkout (measure). Each break changes one rule in a copy of the tree: a rule of the wheels
 // (frontends/native/src/day-detail/wheels.ts), of what a rolled wheel, the stepper, Log and the sport picker hold and
 // write (cardio-log.ts, and the picker's park in sheet-writes.ts), of the sheet drawn for one cardio alone
 // (sheet-screen.ts and the model's copy), of the screens' wiring and words (SessionSheet.tsx, CardioLogBlock.tsx,
-// Wheel.tsx, this-week/ThisWeek.tsx, App.tsx), or of the rest timer (rest-timer/). The fast files are run on each; the
+// Wheel.tsx, this-week/ThisWeek.tsx, App.tsx). The fast files are run on each; the
 // ten-program sweep is run only on a break the fast files let through. A break no file turns red on is a rule no
 // test holds.
 //
@@ -41,8 +42,6 @@ const D = 'frontends/native/src/day-detail/';
 const WHEELS = D + 'wheels.ts', LOG = D + 'cardio-log.ts', WRITES = D + 'sheet-writes.ts', SCREEN = D + 'sheet-screen.ts', MODEL = D + 'cardio-sheet-model.ts';
 const SHEET = D + 'SessionSheet.tsx', BLOCK = D + 'CardioLogBlock.tsx', WHEEL = D + 'Wheel.tsx';
 const WEEK = 'frontends/native/src/this-week/ThisWeek.tsx', APP = 'frontends/native/src/App.tsx';
-const R = 'frontends/native/src/rest-timer/';
-const CLOCK = R + 'rest-clock.ts', TIMER = R + 'RestTimer.tsx', RMODEL = R + 'rest-timer-model.ts';
 
 /**
  * [the file, the rule broken, the text it replaces (once in the file), its replacement]. A rule the code keeps in two
@@ -180,32 +179,6 @@ const BREAKS = [
   [WHEEL, 'a wheel does not snap to a row', "            snapToInterval={WHEEL_ROW}\n", ""],
   [WHEEL, 'a wheel asked to rest clears its timer and reads nothing', "if (t) { clearTimeout(t); settle(ci); }", "if (t) { clearTimeout(t); }"],
   [WHEEL, 'a wrapped column is not jumped back on the screen', "const y = offsets.current[ci]!, back = wheelRecentre(col, y);", "const y = offsets.current[ci]!, back = y;"],
-  // ── The rest timer ──
-  [APP, 'the rest clock is the monotonic one', "new RestClock(NO_ISLAND, performance, () => Date.now())", "new RestClock(undefined, performance, () => Date.now())"],
-  [APP, 'Mark the day done leaves the rest clock running', "onDone={(prog, week, dayKey) => { rest.reset(); setDeck(null);", "onDone={(prog, week, dayKey) => { setDeck(null);"],
-  [APP, 'the rest timer shows with no program', "showsOn(hasProg, tab === 'week'", "showsOn(true, tab === 'week'"],
-  [APP, 'a launch does not say whether a program is held', "    setHasProg(!!prog);\n", ""],
-  [SHEET, 'the open does not zero the idle rest clock', "  useEffect(() => { rest.resetIfIdle(); }, [rest]);\n", ""],
-  [SHEET, 'a redraw does not zero the idle rest clock', "    setDrawn((n) => n + 1);\n    rest.resetIfIdle();\n", "    setDrawn((n) => n + 1);\n"],
-  [SHEET, 'a status set does not stop the rest clock', "    if (r.closed) rest.reset();\n", ""],
-  [CLOCK, 'Reset leaves the time held', "    this.pause();\n    this.watch.reset();\n    this.changed();", "    this.pause();\n    this.changed();"],
-  [CLOCK, 'Reset does not tell the held time before the end', "    this.pause();\n    this.watch.reset();", "    this.watch.reset();"],
-  [CLOCK, 'a listener let go still hears', "return () => { this.heard = this.heard.filter((f) => f !== fn); };", "return () => {};"],
-  [CLOCK, 'the screen hears no change', "    this.heard.forEach((fn) => fn());\n", ""],
-  [CLOCK, 'the Live Activity is told nothing', "    syncIsland(this.island, this.watch);\n", ""],
-  [CLOCK, 'the button only ever starts', "if (this.watch.running) this.pause(); else this.start();", "this.start();"],
-  [CLOCK, 'an idle reset is not heard', "if (this.watch.resetIfIdle()) this.changed();", "this.watch.resetIfIdle();"],
-  [CLOCK, 'the stand-in Live Activity is none at all', "new Stopwatch(stopwatchClock(island, perf, wall))", "new Stopwatch(stopwatchClock(undefined, perf, wall))"],
-  [RMODEL, 'the model\'s copy: the timer shows on This Week alone', "(screen === 'screenWeek' || screen === 'screenProgress' || screen === 'screenBugs')", "(screen === 'screenWeek')"],
-  [TIMER, 'the timer stands 100 points down', "const TOP = 200;", "const TOP = 100;"],
-  [TIMER, 'a running clock is drawn twice a second', "const TICK_MS = 33;", "const TICK_MS = 500;"],
-  [TIMER, 'the button reads Pause', "{running ? 'Stop' : 'Start'}", "{running ? 'Pause' : 'Start'}"],
-  [TIMER, 'the card\'s heading reads Rest', ">Rest Timer</Text>", ">Rest</Text>"],
-  [TIMER, 'a tap on the tab does not open the card', "if (tap && isTab) setOpen(true);", "if (tap && !isTab) setOpen(true);"],
-  [TIMER, 'a drag always docks to the right', "if (x !== null) setSide(snapSide(x, size.current.w, width));", "if (x !== null) setSide('right');"],
-  [TIMER, 'a jitter under 5 points moves the timer', "if (Math.abs(g.dx) > DRAG_THRESHOLD || Math.abs(g.dy) > DRAG_THRESHOLD) moved = true;\n        if (!moved) return;", "moved = true;\n        if (!moved) return;"],
-  [TIMER, 'Reset on the card starts the clock', "onPress={() => clock.reset()}", "onPress={() => clock.toggle()}"],
-  [TIMER, 'the readout reads a clock of its own', "const face = clockFace(clock.watch.now());", "const face = clockFace(0);"],
 ];
 
 /** The files run in the copy: per file, how many tests failed (a file that could not load counts as failed whole). */
@@ -230,7 +203,7 @@ const line = (list) => list.map((f) => '`' + f + '`').join(', ');
 /** The report from every break's row: [n, file, rule, {file: tests red}, whether the sweep was run]. */
 function report(rows, clean) {
   const say = [];
-  say.push('# The Expo app\'s cardio sheet and rest timer: a break per rule, and the test files each turns red');
+  say.push('# The Expo app\'s cardio sheet: a break per rule, and the test files each turns red');
   say.push('');
   say.push('Written by `node tests/measure/native-cardio-sheet_breaks.mjs` (read-only here; each break is made in a copy of the tree and put back).');
   say.push('');
