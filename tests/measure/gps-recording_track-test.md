@@ -42,6 +42,10 @@ phone within 2% of 1,600 m (32 m), and one road run within 2% of the watch. It i
 | Positions averaged over 9 fixes, no distance under 0.5 m/s | 1613.4 m, +0.84% | -0.96% |
 | Positions averaged over 9 fixes, no distance under 1 m/s | 1613.4 m, +0.84% | -0.96% |
 | iOS speed times time | 1622.6 m, +1.41% | -2.96% |
+| A fix kept only once it is 5 m from the last kept fix, iOS accuracy 50 m or better | 1632.4 m, +2.03% | +0.57% |
+| A fix kept only once it is 10 m from the last kept fix, iOS accuracy 50 m or better | 1622.0 m, +1.38% | -0.09% |
+| A fix kept only once it is 15 m from the last kept fix, iOS accuracy 50 m or better | 1609.8 m, +0.61% | -0.77% |
+| The recorder's own count (core's gpsSummary) | 1665.9 m, +4.12% | +1.64% |
 
 ---
 
@@ -63,5 +67,9 @@ phone within 2% of 1,600 m (32 m), and one road run within 2% of the watch. It i
 - **Standing.** The road run's seconds both recorded hold no standing, so its column is the same with and without the
   speed cut. On the track 0.5 m/s and 1 m/s give the same distance on every row: the result does not hang on the exact
   number.
+- **The 10 m rule (D293 as revised).** A fix kept only once it is 10 m from the last kept fix, iOS accuracy 50 m or
+  better: 1622.0 m on the track (+1.38%, 22.0 m over against 32 m allowed) and -0.09% against the watch on the road. The
+  9 fix mean first proposed read closer on the track (+0.84%) but depends on speed (`gps-recording_speed.md`), and was
+  withdrawn. 5 m leaves the track 32.4 m over, just outside the gate; 15 m reads +0.61% and -0.77%.
 - **Not this.** iOS's own speed reading times time read 1.41% long on the track and 2.96% short on the road: it does not
   follow the distance either way.

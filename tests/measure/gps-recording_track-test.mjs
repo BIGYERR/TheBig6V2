@@ -5,7 +5,7 @@
 //   node tests/measure/gps-recording_track-test.mjs <track.gpx> <track.fit> <road.gpx> <road.fit>
 // Its output is saved beside it as gps-recording_track-test.md.
 import fs from 'node:fs';
-import { fitSessions, fitTrack, formatClock, gpsDistanceM, readFit } from '../../core/src/index.ts';
+import { fitSessions, fitTrack, formatClock, gpsDistanceM, gpsSummary, readFit } from '../../core/src/index.ts';
 
 const KNOWN_M = 1600;
 const [trackGpx, trackFit, roadGpx, roadFit] = process.argv.slice(2);
@@ -43,6 +43,17 @@ function averaged(pts, k) {
 function counted(pts, thr) {
   let d = 0;
   for (let i = 1; i < pts.length; i++) if (thr === null || (pts[i].spd ?? Infinity) >= thr) d += gpsDistanceM(pts[i - 1], pts[i]);
+  return d;
+}
+/** Distance joining only the fixes kept: a fix with iOS accuracy 50 m or better, at least m metres from the last kept. */
+function stepped(pts, m) {
+  let d = 0, last = null;
+  for (const p of pts) {
+    if (p.ha !== undefined && p.ha > 50) continue;
+    if (!last) { last = p; continue; }
+    const s = gpsDistanceM(last, p);
+    if (s >= m) { d += s; last = p; }
+  }
   return d;
 }
 function doppler(pts) {
@@ -119,3 +130,12 @@ for (const k of [1, 5, 9]) {
   }
 }
 console.log(`| iOS speed times time | ${doppler(tp).toFixed(1)} m, ${pct(doppler(tp), KNOWN_M)} | ${pct(doppler(rIn), rRef)} |`);
+for (const m of [5, 10, 15]) {
+  const t = stepped(tp, m), r = stepped(rIn, m);
+  console.log(`| A fix kept only once it is ${m} m from the last kept fix, iOS accuracy 50 m or better | ${t.toFixed(1)} m, ${pct(t, KNOWN_M)} | ${pct(r, rRef)} |`);
+}
+// What the recorder itself counts: the GPX's fixes (each run is one stretch) read back as the plugin's lines, between a
+// start and a finish mark, through core's gpsSummary. Before D293's build it equals "Positions as recorded"; after it,
+// this is the gate's proof on the new math.
+const own = (pts) => gpsSummary([{ t: pts[0].t, mark: 'start' }, ...pts.map(({ t, lat, lon, ha, spd }) => ({ t, lat, lon, ha: ha ?? 0, ...(spd === undefined ? {} : { spd }) })), { t: pts.at(-1).t, mark: 'finish' }]).distanceM;
+console.log(`| The recorder's own count (core's gpsSummary) | ${own(tp).toFixed(1)} m, ${pct(own(tp), KNOWN_M)} | ${pct(own(rIn), rRef)} |`);
