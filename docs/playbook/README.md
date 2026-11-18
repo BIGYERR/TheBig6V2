@@ -103,7 +103,9 @@ as a local failure.
 - `docker` builds the production image, waits for its health check, and confirms `/healthz` reports the commit under
   test.
 - Give jobs headroom: Iron Asylum's test job needed 25 minutes, not 15, after a slow runner took twice as long and cut
-  off a run that had no failing test.
+  off a run that had no failing test; and 40, not 25, once the suite had grown (the same commit took 12 minutes on
+  one runner and 21 on another). Set a limit from the slowest run seen, not the usual one, and look again when the
+  suite grows.
 
 ### 5. Heroku: one dyno, deployed from `main` by itself
 

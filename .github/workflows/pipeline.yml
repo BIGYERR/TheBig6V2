@@ -61,7 +61,10 @@ jobs:
     runs-on: ubuntu-latest
     # 25, not 15 (Mario, Post-v0.245.0): the suite runs about 8 minutes, and a slow runner took every file 1.7 to 2.2
     # times longer and cut a run with no failing test at 15 (run 40200902811, attempt 1).
-    timeout-minutes: 25
+    # 40, not 25 (Post-v0.262.4): the suite has grown to 12 to 15 minutes on a fast runner and 21 on a slow one (716 s
+    # to 1,250 s for one commit, b720e61), and a slow runner was cut at 25 with no failing test (run 44220188402,
+    # attempt 1, on a14849a; the same commit's pull request run passed in 910 s).
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
