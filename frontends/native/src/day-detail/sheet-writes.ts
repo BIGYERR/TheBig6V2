@@ -6,6 +6,7 @@
 // LogForm instead of the screen:
 //
 //   persistLogFields, cardioLive, handleDayStatus, clearPartSkips, settleParts     day-status.ts
+//   setCardioSwap's park (parkSport)                                               day-status.ts
 //   updateRPEDisplay (the mark that the slider was moved, D219)                    log-entries.ts
 //   releaseSeasonShown                                                             popups-streaks-reminders.ts
 //
@@ -18,11 +19,11 @@
 //   save, update (the 1RM card; the legacy saveTestMax and e1rmCalcUpdate)         e1rm-card.ts (the Angular card)
 //
 // The store is this app's own SQLite store and nothing else. tests/integration/native-session-sheet.test.ts holds it
-// equal to today's page, key for key, after the same taps on the same keys. Not here: the cardio log's wheels, its
-// Log and its sport picker, which the sheet does not draw yet.
+// equal to today's page, key for key, after the same taps on the same keys. The cardio log's wheels, its Log and its
+// sport picker are cardio-log.ts's, which saves through persistLog here.
 import type { Day } from '@ia/core';
 import { addAddEdit, dropAddEdit } from '@ia/core/engine/state-day-edits.ts';
-import { cardioEntryLogged, dayStoreKey, readDayLogs, writeDayLogs } from '@ia/core/engine/state-day-log.ts';
+import { CARDIO_PARK_FIELDS, cardioEntryLogged, dayStoreKey, readDayLogs, writeDayLogs } from '@ia/core/engine/state-day-log.ts';
 import { clearDayParts, clearDayStatus, dayStatus, setDayStatus, settleDayParts } from '@ia/core/engine/state-day-status.ts';
 import { readPrograms, writePrograms } from '@ia/core/engine/state-programs.ts';
 import { _swapDetailFor } from '@ia/core/engine/swap-prefs.ts';
@@ -50,7 +51,7 @@ export interface LogForm {
 }
 
 /** The cardio nodes a draw puts on the page, by id (cardio-fields.ts's template over cardio-fields-model.ts). */
-function nodesOf(f: CardioFields): Record<string, string> {
+export function nodesOf(f: CardioFields): Record<string, string> {
   if (f.kind === 'time' || f.kind === 'dist') return { [f.first.hiddenId]: f.first.value, [f.second.hiddenId]: f.second.value };
   if (f.kind === 'reps_dist' || f.kind === 'reps_time') return { log_run_reps: f.stepper.stored, [f.wheel.hiddenId]: f.wheel.value };
   if (f.kind === 'run') return { [f.dist.hiddenId]: f.dist.value, [f.pace.hiddenId]: f.pace.value };
@@ -73,7 +74,7 @@ export function typeNotes(f: LogForm, text: string): LogForm { return { ...f, no
 const dayOf = (s: Session): Day | null | undefined => { const wk = s.prog.weeks[s.week]; return ((wk && wk[s.dayKey]) || null) as unknown as Day | null; };
 
 /** The page's cardioLive: the stored entry holds a number for the sport the card is on. No wrap is never live. */
-function cardioLive(s: Session, f: LogForm): boolean {
+export function cardioLive(s: Session, f: LogForm): boolean {
   if (!f.wrap) return false;
   const sport = f.wrap.active || f.wrap.planned || '';
   return cardioEntryLogged(readDayLogs(s.store, s.prog.id)[dayStoreKey(s.week, s.dayKey)], sport);
@@ -122,6 +123,31 @@ export function persistLog(s: Session, f: LogForm, dose: Dose | null, commit: bo
   }
   writeDayLogs(s.store, s.prog.id, logs as never);
   settleDayParts(s.store, s.prog.id, s.week, s.dayKey, dayOf(s), now);
+}
+
+/**
+ * The park of the page's setCardioSwap (V234 D213), the part of the sport picker that writes: the day's entry read
+ * back; when the sport changes, the leaving sport's numbers park on the entry and leave its top level, the arriving
+ * sport's come back from the park, and the entry is stored. A tap on the sport the card is on stores nothing.
+ * Returns the entry, which the new sport's fields are then drawn from (cardio-log.ts swapSport).
+ */
+export function parkSport(s: Session, leaving: string, sport: string): Record<string, unknown> {
+  const logs = readDayLogs(s.store, s.prog.id) as unknown as Record<string, Record<string, unknown>>;
+  const key = dayStoreKey(s.week, s.dayKey);
+  const e: Record<string, unknown> = logs[key] || {};
+  if (sport !== leaving) {
+    const P: Record<string, Record<string, unknown>> = Object.assign({}, (e['parked'] as Record<string, Record<string, unknown>>) || {});
+    const out: Record<string, string> = {};
+    (CARDIO_PARK_FIELDS[leaving] || []).forEach((f) => { out[f] = (e[f] == null ? '' : String(e[f])); e[f] = ''; });
+    if (Object.keys(out).some((f) => out[f] !== '')) P[leaving] = out; else delete P[leaving];
+    const back = P[sport] || null;
+    (CARDIO_PARK_FIELDS[sport] || []).forEach((f) => { e[f] = (back && back[f] != null) ? back[f] : ''; });
+    delete P[sport];
+    if (Object.keys(P).length) e['parked'] = P; else delete e['parked'];
+    logs[key] = e;
+    writeDayLogs(s.store, s.prog.id, logs as never);
+  }
+  return e;
 }
 
 /** What a tap on Done or Skip did: the toast it raises, whether the sheet closes, and whether the completion pop-up follows. */

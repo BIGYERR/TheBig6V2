@@ -393,10 +393,10 @@ describe('native deck: the screen', () => {
     assert.ok(code.includes("if (kind === 'rest') return 1;"), 'a plain card is covered whole');
   });
 
-  test('This Week\'s Start lift and Start session open it, over the tab bar; a sunk button and the run\'s buttons open nothing', () => {
+  test('This Week\'s Start lift and Start session open it, over the tab bar; a sunk button opens nothing', () => {
     const week = strip(readFileSync(join(REPO, 'frontends/native/src/this-week/ThisWeek.tsx'), 'utf8'));
-    assert.ok(week.includes("const starts = !!bt && bt.act === 'deck' && !bt.sunk;"));
-    assert.ok(week.includes('disabled={!starts}') && week.includes('onPress={start}'));
+    assert.ok(week.includes('const starts = !!bt && !bt.sunk;'));
+    assert.ok(week.includes('disabled={!starts}') && week.includes("onPress={() => tap('button')}") && week.includes("if (r.to === 'deck') start();"));
     assert.ok(week.includes('const view = deckView(store, grid, week, key, Date.now(), warn);') && week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from);'));
     const app = strip(readFileSync(join(REPO, 'frontends/native/src/App.tsx'), 'utf8'));
     assert.ok(app.includes('onDeck={(open, from) => setDeck({ open, from })}') && app.includes('<DeckOpening palette={p} store={phoneStore} open={deck.open} from={deck.from} calm={calm} under={under} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}'));

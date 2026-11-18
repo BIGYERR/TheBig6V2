@@ -27,6 +27,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 
 import { asyIcon } from '@ia/core/engine/icons.ts';
+import { dayStatus } from '@ia/core/engine/state-day-status.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { AddSheet } from '../add-sheet/AddSheet';
@@ -37,18 +38,22 @@ import type { DeckProgram, Fields } from '../deck/deck-screen';
 import { type SwapOpen, swapSheetOf } from '../deck/deck-swaps';
 import { type Session, acceptNudge, act, dismissNudge, leftField, nudgeWords, swapMove, tapFill, tapLog, tapReuse, tapStep, undoSwap } from '../deck/deck-writes';
 import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from '../deck/set-fields';
+import type { RestClock } from '../rest-timer/rest-clock';
 import { SwapNudge } from '../swap-nudge/SwapNudge';
 import { SwapSheet } from '../swap-sheet/SwapSheet';
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { WildcardMark } from '../this-week/marks';
 import { PLAN_CHANGE_FAILED } from '../this-week/week-screen';
 import type { CardioCardView } from './cardio-card-model';
+import { type CardioLog, cardioLogOf, logCardio, setNode, stepReps, swapSport, togglePicker } from './cardio-log';
+import { CardioLogBlock, type CardioTaps } from './CardioLogBlock';
 import type { E1rmCard, FootButton } from './day-detail-model';
 import type { ExCard, ExView, Rx, SectionView } from './session-sections-model';
 import { addSheetOf } from './sheet-adds';
 import { RPE_LABELS } from './sheet-readers';
-import { RPE_INFO, type SheetOpen, type SheetProgram, drawnBlocks, footOf, logOf, sheetFields, sheetMoves, sheetView, tokenOf } from './sheet-screen';
-import { type LogForm, type MaxSaved, addMove, e1rmEstimate, formOf, moveRpe, persistLog, removeAdded, saveTestMax, tapStatus, typeNotes } from './sheet-writes';
+import { RPE_INFO, type SheetOpen, type SheetProgram, type SheetView, drawnBlocks, footOf, logOf, sheetDay, sheetFields, sheetFrame, sheetMoves, sheetView, tokenOf } from './sheet-screen';
+import { type LogForm, type MaxSaved, addMove, cardioLive, e1rmEstimate, formOf, moveRpe, persistLog, removeAdded, saveTestMax, tapStatus, typeNotes } from './sheet-writes';
+import type { WheelFlushers } from './Wheel';
 
 /** motion.css: the overlay's slide, cubic-bezier(.32,.72,0,1), 400 ms in and 360 ms out. */
 const SLIDE = Easing.bezier(0.32, 0.72, 0, 1);
@@ -93,8 +98,10 @@ interface Handlers {
   remove: (name: string) => void;
 }
 
-export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, onProgram, onOver, say }: {
+export function SessionSheet({ palette: p, store, open, calm, rest, onClose, onDone, onProgram, onOver, say }: {
   palette: Palette; store: StateStore; open: SheetOpen; calm: boolean;
+  /** The rest timer's clock: zeroed while idle by every draw of the day, stopped at zero by Done or Skip (V221 D179). */
+  rest: RestClock;
   /** The sheet is gone, by Back or after a Skip. */
   onClose: () => void;
   /** Done: the day is stored and the sheet has slid away; the app raises the completion pop-up over This Week. */
@@ -121,6 +128,19 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
   const [form, setForm] = useState<LogForm>(() => formOf(logOf(open.view)));
   const formNow = useRef(form);
   const hold = (f: LogForm): void => { formNow.current = f; setForm(f); };
+  /** The log's cardio card: its fields, the dose they were drawn with, the picker and the note (cardio-log.ts). */
+  const cardioOf = (v: SheetView, g: SheetProgram): CardioLog => { const day = sheetDay(g, v.week, v.dayKey); return cardioLogOf(logOf(v), day && day.cardio, v.dose); };
+  const [cardio, setCardio] = useState<CardioLog>(() => cardioOf(open.view, open.prog));
+  const cardioNow = useRef(cardio);
+  const holdCardio = (c: CardioLog): void => { cardioNow.current = c; setCardio(c); };
+  /** Counts the cardio fields' draws, so each draw starts its wheels afresh (the page's iaWheelInit). */
+  const [drawn, setDrawn] = useState(0);
+  /** The wheels still settling: each rests at once before a tap reads the form (the page's iaWheelFlush). */
+  const flushers = useRef<WheelFlushers>({ list: [] }).current;
+  const flush = (): void => { flushers.list.forEach((f) => f()); };
+  // The page's openDetail zeroes a stopped rest clock on every draw of the day (the open here, each redraw below),
+  // and leaves a running one. An undo draws the foot alone, and leaves the clock be.
+  useEffect(() => { rest.resetIfIdle(); }, [rest]);
   const [setsOpen, setSetsOpen] = useState<Record<string, boolean>>({});
   const [info, setInfo] = useState(false);
   const rxOf = useMemo(() => {
@@ -169,6 +189,9 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
     setView(next);
     apply(sheetFields(next));
     hold(formOf(logOf(next)));
+    holdCardio(cardioOf(next, g));
+    setDrawn((n) => n + 1);
+    rest.resetIfIdle();
     setSetsOpen({});
   };
 
@@ -278,25 +301,52 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
     if (f.touched && f.rpe === String(v)) return;
     const next = moveRpe(f, v);
     hold(next);
-    persistLog(session, next, view.dose, false, Date.now());
+    persistLog(session, next, cardioNow.current.dose, false, Date.now());
   };
   const noted = (text: string): void => {
     const next = typeNotes(formNow.current, text);
     hold(next);
-    persistLog(session, next, view.dose, false, Date.now());
+    persistLog(session, next, cardioNow.current.dose, false, Date.now());
+  };
+
+  // ── The cardio's hand log: the wheels, the stepper, Log and the sport picker (cardio-log.ts) ──
+  const cardioTaps: CardioTaps = {
+    held: (id) => formNow.current.nodes[id] || '',
+    set: (id, value) => { hold(setNode(session, formNow.current, cardioNow.current, id, value, Date.now())); },
+    step: (delta) => { const r = stepReps(session, formNow.current, cardioNow.current, delta, Date.now()); hold(r.form); holdCardio(r.log); },
+    log: () => {
+      flush();
+      const toast = logCardio(session, formNow.current, cardioNow.current, Date.now());
+      if (toast) say(toast);
+      // The Log tap is a write like any other: the form's state is set again so the button reads the store afresh.
+      hold({ ...formNow.current });
+    },
+    picker: () => holdCardio(togglePicker(cardioNow.current)),
+    chip: (sport) => {
+      flush();
+      const r = swapSport(session, formNow.current, cardioNow.current, sport, Date.now());
+      hold(r.form);
+      holdCardio(r.log);
+      setDrawn((n) => n + 1);
+    },
   };
 
   // ── Done and Skip (handleDayStatus) ──
   const status = (st: 'complete' | 'skipped', title: string): void => {
     if (leaving.current) return;
     leave();
-    const r = tapStatus(session, formNow.current, view.dose, title, st, Date.now());
+    // A tap that sets a status rests every wheel first; the undo does not (handleDayStatus, V221 D179).
+    if (dayStatus(store, prog.id, open.week, open.dayKey) !== st) flush();
+    const r = tapStatus(session, formNow.current, cardioNow.current.dose, title, st, Date.now());
+    if (r.closed) rest.reset();
     if (r.toast) say(r.toast);
     if (!r.closed) { setView((v) => ({ ...v, foot: footOf(store, prog, open.week, open.dayKey) })); return; }
     if (r.popup) away(() => onDone(prog, open.week, open.dayKey)); else away(onClose);
   };
 
   const log = logOf(view);
+  /** The sheet as it draws: the whole day, or the one cardio it was opened for (D278 item 3). */
+  const frame = sheetFrame(view, open.only, prog);
   const rpeText = form.touched ? form.rpe + ' — ' + (RPE_LABELS[+form.rpe] || '') : log.view.rpeText;
 
   const card = (x: ExView, k: number, inBlock: boolean, last: boolean) => (
@@ -354,27 +404,29 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
             <Text style={[s.back, { color: on(0.6) }]}>‹ Back</Text>
           </Pressable>
           <View style={s.topright}>
-            {view.counter !== null && <Text testID="sheet-counter" style={[s.counter, { backgroundColor: p.onBand }]}>{view.counter}</Text>}
+            {frame.counter !== null && <Text testID="sheet-counter" style={[s.counter, { backgroundColor: p.onBand }]}>{frame.counter}</Text>}
             <Pressable testID="sheet-rpeinfo" accessibilityRole="button" accessibilityLabel="What is RPE?" hitSlop={8} onPress={() => setInfo(true)} style={[s.rpeBtn, { borderColor: on(0.3) }]}>
               <Text style={[s.rpeBtnText, { color: p.onBand }]}>RPE ⓘ</Text>
             </Pressable>
           </View>
         </View>
-        <Text testID="sheet-over" style={[s.over, { color: p.onBand }]}>{view.over}</Text>
-        <Text testID="sheet-title" style={[s.title, { color: p.onBand }]}>{view.title}</Text>
+        <Text testID="sheet-over" style={[s.over, { color: p.onBand }]}>{frame.over}</Text>
+        <Text testID="sheet-title" style={[s.title, { color: p.onBand }]}>{frame.title}</Text>
         <View style={s.tagrow}>
           <View testID="sheet-tags" style={s.tags}>
-            {view.tags.chips.map((t, k) => <Text key={k} style={[s.tag, { color: tokenColor(p, t.color, p.onBand), backgroundColor: tokenColor(p, t.bg, on(0.12)) }]}>{t.label}</Text>)}
-            {view.tags.travel && <View style={[s.tag, s.travel, { borderColor: on(0.3) }]}><Icon name="backpack" size={11} color={p.onBand} /><Text style={[s.travelText, { color: p.onBand }]}>Travel</Text></View>}
+            {frame.tags.chips.map((t, k) => <Text key={k} style={[s.tag, { color: tokenColor(p, t.color, p.onBand), backgroundColor: tokenColor(p, t.bg, on(0.12)) }]}>{t.label}</Text>)}
+            {frame.tags.travel && <View style={[s.tag, s.travel, { borderColor: on(0.3) }]}><Icon name="backpack" size={11} color={p.onBand} /><Text style={[s.travelText, { color: p.onBand }]}>Travel</Text></View>}
           </View>
-          <Pressable testID="sheet-add" accessibilityRole="button" accessibilityLabel="Add an exercise to this day" hitSlop={8} onPress={openAdd}
-            style={({ pressed }) => [s.addBtn, { backgroundColor: on(pressed ? 0.2 : 0.1), borderColor: on(0.3) }]}>
-            <SvgXml xml={PLUS} color={p.onBand} width={12} height={12} /><Text style={[s.addBtnText, { color: p.onBand }]}>Exercise</Text>
-          </Pressable>
+          {!frame.cardio && (
+            <Pressable testID="sheet-add" accessibilityRole="button" accessibilityLabel="Add an exercise to this day" hitSlop={8} onPress={openAdd}
+              style={({ pressed }) => [s.addBtn, { backgroundColor: on(pressed ? 0.2 : 0.1), borderColor: on(0.3) }]}>
+              <SvgXml xml={PLUS} color={p.onBand} width={12} height={12} /><Text style={[s.addBtnText, { color: p.onBand }]}>Exercise</Text>
+            </Pressable>
+          )}
         </View>
       </View>
       <ScrollView testID="sheet-body" style={{ flex: 1 }} contentContainerStyle={[s.body, { paddingBottom: 20 + insets.bottom }]} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
-        {drawnBlocks(view).map((blk, k) => {
+        {drawnBlocks(frame).map((blk, k) => {
           if (blk.kind === 'also') {
             return (
               <View key={k} testID="sheet-also" style={[s.also, { backgroundColor: 'rgba(' + p.inkRgb + ',0.06)', borderColor: p.border2 }]}>
@@ -422,6 +474,10 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
                     <Slider p={p} value={+form.rpe || 5} onChange={slid} />
                     <Text testID="sheet-rpe" style={[s.rpeWords, { color: p.text }]}>{rpeText}</Text>
                   </View>
+                  {log.view.cardio && form.wrap && (
+                    <CardioLogBlock p={p} card={log.view.cardio} c={cardio} nodes={form.nodes} active={form.wrap.active || form.wrap.planned} logged={cardioLive(session, form)}
+                      drawn={drawn} flushers={flushers} on={cardioTaps} />
+                  )}
                   <Text style={[s.logLabel, { color: p.muted }]}>Notes</Text>
                   <TextInput testID="sheet-notes" accessibilityLabel="Notes" multiline value={form.notes} onChangeText={noted} placeholder="How did it go? Anything to remember next week?" placeholderTextColor={p.muted}
                     style={[s.notes, { backgroundColor: p.surface2, borderColor: p.border2, color: p.text }]} />
@@ -439,9 +495,11 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
           }
           return null;
         })}
-        <View testID="sheet-foot" style={s.foot}>
-          {view.foot.map((btn, k) => <Foot key={btn.id} btn={btn} big={k === 0} p={p} onPress={() => status(btn.status, view.footTitle)} />)}
-        </View>
+        {frame.foot && (
+          <View testID="sheet-foot" style={s.foot}>
+            {view.foot.map((btn, k) => <Foot key={btn.id} btn={btn} big={k === 0} p={p} onPress={() => status(btn.status, view.footTitle)} />)}
+          </View>
+        )}
       </ScrollView>
       {info && (
         <Pressable testID="sheet-rpeover" accessibilityLabel="Close" onPress={() => setInfo(false)} style={[StyleSheet.absoluteFill, s.infoOver, { backgroundColor: 'rgba(' + p.scrimRgb + ',0.55)' }]}>

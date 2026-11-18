@@ -244,3 +244,118 @@ record of the sheet as a screen, from the React Native migration on.
 - **What follows:** nothing differed from today's app and no motion was named (`MIGRATION.md` section 6, decision
   14), so nothing was fixed from it. The sheet's second session stands as built, and the sheet is whole but for
   the run's log, which is the cardio sheet's.
+
+## The cardio sheet in the Expo app: the run card's taps, the wheels, Log and the sport picker (Post-v0.262.4, the migration's phase 3, row 3)
+
+- **Date:** 2026-11-17. **Ruled by:** no new ruling for the sheet itself. Every word, number and behaviour is
+  today's, carried into the Expo app unchanged, so each keeps its ruling: one cardio alone is D278
+  (`docs/decisions/this-week.md`); the wheels are V182 D1 to D6, V184 D5, V232 D199 to D203, V233 D207 to D210, V235
+  D215 and D216, V237 D220 to D222; the dose grammar is V148; the readout's gap V191 D40; the park and its note V234
+  D213 and D214; draft and logged V236 D218; the effort slider D219. One ruling is the row's own: D294
+  P-HANDLOGDOOR, Record run's door until the recorder is built (`docs/decisions/this-week.md`). The cut was put to
+  Mario after the measure and taken whole ("Concur, build it"): the cardio sheet, the rest timer
+  (`docs/decisions/rest-timer.md`) and that door, in one session. **Bump:** none, the page and core do not move (a
+  Post-v0.262.4 pass, standing ruling 1). **Shipped:** Post-v0.262.4, no build of today's app; the beta's next
+  build carries it once Mario merges it.
+- **The finding (measured before any edit, `tests/measure/native-cardio-sheet_today.md`):**
+  - *Where it shows.* 382 days of the ten seeded programs hold a run, a ride or a swim (316, 30 and 36); 374 with a
+    lift beside it, 8 with the cardio alone, which keep Done and Skip. The log draws six forms: 143 days a fixed
+    time, 96 a fixed distance, 55 miles and pace side by side, 22 the reps stepper with the rep clock, 30 the ride's
+    clock under its strip, 36 the swim's yards. The Half Manny's 56 run days draw three of them (27, 15 and 14),
+    never the stepper.
+  - *What each tap writes.* The sheet's opening, a wheel rolled on a draft card, the picker and Log on an empty card
+    write nothing. Log writes `ia_logs`, and `ia_hist` on the day's first touch. A wheel rolled on a logged card
+    writes `ia_logs`. A chip parks the leaving sport's numbers inside the day's entry and brings the arriving
+    sport's back. Done on a day that is only its run adds `ia_comp` and the pop-up's two keys. Every write goes
+    through three of core's writers the beta already called (`writeDayLogs`, `settleDayParts`, and the day's
+    snapshot): no new writer, and nothing asked of core.
+  - *The catch,* and D294: on the iOS app a run card's button opens the recorder, which is phase 4's.
+- **What is built (the cut Mario agreed):**
+  - *Reached as today's is* (`this-week/ThisWeek.tsx`, over `cardRoute` of the model's copy,
+    `day-detail/cardio-sheet-model.ts`): Log the ride and Log the swim, a done run's, ride's or swim's Reopen, and
+    Record run (D294), open the day's sheet for that cardio alone. A done lift's Reopen still opens the whole day.
+  - *One cardio alone* (`sheet-screen.ts` `sheetFrame`, the Angular sheet's last step): the when line and the
+    cardio's name, no tags, no counter, no add button, the cardio card and the log; Done and Skip only on a day with
+    no lift. The sheet keeps it for its life, over every redraw, as the Angular sheet does.
+  - *The wheels' rules* (`wheels.ts`): the page's `_iawParse`, `_iawFormat`, `_iawHome`, `_iawRecenter`,
+    `_iawCommit` and the seed of `iaWheelInit`, line for line: what a stored string seeds, the string a face stores,
+    the face a wheel opens on (the plan, when storage is blank), that nothing is written until a wheel rests on
+    another face, and the jump of a wrapped column back toward its middle.
+  - *The cardio card's taps* (`cardio-log.ts`, over the `LogForm` the sheet already held): the fields' input
+    listener (`setNode`), the page's `updateDoseDerived` as a view (`doseReadout`), `doseRep` (`stepReps`),
+    `logCardio`, `toggleCardioPicker` and `setCardioSwap` (`swapSport`). The picker's one direct write, the park,
+    stands in `sheet-writes.ts` (`parkSport`), which stays the one file of the sheet that calls core's writers.
+  - *The screen* (`CardioLogBlock.tsx`, `Wheel.tsx`, drawn inside the log of `SessionSheet.tsx`): the plan strip,
+    the wheels, the reps stepper, the readout, Did a different activity? with its three chips and note, and Log,
+    which reads the store for its words, never a flag of its own. A wheel is a column of rows per digit group that
+    snaps to a row and is read 90 ms after it last moved; Log, a chip and a status that closes the day rest every
+    wheel first (the page's `iaWheelFlush`).
+  - *Motion.* The wheels, the picker and the sheet's slide are built once for Mario's phone to judge
+    (`MIGRATION.md` section 6, decision 14). The rows above and below the band recede under a shade; they are not
+    shaped row by row as today's are.
+- **What deliberately does not change:** today's app, the page, core and what a program prescribes. The beta writes
+  to its own store only (D289).
+- **Found by the walk, in the walk itself:** the page's stepper writes a number into its field, which an input
+  holds as text; the walker's stand-in kept the number, and the two stores differed by `2` against `"2"` until the
+  stand-in held text as an input does. Nothing differed between the two apps.
+- **A rule the code keeps twice:** the picker brings the store level with the form before it parks, and saves the
+  form again after. On no path of the walks does the first save change what the second leaves, so no break of it
+  alone is in the list; it is ported as today's has it.
+- **Tests** (every expected value of the comparisons is today's page, on purpose; the hand-typed values are the
+  unit file's):
+  - `tests/unit/native-cardio-sheet.test.ts`, 37 tests: the two models' copies held to the byte, the wheels' rules,
+    the readout, what each tap writes, one cardio alone and where a card's tap goes, what the screens call, and the
+    rest timer.
+  - `tests/integration/native-cardio-sheet.test.ts`, 3 tests. HALF_MANNY through the standard history: 20 days
+    worked through the cardio log on both apps, 503 taps with every `ia_` key compared after each, and with it the
+    form, the fields on show, the dose, the readout, each wheel's place and what it remembers, the button and the
+    toast (317 rests of a wheel, 293 that wrote and 24 that did not, 22 jumped back toward the middle; 44 Log taps,
+    16 on an empty card; 61 chips, 20 on the sport the card was on). Then a day that is only its run, with Done
+    over the rolled card; and a rep session of the 1.5 mile test goal program, for the stepper.
+  - `tests/sweeps/native-cardio-sheet.test.ts`, 1 test, the ten seeded programs: 173 days, 3,906 taps, every key
+    equal after each (2,255 rests of a wheel, 35 steps of the stepper, 375 Log taps, 516 chips; the six forms drawn
+    238 times).
+  - Six tests of two older files name the new shape: five in `tests/unit/native-session-sheet.test.ts` (the
+    sheet's folder, the save's dose, the redraw, the frame, This Week's taps) and one in
+    `tests/unit/native-deck.test.ts` (a card's button).
+- **The proof:**
+  - *Each new test on the previous commit.* The three new files import modules the previous commit does not have
+    (`git cat-file -e a33e87a:frontends/native/src/day-detail/cardio-log.ts` fails, and
+    `.../rest-timer/rest-clock.ts`), so they fail there by construction. The two older files were run on a copy of
+    the previous commit's tree (`node tools/tree-at.mjs a33e87a`): 6 of their 138 tests fail there, the six this
+    session changed. `tests/support/native-session-sheet.ts` changed in wiring only (its members opened to the
+    cardio walker, and the dose a save derives from read through one method).
+  - *A break per rule* (`tests/measure/native-cardio-sheet_breaks.md`): 147 breaks, each in a copy of the tree. One
+    part ran first, alone: 37 breaks, 35 red in the fast files, one caught by the sweep alone (the picker open at
+    the draw of a swapped sport) and one let through (the park's own write, which the picker's last save covers).
+    Both got a unit test, the same kind of gap was looked for in the other parts, and then the whole set ran in
+    four parts at once with nothing beside it: 147 of 147 red in the fast files, none swept, none let through.
+  - *Where the Expo app's packages are not installed* (`node tools/tree-at.mjs --working`): `tsc -p .` in the
+    copy's `tests/` is clean, and the three new files, the two changed ones and
+    `integration/native-session-sheet.test.ts` pass there (6 files, 186 tests).
+  - *The session sheet's own break list* (`tests/measure/native-session-sheet_breaks.mjs`), read against the code
+    before the session's edits (`--check`: 256 breaks, 0 with a text not found once) and again after them: 8 of its
+    breaks named text this session changed (the save's dose, the body read off the frame, the card's Reopen, what
+    This Week hands the sheet, the rest clock handed to the sheet). Each was pointed at the code as it stands and
+    run again alone on that list's fast files: 8 of 8 red. The whole list was not run again.
+  - *The Expo type check:* clean. *Every unit and integration test:* 109 files, 2,208 passed and 2 skipped. *The beta's sweeps:* 8 files, 17 passed and 1 skipped.
+- **Seen on the simulator** (iPhone 17 Pro, `npm run sim-ios`, the Release build under Hermes, the copy of Mario's
+  backup, Tuesday of week 13, at night): Record run on the Recovery Run opening the run's own sheet (Today ·
+  Tuesday, Recovery Run, no tags, no add button, no Done and Skip; the strip `15 min @ 10:30/mi`, the clock
+  showing the plan, miles on zero, "enter distance"); miles rolled to 3.20, the readout `4:41/mi` with what it
+  assumed and its gap; Log, the button reading Logged ✓ and the toast Run logged ✓; the picker, the Bike chip (Log
+  the ride, the clock on zero, the note that the run's numbers are kept) and back, the run's 3.20 returned; Back,
+  the run card done as `3.2 mi · 4:41/mi`; its Reopen opening the same sheet on the stored numbers. The final
+  code (the Log button one size in both states) was then built again (`npm run sim-ios:fast`) and the sheet, a roll
+  and Log looked at once more. A roll sent right after another motion was lost twice, and landed when sent alone.
+  *The stepper, on a test phone's keys:* The Half Manny has no rep day, so the simulator's store was saved aside
+  (sha256 `d4a2a8ec…872f11`), the keys of a test phone holding the 1.5 mile test goal program written into it, and
+  Monday's Short Interval opened: `4 × 400m @ 8:13/mi`, Reps completed 4 of 4, one rep fewer, the rep clock rolled
+  to 1:00, Work done `0.75 mi`, `4:01/mi`. The saved store was then put back, twice in all, and read the same hash
+  both times.
+- **Not seen yet:** his phone. On the simulator: the day mode, a swim's box under the keyboard, Done at the foot
+  of a day that is only its run, a wheel still coasting when Log is tapped, Reduce Motion.
+- **Not built, each waiting for its own session:** the recorder and its Live Activity (phase 4); the rest sheet,
+  so the jog's Edit cardio still takes no press.
+- **The ledger** (`tests/measure/rn-migration_test-ledger.md`): the row's nine rows are filled.
+- **Next for the row:** Mario's phone on the next IA Next build.

@@ -49,7 +49,7 @@ const J = JSON.stringify;
 const plain = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 
 /** An element of the page, as far as today's handlers read and change one. */
-interface El {
+export interface El {
   id: string; value: string; textContent: string; dataset: Record<string, string>; style: Record<string, string>;
   classList: { add(c: string): void; remove(c: string): void; contains(c: string): boolean; toggle(c: string, on?: boolean): boolean };
 }
@@ -207,12 +207,12 @@ export class TwoSheets {
   /** The page's side: the sheet as drawn. */
   pageView!: SheetView;
   open_ = false;
-  private readonly now: number;
-  private readonly P: Phone;
+  protected readonly now: number;
+  protected readonly P: Phone;
   readonly week: number;
   readonly dayKey: string;
-  private readonly T: SheetTally;
-  private readonly what: string;
+  protected readonly T: SheetTally;
+  protected readonly what: string;
   private marks = 0;
 
   constructor(P: Phone, store: StateStore, grid: DeckProgram, week: number, dayKey: string, T: SheetTally, what: string) {
@@ -234,13 +234,15 @@ export class TwoSheets {
     P.ev('popFire=(function(o){return function(t,x){document.getElementById("popOverlay").classList.add("show");return o(t,x);};})(popFire);');
   }
 
-  private get els(): Map<string, El> { return (this.P as unknown as { fields: Map<string, El> }).fields; }
-  private page(code: string): unknown { return this.P.ev(code); }
+  /** The dose a save derives from: the draw's, until the sport picker changes it (support/native-cardio-sheet.ts). */
+  protected doseNow(): Dose | null { return this.view.dose; }
+  protected get els(): Map<string, El> { return (this.P as unknown as { fields: Map<string, El> }).fields; }
+  protected page(code: string): unknown { return this.P.ev(code); }
   private get redraws(): string[] { return (this.P.IA.ctx as Record<string, unknown>)['__redraws'] as string[]; }
 
   // ── Drawing ────────────────────────────────────────────────────────────────────────────────────────────────────
   /** The page's sheet drawn afresh, and its log's form placed as the templates write it. */
-  private pageDraw(): void {
+  protected pageDraw(): void {
     const v = pageSheet(this.P, this.week, this.dayKey);
     assert.ok(v, this.what + ': today\'s opens a sheet');
     this.pageView = v;
@@ -260,7 +262,7 @@ export class TwoSheets {
       for (const [id, value] of Object.entries(pageNodes(log.fields))) m.set(id, el(id, value));
     }
   }
-  private nativeDraw(): void {
+  protected nativeDraw(): void {
     const v = sheetView(this.s.store, this.s.prog as SheetProgram, this.week, this.dayKey, this.now);
     assert.ok(v, this.what + ': the Expo app opens a sheet where today\'s does');
     this.view = v;
@@ -316,7 +318,7 @@ export class TwoSheets {
     if (this.open_) this.sameForm('after ' + tap);
   }
   /** A tap: made on the page, then on the beta, then checked. */
-  private tap(name: string, page: () => void, beta: () => string[]): void {
+  protected tap(name: string, page: () => void, beta: () => string[]): void {
     const before = this.P.toasts.length;
     page();
     this.P.settle();
@@ -326,7 +328,7 @@ export class TwoSheets {
     this.T.toasts += said.length;
     this.check(name);
   }
-  private entry(): Record<string, unknown> | undefined {
+  protected entry(): Record<string, unknown> | undefined {
     return (JSON.parse(this.s.store.get('ia_logs_' + this.s.prog.id) || '{}') as Record<string, Record<string, unknown>>)['w' + this.week + '_' + this.dayKey];
   }
 
@@ -337,7 +339,7 @@ export class TwoSheets {
     this.tap('the slider to ' + v, () => {
       this.els.get('log_rpe')!.value = String(v);
       this.page(`updateRPEDisplay(${J(String(v))});persistLogFields(${J(this.dayKey)});updateDoseDerived();`);
-    }, () => { this.form = moveRpe(this.form, v); persistLog(this.s, this.form, this.view.dose, false, this.now); return []; });
+    }, () => { this.form = moveRpe(this.form, v); persistLog(this.s, this.form, this.doseNow(), false, this.now); return []; });
     this.T.slides++;
     if (had && had['sets']) this.T.carried++;
   }
@@ -347,7 +349,7 @@ export class TwoSheets {
     this.tap('notes typed', () => {
       this.els.get('log_notes')!.value = text;
       this.page(`persistLogFields(${J(this.dayKey)});updateDoseDerived();`);
-    }, () => { this.form = typeNotes(this.form, text); persistLog(this.s, this.form, this.view.dose, false, this.now); return []; });
+    }, () => { this.form = typeNotes(this.form, text); persistLog(this.s, this.form, this.doseNow(), false, this.now); return []; });
     this.T.notes++;
     if (had && had['sets']) this.T.carried++;
   }
@@ -364,7 +366,7 @@ export class TwoSheets {
     this.tap((status === 'complete' ? 'Done' : 'Skip') + ' at the foot', () => {
       this.page(`handleDayStatus(${J(this.dayKey)},${J(title)},${J(status)});`);
     }, () => {
-      const r = tapStatus(this.s, this.form, this.view.dose, title, status, this.now);
+      const r = tapStatus(this.s, this.form, this.doseNow(), title, status, this.now);
       closed = r.closed;
       const raised = list.slice(n0);
       assert.equal(raised.length, r.popup ? 1 : 0, this.what + ': a Done that sets the status raises one pop-up, anything else none');
