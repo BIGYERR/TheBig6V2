@@ -2,9 +2,13 @@
 // recorder. Every fix iOS delivers is written raw, one JSON object a line, to Application Support/ia-gps/<id>.jsonl the
 // moment it arrives, so a crash or iOS closing the app keeps the run up to that second. Every judgement (distance,
 // splits, what counts) runs in the page, in core/src/gps; nothing here filters a fix.
+// From D296 P-STEPCLIMB a run also records Core Motion's step counter ({t, steps, sd, cad}: steps since Start, its
+// distance from steps in metres, its cadence in steps a second) and barometer ({t, ralt, kpa}: metres relative to its
+// first reading, kilopascals), raw, beside the fixes. Without the sensors or the permission the run records by GPS alone.
 //   listen  []      the one event channel, kept open: {type:"auth", status}, {type:"fix", fix, recorded},
-//                   {type:"mark", line}, {type:"error", message}
-//   warm    []      location on before Start, so the screen can show iOS's accuracy (asks permission when needed)
+//                   {type:"mark", line}, {type:"motion", line}, {type:"error", message}
+//   warm    []      location on before Start, so the screen can show iOS's accuracy (asks permission when needed, and
+//                   asks Motion & Fitness once, so the question never comes as the athlete starts)
 //   cool    []      location off again, unless a run is recording
 //   start   []      a new run: its file, the start mark, then every fix; waits for permission when it is not yet given
 //   pause   []      the pause mark (location stays on, so the GPS stays warm and the app stays alive in the background)
@@ -17,6 +21,7 @@
 // No network: the file leaves the phone only through the share sheet (window.iaIsland.share), when the athlete shares.
 
 import CoreLocation
+import CoreMotion
 import Foundation
 import UIKit
 #if canImport(Cordova)
@@ -32,6 +37,9 @@ class IAGps: CDVPlugin, CLLocationManagerDelegate {
     private var runId: String?
     private var handle: FileHandle?
     private var paused = false
+    private let pedometer = CMPedometer()
+    private let altimeter = CMAltimeter()
+    private var motionOn = false
 
     @objc(listen:)
     func listen(_ command: CDVInvokedUrlCommand) {
@@ -43,6 +51,7 @@ class IAGps: CDVPlugin, CLLocationManagerDelegate {
     func warm(_ command: CDVInvokedUrlCommand) {
         warmed = true
         ensureUpdates()
+        askMotion()
         ok(command)
     }
 
@@ -87,6 +96,7 @@ class IAGps: CDVPlugin, CLLocationManagerDelegate {
             return
         }
         writeMark("finish")
+        stopMotion()
         closeFile()
         runId = nil
         paused = false
@@ -199,6 +209,57 @@ class IAGps: CDVPlugin, CLLocationManagerDelegate {
         m.allowsBackgroundLocationUpdates = true
         if #available(iOS 11.0, *) { m.showsBackgroundLocationIndicator = true }
         writeMark("start")
+        startMotion(from: Date())
+    }
+
+    // MARK: steps and climb (D296)
+
+    /// Asks Motion & Fitness once, when the recorder opens: a query of the last minute's steps is what makes iOS ask.
+    private func askMotion() {
+        guard CMPedometer.isStepCountingAvailable() else { return }
+        if #available(iOS 11.0, *), CMPedometer.authorizationStatus() != .notDetermined { return }
+        let now = Date()
+        pedometer.queryPedometerData(from: now.addingTimeInterval(-60), to: now) { _, _ in }
+    }
+
+    /// The step counter from Start and the barometer, each reading written raw as it arrives. A refused permission or a
+    /// missing sensor gives no readings, and the run goes on by GPS.
+    private func startMotion(from start: Date) {
+        if motionOn { return }
+        motionOn = true
+        if CMPedometer.isStepCountingAvailable() {
+            pedometer.startUpdates(from: start) { [weak self] data, _ in
+                guard let d = data else { return }
+                var line: [String: Any] = [
+                    "t": Int64((d.endDate.timeIntervalSince1970 * 1000).rounded()),
+                    "steps": d.numberOfSteps.intValue,
+                ]
+                if let sd = d.distance { line["sd"] = sd.doubleValue }
+                if let cad = d.currentCadence { line["cad"] = cad.doubleValue }
+                let reading = line
+                DispatchQueue.main.async { self?.writeMotion(reading) }
+            }
+        }
+        if CMAltimeter.isRelativeAltitudeAvailable() {
+            altimeter.startRelativeAltitudeUpdates(to: OperationQueue.main) { [weak self] data, _ in
+                guard let d = data else { return }
+                self?.writeMotion(["t": IAGps.nowMs(), "ralt": d.relativeAltitude.doubleValue, "kpa": d.pressure.doubleValue])
+            }
+        }
+    }
+
+    private func stopMotion() {
+        guard motionOn else { return }
+        motionOn = false
+        pedometer.stopUpdates()
+        altimeter.stopRelativeAltitudeUpdates()
+    }
+
+    /// On the main queue, like every write: into the run's file, and to the screen when it is showing.
+    private func writeMotion(_ line: [String: Any]) {
+        guard runId != nil else { return }
+        write(line)
+        if UIApplication.shared.applicationState == .active { send(["type": "motion", "line": line]) }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

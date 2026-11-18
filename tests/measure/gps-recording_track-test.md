@@ -45,7 +45,7 @@ phone within 2% of 1,600 m (32 m), and one road run within 2% of the watch. It i
 | A fix kept only once it is 5 m from the last kept fix, iOS accuracy 50 m or better | 1632.4 m, +2.03% | +0.57% |
 | A fix kept only once it is 10 m from the last kept fix, iOS accuracy 50 m or better | 1622.0 m, +1.38% | -0.09% |
 | A fix kept only once it is 15 m from the last kept fix, iOS accuracy 50 m or better | 1609.8 m, +0.61% | -0.77% |
-| The recorder's own count (core's gpsSummary) | 1665.9 m, +4.12% | +1.64% |
+| The recorder's own count (core's gpsSummary) | 1622.0 m, +1.38% | -0.09% |
 
 ---
 
@@ -71,5 +71,8 @@ phone within 2% of 1,600 m (32 m), and one road run within 2% of the watch. It i
   better: 1622.0 m on the track (+1.38%, 22.0 m over against 32 m allowed) and -0.09% against the watch on the road. The
   9 fix mean first proposed read closer on the track (+0.84%) but depends on speed (`gps-recording_speed.md`), and was
   withdrawn. 5 m leaves the track 32.4 m over, just outside the gate; 15 m reads +0.61% and -0.77%.
+- **The gate on the built math (v0.263.0).** "The recorder's own count" is core's `gpsSummary` itself, fed each run's
+  fixes between a start and a finish mark: the track reads within 32 m of 1,600 m and the road within 2% of the watch,
+  the same as the 10 m rule's row. D272's gate is met on the recorder as built.
 - **Not this.** iOS's own speed reading times time read 1.41% long on the track and 2.96% short on the road: it does not
   follow the distance either way.

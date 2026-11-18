@@ -1,6 +1,7 @@
 // window.iaGps: the Run recorder's calls into the GPS recorder (D267 P-GPSTEST, docs/decisions/gps-recording.md).
 //   listen(onEvent)          the one event channel: {type:'auth', status}, {type:'fix', fix, recorded},
-//                            {type:'mark', line}, {type:'error', message}
+//                            {type:'mark', line}, {type:'motion', line} (a step counter or barometer reading,
+//                            D296), {type:'error', message}
 //   warm() / cool()          location on before Start, off again
 //   start() pause() resume() the run's marks; Start waits for permission when it is not yet given
 //   finish(done)             done(id) once the file is closed

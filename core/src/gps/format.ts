@@ -24,3 +24,28 @@ export function formatClock(seconds: number): string {
 export function formatPace(secondsPerMile: number | null): string {
   return secondsPerMile === null || !Number.isFinite(secondsPerMile) ? GPS_BLANK : formatClock(secondsPerMile);
 }
+
+/** The international foot, in metres. */
+export const METRES_PER_FOOT = 0.3048;
+
+/** A climb in whole feet ("33 ft", D296); GPS_BLANK with no barometer reading. */
+export function formatFeet(metres: number | null): string {
+  return metres === null ? GPS_BLANK : `${Math.round(metres / METRES_PER_FOOT)} ft`;
+}
+
+/** A split's net change in whole feet with its sign ("+10 ft", "−7 ft", "0 ft"); empty with no barometer reading. */
+export function formatFeetChange(metres: number | null): string {
+  if (metres === null) return '';
+  const ft = Math.round(metres / METRES_PER_FOOT);
+  return ft > 0 ? `+${ft} ft` : ft < 0 ? `−${-ft} ft` : '0 ft';
+}
+
+/** Steps a minute, whole ("150 spm", D296); GPS_BLANK with no steps. */
+export function formatCadence(stepsPerMinute: number | null): string {
+  return stepsPerMinute === null || !Number.isFinite(stepsPerMinute) ? GPS_BLANK : `${Math.round(stepsPerMinute)} spm`;
+}
+
+/** A step count with thousands commas ("1,500", D296); GPS_BLANK with no step counter. */
+export function formatSteps(steps: number | null): string {
+  return steps === null ? GPS_BLANK : Math.round(steps).toLocaleString('en-US');
+}

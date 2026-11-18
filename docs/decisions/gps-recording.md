@@ -254,7 +254,7 @@
   runs Mario ran for D272's gate. First proposed as a 9 fix mean with no distance under 0.5 m/s; revised the same day,
   before Mario concurred, when he asked whether speed matters and the measure showed the mean depends on it. Mario
   concurred with the revised rule on 2026-11-18, his one condition that the code names the rule in its own words.
-  **Bump:** MINOR, v0.263.0, with D296 (Mario: "MINOR 0.263.0, both"). **Shipped:** not yet.
+  **Bump:** MINOR, v0.263.0, with D296 (Mario: "MINOR 0.263.0, both"). **Shipped:** v0.263.0.
 - **The ask (Mario):** "damn i didnt do the 400m track thing but here is what the app got, STRAVA got and you can look up
   what my COROS watch got that day" (2026-11-15, the road run); "think we need anything else to make sure the phone is
   accurate or what?"; the track run (2026-11-17); "yeah write it up"; then "hmm does speed matter at all? like would it
@@ -331,8 +331,8 @@
 
 - **Date:** 2026-11-18, Post-v0.262.4. **Ruled by:** the main session in the coach hat, put to Mario on 2026-11-17 as
   the first of four ways to bring the phone's motion sensors in; Mario: "build step 1 and park 2 and 3 we will talk
-  about it later, and yeah throw away 4 thats too much". **Bump:** MINOR, v0.263.0, with D293 (Mario). **Shipped:** not
-  yet.
+  about it later, and yeah throw away 4 thats too much". **Bump:** MINOR, v0.263.0, with D293 (Mario). **Shipped:**
+  v0.263.0.
 - **The ask (Mario):** "also i see strava has elevation changes and stuff in their run records how do we get that?";
   "so you dont want to try the mixing of motion sensor thing you were talking about for max accuracy? whats the lift on
   that".
@@ -355,7 +355,8 @@
      and your climb while you record a run. It stays on this phone." Refused, or on a phone without the sensors, the run
      records by GPS as before and the new figures read as blank.
   3. **Steps and cadence.** The steps a run counts are the rise in the step total between two readings of one stretch,
-     so the steps of a pause count for nothing. The cadence is those steps over the moving minutes, in steps a minute,
+     the total standing at 0 at Start, so the steps between the last reading before a pause and the first after it
+     count for nothing. The cadence is those steps over the moving minutes, in steps a minute,
      the watch's unit.
   4. **Climb.** The barometer's altitude in each stretch, counted as the watch counts its own (a turn band of 2 m): the
      altitude last counted is the mark, the stretch's first reading to begin with; a reading above the mark counts as
