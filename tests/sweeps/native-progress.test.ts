@@ -4,7 +4,8 @@
 // pace, so of the run cards only the ladder shows on it; fewer weeks draw the cards that stand in for a trend); then a second program beside it, the first archived, restored, archived again and deleted
 // forever. After every tap every word and number of the screen, what is kept between draws, each toast and every
 // ia_ key is equal to today's page, value for value, no family left out (support/native-progress.ts). Every
-// expected value here is today's page, on purpose.
+// expected value here is today's page, on purpose. Each run card drawn is also read as this app's drawer reads it
+// (readCard there): its words, its bold runs, its blocks' type and every element of its picture.
 //
 // Imported first: every launch a phone makes here is a launch of the beta's seam too, held equal key for key
 // (support/native-launch.ts).
@@ -47,6 +48,14 @@ test('what the ten programs showed: every kind of chart, the ledger\'s three car
   // where it is heading).
   for (const k of ['Long Run Ladder', 'Is Your Easy Actually Easy?', 'Is Your Easy Actually Easy? (the easy bands)', 'Recovery Pace — Easy-Effort Trend', 'Same Effort, More Speed',
     'Same Effort, More Speed (its empty state)', 'Where This Is Heading', 'Mileage — Drift From Plan']) assert.ok((R.cardKinds[k] || 0) >= 5, 'the run card ' + k + ': ' + JSON.stringify(R.cardKinds));
+  // What the drawer read off those cards (readCard), measured on these walks: every part a card can hold, every
+  // element a picture can hold, and a card in each of the four colours.
+  const P = R.cardParts, at = (k: string): number => P[k] || 0;
+  assert.ok(at('head') >= 45 && at('body') >= 50 && at('foot') >= 185 && at('picture') >= 220 && at('card with no picture') >= 50, 'heads, bodies, footers and pictures: ' + JSON.stringify(P));
+  assert.ok(at('block') >= 140 && at('display block') >= 45 && at('block with a line height') >= 135 && at('block with a tracking') >= 45 && at('block with no room under it') >= 55, 'the blocks: ' + JSON.stringify(P));
+  assert.ok(at('bold') >= 375 && at('bold in a colour') >= 315 && at('bold') - at('bold in a colour') >= 60, 'bold runs, in a colour and in none: ' + JSON.stringify(P));
+  assert.ok(at('line') >= 780 && at('rect') >= 1115 && at('circle') >= 340 && at('path') >= 40 && at('polygon') >= 5 && at('text') >= 2185 && at('text that names no face') >= 105, 'the six elements: ' + JSON.stringify(P));
+  assert.ok(at('card in var(--run)') >= 200 && at('card in var(--red)') >= 15 && at('card in var(--muted)') >= 50 && at('card in var(--hip)') >= 5, 'a card in each colour: ' + JSON.stringify(P));
   assert.ok(R.swaps >= 30 && R.jogs >= 100 && R.notes >= 30, 'the journal\'s swap, jog and note lines: ' + JSON.stringify(R));
   assert.ok(C.restores === 10 && C.deletes === 10 && C.confirms === 20 && C.warned >= 2 && C.removed >= 100 && C.chips >= 200 && C.bars >= 50, 'the chips, the bar and the two writes: ' + JSON.stringify(C));
 });

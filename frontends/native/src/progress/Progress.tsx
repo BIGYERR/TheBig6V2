@@ -1,10 +1,10 @@
 // Progress in the Expo app (MIGRATION.md phase 3, row 4), in place of today's ProgressFrame, ProgressScreen and
 // ProgramChips (frontends/app/src/app/screens/progress): the program chips and the archived program's bar, the
-// empty states, the weekly dot charts, the Lift Ledger, the Session Journal and the 1RM estimator, each with
-// today's words. What it shows is progress-screen.ts's view; what a tap writes is progress-writes.ts's.
+// empty states, the weekly dot charts, the run cards, the Lift Ledger, the Session Journal and the 1RM estimator,
+// each with today's words. What it shows is progress-screen.ts's view; what a tap writes is progress-writes.ts's.
 //
 // The body is drawn anew on every draw, as the page writes it anew: the journal's weeks fold back (the latest
-// open), the estimator folds and its two numbers clear. The run cards wait for the next session (DRAWN).
+// open), the estimator folds and its two numbers clear.
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,7 +13,7 @@ import { asyIcon } from '@ia/core/engine/icons.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
-import { CardTitle, DotChartCard, LedgerCards } from './ChartCards';
+import { CardTitle, DotChartCard, LedgerCards, RunCard } from './ChartCards';
 import { paint } from './paint';
 import type { ChipsView } from './program-chips-model';
 import { CALC_LIFTS, type JournalWeek } from './progress-model';
@@ -67,8 +67,8 @@ export function Progress({ palette: p, store, state: st, say }: {
             )}
             {v.charts.filter((c) => DRAWN.includes(c.kind)).map((c, i) => (
               c.kind === 'dot' ? <DotChartCard key={i} spec={c.spec} palette={p} />
-                : c.kind === 'ledger' ? <LedgerCards key={i} view={c.view} palette={p} />
-                  : null
+                : c.kind === 'card' ? <RunCard key={i} spec={c.spec} palette={p} />
+                  : <LedgerCards key={i} view={c.view} palette={p} />
             ))}
             {v.journal && <Journal weeks={v.journal} palette={p} />}
             {v.estimator && <Estimator palette={p} state={st} unit={estimatorUnit(store)} />}
