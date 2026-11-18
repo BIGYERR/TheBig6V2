@@ -24,7 +24,10 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
    `grep -oE '<meta name="ia-version" content="[^"]+"' index.html` (`MAJOR.MINOR.PATCH`; a bare integer N is a pre-semver build, 0.N.0)
    Also `ls *.html` — there must be exactly one HTML file in the repo root.
 2. Version the handoff claims:
-   `grep -m1 -oE '\*\*Working file:\*\*[^\n]*[vV][0-9][0-9.]*' IRON_ASYLUM_HANDOFF_1_1.md`
+   `grep -m1 'Working file:' IRON_ASYLUM_HANDOFF_1_1.md | grep -oE '[vV][0-9]+(\.[0-9]+)*' | head -1`
+   (two plain greps: the line, then the first version on it. The one pattern this replaced held `[^\n]`, which the
+   system's own grep reads as "not a backslash, not an n", so from a script it stopped at `index.html` and printed
+   nothing, Post-v0.262.4.)
 3. Digest line for that exact version at the tail:
    `grep -nE '^- \*\*v<version>' IRON_ASYLUM_HANDOFF_1_1.md` (`V<N>` for a pre-semver build)
    A file version with NO digest line means a build was dropped or the previous session never folded its entry. Say so; do not silently continue.
