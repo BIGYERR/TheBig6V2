@@ -20,6 +20,7 @@ import { fieldsOf } from '../deck/set-fields';
 import { DAY_FULL, type ReadDay, type RestLog, dayIsTravel, restLogLines, runSessionCode, wildcardOn } from '../this-week/week-readers';
 import { type CardioRx, cardioCard } from './cardio-card-model';
 import { type CardioFields, type Dose, cardioFields } from './cardio-fields-model';
+import { type CardioOnly, type SheetFrame, cardioSheet, liftOnDay } from './cardio-sheet-model';
 import { type BodyBlock, type FootButton, alsoJog, detailBody, e1rmCard, hasLogged, liftsFirst, logNudge, loggedCount, rangeNudge, statusFoot } from './day-detail-model';
 import { type LogEntry, type SessionLogData, sessionLog } from './session-log-model';
 import { type ExCard, type ExEntry, type ExSection, sectionsView } from './session-sections-model';
@@ -137,6 +138,18 @@ export function footOf(store: StateStore, prog: SheetProgram, week: number, dayK
   return statusFoot(dayStatus(store, prog.id, week, dayKey));
 }
 
+/** The sheet as it draws: its header, its body, whether it is one cardio alone, and whether Done and Skip stand at its foot. */
+export type Frame = SheetFrame<SheetView['tags']>;
+/**
+ * The Angular sheet's last step (day-detail.ts open() over cardioSheet, D278 item 3): the whole day, or one cardio
+ * alone under the when line and its own name, with no tags, no counter, no add button, and no Done and Skip on a day
+ * that also holds lift work.
+ */
+export function sheetFrame(v: SheetView, only: CardioOnly | null | undefined, prog: SheetProgram): Frame {
+  const day = sheetDay(prog, v.week, v.dayKey);
+  return cardioSheet(only || null, liftOnDay((day && day.sections) || []), { over: v.over, title: v.title, tags: v.tags, counter: v.counter, body: v.body }, { chips: [], travel: false });
+}
+
 /** The log block of a sheet as drawn. */
 export function logOf(v: SheetView): SessionLogData {
   return (v.body.find((b) => b.kind === 'log') as { kind: 'log'; log: SessionLogData }).log;
@@ -149,7 +162,7 @@ export function logOf(v: SheetView): SessionLogData {
  * the cardio card, the day's note, the log and the never marked nudge.
  */
 export const SHEET_DRAWS: readonly BodyBlock['kind'][] = ['also', 'wildcard', 'nudge', 'sections', 'e1rm', 'cardio', 'note', 'log', 'logNudge'];
-export function drawnBlocks(v: SheetView): BodyBlock[] { return v.body.filter((b) => SHEET_DRAWS.includes(b.kind)); }
+export function drawnBlocks(v: { body: BodyBlock[] }): BodyBlock[] { return v.body.filter((b) => SHEET_DRAWS.includes(b.kind)); }
 
 /** Every move's card of a sheet, in order. */
 export function sheetMoves(v: SheetView): ExCard[] {
@@ -183,5 +196,9 @@ export const RPE_INFO = {
   close: 'Got it',
 } as const;
 
-/** What This Week hands the sheet it opens: the launch's grid, the week and the day, and the day as first drawn. */
-export interface SheetOpen { prog: SheetProgram; week: number; dayKey: string; view: SheetView }
+/**
+ * What This Week hands the sheet it opens: the launch's grid, the week and the day, the day as first drawn, and the
+ * one cardio the sheet is asked to draw alone (D278 P-CARDIOSHEET; the Angular app's SheetMode), kept for the sheet's
+ * life as the Angular sheet keeps it over every redraw.
+ */
+export interface SheetOpen { prog: SheetProgram; week: number; dayKey: string; view: SheetView; only?: CardioOnly | null }

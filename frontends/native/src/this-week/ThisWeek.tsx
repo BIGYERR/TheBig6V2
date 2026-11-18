@@ -17,6 +17,7 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Bag, Calendar, Check, CoreIcon, Cross, Die, Dumbbell, Fade, Flag, Glow, Play, RecDot, Runner, WildcardMark } from './marks';
+import { type CardioOnly, cardRoute } from '../day-detail/cardio-sheet-model';
 import { type SheetOpen, type SheetProgram, sheetView } from '../day-detail/sheet-screen';
 import { type DeckOpen, type DeckProgram, deckView } from '../deck/deck-screen';
 import type { GrowBox } from '../deck/grow-motion';
@@ -162,12 +163,12 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLau
   const [headH, setHeadH] = useState(0);
   const [stripH, setStripH] = useState(0);
   const pill = pillParts(view.pill.html);
-  // The day's session sheet, whole (week-view.ts openDay).
-  const openSheet = (week: number, key: string): void => {
+  // The day's session sheet: whole (week-view.ts openDay), or one cardio alone (openCardio, D278 item 3).
+  const openSheet = (week: number, key: string, only: CardioOnly | null = null): void => {
     if (!prog) return;
     const grid = prog as unknown as SheetProgram;
     const view = sheetView(store, grid, week, key, Date.now());
-    if (view) onSheet({ prog: grid, week, dayKey: key, view });
+    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });
   };
   // Start lift, Start session: the day opened as a deck, or as its session sheet where today's app opens that instead
   // (a day whose only card is its cool down; deck.ts open()).
@@ -255,7 +256,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLau
         )}
 
         <View style={s.days}>
-          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} onReopen={openSheet} />}
+          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} onReopen={openSheet} onCardio={openSheet} />}
         </View>
 
         <View style={s.settings}>
@@ -273,7 +274,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLau
   );
 }
 
-function Days({ d, p, onPick, onStart, onReopen }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string, from: DeckFrom | null) => void; onReopen: (week: number, key: string) => void }) {
+function Days({ d, p, onPick, onStart, onReopen, onCardio }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string, from: DeckFrom | null) => void; onReopen: (week: number, key: string) => void; onCardio: (week: number, key: string, sheet: CardioOnly) => void }) {
   const s = styles;
   const first = d.cards[0];
   return (
@@ -281,7 +282,7 @@ function Days({ d, p, onPick, onStart, onReopen }: { d: DaysView; p: Palette; on
       <View testID="week-days" accessibilityLabel="Pick a day" style={[s.week, { backgroundColor: p.surface }]}>
         {d.strip.map((c, i) => <Col key={i} c={c} i={i} p={p} onPick={onPick} />)}
       </View>
-      {d.cards.map((k) => <Card key={k.kind} k={k} p={p} onStart={onStart} onReopen={onReopen} />)}
+      {d.cards.map((k) => <Card key={k.kind} k={k} p={p} when={first ? first.label : ''} onStart={onStart} onReopen={onReopen} onCardio={onCardio} />)}
       {d.rest && (
         <View testID="week-card-rest" style={[s.card, s.cardFirst, { backgroundColor: p.surface }]}>
           <View style={s.head}><Text numberOfLines={1} style={[s.label, { color: p.muted }]}>{d.rest.when}</Text></View>
@@ -367,7 +368,14 @@ export interface DeckFrom { box: GrowBox; card: DayCard }
  * A card of the day. With `copy` it is the copy the deck opens out of (grow-motion.ts growCopy): its label, name and
  * summary on no ground of its own, without its skip pill, its button or Reopen.
  */
-export function Card({ k, p, onStart, onReopen, copy }: { k: DayCard; p: Palette; onStart?: (week: number, key: string, from: DeckFrom | null) => void; onReopen?: (week: number, key: string) => void; copy?: boolean }) {
+export function Card({ k, p, when, onStart, onReopen, onCardio, copy }: {
+  k: DayCard; p: Palette;
+  /** The day's when line, the first card's label: a cardio's own sheet opens under it (D278 item 3). */
+  when?: string;
+  onStart?: (week: number, key: string, from: DeckFrom | null) => void; onReopen?: (week: number, key: string) => void;
+  /** Log the run, the ride or the swim, and a done one's Reopen: that cardio's own sheet. */
+  onCardio?: (week: number, key: string, sheet: CardioOnly) => void; copy?: boolean;
+}) {
   const s = styles;
   const box = useRef<ComponentRef<typeof View>>(null);
   /** Start: the card's place on the screen goes with it, or none when the screen cannot say. */
@@ -380,7 +388,20 @@ export function Card({ k, p, onStart, onReopen, copy }: { k: DayCard; p: Palette
   const off = !!(k.skip && k.skip.on);
   const bt = k.button;
   const btColor = bt ? (bt.sunk ? p.muted : bt.glow ? p.onSignal : p.text) : p.text;
-  const starts = !!bt && bt.act === 'deck' && !bt.sunk;
+  const starts = !!bt && !bt.sunk;
+  /**
+   * The card's button and its done row's Reopen (week-view.ts tap(), over cardRoute): Start opens the deck, the hand
+   * log and a done run's Reopen open that cardio's own sheet, a done lift's Reopen the whole day. Record run opens the
+   * recorder today, which is this app's to grow (phase 4): until then it opens the run's own sheet, the hand log
+   * Ran without the phone? opens from the recorder (D294 P-HANDLOGDOOR, Mario, 2026-11-17).
+   */
+  const tap = (which: 'button' | 'reopen'): void => {
+    const r = cardRoute(k, when || '', which);
+    if (!r) return;
+    if (r.to === 'deck') start();
+    else if (r.to === 'day') { if (onReopen) onReopen(k.week, k.key); }
+    else if (onCardio) onCardio(k.week, k.key, r.to === 'cardio' ? r.sheet : { over: when || '', title: k.title });
+  };
   return (
     <View ref={box} collapsable={false} testID={copy ? undefined : 'week-card-' + k.kind} style={[s.card, k.first ? s.cardFirst : s.cardSecond, { backgroundColor: copy ? 'transparent' : off ? p.cardOff : p.surface }, copy && s.cardCopy]}>
       {k.skip && !copy && (
@@ -410,17 +431,17 @@ export function Card({ k, p, onStart, onReopen, copy }: { k: DayCard; p: Palette
               <Text numberOfLines={1} style={[s.doneTitle, { color: p.text }]}>{k.done.title}</Text>
               <Text numberOfLines={1} style={[s.doneLine, { color: p.muted }]}>{k.done.line}</Text>
             </View>
-            {/* A done lift reopens the whole day (D278 item 4, cardRoute); a done run reopens its own sheet, which is not built yet. */}
-            {!copy && <Text testID={'week-reopen-' + k.kind} accessibilityRole="button" suppressHighlighting onPress={k.kind === 'lift' && onReopen ? () => onReopen(k.week, k.key) : undefined} style={[s.reopen, { color: p.signal }]}>Reopen</Text>}
+            {/* A done lift reopens the whole day, a done run, ride or swim its own sheet (D278 items 3 and 4, cardRoute). */}
+            {!copy && <Text testID={'week-reopen-' + k.kind} accessibilityRole="button" suppressHighlighting onPress={() => tap('reopen')} style={[s.reopen, { color: p.signal }]}>Reopen</Text>}
           </View>
         )}
         {bt && !copy && (
           <Pressable
             testID={'week-button-' + k.kind}
             accessibilityRole="button"
-            // Start lift and Start session open the deck (D275, cardRoute); Record run and the hand log are not built yet.
+            // Start lift and Start session open the deck (D275), the hand log its cardio's own sheet (D278), by cardRoute.
             disabled={!starts}
-            onPress={start}
+            onPress={() => tap('button')}
             accessibilityState={{ disabled: !starts }}
             style={[
               s.btn, { borderColor: p.border2 },

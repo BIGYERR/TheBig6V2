@@ -72,10 +72,10 @@ describe('native session sheet: the models are today\'s files', () => {
     assert.ok(today.length > 2000);
     assert.ok(copy.equals(today), 'add-sheet-model.ts differs from today\'s: copy it again (cp), never edit the copy');
   });
-  test('the sheet\'s folder holds the screen, its view, its readers, the add sheet\'s readers, its writes and the six models; the add sheet\'s holds its screen and its model', () => {
+  test('the sheet\'s folder holds the screen, its view, its readers, the add sheet\'s readers, its writes and the seven models, and the cardio log\'s block, wheel and rules; the add sheet\'s holds its screen and its model', () => {
     assert.deepStrictEqual(readdirSync(join(NATIVE, 'day-detail')).sort(), [
-      'SessionSheet.tsx', 'cardio-card-model.ts', 'cardio-fields-model.ts', 'day-detail-model.ts', 'session-log-model.ts', 'session-sections-model.ts', 'sheet-adds.ts', 'sheet-marks-model.ts',
-      'sheet-readers.ts', 'sheet-screen.ts', 'sheet-writes.ts',
+      'CardioLogBlock.tsx', 'SessionSheet.tsx', 'Wheel.tsx', 'cardio-card-model.ts', 'cardio-fields-model.ts', 'cardio-log.ts', 'cardio-sheet-model.ts', 'day-detail-model.ts', 'session-log-model.ts',
+      'session-sections-model.ts', 'sheet-adds.ts', 'sheet-marks-model.ts', 'sheet-readers.ts', 'sheet-screen.ts', 'sheet-writes.ts', 'wheels.ts',
     ]);
     assert.deepStrictEqual(readdirSync(join(NATIVE, 'add-sheet')).sort(), ['AddSheet.tsx', 'add-sheet-model.ts']);
   });
@@ -864,20 +864,21 @@ describe('native session sheet: which files write, and what the screen calls', (
     assert.ok(sheet.includes("{sets.rows.map((r, ri) => {"), 'every set is drawn: no pips on the sheet');
   });
   test('the slider and the notes save as they change; Done, Skip and Mark Done are one tap, which closes the sheet only when a status was set', () => {
-    assert.ok(sheet.includes('const next = moveRpe(f, v);\n    hold(next);\n    persistLog(session, next, view.dose, false, Date.now());'));
+    // The dose a save derives from is the cardio card's own, which the sport picker changes (cardio-log.ts).
+    assert.ok(sheet.includes('const next = moveRpe(f, v);\n    hold(next);\n    persistLog(session, next, cardioNow.current.dose, false, Date.now());'));
     assert.ok(sheet.includes('if (f.touched && f.rpe === String(v)) return;'), 'a drag that stays on its number saves once');
-    assert.ok(sheet.includes('const next = typeNotes(formNow.current, text);\n    hold(next);\n    persistLog(session, next, view.dose, false, Date.now());'));
-    assert.ok(sheet.includes('const r = tapStatus(session, formNow.current, view.dose, title, st, Date.now());\n    if (r.toast) say(r.toast);'), 'the tap\'s toast is raised');
+    assert.ok(sheet.includes('const next = typeNotes(formNow.current, text);\n    hold(next);\n    persistLog(session, next, cardioNow.current.dose, false, Date.now());'));
+    assert.ok(sheet.includes('const r = tapStatus(session, formNow.current, cardioNow.current.dose, title, st, Date.now());\n    if (r.closed) rest.reset();\n    if (r.toast) say(r.toast);'), 'the tap\'s toast is raised, and a status set stops the rest clock');
     assert.ok(sheet.includes('if (!r.closed) { setView((v) => ({ ...v, foot: footOf(store, prog, open.week, open.dayKey) })); return; }'), 'an undo draws the foot again and nothing else');
     assert.ok(sheet.includes('if (r.popup) away(() => onDone(prog, open.week, open.dayKey)); else away(onClose);'));
     assert.ok(sheet.includes("onPress={() => status(btn.status, view.footTitle)}") && sheet.includes("onPress={() => status('complete', blk.title)}"));
   });
   test('an edit draws the whole sheet again: every field and the log\'s form afresh', () => {
-    assert.ok(sheet.includes('const next = sheetView(store, g, open.week, open.dayKey, Date.now());\n    if (!next) return;\n    setView(next);\n    apply(sheetFields(next));\n    hold(formOf(logOf(next)));\n    setSetsOpen({});'));
+    assert.ok(sheet.includes('const next = sheetView(store, g, open.week, open.dayKey, Date.now());\n    if (!next) return;\n    setView(next);\n    apply(sheetFields(next));\n    hold(formOf(logOf(next)));\n    holdCardio(cardioOf(next, g));\n    setDrawn((n) => n + 1);\n    rest.resetIfIdle();\n    setSetsOpen({});'));
   });
-  test('the sheet draws every block of the view; the run\'s fields are still not drawn', () => {
-    assert.ok(sheet.includes('drawnBlocks(view).map('));
-    assert.doesNotMatch(strip(sheet), /log_run_|cardioFields|WheelView/);
+  test('the sheet draws every block of its frame, and the run\'s fields inside its log', () => {
+    assert.ok(sheet.includes('drawnBlocks(frame).map('));
+    assert.ok(sheet.includes('{log.view.cardio && form.wrap && ('));
     for (const words of ['‹ Back', 'RPE ⓘ', 'Log This Session', 'How hard was it? — RPE', 'Notes', 'How did it go? Anything to remember next week?', 'You logged this one but never marked it.', 'Mark Done ✓', 'tap to undo',
       'Time to add weight.', "' Last session you hit the top of the range on every set of '", "'. Go up in weight today and start back at the bottom of the range.'", 'Put it back', 'put it back', 'Swapped in', 'Skipped', 'Varied', "'This is what tracks\\nyour progress'",
       '>Exercise</Text>', '>Wildcard done</Text>', '>Edit cardio</Text>', '>remove</Text>', "<Text style={[s.bold, { color: p.signal }]}>You added this</Text>{' · not in the plan'}</Text>"]) {
@@ -925,15 +926,15 @@ describe('native session sheet: which files write, and what the screen calls', (
       assert.ok(sheet.includes(words), words);
     }
   });
-  test('This Week opens it: Reopen on a done lift, and Start where the day opens no deck; a done run\'s Reopen opens nothing yet', () => {
+  test('This Week opens it: Reopen on a done lift, and Start where the day opens no deck', () => {
     const week = read('this-week/ThisWeek.tsx');
-    assert.ok(week.includes("onPress={k.kind === 'lift' && onReopen ? () => onReopen(k.week, k.key) : undefined}"));
+    assert.ok(week.includes("else if (r.to === 'day') { if (onReopen) onReopen(k.week, k.key); }") && week.includes("onPress={() => tap('reopen')}"));
     assert.ok(week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from); else openSheet(week, key);'));
-    assert.ok(week.includes('const view = sheetView(store, grid, week, key, Date.now());\n    if (view) onSheet({ prog: grid, week, dayKey: key, view });'));
-    assert.ok(week.includes('onStart={startDeck} onReopen={openSheet} />'));
+    assert.ok(week.includes('const view = sheetView(store, grid, week, key, Date.now());\n    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });'));
+    assert.ok(week.includes('onStart={startDeck} onReopen={openSheet} onCardio={openSheet} />'));
     const app = read('App.tsx');
     assert.ok(app.includes('onSheet={setSheet}'));
     assert.ok(app.includes('onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />'), 'Done closes the sheet and raises the completion pop-up over This Week');
-    assert.ok(app.includes('<SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}'));
+    assert.ok(app.includes('<SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} rest={rest} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}'));
   });
 });

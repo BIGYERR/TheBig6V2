@@ -14,6 +14,9 @@ import { VERSION } from '@ia/core';
 import { BackupLoad } from './BackupLoad';
 import { SessionSheet } from './day-detail/SessionSheet';
 import type { SheetOpen } from './day-detail/sheet-screen';
+import { NO_ISLAND, RestClock } from './rest-timer/rest-clock';
+import { showsOn } from './rest-timer/rest-timer-model';
+import { RestTimer } from './rest-timer/RestTimer';
 import { DeckOpening } from './deck/DeckOpening';
 import type { DeckOpen, DeckProgram } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
@@ -82,8 +85,12 @@ function Shell() {
     const now = new Date();
     raise(s, popOf(s, fireCompletionPopup(s, week, dayKey, now), now, Math.random), null);
   };
+  // ── The rest timer (rest-timer.ts): one clock for the app's life, floating while a program is active ──
+  const rest = useRef(new RestClock(NO_ISLAND, performance, () => Date.now())).current;
+  const [hasProg, setHasProg] = useState(() => !!storedProgram(phoneStore));
   /** Each launch: 600 ms on, the day-after reminder, once a calendar day, when a past day stands unmarked. */
   const launched = useCallback((prog: DeckProgram | null): void => {
+    setHasProg(!!prog);
     if (!prog) return;
     timers.current.push(setTimeout(() => {
       const s = { store: phoneStore, prog } as unknown as PopSession, now = new Date();
@@ -114,12 +121,14 @@ function Shell() {
       </View>
       {deck && (
         <DeckOpening palette={p} store={phoneStore} open={deck.open} from={deck.from} calm={calm} under={under} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}
-          onDone={(prog, week, dayKey) => { setDeck(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
+          // Mark the day done stops the rest clock at zero (deck.ts markDay).
+          onDone={(prog, week, dayKey) => { rest.reset(); setDeck(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
       {sheet && (
-        <SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
+        <SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} rest={rest} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
           onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
+      {showsOn(hasProg, tab === 'week' ? 'screenWeek' : 'screenBugs') && <RestTimer palette={p} clock={rest} />}
       {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
       {over}
       {pop && <PopUp key={pop.n} palette={p} view={pop.view} calm={calm} onAct={answer} onClose={() => setPop(null)} />}

@@ -632,3 +632,32 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   `ia_remind_last_` and `ia_reminded_` (54 of 118 launches measured). It waits with the pop-ups.
 - **Proof:** `tests/support/native-launch.ts`: at every launch a test phone makes, the beta's store after its own
   launch equals the page's, every key. Red on the commit before.
+
+## D294 P-HANDLOGDOOR: in the Expo app, Record run opens the run's hand log until the recorder is built (Mario, 2026-11-17)
+
+- **Date:** 2026-11-17. **D-code:** D294 (`node tools/claims.mjs` at the time of writing: D292 held on
+  `chat/coros-import`, D293 on `chat/gps-smoothing`, neither landed). **Ruled by:** Mario, on the measure's
+  proposal for the migration's phase 3, row 3 ("Concur, build it", to the cut that named it). **Amends, in the Expo
+  app only and until the recorder is built there:** D272 item 6 and D278 item 2 (Record run opens the recorder).
+  Today's app is not changed. **Bump:** none, the page and core do not move (a Post-v0.262.4 pass).
+- **The finding (measured, `tests/measure/native-cardio-sheet_today.md`):** on the iOS app a run card's button is
+  Record run, which opens the GPS recorder, and the run's hand log is reached from the recorder (Ran without the
+  phone?, D272's open item). That is the button of 316 of the 382 days with a run, ride or swim in the ten seeded
+  programs, and of all 56 of The Half Manny's. The recorder is the migration's phase 4. Without it, a run that is not
+  done has no door to its hand log in the Expo app: only a ride's or a swim's Log button and a done run's Reopen
+  reach the cardio sheet.
+- **What changes, in the Expo app:** Record run keeps its words and its mark, and opens the run's own sheet, the one
+  Ran without the phone? opens from the recorder today (the when line, the run's name, its workout and its hand log;
+  D278 item 3). `frontends/native/src/this-week/ThisWeek.tsx`, the card's `tap`.
+- **What deliberately does not:** the button's words (Record run, Record the race), which rides and swims read
+  (Log the ride, Log the swim), a done run's Reopen, today's app, the page, core, what a program prescribes.
+- **The recommendation Mario took, and its counter-argument:** recommended, because otherwise a run cannot be logged
+  in the beta until phase 4. Against it: the button says Record run and opens a log, which differs from today's app
+  until the recorder lands.
+- **Retires:** when the recorder is built in the Expo app (phase 4), Record run opens it, and the hand log is reached
+  from it as today. This entry gets that release's line then.
+- **Expected values:** a run card with a button whose act is `record` routes to the cardio sheet under
+  `{ over: <the day's when line>, title: <the card's title> }`, the same sheet `cardRoute` gives a `log` button
+  (`tests/unit/native-cardio-sheet.test.ts`, This Week routes a card's button).
+- **Release:** Post-v0.262.4, no build of today's app. In the Expo app with the cardio sheet
+  (`docs/decisions/session-sheet.md`, the cardio sheet's entry); on the phone with the next IA Next build once merged.
