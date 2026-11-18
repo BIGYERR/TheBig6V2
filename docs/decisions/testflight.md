@@ -300,3 +300,12 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   done run's Reopen, the rest timer. Nothing differed and no motion was named, so nothing was fixed from it
   (`docs/decisions/session-sheet.md`, the build 119 entry). The rest of his line is D295
   (`docs/decisions/rest-timer.md`).
+- **Seen on `main`, the sixteenth run, the beta's lane alone** (run 44299743222, merge b2e01ca, pull request 53,
+  2026-11-18 07:00 EST; the merge carried no version: a3a5528, Progress in the Expo app with the floating rest
+  timer out, and six tests, docs and rule wording commits; read and recorded by the next session, the run cards',
+  which found the run still uploading and waited for it): the two gates went together (13 s today's, 12 s the
+  beta's). Today's lane skipped its upload, as ruled. The beta's lane archived, signed and uploaded `0.262.4 (120)`
+  (651 s, done 07:12:17) and read it back as processed (135 s, done 07:14:35). The build number moved from 119 to
+  120 on one commit, a3a5528, which changed `frontends/native`. The notices read `testflight 0.262.4 processed
+  (uploaded before this run; a version goes up once, a fix is the next PATCH)` and `testflight next 0.262.4 (120)
+  processed`. The run ended green: 6 jobs passed and 8 skipped by rule.
