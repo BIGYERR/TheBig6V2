@@ -151,3 +151,9 @@ if ever, and the main line reads only main-slot sessions. Tests: `tests/integrat
   ladder dot clipped at the track's edge, and the number pad's room.
 - **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged. The
   row's second session draws the run cards.
+
+## On Mario's phone, IA Next build 120 (2026-11-18)
+
+- Eight things were put to him: the Progress tab, a chip for each of his three programs, the dot charts, Main Lifts with the Deadlift line, the Range Ladder, the journal's weeks folding, the estimator with the number pad over it, the archived program's bar with its trash and Cancel, and no rest timer on any tab. He was told that Restore and Delete Forever write to the beta's own
+  copy only, and that tapping them was his choice. **His report:** "All good!" (no screenshot; he did not say
+  whether he tapped either). Nothing differed and no motion was named, so nothing was fixed from it.

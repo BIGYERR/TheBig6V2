@@ -309,3 +309,6 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   120 on one commit, a3a5528, which changed `frontends/native`. The notices read `testflight 0.262.4 processed
   (uploaded before this run; a version goes up once, a fix is the next PATCH)` and `testflight next 0.262.4 (120)
   processed`. The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 120** (his report, 2026-11-18, no screenshot): "All good!", to eight things on IA Next
+  build 120: the Progress tab, a chip for each of his three programs, the dot charts, Main Lifts with the Deadlift line, the Range Ladder, the journal's weeks folding, the estimator with the number pad over it, the archived program's bar with its trash and Cancel, and no rest timer on any tab. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/progress.md`, the build 120 entry).

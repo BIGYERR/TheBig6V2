@@ -88,3 +88,8 @@ Tests: the island and PWA clock tests in `tests/integration/rest-timer.test.ts` 
   changed (the sheet's Back) and was pointed at the line as it stands, its rule unchanged, and run again alone: red.
 - **Seen on the simulator:** no tab on the edge of This Week, Progress or Bugs.
 - **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged.
+
+## On Mario's phone, IA Next build 120 (2026-11-18)
+
+- D295 as built reached his phone with build 120. No rest timer on any tab was the last of eight things put to
+  him. **His report:** "All good!" (`docs/decisions/progress.md`, the build 120 entry).
