@@ -5,7 +5,9 @@
 // number of the screen and every ia_ key is equal, value for value, no family left out. Every expected value here is
 // today's page, on purpose (support/native-progress.ts). The ten programs are tests/sweeps/native-progress.test.ts's.
 //
-// The run cards are compared here though this app does not draw them yet (DRAWN): their numbers are the view's.
+// Each run card the walks draw is also read as this app's drawer reads it (support/native-progress.ts readCard):
+// its title, every word of its head, body and footer, each bold run and its colour, each block's type, and every
+// element of its picture. The last run card test holds a floor for each of the eight kinds and for each part.
 //
 // Imported first: every launch a phone makes here is a launch of the beta's seam too, held equal key for key
 // (support/native-launch.ts).
@@ -23,6 +25,12 @@ const CREATED = '2026-08-29T09:00:00';
 const HALF = fixtures.HALF_MANNY;
 const SECOND = Object.values(PROGRAMS)[5]!;
 const T = progressTally();
+/** The run cards the walks drew, and what the drawer read off them. */
+const CARDS = progressTally();
+const fold = (R: typeof T): void => {
+  for (const k of Object.keys(R.cardKinds)) CARDS.cardKinds[k] = (CARDS.cardKinds[k] || 0) + R.cardKinds[k]!;
+  for (const k of Object.keys(R.cardParts)) CARDS.cardParts[k] = (CARDS.cardParts[k] || 0) + R.cardParts[k]!;
+};
 
 test('HALF_MANNY through the standard history: Progress opened at each stretch and the estimator worked, the screens and the stores equal', () => {
   let stages = 0;
@@ -59,7 +67,7 @@ test('three weeks of runs logged with a pace: every run card, the swap line and 
   assert.ok(R.swaps >= 1 && R.jogs >= 1 && R.notes >= 1, 'the journal holds a swap, a jog and a note: ' + JSON.stringify(R));
   const note = two.view!.journal!.flatMap((w) => w.entries).find((e) => e.notes);
   assert.ok(note && /Legs heavy/.test(note.notes!), 'the note is in the journal');
-  for (const k of Object.keys(R.cardKinds)) T.cardKinds[k] = (T.cardKinds[k] || 0) + R.cardKinds[k]!;
+  fold(R);
 });
 
 test('one and two weeks of runs are too few for the trend and the zone chart: the easy effort\'s empty state, then the easy bands, equal to today\'s', () => {
@@ -74,6 +82,25 @@ test('one and two weeks of runs are too few for the trend and the zone chart: th
   two = openBoth(twoWeeks.phone, R, 'HALF_MANNY, two weeks of runs');
   assert.deepEqual(two.view!.charts.flatMap((c) => (c.kind === 'card' ? [cardKind(c.spec)] : [])),
     ['Long Run Ladder', 'Is Your Easy Actually Easy? (the easy bands)', 'Recovery Pace — Easy-Effort Trend', 'Mileage — Drift From Plan']);
+  fold(R);
+});
+
+test('a run base program after three weeks draws the easy effort chart and where it is heading; with them each of the eight run cards was read as this app draws it, part by part', () => {
+  const R = progressTally();
+  const two = openBoth(runsLife(PROGRAMS['run base, bodyweight, balanced']!, CREATED).phone, R, 'the run base program, three weeks of runs');
+  const titles = two.view!.charts.flatMap((c) => (c.kind === 'card' ? [cardKind(c.spec)] : []));
+  assert.ok(titles.includes('Same Effort, More Speed') && titles.includes('Where This Is Heading'), 'the run base program\'s cards: ' + titles.join(', '));
+  fold(R);
+  // Each kind is drawn on one screen at least, and a screen is read at each of its five taps.
+  for (const k of ['Long Run Ladder', 'Is Your Easy Actually Easy?', 'Is Your Easy Actually Easy? (the easy bands)', 'Recovery Pace — Easy-Effort Trend', 'Same Effort, More Speed',
+    'Same Effort, More Speed (its empty state)', 'Where This Is Heading', 'Mileage — Drift From Plan']) assert.ok((CARDS.cardKinds[k] || 0) >= 5, 'the run card ' + k + ': ' + JSON.stringify(CARDS.cardKinds));
+  // Measured on these four walks: each count below is what they drew, five taps a screen.
+  const P = CARDS.cardParts, at = (k: string): number => P[k] || 0;
+  assert.ok(at('head') >= 20 && at('body') >= 5 && at('foot') >= 50 && at('picture') >= 60 && at('card with no picture') >= 5, 'heads, bodies, footers and pictures: ' + JSON.stringify(P));
+  assert.ok(at('block') >= 45 && at('display block') >= 20 && at('block with a line height') >= 40 && at('block with a tracking') >= 20 && at('block with no room under it') >= 10, 'the blocks and what their styles name: ' + JSON.stringify(P));
+  assert.ok(at('bold') >= 70 && at('bold in a colour') >= 55 && at('bold') - at('bold in a colour') >= 15, 'bold runs, in a colour and in none: ' + JSON.stringify(P));
+  assert.ok(at('line') >= 225 && at('rect') >= 245 && at('circle') >= 180 && at('path') >= 20 && at('polygon') >= 5 && at('text') >= 675 && at('text that names no face') >= 30, 'the six elements of a picture: ' + JSON.stringify(P));
+  for (const c of ['var(--run)', 'var(--red)', 'var(--muted)', 'var(--hip)']) assert.ok(at('card in ' + c) >= 5, 'a card in ' + c + ': ' + JSON.stringify(P));
 });
 
 test('a run logged in the short first week is left out of the weekly sums, the ladder and the drift on both (D26)', () => {

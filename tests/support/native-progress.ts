@@ -12,11 +12,15 @@ import assert from 'node:assert/strict';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 import { chartChunks, journalWeeks, viewedProgram, weeklySums } from '../../frontends/app/src/app/screens/progress/progress-model.ts';
 import { chipsView } from '../../frontends/app/src/app/screens/progress/program-chips-model.ts';
+import { blockType, markupBlocks } from '../../frontends/native/src/progress/card-markup.ts';
+import type { CardSpec } from '../../frontends/native/src/progress/charts/chart-card-model.ts';
+import { paint, pictureBox, svgProps } from '../../frontends/native/src/progress/paint.ts';
 import {
-  type ProgressState, type ProgressView, afterDelete, askPurge, cancelConfirm, estimateLine, estimatorUnit, newProgressState, openProgress,
+  type ProgressState, type ProgressView, afterDelete, askPurge, cancelConfirm, estimateLine, estimatorUnit, markupParts, newProgressState, openProgress,
   progressView, setCalcLift, showProgram,
 } from '../../frontends/native/src/progress/progress-screen.ts';
 import { deleteProgram, restoreProgram } from '../../frontends/native/src/progress/progress-writes.ts';
+import { DAY, NIGHT } from '../../frontends/native/src/theme.ts';
 import { iso } from './native-deck-swap.ts';
 import { launchNow } from './native-this-week.ts';
 import { sqliteTestStore } from './sqlite-kv.ts';
@@ -32,10 +36,12 @@ export interface ProgressTally {
   journalWeeks: number; journalEntries: number; swaps: number; jogs: number; notes: number;
   chips: number; bars: number; confirms: number; warned: number; restores: number; deletes: number; removed: number; folds: number;
   estimates: number; estimatesEmpty: number; taps: number; keys: number; cardKinds: Record<string, number>;
+  /** What the drawer read off the run cards (readCard): heads, bodies, footers, blocks, bold runs, pictures and their elements. */
+  cardParts: Record<string, number>;
 }
 export const progressTally = (): ProgressTally => ({
   draws: 0, empties: 0, dots: 0, cards: 0, ledgers: 0, mains: 0, lines: 0, ladder: 0, other: 0, journalWeeks: 0, journalEntries: 0, swaps: 0, jogs: 0, notes: 0,
-  chips: 0, bars: 0, confirms: 0, warned: 0, restores: 0, deletes: 0, removed: 0, folds: 0, estimates: 0, estimatesEmpty: 0, taps: 0, keys: 0, cardKinds: {},
+  chips: 0, bars: 0, confirms: 0, warned: 0, restores: 0, deletes: 0, removed: 0, folds: 0, estimates: 0, estimatesEmpty: 0, taps: 0, keys: 0, cardKinds: {}, cardParts: {},
 });
 
 /**
@@ -47,6 +53,89 @@ export function cardKind(spec: { title: string; foot: string | null; body: strin
   if (/^The two bars should not touch/.test(spec.foot || '')) return title + ' (the easy bands)';
   if (/This chart holds effort constant/.test(spec.body || '')) return title + ' (its empty state)';
   return title;
+}
+
+/** A colour the run cards name, in a palette: typed here, not asked of the app's own reader. */
+const TOKEN: Record<string, 'run' | 'red' | 'hip' | 'muted' | 'text'> = { 'var(--run)': 'run', 'var(--red)': 'red', 'var(--hip)': 'hip', 'var(--muted)': 'muted', 'var(--text)': 'text' };
+/** The props react-native-svg's six elements take from a run card's picture. */
+const SVG_PROPS = new Set(['x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'width', 'height', 'd', 'points', 'fill', 'stroke', 'strokeWidth', 'strokeDasharray', 'fontSize', 'fontWeight', 'textAnchor', 'fontFamily', 'opacity']);
+const near = (a: number | undefined, b: number, what: string): void => assert.ok(a !== undefined && Math.abs(a - b) < 1e-9, what + ': ' + a + ' against ' + b);
+
+/**
+ * One run card as the Expo app's drawer reads it (RunCard, ChartCards.tsx), against this file's own reading of the
+ * markup the page wrote: the title's icon and words; every word of the head, the body and the footer, in order;
+ * each <b> as a bold run in the colour it names; each <div> as a block with the type its inline style names; every
+ * element of the picture under react-native-svg's names, painted by day and by night, every text in the app's face;
+ * the picture laid the full width with room past its edge. Counted into `T.cardParts`.
+ */
+export function readCard(spec: CardSpec, T: ProgressTally, what: string): void {
+  const n = (k: string, by = 1): void => { T.cardParts[k] = (T.cardParts[k] || 0) + by; };
+  const title = markupParts(spec.title);
+  assert.ok(title.icon && /^<svg[\s\S]*<\/svg>$/.test(title.icon), what + ': the title opens with its icon');
+  assert.equal(title.text, spec.title.replace(/<svg[\s\S]*?<\/svg>/, '').trim(), what + ': the title\'s words');
+  assert.ok(title.text.length > 5 && !/[<>]/.test(title.text), what + ': the title is plain words');
+  assert.ok(TOKEN[spec.color], what + ': the card\'s colour is one the cards name: ' + spec.color);
+  n('card in ' + spec.color);
+  for (const p of [DAY, NIGHT]) assert.equal(paint(spec.color, p), p[TOKEN[spec.color]!], what + ': the card\'s colour in the palette');
+  for (const part of ['head', 'body', 'foot'] as const) {
+    const html = spec[part];
+    if (html === null) continue;
+    n(part);
+    const blocks = markupBlocks(html);
+    assert.equal(blocks.map((b) => b.runs.map((r) => r.text).join('')).join(''), html.replace(/<[^>]*>/g, ''), what + ': every word of the ' + part + ', in order');
+    const bolds = [...html.matchAll(/<b(?: style="color:([^";]+)")?>([^<]*)<\/b>/g)].map((m) => [m[2]!, m[1] ?? null]);
+    assert.equal(bolds.length, (html.match(/<b[ >]/g) || []).length, what + ': this file read every <b> of the ' + part);
+    assert.deepEqual(blocks.flatMap((b) => b.runs.filter((r) => r.bold).map((r) => [r.text, r.color])), bolds, what + ': the bold runs of the ' + part + ' and their colours');
+    for (const [, c] of bolds) { n('bold'); if (c !== null) { n('bold in a colour'); assert.ok(TOKEN[c], what + ': a bold colour the cards name: ' + c); } }
+    const divs = [...html.matchAll(/<div style="([^"]*)">/g)].map((m) => m[1]!);
+    assert.equal(divs.length, (html.match(/<div[ >]/g) || []).length, what + ': this file read every <div> of the ' + part);
+    const styled = blocks.filter((b) => b.style);
+    assert.equal(styled.length, divs.length, what + ': a block for each <div> of the ' + part);
+    // A footer is one run of words under the footer's own type; a head and a body hold no word outside a block.
+    if (part === 'foot') assert.ok(blocks.length === 1 && blocks[0]!.style === null, what + ': the footer is one block of the footer\'s type');
+    else assert.equal(blocks.length, styled.length, what + ': the ' + part + ' holds no word outside a block');
+    styled.forEach((b, i) => {
+      n('block');
+      const css = divs[i]!, one = (re: RegExp): string | null => { const m = re.exec(css); return m ? m[1]! : null; };
+      const size = one(/(?:^|;)font-size:([0-9.]+)px/), color = one(/(?:^|;)color:([^;]+)/), line = one(/(?:^|;)line-height:([0-9.]+)(?:;|$)/), gap = one(/(?:^|;)margin-bottom:([0-9.]+)px/),
+        track = one(/(?:^|;)letter-spacing:(-?[0-9.]+)em/);
+      assert.ok(size !== null && color !== null && TOKEN[color], what + ': a block names its size and a colour the cards name: ' + css);
+      for (const p of [DAY, NIGHT]) {
+        const t = blockType(b.style!, p);
+        assert.equal(t.fontFamily, 'Helvetica Neue');
+        assert.equal(t.fontSize, +size, what + ': the block\'s size');
+        assert.equal(t.color, p[TOKEN[color]!], what + ': the block\'s colour in the palette');
+        assert.equal(t.fontWeight, /(?:^|;)font-weight:700/.test(css) ? '700' : undefined, what + ': the block\'s weight');
+        if (line === null) assert.equal(t.lineHeight, undefined); else near(t.lineHeight, +line * +size, what + ': the block\'s line height in points');
+        if (track === null) assert.equal(t.letterSpacing, undefined); else near(t.letterSpacing, +track * +size, what + ': the block\'s tracking in points');
+        assert.equal(t.marginBottom, gap === null ? undefined : +gap, what + ': the room under the block');
+      }
+      if (/(?:^|;)font-family:var\(--font-display\)/.test(css)) { n('display block'); assert.equal(b.style!.display, true); } else assert.equal(b.style!.display, false);
+      if (line !== null) n('block with a line height');
+      if (track !== null) n('block with a tracking');
+      if (gap === null) n('block with no room under it');
+    });
+  }
+  const g = spec.svg;
+  if (!g) { n('card with no picture'); return; }
+  n('picture');
+  const box = pictureBox('0 0 ' + g.w + ' ' + g.h, 'width:100%;height:auto;overflow:visible');
+  assert.deepEqual([box.viewBox, box.width, box.height], [[-6, -6, g.w + 12, g.h + 12].join(' '), null, null], what + ': the picture is laid the full width, six units kept past each edge');
+  for (const e of g.els) {
+    n(e.el);
+    assert.ok(['line', 'rect', 'circle', 'path', 'polygon', 'text'].includes(e.el), what + ': an element the picture draws: ' + e.el);
+    for (const p of [DAY, NIGHT]) {
+      const a = svgProps(e, p, 'Helvetica Neue');
+      for (const k of Object.keys(a)) {
+        assert.ok(SVG_PROPS.has(k), what + ': a ' + e.el + '\'s ' + k + ' is no prop of react-native-svg');
+        assert.ok(!/var\(/.test(a[k]!), what + ': a ' + e.el + '\'s ' + k + ' is painted: ' + a[k]);
+      }
+      assert.equal(Object.keys(a).length, Object.keys(e.a).length + (e.el === 'text' && !('font-family' in e.a) ? 1 : 0), what + ': every attribute of a ' + e.el + ' is carried');
+      if (e.el === 'text') assert.equal(a['fontFamily'], 'Helvetica Neue', what + ': a text is in the app\'s face');
+      else assert.equal(a['fontFamily'], undefined, what + ': only a text takes a face');
+    }
+    if (e.el === 'text' && !('font-family' in e.a)) n('text that names no face');
+  }
 }
 
 /**
@@ -158,7 +247,7 @@ export class TwoProgress {
     if (v.empty) T.empties++;
     for (const c of v.charts) {
       if (c.kind === 'dot') T.dots++;
-      else if (c.kind === 'card') { T.cards++; const k = cardKind(c.spec); T.cardKinds[k] = (T.cardKinds[k] || 0) + 1; }
+      else if (c.kind === 'card') { T.cards++; const k = cardKind(c.spec); T.cardKinds[k] = (T.cardKinds[k] || 0) + 1; readCard(c.spec, T, this.what + ', ' + k); }
       else {
         T.ledgers++;
         T.mains += c.view.mains ? c.view.mains.blocks.length : 0;

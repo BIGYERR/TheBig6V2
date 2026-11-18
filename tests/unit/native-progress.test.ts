@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { describe, test } from 'vitest';
 import { type StateStore, memoryStore } from '@ia/core/engine/state-store.ts';
 import { REPO } from '../support/app.ts';
+import { blockStyle, blockType, markupBlocks } from '../../frontends/native/src/progress/card-markup.ts';
 import { ledgerView } from '../../frontends/native/src/progress/charts/ledger-model.ts';
 import type { SvgEl } from '../../frontends/native/src/progress/charts/chart-card-model.ts';
 import { paint, pictureBox, svgProps } from '../../frontends/native/src/progress/paint.ts';
@@ -19,7 +20,7 @@ import {
   DRAWN, afterDelete, askPurge, cancelConfirm, estimateLine, estimatorUnit, markupParts, newProgressState, openProgress, progressView, setCalcLift, showProgram,
 } from '../../frontends/native/src/progress/progress-screen.ts';
 import { PURGE_FAMILIES, cleanLiftLog, deleteProgram, restoreProgram } from '../../frontends/native/src/progress/progress-writes.ts';
-import { DAY } from '../../frontends/native/src/theme.ts';
+import { DAY, NIGHT } from '../../frontends/native/src/theme.ts';
 
 const NATIVE = join(REPO, 'frontends/native/src');
 const TODAY = join(REPO, 'frontends/app/src/app/screens/progress');
@@ -299,8 +300,8 @@ describe('native progress: what the page keeps between draws, and the screen (sh
     const dot = progressView(s, newProgressState(), NOW)!.charts[0]!;
     assert.ok(dot.kind === 'dot' && dot.spec.points.length === 1 && dot.spec.total === '3.0', 'week 7 is past the program: ' + JSON.stringify(dot));
   });
-  test('this app draws the dot charts and the ledger; the run cards are in the view and wait for their drawer', () => {
-    assert.deepEqual([...DRAWN], ['dot', 'ledger']);
+  test('this app draws each of today\'s three kinds of chart: the dot charts, the run cards and the ledger', () => {
+    assert.deepEqual([...DRAWN], ['dot', 'card', 'ledger']);
     assert.ok(read('progress/Progress.tsx').includes('v.charts.filter((c) => DRAWN.includes(c.kind)).map('));
   });
 });
@@ -368,7 +369,7 @@ describe('native progress: the three writes, to this app\'s own store (D289)', (
   });
   test('of the screen\'s files only progress-writes.ts writes, and none names the phone\'s own store', () => {
     const writes = /\.set\(|\.remove\(|writePrograms|writeLiftLog|writeDayLogs|writeActiveProgramId|pickActive/;
-    for (const f of ['progress/progress-screen.ts', 'progress/progress-readers.ts', 'progress/Progress.tsx', 'progress/ChartCards.tsx', 'progress/SvgPicture.tsx', 'progress/paint.ts']) {
+    for (const f of ['progress/progress-screen.ts', 'progress/progress-readers.ts', 'progress/Progress.tsx', 'progress/ChartCards.tsx', 'progress/SvgPicture.tsx', 'progress/paint.ts', 'progress/card-markup.ts']) {
       assert.doesNotMatch(strip(read(f)), writes, f + ' writes');
       assert.doesNotMatch(strip(read(f)), /phoneStore|localStorage/, f + ' names a store of its own');
     }
@@ -414,7 +415,95 @@ describe('native progress: the estimator and the page\'s markup', () => {
     assert.equal(track.viewBox, '-14 -6 168 38');
     assert.ok(Math.abs(track.width! - (140 + 12 * 140 / 156)) < 1e-9 && Math.abs(track.height! - (26 + 12 * 140 / 156)) < 1e-9 && Math.abs(track.margin + 6 * 140 / 156) < 1e-9);
     assert.ok(Math.abs(track.width! / 168 - 140 / 156) < 1e-9, 'the scale is the page\'s');
-    assert.deepEqual(pictureBox('0 0 320 108', 'width:100%;height:auto;overflow:visible'), { viewBox: '0 0 320 108', width: null, height: null, margin: 0, ratio: 320 / 108 });
+    assert.ok(pictureBox('0 0 320 108', 'width:100%;height:auto;overflow:visible').width === null, 'no size named: the full width (its box is the next block\'s test)');
+  });
+});
+
+describe('native progress: a run card\'s markup, its type and its picture', () => {
+  const words = (text: string): { text: string; bold: boolean; color: string | null } => ({ text, bold: false, color: null });
+  const bold = (text: string, color: string | null = null): { text: string; bold: boolean; color: string | null } => ({ text, bold: true, color });
+  const near = (a: number | undefined, b: number): void => assert.ok(a !== undefined && Math.abs(a - b) < 1e-9, a + ' against ' + b);
+
+  test('a footer is one block of its words in order, each <b> a bold run in the colour it names, or in none', () => {
+    // The drift chart's footer, as buildDriftChart writes it.
+    const foot = 'Written <b>12.0 mi</b> · logged <b style="color:var(--run)">13.5 mi</b> across 3 weeks — <b style="color:var(--red)">-1.5 mi</b> net. Distance-prescribed runs only.';
+    assert.deepEqual(markupBlocks(foot), [{ style: null, runs: [words('Written '), bold('12.0 mi'), words(' · logged '), bold('13.5 mi', 'var(--run)'), words(' across 3 weeks — '), bold('-1.5 mi', 'var(--red)'),
+      words(' net. Distance-prescribed runs only.')] }]);
+    assert.deepEqual(markupBlocks('The two bars should not touch.'), [{ style: null, runs: [words('The two bars should not touch.')] }]);
+    assert.deepEqual(markupBlocks('<b>1</b> and <b>2</b>'), [{ style: null, runs: [bold('1'), words(' and '), bold('2')] }], 'a bold run first and last');
+    assert.deepEqual(markupBlocks(''), []);
+  });
+  test('a head is a block for each <div>, in the page\'s order, each with what its inline style names', () => {
+    // The easy zone chart's head (headHtml), with a run too fast.
+    const head = '<div style="font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.02em;color:var(--red);line-height:1.15;margin-bottom:4px">2 of 5 were too fast</div>'
+      + '<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">The plan asks for 10:00/mi.</div>';
+    assert.deepEqual(markupBlocks(head), [
+      { style: { display: true, size: 24, weight: '700', spacing: -0.02, color: 'var(--red)', line: 1.15, gap: 4 }, runs: [words('2 of 5 were too fast')] },
+      { style: { display: false, size: 12, weight: null, spacing: null, color: 'var(--muted)', line: 1.5, gap: 12 }, runs: [words('The plan asks for 10:00/mi.')] },
+    ]);
+  });
+  test('a body\'s block holds its bold runs, each in its colour', () => {
+    // The easy effort chart's empty state (buildEasyEffortEmpty).
+    const body = '<div style="font-size:12px;color:var(--muted);line-height:1.6">it needs <b style="color:var(--text)">6</b> easy or recovery runs. You have <b style="color:var(--text)">4</b>, so 2 to go.</div>';
+    assert.deepEqual(markupBlocks(body), [{ style: { display: false, size: 12, weight: null, spacing: null, color: 'var(--muted)', line: 1.6, gap: null },
+      runs: [words('it needs '), bold('6', 'var(--text)'), words(' easy or recovery runs. You have '), bold('4', 'var(--text)'), words(', so 2 to go.')] }]);
+  });
+  test('words between and after blocks are blocks of their own; a block with no words is left out; an entity is its character; any other tag is left out and its words kept', () => {
+    assert.deepEqual(markupBlocks('before<div style="font-size:12px">in &amp; <i>out</i> &lt;there&gt;</div><div style="font-size:11px"></div> after <b></b><div>bare</div>'), [
+      { style: null, runs: [words('before')] },
+      { style: { display: false, size: 12, weight: null, spacing: null, color: null, line: null, gap: null }, runs: [words('in & out <there>')] },
+      { style: null, runs: [words(' after ')] },
+      { style: { display: false, size: null, weight: null, spacing: null, color: null, line: null, gap: null }, runs: [words('bare')] },
+    ]);
+  });
+  test('a style reads only what it names, each in the unit the page writes it in, and only the display face\'s own name is the display face', () => {
+    const none = { display: false, size: null, weight: null, spacing: null, color: null, line: null, gap: null };
+    assert.deepEqual(blockStyle(''), none);
+    assert.deepEqual(blockStyle('font-family:serif;font-size:12em;letter-spacing:1px;line-height:18px;margin-bottom:1em;font-weight:;color:'), none);
+    assert.deepEqual(blockStyle(' color : var(--text) ; font-size : 12px '), { ...none, color: 'var(--text)', size: 12 });
+    assert.deepEqual(blockStyle('margin-bottom:0px;letter-spacing:0.5em;line-height:1'), { ...none, gap: 0, spacing: 0.5, line: 1 });
+  });
+  test('a block\'s type is its style in points and in this palette: the tracking and the line height off its size, and nothing for what the style does not name', () => {
+    const big = { display: true, size: 24, weight: '700', spacing: -0.02, color: 'var(--red)', line: 1.15, gap: 4 };
+    const t = blockType(big, DAY);
+    assert.deepEqual(Object.keys(t).sort(), ['color', 'fontFamily', 'fontSize', 'fontWeight', 'letterSpacing', 'lineHeight', 'marginBottom']);
+    assert.ok(t.fontFamily === 'Helvetica Neue' && t.fontSize === 24 && t.fontWeight === '700' && t.color === '#9e3328' && t.marginBottom === 4, JSON.stringify(t));
+    near(t.letterSpacing, -0.48);   // 24 × -0.02
+    near(t.lineHeight, 27.6);       // 24 × 1.15
+    assert.equal(blockType(big, NIGHT).color, '#D9665A');
+    // The line under the projected finish: 11 points, no line height named.
+    assert.deepEqual(blockType({ display: false, size: 11, weight: null, spacing: null, color: 'var(--muted)', line: null, gap: 12 }, DAY), { fontFamily: 'Helvetica Neue', fontSize: 11, color: '#6E6E6A', marginBottom: 12 });
+    assert.deepEqual(blockType(blockStyle(''), DAY), { fontFamily: 'Helvetica Neue' });
+    // A tracking or a line height with no size has nothing to be a share of; no room at all is still said.
+    assert.deepEqual(blockType({ display: false, size: null, weight: null, spacing: -0.02, color: null, line: 1.5, gap: 0 }, DAY), { fontFamily: 'Helvetica Neue', marginBottom: 0 });
+    // A size with neither: no tracking and no line height.
+    assert.deepEqual(blockType({ display: false, size: 12, weight: null, spacing: null, color: null, line: null, gap: null }, DAY), { fontFamily: 'Helvetica Neue', fontSize: 12 });
+  });
+  test('the builders of the run cards write those two tags and those seven properties, and no other', () => {
+    const model = strip(read('progress/charts/run-charts-model.ts'));
+    const literals = [...model.matchAll(/'(?:[^'\\\n]|\\.)*'/g)].map((m) => m[0]).join('\n');
+    assert.deepEqual([...new Set([...literals.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g)].map((m) => m[1]))].sort(), ['b', 'div']);
+    assert.deepEqual([...new Set([...literals.matchAll(/(?:["';])([a-z][a-z-]*):(?=[a-z0-9(' -])/g)].map((m) => m[1]))].sort(),
+      ['color', 'font-family', 'font-size', 'font-weight', 'letter-spacing', 'line-height', 'margin-bottom']);
+    // Every <b> opens bare or with a colour alone, and every <div> with a style: the two shapes the reader takes.
+    assert.deepEqual([...new Set([...literals.matchAll(/<b[^>']*/g)].map((m) => m[0]))].sort(), ['<b', '<b style="color:', '<b style="color:var(--run)"', '<b style="color:var(--text)"']);
+    assert.deepEqual([...new Set([...literals.matchAll(/<div[^>']{0,8}/g)].map((m) => m[0]))], ['<div style="']);
+  });
+  test('a picture\'s text that names no face takes the app\'s, as one that names the page\'s does; no other element takes a face', () => {
+    // The pace chart's plan label (buildPaceChart): no font-family.
+    assert.deepEqual(svgProps({ el: 'text', a: { x: '306', y: '40.0', 'font-size': '7.5', fill: 'var(--run)', 'text-anchor': 'end', opacity: '0.85' }, text: 'Plan 9:30/mi' }, DAY, 'Helvetica Neue'),
+      { x: '306', y: '40.0', fontSize: '7.5', fill: DAY.run, textAnchor: 'end', opacity: '0.85', fontFamily: 'Helvetica Neue' });
+    assert.deepEqual(svgProps({ el: 'rect', a: { x: '30.0', y: '26', width: '40.0', height: '18', fill: 'var(--lift)', opacity: '0.82', rx: '1' } }, DAY, 'Helvetica Neue'),
+      { x: '30.0', y: '26', width: '40.0', height: '18', fill: DAY.lift, opacity: '0.82', rx: '1' });
+    assert.deepEqual(svgProps({ el: 'polygon', a: { points: '46.0,60.0 150.0,70.0 ', fill: 'var(--hip)', opacity: '0.13' } }, NIGHT, 'Helvetica Neue'), { points: '46.0,60.0 150.0,70.0 ', fill: NIGHT.hip, opacity: '0.13' });
+  });
+  test('a chart laid the full width of its card keeps six units past each edge, at the page\'s scale and in the page\'s place', () => {
+    // 320 units across the card's width: 332 units are 103.75% of it, pulled back 6 of 320 (1.875%) on every side.
+    assert.deepEqual(pictureBox('0 0 320 108', 'width:100%;height:auto;overflow:visible'), { viewBox: '-6 -6 332 120', width: null, height: null, margin: 0, ratio: 332 / 120, wide: 103.75, pull: -1.875 });
+    const b = pictureBox('0 0 320 152', 'width:100%;height:auto;overflow:visible');
+    // On a card 300 points wide a unit is 300 / 320 of a point: the box is 311.25 by 153.75, and after its margins the picture stands 300 by 142.5, the page's own 300 × 152 / 320.
+    const wide = 300 * b.wide / 100, tall = wide / b.ratio, pull = 300 * b.pull / 100;
+    near(wide, 311.25); near(tall, 153.75); near(wide + 2 * pull, 300); near(tall + 2 * pull, 142.5);
   });
 });
 
@@ -467,6 +556,24 @@ describe('native progress: the screen\'s words and wiring', () => {
     for (const field of ['c.grid.map(', '{g.label}', 'd={c.path}', 'c.points.map(', 'c.xLabels.map(', '{l.text}', "{c.total + ' ' + c.unit}", "{c.peak + ' ' + c.unit}", 'html={c.title}']) assert.ok(cards.includes(field), 'the dot chart draws ' + field);
     assert.ok(cards.includes("{l.ups + ' time' + (l.ups === 1 ? '' : 's')}"));
   });
+  test('a run card draws each part of today\'s spec where it holds one, in the page\'s order: the title in the card\'s colour, the head, the picture, the body, the footer', () => {
+    const lines = [
+      '<CardTitle html={c.title} color={paint(c.color, p)} gap={c.titleGap} />',
+      '{c.head && <Markup html={c.head} palette={p} />}',
+      "{c.svg && <SvgPicture viewBox={'0 0 ' + c.svg.w + ' ' + c.svg.h} style=\"width:100%;height:auto;overflow:visible\" els={c.svg.els} palette={p} />}",
+      '{c.body && <Markup html={c.body} palette={p} />}',
+      '{c.foot && <Markup html={c.foot} base={[s.foot, { color: p.muted }]} palette={p} />}',
+    ];
+    const at = lines.map((l) => cards.indexOf(l));
+    assert.ok(at.every((i) => i > 0), 'each part is drawn: ' + at.join(' '));
+    assert.deepEqual([...at].sort((a, b) => a - b), at, 'in the page\'s order');
+    assert.ok(cards.includes('<View testID="run-card" style={[s.card, { backgroundColor: p.surface }]}>'), 'on a card of its own, as every chart is');
+    assert.ok(cards.includes('{markupBlocks(html).map((b, i) => ('), 'a part is drawn block by block');
+    assert.ok(cards.includes('<Text key={i} style={b.style ? blockType(b.style, p) : base}>'), 'a block in its own type, the words outside one in the type of where they stand');
+    assert.ok(cards.includes('{b.runs.map((r, j) => (r.bold ? <Text key={j} style={[s.bold, r.color !== null && { color: paint(r.color, p) }]}>{r.text}</Text> : r.text))}'), 'a bold run in its colour, the other words as they are');
+    assert.ok(cards.includes("foot: { fontFamily: TEXT, fontSize: 11, marginTop: 6, lineHeight: 16.5 },") && cards.includes("bold: { fontWeight: '700' },"), 'the footer\'s type is the page\'s: 11 points at 1.5, six under the picture');
+    assert.ok(screen.includes("c.kind === 'dot' ? <DotChartCard key={i} spec={c.spec} palette={p} />\n                : c.kind === 'card' ? <RunCard key={i} spec={c.spec} palette={p} />\n                  : <LedgerCards key={i} view={c.view} palette={p} />"), 'each kind of chart goes to its own drawer');
+  });
   test('the journal draws every field of today\'s entry, the confirmation warns only when told to, and the ledger\'s marks follow its rows', () => {
     for (const field of ['{e.day}', '{e.rpe.text}', 'paint(e.rpe.color, p)', '{swap.text}', 'markupParts(l).text', 'markupParts(e.notes).text', '{wk.count}', 'marginBottom: e.headMb', 'marginBottom: e.swap.mb', 'marginBottom: e.jogMb', 'open[wk.week] && (']) assert.ok(screen.includes(field), 'the journal draws ' + field);
     assert.ok(screen.includes("{b.warn && <Text style={{ color: p.muted }}>"));
@@ -479,7 +586,7 @@ describe('native progress: the screen\'s words and wiring', () => {
     assert.ok(cards.includes('const t = markupParts(html);') && cards.includes('<Text style={[s.titleText, { color }]}>{t.text}</Text>'), 'a title is its icon and its plain words');
     assert.ok(cards.includes('{foot && <Text style={[s.foot, { color: p.muted }]}>{markupParts(foot).text}</Text>}'), 'a card with a footer draws it');
     const pic = read('progress/SvgPicture.tsx');
-    assert.ok(pic.includes('<Svg viewBox={box.viewBox} style={size}>') && pic.includes('{ width: box.width, height: box.height, margin: box.margin }') && pic.includes("{ width: '100%' as const, aspectRatio: box.ratio }"));
+    assert.ok(pic.includes('<Svg viewBox={box.viewBox} style={size}>') && pic.includes('{ width: box.width, height: box.height, margin: box.margin }') && pic.includes("{ width: (box.wide + '%') as `${number}%`, aspectRatio: box.ratio, margin: (box.pull + '%') as `${number}%` }"));
     assert.ok(pic.includes('const a = svgProps(e, p, DISPLAY);'));
     for (const [tag, el] of [['line', 'Line'], ['rect', 'Rect'], ['circle', 'Circle'], ['path', 'Path'], ['polygon', 'Polygon']]) assert.ok(pic.includes("case '" + tag + "': return <" + el + ' key={i} {...a} />;'), 'a ' + tag + ' is drawn as one');
     assert.ok(pic.includes('default: return <SvgText key={i} {...a}>{e.text}</SvgText>;'));

@@ -1,10 +1,13 @@
 // Progress's cards in the Expo app (MIGRATION.md phase 3, row 4): the weekly dot chart (the Angular DotChart,
-// charts/dot-chart.ts) and the Lift Ledger's three (LedgerCards and CardShell, charts/ledger-cards.ts and
-// card-shell.ts), each drawn from today's own model with today's words. Every number comes from the spec.
+// charts/dot-chart.ts), a run card (ChartCard, charts/chart-card.ts) and the Lift Ledger's three (LedgerCards and
+// CardShell, charts/ledger-cards.ts and card-shell.ts), each drawn from today's own model with today's words. Every
+// number comes from the spec.
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, SvgXml, Text as SvgText } from 'react-native-svg';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
+import { blockType, markupBlocks } from './card-markup';
+import type { CardSpec } from './charts/chart-card-model';
 import type { DotSpec } from './charts/dot-chart-model';
 import type { LedgerView } from './charts/ledger-model';
 import { paint } from './paint';
@@ -29,6 +32,32 @@ export function CardShell({ title, color, foot, palette: p, children }: { title:
       <CardTitle html={title} color={color} gap={12} />
       {children}
       {foot && <Text style={[s.foot, { color: p.muted }]}>{markupParts(foot).text}</Text>}
+    </View>
+  );
+}
+
+/** A card's head, body or footer as the page writes it: each block a line of type of its own, each <b> bold in the colour it names. `base` is the type of the words outside any block (the footer's). */
+export function Markup({ html, base, palette: p }: { html: string; base?: object; palette: Palette }) {
+  return (
+    <>
+      {markupBlocks(html).map((b, i) => (
+        <Text key={i} style={b.style ? blockType(b.style, p) : base}>
+          {b.runs.map((r, j) => (r.bold ? <Text key={j} style={[s.bold, r.color !== null && { color: paint(r.color, p) }]}>{r.text}</Text> : r.text))}
+        </Text>
+      ))}
+    </>
+  );
+}
+
+/** One run card (the page's ChartCard): the title in the card's colour, the head, the picture, the body and the footer, each only where the spec holds one. */
+export function RunCard({ spec: c, palette: p }: { spec: CardSpec; palette: Palette }) {
+  return (
+    <View testID="run-card" style={[s.card, { backgroundColor: p.surface }]}>
+      <CardTitle html={c.title} color={paint(c.color, p)} gap={c.titleGap} />
+      {c.head && <Markup html={c.head} palette={p} />}
+      {c.svg && <SvgPicture viewBox={'0 0 ' + c.svg.w + ' ' + c.svg.h} style="width:100%;height:auto;overflow:visible" els={c.svg.els} palette={p} />}
+      {c.body && <Markup html={c.body} palette={p} />}
+      {c.foot && <Markup html={c.foot} base={[s.foot, { color: p.muted }]} palette={p} />}
     </View>
   );
 }

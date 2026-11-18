@@ -8,9 +8,8 @@
 //   showProgressScreen, setProgressView, askPurgeFromProgress, cancelProgressConfirm     progress-data.ts
 //   renderProgressScreen (the Angular progress-screen.ts render), setCalcLift, runCalc   lift-ledger-progress-screen.ts
 //
-// The three writes are progress-writes.ts's. Drawn this session: the chips and the archived bar, the empty states,
-// the weekly dot charts, the Lift Ledger, the Session Journal and the estimator. The run cards are in the view,
-// held equal to today's, and drawn by the next session (DRAWN).
+// The three writes are progress-writes.ts's. Drawn: the chips and the archived bar, the empty states, the weekly dot
+// charts, the run cards, the Lift Ledger, the Session Journal and the estimator (DRAWN).
 import { _clkMS } from '@ia/core/engine/clock-format.ts';
 import { asyIcon } from '@ia/core/engine/icons.ts';
 import { readDayHistory } from '@ia/core/engine/state-day-history.ts';
@@ -55,8 +54,8 @@ export function setCalcLift(st: ProgressState, lift: string): void { st.calcLift
 /** A stored program, as far as the screen reads it. */
 type Stored = ProgressProgram & ChipProgram & { startDate?: string | null };
 
-/** The kinds of chart this app draws so far: the run cards ('card') are the next session's. */
-export const DRAWN: readonly ChartBlock['kind'][] = ['dot', 'ledger'];
+/** The kinds of chart this app draws: all three of today's. */
+export const DRAWN: readonly ChartBlock['kind'][] = ['dot', 'card', 'ledger'];
 
 /** One draw of the screen. */
 export interface ProgressView {

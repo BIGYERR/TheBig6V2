@@ -239,9 +239,16 @@ Each phase starts only on Mario's GO, one phase step per session.
   new reader or writer of core. Held equal to today's page: the whole view and every `ia_` key after each of 250,
   150 and 120 taps across the ten programs (the standard history, runs logged with a pace, a second program
   archived, restored and deleted). 213 breaks, none let through. The row's ledger rows are filled.
-- **Next:** Mario's phone on the next IA Next build (the Progress tab, a chip, the ledger, the journal, the
-  estimator, an archived program's bar; no rest timer). Then the row's second session: the eight run cards drawn
-  (a card's head, body and footer from the page's markup, its chart through `SvgPicture`). Still not
+- **Done, phase 3's tenth session, row 4's second of two (Post-v0.262.4, no build):** his phone on IA Next build
+  120 ("All good!": Progress, and no rest timer on any tab). Then today's run cards measured
+  (`tests/measure/native-run-cards_today.md`: two tags and seven style properties in their markup, and pictures the
+  beta already draws), the cut put to Mario as one session and taken ("Concur, build it"), and built
+  (`docs/decisions/progress.md`, the run cards' entry): a reader of the page's markup (`card-markup.ts`), a drawer
+  for the card's title, head, picture, body and footer, the app's face on a text that names none, and room past
+  the edge for a picture laid the full width. `'card'` joins `DRAWN`; the view does not change. Every run card
+  of every walk is read as the drawer reads it, and the view and every `ia_` key stay equal to today's page. 265 breaks, none let through. Row 4's ledger rows are filled and its screen reads are in.
+- **Next:** Mario's phone on the next IA Next build (the eight run cards on Progress: his data draws four of
+  them). Then row 5, the program list and its sheets. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
