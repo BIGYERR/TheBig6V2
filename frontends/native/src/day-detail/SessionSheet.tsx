@@ -38,7 +38,6 @@ import type { DeckProgram, Fields } from '../deck/deck-screen';
 import { type SwapOpen, swapSheetOf } from '../deck/deck-swaps';
 import { type Session, acceptNudge, act, dismissNudge, leftField, nudgeWords, swapMove, tapFill, tapLog, tapReuse, tapStep, undoSwap } from '../deck/deck-writes';
 import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from '../deck/set-fields';
-import type { RestClock } from '../rest-timer/rest-clock';
 import { SwapNudge } from '../swap-nudge/SwapNudge';
 import { SwapSheet } from '../swap-sheet/SwapSheet';
 import { DISPLAY, type Palette, TEXT } from '../theme';
@@ -98,10 +97,8 @@ interface Handlers {
   remove: (name: string) => void;
 }
 
-export function SessionSheet({ palette: p, store, open, calm, rest, onClose, onDone, onProgram, onOver, say }: {
+export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, onProgram, onOver, say }: {
   palette: Palette; store: StateStore; open: SheetOpen; calm: boolean;
-  /** The rest timer's clock: zeroed while idle by every draw of the day, stopped at zero by Done or Skip (V221 D179). */
-  rest: RestClock;
   /** The sheet is gone, by Back or after a Skip. */
   onClose: () => void;
   /** Done: the day is stored and the sheet has slid away; the app raises the completion pop-up over This Week. */
@@ -138,9 +135,6 @@ export function SessionSheet({ palette: p, store, open, calm, rest, onClose, onD
   /** The wheels still settling: each rests at once before a tap reads the form (the page's iaWheelFlush). */
   const flushers = useRef<WheelFlushers>({ list: [] }).current;
   const flush = (): void => { flushers.list.forEach((f) => f()); };
-  // The page's openDetail zeroes a stopped rest clock on every draw of the day (the open here, each redraw below),
-  // and leaves a running one. An undo draws the foot alone, and leaves the clock be.
-  useEffect(() => { rest.resetIfIdle(); }, [rest]);
   const [setsOpen, setSetsOpen] = useState<Record<string, boolean>>({});
   const [info, setInfo] = useState(false);
   const rxOf = useMemo(() => {
@@ -191,7 +185,6 @@ export function SessionSheet({ palette: p, store, open, calm, rest, onClose, onD
     hold(formOf(logOf(next)));
     holdCardio(cardioOf(next, g));
     setDrawn((n) => n + 1);
-    rest.resetIfIdle();
     setSetsOpen({});
   };
 
@@ -338,7 +331,6 @@ export function SessionSheet({ palette: p, store, open, calm, rest, onClose, onD
     // A tap that sets a status rests every wheel first; the undo does not (handleDayStatus, V221 D179).
     if (dayStatus(store, prog.id, open.week, open.dayKey) !== st) flush();
     const r = tapStatus(session, formNow.current, cardioNow.current.dose, title, st, Date.now());
-    if (r.closed) rest.reset();
     if (r.toast) say(r.toast);
     if (!r.closed) { setView((v) => ({ ...v, foot: footOf(store, prog, open.week, open.dayKey) })); return; }
     if (r.popup) away(() => onDone(prog, open.week, open.dayKey)); else away(onClose);

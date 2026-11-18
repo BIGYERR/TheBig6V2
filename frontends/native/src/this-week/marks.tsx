@@ -25,6 +25,15 @@ export function Calendar({ color, size = 20 }: Mark) {
   );
 }
 
+/** Three bars: the Progress tab (today's tab bar draws the same three lines). */
+export function Bars({ color, size = 22 }: Mark) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...STROKE} stroke={color} strokeWidth={2}>
+      <Line x1={12} y1={20} x2={12} y2={10} /><Line x1={18} y1={20} x2={18} y2={4} /><Line x1={6} y1={20} x2={6} y2={16} />
+    </Svg>
+  );
+}
+
 /** A done day's check, and a done card's. */
 export function Check({ color, size = 16 }: Mark) {
   return <Svg width={size} height={size} viewBox="0 0 16 16" {...STROKE} stroke={color} strokeWidth={2.2}><Path d="M3 8.5l3.2 3L13 4.5" /></Svg>;

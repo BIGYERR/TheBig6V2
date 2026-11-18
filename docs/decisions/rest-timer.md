@@ -50,3 +50,41 @@ Tests: the island and PWA clock tests in `tests/integration/rest-timer.test.ts` 
 - **Seen on the simulator:** the tab on the right edge over This Week and over the sheet; the card opened, Start,
   the clock running (0:02, 0:05.16), Stop's outline; the card dragged to the left and docked there, still running.
 - **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged.
+
+## On Mario's phone, IA Next build 119 (2026-11-17)
+
+- The timer was the fifth of five steps put to him (the tab, its card, Start, Stop, Reset, a drag to the other edge,
+  stopped by Done). **His report:** "All good, also I'm good with taking out the rest timer entirely, we'll be shifting to the Dynamic Island later, keep it in the PWA though since we can't use Dynamic Island on that one". Nothing differed and no motion
+  was named, so nothing was fixed from it (`docs/decisions/session-sheet.md`, the build 119 entry).
+
+## D295 P-ISLANDONLY: the Expo app has no floating rest timer, and its rest timer comes back on the Dynamic Island
+
+- **Date:** 2026-11-17. **Ruled by:** Mario, unasked, in his phone report on IA Next build 119: "I'm good with
+  taking out the rest timer entirely, we'll be shifting to the Dynamic Island later, keep it in the PWA though since
+  we can't use Dynamic Island on that one". **Bump:** none (the page and `ia-version` do not move).
+- **The finding:** nothing measured. A product call, made on a timer that worked on his phone ("All good").
+- **What changes, in the Expo app only:** the floating rest timer comes out: the tab on the edge, its card, Start,
+  Stop and Reset, the drag, and the calls that stop or zero it (Mark the day done, Done, Skip, an open and a redraw
+  of the day's sheet). Until phase 4 the Expo app has no rest timer. Phase 4 builds its rest timer on the Dynamic
+  Island (the Live Activity), not as a floating tab.
+- **What deliberately does not change:** the page, which is the PWA, keeps its floating timer and its stopwatch as
+  they are, since a web page has no Dynamic Island; D233 and D235 stand there. Today's iOS app is not touched by this
+  ruling: it stays as it is until cutover. No stored key (the timer never wrote one). What a program prescribes.
+- **The session's reading, his to overrule:** "the rest timer" is the Expo app's floating timer, and it comes out in
+  the session he said it in; "the PWA" is the page as Pages serves it.
+- **Open for phase 4, not ruled:** what in the Expo app starts, stops and resets a rest once no floating tab is
+  there. The Dynamic Island shows a rest that is running; something on a screen has to start it. Raised when phase 4
+  is measured.
+- **Amends:** "D233 and D235 in the Expo app" above, as far as it built the floating timer; `MIGRATION.md` section
+  6, decision 15, and phase 4's entry gate.
+- **Built the same session** (Progress's, `chat/progress`): `frontends/native/src/rest-timer/` is gone (the model's
+  copy, the clock, the screen); `App.tsx` and `SessionSheet.tsx` name no timer (the clock, where it showed, and the
+  five calls that stopped or zeroed it). Today's model and its test stay with today's app.
+- **Tests:** `tests/unit/native-cardio-sheet.test.ts`, "native rest timer: there is none (D295 P-ISLANDONLY)": no
+  file of it, and neither the app, the day's sheet nor the deck names one; the page's timer and today's model are
+  still there. Its first test fails on the commit before (the folder is there). The timer's six tests and the
+  model's copy check left that file with it, and its 25 breaks left `tests/measure/native-cardio-sheet_breaks.md`,
+  run again whole: 122 breaks, none let through. One break of the session sheet's list named a line the removal
+  changed (the sheet's Back) and was pointed at the line as it stands, its rule unchanged, and run again alone: red.
+- **Seen on the simulator:** no tab on the edge of This Week, Progress or Bugs.
+- **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged.

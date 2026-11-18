@@ -1,8 +1,8 @@
-# The Expo app's cardio sheet and rest timer: a break per rule, and the test files each turns red
+# The Expo app's cardio sheet: a break per rule, and the test files each turns red
 
 Written by `node tests/measure/native-cardio-sheet_breaks.mjs` (read-only here; each break is made in a copy of the tree and put back).
 
-- The fast files, run on each break: `unit/native-cardio-sheet.test.ts`, `integration/native-cardio-sheet.test.ts`, `unit/native-session-sheet.test.ts`, `unit/native-deck.test.ts`, `unit/native-shell.test.ts`. Unbroken, they hold 207 tests and all pass.
+- The fast files, run on each break: `unit/native-cardio-sheet.test.ts`, `integration/native-cardio-sheet.test.ts`, `unit/native-session-sheet.test.ts`, `unit/native-deck.test.ts`, `unit/native-shell.test.ts`. Unbroken, they hold 202 tests and all pass.
 - The sweep, run only on a break the fast files let through: `sweeps/native-cardio-sheet.test.ts` (1 tests, all passing unbroken).
 
 | # | File | The rule broken | Files red | Tests red | Which |
@@ -28,26 +28,26 @@ Written by `node tests/measure/native-cardio-sheet_breaks.mjs` (read-only here; 
 | 19 | `wheels.ts` | a wrapped column opens from its first copy | **2** | 5 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 2 |
 | 20 | `wheels.ts` | a blank wheel does not open on the plan | **2** | 3 | integration/native-cardio-sheet 2, unit/native-cardio-sheet 1 |
 | 21 | `wheels.ts` | a wheel looks for its value from the first row | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
-| 22 | `wheels.ts` | the face a wheel opens on is its stored string, not what it shows | **2** | 3 | integration/native-cardio-sheet 2, unit/native-cardio-sheet 1 |
+| 22 | `wheels.ts` | the face a wheel opens on is its stored string, not what it shows | **2** | 3 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 2 |
 | 23 | `wheels.ts` | a rest reads the row above its offset | **1** | 1 | unit/native-cardio-sheet 1 |
 | 24 | `wheels.ts` | a rest past the last row reads no row | **1** | 1 | unit/native-cardio-sheet 1 |
-| 25 | `wheels.ts` | a wrapped column is never jumped back | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
+| 25 | `wheels.ts` | a wrapped column is never jumped back | **2** | 4 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 3 |
 | 26 | `wheels.ts` | a column in its first copy is not jumped forward | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
 | 27 | `wheels.ts` | a column in its last copy is not jumped back | **1** | 1 | unit/native-cardio-sheet 1 |
 | 28 | `wheels.ts` | opening a day writes the face it opened on | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
 | 29 | `wheels.ts` | a wheel never counts as moved | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
 | 30 | `wheels.ts` | a rest on the face the field holds writes it again | **1** | 1 | unit/native-cardio-sheet 1 |
-| 31 | `cardio-log.ts` | the stepper shows its stored count at the draw, not the plan | **2** | 2 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 1 |
+| 31 | `cardio-log.ts` | the stepper shows its stored count at the draw, not the plan | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
 | 32 | `cardio-log.ts` | the planned dose is not kept for the way back | **2** | 5 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 2 |
 | 33 | `cardio-log.ts` | the picker is shut at the draw of a swapped sport | **1** | 1 | unit/native-cardio-sheet 1 |
 | 34 | `cardio-log.ts` | the note is not drawn at the open | **1** | 1 | unit/native-cardio-sheet 1 |
 | 35 | `cardio-log.ts` | a rolled wheel is saved on a draft card | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
-| 36 | `cardio-log.ts` | a rolled wheel is never saved | **2** | 4 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 3 |
-| 37 | `cardio-log.ts` | the readout ignores the reps | **2** | 2 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 1 |
+| 36 | `cardio-log.ts` | a rolled wheel is never saved | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
+| 37 | `cardio-log.ts` | the readout ignores the reps | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
 | 38 | `cardio-log.ts` | the work done row is dropped | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
 | 39 | `cardio-log.ts` | a gap reads on target inside ten seconds | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
 | 40 | `cardio-log.ts` | a gap over a minute prints seconds | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
-| 41 | `cardio-log.ts` | faster and slower are swapped | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
+| 41 | `cardio-log.ts` | faster and slower are swapped | **2** | 4 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 3 |
 | 42 | `cardio-log.ts` | the readout leaves out what it assumed | **1** | 2 | unit/native-cardio-sheet 2 |
 | 43 | `cardio-log.ts` | the readout leaves out the work minutes | **1** | 1 | unit/native-cardio-sheet 1 |
 | 44 | `cardio-log.ts` | the pace is never joined to the work done | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
@@ -58,7 +58,7 @@ Written by `node tests/measure/native-cardio-sheet_breaks.mjs` (read-only here; 
 | 49 | `cardio-log.ts` | the stepper goes under zero | **1** | 1 | unit/native-cardio-sheet 1 |
 | 50 | `cardio-log.ts` | a step on a draft card is saved | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
 | 51 | `cardio-log.ts` | a step on a logged card is not saved | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
-| 52 | `cardio-log.ts` | the stepper does not show its new count | **2** | 2 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 1 |
+| 52 | `cardio-log.ts` | the stepper does not show its new count | **2** | 2 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 1 |
 | 53 | `cardio-log.ts` | a ride's toast reads Run logged | **2** | 3 | integration/native-cardio-sheet 1, unit/native-cardio-sheet 2 |
 | 54 | `cardio-log.ts` | Log on an empty card writes and says logged | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
 | 55 | `cardio-log.ts` | the empty card's words are shorter | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
@@ -81,11 +81,11 @@ Written by `node tests/measure/native-cardio-sheet_breaks.mjs` (read-only here; 
 | 72 | `cardio-log.ts` | a chip keeps the old fields on show | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
 | 73 | `cardio-log.ts` | a chip keeps the old note | **2** | 5 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 2 |
 | 74 | `cardio-sheet-model.ts` | the model's copy: one cardio alone keeps the whole day's body | **2** | 4 | integration/native-cardio-sheet 2, unit/native-cardio-sheet 2 |
-| 75 | `cardio-sheet-model.ts` | the model's copy: a day with a lift keeps Done and Skip on the cardio's sheet | **2** | 4 | unit/native-cardio-sheet 2, integration/native-cardio-sheet 2 |
+| 75 | `cardio-sheet-model.ts` | the model's copy: a day with a lift keeps Done and Skip on the cardio's sheet | **2** | 4 | integration/native-cardio-sheet 2, unit/native-cardio-sheet 2 |
 | 76 | `sheet-screen.ts` | the frame is always the whole day | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
 | 77 | `sheet-screen.ts` | the frame reads no lift on any day | **2** | 3 | integration/native-cardio-sheet 2, unit/native-cardio-sheet 1 |
 | 78 | `sheet-screen.ts` | the frame drops the whole day's counter | **2** | 3 | integration/native-cardio-sheet 2, unit/native-cardio-sheet 1 |
-| 79 | `sheet-screen.ts` | one cardio alone keeps a travel tag | **2** | 4 | unit/native-cardio-sheet 1, integration/native-cardio-sheet 3 |
+| 79 | `sheet-screen.ts` | one cardio alone keeps a travel tag | **2** | 4 | integration/native-cardio-sheet 3, unit/native-cardio-sheet 1 |
 | 80 | `ThisWeek.tsx` | the hand log opens the whole day | **1** | 1 | unit/native-cardio-sheet 1 |
 | 81 | `ThisWeek.tsx` | Reopen on a done run opens nothing | **2** | 2 | unit/native-cardio-sheet 1, unit/native-session-sheet 1 |
 | 82 | `ThisWeek.tsx` | the sheet is opened without the cardio it was asked for | **1** | 1 | unit/native-session-sheet 1 |
@@ -129,30 +129,5 @@ Written by `node tests/measure/native-cardio-sheet_breaks.mjs` (read-only here; 
 | 120 | `Wheel.tsx` | a wheel does not snap to a row | **1** | 1 | unit/native-cardio-sheet 1 |
 | 121 | `Wheel.tsx` | a wheel asked to rest clears its timer and reads nothing | **1** | 1 | unit/native-cardio-sheet 1 |
 | 122 | `Wheel.tsx` | a wrapped column is not jumped back on the screen | **1** | 1 | unit/native-cardio-sheet 1 |
-| 123 | `App.tsx` | the rest clock is the monotonic one | **1** | 1 | unit/native-cardio-sheet 1 |
-| 124 | `App.tsx` | Mark the day done leaves the rest clock running | **1** | 1 | unit/native-cardio-sheet 1 |
-| 125 | `App.tsx` | the rest timer shows with no program | **1** | 1 | unit/native-cardio-sheet 1 |
-| 126 | `App.tsx` | a launch does not say whether a program is held | **1** | 1 | unit/native-cardio-sheet 1 |
-| 127 | `SessionSheet.tsx` | the open does not zero the idle rest clock | **1** | 1 | unit/native-cardio-sheet 1 |
-| 128 | `SessionSheet.tsx` | a redraw does not zero the idle rest clock | **2** | 2 | unit/native-cardio-sheet 1, unit/native-session-sheet 1 |
-| 129 | `SessionSheet.tsx` | a status set does not stop the rest clock | **2** | 2 | unit/native-cardio-sheet 1, unit/native-session-sheet 1 |
-| 130 | `rest-clock.ts` | Reset leaves the time held | **1** | 2 | unit/native-cardio-sheet 2 |
-| 131 | `rest-clock.ts` | Reset does not tell the held time before the end | **1** | 2 | unit/native-cardio-sheet 2 |
-| 132 | `rest-clock.ts` | a listener let go still hears | **1** | 1 | unit/native-cardio-sheet 1 |
-| 133 | `rest-clock.ts` | the screen hears no change | **1** | 1 | unit/native-cardio-sheet 1 |
-| 134 | `rest-clock.ts` | the Live Activity is told nothing | **1** | 1 | unit/native-cardio-sheet 1 |
-| 135 | `rest-clock.ts` | the button only ever starts | **1** | 1 | unit/native-cardio-sheet 1 |
-| 136 | `rest-clock.ts` | an idle reset is not heard | **1** | 1 | unit/native-cardio-sheet 1 |
-| 137 | `rest-clock.ts` | the stand-in Live Activity is none at all | **1** | 3 | unit/native-cardio-sheet 3 |
-| 138 | `rest-timer-model.ts` | the model's copy: the timer shows on This Week alone | **1** | 2 | unit/native-cardio-sheet 2 |
-| 139 | `RestTimer.tsx` | the timer stands 100 points down | **1** | 1 | unit/native-cardio-sheet 1 |
-| 140 | `RestTimer.tsx` | a running clock is drawn twice a second | **1** | 1 | unit/native-cardio-sheet 1 |
-| 141 | `RestTimer.tsx` | the button reads Pause | **1** | 1 | unit/native-cardio-sheet 1 |
-| 142 | `RestTimer.tsx` | the card's heading reads Rest | **1** | 1 | unit/native-cardio-sheet 1 |
-| 143 | `RestTimer.tsx` | a tap on the tab does not open the card | **1** | 1 | unit/native-cardio-sheet 1 |
-| 144 | `RestTimer.tsx` | a drag always docks to the right | **1** | 1 | unit/native-cardio-sheet 1 |
-| 145 | `RestTimer.tsx` | a jitter under 5 points moves the timer | **1** | 1 | unit/native-cardio-sheet 1 |
-| 146 | `RestTimer.tsx` | Reset on the card starts the clock | **1** | 1 | unit/native-cardio-sheet 1 |
-| 147 | `RestTimer.tsx` | the readout reads a clock of its own | **1** | 1 | unit/native-cardio-sheet 1 |
 
-- Breaks made: **147** of 147. Let through by the fast files, so swept: 0. Let through by every file: **0**.
+- Breaks made: **122** of 122. Let through by the fast files, so swept: 0. Let through by every file: **0**.

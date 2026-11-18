@@ -228,8 +228,20 @@ Each phase starts only on Mario's GO, one phase step per session.
   ruling of its own: until the recorder is built, Record run opens the run's hand log (D294 P-HANDLOGDOOR,
   `docs/decisions/this-week.md`). No new writer of core. Held equal to today's page: every `ia_` key after each of
   3,906 taps of the cardio log across the ten programs. The row's ledger rows are filled.
-- **Next:** Mario's phone on the next IA Next build (Record run on a run, the wheels, Log, the sport picker, a done
-  run's Reopen, the rest timer). Then Progress (row 4 of phase 3). Still not
+- **Done, phase 3's ninth session, row 4's first of two (Post-v0.262.4, no build):** his phone on IA Next build
+  119 ("All good"), and in the same line his ruling that the beta's floating rest timer comes out and returns on
+  the Dynamic Island in phase 4 (D295 P-ISLANDONLY, decision 15), built at once. Then today's Progress measured
+  (`tests/measure/native-progress_today.md`), the cut put to Mario and taken as two sessions ("Two sessions"), and
+  the first built (`docs/decisions/progress.md`, the Expo app's entry): a Progress tab, the program chips and the
+  archived bar with Restore and Delete Forever, the empty states, the weekly dot charts, the Lift Ledger, the
+  Session Journal and the 1RM estimator, from today's six model files and the page's readers ported line for line
+  (`frontends/native/src/progress/`). The run cards are in the view, held equal to today's, and not drawn yet. No
+  new reader or writer of core. Held equal to today's page: the whole view and every `ia_` key after each of 250,
+  150 and 120 taps across the ten programs (the standard history, runs logged with a pace, a second program
+  archived, restored and deleted). 213 breaks, none let through. The row's ledger rows are filled.
+- **Next:** Mario's phone on the next IA Next build (the Progress tab, a chip, the ledger, the journal, the
+  estimator, an archived program's bar; no rest timer). Then the row's second session: the eight run cards drawn
+  (a card's head, body and footer from the page's markup, its chart through `SvgPicture`). Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
@@ -502,8 +514,8 @@ The order is the session's reading of what Mario uses daily (no usage numbers ex
 |---|---|---|
 | 1 | The swipe deck: cards, set logging, Call it | 2 |
 | 2 | The session sheet and its log (wheels, set rows, the RPE card, the 1RM card) | 3 |
-| 3 | The run card, the cardio sheet, the rest timer (no Live Activity yet) | 1 to 2 (taken in 1) |
-| 4 | Progress: journal, charts, ledger, estimator | 2 to 3 |
+| 3 | The run card, the cardio sheet, the rest timer (no Live Activity yet; the floating timer taken out again, decision 15) | 1 to 2 (taken in 1) |
+| 4 | Progress: journal, charts, ledger, estimator | 2 to 3 (taken in 2: the run cards' drawing second) |
 | 5 | The program list and its sheets (goal, mile, mile lock, injury and travel, rest day) | 2 to 3 |
 | 6 | The wizard and generating | 2 |
 | 7 | Swap, add, Random Workout, pop-ups, the toast, the Bugs tab, backup, theme | 1 to 2 |
@@ -525,7 +537,8 @@ match the old build's on the rehearsal backup and on the 10 seeded programs. Mar
 
 ### Phase 4: GPS, the Live Activity and the widget (3 to 4 sessions)
 
-**Entry gate:** phase 3's run card and rest timer done. Mario's GO.
+**Entry gate:** phase 3's run card done. Mario's GO. (The floating rest timer is out of the Expo app, section 6
+decision 15: the rest timer is built here, on the Dynamic Island.)
 
 `IAGps.swift` and `IAIsland.swift` become two local Expo modules, the Swift kept, the Cordova plumbing replaced.
 `RestTimerWidget.swift` and `RestTimerAttributes.swift` move unchanged into the widget target the spike proved.
@@ -559,6 +572,11 @@ the Angular app, the legacy script, CSS and HTML, `build-index` and the VM harne
 app's Docker journeys and the parity collage, and the Engine row on the Bugs screen (D286, both apps): from then on
 CI's Hermes job proves the engine on every push, so the athlete never needs the button. The root `index.html` and Pages go only if Mario retires the web app
 (section 6).
+
+**Brought back down, at the same time:** the tests job's time limit in `.github/workflows/pipeline.yml`. It was raised
+from 25 to 40 minutes on 2026-11-17 for the migration only (Mario: "i dont think it needs to be that long after"):
+the files that hold the Expo app equal to the page were 494 s of the job's 2,148 s of test time then, and go with the
+page. Measure the job on a slow and a fast runner once they are gone, and set the limit from the slowest.
 
 ### Between 5 and 6: the race plans (D270), its own ruled release
 
@@ -802,6 +820,12 @@ Each with the session's pick first.
     the GPS recorder in phase 4, Random Workout. The session's reading, his to overrule: a number a ruling set for a
     motion (D275 call 16's 420 ms) is still carried where a screen has one, since it costs nothing, and nothing is
     owed to prove it. Motion already built and tested (the deck's swipe, pager and opening) stays as it is.
+15. **The rest timer in the new app.** **Answered 2026-11-17, unasked** ("I'm good with taking out the rest timer
+    entirely, we'll be shifting to the Dynamic Island later, keep it in the PWA though since we can't use Dynamic
+    Island on that one"), in his phone report on IA Next build 119, where the floating timer of row 3 was all
+    good. The Expo app's floating rest timer comes out, and phase 4 builds its rest timer on the Dynamic Island.
+    The page keeps its own (D295 P-ISLANDONLY, `docs/decisions/rest-timer.md`). Open for phase 4: what on a screen
+    starts a rest once no floating tab is there.
 
 ---
 

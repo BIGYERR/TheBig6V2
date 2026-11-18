@@ -4,7 +4,7 @@ The Expo app the React Native migration builds (`MIGRATION.md`, phases 2 and 3),
 which it does not touch. Its bundle id is **com.bigyerr.ironasylum.next**, so it installs next to today's app
 (`com.bigyerr.ironasylum`) and never replaces it before cutover. `tests/unit/native-shell.test.ts` holds that.
 
-**Today it holds two tabs.** **This Week** (phase 2 session 4, `src/this-week/`; D276, D278, D279 and D284 carried over,
+**Today it holds three tabs.** **This Week** (phase 2 session 4, `src/this-week/`; D276, D278, D279 and D284 carried over,
 `docs/decisions/this-week.md`): today's screen drawn from the stored state; drawing it writes nothing. `week-view-model.ts` and
 `week-strip.ts` are copies of the Angular screen's own files, held equal to the byte by
 `tests/unit/native-this-week.test.ts`: copy them again with `cp` when today's change, never edit them here.
@@ -34,6 +34,24 @@ the two apps' stores equal, key for key, after every tap of whole histories (`te
 Not here yet: swap, its put it back and remove (drawn, taking no press); the opening out of the card and the up and
 down pager; the completion pop-up, in whose place Mark the day done raises "Done ✓". The beta writes none of the
 pop-ups' keys.
+
+**Progress** (phase 3, row 4, `src/progress/`; D11, D55, D57 to D59, D255, D6 and D26 carried over,
+`docs/decisions/progress.md`): today's screen for one program at a time, read from the stored state. The program
+chips and the archived program's bar (Restore, and Delete Forever behind its confirmation), the two empty states,
+the weekly dot charts, the Lift Ledger's three cards, the Session Journal and the 1RM estimator are drawn. The run
+cards are in the view, held equal to today's, and are not drawn yet (`progress-screen.ts`, `DRAWN`): their drawer is
+the row's second session. `progress-model.ts`, `program-chips-model.ts` and the four files of `charts/` are copies
+of the Angular screen's own, held equal to the byte by `tests/unit/native-progress.test.ts`: copy them again with
+`cp` when today's change, never edit them here. `progress-readers.ts` is the page's own readers that are not in
+core, line for line (the ledger's rows, the easy zone's runs, the short first week); `progress-screen.ts` joins them
+over core's readers as the page's render does; `paint.ts` turns the web's colours and SVG attributes into
+react-native-svg's. **It writes in three places only, all in `progress-writes.ts`:** the open's cleanup of the
+viewed program's lift log (written only when a row changed), Restore, and Delete Forever (the program's row, then
+its fifteen key families). `tests/integration/native-progress.test.ts` and the sweep of that name hold the screen
+and every `ia_` key equal to today's page after every tap.
+
+**There is no floating rest timer** (D295, `docs/decisions/rest-timer.md`): the one built with the cardio sheet was
+taken out again, and the rest timer comes back on the Dynamic Island in phase 4. The page keeps its own.
 
 **Bugs**, with two rows and a line saying whether its Swift module answered: the engine check (D286, `docs/decisions/engine-check.md`), core's
 `core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes, which reads and writes

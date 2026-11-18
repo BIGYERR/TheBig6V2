@@ -359,3 +359,17 @@ record of the sheet as a screen, from the React Native migration on.
   so the jog's Edit cardio still takes no press.
 - **The ledger** (`tests/measure/rn-migration_test-ledger.md`): the row's nine rows are filled.
 - **Next for the row:** Mario's phone on the next IA Next build.
+
+## On Mario's phone, IA Next build 119 (2026-11-17)
+
+- **The build:** `0.262.4 (119)`, uploaded by run 44227254025 on `main` (merge c54d41b, pull request 52) and read
+  back as processed (`docs/decisions/testflight.md`, the fifteenth run). It carries row 3: the run card's taps, the
+  cardio sheet and the rest timer.
+- **What he was asked,** five steps: Record run on a run card opening that run's own sheet (D294); the wheels, then
+  Log and its toast; Did a different activity?, its chips and back; Reopen on a done run; the rest timer (the tab,
+  its card, Start, Stop, Reset, a drag to the other edge, stopped by Done). His program has no rep day, so the reps
+  stepper was not asked of him.
+- **His report,** one line, no screenshot: "All good, also I'm good with taking out the rest timer entirely, we'll be shifting to the Dynamic Island later, keep it in the PWA though since we can't use Dynamic Island on that one".
+- **What follows:** nothing differed from today's app and no motion was named (`MIGRATION.md` section 6, decision
+  14), so nothing was fixed from it. The cardio sheet stands as built. The rest of his line is a ruling of its own:
+  the floating rest timer comes out of the Expo app (D295 P-ISLANDONLY, `docs/decisions/rest-timer.md`).

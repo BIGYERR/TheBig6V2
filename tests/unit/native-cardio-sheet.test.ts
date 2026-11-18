@@ -1,10 +1,10 @@
-// The Expo app's cardio sheet and rest timer (MIGRATION.md phase 3, row 3), by rule. Every expected value here is
+// The Expo app's cardio sheet (MIGRATION.md phase 3, row 3), by rule; its floating rest timer came out again (D295). Every expected value here is
 // typed by hand from the rulings the rules carry (the wheels V182 to V237, the dose grammar V148, draft and logged
 // V236 D218, the park V234 D213 and D214, the gap V191 D40, one cardio alone D278, the rest clock V221 D179 and V239
 // D233), never asked of today's page. tests/integration/native-cardio-sheet.test.ts holds the same rules equal to
 // today's page tap by tap.
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, test } from 'vitest';
 import { memoryStore } from '@ia/core/engine/state-store.ts';
@@ -18,8 +18,6 @@ import { type SheetProgram, logOf, sheetFrame, sheetView } from '../../frontends
 import { type LogForm, cardioLive, formOf, parkSport } from '../../frontends/native/src/day-detail/sheet-writes.ts';
 import { WHEEL_ROW, WHEEL_SETTLE_MS, wheelFormat, wheelHome, wheelParse, wheelRecentre, wheelRest, wheelSeed, wheelSel } from '../../frontends/native/src/day-detail/wheels.ts';
 import type { Session } from '../../frontends/native/src/deck/deck-writes.ts';
-import { NO_ISLAND, RestClock } from '../../frontends/native/src/rest-timer/rest-clock.ts';
-import { type Island, showsOn } from '../../frontends/native/src/rest-timer/rest-timer-model.ts';
 
 const NATIVE = join(REPO, 'frontends/native/src');
 const read = (f: string): string => readFileSync(join(NATIVE, f), 'utf8');
@@ -50,7 +48,7 @@ function opened(store: StateStore, dayKey = 'mon'): { s: Session; f: LogForm; c:
 const entry = (store: StateStore, dayKey = 'mon'): Record<string, unknown> => (JSON.parse(store.get('ia_logs_p1') || '{}') as Record<string, Record<string, unknown>>)['w1_' + dayKey] || {};
 
 describe('native cardio sheet: the models are today\'s files', () => {
-  for (const [f, from] of [['day-detail/cardio-sheet-model.ts', 'day-detail/cardio-sheet-model.ts'], ['rest-timer/rest-timer-model.ts', 'rest-timer/rest-timer-model.ts']] as const) {
+  for (const [f, from] of [['day-detail/cardio-sheet-model.ts', 'day-detail/cardio-sheet-model.ts']] as const) {
     test(f + ' in frontends/native is frontends/app\'s, byte for byte', () => {
       const today = readFileSync(join(REPO, 'frontends/app/src/app/screens', from));
       const copy = readFileSync(join(NATIVE, f));
@@ -396,76 +394,16 @@ describe('native cardio sheet: the screen', () => {
   });
 });
 
-describe('native rest timer: the clock (V221 D179, V239 D233)', () => {
-  const clockAt = (island: Island | undefined, t: { perf: number; wall: number }) => new RestClock(island, { now: () => t.perf }, () => t.wall);
-  test('Start, Stop and Reset; a day\'s sheet opening zeroes a stopped clock and leaves a running one', () => {
-    const t = { perf: 0, wall: 1000 };
-    const c = clockAt(NO_ISLAND, t);
-    let heard = 0;
-    const off = c.listen(() => { heard++; });
-    c.toggle();
-    t.wall = 1000 + 65000;
-    assert.equal(c.watch.running, true);
-    assert.equal(c.watch.now(), 65000);
-    c.resetIfIdle();
-    assert.equal(c.watch.now(), 65000, 'a running clock is left alone');
-    c.toggle();
-    assert.deepStrictEqual([c.watch.running, c.watch.now()], [false, 65000]);
-    c.resetIfIdle();
-    assert.equal(c.watch.now(), 0, 'a stopped clock goes to zero');
-    c.start(); t.wall += 5000; c.reset();
-    assert.deepStrictEqual([c.watch.running, c.watch.now()], [false, 0], 'Done, Skip and Reset stop it at zero');
-    // Start, Stop, the idle reset that zeroed it, Start, then Reset's pause and its zero.
-    assert.equal(heard, 6, 'the screen hears every change, and only a change');
-    off();
-    const was = heard;
-    c.start();
-    assert.equal(heard, was, 'a listener let go hears nothing');
+describe('native rest timer: there is none (D295 P-ISLANDONLY)', () => {
+  test('the Expo app holds no floating rest timer: no file of it, and neither the app nor the day\'s sheet names one', () => {
+    assert.equal(existsSync(join(NATIVE, 'rest-timer')), false, 'frontends/native/src/rest-timer is gone');
+    for (const f of ['App.tsx', 'day-detail/SessionSheet.tsx', 'deck/Deck.tsx', 'deck/DeckOpening.tsx']) {
+      assert.doesNotMatch(strip(read(f)), /rest-timer|RestTimer|RestClock|resetIfIdle|\brest\.reset\b|showsOn/, f + ' names the rest timer');
+    }
   });
-  test('the clock is the wall clock, as on today\'s iOS app, so a rest counts through a locked phone; with no Live Activity at all it would be the monotonic one', () => {
-    const t = { perf: 0, wall: 500000 };
-    const wall = clockAt(NO_ISLAND, t), mono = clockAt(undefined, t);
-    wall.start(); mono.start();
-    t.wall += 90000;   // the phone locked for 90 s: the wall clock moved, the monotonic one did not
-    assert.equal(wall.watch.now(), 90000);
-    assert.equal(mono.watch.now(), 0);
-    assert.ok(read('App.tsx').includes('const rest = useRef(new RestClock(NO_ISLAND, performance, () => Date.now())).current;'));
-  });
-  test('the Live Activity, once there is one, is told each change: the start while running, the time held when stopped, the end at zero', () => {
-    const told: string[] = [];
-    const island: Island = { run: (ms) => { told.push('run ' + ms); }, stop: (ms) => { told.push('stop ' + ms); }, end: () => { told.push('end'); } };
-    const t = { perf: 0, wall: 1000 };
-    const c = clockAt(island, t);
-    c.start(); t.wall = 4000; c.pause(); c.reset();
-    // Reset is a pause and then the zero, as today's: the time held is told, then the end.
-    assert.deepStrictEqual(told, ['run 1000', 'stop 3000', 'stop 3000', 'end']);
-  });
-  test('it shows with a program, on This Week and Bugs; the app draws it over the deck and the sheet, under the toast', () => {
-    assert.equal(showsOn(true, 'screenWeek'), true);
-    assert.equal(showsOn(true, 'screenBugs'), true);
-    assert.equal(showsOn(false, 'screenWeek'), false);
-    const app = read('App.tsx');
-    assert.ok(app.includes("{showsOn(hasProg, tab === 'week' ? 'screenWeek' : 'screenBugs') && <RestTimer palette={p} clock={rest} />}"));
-    assert.ok(app.indexOf('<RestTimer ') > app.indexOf('<SessionSheet ') && app.indexOf('<RestTimer ') > app.indexOf('<DeckOpening ') && app.indexOf('<RestTimer ') < app.indexOf('<Toast '));
-    assert.ok(app.includes('setHasProg(!!prog);'));
-  });
-  test('Mark the day done, Done and Skip stop it at zero; an open and each redraw of the day zero it while idle; an undo leaves it', () => {
-    const app = read('App.tsx'), sheet = read('day-detail/SessionSheet.tsx');
-    assert.ok(app.includes('onDone={(prog, week, dayKey) => { rest.reset(); setDeck(null);'));
-    assert.ok(sheet.includes('if (r.closed) rest.reset();'));
-    assert.ok(sheet.includes('useEffect(() => { rest.resetIfIdle(); }, [rest]);'));
-    assert.ok(sheet.includes('setDrawn((n) => n + 1);\n    rest.resetIfIdle();\n    setSetsOpen({});'));
-    assert.equal(sheet.split('rest.resetIfIdle()').length - 1, 2, 'the open and the redraw, nowhere else');
-  });
-  test('the screen: the tab, the card with today\'s words, a drag past 5 points that docks to the nearer edge, a tap on the tab that opens the card', () => {
-    const t = read('rest-timer/RestTimer.tsx');
-    for (const words of ['>Rest Timer</Text>', "{running ? 'Stop' : 'Start'}", '>Reset</Text>', 'accessibilityLabel="Rest timer, tap to open"', 'accessibilityLabel="Minimize"', '{face.main}', '{face.cs}', '{st.chevron}']) assert.ok(t.includes(words), words);
-    assert.ok(t.includes('onPress={() => clock.toggle()}') && t.includes('onPress={() => clock.reset()}'));
-    assert.ok(t.includes('const face = clockFace(clock.watch.now());'), 'the readout is the clock\'s own time');
-    assert.ok(t.includes('if (Math.abs(g.dx) > DRAG_THRESHOLD || Math.abs(g.dy) > DRAG_THRESHOLD) moved = true;\n        if (!moved) return;'));
-    assert.ok(t.includes('if (x !== null) setSide(snapSide(x, size.current.w, width));\n        setLeft(null);'));
-    assert.ok(t.includes('if (tap && isTab) setOpen(true);'));
-    assert.ok(t.includes('const TOP = 200;') && t.includes('const TICK_MS = 33;'));
-    assert.doesNotMatch(strip(t) + strip(read('rest-timer/rest-clock.ts')), /\bstore\b|state-|sheet-writes/, 'the timer reaches no store');
+  test('the page keeps its own floating timer, which a web page needs (the PWA has no Dynamic Island)', () => {
+    const page = readFileSync(join(REPO, 'frontends/app/src/legacy/src/js/rest-timer.ts'), 'utf8');
+    assert.ok(page.includes('function _rtInit('), 'the page\'s timer is still wired');
+    assert.ok(existsSync(join(REPO, 'frontends/app/src/app/screens/rest-timer/rest-timer-model.ts')), 'and today\'s iOS app keeps its own');
   });
 });
