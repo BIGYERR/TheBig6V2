@@ -295,3 +295,8 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   119 on one commit, 95ea5f4, which changed `frontends/native`. The notices read `testflight 0.262.4 processed
   (uploaded before this run; a version goes up once, a fix is the next PATCH)` and `testflight next 0.262.4 (119)
   processed`. The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 119** (his report, 2026-11-17, no screenshot): "All good, also I'm good with taking out the rest timer entirely, we'll be shifting to the Dynamic Island later, keep it in the PWA though since we can't use Dynamic Island on that one", to five steps
+  on IA Next build 119: Record run on a run card, the wheels with Log and its toast, the sport picker and back, a
+  done run's Reopen, the rest timer. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/session-sheet.md`, the build 119 entry). The rest of his line is D295
+  (`docs/decisions/rest-timer.md`).

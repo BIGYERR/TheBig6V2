@@ -502,7 +502,7 @@ The order is the session's reading of what Mario uses daily (no usage numbers ex
 |---|---|---|
 | 1 | The swipe deck: cards, set logging, Call it | 2 |
 | 2 | The session sheet and its log (wheels, set rows, the RPE card, the 1RM card) | 3 |
-| 3 | The run card, the cardio sheet, the rest timer (no Live Activity yet) | 1 to 2 (taken in 1) |
+| 3 | The run card, the cardio sheet, the rest timer (no Live Activity yet; the floating timer taken out again, decision 15) | 1 to 2 (taken in 1) |
 | 4 | Progress: journal, charts, ledger, estimator | 2 to 3 |
 | 5 | The program list and its sheets (goal, mile, mile lock, injury and travel, rest day) | 2 to 3 |
 | 6 | The wizard and generating | 2 |
@@ -525,7 +525,8 @@ match the old build's on the rehearsal backup and on the 10 seeded programs. Mar
 
 ### Phase 4: GPS, the Live Activity and the widget (3 to 4 sessions)
 
-**Entry gate:** phase 3's run card and rest timer done. Mario's GO.
+**Entry gate:** phase 3's run card done. Mario's GO. (The floating rest timer is out of the Expo app, section 6
+decision 15: the rest timer is built here, on the Dynamic Island.)
 
 `IAGps.swift` and `IAIsland.swift` become two local Expo modules, the Swift kept, the Cordova plumbing replaced.
 `RestTimerWidget.swift` and `RestTimerAttributes.swift` move unchanged into the widget target the spike proved.
@@ -807,6 +808,12 @@ Each with the session's pick first.
     the GPS recorder in phase 4, Random Workout. The session's reading, his to overrule: a number a ruling set for a
     motion (D275 call 16's 420 ms) is still carried where a screen has one, since it costs nothing, and nothing is
     owed to prove it. Motion already built and tested (the deck's swipe, pager and opening) stays as it is.
+15. **The rest timer in the new app.** **Answered 2026-11-17, unasked** ("I'm good with taking out the rest timer
+    entirely, we'll be shifting to the Dynamic Island later, keep it in the PWA though since we can't use Dynamic
+    Island on that one"), in his phone report on IA Next build 119, where the floating timer of row 3 was all
+    good. The Expo app's floating rest timer comes out, and phase 4 builds its rest timer on the Dynamic Island.
+    The page keeps its own (D295 P-ISLANDONLY, `docs/decisions/rest-timer.md`). Open for phase 4: what on a screen
+    starts a rest once no floating tab is there.
 
 ---
 
