@@ -549,7 +549,11 @@ decision 15: the rest timer is built here, on the Dynamic Island.)
 
 `IAGps.swift` and `IAIsland.swift` become two local Expo modules, the Swift kept, the Cordova plumbing replaced.
 `RestTimerWidget.swift` and `RestTimerAttributes.swift` move unchanged into the widget target the spike proved.
-Background location, its permission strings and its App Store wording are set here.
+Background location, its permission strings and its App Store wording are set here. So is Motion & Fitness
+(`NSMotionUsageDescription`, today's words in `ia-gps/plugin.xml`): from v0.263.0 the recorder also reads the step
+counter and the barometer (D296, `docs/decisions/gps-recording.md`). That Swift is in `IAGps.swift`, so it moves with the
+module; the distance (D293's 10 m rule) and the steps, cadence and climb are counted in `core/src/gps`, which stays, and
+the Expo screen draws the second row (Climb, Cadence, Steps) and each split's climb as today's does.
 
 **Exit gate:** a real run by Mario with the phone recording beside the COROS Pace 4, compared by
 `tests/measure/gps-recording_watch-compare.js`, no worse than today's app on the same route. The rest timer's Live
