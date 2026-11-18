@@ -560,6 +560,11 @@ app's Docker journeys and the parity collage, and the Engine row on the Bugs scr
 CI's Hermes job proves the engine on every push, so the athlete never needs the button. The root `index.html` and Pages go only if Mario retires the web app
 (section 6).
 
+**Brought back down, at the same time:** the tests job's time limit in `.github/workflows/pipeline.yml`. It was raised
+from 25 to 40 minutes on 2026-11-17 for the migration only (Mario: "i dont think it needs to be that long after"):
+the files that hold the Expo app equal to the page were 494 s of the job's 2,148 s of test time then, and go with the
+page. Measure the job on a slow and a fast runner once they are gone, and set the limit from the slowest.
+
 ### Between 5 and 6: the race plans (D270), its own ruled release
 
 The engine is free to change again once cutover holds. D270 P-OWNPLANS (proposed, `docs/decisions/race-plans.md`)

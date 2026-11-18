@@ -64,6 +64,9 @@ jobs:
     # 40, not 25 (Post-v0.262.4): the suite has grown to 12 to 15 minutes on a fast runner and 21 on a slow one (716 s
     # to 1,250 s for one commit, b720e61), and a slow runner was cut at 25 with no failing test (run 44220188402,
     # attempt 1, on a14849a; the same commit's pull request run passed in 910 s).
+    # Until the React Native cutover, not for good (Mario, 2026-11-17): 26 of the 149 files hold the Expo app equal to
+    # the page (494 s of the 2,148 s of test time, run 44220790681), a share that grows with each screen and goes at
+    # cutover with the page's own tests. Measure again then and bring this down (MIGRATION.md, phase 5).
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
