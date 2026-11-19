@@ -77,7 +77,39 @@ describe('the screen', () => {
     assert.equal(view.distance, '1.49');
     assert.equal(view.avgPace, '6:42');
     assert.equal(view.milePace, '6:42');
-    assert.deepEqual(view.splits, [{ mile: 1, time: '6:42' }]);
+    assert.deepEqual(view.splits, [{ mile: 1, time: '6:42', climb: '' }]);
+  });
+
+  // D296: the step counter's total at 600 s is 1,500, so 1,500 steps over 10 moving minutes is 150 steps a minute; the
+  // barometer rises 10 m, past the 2 m band, and 10 ÷ 0.3048 = 32.8 ft reads 33 ft.
+  it('shows the climb in feet, the cadence in steps a minute and the steps, in a second row (D296)', () => {
+    const [start, ...fixes] = meridian(600);
+    const lines: GpsLine[] = [...(start ? [start] : []), { t: T0, ralt: 0 }, ...fixes, { t: T0 + 600000, steps: 1500 }, { t: T0 + 600000, ralt: 10 }];
+    const view = recorderView(lines, { ...LIVE, now: T0 + 600000 });
+    assert.equal(view.climb, '33 ft');
+    assert.equal(view.cadence, '150 spm');
+    assert.equal(view.steps, '1,500');
+  });
+
+  it('leaves the second row blank on a run with no step counter or barometer reading (D296)', () => {
+    const view = recorderView(meridian(600), { ...LIVE, now: T0 + 600000 });
+    assert.deepEqual([view.climb, view.cadence, view.steps], ['—', '—', '—']);
+  });
+
+  // The barometer reads 0 at the start, 3 m at 400 s and 1 m at 804 s; the miles end at 402.336 s and 804.672 s, so
+  // mile 1 climbs 3 m (9.84 ft, "+10 ft") and mile 2 falls 2 m (6.56 ft, "−7 ft").
+  it('gives each split its climb in feet with its sign (D296)', () => {
+    const lines: GpsLine[] = [{ t: T0, mark: 'start' }, { t: T0, ralt: 0 }];
+    for (let s = 0; s <= 900; s++) {
+      lines.push({ t: T0 + s * 1000, lat: (4 * s) / DEG_LAT_M, lon: 0, ha: 5 });
+      if (s === 400) lines.push({ t: T0 + s * 1000, ralt: 3 });
+      if (s === 804) lines.push({ t: T0 + s * 1000, ralt: 1 });
+    }
+    const view = recorderView(lines, { ...LIVE, now: T0 + 900000 });
+    assert.deepEqual(
+      view.splits.map((s) => s.climb),
+      ['+10 ft', '−7 ft'],
+    );
   });
 
   it('shows no pace before any distance', () => {

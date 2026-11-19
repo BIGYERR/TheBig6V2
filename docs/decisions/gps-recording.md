@@ -247,3 +247,146 @@
   This Week; Record run opens D267's recorder out of the run card with Ran without the phone? on it. The recording
   screen as R2 over R3, Save behind the gate, the live bar and "Back to your run" build next, then Can't run? (D249),
   in their own releases (Mario, 2026-11-08, "Screen now, rest next").
+
+## D293 P-GPSSMOOTH: the recorder counts a fix only once it stands 10 m from the last one kept (proposed 2026-11-17, revised the same day, concurred 2026-11-18)
+
+- **Date:** 2026-11-17 and 2026-11-18, Post-v0.262.4. **Ruled by:** the main session in the coach hat, on the two test
+  runs Mario ran for D272's gate. First proposed as a 9 fix mean with no distance under 0.5 m/s; revised the same day,
+  before Mario concurred, when he asked whether speed matters and the measure showed the mean depends on it. Mario
+  concurred with the revised rule on 2026-11-18, his one condition that the code names the rule in its own words.
+  **Bump:** MINOR, v0.263.0, with D296 (Mario: "MINOR 0.263.0, both"). **Shipped:** v0.263.0.
+- **The ask (Mario):** "damn i didnt do the 400m track thing but here is what the app got, STRAVA got and you can look up
+  what my COROS watch got that day" (2026-11-15, the road run); "think we need anything else to make sure the phone is
+  accurate or what?"; the track run (2026-11-17); "yeah write it up"; then "hmm does speed matter at all? like would it
+  work for cycling and things like that?" and "do you not have any other running apps or code that have solved this
+  problem already? this cant be a new problem".
+- **The measure** (`tests/measure/gps-recording_track-test.md` and `tests/measure/gps-recording_speed.md`, their
+  scripts beside them; the runs' GPX and FIT files are not committed):
+  - **The track (4 laps of lane 1, 1,600 m).** As the recorder counts today, the phone read 1665.9 m for the whole
+    recording (+4.12%) and 1641.8 m for the run alone (+2.61%). Lap by lap: 407, 407, 409 and 409 m. Standing, it
+    counted 13.2 m in the 37 s before the run and 10.9 m in the 68 s after. The watch read 1613.0 m over the run
+    (+0.81%) and logged positions only while moving.
+  - **The road run (2026-11-13).** Over the 3,596 s both recorded, the phone read 9182.1 m against the watch's 9034.0 m
+    (+1.64%).
+  - **The signal was good.** iOS's accuracy on the track: median 2.2 m, worst 7.4 m.
+  - **The first proposal, withdrawn.** Each fix the mean of 9, no distance under 0.5 m/s: 1613.4 m (+0.84%) on the
+    track and -0.96% against the watch on the road. But 9 fixes are 9 seconds, so the mean cuts every bend by more the
+    faster the athlete goes: on a clean track it reads 1.25% short at the track test's pace, 3.92% at 5:58 a mile and
+    11.91% at 9 m/s; on the two runs with every 3rd or 4th fix kept (the same ground 3 or 4 times as fast, the phone's
+    own noise) it reads 5.29% and 9.56% short on the track. Its +0.84% was the corner it cut cancelling the noise it
+    removed, at one pace only.
+  - **The 10 m rule.** A fix kept only once it is 10 m from the last kept fix, iOS accuracy 50 m or better: 1622.0 m on
+    the track (+1.38%, 22.0 m over against the 32 m allowed) and -0.09% against the watch on the road. With every 2nd,
+    3rd or 4th fix kept it reads between +0.76% and +1.53% on the track and between -0.74% and -0.09% on the road; on
+    the clean courses it stays within 0.82% of the true path at every speed from a walk to 12 m/s, but a 9 m/s ride on a
+    running track's bends (-1.55%). 5 m reads 1632.4 m (+2.03%, over the gate) and +0.57%; 15 m 1609.8 m (+0.61%) and
+    -0.77%.
+- **The finding.** The recorder is long for two reasons, both in how it counts and neither in the signal. Running, it
+  joins one fix a second, each a little to one side of the true path, into a slight zig-zag. Standing, it counts the
+  fixes' drift as distance. A cure that averages a fixed number of fixes averages a fixed time, so it trades the
+  zig-zag for corners cut in proportion to speed. A minimum step does not depend on speed: standing drift never stands
+  10 m from the last kept fix, a 2 m wobble adds little to a 10 m step, and at a ride's speed every fix is kept and no
+  bend is averaged away.
+- **The coaching argument.** D267's still holds: a recorder that reads long writes a pace too fast into every chart that
+  reads the log. One that reads short on bends writes a pace too slow, and worst where it matters, the athlete's speed
+  work on a track. The rule has to hold at every pace the program prescribes, and the program also prescribes rides
+  (its cycling goals). The 10 m rule holds within the watch's own reach on the known distance at every speed tried.
+- **What changes (`core/src/gps/`, the math every run is counted by):**
+  1. **The 10 m rule.** In each stretch (D267: the fixes between Start, a pause and Finish) the first valid fix with an
+     iOS accuracy of 50 m or better is kept. After it, such a fix is kept only when it stands 10 m or more from the
+     last kept fix, and that distance is added. A fix with an accuracy worse than 50 m is never kept. Nothing after a
+     stretch's last kept fix is added (less than 10 m a stretch).
+  2. **Splits.** A mile split falls between the two kept fixes either side of it, its moving time interpolated between
+     them as before.
+  3. **What reads it.** The distance, the average pace, the mile splits and the pace of the mile in progress. While a
+     run records, the distance moves in steps of 10 m or more.
+  4. **Every run is counted again.** The raw files do not change, so every run on the phone shows its new count the
+     next time it is opened.
+  5. **The gate is met on the runs already recorded.** D272's track test judges the recorder, and the plugin does not
+     change for the count, so the build proves the gate by running the two runs' raw fixes through the new math (the
+     track measure's row "The recorder's own count"). Save to the day (D272 items 3 to 5) may then build, in its own
+     release.
+- **Where the numbers come from.** 10 m and 50 m are the minimum step and the accuracy limit open source run and ride
+  trackers use, measured here on Mario's runs rather than taken on trust: 10 m sits between 5 m, which fails the track
+  half of the gate by 0.4 m, and 15 m, which reads closer on the track and further on the road and moves the live
+  distance about every 7 seconds at his pace. 50 m changes nothing on his runs (worst 7.4 m); it keeps a wild fix, such
+  as the first seconds of a cold GPS, out of the count.
+- **What deliberately does not change:** the plugin and the raw file it writes (D267 item 2: record raw, judge later);
+  the GPX, which keeps every valid fix, so the comparison sees what the phone saw (the 50 m limit and the 10 m rule are
+  the count's, not the file's); the run card, the log and the program; the time, which was never wrong. iOS's speed
+  reading is not used for distance, and no speed cut is needed. A step has no upper limit: after the GPS is lost the
+  next kept fix counts as the straight line from the last.
+- **Blast radius:** the iOS app's Run recorder (the Angular screen and `core/src/gps/`); every recorded run's distance,
+  pace and splits on its screen. The page on Pages, the Expo beta (no recorder yet) and every program are untouched.
+- **Tests (`tests/unit/gps-recording.test.ts`, hand oracles; each new one fails on v0.262.4):** a track north at 3 m/s
+  whose fixes alternate 2 m east and west reads 5 m a second as every fix joined, 200 m over 40 s, and 120 m under the
+  rule (the kept fixes are every 4th, 12 m apart on the line: the 3rd stands √(81 + 16) ≈ 9.85 m off); fixes wandering
+  inside 4.3 m for a minute add nothing; a fix 100 m off with an accuracy of 60 m is never kept while one of 50 m is;
+  a run north at 4 m/s that stops 4 m past its last kept fix counts 12 m, not 16. The D267 tests (the meridian degree,
+  an invalid fix, a pause's gap, a straight track's splits, the GPX) keep their oracles: on a straight line at a steady
+  speed the kept fixes lie on the line.
+- **Mario's calls, answered:** (1) the revised rule, concurred 2026-11-18; (2) MINOR v0.263.0 with D296, his pick.
+
+## D296 P-STEPCLIMB: the recorder counts the steps and the climb (ruled 2026-11-18)
+
+- **Date:** 2026-11-18, Post-v0.262.4. **Ruled by:** the main session in the coach hat, put to Mario on 2026-11-17 as
+  the first of four ways to bring the phone's motion sensors in; Mario: "build step 1 and park 2 and 3 we will talk
+  about it later, and yeah throw away 4 thats too much". **Bump:** MINOR, v0.263.0, with D293 (Mario). **Shipped:**
+  v0.263.0.
+- **The ask (Mario):** "also i see strava has elevation changes and stuff in their run records how do we get that?";
+  "so you dont want to try the mixing of motion sensor thing you were talking about for max accuracy? whats the lift on
+  that".
+- **The measure** (`tests/measure/gps-recording_watch-climb.md`, its scripts beside it; no run file is committed):
+  - **The phone's GPS altitude cannot give the climb.** Summed, it read 603 m of climb on the flat road run against the
+    watch's 18 m, and 132 m with each altitude the mean of 9; 133 m on the track against the watch's 4 m.
+  - **The watch counts climb with a 2 m turn band.** Its own altitude track, counted as below, gives its own session
+    totals: 11 m of climb on the road (the session says 11 m), 18 m of descent (17 m), and nothing on the track (0 m).
+    Every change counted gives 18 m and 25 m; a dead band of 2 m gives 6 m and 12 m.
+  - **The watch's cadence** averaged 150.5 steps a minute on the road and 139.3 on the track.
+- **The finding.** The climb a run's record shows comes from air pressure, as on the watch, not from GPS. The iPhone has
+  a barometer and a step counter (Core Motion); the recorder reads neither today.
+- **What changes:**
+  1. **The plugin records two more kinds of line, raw, beside the fixes:** from the step counter, the steps since Start
+     (`steps`), and where iOS gives them its distance from steps (`sd`, metres) and its current cadence (`cad`, steps a
+     second); from the barometer, the altitude relative to its first reading (`ralt`, metres) and the pressure (`kpa`).
+     Each line carries the time it arrived (`t`). As D267: nothing is filtered on the phone, and every judgement runs
+     in core over the raw lines, so a rule tuned later reruns on the runs already recorded.
+  2. **One permission, Motion & Fitness**, asked when the recorder opens, beside Location: "The Asylum counts your steps
+     and your climb while you record a run. It stays on this phone." Refused, or on a phone without the sensors, the run
+     records by GPS as before and the new figures read as blank.
+  3. **Steps and cadence.** The steps a run counts are the rise in the step total between two readings of one stretch,
+     the total standing at 0 at Start, so the steps between the last reading before a pause and the first after it
+     count for nothing. The cadence is those steps over the moving minutes, in steps a minute,
+     the watch's unit.
+  4. **Climb.** The barometer's altitude in each stretch, counted as the watch counts its own (a turn band of 2 m): the
+     altitude last counted is the mark, the stretch's first reading to begin with; a reading above the mark counts as
+     climb when the last change counted was a climb or when it stands 2 m or more above the mark, a reading below the
+     mark counts as descent the same way, and either way the mark moves to it. The climb shows in feet.
+  5. **A split's climb.** Each mile split carries the net change of the barometer's altitude across the mile, from the
+     last reading at or before its start to the last at or before its end, in feet with its sign.
+  6. **The screen.** Under Miles, Avg pace and This mile, a second row: Climb ("59 ft"), Cadence ("152 spm") and Steps
+     ("8,412"); a blank where there is no reading. Each split row adds its climb ("+10 ft").
+  7. **The GPX** gives each point the step total and the barometer's altitude last read at or before its time, as the
+     extensions `ia:steps` and `ia:ralt`, which other GPX readers ignore, so the comparison on the Mac reads them. Its
+     `ele` stays iOS's GPS altitude.
+- **Where the numbers come from.** The 2 m band is read off the watch: 1.5 m and 2 m both give the watch's totals on
+  both runs, and 2 m, the larger, gives a phone in a pocket, whose air pressure moves with every stride and gust, the
+  wider margin before a wobble counts as a hill. Steps a minute is the watch's own unit.
+- **Parked and dropped (Mario, 2026-11-18).** Parked, to talk about later: steps that carry the distance through a GPS
+  loss (the second way), and Apple's own workout session on the iPhone, iOS 26 and later (the third). Dropped: a fusion
+  of our own of the motion sensors with GPS (the fourth), weeks of work that the references at hand could not prove.
+- **What deliberately does not change:** the distance (D293 counts it; the step counter's distance is recorded, never
+  counted); the GPX's `ele`; the run card, the log and every program; the page on Pages and the Expo beta (the recorder
+  is the iOS app's alone).
+- **Blast radius:** the iOS app: the ia-gps plugin (Core Motion, and one Info.plist key, a usage text and not a signing
+  capability, so the TestFlight secrets do not change), the Run recorder screen and `core/src/gps/`.
+- **Not yet seen:** whether iOS keeps the barometer and the step counter reporting with the screen locked. The step
+  total counts from Start whatever the gaps; a gap in the barometer would lose the climb it spans. The next run with the
+  watch shows it, and its measure (steps, cadence and climb against the watch's) is written when that run is in.
+- **Tests (hand oracles; each new one fails on v0.262.4):** `tests/unit/gps-recording.test.ts`: the two new lines parse
+  and a fix still parses as before; step totals of 0 and 100, a pause, then 150 and 250 count 200 steps, the 50 between
+  the last reading before the pause and the first after it dropped; the cadence is those steps over the moving minutes; the
+  altitudes 0, 1, 1.9, 0.5, 2.5, 3.5, 2, 1.4 and 2 count 3.5 m of climb and 2.1 m of descent; the band starts again
+  after a pause; a split carries the barometer's net change across its mile; the GPX points carry the step total and
+  the barometer's altitude last read. `frontends/app/test/unit/run-recorder.test.ts`: the second row reads "33 ft",
+  "150 spm" and "1,500"; a run with no readings reads blank; a split row reads "+10 ft" and "−7 ft".

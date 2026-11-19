@@ -6,7 +6,12 @@
 //   a meridian the haversine is exact (2R·asin(sin(Δφ/2)) = R·Δφ), so a track that moves north at a steady speed
 //   covers speed × time;
 // - a mile is 1,609.344 m, so at 4 m/s a mile takes 402.336 s;
+// - near 0° latitude a degree of longitude is the same 111,195.0797 m, so a fix x metres east and y metres north of
+//   0°, 0° sits at (y, x) ÷ 111,195.0797 degrees, and distances between such fixes are plain Pythagoras;
 // - times are built with Date.UTC, and every line is typed out.
+//
+// D293 (the 10 m rule) and D296 (steps and climb) added the tests from "the 10 m rule" on. A straight line at a steady
+// speed keeps every fix that stands 10 m or more on, so the D267 tests above it keep their oracles.
 import assert from 'node:assert/strict';
 import { describe, test } from 'vitest';
 import {
@@ -98,6 +103,149 @@ describe('mile splits', () => {
   });
 });
 
+/** A fix x metres east and y metres north of 0°, 0°, at t seconds, with an accuracy of ha metres. */
+function at(t: number, x: number, y: number, ha = 5): GpsLine {
+  return { t: t * 1000, lat: y / DEG_LAT_M, lon: x / DEG_LAT_M, ha };
+}
+const START: GpsLine = { t: 0, mark: 'start' };
+
+describe('the 10 m rule (D293)', () => {
+  test('a run north at 3 m/s whose fixes swing 2 m either side of its line counts the line, not the zig-zag', () => {
+    // Every fix joined, each step is a 3, 4, 5 triangle: 40 steps of 5 m, 200 m. Kept from fix 0, the 1st stands 5 m
+    // off, the 2nd 6 m, the 3rd √(9² + 4²) ≈ 9.85 m, the 4th 12 m: every 4th fix is kept, on the line, 12 m apart, and
+    // the 40 s count 10 steps of 12 m, 120 m.
+    const lines: GpsLine[] = [START];
+    for (let s = 0; s <= 40; s++) lines.push(at(s, s % 2 === 0 ? 2 : -2, 3 * s));
+    lines.push({ t: 40000, mark: 'finish' });
+    assert.ok(Math.abs(gpsSummary(lines).distanceM - 120) < 1e-3);
+  });
+
+  test('standing, a fix wandering within a few metres of where it stood adds nothing', () => {
+    // A minute of fixes round the corners of a 3 m square: none stands 10 m (the far corner is √18 ≈ 4.24 m) from the
+    // first, so nothing is kept after it. Every fix joined would count 60 steps of 3 m or more.
+    const corners = [
+      [0, 0],
+      [3, 0],
+      [3, 3],
+      [0, 3],
+    ] as const;
+    const lines: GpsLine[] = [START];
+    for (let s = 0; s <= 60; s++) {
+      const [x, y] = corners[s % 4] ?? [0, 0];
+      lines.push(at(s, x, y));
+    }
+    lines.push({ t: 60000, mark: 'finish' });
+    assert.equal(gpsSummary(lines).distanceM, 0);
+  });
+
+  test('a fix with an accuracy worse than 50 m is never kept, and one of 50 m is', () => {
+    // From 0, 0: a fix 100 m east and 20 m north at 60 m accuracy is passed over; one 30 m north at 50 m is kept, 30 m.
+    const run = gpsSummary([START, at(0, 0, 0), at(10, 100, 20, 60), at(20, 0, 30, 50), { t: 20000, mark: 'finish' }]);
+    assert.ok(Math.abs(run.distanceM - 30) < 1e-3);
+  });
+
+  test('nothing after the last kept fix is counted', () => {
+    // North at 4 m/s for 4 s: the fixes stand 0, 4, 8, 12 and 16 m on. 12 m is kept; 16 m is 4 m past it. 12 m.
+    const lines: GpsLine[] = [START];
+    for (let s = 0; s <= 4; s++) lines.push(at(s, 0, 4 * s));
+    lines.push({ t: 4000, mark: 'finish' });
+    assert.ok(Math.abs(gpsSummary(lines).distanceM - 12) < 1e-3);
+  });
+});
+
+describe('steps and cadence (D296)', () => {
+  test('a step counter line and a barometer line parse, and a fix still parses as a fix', () => {
+    const text = '{"t":5,"steps":12,"sd":8.5,"cad":2.6}\n{"t":6,"ralt":-0.4,"kpa":101.2}\n{"t":7,"lat":1,"lon":2,"ha":3}';
+    assert.deepEqual(parseRecording(text), [
+      { t: 5, steps: 12, sd: 8.5, cad: 2.6 },
+      { t: 6, ralt: -0.4, kpa: 101.2 },
+      { t: 7, lat: 1, lon: 2, ha: 3 },
+    ]);
+  });
+
+  test('steps count the rise in the total inside each stretch, and a pause drops the steps across it', () => {
+    // Start at 0 s (the total stands at 0), 100 at 10 s, Pause at 60 s, 130 at 90 s while paused, Resume at 100 s, 150
+    // at 110 s, 250 at 160 s, Finish at 170 s: 100 + (250 − 150) = 200 steps; the 50 from 100 to 150 span the pause.
+    // Moving time 170 − 40 = 130 s, so the cadence is 200 × 60 ÷ 130 ≈ 92.31 steps a minute.
+    const run = gpsSummary([
+      START,
+      { t: 10000, steps: 100 },
+      { t: 60000, mark: 'pause' },
+      { t: 90000, steps: 130 },
+      { t: 100000, mark: 'resume' },
+      { t: 110000, steps: 150 },
+      { t: 160000, steps: 250 },
+      { t: 170000, mark: 'finish' },
+    ]);
+    assert.equal(run.steps, 200);
+    assert.ok(Math.abs((run.cadenceSpm ?? 0) - (200 * 60) / 130) < 1e-9);
+  });
+
+  test('a run with no step counter or barometer reading has no steps, cadence or climb', () => {
+    const run = gpsSummary([START, at(0, 0, 0), at(10, 0, 40), { t: 10000, mark: 'finish' }]);
+    assert.equal(run.steps, null);
+    assert.equal(run.cadenceSpm, null);
+    assert.equal(run.climbM, null);
+    assert.equal(run.descentM, null);
+  });
+});
+
+describe('climb (D296)', () => {
+  const baro = (s: number, ralt: number): GpsLine => ({ t: s * 1000, ralt });
+
+  test('counts on a 2 m turn band', () => {
+    // Mark 0. 1, 1.9 and 0.5 stand under 2 m from it. 2.5 stands 2.5 m above: climb 2.5, mark 2.5, climbing. 3.5 rises
+    // on: climb 1, mark 3.5. 2 is 1.5 below: nothing. 1.4 is 2.1 below: descent 2.1, mark 1.4, descending. 2 is 0.6
+    // above: nothing. Climb 3.5 m, descent 2.1 m.
+    const alts = [0, 1, 1.9, 0.5, 2.5, 3.5, 2, 1.4, 2];
+    const run = gpsSummary([START, ...alts.map((a, i) => baro(i + 1, a)), { t: 10000, mark: 'finish' }]);
+    assert.ok(Math.abs((run.climbM ?? -1) - 3.5) < 1e-9);
+    assert.ok(Math.abs((run.descentM ?? -1) - 2.1) < 1e-9);
+  });
+
+  test('the band starts again after a pause, and a reading while paused counts for nothing', () => {
+    // Stretch 1: 0, then 1.5 (under the band). Paused: 1.5. Stretch 2 marks its first reading, 1.5, and 3 stands 1.5
+    // above it: no climb. Carried across the pause, the mark 0 would have counted 3 m.
+    const run = gpsSummary([
+      START,
+      baro(1, 0),
+      baro(2, 1.5),
+      { t: 3000, mark: 'pause' },
+      baro(4, 1.5),
+      { t: 5000, mark: 'resume' },
+      baro(6, 1.5),
+      baro(7, 3),
+      { t: 8000, mark: 'finish' },
+    ]);
+    assert.equal(run.climbM, 0);
+    assert.equal(run.descentM, 0);
+  });
+
+  test('a split carries the barometer\'s net change across its mile', () => {
+    // North at 4 m/s for 900 s: the miles end at 402.336 s and 804.672 s. The barometer reads 0 at 0 s, 3 at 400 s,
+    // 3.5 at 403 s, 1 at 804 s and 0 at 900 s. The last reading at or before each end: 3 (mile 1, +3 m) and 1 (mile 2,
+    // 1 − 3 = −2 m).
+    const lines: GpsLine[] = [START, baro(0, 0)];
+    const readings = new Map([
+      [400, 3],
+      [403, 3.5],
+      [804, 1],
+      [900, 0],
+    ]);
+    for (let s = 0; s <= 900; s++) {
+      lines.push(fix(s * 1000, (4 * s) / DEG_LAT_M));
+      const r = readings.get(s);
+      if (r !== undefined) lines.push(baro(s, r));
+    }
+    lines.push({ t: 900000, mark: 'finish' });
+    const run = gpsSummary(lines);
+    assert.deepEqual(
+      run.splits.map((s) => s.climbM),
+      [3, -2],
+    );
+  });
+});
+
 describe('the recording file', () => {
   test('a line cut short by iOS closing the app is skipped, and every whole line is kept', () => {
     const text = '{"t":0,"mark":"start"}\n{"t":1000,"lat":37.1,"lon":-76.5,"ha":4.7,"spd":2.45}\n\n{"t":2000,"lat":37.10';
@@ -155,6 +303,23 @@ describe('the GPX the Run recorder shares', () => {
     assert.ok(gpx.includes('<trkpt lat="37.3" lon="-76.4"><time>2026-10-26T12:00:10.000Z</time><extensions><ia:ha>6</ia:ha></extensions></trkpt>'));
     assert.ok(gpx.includes('<trkpt lat="37.31" lon="-76.4"><time>2026-10-26T12:00:11.000Z</time><extensions><ia:ha>7</ia:ha></extensions></trkpt>'));
     assert.ok(!gpx.includes('lat="37.2"'));
+  });
+
+  test('gives each point the step total and the barometer altitude last read at or before it (D296)', () => {
+    const withMotion = recordingGpx(
+      [
+        { t: t0, mark: 'start' },
+        { t: t0 + 500, steps: 3 },
+        { t: t0 + 700, ralt: 0.4 },
+        { t: t0 + 1000, lat: 37.1, lon: -76.5, ha: 5 },
+        { t: t0 + 1500, steps: 5 },
+        { t: t0 + 2000, lat: 37.2, lon: -76.5, ha: 5 },
+        { t: t0 + 3000, mark: 'finish' },
+      ],
+      'Run',
+    );
+    assert.ok(withMotion.includes('<extensions><ia:ha>5</ia:ha><ia:steps>3</ia:steps><ia:ralt>0.4</ia:ralt></extensions></trkpt>'));
+    assert.ok(withMotion.includes('<extensions><ia:ha>5</ia:ha><ia:steps>5</ia:steps><ia:ralt>0.4</ia:ralt></extensions></trkpt>'));
   });
 
   test('names the run, escaped, and starts at the start mark', () => {

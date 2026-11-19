@@ -56,6 +56,20 @@ type Share = (fileName: string, text: string, done: () => void, fail: () => void
           <div style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums">{{ view().milePace }}</div>
         </div>
       </div>
+      <div style="display:flex;gap:8px">
+        <div class="look-row" style="flex:1;border-top:none;padding-top:0;margin-top:0">
+          <div class="look-lbl">Climb</div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums">{{ view().climb }}</div>
+        </div>
+        <div class="look-row" style="flex:1;border-top:none;padding-top:0;margin-top:0">
+          <div class="look-lbl">Cadence</div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums">{{ view().cadence }}</div>
+        </div>
+        <div class="look-row" style="flex:1;border-top:none;padding-top:0;margin-top:0">
+          <div class="look-lbl">Steps</div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums">{{ view().steps }}</div>
+        </div>
+      </div>
       <div class="look-seg">
         @for (b of view().buttons; track b) {
           <button class="look-opt" style="padding:14px;font-size:15px" (click)="press(b)">{{ label[b] }}</button>
@@ -72,7 +86,7 @@ type Share = (fileName: string, text: string, done: () => void, fail: () => void
           <div class="look-lbl">Splits</div>
           @for (s of view().splits; track s.mile) {
             <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text);font-variant-numeric:tabular-nums">
-              <span>Mile {{ s.mile }}</span><span>{{ s.time }}</span>
+              <span>Mile {{ s.mile }}</span><span>{{ s.time }}@if (s.climb) {&nbsp;&nbsp;{{ s.climb }}}</span>
             </div>
           }
         </div>
@@ -147,6 +161,8 @@ export class RunRecorder implements OnDestroy {
     else if (e.type === 'fix') {
       this.lastFix.set(e.fix);
       if (e.recorded && this.live()) this.lines.update((ls) => [...ls, e.fix]);
+    } else if (e.type === 'motion') {
+      if (this.live()) this.lines.update((ls) => [...ls, e.line]);
     } else if (e.type === 'mark') {
       if ('mark' in e.line && e.line.mark === 'start') {
         this.live.set(true);

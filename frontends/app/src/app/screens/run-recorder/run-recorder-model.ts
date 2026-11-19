@@ -4,9 +4,13 @@
  * run card read; this file only turns a run into the screen's words, which is all the component draws.
  */
 import {
+  formatCadence,
   formatClock,
+  formatFeet,
+  formatFeetChange,
   formatMiles,
   formatPace,
+  formatSteps,
   gpsSummary,
   pacePerMile,
   parseRecording,
@@ -38,6 +42,8 @@ export type GpsEvent =
   | { type: 'auth'; status: GpsAuth }
   | { type: 'fix'; fix: GpsFix; recorded: boolean }
   | { type: 'mark'; line: GpsLine }
+  /** A step counter or barometer reading (D296), written to the run's file before it is sent. */
+  | { type: 'motion'; line: GpsLine }
   | { type: 'error'; message: string };
 
 /** The Bugs tab shows the Run recorder row only inside the iOS app, where the plugin is. */
@@ -73,7 +79,12 @@ export interface RecorderView {
   distance: string;
   avgPace: string;
   milePace: string;
-  splits: { mile: number; time: string }[];
+  /** D296's second row: the climb in feet, the cadence in steps a minute and the steps, blank without the sensors. */
+  climb: string;
+  cadence: string;
+  steps: string;
+  /** Each split's time and the barometer's net change across it ("+10 ft"; empty without the barometer). */
+  splits: { mile: number; time: string; climb: string }[];
   buttons: RecorderButton[];
 }
 
@@ -114,7 +125,10 @@ export function recorderView(lines: readonly GpsLine[], ctx: RecorderContext): R
     distance: formatMiles(run.distanceM),
     avgPace: formatPace(pacePerMile(run.distanceM, run.movingS)),
     milePace: formatPace(pacePerMile(run.partM, run.partS)),
-    splits: run.splits.map((s) => ({ mile: s.mile, time: formatClock(s.seconds) })),
+    climb: formatFeet(run.climbM),
+    cadence: formatCadence(run.cadenceSpm),
+    steps: formatSteps(run.steps),
+    splits: run.splits.map((s) => ({ mile: s.mile, time: formatClock(s.seconds), climb: formatFeetChange(s.climbM) })),
     buttons: BUTTONS[state],
   };
 }
