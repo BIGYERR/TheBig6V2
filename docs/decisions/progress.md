@@ -247,3 +247,9 @@ if ever, and the main line reads only main-slot sessions. Tests: `tests/integrat
   tap and put back after the last, twice (sha256 `278ba57f…575af3` each time, no `-wal` or `-shm` beside it).
   Nothing was fixed from the look.
 - **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged.
+
+## On Mario's phone, IA Next build 121 (2026-11-18)
+
+- Put to him on the Progress tab: the four run cards his data draws (Long Run Ladder, Is Your Easy Actually Easy?, the recovery pace trend, the drift from plan), each title in its colour, the bold numbers in their colours, each chart whole to its edges, and Main Lifts' line charts where they were. **His report:** "All good" (no screenshot). Nothing
+  differed and no motion was named, so nothing was fixed from it. Row 4 of the migration's phase 3 is done on his
+  phone.

@@ -321,3 +321,6 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   commit, 95e66bc, which changed `frontends/native`. The notices read `testflight 0.262.4 processed (uploaded
   before this run; a version goes up once, a fix is the next PATCH)` and `testflight next 0.262.4 (121) processed`.
   The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 121** (his report, 2026-11-18, no screenshot): "All good", to the run cards on IA Next
+  build 121: the four run cards his data draws (Long Run Ladder, Is Your Easy Actually Easy?, the recovery pace trend, the drift from plan), each title in its colour, the bold numbers in their colours, each chart whole to its edges, and Main Lifts' line charts where they were. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/progress.md`, the build 121 entry).
