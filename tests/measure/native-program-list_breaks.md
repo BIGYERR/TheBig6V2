@@ -17,7 +17,7 @@ Written by `node tests/measure/native-program-list_breaks.mjs` (read-only here; 
 | 8 | `list-readers.ts` | a base run's sentence ends as a race plan's | **2** | 11 | integration/native-program-list 10, unit/native-program-list 1 |
 | 9 | `list-readers.ts` | the pace goal's sentence ends as a race plan's | **2** | 4 | integration/native-program-list 3, unit/native-program-list 1 |
 | 10 | `list-readers.ts` | a clamped mile is not said | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
-| 11 | `list-readers.ts` | faster and slower swap in a clamped sentence | **2** | 3 | unit/native-program-list 1, integration/native-program-list 2 |
+| 11 | `list-readers.ts` | faster and slower swap in a clamped sentence | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
 | 12 | `list-readers.ts` | the clamped row is named for the other end | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
 | 13 | `list-readers.ts` | an entry of no time is printed as a time | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 14 | `list-readers.ts` | no count of seeded runs reads as one run | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
@@ -35,13 +35,13 @@ Written by `node tests/measure/native-program-list_breaks.mjs` (read-only here; 
 | 26 | `list-readers.ts` | the hybrid path is the one with an event | **2** | 6 | integration/native-program-list 4, unit/native-program-list 2 |
 | 27 | `list-readers.ts` | the time out is counted from the machine's own day | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
 | 28 | `list-readers.ts` | an older program's seed is not printed | **2** | 4 | integration/native-program-list 3, unit/native-program-list 1 |
-| 29 | `list-readers.ts` | the race date loses its year | **2** | 4 | integration/native-program-list 2, unit/native-program-list 2 |
+| 29 | `list-readers.ts` | the race date loses its year | **2** | 4 | unit/native-program-list 2, integration/native-program-list 2 |
 | 30 | `list-readers.ts` | a goal's label is not today's | **2** | 6 | integration/native-program-list 4, unit/native-program-list 2 |
 | 31 | `list-readers.ts` | a goal's description is not today's | **1** | 1 | integration/native-program-list 1 |
 | 32 | `list-readers.ts` | the pace goal ranks under the base | **2** | 4 | integration/native-program-list 3, unit/native-program-list 1 |
 | 33 | `list-readers.ts` | the triathlon swim is offered on the hybrid path | **1** | 2 | unit/native-program-list 2 |
 | 34 | `list-readers.ts` | the 100 time needs no target | **2** | 3 | integration/native-program-list 1, unit/native-program-list 2 |
-| 35 | `list-readers.ts` | a time needs both its minutes and its seconds | **2** | 6 | unit/native-program-list 3, integration/native-program-list 3 |
+| 35 | `list-readers.ts` | a time needs both its minutes and its seconds | **2** | 6 | integration/native-program-list 3, unit/native-program-list 3 |
 | 36 | `list-readers.ts` | the pace goal takes a distance or a time | **2** | 5 | integration/native-program-list 2, unit/native-program-list 3 |
 | 37 | `list-readers.ts` | a goal picked with no target needed is not ready | **2** | 8 | integration/native-program-list 4, unit/native-program-list 4 |
 | 38 | `list-readers.ts` | the blank mile is required of a beginner | **1** | 1 | unit/native-program-list 1 |
@@ -50,7 +50,7 @@ Written by `node tests/measure/native-program-list_breaks.mjs` (read-only here; 
 | 41 | `list-readers.ts` | a mile over twenty five minutes is taken | **2** | 3 | integration/native-program-list 1, unit/native-program-list 2 |
 | 42 | `list-readers.ts` | five minutes flat is told the chart tops out | **1** | 1 | unit/native-program-list 1 |
 | 43 | `list-readers.ts` | twelve minutes flat is told to base first | **1** | 1 | unit/native-program-list 1 |
-| 44 | `list-readers.ts` | the week a program is in is one on | **2** | 10 | unit/native-program-list 5, integration/native-program-list 5 |
+| 44 | `list-readers.ts` | the week a program is in is one on | **2** | 10 | integration/native-program-list 5, unit/native-program-list 5 |
 | 45 | `list-screen.ts` | a second tap on a card leaves it open | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
 | 46 | `list-screen.ts` | Archive arms the delete's tier | **2** | 4 | integration/native-program-list 2, unit/native-program-list 2 |
 | 47 | `list-screen.ts` | Delete forever… arms the archive's tier | **2** | 4 | integration/native-program-list 2, unit/native-program-list 2 |
@@ -61,9 +61,9 @@ Written by `node tests/measure/native-program-list_breaks.mjs` (read-only here; 
 | 52 | `list-screen.ts` | no card is the active one | **2** | 15 | integration/native-program-list 12, unit/native-program-list 3 |
 | 53 | `list-screen.ts` | the days of the schedule lose their names | **2** | 14 | integration/native-program-list 12, unit/native-program-list 2 |
 | 54 | `list-screen.ts` | the goal in Focus loses its label | **2** | 12 | integration/native-program-list 11, unit/native-program-list 1 |
-| 55 | `list-screen.ts` | the paces are not drawn | **2** | 11 | unit/native-program-list 1, integration/native-program-list 10 |
+| 55 | `list-screen.ts` | the paces are not drawn | **2** | 11 | integration/native-program-list 10, unit/native-program-list 1 |
 | 56 | `list-screen.ts` | the bold words are not marked | **2** | 11 | integration/native-program-list 10, unit/native-program-list 1 |
-| 57 | `list-screen.ts` | a break does not end a line | **2** | 14 | unit/native-program-list 2, integration/native-program-list 12 |
+| 57 | `list-screen.ts` | a break does not end a line | **2** | 14 | integration/native-program-list 12, unit/native-program-list 2 |
 | 58 | `list-screen.ts` | an ampersand is left as its entity | **1** | 1 | unit/native-program-list 1 |
 | 59 | `list-screen.ts` | an icon is read as words | **1** | 2 | unit/native-program-list 2 |
 | 60 | `list-screen.ts` | the goal sheet opens on a program that is gone | **1** | 1 | unit/native-program-list 1 |
@@ -85,16 +85,16 @@ Written by `node tests/measure/native-program-list_breaks.mjs` (read-only here; 
 | 76 | `list-screen.ts` | This Week opens with no active program | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 77 | `list-screen.ts` | Programs is refused with no active program | **1** | 1 | unit/native-program-list 1 |
 | 78 | `list-screen.ts` | the refusal's words are not today's | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
-| 79 | `list-writes.ts` | today is marked as asked too | **2** | 5 | integration/native-program-list 4, unit/native-program-list 1 |
+| 79 | `list-writes.ts` | today is marked as asked too | **2** | 5 | unit/native-program-list 1, integration/native-program-list 4 |
 | 80 | `list-writes.ts` | a marked day is recorded as asked | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 81 | `list-writes.ts` | the record is stored when nothing was added | **1** | 1 | unit/native-program-list 1 |
 | 82 | `list-writes.ts` | the asked days go under the reminder's day | **2** | 5 | integration/native-program-list 4, unit/native-program-list 1 |
 | 83 | `list-writes.ts` | an archived program is set active | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
-| 84 | `list-writes.ts` | a switch does not write the pointer | **2** | 5 | integration/native-program-list 4, unit/native-program-list 1 |
+| 84 | `list-writes.ts` | a switch does not write the pointer | **2** | 5 | unit/native-program-list 1, integration/native-program-list 4 |
 | 85 | `list-writes.ts` | Set Active does not mark the past days as asked | **1** | 2 | integration/native-program-list 2 |
 | 86 | `list-writes.ts` | Set Active's toast is reworded | **1** | 2 | integration/native-program-list 2 |
-| 87 | `list-writes.ts` | a name is cut before it is trimmed | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
-| 88 | `list-writes.ts` | a name may run to forty one | **2** | 3 | unit/native-program-list 1, integration/native-program-list 2 |
+| 87 | `list-writes.ts` | a name is cut before it is trimmed | **2** | 3 | unit/native-program-list 1, integration/native-program-list 2 |
+| 88 | `list-writes.ts` | a name may run to forty one | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
 | 89 | `list-writes.ts` | the same name is stored again | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 90 | `list-writes.ts` | a blank name is stored | **2** | 3 | integration/native-program-list 2, unit/native-program-list 1 |
 | 91 | `list-writes.ts` | the hand on reads the pointer alone | **1** | 1 | unit/native-program-list 1 |
@@ -108,12 +108,12 @@ Written by `node tests/measure/native-program-list_breaks.mjs` (read-only here; 
 | 99 | `list-writes.ts` | a deleted program keeps its keys | **2** | 3 | integration/native-program-list 1, unit/native-program-list 2 |
 | 100 | `list-writes.ts` | a deleted program stays in the list | **2** | 4 | integration/native-program-list 2, unit/native-program-list 2 |
 | 101 | `list-writes.ts` | Delete Forever's toast is reworded | **2** | 4 | integration/native-program-list 2, unit/native-program-list 2 |
-| 102 | `list-writes.ts` | a run goal switch drops the mile | **2** | 6 | unit/native-program-list 3, integration/native-program-list 3 |
+| 102 | `list-writes.ts` | a run goal switch drops the mile | **2** | 6 | integration/native-program-list 3, unit/native-program-list 3 |
 | 103 | `list-writes.ts` | any sport's switch carries a mile | **1** | 1 | unit/native-program-list 1 |
 | 104 | `list-writes.ts` | an empty mile is carried | **1** | 1 | unit/native-program-list 1 |
 | 105 | `list-writes.ts` | where the mile came from is not carried | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 106 | `list-writes.ts` | the new goal keeps no blank baseline | **2** | 9 | integration/native-program-list 5, unit/native-program-list 4 |
-| 107 | `list-writes.ts` | the swim unit is not carried | **2** | 2 | unit/native-program-list 1, integration/native-program-list 1 |
+| 107 | `list-writes.ts` | the swim unit is not carried | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 108 | `list-writes.ts` | a 500 time lands on the 100 goal's own base | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 109 | `list-writes.ts` | the 100 goal hands its 100 time on as a 500 | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
 | 110 | `list-writes.ts` | the 500 goal's time is not carried | **2** | 2 | integration/native-program-list 1, unit/native-program-list 1 |
