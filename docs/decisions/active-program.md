@@ -200,4 +200,6 @@ and `tests/measure/v221_rulings/p_active_ruling.md`). The switch is `setActive` 
   saved aside before the first tap and put back after each writing pass (sha256 `278ba57f…575af3` each time, no
   `-wal` or `-shm` beside it). **Fixed from the look:** the list jumped back to its top at every draw (its body
   was keyed by the draw); it is one body now.
-- **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged.
+- **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged. The
+  branch was rebased onto v0.263.0 (the GPS recorder's release, on `dev` meanwhile) before landing, with no
+  conflict and the tests green on the rebased tree, so that build carries core's 0.263.0.
