@@ -44,10 +44,10 @@ const s = StyleSheet.create({
   scrim: { backgroundColor: 'rgba(0,0,0,0.78)' },
   center: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', padding: 20 },
   card: { width: '100%', maxWidth: 340, borderRadius: 24, padding: 20 },
-  head: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '600', marginBottom: 8 },
+  head: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '700', marginBottom: 8 },
   body: { fontFamily: TEXT, fontSize: 14, lineHeight: 21.7, marginBottom: 16 },
   yes: { borderRadius: 999, padding: 13, alignItems: 'center', marginBottom: 8 },
   yesText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700' },
   no: { borderRadius: 999, borderWidth: 1, padding: 11, alignItems: 'center' },
-  noText: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '600' },
+  noText: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '700' },
 });

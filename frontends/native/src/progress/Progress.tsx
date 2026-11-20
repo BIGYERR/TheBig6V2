@@ -6,13 +6,14 @@
 // The body is drawn anew on every draw, as the page writes it anew: the journal's weeks fold back (the latest
 // open), the estimator folds and its two numbers clear.
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { type LayoutChangeEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import { asyIcon } from '@ia/core/engine/icons.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
 import { DISPLAY, type Palette, TEXT } from '../theme';
+import { Glow } from '../this-week/marks';
 import { CardTitle, DotChartCard, LedgerCards, RunCard } from './ChartCards';
 import { paint } from './paint';
 import type { ChipsView } from './program-chips-model';
@@ -35,6 +36,8 @@ export function Progress({ palette: p, store, state: st, say }: {
   say: (text: string) => void;
 }) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const [headH, setHeadH] = useState(0);
   // The tab's tap (showProgressScreen), then the first draw. n counts the draws: each is a body of its own.
   const [drawn, setDrawn] = useState(() => { openProgress(st); return { view: progressView(store, st, Date.now()), n: 0 }; });
   const redraw = (): void => setDrawn((d) => ({ view: progressView(store, st, Date.now()), n: d.n + 1 }));
@@ -48,11 +51,14 @@ export function Progress({ palette: p, store, state: st, say }: {
   };
   return (
     <View testID="progress" style={{ flex: 1, backgroundColor: p.bg }}>
-      <View style={[s.top, { paddingTop: insets.top, borderBottomColor: p.border }]}>
+      {/* The glow (look.css): painted behind the top bar and again, in the same box, behind the top of the body. */}
+      <View testID="progress-top" onLayout={(e: LayoutChangeEvent) => setHeadH(e.nativeEvent.layout.height)} style={[s.top, { paddingTop: insets.top }]}>
+        <Glow width={width} height={headH} top={0} rgb={p.signalRgb} alpha={p.glowAlpha} />
         <Text style={[s.app, { color: p.muted }]}>The Asylum</Text>
         <Text accessibilityRole="header" style={[s.screen, { color: p.text }]}>Progress</Text>
       </View>
       <ScrollView key={drawn.n} testID="progress-body" contentContainerStyle={[s.body, { paddingBottom: 140 + insets.bottom }]} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets>
+        <Glow width={width} height={Math.max(0, 200 - headH)} top={headH} rgb={p.signalRgb} alpha={p.glowAlpha} />
         {v && (
           <>
             <Chips view={v.chips} palette={p} on={on} />
@@ -217,9 +223,10 @@ function Estimator({ palette: p, state: st, unit }: { palette: Palette; state: P
 
 const s = StyleSheet.create({
   // The page's top bar (look.css .top-bar): the app's name small, the screen's name large.
-  top: { paddingHorizontal: 20, paddingBottom: 16, borderBottomWidth: 1 },
-  app: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '600' },
-  screen: { fontFamily: DISPLAY, fontSize: 40, fontWeight: '700', letterSpacing: -1.2, lineHeight: 42, marginTop: 2 },
+  // Its lines' heights and the name's place are WebKit's, as on the Programs tab (Programs.tsx).
+  top: { paddingHorizontal: 20, paddingBottom: 16, overflow: 'hidden' },
+  app: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '700', paddingBottom: 2.1 },
+  screen: { fontFamily: DISPLAY, fontSize: 40, fontWeight: '700', letterSpacing: -1.6, lineHeight: 42, marginTop: 4.9, marginBottom: -2.9 },
   body: { paddingTop: 16, paddingHorizontal: 20, gap: 20 },
   card: { borderRadius: 16, paddingVertical: 14, paddingHorizontal: 16 },
   chipsScroll: { flexGrow: 0 },
@@ -231,7 +238,7 @@ const s = StyleSheet.create({
   confirm: { gap: 8, borderWidth: 1, borderRadius: 16, paddingVertical: 10, paddingHorizontal: 12 },
   confirmText: { fontFamily: TEXT, fontSize: 12, lineHeight: 18 },
   confirmRow: { flexDirection: 'row', gap: 8 },
-  action: { padding: 7, borderRadius: 4, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  action: { padding: 7, borderRadius: 999, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   grow: { flex: 1 },
   trash: { paddingVertical: 8, paddingHorizontal: 10 },
   actionText: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
@@ -251,7 +258,7 @@ const s = StyleSheet.create({
   entryDay: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '700' },
   entryRpe: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
   swap: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 5, borderRadius: 3, paddingVertical: 3, paddingHorizontal: 7 },
-  swapText: { fontFamily: TEXT, fontSize: 11, fontWeight: '600' },
+  swapText: { fontFamily: TEXT, fontSize: 11, fontWeight: '700' },
   jog: { fontFamily: TEXT, fontSize: 12, fontWeight: '500', lineHeight: 18 },
   notes: { fontFamily: TEXT, fontSize: 12, lineHeight: 18, fontStyle: 'italic' },
   estimator: { borderRadius: 16, paddingHorizontal: 16, marginTop: 4 },
@@ -264,7 +271,7 @@ const s = StyleSheet.create({
   inputs: { flexDirection: 'row', gap: 10, marginBottom: 10 },
   inputGroup: { flex: 1, gap: 6 },
   inputLabel: { fontFamily: DISPLAY, fontSize: 11, fontWeight: '700' },
-  input: { fontFamily: TEXT, fontSize: 16, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderRadius: 4 },
+  input: { fontFamily: TEXT, fontSize: 16, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderRadius: 12 },
   result: { fontFamily: TEXT, fontSize: 13, minHeight: 20, lineHeight: 19.5 },
   resultBold: { fontWeight: '700' },
 });

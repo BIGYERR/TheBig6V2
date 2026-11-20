@@ -22,11 +22,13 @@ const HALF = PROGRAMS[names[0]!]!;
 
 describe('native program list: The Half Manny through the standard history', () => {
   const T = listTally();
-  test('the list, the goal sheet and the mile pencil at each stretch, then a second program beside it', () => {
+  // The goal sheet and the mile pencil after three weeks are the sweep's alone (its first program is this one): that
+  // walk was a third of this test's time in the 60-second check (Post-v0.263.0).
+  test('the list at each stretch, the goal sheet and the mile pencil before anything is trained, then a second program beside it', () => {
     let stages = 0;
     const { phone } = life(HALF, CREATED, undefined, (stage, P) => {
       listWalk(P, T, 'half manny, ' + stage);
-      if (stage === '0 generated' || stage === '3 third week') { goalWalk(P, T, 'half manny, ' + stage); assert.equal(mileWalk(P, T, 'half manny, ' + stage), 'edit'); }
+      if (stage === '0 generated') { goalWalk(P, T, 'half manny, ' + stage); assert.equal(mileWalk(P, T, 'half manny, ' + stage), 'edit'); }
       stages++;
     });
     assert.equal(stages, 5);

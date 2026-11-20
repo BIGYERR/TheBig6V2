@@ -324,3 +324,25 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
 - **On Mario's phone, build 121** (his report, 2026-11-18, no screenshot): "All good", to the run cards on IA Next
   build 121: the four run cards his data draws (Long Run Ladder, Is Your Easy Actually Easy?, the recovery pace trend, the drift from plan), each title in its colour, the bold numbers in their colours, each chart whole to its edges, and Main Lifts' line charts where they were. Nothing differed and no motion was named, so nothing was fixed from it
   (`docs/decisions/progress.md`, the build 121 entry).
+- **Seen on `main`, the eighteenth run, both lanes** (run 44427205622, merge 4009134, v0.263.0, the GPS chat's
+  release, 2026-11-18 19:13 EST; not recorded here by the session that shipped it, so read from the run's own page
+  by the rest sheet's session on 2026-11-19): the two gates went together (11 s today's, 20 s the beta's). Today's
+  lane uploaded `0.263.0` (4m39s) and read it back as processed (1m50s). The beta's lane uploaded `0.263.0 (122)`
+  (12m0s) and read it back as processed (2m45s). The gates' notices read `testflight 0.263.0 is not in App Store
+  Connect yet; uploading` and `testflight next 0.263.0 (122) is not in App Store Connect yet; uploading`.
+- **Seen on `main`, the nineteenth run, the beta's lane alone** (run 44658737804, merge c9407ed, pull request 56,
+  2026-11-19 21:09 EST; the merge carried no version: dc08115, the program list in the Expo app, and ten tests and
+  docs commits; read and recorded by the next session, the rest sheet's, which found the run still uploading and
+  waited for it): the two gates went together (10 s today's, 12 s the beta's). Today's lane skipped its upload, as
+  ruled. The beta's lane archived, signed and uploaded `0.263.0 (123)` (339 s, done 21:15:59) and read it back as
+  processed (132 s, done 21:18:13). The build number moved from 122 to 123 on one commit, dc08115, which changed
+  `frontends/native`. The notices read `testflight 0.263.0 processed (uploaded before this run; a version goes up
+  once, a fix is the next PATCH)` and `testflight next 0.263.0 (123) processed`. The run ended green: 6 jobs passed
+  and 8 skipped by rule.
+- **On Mario's phone, build 123** (his report, 2026-11-19, two screenshots: today's 0.263.0 and IA Next 123 on the
+  Programs tab): "Fonts looks different and the copy button doesn't work not sure if you just didn't build it in".
+  The copy button is not built yet (drawn, no press; the row's third session). The look differed and was proved on
+  the simulator before any change: the screen's name in a condensed face, square buttons, no glow, Build New
+  Program under the last card. Fixed in the beta and measured against his own screenshot of today's, every line
+  within a point (`docs/decisions/active-program.md`, the build 123 entry). On the phone with the next IA Next
+  build.

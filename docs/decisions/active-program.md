@@ -203,3 +203,51 @@ and `tests/measure/v221_rulings/p_active_ruling.md`). The switch is `setActive` 
 - **Release:** Post-v0.262.4, no build of today's app; on the phone with the next IA Next build once merged. The
   branch was rebased onto v0.263.0 (the GPS recorder's release, on `dev` meanwhile) before landing, with no
   conflict and the tests green on the rebased tree, so that build carries core's 0.263.0.
+
+## On Mario's phone, IA Next build 123 (2026-11-19): the Programs tab's look differed, and is fixed
+
+- Put to him on the Programs tab: his two cards with the active one edged in orange, an open card (the est. mark,
+  six pace chips, the line under them, the event), the mile's pencil and its lock, a goal's pencil and its sheet,
+  Archive's question and Cancel, and the list keeping its place after a tap low on an open card. He was told which
+  taps write to the beta's own copy only. **His report** (two screenshots, today's 0.263.0 and IA Next 123, the
+  Programs tab on each): "Fonts looks different and the copy button doesn't work not sure if you just didn't build
+  it in".
+- **The copy button.** Not built: it is drawn and takes no press, as the first session recorded (the clipboard is a
+  native package the beta does not carry yet). It comes with the row's third session, with the date box.
+- **The look, proved before anything was changed.** Both apps on the simulator (iPhone 17 Pro, the beta on a copy
+  of his backup) drew what his two screenshots show. Seven things differed on the Programs tab, from two causes:
+  - *Helvetica Neue has no 600 and no 800.* WebKit draws both with its Bold. iOS, asked for 800, answers with
+    Condensed Black (the screen's name), and asked for 600 with Medium (the line over it). This Week and the deck
+    carry the rule (every 600 and 800 of today's is 700 in the beta); the Programs tab did not, and 36 styles on
+    10 other files asked for 600.
+  - *The Track look's layer was left off* (D263, `look.css`, which rounds what the component sheets draw square):
+    no glow behind the top bar and a rule under it; the card's corners 16 for 24; the buttons, the badge, the chips
+    and the copy button square for pills; the badge and the detail's labels 10 for 12; the rename box 4 for 12; and
+    Build New Program under the last card, where today's sits at the screen's foot.
+  The values were read out of today's running app (the computed style of each class), never by eye.
+- **A third cause, found by measuring his screenshot of today's.** Where the CSS names no line height, WebKit draws
+  Helvetica Neue's line 1.34 times its size, the letters where iOS puts them and the rest under them; iOS draws
+  1.19. So a card was 161.3 tall for today's 158, a button 30.3 for 32, the top bar 140.5 for 142, and the tab bar
+  stood 1.7 lower than today's on every tab. Each such line on the Programs tab, and the tab bar's labels, now keep
+  iOS's own height and take the difference as padding under them. The screen's name, whose height the CSS sets, sat
+  5 higher than today's; it now sits where today's does.
+- **Fixed, the beta only:** the Programs tab (weights, the glow and no rule, the radii, the 12s, the lines, Build
+  New Program at the foot); Progress's top bar (the same two weights, the glow and no rule, the name's spacing 1.6
+  for 1.2) with its buttons as pills and its box at 12; the goal sheet (tiles at 16, the box at 12, pills), the
+  mile pencil (the box at 12, pills) and a sheet's Back (a pill); the tab bar's labels; and the 36 styles that asked
+  for 600, now 700 (the session sheet 18, the add sheet 4, the swap sheet 4, Progress 2, its cards 2, the swap
+  nudge 2, and one each on the mile pencil, the pop-ups, a sheet's frame and the cardio block). Progress's cards
+  were already today's 16, which today's page writes inline.
+- **Measured after, on the simulator against his screenshot of today's** (text bands and edges read from the
+  pixels, in points): the line over the name 66.0 for 66.3; the name 91.7 for 91.3; the first card's top 158.3 for
+  158.0 and its name 182.3 for 182.3; its three lines 211.3, 227.0 and 242.7 for 210.3, 226.3 and 242.0; its
+  buttons 265.7 to 297.7 for 265.0 to 297.0; the second card 326.7 to 485.0 for 326.0 to 484.0; Build New Program
+  670.7 to 723.7 for 671.3 to 724.0. Every one within a point; before, up to 5 apart.
+- **Tests (`tests/unit/native-look.test.ts`, new, 17 tests):** no weight in the app but 400, 500 and 700, bar two
+  styles on the system face; today's sheets still saying what the beta copies (the four radii, which shapes are
+  pills, the top bar's rule); and the Programs tab, Progress and the two sheets carrying those values. On the
+  commit before (`tools/tree-at.mjs`): 10 of the first 15 red; the 5 that pass guard what must not change, and the
+  file says so. The 2 added after are on the lines' padding, which that commit does not have.
+- **Not changed:** any word, number or behaviour; today's app; core. The other screens' own line heights were set
+  when each was built and seen beside today's on his phone; they were not measured again here.
+- **Release:** Post-v0.263.0, no build of today's app; on the phone with the next IA Next build once merged.

@@ -209,7 +209,8 @@ const styles = StyleSheet.create({
   // The floating tab bar (look.css .tabbar, D263): 12 from the sides, above the home indicator.
   tabbar: { position: 'absolute', left: 12, right: 12, flexDirection: 'row', padding: 6, borderRadius: 34, borderWidth: 1, boxShadow: '0 10px 30px rgba(0,0,0,0.18)' },
   tab: { flex: 1, alignItems: 'center', gap: 3, paddingTop: 9, paddingHorizontal: 4, paddingBottom: 8, borderRadius: 28 },
-  tabLabel: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
+  // The label's line is WebKit's 16, iOS's own 14.3 and 1.7 under it (Programs.tsx has the measure): the bar was 1.7 short.
+  tabLabel: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700', paddingBottom: 1.7 },
   toastWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   toast: { paddingVertical: 10, paddingHorizontal: 20, borderRadius: 4, maxWidth: '92%' },
   toastText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700', color: '#0a0a0a', textAlign: 'center' },

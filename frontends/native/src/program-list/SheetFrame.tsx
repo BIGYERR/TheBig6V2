@@ -53,7 +53,7 @@ export function SheetFrame({ id, palette: p, calm, onClose, children }: {
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingBottom: 14, borderBottomWidth: 1 },
-  back: { borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
-  backText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '600' },
+  back: { borderWidth: 1, borderRadius: 999, paddingVertical: 8, paddingHorizontal: 14 },
+  backText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700' },
   body: { padding: 20 },
 });

@@ -90,10 +90,10 @@ const styles = StyleSheet.create({
   facts: { marginTop: 10 },
   fact: { flexDirection: 'row', justifyContent: 'space-between', gap: 14 },
   factK: { fontFamily: TEXT, fontSize: 13, lineHeight: 22.1 },
-  factV: { fontFamily: TEXT, fontSize: 13, lineHeight: 22.1, fontWeight: '600', textAlign: 'right', flexShrink: 1 },
+  factV: { fontFamily: TEXT, fontSize: 13, lineHeight: 22.1, fontWeight: '700', textAlign: 'right', flexShrink: 1 },
   fields: { flexDirection: 'row', gap: 6, marginTop: 12 },
-  input: { flex: 1, borderWidth: 1, borderRadius: 4, fontFamily: TEXT, fontSize: 16, paddingVertical: 12, paddingHorizontal: 14, textAlign: 'center' },
+  input: { flex: 1, borderWidth: 1, borderRadius: 12, fontFamily: TEXT, fontSize: 16, paddingVertical: 12, paddingHorizontal: 14, textAlign: 'center' },
   btns: { flexDirection: 'row', gap: 8, marginTop: 14 },
-  btn: { flex: 1, padding: 7, borderRadius: 4, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  btn: { flex: 1, padding: 7, borderRadius: 999, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   btnText: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
 });
