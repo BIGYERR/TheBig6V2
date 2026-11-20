@@ -7,8 +7,9 @@
 //
 // Nothing here writes, and nothing opens yet: a tap on a week title or on a day works (they change what is shown,
 // not what is stored). Every other control is drawn as today's and does nothing until its own screen exists: the
-// cards' buttons (the recorder, the deck, the hand log), the Skip pills, Reopen, the rest card's links, Hurt?, the
-// race date and the start date, Random Workout and Traveling?.
+// cards' buttons (the recorder, the deck, the hand log), the Skip pills, Reopen, Hurt?, the race date and the start
+// date, Random Workout and Traveling?. The rest card's links open the rest day sheet (rest-sheet/RestSheet.tsx),
+// which the app draws over the screen and which writes to this app's own store.
 import { type ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,6 +22,7 @@ import { type CardioOnly, cardRoute } from '../day-detail/cardio-sheet-model';
 import { type SheetOpen, type SheetProgram, sheetView } from '../day-detail/sheet-screen';
 import { type DeckOpen, type DeckProgram, deckView } from '../deck/deck-screen';
 import type { GrowBox } from '../deck/grow-motion';
+import type { RestAsk, RestProgram } from '../rest-sheet/rest-sheet-model';
 import { BLANK, PLAN_CHANGE_FAILED, drawWeek, launch, launchTitle, pillArrow, pillParts, tokenOf } from './week-screen';
 import { type StripClock, type StripEl, StripPlacer } from './week-strip';
 import { type Column, type DayCard, type DaysView, TITLE_W, type WeekView } from './week-view-model';
@@ -41,7 +43,7 @@ const TAB_ROOM = 96;
 
 type Tint = keyof Pick<Palette, 'run' | 'bike' | 'swim' | 'lift' | 'signal' | 'dim'>;
 
-export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLaunch }: {
+export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRest, onLaunch }: {
   palette: Palette; store: StateStore; tick: number;
   /** The program Make the change handed back since the launch, to hold in place of the launch's own; null for none. */
   held: DeckProgram | null;
@@ -49,6 +51,8 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLau
   onDeck: (deck: DeckOpen, from: DeckFrom | null) => void;
   /** Reopen on a done lift, and Start where the day opens no deck: the day's session sheet (D278 item 4; deck.ts open()). */
   onSheet: (sheet: SheetOpen) => void;
+  /** Training anyway?, Log cardio, Edit cardio: the rest day sheet on that view. */
+  onRest: (ask: RestAsk) => void;
   /** Each launch, with the program it handed back: the app raises the day-after reminder 600 ms on (bug-report-init.ts). */
   onLaunch: (prog: DeckProgram | null) => void;
 }) {
@@ -256,7 +260,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLau
         )}
 
         <View style={s.days}>
-          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} onReopen={openSheet} onCardio={openSheet} />}
+          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={(week, key, view) => { if (prog) onRest({ prog: prog as unknown as RestProgram, week, dayKey: key, view }); }} />}
         </View>
 
         <View style={s.settings}>
@@ -274,7 +278,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onLau
   );
 }
 
-function Days({ d, p, onPick, onStart, onReopen, onCardio }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string, from: DeckFrom | null) => void; onReopen: (week: number, key: string) => void; onCardio: (week: number, key: string, sheet: CardioOnly) => void }) {
+function Days({ d, p, onPick, onStart, onReopen, onCardio, onRest }: { d: DaysView; p: Palette; onPick: (col: number) => void; onStart: (week: number, key: string, from: DeckFrom | null) => void; onReopen: (week: number, key: string) => void; onCardio: (week: number, key: string, sheet: CardioOnly) => void; onRest: (week: number, key: string, view: 'move' | 'cardio') => void }) {
   const s = styles;
   const first = d.cards[0];
   return (
@@ -290,8 +294,8 @@ function Days({ d, p, onPick, onStart, onReopen, onCardio }: { d: DaysView; p: P
           <Text style={[s.blurb, { color: p.muted }]}>Recovery is where the work sets in. Move easy, refuel, sleep.</Text>
           {d.rest.lines.map((l, i) => <Text key={i} style={[s.restLogged, { color: p.run }]}>{l}</Text>)}
           <View style={s.links}>
-            {d.rest.anyway && <Text accessibilityRole="button" style={[s.link, { color: p.muted, textDecorationColor: p.border2 }]}>Training anyway?</Text>}
-            <Text accessibilityRole="button" style={[s.link, { color: p.muted, textDecorationColor: p.border2 }]}>{d.rest.logLabel}</Text>
+            {d.rest.anyway && <Text testID="rest-anyway" accessibilityRole="button" onPress={() => onRest(d.rest!.week, d.rest!.key, 'move')} style={[s.link, { color: p.muted, textDecorationColor: p.border2 }]}>Training anyway?</Text>}
+            <Text testID="rest-log-link" accessibilityRole="button" onPress={() => onRest(d.rest!.week, d.rest!.key, 'cardio')} style={[s.link, { color: p.muted, textDecorationColor: p.border2 }]}>{d.rest.logLabel}</Text>
           </View>
         </View>
       )}

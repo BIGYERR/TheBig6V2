@@ -218,7 +218,7 @@ const BREAKS = [
   [FRAME, "a sheet leaves twice", "    if (leaving.current) return;\n", ""],
   [FRAME, "Reduce Motion still slides", "    if (calm) { onClose(); return; }\n", ""],
   [APP, "the Programs tab is named Home", "<TabButton id=\"tab-home\" label=\"Programs\"", "<TabButton id=\"tab-home\" label=\"Home\""],
-  [APP, "a sheet is not drawn", "      {cover}\n      {toast && <Toast", "      {toast && <Toast"],
+  [APP, "a sheet is not drawn", "      {cover}\n      {rest && (", "      {rest && ("],
   [APP, "Set Active ends on Progress", "onSwitch={() => go('week')}", "onSwitch={() => go('progress')}"],
   [APP, "the list forgets what it kept at every draw of the app", "const list = useRef(newListState()).current;", "const list = newListState();"],
   [APP, "a long toast is cut to one line", "<Text numberOfLines={2} style={styles.toastText}>", "<Text numberOfLines={1} style={styles.toastText}>"],

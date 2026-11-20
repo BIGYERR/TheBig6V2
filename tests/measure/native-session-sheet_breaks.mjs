@@ -195,7 +195,7 @@ const BREAKS = [
   [WEEK, 'This Week does not hand the sheet its day', "    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });\n", ''],
   [APP, 'Done on the sheet raises no pop-up', "setSheet(null); complete(", "setSheet(null); void ("],
   [APP, 'the sheet\'s Back does not close it', "open={sheet} calm={calm} onClose={() => setSheet(null)}", "open={sheet} calm={calm} onClose={() => {}}"],
-  [APP, 'This Week\'s Reopen reaches no sheet', "onSheet={setSheet} onLaunch", "onSheet={() => {}} onLaunch"],
+  [APP, 'This Week\'s Reopen reaches no sheet', "onSheet={(s) => { setGoing(false); setSheet(s); }} onRest", "onSheet={() => {}} onRest"],
   // ── The sheet's second session: what the add sheet lists (sheet-adds.ts) ──
   [ADDS, 'a move already on the card is offered again', "    if (onCard[n.toLowerCase()]) return;\n", ''],
   [ADDS, 'the card\'s names are matched to the kit\'s by their exact case', "onCard[it.name.toLowerCase()] = 1;", "onCard[it.name] = 1;"],
@@ -278,7 +278,8 @@ const BREAKS = [
   [SHEET, 'a remove does not draw the sheet again', "const toast = removeAdded(session, name);\n      if (toast === null) return;\n      redraw();\n", "const toast = removeAdded(session, name);\n      if (toast === null) return;\n"],
   [SHEET, 'an added move\'s remove reads delete', ">remove</Text>", ">delete</Text>"],
   [SHEET, 'an added move no longer says the athlete added it', "<Text style={[s.bold, { color: p.signal }]}>You added this</Text>{' · not in the plan'}</Text>", "<Text style={[s.bold, { color: p.signal }]}>Added</Text></Text>"],
-  [SHEET, 'the jog\'s Edit cardio takes a press', "<View style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></View>", "<Pressable onPress={() => {}} style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></Pressable>"],
+  // Until the rest sheet's session this rule read "the jog's Edit cardio takes a press": the button took none. It asks for the rest sheet now, and the break is the press that asks for nothing.
+  [SHEET, 'the jog\'s Edit cardio asks for no sheet', "onPress={() => { leave(); onRest({ prog: prog as unknown as RestProgram, week: open.week, dayKey: open.dayKey, view: 'cardio' }, () => redraw()); }} style={[s.alsoBtn,", "onPress={() => { leave(); }} style={[s.alsoBtn,"],
   [SHEET, 'the jog\'s lines are not drawn', "                {blk.lines.map((l, i) => <Text key={i} style={[s.alsoLine, { color: p.run }]}>{l}</Text>)}\n", ''],
   [SHEET, 'the jog\'s label is not drawn', "                <Text style={[s.alsoLbl, { color: p.muted }]}>{blk.label}</Text>\n", ''],
   [SHEET, 'the Wildcard tag reads Wildcard', ">Wildcard done</Text>", ">Wildcard</Text>"],

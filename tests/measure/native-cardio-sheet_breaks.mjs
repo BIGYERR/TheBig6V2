@@ -139,7 +139,7 @@ const BREAKS = [
   [WEEK, 'the sheet is opened without the cardio it was asked for', "if (view) onSheet({ prog: grid, week, dayKey: key, view, only });", "if (view) onSheet({ prog: grid, week, dayKey: key, view });"],
   [WEEK, 'a sunk button presses', "const starts = !!bt && !bt.sunk;", "const starts = !!bt;"],
   [WEEK, 'the when line is the card\'s own label', "when={first ? first.label : ''}", "when={k.label}"],
-  [WEEK, 'a card\'s cardio tap has nowhere to go', "onStart={startDeck} onReopen={openSheet} onCardio={openSheet} />}", "onStart={startDeck} onReopen={openSheet} onCardio={() => {}} />}"],
+  [WEEK, 'a card\'s cardio tap has nowhere to go', "onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={", "onStart={startDeck} onReopen={openSheet} onCardio={() => {}} onRest={"],
   // ── The sheet's wiring ──
   [SHEET, 'the cardio log is not drawn', "{log.view.cardio && form.wrap && (", "{log.view.cardio && !form.wrap && ("],
   [SHEET, 'the add button stands on one cardio alone', "{!frame.cardio && (\n            <Pressable testID=\"sheet-add\"", "{(\n            <Pressable testID=\"sheet-add\""],

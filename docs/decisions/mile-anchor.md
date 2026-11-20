@@ -96,3 +96,30 @@ what the app does when the logged runs disagree with it. Measure: `tests/measure
 - **Release:** v0.259.0 (2026-11-08). The page Pages serves changes only by its version (`tools/same-script.mjs`: the
   same 172,655 script tokens); `frontends/app/test/unit/mile-nudge.test.ts` 16/16, its 14 judge and sheet tests unable to
   load on v0.258.1 (`mile-nudge-model.ts` is new) and its two wiring tests, run on v0.258.1's sources, each failing.
+
+## D274 in the Expo app: the coach's mile nudge (Post-v0.263.0, the migration's phase 3, row 5, the second of three sessions)
+
+- **Date:** 2026-11-20. **Ruled by:** no new ruling: D274 and its Amendment 1, carried unchanged (Mario, "Concur,
+  build it", on the cut put to him after `tests/measure/native-rest-sheet_today.md`). **Bump:** none.
+- **What is built** (`frontends/native/src/mile-nudge/`): `mile-nudge-model.ts`, today's file byte for byte (the
+  judge and the sheet's words); `nudge-screen.ts`, the Angular screen's code around it with its bridge into the page
+  replaced by core's readers (the judge after every tap of the cardio card's Log; either answer leaving the two
+  cards and the mile judged against on the program, in `ia_programs`; Update mile time opening the mile pencil with
+  the offer in its two fields); and `MileNudge.tsx`, the sheet from the foot of the screen. The app holds an offer
+  until This Week shows with the session sheet going or gone, then 700 ms, as today's.
+- **Read from today's code, carried, not ruled:** the judge's test for a skipped card compares the day's mark, a
+  record, with the word `skipped`, so it never holds: a skipped easy card that carries a logged distance and time
+  still counts. The beta reads the same marks the same way.
+- **On Mario's data it will not rise now:** his mile is locked this close to the race (the measure, section F).
+- **Proof.** The judge on both apps after each of two easy runs logged by hand through each app's own cardio sheet:
+  no offer after one, the offer after two (slower, faster, and against two paces once the mile moved between the
+  runs), Keep, Update mile time with the pencil's fields, the judge shut on an answered card, on runs off the plan
+  in opposite ways, and in the program's last three weeks; the offers, the sheet's words, the pencil and every
+  `ia_` key equal today's (`tests/support/native-rest-sheet.ts` `TwoNudges`; four of the ten seeded programs
+  prescribe two easy runs with a pace in their first three weeks). The wiring by rule
+  (`tests/unit/native-rest-sheet.test.ts`), and its breaks in `tests/measure/native-rest-sheet_breaks.md`.
+- **Seen on the simulator**, on a test phone's keys written into its store (a program in its first week, two easy
+  runs logged 150 s a mile slow; the store put back after, `278ba57f3f6a382b` before and after): a tap on the
+  logged card's Log, Back, and the sheet rose over This Week with today's words; Update mile time opened the mile
+  pencil on 12:00; the save rebuilt the week (the next long run 14:30 a mile).
+- **Release:** Post-v0.263.0, no build of today's app; on the phone with the beta's next build.

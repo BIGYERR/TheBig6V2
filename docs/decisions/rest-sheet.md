@@ -71,3 +71,60 @@ every sheet takes touches only while it is open. Tests: `tests/integration/rest-
   the hero's buttons (2); C6 the session card's block (`restAlsoHTML` and its call, 2); C7 the closed-sheet CSS (3);
   the Clear button's and the block's styles (2). No hunk outside the ruling's classes, and nothing removed that the
   ruling did not retire.
+
+## D223 to D232 in the Expo app: the rest day sheet (Post-v0.263.0, the migration's phase 3, row 5, the second of three sessions)
+
+- **Date:** 2026-11-20. **Ruled by:** no new ruling. Every word, number and behaviour is today's, carried into the
+  Expo app unchanged, so each keeps its ruling: the jog as its own record on the day (V238 D223, D226); no defaults
+  on the face, the face from the record, Logged ✓ while the face is the record, a selected effort deselecting,
+  nothing written for an empty face, Clear in two taps (D228, above); the controls by sport and each sport's unit
+  (D229); the sheet on every day a jog may land, and no Training anyway? on a day a session left (D231); Already
+  logged here (D232); what counts as logged for a move (V236 D219 item 2, V238 D225); a day before the start (V174
+  D24); the beta's own store (D289, `docs/decisions/data-backup.md`). **The cut** was put to Mario after the measure
+  (`tests/measure/native-rest-sheet_today.md`) as one session, with the case against leaving the menu out said; he
+  took it ("Concur, build it", 2026-11-20). **Bump:** none, the page and core do not move (a Post-v0.263.0 pass,
+  standing ruling 1). **Shipped:** Post-v0.263.0, no build of today's app; the beta's next build carries it.
+- **Finding (the measure).** Today's iOS app opens the sheet by two doors: This Week's rest card (Training anyway?
+  on Move; Log cardio, or Edit cardio once a jog line prints, on Log cardio) and the session sheet's Edit cardio on
+  a day that holds a session and a jog. The sheet's third view, the menu (Not resting?), is opened by the page's own
+  week list alone, so today's iOS app never draws it. The sheet has no Angular model: the page writes its body as
+  markup (`rest-day-shell.ts`).
+- **What is built** (`frontends/native/src/rest-sheet/`): `rest-sheet-model.ts`, written from the page function for
+  function (where the sheet opens, what Move offers, the spacing warning, the face and the record, and the two
+  views as data: every word the page prints, in the page's order); `rest-writes.ts` (Move it here: the move under
+  the day moved onto in `ia_moves_`, core's `applyRestDayMoves` on the grid in hand, the grid into `ia_programs`,
+  no rebuild; Log it: `restLog[sport]` in the day's `ia_logs_` entry; Clear); and `RestSheet.tsx`, the screen, in
+  the frame the goal sheet uses, with the cardio sheet's wheels. This Week's two links and the session sheet's Edit
+  cardio open it; a write draws This Week, and the session sheet under it, again.
+- **What deliberately is not built:** the menu (no door of today's iOS app leads to it; a later row that opens a
+  rest day by a tap on the day would build it then).
+- **Carried as today's, not ruled (MIGRATION.md section 7):** Move still offers a session whose day holds a
+  snapshot (a logged lift, a set draft, a part skipped alone), and such a move shows the session on both days after
+  the next launch. The beta offers the same sessions and writes the same bytes. On the copy of Mario's backup 1 of
+  the 3 sessions Move offers this week is in that state.
+- **Proof.** After every tap the page's draft, every byte of the sheet's markup (the Expo app's view printed as the
+  page's markup, the wheels included), each toast, whether the sheet closed, the grid in hand, This Week under the
+  sheet and every `ia_` key equal today's page: on The Half Manny in the 60-second check
+  (`tests/integration/native-rest-sheet.test.ts`) and on the ten seeded programs through the standard history
+  (`tests/sweeps/native-rest-sheet.test.ts`: the doors asked 2,028 times, 270 moves each on a phone of its own and
+  read at the next launch, every sport's Log cardio at three stretches). Each kind the sheet can draw, say or write
+  has a floor, read off the model's builders; the kinds no seeded program draws by itself are made by a walk of
+  their own (the warning that names both neighbours, a record of a sport the program does not train, a record above
+  the dial, a day that holds a session and a jog, with the session trained). Each rule by a hand table:
+  `tests/unit/native-rest-sheet.test.ts` (68 tests); the look: `tests/unit/native-look.test.ts`. A break per rule:
+  `tests/measure/native-rest-sheet_breaks.md` (272 breaks, every one red on the fast files). The whole of `tests/unit` and
+  `tests/integration`: 116 files, 2,448 passed and 2 skipped. None of the new files loads on the commit before (`git cat-file -e` fails on
+  `frontends/native/src/rest-sheet/rest-sheet-model.ts` there), so each fails there by construction.
+- **The look, measured beside today's own sheet.** Today's installed app on the simulator holds no rest day, so
+  today's sheet was drawn by WebKit itself: the Expo app's view printed as the page's markup (the string the walks
+  hold equal to the page's, byte for byte), inside the page's frame and under today's stylesheets, opened in the
+  simulator's Safari at the phone's width. Three gaps showed and are fixed: a wheel's caption drew at 10 where
+  `look.css` draws 12 (the component sheet's size, the look layer left off; the cardio card's wheels drew the same
+  10 and are 12 now too); a sheet's Back stood 2 short (iOS's own line where WebKit's is 19 at 14; the goal sheet
+  and the mile pencil share that frame); and WebKit lays a line whose height the CSS sets at whole points (13 at
+  1.5 is drawn 19, not 19.5). After: every line of Log cardio, of its efforts with Noted, and of Move's rows and
+  button within a point of today's (the text bands read from the pixels of both screenshots).
+- **Seen on the simulator** (iPhone 17 Pro, a copy of Mario's backup; its store saved aside first and put back,
+  `278ba57f3f6a382b` before and after): the rest card's two links; Log cardio with a walk rolled, an effort, Log it,
+  the line and Edit cardio on the card, Logged ✓, Clear in two taps; Move with a row picked and moved, the session
+  on the rest day and its old day resting. **Not yet seen:** Mario's phone.

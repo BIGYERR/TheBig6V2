@@ -15,8 +15,8 @@
 // own store (D289).
 //
 // Not drawn yet, each waiting for its own session: in the log the run's fields, its wheels, its Log and its sport
-// picker, which come with the cardio sheet; the run's workout is drawn as words. The jog's Edit cardio is drawn and
-// takes no press until the rest sheet is built. The 1RM card's reps are five buttons where today's is a list of five.
+// picker, which come with the cardio sheet; the run's workout is drawn as words. The jog's Edit cardio opens the rest
+// day sheet on Log cardio (rest-sheet/RestSheet.tsx), and the sheet is drawn again once it wrote. The 1RM card's reps are five buttons where today's is a list of five.
 //
 // The motion is this app's own, built once (MIGRATION.md section 6, decision 14): the sheet slides up and away as
 // the swap sheet does.
@@ -35,6 +35,7 @@ import type { AddSheetView } from '../add-sheet/add-sheet-model';
 import type { CardAct } from '../deck/deck-model';
 import { parseRx } from '../deck/deck-readers';
 import type { DeckProgram, Fields } from '../deck/deck-screen';
+import type { RestAsk, RestProgram } from '../rest-sheet/rest-sheet-model';
 import { type SwapOpen, swapSheetOf } from '../deck/deck-swaps';
 import { type Session, acceptNudge, act, dismissNudge, leftField, nudgeWords, swapMove, tapFill, tapLog, tapReuse, tapStep, undoSwap } from '../deck/deck-writes';
 import { type FieldsView, type MoveFields, fieldsView, openedSets, typeLoad, typeRep, typeSetLoad } from '../deck/set-fields';
@@ -97,7 +98,7 @@ interface Handlers {
   remove: (name: string) => void;
 }
 
-export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, onProgram, onOver, say }: {
+export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, onProgram, onOver, onRest, onLogged, onGoing, say }: {
   palette: Palette; store: StateStore; open: SheetOpen; calm: boolean;
   /** The sheet is gone, by Back or after a Skip. */
   onClose: () => void;
@@ -107,6 +108,12 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
   onProgram: (prog: DeckProgram) => void;
   /** A card the app draws over the toast: the coach's nudge, or none. */
   onOver: (card: React.ReactNode) => void;
+  /** Edit cardio on a day that holds a session and a jog: the rest day sheet on Log cardio, and what to draw again once it wrote. */
+  onRest: (ask: RestAsk, wrote: () => void) => void;
+  /** The cardio card's Log was tapped: the app judges the coach's mile nudge on this card (D274). */
+  onLogged: (week: number, dayKey: string) => void;
+  /** The sheet has begun to slide away: This Week shows again from here, as today's does once the sheet loses its open mark. */
+  onGoing: () => void;
   say: (toast: string) => void;
 }) {
   const insets = useSafeAreaInsets();
@@ -157,6 +164,7 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
     if (leaving.current) return;
     leaving.current = true;
     Keyboard.dismiss();
+    onGoing();
     if (calm) { then(); return; }
     Animated.timing(y, { toValue: 1, duration: SLIDE_OUT, easing: SLIDE, useNativeDriver: true }).start(() => then());
   };
@@ -313,6 +321,7 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
       if (toast) say(toast);
       // The Log tap is a write like any other: the form's state is set again so the button reads the store afresh.
       hold({ ...formNow.current });
+      onLogged(open.week, open.dayKey);
     },
     picker: () => holdCardio(togglePicker(cardioNow.current)),
     chip: (sport) => {
@@ -424,8 +433,7 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
               <View key={k} testID="sheet-also" style={[s.also, { backgroundColor: 'rgba(' + p.inkRgb + ',0.06)', borderColor: p.border2 }]}>
                 <Text style={[s.alsoLbl, { color: p.muted }]}>{blk.label}</Text>
                 {blk.lines.map((l, i) => <Text key={i} style={[s.alsoLine, { color: p.run }]}>{l}</Text>)}
-                {/* The rest sheet is not built yet: the button is drawn and takes no press. */}
-                <View style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></View>
+                <Pressable testID="sheet-also-edit" accessibilityRole="button" onPress={() => { leave(); onRest({ prog: prog as unknown as RestProgram, week: open.week, dayKey: open.dayKey, view: 'cardio' }, () => redraw()); }} style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></Pressable>
               </View>
             );
           }

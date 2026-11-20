@@ -220,7 +220,7 @@ Written by `node tests/measure/native-session-sheet_breaks.mjs` (read-only here;
 | 211 | `SessionSheet.tsx` | a remove does not draw the sheet again | **1** | 1 | unit/native-session-sheet 1 |
 | 212 | `SessionSheet.tsx` | an added move's remove reads delete | **1** | 1 | unit/native-session-sheet 1 |
 | 213 | `SessionSheet.tsx` | an added move no longer says the athlete added it | **1** | 1 | unit/native-session-sheet 1 |
-| 214 | `SessionSheet.tsx` | the jog's Edit cardio takes a press | **1** | 1 | unit/native-session-sheet 1 |
+| 214 | `SessionSheet.tsx` | the jog's Edit cardio asks for no sheet (until the rest sheet's session, Post-v0.263.0: "takes a press"; run again alone on the new rule) | **1** | 1 | unit/native-session-sheet 1 |
 | 215 | `SessionSheet.tsx` | the jog's lines are not drawn | **1** | 1 | unit/native-session-sheet 1 |
 | 216 | `SessionSheet.tsx` | the jog's label is not drawn | **1** | 1 | unit/native-session-sheet 1 |
 | 217 | `SessionSheet.tsx` | the Wildcard tag reads Wildcard | **1** | 1 | unit/native-session-sheet 1 |

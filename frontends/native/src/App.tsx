@@ -7,12 +7,16 @@
 // loaded into that store in place of everything in it (session 2), and one line saying whether the app's own Swift
 // module answered (session 3, the native spike); and Progress (phase 3, row 4: progress/Progress.tsx), which reads
 // the same store and writes to it on Restore and Delete Forever alone.
+// The rest day sheet (rest-sheet/RestSheet.tsx: Move a session here, Log cardio, Clear) opens from This Week's rest
+// card and from the session sheet's Edit cardio, and the coach's mile nudge (D274, mile-nudge/MileNudge.tsx) rises
+// over This Week 700 ms after it shows again once a run's Log earned it; both write to this app's own store.
 // The floating rest timer is not here: it comes back on the Dynamic Island (D295, phase 4).
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VERSION } from '@ia/core';
+import { readDayLogs } from '@ia/core/engine/state-day-log.ts';
 
 import { BackupLoad } from './BackupLoad';
 import { SessionSheet } from './day-detail/SessionSheet';
@@ -20,12 +24,18 @@ import type { SheetOpen } from './day-detail/sheet-screen';
 import { DeckOpening } from './deck/DeckOpening';
 import type { DeckOpen, DeckProgram } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
+import { MileNudge } from './mile-nudge/MileNudge';
+import { nudgeText } from './mile-nudge/mile-nudge-model';
+import { NUDGE_DELAY_MS, type PendingNudge, afterLog, answer as answerNudge, update as nudgeMile } from './mile-nudge/nudge-screen';
+import { MileSheet } from './mile-sheet/MileSheet';
 import { SWIFT_ANSWER } from './native-spike';
 import { PopUp } from './pop-up/PopUp';
 import { Programs } from './program-list/Programs';
-import { newListState, tabRefused } from './program-list/list-screen';
+import { type MileOpen, newListState, refreshReport, tabRefused } from './program-list/list-screen';
 import { Progress } from './progress/Progress';
 import { newProgressState } from './progress/progress-screen';
+import { RestSheet } from './rest-sheet/RestSheet';
+import { type RestAsk, type RestDraft, type RestLogs, type RestProgram, openRest } from './rest-sheet/rest-sheet-model';
 import type { PopView } from './pop-up/pop-up-model';
 import { type PopSession, type Reminder, fireCompletionPopup, maybeShowReminder, popOf, resolveReminder } from './pop-up/pop-ups';
 import { swiftLine } from './spike-line';
@@ -92,6 +102,46 @@ function Shell() {
   // A card the deck hands up to be drawn over the toast (the coach's nudge), or none.
   const [over, setOver] = useState<React.ReactNode>(null);
 
+  // ── The rest day sheet (rest-day-shell.ts; ./rest-sheet) ──
+  // The sheet open over the whole screen, and what to draw again under it once it wrote (the session sheet, on a
+  // day that holds a session and a jog). A count redraws This Week, which reads the store and the grid at each draw.
+  const [rest, setRest] = useState<{ prog: RestProgram; draft: RestDraft; wrote: (() => void) | null; n: number } | null>(null);
+  const [, setWrites] = useState(0);
+  const askRest = (ask: RestAsk, wrote: (() => void) | null = null): void => {
+    const r = openRest(ask.prog, readDayLogs(phoneStore, ask.prog.id) as unknown as RestLogs, ask.week, ask.dayKey, ask.view, new Date());
+    if ('toast' in r) { say(r.toast); return; }
+    setRest((was) => ({ prog: ask.prog, draft: r.draft, wrote, n: was ? was.n + 1 : 1 }));
+  };
+
+  // ── The coach's mile nudge (D274; ./mile-nudge) ──
+  // Judged after each tap of the cardio card's Log. An offer waits until This Week shows again (the session sheet
+  // going or gone), then 700 ms, and rises over it; a sheet opened in the wait starts the wait again.
+  const pending = useRef<PendingNudge | null>(null);
+  const [waits, setWaits] = useState(0);
+  const [going, setGoing] = useState(false);
+  const [nudge, setNudge] = useState<PendingNudge | null>(null);
+  const [mile, setMile] = useState<MileOpen | null>(null);
+  const logged = (progId: string, week: number, dayKey: string): void => {
+    const offer = afterLog(phoneStore, progId, week, dayKey, new Date());
+    if (!offer) return;
+    pending.current = offer;
+    setWaits((n) => n + 1);
+  };
+  const onWeek = tab === 'week' && (!sheet || going);
+  useEffect(() => {
+    if (!pending.current || !onWeek) return;
+    const t = setTimeout(() => { const p = pending.current; pending.current = null; if (p) setNudge(p); }, NUDGE_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [waits, onWeek]);
+  /** Either answer leaves the record on the program; Update mile time then opens the mile pencil on the offer. */
+  const answered = (open: boolean): void => {
+    const n = nudge;
+    setNudge(null);
+    if (!n) return;
+    answerNudge(phoneStore, n);
+    if (open) setMile(nudgeMile(phoneStore, n, new Date()));
+  };
+
   // ── The pop-ups (popups-streaks-reminders.ts; ./pop-up/pop-ups.ts) ──
   const [calm, setCalm] = useState(false);
   useEffect(() => { AccessibilityInfo.isReduceMotionEnabled().then(setCalm, () => {}); }, []);
@@ -130,7 +180,7 @@ function Shell() {
         <Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} />
       ) : tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
-          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={setSheet} onLaunch={launched} />
+          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
         </Animated.View>
       ) : tab === 'progress' ? <Progress key={progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
@@ -145,11 +195,22 @@ function Shell() {
       )}
       {sheet && (
         <SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
+          onRest={askRest} onLogged={(week, dayKey) => logged(sheet.prog.id, week, dayKey)} onGoing={() => setGoing(true)}
           onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
       {cover}
+      {rest && (
+        <RestSheet key={rest.n} palette={p} session={{ store: phoneStore, prog: rest.prog }} draft={rest.draft} calm={calm} say={say} onClose={() => setRest(null)}
+          onWrote={() => { setWrites((n) => n + 1); if (rest.wrote) rest.wrote(); }} />
+      )}
+      {mile && (
+        <MileSheet palette={p} store={phoneStore} open={mile} calm={calm} say={say} onClose={() => setMile(null)}
+          report={refreshReport(say)}
+          onDone={(o) => { if (o.prog) setHeld(o.prog as unknown as DeckProgram); if (o.toast) say(o.toast); }} />
+      )}
       {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
       {over}
+      {nudge && <MileNudge palette={p} text={nudgeText(nudge.offer)} calm={calm} onUpdate={() => answered(true)} onKeep={() => answered(false)} />}
       {pop && <PopUp key={pop.n} palette={p} view={pop.view} calm={calm} onAct={answer} onClose={() => setPop(null)} />}
     </View>
   );
