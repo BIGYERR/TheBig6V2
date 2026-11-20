@@ -248,10 +248,10 @@ describe('climb (D296)', () => {
 
 describe('the recording file', () => {
   test('a line cut short by iOS closing the app is skipped, and every whole line is kept', () => {
-    const text = '{"t":0,"mark":"start"}\n{"t":1000,"lat":37.1,"lon":-76.5,"ha":4.7,"spd":2.45}\n\n{"t":2000,"lat":37.10';
+    const text = '{"t":0,"mark":"start"}\n{"t":1000,"lat":10.1,"lon":-20.5,"ha":4.7,"spd":2.45}\n\n{"t":2000,"lat":10.10';
     assert.deepEqual(parseRecording(text), [
       { t: 0, mark: 'start' },
-      { t: 1000, lat: 37.1, lon: -76.5, ha: 4.7, spd: 2.45 },
+      { t: 1000, lat: 10.1, lon: -20.5, ha: 4.7, spd: 2.45 },
     ]);
   });
 });
@@ -279,12 +279,12 @@ describe('the GPX the Run recorder shares', () => {
   const gpx = recordingGpx(
     [
       { t: t0, mark: 'start' },
-      { t: t0 + 1000, lat: 37.1, lon: -76.5, ha: 5, alt: 12, va: 3, spd: 2.5 },
-      { t: t0 + 2000, lat: 37.2, lon: -76.5, ha: -1 },
+      { t: t0 + 1000, lat: 10.1, lon: -20.5, ha: 5, alt: 12, va: 3, spd: 2.5 },
+      { t: t0 + 2000, lat: 10.2, lon: -20.5, ha: -1 },
       { t: t0 + 3000, mark: 'pause' },
       { t: t0 + 9000, mark: 'resume' },
-      { t: t0 + 10000, lat: 37.3, lon: -76.4, ha: 6, alt: 15, va: -1 },
-      { t: t0 + 11000, lat: 37.31, lon: -76.4, ha: 7, spd: -1 },
+      { t: t0 + 10000, lat: 10.3, lon: -20.4, ha: 6, alt: 15, va: -1 },
+      { t: t0 + 11000, lat: 10.31, lon: -20.4, ha: 7, spd: -1 },
       { t: t0 + 12000, mark: 'finish' },
     ],
     'Run <test> & co',
@@ -295,14 +295,14 @@ describe('the GPX the Run recorder shares', () => {
     assert.equal(gpx.match(/<trkpt /g)?.length, 3);
     assert.ok(
       gpx.includes(
-        '<trkpt lat="37.1" lon="-76.5"><ele>12</ele><time>2026-10-26T12:00:01.000Z</time>' +
+        '<trkpt lat="10.1" lon="-20.5"><ele>12</ele><time>2026-10-26T12:00:01.000Z</time>' +
           '<extensions><ia:ha>5</ia:ha><ia:spd>2.5</ia:spd></extensions></trkpt>',
       ),
     );
     // No altitude where iOS gave the altitude no accuracy, no speed where iOS gave none.
-    assert.ok(gpx.includes('<trkpt lat="37.3" lon="-76.4"><time>2026-10-26T12:00:10.000Z</time><extensions><ia:ha>6</ia:ha></extensions></trkpt>'));
-    assert.ok(gpx.includes('<trkpt lat="37.31" lon="-76.4"><time>2026-10-26T12:00:11.000Z</time><extensions><ia:ha>7</ia:ha></extensions></trkpt>'));
-    assert.ok(!gpx.includes('lat="37.2"'));
+    assert.ok(gpx.includes('<trkpt lat="10.3" lon="-20.4"><time>2026-10-26T12:00:10.000Z</time><extensions><ia:ha>6</ia:ha></extensions></trkpt>'));
+    assert.ok(gpx.includes('<trkpt lat="10.31" lon="-20.4"><time>2026-10-26T12:00:11.000Z</time><extensions><ia:ha>7</ia:ha></extensions></trkpt>'));
+    assert.ok(!gpx.includes('lat="10.2"'));
   });
 
   test('gives each point the step total and the barometer altitude last read at or before it (D296)', () => {
@@ -311,9 +311,9 @@ describe('the GPX the Run recorder shares', () => {
         { t: t0, mark: 'start' },
         { t: t0 + 500, steps: 3 },
         { t: t0 + 700, ralt: 0.4 },
-        { t: t0 + 1000, lat: 37.1, lon: -76.5, ha: 5 },
+        { t: t0 + 1000, lat: 10.1, lon: -20.5, ha: 5 },
         { t: t0 + 1500, steps: 5 },
-        { t: t0 + 2000, lat: 37.2, lon: -76.5, ha: 5 },
+        { t: t0 + 2000, lat: 10.2, lon: -20.5, ha: 5 },
         { t: t0 + 3000, mark: 'finish' },
       ],
       'Run',

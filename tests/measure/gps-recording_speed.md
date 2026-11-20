@@ -1,9 +1,9 @@
-# GPS recording: does the count depend on speed? (measure, 2026-11-17, on v0.262.4)
+# GPS recording: does the count depend on speed? (measure, on v0.262.4)
 
 Mario, after D293 was first proposed: "hmm does speed matter at all? like would it work for cycling and things like
 that?", then "this cant be a new problem". The measure behind D293's revision (`docs/decisions/gps-recording.md`).
 
-- **The runs.** The track test (2026-11-17, 4 laps of lane 1) and the road run (2026-11-13), each the phone's GPX shared
+- **The runs.** The track test (4 laps of lane 1) and the road run, each the phone's GPX shared
   from the Run recorder, and the road run's watch FIT; none is committed. They are the runs of
   `gps-recording_track-test.md`.
 - **The script.** `node tests/measure/gps-recording_speed.mjs <track.gpx> <road.gpx> <road.fit>` printed everything

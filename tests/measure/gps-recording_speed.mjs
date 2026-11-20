@@ -6,7 +6,7 @@
 // A. Geometry, no noise: a 400 m track (lane 1's running line, bends of radius 36.8 m, straights of 84.39 m) and a
 //    400 by 300 m city block with right angle turns of radius 8 m, one fix a second, from a walk to a fast ride. What each
 //    count reads against the true path.
-// B. The phone's own noise at higher speed: the track test (2026-11-17) and the road run (2026-11-13) with every 2nd, 3rd
+// B. The phone's own noise at higher speed: the track test and the road run with every 2nd, 3rd
 //    or 4th fix kept, which is the same ground covered 2, 3 or 4 times as fast. The track against 1,600 m, the road
 //    against the watch over the seconds both recorded.
 //

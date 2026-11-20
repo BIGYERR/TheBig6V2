@@ -1,10 +1,10 @@
-# GPS recording: the track test and the road run (measure, 2026-11-17, on v0.262.4)
+# GPS recording: the track test and the road run (measure, on v0.262.4)
 
 The result D272's gate names (`docs/decisions/gps-recording.md`, D272 call 1): four laps of a 400 m track in lane 1, the
 phone within 2% of 1,600 m (32 m), and one road run within 2% of the watch. It is the measure behind D293.
 
-- **The runs.** Road: 2026-11-13, 5:07 PM, a Recovery Run of about 60 minutes, the phone (the Run recorder, v0.255.0's
-  plugin) and the COROS Pace 4 together. Track: 2026-11-17, 5:15 PM, about 30 s standing on the line, 4 laps of lane 1,
+- **The runs.** Road: a run of about 60 minutes, the phone (the Run recorder, v0.255.0's
+  plugin) and the COROS Pace 4 together. Track: about 30 s standing on the line, 4 laps of lane 1,
   about 60 s standing, the phone and the watch together, the watch on a plain Run (not Track Run, which snaps to the
   track). Mario carried the phone as he runs with it.
 - **The files.** Each run's GPX, shared from the Run recorder, and the watch's FIT file, read through the COROS connector
