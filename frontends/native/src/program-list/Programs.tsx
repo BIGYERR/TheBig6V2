@@ -12,7 +12,7 @@
 // over the tab bar. Drawn and taking no press: the copy button by the seed (the clipboard is a native package this
 // app does not carry yet) and Build New Program (the wizard, row 6).
 import { type ReactNode, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { type LayoutChangeEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 
@@ -22,6 +22,7 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 import { GoalSheet } from '../goal-sheet/GoalSheet';
 import { MileSheet } from '../mile-sheet/MileSheet';
 import { DISPLAY, type Palette, TEXT } from '../theme';
+import { Glow } from '../this-week/marks';
 import {
   LIST_WORDS, type ListCard, type ListState, type Run, activeId, archiveQuestion, askArchive, askPurge, cancelConfirm, endRename, listView, markupLines,
   openGoal, openMile, purgeWarning, refreshReport, startRename, toggleCard,
@@ -64,6 +65,8 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
   onCover: (sheet: ReactNode) => void;
 }) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const [headH, setHeadH] = useState(0);
   const [drawn, setDrawn] = useState(() => ({ view: listView(store, st, new Date()), n: 0 }));
   const redraw = (): void => setDrawn((d) => ({ view: listView(store, st, new Date()), n: d.n + 1 }));
   // The rename box's words as typed: the page reads its input at Save.
@@ -134,7 +137,7 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
             </View>
             <View style={[s.chips, s.wrap]}>{d.paces.chips.map((x, i) => chip(x, i, true))}</View>
             <Text testID="pace-source" style={[s.source, { color: p.muted }]}>
-              {markupLines(d.paces.sentence).flat().map((r, i) => <Text key={i} style={r.bold && { color: p.text, fontWeight: '600' }}>{r.text}</Text>)}
+              {markupLines(d.paces.sentence).flat().map((r, i) => <Text key={i} style={r.bold && { color: p.text, fontWeight: '700' }}>{r.text}</Text>)}
             </Text>
           </View>
         )}
@@ -174,12 +177,17 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
   );
   return (
     <View testID="programs" style={{ flex: 1, backgroundColor: p.bg }}>
-      <View style={[s.top, { paddingTop: insets.top, borderBottomColor: p.border }]}>
+      {/* The glow (look.css): painted behind the top bar and again, in the same box, behind the top of the list. */}
+      <View testID="programs-top" onLayout={(e: LayoutChangeEvent) => setHeadH(e.nativeEvent.layout.height)} style={[s.top, { paddingTop: insets.top }]}>
+        <Glow width={width} height={headH} top={0} rgb={p.signalRgb} alpha={p.glowAlpha} />
         <Text style={[s.app, { color: p.muted }]}>The Asylum</Text>
         <Text accessibilityRole="header" style={[s.screen, { color: p.text }]}>{LIST_WORDS.title}</Text>
       </View>
       {/* One body through every draw: the list keeps its place when a tap low on an open card draws it again. */}
-      <ScrollView testID="programs-body" contentContainerStyle={[s.body, { paddingBottom: 140 + insets.bottom }]} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
+      <ScrollView testID="programs-body" contentContainerStyle={[s.body, { paddingBottom: 96 + insets.bottom }]} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
+        <Glow width={width} height={Math.max(0, 200 - headH)} top={headH} rgb={p.signalRgb} alpha={p.glowAlpha} />
+        {/* The list takes what height is left (screens.css .prog-list), so Build New Program sits at the screen's foot under a short list. */}
+        <View style={s.list}>
         {v.empty && <Text testID="programs-empty" style={[s.empty, { color: p.muted }]}>{EMPTY_HTML[v.empty].replace('<br>', '\n')}</Text>}
         {v.cards.map((c) => (
           <View key={c.id} testID={'card-' + c.id} style={[s.card, { backgroundColor: p.surface, borderColor: c.isActive ? p.signal : 'transparent' }]}>
@@ -228,6 +236,7 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
             )}
           </View>
         ))}
+        </View>
         {/* The wizard is not built yet (row 6): the button is drawn and takes no press. */}
         <View testID="build-new" style={[s.build, { borderColor: p.border2 }]}><Text style={[s.buildText, { color: p.text }]}>{LIST_WORDS.build}</Text></View>
       </ScrollView>
@@ -236,56 +245,62 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
 }
 
 const styles = StyleSheet.create({
-  top: { paddingHorizontal: 20, paddingBottom: 16, borderBottomWidth: 1 },
-  app: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '600' },
-  screen: { fontFamily: DISPLAY, fontSize: 40, fontWeight: '800', letterSpacing: -1.6, lineHeight: 42, marginTop: 2 },
-  body: { paddingTop: 16, paddingHorizontal: 20, gap: 10 },
+  // Line heights, measured on Mario's phone (IA Next 123 beside today's 0.263.0): where today's CSS leaves a line's
+  // height to the face, WebKit draws Helvetica Neue's line 1.34 times its size, the letters where iOS puts them and the
+  // rest under them; iOS draws it 1.19 times. So each such line keeps its own height here and takes the difference as
+  // padding under it (2.1 at 15, 3.1 at 20, 1.7 at 12, 1.3 at 9). The screen's name, whose height the CSS sets, sits
+  // 2.9 lower in WebKit's line than in this one.
+  top: { paddingHorizontal: 20, paddingBottom: 16, overflow: 'hidden' },
+  app: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '700', paddingBottom: 2.1 },
+  screen: { fontFamily: DISPLAY, fontSize: 40, fontWeight: '700', letterSpacing: -1.6, lineHeight: 42, marginTop: 4.9, marginBottom: -2.9 },
+  body: { flexGrow: 1 },
+  list: { flexGrow: 1, paddingVertical: 16, paddingHorizontal: 20, gap: 10 },
   empty: { fontFamily: TEXT, fontSize: 14, textAlign: 'center', paddingVertical: 60, paddingHorizontal: 20 },
-  card: { borderRadius: 16, borderWidth: 1, paddingVertical: 18, paddingHorizontal: 20 },
+  card: { borderRadius: 24, borderWidth: 1, paddingVertical: 18, paddingHorizontal: 20 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  name: { fontFamily: DISPLAY, fontSize: 20, fontWeight: '700', flexShrink: 1 },
+  name: { fontFamily: DISPLAY, fontSize: 20, fontWeight: '700', paddingBottom: 3.1, flexShrink: 1 },
   headRight: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 0 },
-  badge: { paddingVertical: 3, paddingHorizontal: 8, borderRadius: 4 },
-  badgeText: { fontFamily: DISPLAY, fontSize: 10, fontWeight: '700' },
+  badge: { paddingVertical: 3, paddingHorizontal: 8, borderRadius: 999 },
+  badgeText: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700', paddingBottom: 1.7 },
   pencil: { padding: 2 },
   turned: { transform: [{ rotate: '180deg' }] },
   line: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
-  meta: { fontFamily: TEXT, fontSize: 12, lineHeight: 18 },
+  meta: { fontFamily: TEXT, fontSize: 12, paddingBottom: 1.7 },
   actions: { flexDirection: 'row', gap: 8 },
   actionsTop: { marginTop: 10 },
-  action: { flex: 1, padding: 7, borderRadius: 4, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  actionText: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
+  action: { flex: 1, padding: 7, borderRadius: 999, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  actionText: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700', paddingBottom: 1.7 },
   isActive: { opacity: 0.4 },
   confirm: { marginTop: 10, gap: 8 },
   confirmText: { fontFamily: TEXT, fontSize: 13, lineHeight: 19.5 },
   confirmNote: { fontSize: 12 },
   purgeLink: { fontFamily: TEXT, fontSize: 11, textDecorationLine: 'underline', paddingVertical: 2 },
-  renameInput: { flex: 1, minWidth: 0, borderWidth: 1, borderRadius: 4, fontFamily: TEXT, fontSize: 16, paddingVertical: 8, paddingHorizontal: 10 },
+  renameInput: { flex: 1, minWidth: 0, borderWidth: 1, borderRadius: 12, fontFamily: TEXT, fontSize: 16, paddingVertical: 8, paddingHorizontal: 10 },
   renameBtns: { flexDirection: 'row', gap: 6, flexShrink: 0, marginLeft: 8 },
   renameSave: { flex: 0, paddingVertical: 8, paddingHorizontal: 12 },
   renameX: { flex: 0, paddingVertical: 8, paddingHorizontal: 10 },
   detail: { marginTop: 13, paddingTop: 13, borderTopWidth: 1 },
   group: { marginBottom: 12 },
-  groupLabel: { fontFamily: DISPLAY, fontSize: 10, fontWeight: '700', marginBottom: 5 },
+  groupLabel: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700', paddingBottom: 1.7, marginBottom: 5 },
   flat: { marginBottom: 0 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 5 },
   est: { fontSize: 9, fontWeight: '400' },
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: 14 },
   rowK: { fontFamily: TEXT, fontSize: 13, lineHeight: 22.1 },
-  rowV: { fontFamily: TEXT, fontSize: 13, lineHeight: 22.1, fontWeight: '600', textAlign: 'right', flexShrink: 1 },
+  rowV: { fontFamily: TEXT, fontSize: 13, lineHeight: 22.1, fontWeight: '700', textAlign: 'right', flexShrink: 1 },
   goal: { flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 1 },
   chips: { flexDirection: 'row', gap: 6 },
   wrap: { flexWrap: 'wrap' },
-  chip: { borderWidth: 1, borderRadius: 4, paddingVertical: 7, paddingHorizontal: 4, alignItems: 'center' },
+  chip: { borderWidth: 1, borderRadius: 999, paddingVertical: 7, paddingHorizontal: 4, alignItems: 'center' },
   chipGrow: { flex: 1 },
   chipThird: { flexGrow: 1, flexBasis: '30%' },
-  chipK: { fontFamily: DISPLAY, fontSize: 9, fontWeight: '700' },
+  chipK: { fontFamily: DISPLAY, fontSize: 9, fontWeight: '700', paddingBottom: 1.3 },
   chipV: { fontFamily: DISPLAY, fontSize: 18, fontWeight: '700', lineHeight: 19.8 },
-  chipU: { fontFamily: TEXT, fontSize: 9 },
+  chipU: { fontFamily: TEXT, fontSize: 9, paddingBottom: 1.3 },
   source: { fontFamily: TEXT, fontSize: 11, lineHeight: 16.5, marginTop: 6 },
   foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 2 },
   seed: { fontFamily: 'Menlo', fontSize: 11 },
-  copy: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 4, borderWidth: 1 },
-  build: { marginTop: 6, borderWidth: 1.5, borderRadius: 4, padding: 15, alignItems: 'center' },
-  buildText: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '700' },
+  copy: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 999, borderWidth: 1 },
+  build: { marginHorizontal: 20, marginBottom: 20, borderWidth: 1.5, borderRadius: 999, padding: 15, alignItems: 'center' },
+  buildText: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '700', paddingBottom: 2.1 },
 });

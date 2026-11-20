@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   stripLbl: { fontFamily: DISPLAY, fontSize: 10, fontWeight: '700', flexShrink: 1 },
   stripVal: { fontFamily: 'Menlo', fontSize: 13, fontWeight: '700' },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 5 },
-  label: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '600' },
+  label: { fontFamily: DISPLAY, fontSize: 13, fontWeight: '700' },
   wrap: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   solo: { maxWidth: 178.2 },
   rep: { maxWidth: 190 },

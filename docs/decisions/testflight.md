@@ -339,3 +339,10 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   `frontends/native`. The notices read `testflight 0.263.0 processed (uploaded before this run; a version goes up
   once, a fix is the next PATCH)` and `testflight next 0.263.0 (123) processed`. The run ended green: 6 jobs passed
   and 8 skipped by rule.
+- **On Mario's phone, build 123** (his report, 2026-11-19, two screenshots: today's 0.263.0 and IA Next 123 on the
+  Programs tab): "Fonts looks different and the copy button doesn't work not sure if you just didn't build it in".
+  The copy button is not built yet (drawn, no press; the row's third session). The look differed and was proved on
+  the simulator before any change: the screen's name in a condensed face, square buttons, no glow, Build New
+  Program under the last card. Fixed in the beta and measured against his own screenshot of today's, every line
+  within a point (`docs/decisions/active-program.md`, the build 123 entry). On the phone with the next IA Next
+  build.

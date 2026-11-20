@@ -133,7 +133,7 @@ const s = StyleSheet.create({
   stat: { flex: 1, borderWidth: 1, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 8, alignItems: 'center' },
   statNum: { fontFamily: DISPLAY, fontWeight: '700' },
   statLblRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 5 },
-  statLbl: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '600' },
+  statLbl: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
   actions: { alignSelf: 'stretch', gap: 8 },
   actionsRow: { flexDirection: 'row' },
   act: { padding: 14, borderRadius: 999, borderWidth: 1, alignItems: 'center' },
