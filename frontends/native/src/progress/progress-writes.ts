@@ -45,8 +45,9 @@ export function restoreProgram(store: StateStore, id: string): string | null {
  * The page hands the active program on first when the deleted one is active (_handoffActiveFrom). On Progress the
  * bar is offered on an archived program only, and neither archiving nor a launch leaves ia_active on an archived
  * program, so there is nothing to hand on here. Were the pointer on it all the same, it is put on the first program
- * that is not archived, or removed with none, as the page leaves it; the rest of a switch (the launch's own writes,
- * the past days marked as asked, D238) is the program list's, which is not built yet.
+ * that is not archived, or removed with none, as the page leaves it. The whole of a switch (the launch's own writes,
+ * the past days marked as asked, D238) is the program list's Delete Forever, which is offered on a live program and
+ * so can meet the active one (program-list/list-writes.ts deleteProgram).
  */
 export function deleteProgram(store: StateStore, id: string): string {
   let programs = readPrograms(store) as unknown as { id: string }[];

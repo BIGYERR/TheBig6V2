@@ -17,6 +17,9 @@
 //        (and 1/4, 2/4, 3/4 on three more copies), then
 //        node tests/measure/native-deck-pager_breaks.mjs --merge <scratch>/part0.json <scratch>/part1.json ...
 // A break run again alone (--only <text> --json <file>) is merged after the parts and replaces its earlier row.
+// Before a list written in an earlier session runs again, it is read against the code as it stands, with no copy:
+//        node tests/measure/native-deck-pager_breaks.mjs --check
+//        (names every break whose text is not in its file once; exit 1 when there is one)
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -25,8 +28,9 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const arg = (name) => (process.argv.indexOf(name) > 0 ? process.argv[process.argv.indexOf(name) + 1] : null);
 const merging = process.argv[2] === '--merge';
-const tree = !merging && process.argv[2] ? resolve(process.argv[2]) : null;
-if (!tree && !merging) { console.error('usage: node tests/measure/native-deck-pager_breaks.mjs <a tools/tree-at.mjs --working copy> [--only <text>] [--part k/n --json <file>] | --merge <files>'); process.exit(2); }
+const checking = process.argv[2] === '--check';
+const tree = !merging && !checking && process.argv[2] ? resolve(process.argv[2]) : null;
+if (!tree && !merging && !checking) { console.error('usage: node tests/measure/native-deck-pager_breaks.mjs <a tools/tree-at.mjs --working copy> [--only <text>] [--part k/n --json <file>] | --merge <files> | --check'); process.exit(2); }
 const only = arg('--only');
 const part = arg('--part') ? arg('--part').split('/').map(Number) : null;
 const TESTS = tree ? join(tree, 'tests') : '';
@@ -185,6 +189,22 @@ if (merging) {
   writeFileSync(join(HERE, 'native-deck-pager_breaks.md'), say.join('\n') + '\n');
   console.log(say.slice(-1)[0]);
   process.exit(0);
+}
+
+// --check: the whole list read against this checkout, every text that is not in its file once named, nothing run.
+if (checking) {
+  const root = resolve(HERE, '..', '..');
+  let bad = 0;
+  BREAKS.forEach(([file, rule, from, to], i) => {
+    let text = readFileSync(join(root, file), 'utf8');
+    for (const [a, b] of (Array.isArray(from) ? from : [[from, to]])) {
+      const times = text.split(a).length - 1;
+      if (times !== 1) { bad++; console.log('break ' + (i + 1) + ' (' + rule + '): its text is in ' + file + ' ' + times + ' times, not once'); }
+      text = text.replace(a, b);
+    }
+  });
+  console.log(BREAKS.length + ' breaks read against this checkout, ' + bad + ' with a text not found once');
+  process.exit(bad ? 1 : 0);
 }
 
 const clean = run();

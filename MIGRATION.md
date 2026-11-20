@@ -247,8 +247,20 @@ Each phase starts only on Mario's GO, one phase step per session.
   for the card's title, head, picture, body and footer, the app's face on a text that names none, and room past
   the edge for a picture laid the full width. `'card'` joins `DRAWN`; the view does not change. Every run card
   of every walk is read as the drawer reads it, and the view and every `ia_` key stay equal to today's page. 265 breaks, none let through. Row 4's ledger rows are filled and its screen reads are in.
-- **Next:** Mario's phone on the next IA Next build (the eight run cards on Progress: his data draws four of
-  them). Then row 5, the program list and its sheets. Still not
+- **Done, phase 3's eleventh session, row 5's first of three (Post-v0.262.4, no build):** his phone on IA Next build
+  121 ("All good": the four run cards his data draws). Then today's program list and its sheets measured
+  (`tests/measure/native-program-list_today.md`: three taps switch the active program, a goal or a mile on the
+  active one rebuilds, and neither the rest sheet nor the injury chip has an Angular model), the cut put to Mario as
+  three sessions and taken ("Concur, build it"), and the first built (`docs/decisions/active-program.md`, the
+  program list's entry): a Programs tab, the first of four, with the list, a card's detail, the rename, Set Active,
+  Archive, Delete Forever, the goal sheet and the mile pencil with its lock, and the tab bar's refusal with no
+  active program. Every screen, the grid in hand after a switch or a rebuild and every `ia_` key stay equal to
+  today's page. 180 breaks, none let through. The ledger rows of the list, the goal sheet and the mile pencil are filled.
+- **Next:** Mario's phone on the next IA Next build (the Programs tab: his two cards, an open card, the lock on
+  the mile's pencil, a goal's sheet). Then row 5's second session: the rest day sheet (Move, Log cardio, Clear),
+  the session sheet's Edit cardio and the coach's mile nudge; and its third: Hurt?, Traveling?, the chip, I'm back
+  and the check in, with the date box and the clipboard (two native packages), and This Week's start date and race
+  date, which no row names. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
@@ -523,12 +535,17 @@ The order is the session's reading of what Mario uses daily (no usage numbers ex
 | 2 | The session sheet and its log (wheels, set rows, the RPE card, the 1RM card) | 3 |
 | 3 | The run card, the cardio sheet, the rest timer (no Live Activity yet; the floating timer taken out again, decision 15) | 1 to 2 (taken in 1) |
 | 4 | Progress: journal, charts, ledger, estimator | 2 to 3 (taken in 2: the run cards' drawing second) |
-| 5 | The program list and its sheets (goal, mile, mile lock, injury and travel, rest day) | 2 to 3 |
+| 5 | The program list and its sheets (goal, mile, mile lock, injury and travel, rest day) | 2 to 3 (taken in 3: the list with the goal sheet and the mile pencil; the rest day sheet with the mile nudge; injury and travel) |
 | 6 | The wizard and generating | 2 |
 | 7 | Swap, add, Random Workout, pop-ups, the toast, the Bugs tab, backup, theme | 1 to 2 |
 
 The session sheet is taken in two sessions, not three (Mario, 2026-11-16, "Concur build", on the measure's
 proposal): its log's run fields and wheels move to row 3 with the cardio sheet, which is the same piece.
+
+Row 5 is taken in three sessions (Mario, 2026-11-18, "Concur, build it", on the measure's proposal): the
+Programs tab with the goal sheet and the mile pencil; the rest day sheet with the coach's mile nudge; Hurt? and
+Traveling? with their chip and check in. The rest day sheet and the injury chip are written by the page as markup,
+with no Angular model to copy, and the third session adds two native packages (a date box, the clipboard).
 
 Each screen: built from the lifted logic and the Angular screen's pure model where one exists, its tests written from
 the ledger, then **checked against the old build** on the same backup (section 3.3).
