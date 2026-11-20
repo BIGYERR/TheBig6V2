@@ -835,6 +835,8 @@ describe('native session sheet: which files write, and what the screen calls', (
       'sheet-rpe', 'sheet-rpeclose', 'sheet-rpeinfo', 'sheet-rpeover', 'sheet-setload-', 'sheet-sets-', 'sheet-slider', 'sheet-swap-', 'sheet-tags', 'sheet-title', 'sheet-unswap-',
       // The second session's: the add button, an added move's remove, the jog, the Wildcard tag, the note, the 1RM card.
       'sheet-add', 'sheet-remove-', 'sheet-also', 'sheet-wildcard', 'sheet-note', 'sheet-max', 'sheet-max-weight', 'sheet-max-reps-', 'sheet-max-out', 'sheet-max-save', 'sheet-max-saved',
+      // The rest sheet's session: the jog's Edit cardio.
+      'sheet-also-edit',
     ].sort());
     // The cards' taps are the deck's own writers, each stamped with the instant of the tap.
     for (const call of ['tapStep(session, fieldsNow.current, exKey, k, step, Date.now())', 'tapReuse(session, fieldsNow.current, exKey, value, Date.now())', 'tapFill(session, fieldsNow.current, exKey, value, Date.now())',
@@ -905,12 +907,13 @@ describe('native session sheet: which files write, and what the screen calls', (
     }
     assert.ok(add.includes('const none = !v.gap.length && !v.more.length && !v.off.length;') && add.includes('{none\n          ? <Text testID="add-empty"'), 'the empty words stand only where all three lists are empty, and the foot only where one is not');
   });
-  test('the jog\'s Edit cardio takes no press until the rest sheet is built; the Wildcard tag and the note only draw', () => {
-    assert.ok(sheet.includes('<View style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></View>'));
+  test('the jog\'s Edit cardio hands the day to the app, which opens the rest sheet over this one; the Wildcard tag and the note only draw', () => {
+    assert.ok(sheet.includes('<Pressable testID="sheet-also-edit" accessibilityRole="button" onPress={() => { leave(); onRest({ prog: prog as unknown as RestProgram, week: open.week, dayKey: open.dayKey, view: \'cardio\' }, () => redraw()); }} style={[s.alsoBtn, { borderColor: p.border2 }]}><Text style={[s.alsoBtnText, { color: p.text }]}>Edit cardio</Text></Pressable>'));
     assert.ok(sheet.includes('<Text style={[s.alsoLbl, { color: p.muted }]}>{blk.label}</Text>') && sheet.includes('{blk.lines.map((l, i) => <Text key={i} style={[s.alsoLine, { color: p.run }]}>{l}</Text>)}'));
     assert.ok(sheet.includes('<Text style={[s.wcSub, { color: p.muted }]}>{blk.sub}</Text>'));
     assert.ok(sheet.includes("if (blk.kind === 'note') return <Text key={k} testID=\"sheet-note\"") && sheet.includes('{plain(blk.html)}</Text>;'));
-    assert.doesNotMatch(strip(sheet), /openRestSheet|RestSheet/);
+    // The sheet draws no rest sheet itself and writes no jog: it only asks.
+    assert.doesNotMatch(strip(sheet), /openRestSheet|<RestSheet|applyRestCardio|clearRestCardio|applyRestMove/);
   });
   test('the 1RM card: the estimate reads 0 until a field changes, the save is one call with the card\'s lift and its two fields, and its line stands where the button stood', () => {
     assert.ok(sheet.includes("if (blk.kind === 'e1rm') return <E1rm key={k} card={blk.card} p={p} onSave={(weight, reps) => saveMax(blk.card.lift, weight, reps)} />;"));
@@ -931,9 +934,9 @@ describe('native session sheet: which files write, and what the screen calls', (
     assert.ok(week.includes("else if (r.to === 'day') { if (onReopen) onReopen(k.week, k.key); }") && week.includes("onPress={() => tap('reopen')}"));
     assert.ok(week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from); else openSheet(week, key);'));
     assert.ok(week.includes('const view = sheetView(store, grid, week, key, Date.now());\n    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });'));
-    assert.ok(week.includes('onStart={startDeck} onReopen={openSheet} onCardio={openSheet} />'));
+    assert.ok(week.includes('onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={'));
     const app = read('App.tsx');
-    assert.ok(app.includes('onSheet={setSheet}'));
+    assert.ok(app.includes('onSheet={(s) => { setGoing(false); setSheet(s); }}'));
     assert.ok(app.includes('onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />'), 'Done closes the sheet and raises the completion pop-up over This Week');
     assert.ok(app.includes('<SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}'));
   });

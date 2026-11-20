@@ -54,6 +54,8 @@ export function SheetFrame({ id, palette: p, calm, onClose, children }: {
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingBottom: 14, borderBottomWidth: 1 },
   back: { borderWidth: 1, borderRadius: 999, paddingVertical: 8, paddingHorizontal: 14 },
-  backText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700' },
+  // The line is WebKit's 19 at 14, iOS's own 16.7 and 2.3 under it: the header stood 2 short of today's (measured in
+  // the simulator's Safari, beside the rest sheet).
+  backText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700', paddingBottom: 2.3 },
   body: { padding: 20 },
 });

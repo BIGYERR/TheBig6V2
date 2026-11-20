@@ -256,9 +256,24 @@ Each phase starts only on Mario's GO, one phase step per session.
   Archive, Delete Forever, the goal sheet and the mile pencil with its lock, and the tab bar's refusal with no
   active program. Every screen, the grid in hand after a switch or a rebuild and every `ia_` key stay equal to
   today's page. 180 breaks, none let through. The ledger rows of the list, the goal sheet and the mile pencil are filled.
-- **Next:** Mario's phone on the next IA Next build (the Programs tab: his two cards, an open card, the lock on
-  the mile's pencil, a goal's sheet). Then row 5's second session: the rest day sheet (Move, Log cardio, Clear),
-  the session sheet's Edit cardio and the coach's mile nudge; and its third: Hurt?, Traveling?, the chip, I'm back
+- **Done, phase 3's twelfth session, row 5's second of three (Post-v0.263.0, no build):** his phone on IA Next
+  build 123 ("Fonts looks different and the copy button doesn't work"): the copy button is the third session's;
+  the look was proved on the simulator and fixed (no weight Helvetica Neue lacks, the Track look's layer on the
+  Programs tab, WebKit's line heights; `docs/decisions/active-program.md`, the build 123 entry;
+  `tests/unit/native-look.test.ts`). Then today's rest day sheet and the mile nudge measured
+  (`tests/measure/native-rest-sheet_today.md`: two doors in today's iOS app, a menu it never opens, and Move meets
+  the carried item below), the cut put to Mario as one session and taken ("Concur, build it"), and built
+  (`docs/decisions/rest-sheet.md` and `docs/decisions/mile-anchor.md`, each ruling's Expo entry): the rest day
+  sheet's two views (Move a session here; Log cardio with Clear), opened from This Week's rest card and from the
+  session sheet's Edit cardio, and the coach's mile nudge, judged after each cardio Log and rising over This Week,
+  whose Update mile time opens the mile pencil on the offer. The sheet's every byte as the page writes it, the
+  grid in hand, This Week under the sheet and every `ia_` key stay equal to today's page. 272 breaks, none let through.
+  The sheet's look was measured beside today's own markup drawn by the simulator's Safari, and three gaps fixed
+  (a wheel's caption at 12, a sheet's Back, WebKit's whole-point lines).
+  The ledger rows of the rest sheet and the nudge are filled.
+- **Next:** Mario's phone on the next IA Next build (the Programs tab's look beside today's; a rest day's two
+  links, a move, a jog logged, edited and cleared; the nudge will not rise on his data, his mile being locked).
+  Then row 5's third session: Hurt?, Traveling?, the chip, I'm back
   and the check in, with the date box and the clipboard (two native packages), and This Week's start date and race
   date, which no row names. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
@@ -880,6 +895,15 @@ Each with the session's pick first.
   lift logged, moved to Wednesday (`tests/measure/stored-state_first-touch.md`). Nothing stored is lost or
   rewritten: both snapshots, the lift log and the move are as written. The golden case "a touched day edited, then
   its session moved" holds today's bytes, so the freeze slice reproduces them and a fix shows as a reviewed diff.
+  **The Expo app's rest sheet carries it as it stands (2026-11-20):** written from the page line for line, its Move
+  offers the same sessions and writes the same bytes (`tests/measure/native-rest-sheet_today.md`, section D: at
+  the end of the first trained week Move still offers 32 sessions across the ten seeded programs, 2 of them holding
+  a snapshot; on the copy of Mario's backup, 1 of the 3 offered this week).
+- **The mile nudge's judge never reads a card as skipped** (found reading today's code for the Expo app's copy,
+  2026-11-20; not ruled, not fixed). D274 passes over a skipped card, and the judge tests the day's mark against
+  the word `skipped`; the mark is a record (its status inside it), so the test never holds. A skipped easy card
+  that still carries a logged distance and time counts as one of the two runs. The Expo app reads the same marks
+  the same way (`frontends/native/src/mile-nudge/nudge-screen.ts`), so the two apps agree.
   The fix is its own ruling and belongs with the freeze slice (it touches the freeze, the move and what the rest
   sheet offers). Until then: a session with anything logged on it is better finished where it is than moved.
 

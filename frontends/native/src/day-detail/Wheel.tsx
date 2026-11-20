@@ -100,7 +100,9 @@ export function Wheel({ w, p, held, onWrite, flushers }: {
 
 const styles = StyleSheet.create({
   cell: { minWidth: 0 },
-  cap: { fontFamily: DISPLAY, fontSize: 10, fontWeight: '700', marginBottom: 5 },
+  // look.css draws the caption at 12 (detail-sheet.css's 10 is the component sheet's); its line is WebKit's 16, iOS's
+  // own 14.3 and 1.7 under it.
+  cap: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700', paddingBottom: 1.7, marginBottom: 5 },
   wheel: { flexDirection: 'row', borderWidth: 1, borderRadius: 12, overflow: 'hidden', height: WHEEL_ROW * 3 + 2 },
   col: { flex: 1, height: WHEEL_ROW * 3 },
   pad: { height: WHEEL_ROW },

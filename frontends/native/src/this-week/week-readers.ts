@@ -218,7 +218,7 @@ export function runSessionCode(sub: string | null | undefined, key: string | nul
 // ── The rest day ─────────────────────────────────────────────────────────────────────────────────────────────────
 /** A rest day's logged cardio, by sport. */
 export type RestLog = Record<string, { dist?: string | number; mins?: string | number; rpe?: string | number } | null | undefined>;
-const REST_WORD: Record<string, string> = { run: 'run', bike: 'ride', swim: 'swim', row: 'row', walk: 'walk' };
+export const REST_WORD: Record<string, string> = { run: 'run', bike: 'ride', swim: 'swim', row: 'row', walk: 'walk' };
 const REST_UNIT: Record<string, string> = { run: 'mi', bike: 'mi', swim: 'yd', row: 'm' };
 
 /** The page's restDist: a record's distance in its sport's unit, or 0. */
@@ -226,7 +226,7 @@ function restDist(t: string, r: RestLog[string]): number {
   return REST_UNIT[t] && r && +r.dist! > 0 ? Math.round(+r.dist! * 100) / 100 : 0;
 }
 /** The page's restLogHead: the time when the record holds one, else the distance. */
-function restLogHead(t: string, r: RestLog[string]): string {
+export function restLogHead(t: string, r: RestLog[string]): string {
   const m = r && +r.mins! > 0 ? Math.round(+r.mins!) : 0, d = restDist(t, r);
   return m > 0 ? m + ' min ' + (REST_WORD[t] || t) : d + ' ' + REST_UNIT[t] + ' ' + (REST_WORD[t] || t);
 }

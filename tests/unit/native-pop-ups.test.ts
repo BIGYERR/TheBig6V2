@@ -342,7 +342,7 @@ describe('native pop-ups: which files write, and what the screens say', () => {
     const week = read('this-week/ThisWeek.tsx');
     assert.ok(week.includes('useEffect(() => { onLaunch(launched.prog as unknown as DeckProgram | null); }, [launched]);'));
     assert.ok(week.includes('const prog = held && launched.prog && held.id === launched.prog.id ? (held as unknown as typeof launched.prog) : launched.prog;'));
-    assert.ok(app.includes('held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={setSheet} onLaunch={launched}') && app.includes("if (t === 'week' && tab !== 'week') { setTick((n) => n + 1); setHeld(null); }"), 'and let go at the next launch');
+    assert.ok(app.includes('held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched}') && app.includes("if (t === 'week' && tab !== 'week') { setTick((n) => n + 1); setHeld(null); }"), 'and let go at the next launch');
   });
 
   test('the motions are today\'s numbers: the card and the scrim still under Reduce Motion, the icon and the confetti not', () => {
