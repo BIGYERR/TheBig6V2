@@ -346,3 +346,22 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   Program under the last card. Fixed in the beta and measured against his own screenshot of today's, every line
   within a point (`docs/decisions/active-program.md`, the build 123 entry). On the phone with the next IA Next
   build.
+- **Seen on `main`, the twentieth run, the beta's lane alone** (run 44762973071, merge aae4361, pull request 57,
+  2026-11-20 10:24 EST; the merge carried no version: 89d067c, the Programs tab's look in the Expo app, and three
+  tests and docs commits; read and recorded by the next session, the injury and travel one): the two gates went
+  together (13 s today's, 11 s the beta's). Today's lane skipped its upload, as ruled. The beta's lane archived,
+  signed and uploaded `0.263.0 (124)` (309 s, done 10:31:13) and read it back as processed (136 s, done 10:33:32).
+  The build number moved from 123 to 124 on one commit, 89d067c, which changed `frontends/native`. The notices read
+  `testflight 0.263.0 processed (uploaded before this run; a version goes up once, a fix is the next PATCH)` and
+  `testflight next 0.263.0 (124) processed`. The run ended green: 6 jobs passed and 8 skipped by rule.
+- **Seen on `main`, the twenty-first run, the beta's lane alone** (run 44768817087, merge 00cf155, pull request 58,
+  2026-11-20 10:59 EST, 35 minutes after the twentieth; the merge carried no version: 66edde5, the rest day sheet and
+  the mile nudge in the Expo app, and a docs commit; found still uploading by the injury and travel session, which
+  waited for it): the two gates went together (11 s today's, 13 s the beta's). Today's lane skipped its upload, as
+  ruled. The beta's upload job waited 5 minutes for a macOS runner (queued 11:00:54, started 11:05:56; GitHub's notice:
+  "Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times"), then
+  archived, signed and uploaded `0.263.0 (125)` (707 s, done 11:17:43) and read it back as processed (134 s, done
+  11:20:00). The build number moved from 124 to 125 on one commit, 66edde5, which changed `frontends/native`. Both
+  `testflight.mjs leg` lines, read after the run ended: `testflight 0.263.0 processed (uploaded before this run; a
+  version goes up once, a fix is the next PATCH) (run 44768817087, 00cf155)` and `testflight next 0.263.0 (125)
+  processed (run 44768817087, 00cf155)`. The run ended green: 6 jobs passed and 8 skipped by rule.
