@@ -17,9 +17,9 @@
 // (the reminder, once a calendar day) and ia_reminded_ (each day already asked about). The reminder's answer ends in
 // core's own writers. tests/integration/native-pop-ups.test.ts holds every line and every key equal to today's page.
 //
-// Not here: the injury check-ins and the Wildcard's pop-up, a switched program's past days marked as asked
-// (markPastAsked): that flow is not in this app. The season mark released by an unmark (releaseSeasonShown) is the
-// session sheet's (day-detail/sheet-writes.ts).
+// Not here: the injury check-ins and the Wildcard's pop-up. A switched program's past days marked as asked
+// (markPastAsked) is the program list's (program-list/list-writes.ts). The season mark released by an unmark
+// (releaseSeasonShown) is the session sheet's (day-detail/sheet-writes.ts).
 import { ASY_ICON_PATHS, asyIcon } from '@ia/core/engine/icons.ts';
 import { dayStoreKey } from '@ia/core/engine/state-day-log.ts';
 import { recordDaySnapshot } from '@ia/core/engine/state-day-history.ts';

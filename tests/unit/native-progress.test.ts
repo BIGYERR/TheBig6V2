@@ -544,7 +544,7 @@ describe('native progress: the screen\'s words and wiring', () => {
     assert.ok(screen.includes('{v.estimator && <Estimator palette={p} state={st} unit={estimatorUnit(store)} />}'));
   });
   test('the app holds a Progress tab between This Week and Bugs; each tap on it opens the screen afresh, and what it keeps outlives a visit', () => {
-    assert.ok(app.includes("type Tab = 'week' | 'progress' | 'bugs';"));
+    assert.ok(app.includes("type Tab = 'home' | 'week' | 'progress' | 'bugs';"));
     assert.ok(app.includes('const progress = useRef(newProgressState()).current;'));
     assert.ok(app.includes("if (t === 'progress') setProgressTaps((n) => n + 1);"));
     assert.ok(app.includes(": tab === 'progress' ? <Progress key={progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}"));

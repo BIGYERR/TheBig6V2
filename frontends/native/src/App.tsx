@@ -1,11 +1,12 @@
-// The Expo app (MIGRATION.md phases 2 and 3). Three tabs, as today's app names them: This Week (phase 2, session 4),
+// The Expo app (MIGRATION.md phases 2 and 3). Four tabs, as today's app names them: Programs (phase 3, row 5:
+// program-list/Programs.tsx), the program list with its goal sheet and its mile pencil; This Week (phase 2, session 4),
 // drawn from the stored state, whose Start lift opens the swipe deck (phase 3, its first screen), which logs into
 // this app's own SQLite store (D289), with the pop-ups today's app raises over it (the completion pop-up after Mark
 // the day done, the day-after reminder 600 ms after a launch, and its answer), and whose Reopen on a done lift opens the
 // day's session sheet (phase 3, its second screen: day-detail/SessionSheet.tsx); and Bugs: the engine check under Hermes (session 1), the Backup row, a backup
 // loaded into that store in place of everything in it (session 2), and one line saying whether the app's own Swift
 // module answered (session 3, the native spike); and Progress (phase 3, row 4: progress/Progress.tsx), which reads
-// the same store and writes to it on Restore and Delete Forever alone. Programs is today's app's still (phase 3).
+// the same store and writes to it on Restore and Delete Forever alone.
 // The floating rest timer is not here: it comes back on the Dynamic Island (D295, phase 4).
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -21,6 +22,8 @@ import type { DeckOpen, DeckProgram } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
 import { SWIFT_ANSWER } from './native-spike';
 import { PopUp } from './pop-up/PopUp';
+import { Programs } from './program-list/Programs';
+import { newListState, tabRefused } from './program-list/list-screen';
 import { Progress } from './progress/Progress';
 import { newProgressState } from './progress/progress-screen';
 import type { PopView } from './pop-up/pop-up-model';
@@ -28,7 +31,7 @@ import { type PopSession, type Reminder, fireCompletionPopup, maybeShowReminder,
 import { swiftLine } from './spike-line';
 import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
-import { Bars, Bug, Calendar } from './this-week/marks';
+import { Bars, Bug, Calendar, Home } from './this-week/marks';
 import { type DeckFrom, ThisWeek } from './this-week/ThisWeek';
 import { storedProgram } from './this-week/week-screen';
 
@@ -37,7 +40,7 @@ function engineName(): string {
   return typeof (globalThis as { HermesInternal?: unknown }).HermesInternal === 'object' ? 'Hermes' : 'another engine';
 }
 
-type Tab = 'week' | 'progress' | 'bugs';
+type Tab = 'home' | 'week' | 'progress' | 'bugs';
 
 export default function App() {
   return (
@@ -68,9 +71,20 @@ function Shell() {
   // app's life, and a count of the taps on its tab: each is the page's showProgressScreen, a screen opened afresh.
   const progress = useRef(newProgressState()).current;
   const [progressTaps, setProgressTaps] = useState(0);
+  // What the program list keeps between its draws (the open cards, the rename, the confirmation), for the app's life,
+  // and a count of the taps on its tab: each is the page's tabGo, the list drawn afresh from the store.
+  const list = useRef(newListState()).current;
+  const [homeTaps, setHomeTaps] = useState(0);
+  // A sheet the Programs tab hands up to be drawn over the whole screen and the tab bar (the goal sheet, the mile
+  // pencil's two), under the toast, or none.
+  const [cover, setCover] = useState<React.ReactNode>(null);
   const go = (t: Tab): void => {
+    // Today's tab bar: This Week and Progress do not open with no active program, and say why (tabGo).
+    const refused = tabRefused(phoneStore, t);
+    if (refused) { say(refused); return; }
     if (t === 'week' && tab !== 'week') { setTick((n) => n + 1); setHeld(null); }
     if (t === 'progress') setProgressTaps((n) => n + 1);
+    if (t === 'home') setHomeTaps((n) => n + 1);
     setTab(t);
   };
   // The program Make the change handed back (the coach's nudge), which This Week holds until its next launch.
@@ -112,12 +126,15 @@ function Shell() {
   return (
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
-      {tab === 'week' ? (
+      {tab === 'home' ? (
+        <Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} />
+      ) : tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
           <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={setSheet} onLaunch={launched} />
         </Animated.View>
       ) : tab === 'progress' ? <Progress key={progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
+        <TabButton id="tab-home" label="Programs" on={tab === 'home'} palette={p} onPress={() => go('home')} icon={(c) => <Home color={c} />} />
         <TabButton id="tab-week" label="This Week" on={tab === 'week'} palette={p} onPress={() => go('week')} icon={(c) => <Calendar color={c} size={22} />} />
         <TabButton id="tab-progress" label="Progress" on={tab === 'progress'} palette={p} onPress={() => go('progress')} icon={(c) => <Bars color={c} />} />
         <TabButton id="tab-bugs" label="Bugs" on={tab === 'bugs'} palette={p} onPress={() => go('bugs')} icon={(c) => <Bug color={c} />} />
@@ -130,6 +147,7 @@ function Shell() {
         <SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
           onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
+      {cover}
       {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
       {over}
       {pop && <PopUp key={pop.n} palette={p} view={pop.view} calm={calm} onAct={answer} onClose={() => setPop(null)} />}
@@ -149,7 +167,8 @@ function Toast({ text, palette: p, bottom, onDone }: { text: string; palette: Pa
   return (
     <View pointerEvents="none" style={[styles.toastWrap, { bottom }]}>
       <Animated.View testID="toast" accessibilityLiveRegion="polite" style={[styles.toast, { backgroundColor: p.run, opacity: shown }]}>
-        <Text numberOfLines={1} style={styles.toastText}>{text}</Text>
+        {/* Today's toast is one line that may run past the screen's edges; here a long one takes a second line, so its words are read whole. */}
+        <Text numberOfLines={2} style={styles.toastText}>{text}</Text>
       </Animated.View>
     </View>
   );
@@ -193,5 +212,5 @@ const styles = StyleSheet.create({
   tabLabel: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
   toastWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   toast: { paddingVertical: 10, paddingHorizontal: 20, borderRadius: 4, maxWidth: '92%' },
-  toastText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700', color: '#0a0a0a' },
+  toastText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700', color: '#0a0a0a', textAlign: 'center' },
 });

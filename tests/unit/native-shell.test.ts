@@ -196,8 +196,10 @@ describe('native shell: the engine check is core\'s, as it is', () => {
     // the instant the reminder's answer is stored at (App.tsx: the page's resolveReminder stamps the day's status).
     // The session sheet reads it as the deck does: to draw the day, and to stamp each write. Progress reads it at each
     // draw to know which week is in progress, the one its sums hold back (the page's _cutWeek reads the same clock).
+    // The Programs tab reads it at each draw (the race's countdown, the week a program is in) and hands it to each
+    // switch and rebuild, as its goal sheet and its mile pencil do (the page's refreshProgram and _goalCurWeek).
     const dated = files.filter((f) => /Date\.now\(\)/.test(readFileSync(f, 'utf8'))).map((f) => f.slice(NATIVE.length + 1)).sort();
-    assert.deepStrictEqual(dated, [join('src', 'App.tsx'), join('src', 'day-detail', 'SessionSheet.tsx'), join('src', 'deck', 'Deck.tsx'), join('src', 'progress', 'Progress.tsx'), join('src', 'this-week', 'ThisWeek.tsx')]);
+    assert.deepStrictEqual(dated, [join('src', 'App.tsx'), join('src', 'day-detail', 'SessionSheet.tsx'), join('src', 'deck', 'Deck.tsx'), join('src', 'goal-sheet', 'GoalSheet.tsx'), join('src', 'mile-sheet', 'MileSheet.tsx'), join('src', 'program-list', 'Programs.tsx'), join('src', 'progress', 'Progress.tsx'), join('src', 'this-week', 'ThisWeek.tsx')]);
     assert.doesNotMatch(all, /Date\.now\(\)\s*-|-\s*Date\.now\(\)/, 'no span of time is taken from the date');
   });
 });
