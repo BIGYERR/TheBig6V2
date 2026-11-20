@@ -128,3 +128,10 @@ every sheet takes touches only while it is open. Tests: `tests/integration/rest-
   `278ba57f3f6a382b` before and after): the rest card's two links; Log cardio with a walk rolled, an effort, Log it,
   the line and Edit cardio on the card, Logged ✓, Clear in two taps; Move with a row picked and moved, the session
   on the rest day and its old day resting. **Not yet seen:** Mario's phone.
+
+## On Mario's phone, IA Next build 125 (2026-11-20)
+
+- Put to him: on a rest day, Training anyway? and Log cardio; a session moved; a jog logged, edited and cleared.
+  **His report:** "All good" (no screenshot). Nothing differed and no motion was named, so nothing was fixed from
+  it. The coach's mile nudge was not put to him: it rises only after two easy runs in a row off the plan
+  (`docs/decisions/mile-anchor.md`), and it stays not yet seen on his phone.

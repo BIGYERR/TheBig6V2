@@ -365,3 +365,7 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   `testflight.mjs leg` lines, read after the run ended: `testflight 0.263.0 processed (uploaded before this run; a
   version goes up once, a fix is the next PATCH) (run 44768817087, 00cf155)` and `testflight next 0.263.0 (125)
   processed (run 44768817087, 00cf155)`. The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 125** (his report, 2026-11-20, no screenshot): "All good", to four things on IA Next
+  build 125: the Programs tab's look beside today's; on a rest day, Training anyway? and Log cardio; a session moved;
+  a jog logged, edited and cleared. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/active-program.md` and `docs/decisions/rest-sheet.md`, the build 125 entries).

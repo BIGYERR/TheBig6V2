@@ -251,3 +251,10 @@ and `tests/measure/v221_rulings/p_active_ruling.md`). The switch is `setActive` 
 - **Not changed:** any word, number or behaviour; today's app; core. The other screens' own line heights were set
   when each was built and seen beside today's on his phone; they were not measured again here.
 - **Release:** Post-v0.263.0, no build of today's app; on the phone with the next IA Next build once merged.
+
+## On Mario's phone, IA Next build 125 (2026-11-20): the Programs tab's look is today's
+
+- Put to him: the Programs tab's look beside today's, after the fix made from his two screenshots of build 123 (the
+  entry above; it reached his phone as build 124, and 125 carries it). **His report:** "All good" (no screenshot).
+  Nothing differed, so nothing was fixed from it. The copy button is still drawn with no press; it is built in the
+  row's third session.
