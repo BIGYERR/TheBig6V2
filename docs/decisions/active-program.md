@@ -251,3 +251,29 @@ and `tests/measure/v221_rulings/p_active_ruling.md`). The switch is `setActive` 
 - **Not changed:** any word, number or behaviour; today's app; core. The other screens' own line heights were set
   when each was built and seen beside today's on his phone; they were not measured again here.
 - **Release:** Post-v0.263.0, no build of today's app; on the phone with the next IA Next build once merged.
+
+## On Mario's phone, IA Next build 125 (2026-11-20): the Programs tab's look is today's
+
+- Put to him: the Programs tab's look beside today's, after the fix made from his two screenshots of build 123 (the
+  entry above; it reached his phone as build 124, and 125 carries it). **His report:** "All good" (no screenshot).
+  Nothing differed, so nothing was fixed from it. The copy button is still drawn with no press; it is built in the
+  row's third session.
+
+## The copy button in the Expo app: a program's selections to the clipboard (Post-v0.263.0, the migration's phase 3, row 5, the third of three sessions)
+
+- **Date:** 2026-11-20. **Ruled by:** no new ruling: the text is today's `progSelLines` (V172, the run anchor's
+  line D7c), carried unchanged. Mario named it on his phone on IA Next build 123 ("the copy button doesn't work");
+  it was the row's third session's, and he took that session's cut ("Concur, build it", 2026-11-20;
+  `docs/decisions/injury-overlays.md`, the Expo entry). **Bump:** none. **Shipped:** Post-v0.263.0, no build of
+  today's app; the beta's next build carries it.
+- **What is built:** `progSelLines` and `runAnchorLine` in `frontends/native/src/program-list/list-readers.ts`,
+  the page's own line for line; `copyText` in `list-screen.ts` (the stored program's lines joined by line breaks);
+  and the button's press in `Programs.tsx`, which hands the text to the clipboard (`expo-clipboard` 58.0.4, the
+  version Expo SDK 58 names) and says Selections copied ✓ once the clipboard answers, and when it refuses, as the
+  page says it after its fallback. It writes nothing.
+- **Proof.** The text handed to the clipboard and the toast equal today's page's on the ten seeded programs at
+  each of five stretches and on a lifter with no cardio and no lifts entered (51 copies,
+  `tests/sweeps/native-change-sheet.test.ts`; The Half Manny in `tests/integration/native-change-sheet.test.ts`).
+  Every line and every arm of the run anchor's line by a hand table (`tests/unit/native-change-sheet.test.ts`);
+  the button's wiring in `tests/unit/native-program-list.test.ts`. The breaks are
+  `tests/measure/native-change-sheet_breaks.md`.

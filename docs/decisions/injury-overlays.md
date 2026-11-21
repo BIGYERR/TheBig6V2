@@ -60,3 +60,93 @@ D193, D194, D197) are recorded in the handoff and `docs/test-migration/13-injury
   the filter's own claim made true: "kills jump/plyo conditioning".
 - **Expected values (typed by hand):** a section holding `Pogo hops` and `Dumbbell row`, filtered under a calf,
   ankle or knee plan on either tier, keeps `Dumbbell row` alone; uninjured it keeps both.
+
+## Hurt? and Traveling? in the Expo app: the sheet, the chips, I'm back and the check in (Post-v0.263.0, the migration's phase 3, row 5, the third of three sessions)
+
+- **Date:** 2026-11-20. **Ruled by:** no new ruling. Every word, number and behaviour is today's, carried into the
+  Expo app unchanged, so each keeps its ruling: an overlay stored on its program by its dates, the weeks derived
+  (V96); travel as holding, and a full gym as an answer that stores nothing; the injury's two tiers and what each
+  region's plan does (D43, D44, D52, D54, D154, D193, D194, D197, and D245 above for the calf); I'm back as one
+  return week, and a second week, cardio only, where the injury took running away (V142 D1); the pop-up that
+  promises only what the engine enforces, the pace clock spoken for the pace goal alone (V142 D2b); the check in
+  two weeks on, on This Week until it is answered; one date grammar for every surface that names a span, `to` the
+  last day covered (V175 D29); the beta's own store (D289, `docs/decisions/data-backup.md`). **The cut** was put to
+  Mario after the measure (`tests/measure/native-injury-travel_today.md`) as one session for all of row 5's third
+  part (this sheet, the chips, This Week's two dates in `docs/decisions/this-week.md`, the copy button in
+  `docs/decisions/active-program.md`, and the two native packages), with the case against said (half again the rest
+  sheet's session, and two packages' build risk; the other way was two sessions); he took it ("Concur, build it",
+  2026-11-20). **Bump:** none, the page and core do not move (a Post-v0.263.0 pass, standing ruling 1).
+  **Shipped:** Post-v0.263.0, no build of today's app; the beta's next build carries it.
+- **Finding (the measure).** Today's iOS app opens each sheet by one door, both on This Week: the Hurt? pill beside
+  the week titles, which reads the region in red while an injury is live, and Traveling? at the foot. The sheet has
+  an Angular model (`change-sheet-model.ts`); the chips under the two buttons have none: the page writes them as
+  markup (`overlays.ts` `renderOverlayChip`). Every write is `ia_programs` alone. A choice on the sheet writes
+  nothing; Apply change, a chip's ✕ and I'm back store the list and rebuild the program; the check in's Same, More
+  time and Worse store when it was last asked and rebuild nothing; a refusal says why and writes nothing.
+- **What is built** (`frontends/native/src/change-sheet/`): `change-sheet-model.ts`, today's file, byte for byte;
+  `overlay-readers.ts`, written from the page function for function (the date words and the span grammar, the
+  chips and the check in as data, the draft kept for the app's life as the page keeps `_ovDraft`, what a From
+  carries); `overlay-writes.ts` (Traveling?'s and Hurt?'s Apply change, the ✕, I'm back with its pop-up, the check
+  in's three answers and the two buttons of Better's pop-up); `ChangeSheet.tsx`, the sheet, in the frame the goal
+  sheet uses; `ChangeChips.tsx`, the chips, drawn by This Week at each draw. A date box opens the app's own
+  calendar (`frontends/native/src/date-box/`, below).
+- **The date box.** Today's app asks WebKit for a date: a calendar with Reset and a check, a change at each day
+  picked, a blank value after Reset. React Native has no such field, so the beta draws its own over the iOS calendar
+  (`@react-native-community/datetimepicker` 9.2.1, the version Expo SDK 58 names): a day picked is written at once
+  and the box stays until the check or a tap outside; Reset writes a blank, the box stays and its calendar goes back
+  to today; every day is offered. What it hands back is what WebKit's field hands the page (`date-box.ts`), so every
+  kind stays reachable: From and Through reading Set date, the trip that runs onward, Pick both dates, a Through
+  before From. Its look follows WebKit's box and is judged on his phone.
+- **Carried as today's, not ruled and not fixed (found by the measure and by the walks):**
+  - Hurt? applied while an injury is live stores a second injury beside the first: two chips, and the pill names
+    the first.
+  - The week after a return week is stored as an injury with an end, so its chip offers I'm back, Hurt? opens on
+    its region, and I'm back on it leaves another return week.
+  - A change that has ended stays stored; nothing prunes the list.
+  - After I'm back the pace clock counts only what is still stored, which is the return week: an injury of any
+    length reads "about 1 more week" on a pace goal. Six weeks injured and one day injured say the same.
+  - Changes stored in one launch of the page share an id only where its clock is pinned (the tests); on a phone two
+    taps are milliseconds apart.
+- **Proof.** After every tap the draft, every byte of the sheet's markup while it is open (the Expo app's view
+  printed as the page's markup), every byte of the chips, each toast, each pop-up whole, whether the sheet closed,
+  the program in hand whole, This Week under it and every `ia_` key equal today's page: on The Half Manny, a
+  program with a start date and a phone with two programs stored in the 60-second check
+  (`tests/integration/native-change-sheet.test.ts`, 9 tests)
+  and on the ten seeded programs through the standard history, with a dated test goal, a pace goal with an event
+  and no date, and a lifter beside them
+  (`tests/sweeps/native-change-sheet.test.ts`, 14 tests). Each kind the screens can draw, say or write has a
+  floor, read off the builders; the kinds no seeded program draws by itself are made by a walk of their own (the
+  check in at fourteen days, asked three times; Better answered each way; a second I'm back on the week after; a
+  second injury; a trip of every span; the changes no tap stores: Less time, Suspended, a kind and a gear with no
+  name, a trip with no end, an injury in a region with no name; a program with no start date). Each rule by a hand
+  table: `tests/unit/native-change-sheet.test.ts` (64 tests). A break per rule:
+  `tests/measure/native-change-sheet_breaks.md` (411 breaks, every one red: 401 on the fast files and 10 on the sweep). The whole of `tests/unit` and `tests/integration`:
+  118 files, 2,522 passed and 2 skipped. None of the three new files loads on the commit before (`git cat-file -e` fails on
+  `frontends/native/src/change-sheet/overlay-readers.ts` there), so each fails there by construction.
+- **Not reachable from the screen, held by a hand table alone:** That date didn't resolve (a race date the calendar
+  hands over always reads); a region the app has no name for; the guards behind a button the sheet does not draw.
+- **The look, measured beside today's own.** Today's installed app on the simulator holds no injury and no trip,
+  so today's sheets and chips were drawn by WebKit itself: the Expo app's views printed as the page's markup (the
+  strings the walks hold equal to the page's, byte for byte), inside the page's frame and under today's
+  stylesheets, opened in the simulator's Safari at the phone's width. Hurt? top and foot, Traveling?, and the chips
+  with the check in: every text band of the final build within a point of today's (read from the pixels of both
+  screenshots). Three gaps showed first and are fixed: a tier's second line stood 1.7 short (WebKit lays a card's
+  line at 16), the date box's value 1.0 high, and the effect's lines drifted to 1.5 low by the third. The check in
+  is drawn as any chip: `week-view.css` gives `.reassess-card` a red edge and `.change-chip`, later in the sheet,
+  takes it back, as WebKit's own draw showed. A test holds each measured value
+  (`tests/unit/native-change-sheet.test.ts`, the look).
+- **Today's date field, tried in the same Safari** on a field set as the Angular screens set theirs (its value as a
+  property, an earliest day on it): a day picked is written at once and the box stays; Reset writes a blank and the
+  box stays, its calendar back on today; the earliest day is not enforced, a day before it is picked and written.
+  The beta's box does each of the three, so a Through before From is still answered by the page's own refusal.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5; `npm run sim-ios` with the two packages' pods, then
+  `sim-ios:fast` on the final code). On a copy of Mario's backup: Traveling? applied (the toast, the day built under
+  travel, the chip); Hurt? applied (the pill in red, the injury week, the chip with I'm back); the race date moved
+  in the calendar (written at the pick with its toast, the box staying; Reset back on today with the date kept; the
+  check closing it; the title back on the week holding today); I'm back (Two weeks to full send, the return week's
+  chip and the week after's); a chip's ✕; and the copy button (the toast, and 10 lines on the simulator's
+  clipboard). On a test phone's keys, since the copy of his backup holds no injury two weeks old: the check in
+  under its chip, Better, the pop-up's two buttons, More time and its toast. The store was put back after:
+  `278ba57f3f6a382b`, the hash the session began on. The new build's first launch had raised the day after reminder
+  and written its marks (3 of the 36 keys differed, counted, never read), so the file put back is the copy made
+  before any build. **Not yet seen:** Mario's phone.

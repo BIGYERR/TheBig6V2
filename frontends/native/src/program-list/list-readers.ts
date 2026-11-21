@@ -3,6 +3,7 @@
 //
 //   _FOCUS_LABELS, _PATH_LABELS, _EQUIP_LABELS, _CARDIO_LABELS, _GOAL_LABELS, _DAYF        programs.ts
 //   progSelData, runAnchorChips, runAnchorSentence, _goalCurWeek, _goalInputsValid         programs.ts
+//   runAnchorLine, progSelLines (the copy button's text)                                   programs.ts
 //   CARDIO_GOALS_BY_TYPE, HYBRID_EXCLUDED_GOALS, _GOAL_RANK, _GOAL_REQ_INPUTS              wizard.ts
 //   _mileEntryState                                                                        wizard-generate.ts
 //
@@ -114,6 +115,39 @@ export function progSelData(p: ListProgram, now: Date): ProgSel & { name: string
     runAnchor: runAnchorInfo(c as never),
   };
 }
+
+/** The run anchor's one line in the copied text (runAnchorLine, V172 D7c): the mile, where it came from, the row's paces. */
+export function runAnchorLine(a: RunAnchorInfo): string {
+  const m = _fmtMileAnchor(a.anchorSec);
+  const prov = a.clamped ? `entry ${a.rawSec > 0 ? _fmtMileAnchor(a.rawSec) : 'invalid'} clamped to the chart's ${a.clamped === 'fast' ? 'fastest' : 'slowest'} row`
+    : a.kind === 'seeded' ? `seeded from ${a.prog || 'previous block'}, ${a.n} logged recovery run${a.n === 1 ? '' : 's'}`
+    : a.kind === 'edited' ? `edited in week ${a.wk}`
+    : a.kind === 'entered' ? 'entered' : a.exp + ' default, no mile time entered';
+  const chips = runAnchorChips(a).slice(1).map((c) => `${c.k.toLowerCase()} ${c.v}`).join(' / ');
+  const scope = (a.goalId === 'run_pace_goal') ? ' | Week 1 runs off this row. Every week after it moves toward your goal.' : '';
+  return `Run anchor: ${m} mile (${prov}) → ${chips}${scope}`;
+}
+
+/** The lines the copy button hands the clipboard (progSelLines, V172): a program's selections, for troubleshooting. */
+export function progSelLines(p: ListProgram, now: Date): string[] {
+  const s = progSelData(p, now);
+  const lines = [
+    'THE ASYLUM — Program selections',
+    'Name: ' + s.name,
+    'Goal: ' + (GOAL_LABELS[s.goal] || s.goal || '—') + ' | Lift focus: ' + s.liftLabel + ' | Path: ' + s.pathLabel,
+    'Experience: ' + s.experience + ' | Age: ' + s.ageBracket + ' | Equip: ' + s.equipLabel + ' | Units: ' + s.unit,
+    'Train days: ' + (s.trainDays.map((d) => DAYF[d] || d).join(', ') || '—') + ' | Rest: ' + (s.restDays.map((d) => DAYF[d] || d).join(', ') || 'none') + ' | Length: ' + s.length + ' wks',
+    'Starting 1RM' + (s.lifts.estimated ? ' (est. from experience)' : '') + ': squat ' + s.lifts.squat + ' / bench ' + s.lifts.bench + ' / deadlift ' + s.lifts.deadlift + ' ' + s.unit,
+    'Cardio: ' + (s.cardio.length ? s.cardio.map((c) => c.type + '=' + (c.goal || 'general')).join(', ') : 'lift only'),
+  ];
+  if (s.runAnchor) lines.push(runAnchorLine(s.runAnchor));
+  if (s.eventTargeted) lines.push('Event: ' + (s.raceStr || 'no date') + (s.raceOut ? ' (' + (s.raceOut as unknown as { copy: string }).copy + ')' : ''));
+  if (s.seed != null) lines.push('Seed: ' + s.seed);
+  return lines;
+}
+
+/** Today's words once the clipboard holds the lines (copyProgSel). */
+export const COPIED = 'Selections copied ✓';
 
 /** The week a program is in (_goalCurWeek): any stored program's, not the active one's alone. `today` is the day at midnight. */
 export function goalCurWeek(p: ListProgram, today: Date): number {

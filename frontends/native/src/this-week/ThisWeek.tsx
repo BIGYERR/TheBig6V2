@@ -5,11 +5,11 @@
 // tag and the tiles. What it shows comes from week-screen.ts (today's own model over the stored state); the sizes,
 // weights, gaps and colours are today's computed styles, read off the Angular screen at 402 wide.
 //
-// Nothing here writes, and nothing opens yet: a tap on a week title or on a day works (they change what is shown,
-// not what is stored). Every other control is drawn as today's and does nothing until its own screen exists: the
-// cards' buttons (the recorder, the deck, the hand log), the Skip pills, Reopen, Hurt?, the race date and the start
-// date, Random Workout and Traveling?. The rest card's links open the rest day sheet (rest-sheet/RestSheet.tsx),
-// which the app draws over the screen and which writes to this app's own store.
+// Nothing here writes. A tap on a week title or on a day changes what is shown, not what is stored. The rest card's
+// links open the rest day sheet (rest-sheet/RestSheet.tsx). Hurt?, Traveling?, the chips of the changes still live
+// (change-sheet/ChangeChips.tsx: I'm back, the ✕, the check in), the race date and Program Start are handed up to
+// the app as asks (WeekAsk), which draws their sheets over the screen and writes to this app's own store. Drawn as
+// today's and doing nothing until its own screen exists: Random Workout.
 import { type ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,10 +20,13 @@ import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Bag, Calendar, Check, CoreIcon, Cross, Die, Dumbbell, Fade, Flag, Glow, Play, RecDot, Runner, WildcardMark } from './marks';
 import { type CardioOnly, cardRoute } from '../day-detail/cardio-sheet-model';
 import { type SheetOpen, type SheetProgram, sheetView } from '../day-detail/sheet-screen';
+import { ChangeChips } from '../change-sheet/ChangeChips';
+import { type OverlayProgram, overlayChips } from '../change-sheet/overlay-readers';
 import { type DeckOpen, type DeckProgram, deckView } from '../deck/deck-screen';
 import type { GrowBox } from '../deck/grow-motion';
 import type { RestAsk, RestProgram } from '../rest-sheet/rest-sheet-model';
-import { BLANK, PLAN_CHANGE_FAILED, drawWeek, launch, launchTitle, pillArrow, pillParts, tokenOf } from './week-screen';
+import { currentWeek } from './week-readers';
+import { BLANK, PLAN_CHANGE_FAILED, type ScreenProgram, drawWeek, launch, launchTitle, midnight, pillArrow, pillParts, tokenOf } from './week-screen';
 import { type StripClock, type StripEl, StripPlacer } from './week-strip';
 import { type Column, type DayCard, type DaysView, TITLE_W, type WeekView } from './week-view-model';
 
@@ -43,10 +46,26 @@ const TAB_ROOM = 96;
 
 type Tint = keyof Pick<Palette, 'run' | 'bike' | 'swim' | 'lift' | 'signal' | 'dim'>;
 
-export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRest, onLaunch }: {
+/**
+ * What the screen holds for the app between draws: the program in hand (today's activeProg), and the program week
+ * the screen itself last wrote (a title picked, a day opened; week-view.ts ownWeek), null before the first draw.
+ */
+export interface WeekHand { prog: ScreenProgram | null; own: number | null }
+/** A tap the app answers: Hurt?, Traveling?, a chip's I'm back or ✕, the check in's answer, a date box of the row. */
+export type WeekAsk =
+  | { kind: 'hurt' } | { kind: 'travel' }
+  | { kind: 'back'; id: string } | { kind: 'remove'; id: string } | { kind: 'answer'; id: string; ans: 'better' | 'same' | 'worse' }
+  | { kind: 'date'; which: 'race' | 'start'; value: string };
+
+export function ThisWeek({ palette: p, store, tick, held, hand, resets, onAsk, onDeck, onSheet, onRest, onLaunch }: {
   palette: Palette; store: StateStore; tick: number;
   /** The program Make the change handed back since the launch, to hold in place of the launch's own; null for none. */
   held: DeckProgram | null;
+  /** The program in hand and the screen's own week, kept where the app can read them. */
+  hand: WeekHand;
+  /** Counts the dates set that send the title back to the one holding today (week-dates/week-dates.ts titleAfterDate). */
+  resets: number;
+  onAsk: (ask: WeekAsk) => void;
   /** Start lift, Start session: the day as a deck, and the card it opens out of (call 16) when its place is known. */
   onDeck: (deck: DeckOpen, from: DeckFrom | null) => void;
   /** Reopen on a done lift, and Start where the day opens no deck: the day's session sheet (D278 item 4; deck.ts open()). */
@@ -77,8 +96,10 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
     lastProg.current = progId;
     picks.current.clear();
     placed.current = false;
+    hand.own = null;
     if (shownPick !== null) setShown(null);
   }
+  hand.prog = prog;
   // The title in view is the launch's own until one is picked; the day picked in each title is kept under its number.
   // Record run is offered, as on today's iOS app (D272 item 6): the recorder is this app's to grow (phase 4).
   const now = new Date();
@@ -86,6 +107,8 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
   const screen = prog ? drawWeek(store, prog, now, { shown: shownNow, picked: picks.current.get(shownNow) ?? null }, true) : null;
   const shown = screen ? screen.shown : 1;
   const view: WeekView = screen ? screen.view : BLANK;
+  // The week the screen holds as its own starts as the one holding today (the page's currentWeek at a launch).
+  if (prog && hand.own === null) hand.own = currentWeek(prog, midnight(now));
 
   // ── The week titles: the strip, its launch glide (D279) and where it settles ──
   const strip = useRef<ComponentRef<typeof ScrollView>>(null);
@@ -128,7 +151,15 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
     AccessibilityInfo.isReduceMotionEnabled().then(known, () => known(false));
     return () => { live = false; placer.current?.cancel(); };
   }, [place]);
-  useEffect(() => { place(); }, [place, progId]);
+  // A date set from outside the screen's own week: the title holding today again, and the strip placed anew.
+  const [placeTick, setPlaceTick] = useState(0);
+  useEffect(() => {
+    if (!resets) return;
+    placed.current = false;
+    setShown(null);
+    setPlaceTick((n) => n + 1);
+  }, [resets]);
+  useEffect(() => { place(); }, [place, progId, placeTick]);
 
   const titleCount = view.titles.length;
   const stripEnd = Math.max(0, titleCount * TITLE_W + STRIP_PAD - width);
@@ -142,8 +173,8 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
       left.current = x;
       strip.current?.scrollTo({ x, animated: !calm.current });
     }
-    if (t !== shown) setShown(t);
-  }, [screen, shown, stripEnd]);
+    if (t !== shown) { setShown(t); hand.own = Math.min(t, screen.totalWeeks); }
+  }, [screen, shown, stripEnd, hand]);
   /** Where the strip settles is the week: round(left / 240) + 1, once the scroll has stopped (week-view.ts settle). */
   const scrolled = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (placer.current!.busy) return;
@@ -170,6 +201,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
   // The day's session sheet: whole (week-view.ts openDay), or one cardio alone (openCardio, D278 item 3).
   const openSheet = (week: number, key: string, only: CardioOnly | null = null): void => {
     if (!prog) return;
+    hand.own = week;
     const grid = prog as unknown as SheetProgram;
     const view = sheetView(store, grid, week, key, Date.now());
     if (view) onSheet({ prog: grid, week, dayKey: key, view, only });
@@ -178,6 +210,7 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
   // (a day whose only card is its cool down; deck.ts open()).
   const startDeck = (week: number, key: string, from: DeckFrom | null): void => {
     if (!prog) return;
+    hand.own = week;
     const grid = prog as unknown as DeckProgram;
     const warn = { shown: false, src: '' };
     const view = deckView(store, grid, week, key, Date.now(), warn);
@@ -217,9 +250,9 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
             ))}
           </ScrollView>
           <Fade width={STRIP_PAD} height={stripH} color={p.bg} />
-          <View testID="week-hurt" accessibilityRole="button" accessibilityLabel="Report or manage an injury" accessibilityState={{ disabled: true }} style={[s.hurt, { top: Math.max(0, (stripH - 40) / 2), backgroundColor: p.bg, borderColor: view.hurt.injured ? p.red : p.border2 }]}>
+          <Pressable testID="week-hurt" accessibilityRole="button" accessibilityLabel="Report or manage an injury" onPress={() => onAsk({ kind: 'hurt' })} style={({ pressed }) => [s.hurt, { top: Math.max(0, (stripH - 40) / 2), backgroundColor: p.bg, borderColor: view.hurt.injured ? p.red : p.border2 }, pressed && s.sunk]}>
             <Text style={[s.hurtText, { color: view.hurt.injured ? p.red : p.text }]}>{view.hurt.label}</Text>
-          </View>
+          </Pressable>
         </View>
         </View>
       </View>
@@ -229,21 +262,21 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
         <Glow width={width} height={Math.max(0, 200 - headH)} top={headH} rgb={p.signalRgb} alpha={p.glowAlpha} />
         <View style={[s.row, view.injuryWeek && { backgroundColor: 'rgba(' + p.redRgb + ',0.07)' }]}>
           {view.row.kind === 'race' ? (
-            <View testID="week-race" accessibilityLabel="Race date" style={s.race}>
+            <Pressable testID="week-race" accessibilityRole="button" accessibilityLabel="Race date" onPress={() => onAsk({ kind: 'date', which: 'race', value: view.row.iso })} style={s.race}>
               <Flag color={p.text} />
               <View style={s.raceStack}>
                 <Text numberOfLines={1} style={[s.raceBig, { color: p.text }]}>{view.row.big}</Text>
                 <Text numberOfLines={1} style={[s.raceSmall, { color: p.muted }]}>{view.row.small}</Text>
               </View>
-            </View>
+            </Pressable>
           ) : (
-            <View testID="week-start" accessibilityLabel="Program start date" style={s.start}>
+            <Pressable testID="week-start" accessibilityRole="button" accessibilityLabel="Program start date" onPress={() => onAsk({ kind: 'date', which: 'start', value: view.row.iso })} style={s.start}>
               <Calendar color={p.accent} />
               <View style={s.startStack}>
                 <Text style={[s.startLbl, { color: p.muted }]}>Program Start</Text>
                 <Text numberOfLines={1} style={[s.startTxt, { color: view.row.shown ? p.text : p.muted, fontWeight: view.row.shown ? '700' : '500' }]}>{view.row.shown || 'Set date'}</Text>
               </View>
-            </View>
+            </Pressable>
           )}
           {pill.text !== '' && (
             <View testID="week-pill" style={[s.pill, { borderColor: p.signal }, pillInk && { backgroundColor: p.accent }]}>
@@ -260,18 +293,23 @@ export function ThisWeek({ palette: p, store, tick, held, onDeck, onSheet, onRes
         )}
 
         <View style={s.days}>
-          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={(week, key, view) => { if (prog) onRest({ prog: prog as unknown as RestProgram, week, dayKey: key, view }); }} />}
+          {view.days && <Days d={view.days} p={p} onPick={pickDay} onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={(week, key, view) => { if (prog) { hand.own = week; onRest({ prog: prog as unknown as RestProgram, week, dayKey: key, view }); } }} />}
         </View>
 
         <View style={s.settings}>
-          <View testID="week-random" accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.action, { borderColor: p.border2 }]}>
-            <Die color={p.signal} />
-            <Text style={[s.actionText, { color: p.text }]}>Random Workout</Text>
+          <View style={s.actions}>
+            <View testID="week-random" accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.action, { borderColor: p.border2 }]}>
+              <Die color={p.signal} />
+              <Text style={[s.actionText, { color: p.text }]}>Random Workout</Text>
+            </View>
+            <Pressable testID="week-travel" accessibilityRole="button" onPress={() => onAsk({ kind: 'travel' })} style={({ pressed }) => [s.action, { borderColor: p.border2, justifyContent: 'center' }, pressed && s.sunk]}>
+              <Bag color={p.text} />
+              <Text style={[s.actionText, { color: p.text }]}>Traveling?</Text>
+            </Pressable>
           </View>
-          <View testID="week-travel" accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.action, { borderColor: p.border2, justifyContent: 'center' }]}>
-            <Bag color={p.text} />
-            <Text style={[s.actionText, { color: p.text }]}>Traveling?</Text>
-          </View>
+          {/* The changes still live (renderOverlayChip), drawn at each draw of the screen, as the page fills its wrap. */}
+          <ChangeChips palette={p} chips={overlayChips(prog as unknown as OverlayProgram | null, now.getTime())}
+            onBack={(id) => onAsk({ kind: 'back', id })} onRemove={(id) => onAsk({ kind: 'remove', id })} onAnswer={(id, ans) => onAsk({ kind: 'answer', id, ans })} />
         </View>
       </View>
     </ScrollView>
@@ -550,7 +588,10 @@ const styles = StyleSheet.create({
   statDen: { fontSize: 17 },
 
   // Random Workout and Traveling?
-  settings: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, paddingBottom: 24 },
+  settings: { paddingHorizontal: 16, paddingBottom: 24 },
+  actions: { flexDirection: 'row', gap: 10 },
+  // .change-btn:active and .tw-hurt:active: the button sinks a little.
+  sunk: { transform: [{ scale: 0.98 }] },
   action: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1.5, borderRadius: 999, paddingVertical: 13, paddingHorizontal: 14 },
   actionText: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '700' },
 });

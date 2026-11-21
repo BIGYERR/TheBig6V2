@@ -27,7 +27,7 @@ import { fmtStartDay } from '../this-week/week-readers';
 import { PLAN_CHANGE_FAILED, midnight, storedProgram } from '../this-week/week-screen';
 import {
   CARDIO_GOALS_BY_TYPE, CARDIO_LABELS, DAYF, GOAL_LABELS, GOAL_RANK, GOAL_REQ_INPUTS, HYBRID_EXCLUDED_GOALS, type ListProgram,
-  goalCurWeek, goalInputsValid, progSelData, runAnchorChips, runAnchorSentence,
+  goalCurWeek, goalInputsValid, progSelData, progSelLines, runAnchorChips, runAnchorSentence,
 } from './list-readers';
 import { type ProgramDetailView, programDetail } from './program-detail-model';
 import { type ListedProgram, type ProgramCard, programList } from './program-list-model';
@@ -95,6 +95,15 @@ export interface ListView { empty: 'none' | 'archived' | null; cards: ListCard[]
 export function activeId(store: StateStore): string | null {
   const a = storedProgram(store);
   return a ? a.id : null;
+}
+
+/**
+ * The copy button by the seed (copyProgSel): the stored program's selections as one text for the clipboard, or null
+ * when the program is gone. Nothing is written; the toast waits for the clipboard's answer.
+ */
+export function copyText(store: StateStore, id: string, now: Date): string | null {
+  const p = (readPrograms(store) as unknown as ListProgram[]).find((x) => x.id === id);
+  return p ? progSelLines(p, now).join('\n') : null;
 }
 
 /** The page's renderProgList, as the Angular list reads it: each unarchived program's card and its detail, or why there are none. */

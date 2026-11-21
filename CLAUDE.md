@@ -556,6 +556,10 @@ before a merge into `main` touches the build).
   at, then the saved file copied back with its `-wal` and `-shm` removed and the hash read again, the same. The report
   names both hashes. Only the simulator's store is ever written this way, never a phone's (Post-v0.262.4: the 1RM
   card, the day's note, the jog and the Wildcard tag, none of which The Half Manny has a day for).
+  The store is saved aside before the session's first `npm run sim-ios`, never after it: the build ends by
+  launching the app, and a launch writes (the day after reminder raises and stores its marks). A copy made after
+  that launch is not the copy the session began on (Post-v0.263.0: 3 of the 36 keys had changed by the time the
+  store was saved; the copy the measure had made before any build was the one put back).
   A new screen of the beta is measured beside today's own before Mario's phone sees it. Where today's installed app
   on the simulator holds the screen with data, the reference is a screenshot of it. Where it holds none, the
   reference is today's markup drawn by WebKit: the string the screen's tests hold equal to the page's, inside the
@@ -564,6 +568,12 @@ before a merge into `main` touches the build).
   today's. A computed style says what the CSS asks for, not where WebKit puts the line (Post-v0.263.0: his phone on
   IA Next 123 found the Programs tab's fonts off; the rest sheet's reference then found a wheel's caption at 10 for
   12, a sheet's Back 2 short and a line height WebKit lays at whole points, before he saw it).
+  A control of the beta that stands in for one of WebKit's (a date field, a select) is tried in the simulator's
+  Safari before it is built: on a field set as today's Angular screens set theirs (a value bound as a property is
+  not an attribute, and Reset goes back to the attribute), each tap is made and read, what it writes and when,
+  whether the control stays open, and whether an attribute such as `min` is enforced at all (Post-v0.263.0: the
+  date box was built to close on Reset and to offer no day before its earliest; WebKit's Reset blanks the field
+  and stays open, and its calendar offers every day, so the box was built a second time).
 
 ## Files
 - `index.html` — the app's page, generated. Its source is `frontends/app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta

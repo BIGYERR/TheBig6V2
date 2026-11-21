@@ -271,11 +271,26 @@ Each phase starts only on Mario's GO, one phase step per session.
   The sheet's look was measured beside today's own markup drawn by the simulator's Safari, and three gaps fixed
   (a wheel's caption at 12, a sheet's Back, WebKit's whole-point lines).
   The ledger rows of the rest sheet and the nudge are filled.
-- **Next:** Mario's phone on the next IA Next build (the Programs tab's look beside today's; a rest day's two
-  links, a move, a jog logged, edited and cleared; the nudge will not rise on his data, his mile being locked).
-  Then row 5's third session: Hurt?, Traveling?, the chip, I'm back
-  and the check in, with the date box and the clipboard (two native packages), and This Week's start date and race
-  date, which no row names. Still not
+- **Done, phase 3's thirteenth session, row 5's third of three (Post-v0.263.0, no build):** his phone on IA Next
+  build 125 ("All good": the Programs tab's look beside today's, Training anyway? and Log cardio on a rest day, a
+  session moved, a jog logged, edited and cleared). Then today's Hurt? and Traveling? measured
+  (`tests/measure/native-injury-travel_today.md`: one door each, both on This Week; the chips written by the page
+  as markup; every write `ia_programs` alone), the cut put to Mario as one session and taken ("Concur, build it"),
+  and built (`docs/decisions/injury-overlays.md`, `docs/decisions/this-week.md` and
+  `docs/decisions/active-program.md`, each an Expo entry): the two sheets, the chips with I'm back and the check
+  in and their pop-ups, This Week's race date and Program Start, the app's own date box over the iOS calendar, and
+  the copy button, with the two native packages (`@react-native-community/datetimepicker` 9.2.1 and
+  `expo-clipboard` 58.0.4, the versions Expo SDK 58 names). The draft, every byte of the sheet and of the chips as
+  the page writes them, each toast and pop-up, the program in hand whole, This Week under it and every `ia_` key
+  stay equal to today's page. 411 breaks, every one red: 401 on the fast files and 10 on the sweep.
+  The look was measured beside today's own markup drawn by the simulator's Safari, every line within a point,
+  and today's date field tried there: its Reset blanks the field and stays, and it enforces no earliest day.
+  The ledger row of the change sheet's model is filled. **Row 5 is built.**
+- **Next:** Mario's phone on the next IA Next build (Hurt? on a region and a tier, its chip, I'm back and the
+  pop-up, the return week's chips and their ✕; Traveling? with its dates in the calendar, its chip; the race date
+  moved and put back; the copy button and a paste). The check in will not rise on his data for two weeks after an
+  injury is set. Then row 6, the wizard and generating, which reads the start date's resolver from
+  `week-dates/week-dates.ts`. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
