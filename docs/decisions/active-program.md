@@ -277,3 +277,8 @@ and `tests/measure/v221_rulings/p_active_ruling.md`). The switch is `setActive` 
   Every line and every arm of the run anchor's line by a hand table (`tests/unit/native-change-sheet.test.ts`);
   the button's wiring in `tests/unit/native-program-list.test.ts`. The breaks are
   `tests/measure/native-change-sheet_breaks.md`.
+
+## On Mario's phone, IA Next build 126 (2026-11-20): the copy button
+
+- Put to him: the copy button and a paste. **His report:** "All good" (no screenshot). Nothing differed, so
+  nothing was fixed from it.

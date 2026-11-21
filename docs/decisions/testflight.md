@@ -379,3 +379,9 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   session's start: `testflight 0.263.0 processed (uploaded before this run; a version goes up once, a fix is the
   next PATCH) (run 44861762294, c3d35dd)` and `testflight next 0.263.0 (126) processed (run 44861762294, c3d35dd)`.
   The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 126** (his report, 2026-11-20, no screenshot): "All good", to what the wizard's session
+  put to him on IA Next build 126: Hurt? on a region and a tier, its chip, I'm back and its pop-up, the return
+  week's chips and their ✕; Traveling? with its dates in the calendar, and its chip; the race date moved and put
+  back; the copy button and a paste. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/injury-overlays.md`, `docs/decisions/this-week.md` and `docs/decisions/active-program.md`, the
+  build 126 entries).

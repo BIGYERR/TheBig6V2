@@ -150,3 +150,10 @@ D193, D194, D197) are recorded in the handoff and `docs/test-migration/13-injury
   `278ba57f3f6a382b`, the hash the session began on. The new build's first launch had raised the day after reminder
   and written its marks (3 of the 36 keys differed, counted, never read), so the file put back is the copy made
   before any build. **Not yet seen:** Mario's phone.
+
+## On Mario's phone, IA Next build 126 (2026-11-20)
+
+- Put to him: Hurt? on a region and a tier, its chip, I'm back and its pop-up, the return week's chips and their ✕;
+  Traveling? with its dates in the calendar, and its chip. **His report:** "All good" (no screenshot). Nothing
+  differed and no motion was named, so nothing was fixed from it. The check in was not put to him: it is drawn
+  only on an injury 14 days old, and it stays not yet seen on his phone.
