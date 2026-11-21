@@ -661,3 +661,39 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   (`tests/unit/native-cardio-sheet.test.ts`, This Week routes a card's button).
 - **Release:** Post-v0.262.4, no build of today's app. In the Expo app with the cardio sheet
   (`docs/decisions/session-sheet.md`, the cardio sheet's entry); on the phone with the next IA Next build once merged.
+
+## This Week in the Expo app: Hurt?, Traveling?, the chips, the race date and Program Start take their taps (Post-v0.263.0, the migration's phase 3, row 5, the third of three sessions)
+
+- **Date:** 2026-11-20. **Ruled by:** no new ruling. The screen is D276's as carried above; what its controls do is
+  today's, each under its own ruling: the race date lays the plan back from the race and keeps the weeks behind
+  (V188 D14a); Program Start goes through the one resolver the wizard and the start box share (V174 D21: a short
+  first week from any day, D24; a short week with no training day left moves to the next Monday, D25; unless it
+  holds the test of a dated test goal, D184 c), and a dated test goal pins its test week again from the new
+  start (V207 D106a); the beta's own store (D289). Mario took the cut with Hurt? and Traveling?
+  (`docs/decisions/injury-overlays.md`, the Expo entry: "Concur, build it", 2026-11-20). **Bump:** none.
+  **Shipped:** Post-v0.263.0, no build of today's app; the beta's next build carries it.
+- **Finding (the measure, `tests/measure/native-injury-travel_today.md`).** The row under the week titles shows the
+  race date on a program laid back from a race (4 of the ten seeded programs) and Program Start on every other (a
+  dated test goal among them). The race date accepts any day and always rebuilds. A start date is stored with no
+  rebuild, except on a dated test goal. Both write `ia_programs` alone, and a cleared box does nothing. After
+  either, the page's current week is the week holding today, set from outside the screen, so today's screen goes
+  back to the title holding today and places its strip anew, unless that is the week the screen itself last wrote
+  (a title picked, a day opened).
+- **What is built:** `frontends/native/src/week-dates/week-dates.ts`, the page's `setProgRace`, `setProgStart`,
+  `_rsRace` and `resolveStartDate` line for line, in a folder of its own because This Week's folder writes nothing,
+  with `titleAfterDate`, the rule above. The resolver is the wizard's too; the wizard reads it from here once it is
+  built in this app (row 6). `ThisWeek.tsx` hands every tap up as an ask (Hurt?, Traveling?, a chip's I'm back and
+  ✕, the check in's answer, the row's date) and keeps the program in hand and the week it last wrote where the app
+  reads them, so a second date picked in an open calendar writes on the program the first one handed back. The app
+  (`App.tsx`) answers each ask, in today's order: the program in hand, This Week drawn, the toast or the pop-up.
+  Random Workout still takes no press (row 7).
+- **Carried as today's, not ruled and not fixed:** the race date accepts any day, a past one included, and a race
+  two days out moves the start into the past; the toast `Race day <day> — plan starts <day> ✓` keeps today's dash.
+- **Proof.** After every date the toast, the program in hand whole, This Week and every `ia_` key equal today's
+  page, and the week the screen holds as its own is the page's current week: on the ten seeded programs at three
+  stretches of the standard history and on a dated test goal made for the purpose
+  (`tests/sweeps/native-change-sheet.test.ts`: the date it holds, a week on, a week back, three days on, a blank
+  box, and for a start date each day of the week holding today, so the short week, the moved start and the week
+  that holds the test are each said), and on a stored program with no start date, whose row reads Set date. The
+  resolver, the test date it is given, the refusals and the title rule by hand tables
+  (`tests/unit/native-change-sheet.test.ts`). The breaks are `tests/measure/native-change-sheet_breaks.md`.

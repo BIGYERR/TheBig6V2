@@ -9,8 +9,9 @@
 //
 // The taps are list-screen.ts's (what is kept between draws) and list-writes.ts's (the store). Set Active ends on
 // This Week, as today's does. The goal's pencil and the mile's pencil hand their sheet up to the app, which draws it
-// over the tab bar. Drawn and taking no press: the copy button by the seed (the clipboard is a native package this
-// app does not carry yet) and Build New Program (the wizard, row 6).
+// over the tab bar. The copy button by the seed hands the program's selections to the clipboard (expo-clipboard) and
+// says so once the clipboard answers, as today's does. Drawn and taking no press: Build New Program (the wizard, row 6).
+import * as Clipboard from 'expo-clipboard';
 import { type ReactNode, useRef, useState } from 'react';
 import { type LayoutChangeEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,9 +25,10 @@ import { MileSheet } from '../mile-sheet/MileSheet';
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Glow } from '../this-week/marks';
 import {
-  LIST_WORDS, type ListCard, type ListState, type Run, activeId, archiveQuestion, askArchive, askPurge, cancelConfirm, endRename, listView, markupLines,
+  LIST_WORDS, type ListCard, type ListState, type Run, activeId, archiveQuestion, askArchive, askPurge, cancelConfirm, copyText, endRename, listView, markupLines,
   openGoal, openMile, purgeWarning, refreshReport, startRename, toggleCard,
 } from './list-screen';
+import { COPIED } from './list-readers';
 import { type Outcome, archiveProgram, deleteProgram, renameProgram, setActive } from './list-writes';
 import type { DetailChip, DetailRow } from './program-detail-model';
 import { EMPTY_HTML } from './program-list-model';
@@ -156,8 +158,10 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
         {d.event && rows('Event target', d.event)}
         <View style={s.foot}>
           <Text testID="detail-seed" style={[s.seed, { color: p.muted }]}>{d.seed}</Text>
-          {/* Copy selections is not built yet: the button is drawn and takes no press. */}
-          <View accessibilityLabel="Copy program selections for troubleshooting" style={[s.copy, { backgroundColor: p.surface, borderColor: p.border2 }]}><Icon name="copy" size={15} color={p.muted} /></View>
+          {/* copyProgSel: the toast once the clipboard answers, and when it refuses, as the page says it after its fallback. */}
+          <Pressable testID={'detail-copy-' + c.id} accessibilityRole="button" accessibilityLabel="Copy program selections for troubleshooting" hitSlop={8}
+            onPress={() => { const text = copyText(store, c.id, new Date()); if (text !== null) Clipboard.setStringAsync(text).then(() => say(COPIED), () => say(COPIED)); }}
+            style={[s.copy, { backgroundColor: p.surface, borderColor: p.border2 }]}><Icon name="copy" size={15} color={p.muted} /></Pressable>
         </View>
       </View>
     );

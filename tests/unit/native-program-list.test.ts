@@ -622,11 +622,15 @@ describe('native program list: the screens\' words and wiring', () => {
     assert.ok(list.includes('{ strength: p.lift, hypertrophy: p.hip, fatloss: p.run, athletic: p.bike, balanced: p.accent }'), 'each goal\'s badge in its own colour (screens.css)');
     assert.ok(list.includes('onSubmitEditing={() => on.save(c.id)}') && list.includes('maxLength={40}') && list.includes('onChangeText={(t) => { typed.current = t; }}'), 'the rename box: forty at most, Return saves');
   });
-  test('the active card has no Set Active, and the copy button and Build New Program take no press', () => {
+  test('the active card has no Set Active, and Build New Program takes no press', () => {
     assert.ok(list.includes("? <View testID={'active-' + c.id} style={[s.action, s.isActive, { borderColor: p.border2 }]}><Text style={[s.actionText, { color: p.muted }]}>{LIST_WORDS.active}</Text></View>"));
-    assert.ok(list.includes('<View accessibilityLabel="Copy program selections for troubleshooting" style={[s.copy, { backgroundColor: p.surface, borderColor: p.border2 }]}><Icon name="copy" size={15} color={p.muted} /></View>'));
     assert.ok(list.includes('<View testID="build-new" style={[s.build, { borderColor: p.border2 }]}><Text style={[s.buildText, { color: p.text }]}>{LIST_WORDS.build}</Text></View>'));
-    assert.equal((list.match(/onPress=/g) || []).length, 5, 'the list\'s five presses: a button and a pencil (one helper each), the rename\'s X, the card, the purge link');
+    assert.equal((list.match(/onPress=/g) || []).length, 6, 'the list\'s six presses: a button and a pencil (one helper each), the rename\'s X, the card, the purge link, the copy button');
+  });
+  test('the copy button hands the stored program\'s lines to the clipboard, and says so once it answers or refuses', () => {
+    assert.ok(list.includes("import * as Clipboard from 'expo-clipboard';"));
+    assert.ok(list.includes("<Pressable testID={'detail-copy-' + c.id} accessibilityRole=\"button\" accessibilityLabel=\"Copy program selections for troubleshooting\" hitSlop={8}"));
+    assert.ok(list.includes('onPress={() => { const text = copyText(store, c.id, new Date()); if (text !== null) Clipboard.setStringAsync(text).then(() => say(COPIED), () => say(COPIED)); }}'), 'the toast waits for the clipboard, and follows a refusal too (the page\'s fallback, then its toast)');
   });
   test('the pencils open their sheets over the whole screen, each handed the store and what the tap read', () => {
     assert.ok(list.includes('const draft = openGoal(store, id, sport);') && list.includes('if (draft) onCover(<GoalSheet palette={p} store={store} draft={draft} calm={calm} report={report} onClose={() => onCover(null)} onDone={done} />);'));

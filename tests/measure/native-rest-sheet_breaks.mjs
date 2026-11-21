@@ -309,7 +309,7 @@ const BREAKS = [
   [WEEK, "Training anyway? asks for Log cardio", "onRest(d.rest!.week, d.rest!.key, 'move')", "onRest(d.rest!.week, d.rest!.key, 'cardio')"],
   [WEEK, "the log link asks for Move", "onRest(d.rest!.week, d.rest!.key, 'cardio')", "onRest(d.rest!.week, d.rest!.key, 'move')"],
   [WEEK, "Training anyway? is drawn on a day a session left", '{d.rest.anyway && <Text testID="rest-anyway"', '{true && <Text testID="rest-anyway"'],
-  [WEEK, "the rest card's links reach no sheet", "onRest={(week, key, view) => { if (prog) onRest({ prog: prog as unknown as RestProgram, week, dayKey: key, view }); }}", "onRest={() => {}}"],
+  [WEEK, "the rest card's links reach no sheet", "onRest={(week, key, view) => { if (prog) { hand.own = week; onRest({ prog: prog as unknown as RestProgram, week, dayKey: key, view }); } }}", "onRest={() => {}}"],
   [SESSION, "Edit cardio asks for Move", "dayKey: open.dayKey, view: 'cardio' }, () => redraw());", "dayKey: open.dayKey, view: 'move' }, () => redraw());"],
   [SESSION, "the session sheet is not drawn again after the rest sheet wrote", "view: 'cardio' }, () => redraw()); }}", "view: 'cardio' }, () => {}); }}"],
   [SESSION, "the app is not told of a Log", "      onLogged(open.week, open.dayKey);\n", ""],

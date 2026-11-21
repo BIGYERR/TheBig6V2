@@ -10,6 +10,9 @@
 // The rest day sheet (rest-sheet/RestSheet.tsx: Move a session here, Log cardio, Clear) opens from This Week's rest
 // card and from the session sheet's Edit cardio, and the coach's mile nudge (D274, mile-nudge/MileNudge.tsx) rises
 // over This Week 700 ms after it shows again once a run's Log earned it; both write to this app's own store.
+// Hurt? and Traveling? (change-sheet/ChangeSheet.tsx) open from This Week, whose chips carry I'm back, the ✕ and the
+// check in; the race date and Program Start open the app's calendar (date-box/DateBox.tsx), as do the sheet's date
+// boxes. Each writes ia_programs in this app's own store (change-sheet/overlay-writes.ts, week-dates/week-dates.ts).
 // The floating rest timer is not here: it comes back on the Dynamic Island (D295, phase 4).
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -19,6 +22,12 @@ import { VERSION } from '@ia/core';
 import { readDayLogs } from '@ia/core/engine/state-day-log.ts';
 
 import { BackupLoad } from './BackupLoad';
+import { ChangeSheet } from './change-sheet/ChangeSheet';
+import type { OverlayDraft } from './change-sheet/change-sheet-model';
+import { type OverlayProgram, newOverlayDraft, openInjury, openTravel } from './change-sheet/overlay-readers';
+import { type OverlayAct, type OverlaySession, type OverlayTap, imBackFromInjury, injReassess, injSnooze, removeOverlay } from './change-sheet/overlay-writes';
+import { DateBox } from './date-box/DateBox';
+import type { DateAsk } from './date-box/date-box';
 import { SessionSheet } from './day-detail/SessionSheet';
 import type { SheetOpen } from './day-detail/sheet-screen';
 import { DeckOpening } from './deck/DeckOpening';
@@ -42,8 +51,9 @@ import { swiftLine } from './spike-line';
 import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
 import { Bars, Bug, Calendar, Home } from './this-week/marks';
-import { type DeckFrom, ThisWeek } from './this-week/ThisWeek';
-import { storedProgram } from './this-week/week-screen';
+import { type DeckFrom, ThisWeek, type WeekAsk, type WeekHand } from './this-week/ThisWeek';
+import { type DatedProgram, setProgRace, setProgStart, titleAfterDate } from './week-dates/week-dates';
+import { midnight, storedProgram } from './this-week/week-screen';
 
 /** Which JavaScript engine runs this bundle: Hermes sets HermesInternal on the global object. */
 function engineName(): string {
@@ -146,10 +156,12 @@ function Shell() {
   const [calm, setCalm] = useState(false);
   useEffect(() => { AccessibilityInfo.isReduceMotionEnabled().then(setCalm, () => {}); }, []);
   // The pop-up on screen, the reminder it asks about when it is one, and a count so each is a card of its own.
-  const [pop, setPop] = useState<{ view: PopView; s: PopSession; ask: Reminder | null; n: number } | null>(null);
+  // `acts` is what each button does on a card with more than the one that closes it (the check in's Good sign).
+  const [pop, setPop] = useState<{ view: PopView; s: PopSession; ask: Reminder | null; acts: OverlayAct[] | null; n: number } | null>(null);
+  const popN = useRef(0);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
-  const raise = (s: PopSession, view: PopView, ask: Reminder | null): void => setPop((was) => ({ view, s, ask, n: was ? was.n + 1 : 1 }));
+  const raise = (s: PopSession, view: PopView, ask: Reminder | null, acts: OverlayAct[] | null = null): void => setPop({ view, s, ask, acts, n: ++popN.current });
   /** A day just marked done: the season on the program's last day, a streak milestone, or the workout line. */
   const complete = (s: PopSession, week: number, dayKey: string): void => {
     const now = new Date();
@@ -168,11 +180,71 @@ function Shell() {
   const answer = (index: number): void => {
     const was = pop;
     setPop(null);
+    if (was && was.acts) {
+      // The check in's Good sign: I'm back, or More time (the page's popClose, then the call).
+      const a = was.acts[index], s = session();
+      if (a && s) took(s, a.kind === 'back' ? imBackFromInjury(s, a.id, Date.now(), report) : injSnooze(s, a.id, Date.now()));
+      return;
+    }
     if (!was || !was.ask) return;
     const done = index === 0, ask = was.ask;
     say(resolveReminder(was.s, ask.week, ask.dayKey, ask.title, done ? 'complete' : 'skipped', Date.now()));
     if (done) timers.current.push(setTimeout(() => complete(was.s, ask.week, ask.dayKey), 380));
   };
+
+  // ── Hurt?, Traveling?, the chips and the two dates (overlays.ts, programs.ts; ./change-sheet, ./week-dates) ──
+  // The program in hand is This Week's (today's activeProg), read where the tap lands, so a second date picked in
+  // an open calendar writes on the program the first one handed back.
+  const hand = useRef<WeekHand>({ prog: null, own: null }).current;
+  // The page's _ovDraft: one draft for the app's life, so Traveling? opens on the dates it last held.
+  const ovDraft = useRef<OverlayDraft>(newOverlayDraft());
+  const [change, setChange] = useState<{ session: OverlaySession; draft: OverlayDraft; n: number } | null>(null);
+  const changeN = useRef(0);
+  const [dateAsk, setDateAsk] = useState<{ ask: DateAsk; n: number } | null>(null);
+  const dateN = useRef(0);
+  const openDate = (ask: DateAsk): void => setDateAsk({ ask, n: ++dateN.current });
+  const [resets, setResets] = useState(0);
+  const report = refreshReport(say);
+  const session = (): OverlaySession | null => (hand.prog ? { store: phoneStore, prog: hand.prog as unknown as OverlayProgram } : null);
+  /** What a chip's tap left, in today's order: the program in hand, This Week drawn, the toast or the pop-up. */
+  function took(s: OverlaySession, r: OverlayTap | null): void {
+    if (!r) return;
+    if (r.prog) setHeld(r.prog as unknown as DeckProgram);
+    setWrites((n) => n + 1);
+    if (r.toast) say(r.toast);
+    if (r.pop) {
+      const ps = { store: phoneStore, prog: r.prog || s.prog } as unknown as PopSession, now = new Date();
+      raise(ps, popOf(ps, r.pop, now, Math.random), null, r.acts || null);
+    }
+  }
+  /** A date picked for This Week's row: stored, the program in hand, the title back on today's when the page's is. */
+  const dated = (which: 'race' | 'start', iso: string): void => {
+    const prog = hand.prog as unknown as DatedProgram | null, now = Date.now();
+    const r = which === 'race' ? setProgRace(phoneStore, prog, iso, now, report) : setProgStart(phoneStore, prog, iso, now, report);
+    if (!r) return;
+    if (r.set) {
+      setHeld(r.prog as unknown as DeckProgram);
+      const t = titleAfterDate(hand.own, r.prog, midnight(new Date(now)));
+      hand.own = t.own;
+      if (t.reset) setResets((n) => n + 1);
+    }
+    setWrites((n) => n + 1);
+    say(r.toast);
+  };
+  const asked = (ask: WeekAsk): void => {
+    const s = session();
+    if (!s) return;
+    const now = new Date();
+    if (ask.kind === 'hurt' || ask.kind === 'travel') {
+      const draft = ask.kind === 'hurt' ? openInjury(ovDraft.current, s.prog, now) : openTravel(ovDraft.current, now);
+      ovDraft.current = draft;
+      setChange({ session: s, draft, n: ++changeN.current });
+    } else if (ask.kind === 'remove') took(s, removeOverlay(s, ask.id, now.getTime(), report));
+    else if (ask.kind === 'back') took(s, imBackFromInjury(s, ask.id, now.getTime(), report));
+    else if (ask.kind === 'answer') took(s, injReassess(s, ask.id, ask.ans, now.getTime()));
+    else openDate({ value: ask.value, min: null, onChange: (iso) => dated(ask.which, iso) });
+  };
+
   return (
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
@@ -180,7 +252,7 @@ function Shell() {
         <Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} />
       ) : tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
-          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
+          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
         </Animated.View>
       ) : tab === 'progress' ? <Progress key={progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
@@ -208,6 +280,12 @@ function Shell() {
           report={refreshReport(say)}
           onDone={(o) => { if (o.prog) setHeld(o.prog as unknown as DeckProgram); if (o.toast) say(o.toast); }} />
       )}
+      {change && (
+        <ChangeSheet key={change.n} palette={p} session={change.session} draft={change.draft} calm={calm} say={say} report={report}
+          onDraft={(d) => { ovDraft.current = d; }} onDate={openDate} onClose={() => setChange(null)}
+          onDone={(r) => { if (r.prog) setHeld(r.prog as unknown as DeckProgram); setWrites((n) => n + 1); }} />
+      )}
+      {dateAsk && <DateBox key={dateAsk.n} palette={p} ask={dateAsk.ask} calm={calm} onClose={() => setDateAsk(null)} />}
       {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
       {over}
       {nudge && <MileNudge palette={p} text={nudgeText(nudge.offer)} calm={calm} onUpdate={() => answered(true)} onKeep={() => answered(false)} />}

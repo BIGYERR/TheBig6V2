@@ -199,8 +199,9 @@ describe('native shell: the engine check is core\'s, as it is', () => {
     // The Programs tab reads it at each draw (the race's countdown, the week a program is in) and hands it to each
     // switch and rebuild, as its goal sheet and its mile pencil do (the page's refreshProgram and _goalCurWeek).
     // The rest day sheet stamps a move and a jog with it (the page's applyRestMove and applyRestCardio).
+    // Hurt? and Traveling? stamp a change with it, which is also its id (the page's applyInjuryDraft and applyOverlayDraft).
     const dated = files.filter((f) => /Date\.now\(\)/.test(readFileSync(f, 'utf8'))).map((f) => f.slice(NATIVE.length + 1)).sort();
-    assert.deepStrictEqual(dated, [join('src', 'App.tsx'), join('src', 'day-detail', 'SessionSheet.tsx'), join('src', 'deck', 'Deck.tsx'), join('src', 'goal-sheet', 'GoalSheet.tsx'), join('src', 'mile-sheet', 'MileSheet.tsx'), join('src', 'program-list', 'Programs.tsx'), join('src', 'progress', 'Progress.tsx'), join('src', 'rest-sheet', 'RestSheet.tsx'), join('src', 'this-week', 'ThisWeek.tsx')]);
+    assert.deepStrictEqual(dated, [join('src', 'App.tsx'), join('src', 'change-sheet', 'ChangeSheet.tsx'), join('src', 'day-detail', 'SessionSheet.tsx'), join('src', 'deck', 'Deck.tsx'), join('src', 'goal-sheet', 'GoalSheet.tsx'), join('src', 'mile-sheet', 'MileSheet.tsx'), join('src', 'program-list', 'Programs.tsx'), join('src', 'progress', 'Progress.tsx'), join('src', 'rest-sheet', 'RestSheet.tsx'), join('src', 'this-week', 'ThisWeek.tsx')]);
     assert.doesNotMatch(all, /Date\.now\(\)\s*-|-\s*Date\.now\(\)/, 'no span of time is taken from the date');
   });
 });

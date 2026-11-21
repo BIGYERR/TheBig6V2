@@ -154,7 +154,7 @@ Written by `node tests/measure/native-program-list_breaks.mjs` (read-only here; 
 | 145 | `Programs.tsx` | a goal's pencil opens the mile | **1** | 1 | unit/native-program-list 1 |
 | 146 | `Programs.tsx` | the mile's pencil opens the rename | **1** | 1 | unit/native-program-list 1 |
 | 147 | `Programs.tsx` | a name may be typed past forty | **1** | 1 | unit/native-program-list 1 |
-| 148 | `Programs.tsx` | the copy button takes a press | **1** | 1 | unit/native-program-list 1 |
+| 148 | `Programs.tsx` | the copy button takes no press | **1** | 1 | unit/native-program-list 1 |
 | 149 | `Programs.tsx` | Build New Program takes a press | **1** | 1 | unit/native-program-list 1 |
 | 150 | `Programs.tsx` | the list jumps to its top at every draw | **1** | 1 | unit/native-program-list 1 |
 | 151 | `Programs.tsx` | the empty list's break is drawn as markup | **1** | 1 | unit/native-program-list 1 |

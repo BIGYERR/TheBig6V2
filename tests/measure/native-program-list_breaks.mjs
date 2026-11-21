@@ -195,7 +195,7 @@ const BREAKS = [
   [LIST, "a goal's pencil opens the mile", "() => on.goal(c.id, x.type))}", "() => on.mile(c.id))}"],
   [LIST, "the mile's pencil opens the rename", "'Change mile time', 14, () => on.mile(c.id))}", "'Change mile time', 14, () => on.pencil(c))}"],
   [LIST, "a name may be typed past forty", "maxLength={40}", "maxLength={60}"],
-  [LIST, "the copy button takes a press", "<View accessibilityLabel=\"Copy program selections for troubleshooting\"", "<Pressable accessibilityLabel=\"Copy program selections for troubleshooting\""],
+  [LIST, "the copy button takes no press", "onPress={() => { const text = copyText(store, c.id, new Date()); if (text !== null) Clipboard", "onLongPress={() => { const text = copyText(store, c.id, new Date()); if (text !== null) Clipboard"],
   [LIST, "Build New Program takes a press", "<View testID=\"build-new\" style", "<Pressable testID=\"build-new\" style"],
   [LIST, "the list jumps to its top at every draw", "<ScrollView testID=\"programs-body\"", "<ScrollView key={drawn.n} testID=\"programs-body\""],
   [LIST, "the empty list's break is drawn as markup", "EMPTY_HTML[v.empty].replace('<br>', '\\n')", "EMPTY_HTML[v.empty]"],
