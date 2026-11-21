@@ -2,7 +2,9 @@
 // check, over whatever asked for a date (Hurt?'s From, Traveling?'s From and Through, This Week's race date and
 // Program Start). Today's app gets this from WebKit's date field; date-box.ts says what was seen of it and is held
 // equal. A day picked is written at once and the box stays, as WebKit's stays, until the check or a tap outside it.
-// Reset writes a blank field, the box stays, and the calendar goes back to today.
+// Reset writes a blank field, the box stays, and the calendar goes back to the day it opened on (today for a blank
+// field): seen again in the simulator's Safari with the wizard's start date, a field opened on the 21st, the 25th
+// picked, and Reset showing the 21st on a day that was the 20th.
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -12,7 +14,8 @@ import { DATE_WORDS, type DateAsk, RESET_VALUE, calendarDay, pickedValue } from 
 
 export function DateBox({ palette: p, ask, calm, onClose }: { palette: Palette; ask: DateAsk; calm: boolean; onClose: () => void }) {
   const s = styles;
-  const [day, setDay] = useState(() => calendarDay(ask.value, new Date()));
+  const opened = useRef(calendarDay(ask.value, new Date())).current;
+  const [day, setDay] = useState(opened);
   const shown = useRef(new Animated.Value(calm ? 1 : 0)).current;
   useEffect(() => {
     if (!calm) Animated.timing(shown, { toValue: 1, duration: 180, useNativeDriver: true }).start();
@@ -32,7 +35,7 @@ export function DateBox({ palette: p, ask, calm, onClose }: { palette: Palette; 
           onChange={(e, d) => { if (e.type !== 'set' || !d) return; setDay(d); ask.onChange(pickedValue(d)); }}
         />
         <View style={[s.foot, { borderTopColor: p.border }]}>
-          <Pressable testID="date-box-reset" accessibilityRole="button" hitSlop={8} onPress={() => { ask.onChange(RESET_VALUE); setDay(calendarDay(RESET_VALUE, new Date())); }} style={[s.btn, { backgroundColor: p.surface2 }]}>
+          <Pressable testID="date-box-reset" accessibilityRole="button" hitSlop={8} onPress={() => { ask.onChange(RESET_VALUE); setDay(opened); }} style={[s.btn, { backgroundColor: p.surface2 }]}>
             <Text style={[s.btnText, { color: p.text }]}>{DATE_WORDS.reset}</Text>
           </Pressable>
           <Pressable testID="date-box-done" accessibilityRole="button" accessibilityLabel={DATE_WORDS.done} hitSlop={8} onPress={onClose} style={[s.check, { backgroundColor: p.signal }]}>

@@ -731,3 +731,62 @@ what is stored.
   longer reaches legacy callers, so they now seed real data (a travel overlay key, Wildcard records). 69/69 at 0 px.
 - **Does not change:** the single-file page (only its version meta); the source files; any program; any stored key or
   value.
+
+## The wizard in the Expo app: the steps, the name step and Generate (Post-v0.263.0, the migration's phase 3, row 6, the first of two sessions)
+
+- **Date:** 2026-11-20 and 21. **Ruled by:** no new ruling. Mario took the cut on the measure's proposal ("Concur,
+  build it", 2026-11-20): this session the bar, the five card steps, the name step and Generate; the cardio goals
+  step's goals, forms, seed offer, race date and card in the next. **Bump:** none (`index.html` and `ia-version`
+  unmoved). **Carried, each under its own code:** the start date and its resolver (V174 D19 to D25, D184 c), a race
+  plan counted back from its race (V188 D14a), the test week's pin (D106a, D183, D184), the mile's and the swim's
+  validators at Generate (V176 D9, D110a, D187 R3, D188), the wizard committing through the loader and landing on
+  week 1 (V221 D178), the summary's start row (D242, D246: `docs/decisions/race-date.md`).
+- **The finding (`tests/measure/native-wizard_today.md`):** one door, + Build New Program under the Programs tab's
+  cards; 7 steps on the race and hybrid paths and 6 on the strength path; Continue never refuses; the screen is the
+  Angular `wizard.ts` over two models (`wizard-model.ts`, `cardio-goal-model.ts`) and the page's own readers; no tap
+  before Generate stores anything; Generate writes `ia_programs` and `ia_active` alone and lands on week 1.
+- **What is built (`frontends/native/src/wizard/`):** `wizard-model.ts` and `cardio-goal-model.ts`, today's files
+  byte for byte; `wizard-readers.ts`, written from `wizard.ts` and `wizard-generate.ts` function for function (the
+  draft, the focuses, the rest days' floor and advisories, the start date's four sentences, a race plan's copy, the
+  swim validator, the name step); `wizard-screen.ts` (the page's handlers as taps on one state, each step's view,
+  the start date's repaint, where This Week lands, the title's line); `wizard-writes.ts`, the one file that writes
+  (the length's pop-up, the refusals, the pins, the start applied, the program stored last and made active through
+  the list's own switch); `Wizard.tsx`, `Generating.tsx` and `generating-figure.ts` (the page's SVG animation worked
+  out frame by frame). `App.tsx` opens a wizard of its own at each Build New Program, over the tab bar and under the
+  calendar and the toast, and after Generate shows This Week where the wizard lands, with no launch's reminder;
+  `ThisWeek.tsx` takes the landing; the toast draws the mark the page writes before the floor's words.
+- **This session's edge:** the cardio goals step opens and shuts its sports and lists each sport's goals, and a
+  goal takes no press. The draft is prepared as the page prepares it when the step is drawn (a race date of today
+  when it has none). A draft set whole that holds a goal is not walked through that step in the tests: today's draw
+  of it writes the seed it read and the weeks to the race into the draft, and both are the next session's.
+- **Carried equal, today's behaviour:** Hybrid with Run a 5K or Run a 10K builds a race plan whose race is today;
+  the rest day step's advisory box is drawn in no state (the handoff's section 12 has both, not ruled).
+- **The date box (`date-box/DateBox.tsx`), seen again in the simulator's Safari** on a field set as the Angular
+  wizard sets its start date (the value a property, read on change): a day picked writes at once and the box stays;
+  Reset writes a blank, the box stays, and its calendar goes back to the day the box opened on (opened on the 21st,
+  the 25th picked, Reset showed the 21st on a day that was the 20th). The beta's Reset went to today; it now goes to
+  the day it opened on. A blank start stays blank in its field until the step is next drawn whole, as today's.
+- **Proof.** The step, the draft, the bar, each step's markup (typed by hand from `renderWizardStep`, white space
+  between tags apart), the toast and every `ia_` key equal today's page after every tap, and after Generate the
+  pop-up, the lines, the program in hand whole, every `ia_` key, the launch This Week then makes and This Week
+  itself (`tests/support/native-wizard.ts`): the strength, race and hybrid paths by taps alone
+  (`tests/integration/native-wizard.test.ts`), the ten seeded configs on an empty phone and as a second program,
+  every set of rest days under each goal and focus, the start date over two weeks, race plans from behind to weeks
+  ahead, a dated test goal with its start moved and with the week that holds the test, and each refusal
+  (`tests/sweeps/native-wizard.test.ts`, with a floor for every kind a step draws). Each rule by a hand table
+  (`tests/unit/native-wizard.test.ts`). 382 breaks, every one red, 7 of them on the sweep alone; the first part alone had let 4 of 96 through and the first whole run 1 of 382, each closed by a test before the whole set ran again. The breaks are `tests/measure/native-wizard_breaks.md`.
+- **The look,** measured beside today's own markup drawn by the simulator's Safari (iPhone 17 Pro, iOS 26.5): the
+  path, About you, the equipment, the cardio goals with a sport open, the lifting focus, the rest days plain and at
+  the floor, the name step and the generating screen; every box within a third of a point and every line within
+  one. Three things were found and set on the way: WebKit lays a line with no line height of its own at the face's
+  own (14 bold stands 19, 15 stands 20, 16 stands 21) and cuts a fractional line height down to a whole one (12 at
+  1.4 is 16); it draws a 1.5 edge as 4 device pixels; and iOS lays each text one device pixel taller than its
+  lines, which each text that stacks now gives back. Not measured, since no tap of this session reaches them: the
+  length's pop-up and a start set by a race date; they are measured with the next session's build.
+- **Seen on the simulator** on a copy of Mario's backup: every step of the strength path, Back through all of them,
+  the rest days to the floor, the calendar over the name step (a pick, the copy and the row repainted, the check),
+  Generate, the figure and its line, and This Week on the new program, which stood third and active on the Programs
+  tab. The store was put back after: `278ba57f3f6a382b`, the hash the session began on (`ce33f280b11127ed` with the
+  test program in it). Once, after a pick and the check, the wizard stood on its first step; the same state and
+  taps made three more times did not show it again. **Not yet seen:** Mario's phone.
+- **Release:** Post-v0.263.0, no build of today's app. On the phone with the next IA Next build.

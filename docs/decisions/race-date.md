@@ -40,3 +40,12 @@ and the Angular `frontends/app/src/app/screens/wizard/wizard.ts`. Tests: `tests/
 - **What changes:** a comma: `Mon, Oct 26, 2026, set by race date` and `Sat, Oct 24, 2026, short first week`. The
   plain start (no note) is unchanged.
 - **What deliberately does not change:** which start the row prints (D242), every other wizard line, and the program.
+
+## D242 and D246 in the Expo app (Post-v0.263.0, the migration's phase 3, row 6, the first of two sessions)
+
+- Carried unchanged into the Expo app's name step (`frontends/native/src/wizard/wizard-readers.ts` `wizardStartSummary`
+  and `startSummaryVal`): the summary's start row reads the start the field above it shows, a race plan's start with
+  ", set by race date" and a short first week with ", short first week". Held equal to today's page on every
+  draft of `tests/sweeps/native-wizard.test.ts` and by hand tables in `tests/unit/native-wizard.test.ts`. The whole
+  entry is `docs/decisions/angular-screens.md`, the wizard in the Expo app.
+- **Release:** Post-v0.263.0, no build of today's app. On the phone with the next IA Next build.

@@ -50,7 +50,15 @@ type Tint = keyof Pick<Palette, 'run' | 'bike' | 'swim' | 'lift' | 'signal' | 'd
  * What the screen holds for the app between draws: the program in hand (today's activeProg), and the program week
  * the screen itself last wrote (a title picked, a day opened; week-view.ts ownWeek), null before the first draw.
  */
-export interface WeekHand { prog: ScreenProgram | null; own: number | null }
+export interface WeekHand {
+  prog: ScreenProgram | null; own: number | null;
+  /**
+   * Where the wizard lands (wizard/wizard-screen.ts landingTitle), set by the app before it shows this screen after
+   * Generate and taken by the screen's first draw: the title to show (null for the launch's own) and the week the
+   * screen then holds as its own.
+   */
+  land?: { pick: number | null; own: number } | null;
+}
 /** A tap the app answers: Hurt?, Traveling?, a chip's I'm back or ✕, the check in's answer, a date box of the row. */
 export type WeekAsk =
   | { kind: 'hurt' } | { kind: 'travel' }
@@ -85,7 +93,9 @@ export function ThisWeek({ palette: p, store, tick, held, hand, resets, onAsk, o
   const prog = held && launched.prog && held.id === launched.prog.id ? (held as unknown as typeof launched.prog) : launched.prog;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { onLaunch(launched.prog as unknown as DeckProgram | null); }, [launched]);
-  const [shownPick, setShown] = useState<number | null>(null);
+  // After Generate the screen opens where the wizard lands (the page's currentWeek set to 1 from outside the screen).
+  const land = useRef(hand.land || null).current;
+  const [shownPick, setShown] = useState<number | null>(land ? land.pick : null);
   const picks = useRef(new Map<number, number>());
   const [, redraw] = useState(0);
   const progId = prog ? prog.id : null;
@@ -97,9 +107,10 @@ export function ThisWeek({ palette: p, store, tick, held, hand, resets, onAsk, o
     picks.current.clear();
     placed.current = false;
     hand.own = null;
-    if (shownPick !== null) setShown(null);
+    if (shownPick !== null && !hand.land) setShown(null);
   }
   hand.prog = prog;
+  if (hand.land && prog) { hand.own = hand.land.own; hand.land = null; }
   // The title in view is the launch's own until one is picked; the day picked in each title is kept under its number.
   // Record run is offered, as on today's iOS app (D272 item 6): the recorder is this app's to grow (phase 4).
   const now = new Date();
