@@ -286,11 +286,28 @@ Each phase starts only on Mario's GO, one phase step per session.
   The look was measured beside today's own markup drawn by the simulator's Safari, every line within a point,
   and today's date field tried there: its Reset blanks the field and stays, and it enforces no earliest day.
   The ledger row of the change sheet's model is filled. **Row 5 is built.**
-- **Next:** Mario's phone on the next IA Next build (Hurt? on a region and a tier, its chip, I'm back and the
-  pop-up, the return week's chips and their ✕; Traveling? with its dates in the calendar, its chip; the race date
-  moved and put back; the copy button and a paste). The check in will not rise on his data for two weeks after an
-  injury is set. Then row 6, the wizard and generating, which reads the start date's resolver from
-  `week-dates/week-dates.ts`. Still not
+- **Done, phase 3's fourteenth session, row 6's first of two (Post-v0.263.0, no build):** his phone on IA Next
+  build 126 ("All good": Hurt? on a region and a tier, its chip, I'm back and its pop-up, the return week's chips
+  and their ✕, Traveling? with its dates and chip, the race date moved and put back, the copy button and a paste).
+  Then today's wizard measured (`tests/measure/native-wizard_today.md`: one door, 7 steps and 6 on the strength
+  path, two Angular models, nothing stored before Generate, which writes `ia_programs` and `ia_active` alone), the
+  cut put to Mario as above and taken ("Concur, build it"), and built (`docs/decisions/angular-screens.md` and
+  `docs/decisions/race-date.md`, each an Expo entry): Build New Program on the Programs tab, the wizard over the
+  whole screen, its bar, the path, About you, the equipment, the cardio goals as far as the sports and their goals,
+  the lifting focus with the strength path's add-on, the rest days with their floor and its toast, the name step
+  with the start date in the app's calendar or set by a race date, the length's pop-up, the refusals, the
+  generating screen, the program stored and made active, and This Week on its first week. The step, the draft,
+  the bar, every word, attribute and tag of each step as the page writes it, the toast and every `ia_` key stay
+  equal to today's page after every tap; after Generate the pop-up, the lines, the program in hand whole, every
+  `ia_` key and This Week do, on the ten seeded programs on an empty phone and as a second program. 382 breaks, every one red, 7 of them on the sweep alone; the first part alone had let 4 of 96 through and the first whole run 1 of 382, each closed by a test before the whole set ran again.
+  The look was measured beside today's own markup drawn by the simulator's Safari, every line within a point, and
+  today's date and text fields tried there. The ledger rows of the wizard's two models are filled.
+  Found by the measure, not ruled: Hybrid with Run a 5K or Run a 10K builds a race plan whose race is today; the
+  rest day step's advisory box is drawn in no state (the handoff's section 12).
+- **Next:** Mario's phone on the next IA Next build (Build New Program; each step of the strength path, Back and
+  Continue; the rest days down to the floor and the toast; the name and the start date in the calendar, Reset;
+  Generate, the figure and its lines, and This Week on the new program; the race path's cardio goals opening and
+  shutting their sports). Then row 6's second session, the cardio goals step whole. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
@@ -577,6 +594,12 @@ Row 5 is taken in three sessions (Mario, 2026-11-18, "Concur, build it", on the 
 Programs tab with the goal sheet and the mile pencil; the rest day sheet with the coach's mile nudge; Hurt? and
 Traveling? with their chip and check in. The rest day sheet and the injury chip are written by the page as markup,
 with no Angular model to copy, and the third session adds two native packages (a date box, the clipboard).
+
+Row 6 is taken in two sessions (Mario, 2026-11-20, "Concur, build it", on the measure's proposal): the bar, the
+five card steps, the name step with its start date and Generate first, which makes a program end to end on the
+strength path; then the cardio goals step's goals, their forms and number fields, the seed offer, the race date
+and the card under it, and the shorter plan's link. In the first, the cardio goals step opens and shuts its sports
+and lists their goals, and a goal takes no press.
 
 Each screen: built from the lifted logic and the Angular screen's pure model where one exists, its tests written from
 the ledger, then **checked against the old build** on the same backup (section 3.3).

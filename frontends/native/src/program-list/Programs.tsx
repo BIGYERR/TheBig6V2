@@ -10,7 +10,7 @@
 // The taps are list-screen.ts's (what is kept between draws) and list-writes.ts's (the store). Set Active ends on
 // This Week, as today's does. The goal's pencil and the mile's pencil hand their sheet up to the app, which draws it
 // over the tab bar. The copy button by the seed hands the program's selections to the clipboard (expo-clipboard) and
-// says so once the clipboard answers, as today's does. Drawn and taking no press: Build New Program (the wizard, row 6).
+// says so once the clipboard answers, as today's does. Build New Program asks the app for the wizard (wizard/Wizard.tsx).
 import * as Clipboard from 'expo-clipboard';
 import { type ReactNode, useRef, useState } from 'react';
 import { type LayoutChangeEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
@@ -53,7 +53,7 @@ function badgeColor(goal: string, p: Palette): string | null {
   return ({ strength: p.lift, hypertrophy: p.hip, fatloss: p.run, athletic: p.bike, balanced: p.accent } as Record<string, string>)[goal] || null;
 }
 
-export function Programs({ palette: p, store, state: st, calm, say, onSwitch, onGone, onCover }: {
+export function Programs({ palette: p, store, state: st, calm, say, onSwitch, onGone, onCover, onBuild }: {
   palette: Palette; store: StateStore;
   /** What the page keeps between draws; the app holds it, so an open card outlives a visit. */
   state: ListState;
@@ -65,6 +65,8 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
   onGone: (id: string) => void;
   /** A sheet to draw over the whole screen and the tab bar, or none. */
   onCover: (sheet: ReactNode) => void;
+  /** Build New Program (startWizard): the wizard, over the whole screen. */
+  onBuild: () => void;
 }) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -242,7 +244,7 @@ export function Programs({ palette: p, store, state: st, calm, say, onSwitch, on
         ))}
         </View>
         {/* The wizard is not built yet (row 6): the button is drawn and takes no press. */}
-        <View testID="build-new" style={[s.build, { borderColor: p.border2 }]}><Text style={[s.buildText, { color: p.text }]}>{LIST_WORDS.build}</Text></View>
+        <Pressable testID="build-new" accessibilityRole="button" onPress={onBuild} style={({ pressed }) => [s.build, { borderColor: p.border2 }, pressed && { transform: [{ scale: 0.98 }] }]}><Text style={[s.buildText, { color: p.text }]}>{LIST_WORDS.build}</Text></Pressable>
       </ScrollView>
     </View>
   );

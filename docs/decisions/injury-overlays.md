@@ -157,3 +157,11 @@ D193, D194, D197) are recorded in the handoff and `docs/test-migration/13-injury
   Traveling? with its dates in the calendar, and its chip. **His report:** "All good" (no screenshot). Nothing
   differed and no motion was named, so nothing was fixed from it. The check in was not put to him: it is drawn
   only on an injury 14 days old, and it stays not yet seen on his phone.
+
+## The date box's Reset goes back to the day it opened on (Post-v0.263.0, the wizard's session)
+
+- Seen again in the simulator's Safari with the wizard's start date (`docs/decisions/angular-screens.md`, the wizard
+  in the Expo app): WebKit's Reset blanks the field and its calendar shows the day the box opened on, which is today
+  only for a blank field. `DateBox.tsx` keeps that day (`opened`) and Reset sets the calendar to it. What Reset
+  writes is unchanged: a blank. `tests/unit/native-change-sheet.test.ts` holds the line, and the three breaks of
+  `tests/measure/native-change-sheet_breaks.mjs` that name it are pointed at it.

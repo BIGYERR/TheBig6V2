@@ -13,12 +13,17 @@
 // Hurt? and Traveling? (change-sheet/ChangeSheet.tsx) open from This Week, whose chips carry I'm back, the ✕ and the
 // check in; the race date and Program Start open the app's calendar (date-box/DateBox.tsx), as do the sheet's date
 // boxes. Each writes ia_programs in this app's own store (change-sheet/overlay-writes.ts, week-dates/week-dates.ts).
+// Build New Program on the Programs tab opens the wizard (wizard/Wizard.tsx) over the whole screen: its steps, the
+// length's pop-up and the generating screen, which stores the new program (wizard/wizard-writes.ts) and lands on This
+// Week's first week. The cardio goals' forms are the row's second session.
 // The floating rest timer is not here: it comes back on the Dynamic Island (D295, phase 4).
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { SvgXml } from 'react-native-svg';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VERSION } from '@ia/core';
+import { asyIcon } from '@ia/core/engine/icons.ts';
 import { readDayLogs } from '@ia/core/engine/state-day-log.ts';
 
 import { BackupLoad } from './BackupLoad';
@@ -53,6 +58,8 @@ import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
 import { Bars, Bug, Calendar, Home } from './this-week/marks';
 import { type DeckFrom, ThisWeek, type WeekAsk, type WeekHand } from './this-week/ThisWeek';
 import { type DatedProgram, setProgRace, setProgStart, titleAfterDate } from './week-dates/week-dates';
+import { Wizard } from './wizard/Wizard';
+import { landingTitle } from './wizard/wizard-screen';
 import { midnight, storedProgram } from './this-week/week-screen';
 
 /** Which JavaScript engine runs this bundle: Hermes sets HermesInternal on the global object. */
@@ -85,8 +92,9 @@ function Shell() {
   // This Week's size under the deck (D275 call 16): 96% while the deck is open, its own again as it closes.
   const under = useRef(new Animated.Value(1)).current;
   // Today's toast (rest-day-shell.ts showToast): one line over everything, gone after 2.2 s.
-  const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
-  const say = (text: string): void => setToast((t) => ({ text, n: t ? t.n + 1 : 1 }));
+  // One toast carries a mark before its words (the wizard's floor of training days), as the page writes it.
+  const [toast, setToast] = useState<{ text: string; icon: string | null; n: number } | null>(null);
+  const say = (text: string, icon?: string): void => setToast((t) => ({ text, icon: icon || null, n: t ? t.n + 1 : 1 }));
   // What Progress keeps between its draws (the program asked for, the delete armed, the estimator's lift), for the
   // app's life, and a count of the taps on its tab: each is the page's showProgressScreen, a screen opened afresh.
   const progress = useRef(newProgressState()).current;
@@ -169,6 +177,7 @@ function Shell() {
   };
   /** Each launch: 600 ms on, the day-after reminder, once a calendar day, when a past day stands unmarked. */
   const launched = useCallback((prog: DeckProgram | null): void => {
+    if (quiet.current) { quiet.current = false; return; }
     if (!prog) return;
     timers.current.push(setTimeout(() => {
       const s = { store: phoneStore, prog } as unknown as PopSession, now = new Date();
@@ -196,6 +205,12 @@ function Shell() {
   // The program in hand is This Week's (today's activeProg), read where the tap lands, so a second date picked in
   // an open calendar writes on the program the first one handed back.
   const hand = useRef<WeekHand>({ prog: null, own: null }).current;
+  // ── The wizard (wizard.ts, wizard-generate.ts; ./wizard) ──
+  // Open over the whole screen, a count so each Build New Program is a wizard of its own with a draft of its own.
+  const [wizard, setWizard] = useState<number | null>(null);
+  const wizardN = useRef(0);
+  // After Generate This Week shows the new program with no launch's reminder: the page makes no launch there.
+  const quiet = useRef(false);
   // The page's _ovDraft: one draft for the app's life, so Traveling? opens on the dates it last held.
   const ovDraft = useRef<OverlayDraft>(newOverlayDraft());
   const [change, setChange] = useState<{ session: OverlaySession; draft: OverlayDraft; n: number } | null>(null);
@@ -249,7 +264,7 @@ function Shell() {
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
       {tab === 'home' ? (
-        <Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} />
+        <Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />
       ) : tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
           <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
@@ -271,6 +286,15 @@ function Shell() {
           onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
       {cover}
+      {wizard !== null && (
+        <Wizard key={wizard} palette={p} store={phoneStore} say={say} report={report} onDate={openDate} onClose={() => setWizard(null)}
+          onDone={(prog) => {
+            // The page's doGenerate: the current week is 1, then This Week is shown and drawn.
+            hand.land = landingTitle(prog, midnight(new Date()));
+            quiet.current = true;
+            setWizard(null); setHeld(null); setTick((n) => n + 1); setTab('week');
+          }} />
+      )}
       {rest && (
         <RestSheet key={rest.n} palette={p} session={{ store: phoneStore, prog: rest.prog }} draft={rest.draft} calm={calm} say={say} onClose={() => setRest(null)}
           onWrote={() => { setWrites((n) => n + 1); if (rest.wrote) rest.wrote(); }} />
@@ -286,7 +310,7 @@ function Shell() {
           onDone={(r) => { if (r.prog) setHeld(r.prog as unknown as DeckProgram); setWrites((n) => n + 1); }} />
       )}
       {dateAsk && <DateBox key={dateAsk.n} palette={p} ask={dateAsk.ask} calm={calm} onClose={() => setDateAsk(null)} />}
-      {toast && <Toast key={toast.n} text={toast.text} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
+      {toast && <Toast key={toast.n} text={toast.text} icon={toast.icon} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
       {over}
       {nudge && <MileNudge palette={p} text={nudgeText(nudge.offer)} calm={calm} onUpdate={() => answered(true)} onKeep={() => answered(false)} />}
       {pop && <PopUp key={pop.n} palette={p} view={pop.view} calm={calm} onAct={answer} onClose={() => setPop(null)} />}
@@ -295,7 +319,7 @@ function Shell() {
 }
 
 /** The toast (overlays-components.css .toast with look.css): the run colour, ink type, fading in and out over 0.2 s. */
-function Toast({ text, palette: p, bottom, onDone }: { text: string; palette: Palette; bottom: number; onDone: () => void }) {
+function Toast({ text, icon, palette: p, bottom, onDone }: { text: string; icon: string | null; palette: Palette; bottom: number; onDone: () => void }) {
   const shown = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     Animated.timing(shown, { toValue: 1, duration: 200, useNativeDriver: true }).start();
@@ -307,7 +331,8 @@ function Toast({ text, palette: p, bottom, onDone }: { text: string; palette: Pa
     <View pointerEvents="none" style={[styles.toastWrap, { bottom }]}>
       <Animated.View testID="toast" accessibilityLiveRegion="polite" style={[styles.toast, { backgroundColor: p.run, opacity: shown }]}>
         {/* Today's toast is one line that may run past the screen's edges; here a long one takes a second line, so its words are read whole. */}
-        <Text numberOfLines={2} style={styles.toastText}>{text}</Text>
+        {icon !== null && <SvgXml xml={asyIcon(icon, 13).replace(/ style="[^"]*"/, '')} color="#0a0a0a" width={13} height={13} />}
+        <Text numberOfLines={2} style={[styles.toastText, icon !== null && styles.toastWords]}>{(icon !== null ? ' ' : '') + text}</Text>
       </Animated.View>
     </View>
   );
@@ -351,6 +376,7 @@ const styles = StyleSheet.create({
   // The label's line is WebKit's 16, iOS's own 14.3 and 1.7 under it (Programs.tsx has the measure): the bar was 1.7 short.
   tabLabel: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700', paddingBottom: 1.7 },
   toastWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
-  toast: { paddingVertical: 10, paddingHorizontal: 20, borderRadius: 4, maxWidth: '92%' },
+  toast: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 4, maxWidth: '92%' },
+  toastWords: { flexShrink: 1 },
   toastText: { fontFamily: DISPLAY, fontSize: 14, fontWeight: '700', color: '#0a0a0a', textAlign: 'center' },
 });
