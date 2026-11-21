@@ -622,10 +622,10 @@ describe('native program list: the screens\' words and wiring', () => {
     assert.ok(list.includes('{ strength: p.lift, hypertrophy: p.hip, fatloss: p.run, athletic: p.bike, balanced: p.accent }'), 'each goal\'s badge in its own colour (screens.css)');
     assert.ok(list.includes('onSubmitEditing={() => on.save(c.id)}') && list.includes('maxLength={40}') && list.includes('onChangeText={(t) => { typed.current = t; }}'), 'the rename box: forty at most, Return saves');
   });
-  test('the active card has no Set Active, and Build New Program takes no press', () => {
+  test('the active card has no Set Active, and Build New Program asks the app for the wizard', () => {
     assert.ok(list.includes("? <View testID={'active-' + c.id} style={[s.action, s.isActive, { borderColor: p.border2 }]}><Text style={[s.actionText, { color: p.muted }]}>{LIST_WORDS.active}</Text></View>"));
-    assert.ok(list.includes('<View testID="build-new" style={[s.build, { borderColor: p.border2 }]}><Text style={[s.buildText, { color: p.text }]}>{LIST_WORDS.build}</Text></View>'));
-    assert.equal((list.match(/onPress=/g) || []).length, 6, 'the list\'s six presses: a button and a pencil (one helper each), the rename\'s X, the card, the purge link, the copy button');
+    assert.ok(list.includes('<Pressable testID="build-new" accessibilityRole="button" onPress={onBuild} style={({ pressed }) => [s.build, { borderColor: p.border2 }, pressed && { transform: [{ scale: 0.98 }] }]}><Text style={[s.buildText, { color: p.text }]}>{LIST_WORDS.build}</Text></Pressable>'));
+    assert.equal((list.match(/onPress=/g) || []).length, 7, 'the list\'s seven presses: a button and a pencil (one helper each), the rename\'s X, the card, the purge link, the copy button, Build New Program');
   });
   test('the copy button hands the stored program\'s lines to the clipboard, and says so once it answers or refuses', () => {
     assert.ok(list.includes("import * as Clipboard from 'expo-clipboard';"));
@@ -655,9 +655,9 @@ describe('native program list: the screens\' words and wiring', () => {
   test('the app holds a Programs tab first, draws its sheets over the tab bar and under the toast, and Set Active ends on This Week', () => {
     assert.ok(app.includes("type Tab = 'home' | 'week' | 'progress' | 'bugs';"));
     assert.ok(app.includes('const refused = tabRefused(phoneStore, t);\n    if (refused) { say(refused); return; }\n    if (t === \'week\' && tab !== \'week\')'), 'a tab that is refused says why and does not open');
-    assert.ok(app.includes('<Text numberOfLines={2} style={styles.toastText}>{text}</Text>') && app.includes("color: '#0a0a0a', textAlign: 'center' },"), 'a long toast takes a second line, so the refusal is read whole');
+    assert.ok(app.includes("<Text numberOfLines={2} style={[styles.toastText, icon !== null && styles.toastWords]}>{(icon !== null ? ' ' : '') + text}</Text>") && app.includes("color: '#0a0a0a', textAlign: 'center' },"), 'a long toast takes a second line, so the refusal is read whole');
     assert.ok(app.includes('const list = useRef(newListState()).current;') && app.includes("if (t === 'home') setHomeTaps((n) => n + 1);"));
-    assert.ok(app.includes("<Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} />"));
+    assert.ok(app.includes("<Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />"));
     const home = app.indexOf('id="tab-home" label="Programs"'), week = app.indexOf('id="tab-week"'), bar = app.indexOf('testID="tab-bar"'), cover = app.indexOf('{cover}'), toast = app.indexOf('{toast && <Toast');
     assert.ok(home > 0 && home < week, 'Programs is the first tab');
     assert.ok(bar < cover && cover < toast, 'a sheet is drawn after the tab bar and before the toast');

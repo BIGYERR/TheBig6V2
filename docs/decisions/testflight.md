@@ -369,3 +369,19 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   build 125: the Programs tab's look beside today's; on a rest day, Training anyway? and Log cardio; a session moved;
   a jog logged, edited and cleared. Nothing differed and no motion was named, so nothing was fixed from it
   (`docs/decisions/active-program.md` and `docs/decisions/rest-sheet.md`, the build 125 entries).
+- **Seen on `main`, the twenty-second run, the beta's lane alone** (run 44861762294, merge c3d35dd, pull request 59,
+  2026-11-20 22:33 EST; the merge carried no version: a13966a, Hurt? and Traveling? in the Expo app, and four tests
+  and docs commits; read and recorded by the next session, the wizard's, after the run had ended): the two gates went
+  together (10 s today's, 17 s the beta's). Today's lane skipped its upload, as ruled. The beta's lane archived,
+  signed and uploaded `0.263.0 (126)` (582 s, done 22:44:44) and read it back as processed (132 s, done 22:46:59);
+  its upload job started 3 s after its gate, with no wait for a runner. The build number moved from 125 to 126 on
+  one commit, a13966a, which changed `frontends/native`. Both `testflight.mjs leg` lines, read at the wizard
+  session's start: `testflight 0.263.0 processed (uploaded before this run; a version goes up once, a fix is the
+  next PATCH) (run 44861762294, c3d35dd)` and `testflight next 0.263.0 (126) processed (run 44861762294, c3d35dd)`.
+  The run ended green: 6 jobs passed and 8 skipped by rule.
+- **On Mario's phone, build 126** (his report, 2026-11-20, no screenshot): "All good", to what the wizard's session
+  put to him on IA Next build 126: Hurt? on a region and a tier, its chip, I'm back and its pop-up, the return
+  week's chips and their ✕; Traveling? with its dates in the calendar, and its chip; the race date moved and put
+  back; the copy button and a paste. Nothing differed and no motion was named, so nothing was fixed from it
+  (`docs/decisions/injury-overlays.md`, `docs/decisions/this-week.md` and `docs/decisions/active-program.md`, the
+  build 126 entries).

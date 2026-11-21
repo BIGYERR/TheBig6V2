@@ -2,7 +2,7 @@
 // today's app holds them in frontends/app/src/legacy/src/css/base.css: each name here is that file's token of the
 // same name without its dashes. Primary actions are ink, never signal: signal is for what is live.
 export interface Palette {
-  bg: string; surface: string; surface2: string; border: string; border2: string;
+  bg: string; surface: string; surface2: string; surface3: string; border: string; border2: string;
   text: string; muted: string; dim: string; accent: string; onInk: string;
   signal: string; onSignal: string;
   run: string; bike: string; swim: string; lift: string; red: string; green: string;
@@ -26,7 +26,7 @@ export interface Palette {
   bandHeader: string;
 }
 export const DAY: Palette = {
-  bg: '#F3F3F1', surface: '#FFFFFF', surface2: '#EDEDEA', border: '#E3E3DF', border2: '#CFCFCA',
+  bg: '#F3F3F1', surface: '#FFFFFF', surface2: '#EDEDEA', surface3: '#E1E1DD', border: '#E3E3DF', border2: '#CFCFCA',
   text: '#111111', muted: '#6E6E6A', dim: '#5F5F62', accent: '#111111', onInk: '#FFFFFF',
   signal: '#CF4E1A', onSignal: '#FBF6EE',
   run: '#5e8c54', bike: '#3f6e96', swim: '#3f6e96', lift: '#bc6a43', red: '#9e3328', green: '#5e8c54',
@@ -38,7 +38,7 @@ export const DAY: Palette = {
   bandHeader: '#161618',
 };
 export const NIGHT: Palette = {
-  bg: '#000000', surface: '#161616', surface2: '#242424', border: '#262626', border2: '#3C3C3C',
+  bg: '#000000', surface: '#161616', surface2: '#242424', surface3: '#2E2E2E', border: '#262626', border2: '#3C3C3C',
   text: '#FFFFFF', muted: '#A3A3A3', dim: '#7A7A7A', accent: '#FFFFFF', onInk: '#000000',
   signal: '#E2622B', onSignal: '#12110D',
   run: '#86B27A', bike: '#7FA6C9', swim: '#7FA6C9', lift: '#D98A63', red: '#D9665A', green: '#86B27A',

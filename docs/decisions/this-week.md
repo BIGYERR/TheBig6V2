@@ -697,3 +697,9 @@ and the app's `frontends/app/test/unit/week-view.test.ts`.
   that holds the test are each said), and on a stored program with no start date, whose row reads Set date. The
   resolver, the test date it is given, the refusals and the title rule by hand tables
   (`tests/unit/native-change-sheet.test.ts`). The breaks are `tests/measure/native-change-sheet_breaks.md`.
+
+## On Mario's phone, IA Next build 126 (2026-11-20): the race date
+
+- Put to him: the race date moved in the calendar and put back. **His report:** "All good" (no screenshot).
+  Nothing differed and no motion was named, so nothing was fixed from it. Program Start was not put to him: his
+  active program's row is the race date.

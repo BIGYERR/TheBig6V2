@@ -633,7 +633,7 @@ describe('native change sheet: the screens\' wiring', () => {
     assert.ok(week.includes('if (prog && hand.own === null) hand.own = currentWeek(prog, midnight(now));'), 'the week holding today, as a launch leaves the page\'s');
     assert.ok(week.includes('if (t !== shown) { setShown(t); hand.own = Math.min(t, screen.totalWeeks); }'), 'a title picked');
     assert.equal((week.match(/hand\.own = week;/g) || []).length, 3, 'a day opened: its sheet, its deck, its rest sheet');
-    assert.ok(week.includes('    hand.own = null;\n    if (shownPick !== null) setShown(null);'), 'another program starts again');
+    assert.ok(week.includes('    hand.own = null;\n    if (shownPick !== null && !hand.land) setShown(null);'), 'another program starts again, unless the wizard just landed on it (tests/unit/native-wizard.test.ts)');
     assert.match(week, /if \(!resets\) return;\s*placed\.current = false;\s*setShown\(null\);\s*setPlaceTick\(\(n\) => n \+ 1\);/);
     assert.ok(week.includes('useEffect(() => { place(); }, [place, progId, placeTick]);'), 'and the strip is placed anew');
   });
@@ -667,11 +667,11 @@ describe('native change sheet: the screens\' wiring', () => {
     assert.ok(dated.includes('const prog = hand.prog as unknown as DatedProgram | null'), 'the program in hand as the pick lands, not the one the calendar opened on');
     assert.match(dated, /if \(!r\) return;\s*if \(r\.set\) \{\s*setHeld\(r\.prog as unknown as DeckProgram\);\s*const t = titleAfterDate\(hand\.own, r\.prog, midnight\(new Date\(now\)\)\);\s*hand\.own = t\.own;\s*if \(t\.reset\) setResets\(\(n\) => n \+ 1\);\s*\}\s*setWrites\(\(n\) => n \+ 1\);\s*say\(r\.toast\);/);
   });
-  test('the date box, as WebKit\'s: a day picked is written at once and the box stays; Reset writes a blank, stays, and shows today; the check and a tap outside close', () => {
+  test('the date box, as WebKit\'s: a day picked is written at once and the box stays; Reset writes a blank, stays, and shows the day the box opened on; the check and a tap outside close', () => {
     assert.ok(box.includes("onChange={(e, d) => { if (e.type !== 'set' || !d) return; setDay(d); ask.onChange(pickedValue(d)); }}"));
-    assert.ok(box.includes('onPress={() => { ask.onChange(RESET_VALUE); setDay(calendarDay(RESET_VALUE, new Date())); }}'), 'Reset does not close the box');
+    assert.ok(box.includes('onPress={() => { ask.onChange(RESET_VALUE); setDay(opened); }}'), 'Reset does not close the box, and its calendar goes back to the day it opened on, as WebKit\'s does');
     assert.ok(box.includes('<Pressable testID="date-box-done" accessibilityRole="button" accessibilityLabel={DATE_WORDS.done} hitSlop={8} onPress={onClose}') && box.includes('<Pressable testID="date-box-out" accessibilityLabel="Close the calendar" onPress={onClose}'));
-    assert.ok(box.includes('mode="date"') && box.includes('display="inline"') && box.includes('useState(() => calendarDay(ask.value, new Date()))'));
+    assert.ok(box.includes('mode="date"') && box.includes('display="inline"') && box.includes('const opened = useRef(calendarDay(ask.value, new Date())).current;\n  const [day, setDay] = useState(opened);'));
     assert.doesNotMatch(box, /minimumDate|maximumDate/, 'every day is offered, as WebKit\'s calendar offers it: Apply change refuses a Through before From');
     assert.equal((box.match(/onClose/g) || []).length, 4, 'the box closes by its check and by a tap outside alone (the prop, its type, the two presses)');
     assert.ok(app.includes('{dateAsk && <DateBox key={dateAsk.n} palette={p} ask={dateAsk.ask} calm={calm} onClose={() => setDateAsk(null)} />}'));
