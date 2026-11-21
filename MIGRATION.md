@@ -432,6 +432,7 @@ Mario's order is kept. Three changes, each with its reason:
   it cannot run inside the migration, and the plans as they stand cannot go public (section 5, risk 3).
 
 **Total size: 30 to 39 sessions (estimate).** At one phase step per session, with Mario's phone checks between.
+Phase 6's 2 to 3 are in that figure and are parked (section 6 decision 16): the migration ends at phase 5.
 
 ### Phase 1: golden records, then the logic into core (6 to 7 sessions)
 
@@ -642,7 +643,10 @@ The engine is free to change again once cutover holds. D270 P-OWNPLANS (proposed
 replaces the transcribed plans, moves HALF_MANNY to a new printed digest and regenerates the goldens, by the normal
 ruling path. It is the entry gate to phase 6, not part of the migration.
 
-### Phase 6: App Store submission (2 to 3 sessions, plus review time)
+### Phase 6: App Store submission (2 to 3 sessions, plus review time). Parked by Mario, 2026-11-20
+
+**Parked (section 6 decision 16):** not part of the migration, not counted in its progress, started only on his
+word. The text below is kept as it was written.
 
 **Entry gate:** phase 5's exit gate. D270 shipped. Mario's GO.
 
@@ -884,6 +888,15 @@ Each with the session's pick first.
     good. The Expo app's floating rest timer comes out, and phase 4 builds its rest timer on the Dynamic Island.
     The page keeps its own (D295 P-ISLANDONLY, `docs/decisions/rest-timer.md`). Open for phase 4: what on a screen
     starts a rest once no floating tab is there.
+16. **Phase 6, the App Store.** **Answered 2026-11-20: parked** ("i dont intend on submitting it to the app store yet
+    i just wanna do this migration and keep working on the app", then "Concur, park phase 6"), after the merge of
+    pull request 59, when he asked what the last step of the progress notes meant. The migration ends at phase 5,
+    cutover: the Expo app replaces today's on his phone through TestFlight, which is the private channel to his
+    phone and no part of the App Store. Phase 6 stays written below as it was and is not counted: no progress note
+    lists it as owed, no session steers toward store requirements, and it starts only on his word. One line of it
+    still binds whenever that is: the race plans as they stand cannot go public, so D270 comes before any public
+    release (section 5, risk 3). The 2026-11-11 decision that an App Store release is the end goal is not withdrawn;
+    it has no date.
 
 ---
 
