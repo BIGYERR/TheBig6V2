@@ -625,7 +625,9 @@ Background location, its permission strings and its App Store wording are set he
 (`NSMotionUsageDescription`, today's words in `ia-gps/plugin.xml`): from v0.263.0 the recorder also reads the step
 counter and the barometer (D296, `docs/decisions/gps-recording.md`). That Swift is in `IAGps.swift`, so it moves with the
 module; the distance (D293's 10 m rule) and the steps, cadence and climb are counted in `core/src/gps`, which stays, and
-the Expo screen draws the second row (Climb, Cadence, Steps) and each split's climb as today's does.
+the Expo screen draws the second row (Climb, Cadence, Steps) and each split's climb as today's does. Save to the day
+(D272 items 3 to 5: the recording screen as R2 over R3, Save behind the gate, the live bar and "Back to your run") is
+built here once, in the Expo app, and never in today's app (Mario, 2026-11-22, "Phase 4, once").
 
 **The watch import** (D292 with its three amendments, `docs/decisions/watch-import.md`; section 6 decision 17), one
 session of its own and new to the beta, since today's app has none: a run the watch records fills its run card by

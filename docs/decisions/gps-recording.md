@@ -247,6 +247,12 @@
   This Week; Record run opens D267's recorder out of the run card with Ran without the phone? on it. The recording
   screen as R2 over R3, Save behind the gate, the live bar and "Back to your run" build next, then Can't run? (D249),
   in their own releases (Mario, 2026-11-08, "Screen now, rest next").
+- **Where items 3 to 5 build (Mario, 2026-11-22, "Phase 4, once"):** the recording screen as R2 over R3, Save behind
+  the gate, the live bar and "Back to your run" are built once, in the Expo app, in the migration's phase 4
+  (`MIGRATION.md`), and never in today's app. The session recommended it after the first run on v0.263.0: built now,
+  they would be built twice, and the climb (D296) is not settled. The case against: until phase 4 a recorded run does
+  not fill the day's log, so runs are logged by hand. No new D-code: the items and their words are unchanged, only
+  where they are built.
 
 ## D293 P-GPSSMOOTH: the recorder counts a fix only once it stands 10 m from the last one kept (proposed 2026-11-17, revised the same day, concurred 2026-11-18)
 
