@@ -7,20 +7,22 @@ counter and the barometer keep reporting through a run in the pocket with the sc
 - **The run.** One road run of about 56 minutes with no pause, the phone on v0.263.0's Run recorder and the COROS Pace 4
   together.
 - **The files.** The Run recorder's GPX, shared from the phone; it is not committed (a track shows where a run starts
-  and ends) and sat in the session's scratchpad. The watch's totals are COROS's own activity record, read through the
-  connector; no watch file was downloaded.
-- **The script.** `node tests/measure/gps-recording_first-run.mjs <run.gpx> 7.62 55:48 150 15 10` printed everything
-  below; nothing was added up by hand.
+  and ends) and sat in the session's scratchpad. The watch's numbers are COROS's own records of the run, read through
+  the connector: its distance and mile laps from the lap data, its time, cadence and climb from the activity detail; no
+  watch file was downloaded.
+- **The script.** `node tests/measure/gps-recording_first-run.mjs <run.gpx> 7617.46 55:48 150 15 10
+  690.91,711.47,675.68,695.65` printed everything below; nothing was added up by hand.
 
 ## The fixes
 - 3352 fixes over 55:51 from Start, 1 segment; seconds between fixes: 1 s ×3351.
 - Accuracy: median 2.4 m, worst 5.8 m; worse than 10 m: 0; worse than 50 m: 0.
 
 ## Distance
-- The watch: 7620 m in 55:48 (COROS rounds to 10 m, so 7615 to 7625 m). The phone recorded 55:51.
-- The recorder (the 10 m rule, as the screen counted): 7619.2 m, -0.08% to +0.06% against the watch.
-- Every fix joined (the count before v0.263.0): 7782.1 m, +2.06% to +2.19%.
+- The watch: 7617.46 m in 55:48. The phone recorded 55:51.
+- The recorder (the 10 m rule, as the screen counted): 7619.2 m, +0.02% against the watch.
+- Every fix joined (the count before v0.263.0): 7782.1 m, +2.16%.
 - Splits: mile 1 11:28, mile 2 11:42, mile 3 11:22, mile 4 11:41.
+- Against the watch's mile laps: mile 1: phone 11:28, watch 11:31 (-2.8 s); ended -2.8 s from the watch's; mile 2: phone 11:42, watch 11:51 (-9.9 s); ended -12.7 s from the watch's; mile 3: phone 11:22, watch 11:16 (+6.2 s); ended -6.5 s from the watch's; mile 4: phone 11:41, watch 11:36 (+5.5 s); ended -1.0 s from the watch's.
 
 ## Steps and cadence
 - The phone: 8340 steps, 149.3 steps a minute over 55:51 moving.
@@ -47,8 +49,11 @@ counter and the barometer keep reporting through a run in the pocket with the sc
 - The barometer: first reading 1 s after Start, 2520 values, the longest wait for a new one 7 s; seconds between new values: 1 s ×1932, 2 s ×434, 3 s ×93, 4 s ×40, 5 s ×12, 6 s ×5, 7 s ×3.
 
 ## What it shows
-- **Distance holds.** The 10 m rule reads the watch's distance within its rounding; joining every fix, the count
+- **Distance holds.** The 10 m rule reads +0.02% against the watch's distance; joining every fix, the count
   before v0.263.0, read about 2% long on the same fixes. One fix a second for the whole run, none worse than 10 m.
+  Mile by mile the two devices part by up to 9.9 s (mile 2) and come back together: the phone reached mile 2 12.7 s
+  before the watch did, and mile 4 1.0 s before it. Neither is the truth on a road; the track test is the known
+  distance.
 - **Steps and cadence hold.** 0.36% under the middle of the watch's range, two steps under its floor.
 - **Both sensors report all run.** No wait for a new step total over 5 s, none for a new barometer reading over 7 s, in
   55:51. The file does not say whether the screen was locked; if it was, iOS keeps both reporting while the recorder

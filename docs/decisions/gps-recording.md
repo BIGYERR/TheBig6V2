@@ -334,8 +334,8 @@
 - **Mario's calls, answered:** (1) the revised rule, concurred 2026-11-18; (2) MINOR v0.263.0 with D296, his pick.
 - **The first run on v0.263.0** (Post-v0.263.0, `tests/measure/gps-recording_first-run.md`): one road run of about 56
   minutes with the watch, one fix a second, none worse than 10 m. The recorder read 7619.2 m against the watch's
-  7.62 km, -0.08% to +0.06% inside COROS's rounding; every fix joined would have read about 2.1% long. The rule holds,
-  and nothing changes.
+  7617.46 m (its lap data), +0.02%; every fix joined would have read +2.16%. Mile by mile the two part by up to 9.9 s
+  against the watch's laps and come back together, mile 4 ending 1.0 s apart. The rule holds, and nothing changes.
 
 ## D296 P-STEPCLIMB: the recorder counts the steps and the climb (ruled 2026-11-18)
 

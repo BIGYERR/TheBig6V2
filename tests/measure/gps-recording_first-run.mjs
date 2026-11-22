@@ -2,21 +2,23 @@
 // recorder's GPX of one run, never committed (a track shows where a run starts and ends), turns it back into the
 // recorder's lines (a fix for each point, a step counter or barometer line wherever `ia:steps` or `ia:ralt` changes, the
 // Start mark at the GPX's start and the finish at its last point) and counts them with core's gpsSummary, as the screen
-// counted. The watch's totals are typed from COROS's own record of the run, read through the connector; COROS rounds
-// them (distance to 10 m, cadence to 1 step a minute, climb to 1 m), so each comparison prints the range the rounding
+// counted. The watch's totals are typed from COROS's own records of the run, read through the connector: its distance
+// and mile laps from the lap data (centimetres and hundredths of a second), its time, cadence and climb from the activity
+// detail, which rounds them (cadence to 1 step a minute, climb to 1 m), so the steps print the range the rounding
 // leaves. It prints counts, distances and times from Start only: never a coordinate, a date or a clock time.
-//   node tests/measure/gps-recording_first-run.mjs <run.gpx> <watch km> <watch m:ss> <watch spm> <watch gain m> <watch loss m>
+//   node tests/measure/gps-recording_first-run.mjs <run.gpx> <watch m> <watch m:ss> <watch spm> <watch gain m> <watch loss m> [<watch mile laps, s,s,...>]
 // Its output is saved beside it as gps-recording_first-run.md.
 import fs from 'node:fs';
 import { CLIMB_BAND_M, formatClock, gpsDistanceM, gpsSummary } from '../../core/src/index.ts';
 
-const [file, km, clock, spm, gain, loss] = process.argv.slice(2);
+const [file, metres, clock, spm, gain, loss, laps] = process.argv.slice(2);
 if (loss === undefined) {
-  console.error('usage: node tests/measure/gps-recording_first-run.mjs <run.gpx> <watch km> <watch m:ss> <watch spm> <watch gain m> <watch loss m>');
+  console.error('usage: node tests/measure/gps-recording_first-run.mjs <run.gpx> <watch m> <watch m:ss> <watch spm> <watch gain m> <watch loss m> [<watch mile laps, s,s,...>]');
   process.exit(2);
 }
 const W = {
-  m: Number(km) * 1000,
+  m: Number(metres),
+  laps: laps ? laps.split(',').map(Number) : [],
   s: clock.split(':').reduce((a, x) => a * 60 + Number(x), 0),
   spm: Number(spm),
   gain: Number(gain),
@@ -82,11 +84,23 @@ console.log('');
 console.log('## Distance');
 let joined = 0;
 for (let i = 1; i < P.length; i++) joined += gpsDistanceM(P[i - 1], P[i]);
-const range = (x) => `${pct(x, W.m + 5)} to ${pct(x, W.m - 5)}`;
-console.log(`- The watch: ${W.m.toFixed(0)} m in ${formatClock(W.s)} (COROS rounds to 10 m, so ${W.m - 5} to ${W.m + 5} m). The phone recorded ${formatClock((end - start) / 1000)}.`);
-console.log(`- The recorder (the 10 m rule, as the screen counted): ${run.distanceM.toFixed(1)} m, ${range(run.distanceM)} against the watch.`);
-console.log(`- Every fix joined (the count before v0.263.0): ${joined.toFixed(1)} m, ${range(joined)}.`);
+console.log(`- The watch: ${W.m.toFixed(2)} m in ${formatClock(W.s)}. The phone recorded ${formatClock((end - start) / 1000)}.`);
+console.log(`- The recorder (the 10 m rule, as the screen counted): ${run.distanceM.toFixed(1)} m, ${pct(run.distanceM, W.m)} against the watch.`);
+console.log(`- Every fix joined (the count before v0.263.0): ${joined.toFixed(1)} m, ${pct(joined, W.m)}.`);
 console.log(`- Splits: ${run.splits.map((s) => `mile ${s.mile} ${formatClock(s.seconds)}`).join(', ')}.`);
+if (W.laps.length) {
+  // Each mile's time on the phone against the watch's auto lap, and where each mile ended from Start on both: the second
+  // is how far one device's distance ran ahead of the other's, in seconds of running.
+  let p = 0, w = 0;
+  const rows = run.splits.slice(0, W.laps.length).map((s, i) => {
+    p += s.seconds;
+    w += W.laps[i];
+    const d = s.seconds - W.laps[i];
+    const c = p - w;
+    return `mile ${s.mile}: phone ${formatClock(s.seconds)}, watch ${formatClock(W.laps[i])} (${d >= 0 ? '+' : ''}${d.toFixed(1)} s); ended ${c >= 0 ? '+' : ''}${c.toFixed(1)} s from the watch's`;
+  });
+  console.log(`- Against the watch's mile laps: ${rows.join('; ')}.`);
+}
 
 console.log('');
 console.log('## Steps and cadence');
