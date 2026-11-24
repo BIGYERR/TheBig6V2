@@ -20,6 +20,15 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
    else; a chat never commits there (the pre-commit hook refuses). Report the branch in the GIT line. When Mario says push,
    `node tools/land.mjs` from the worktree lands the branch on `dev` and pushes, as one step.
 
+   **Then clear finished worktrees (Mario, Post-v0.263.0).** `git worktree list` names every chat's folder. For each one
+   that is not this chat's, check three things. First, no open chat has it as its folder
+   (`mcp__ccd_session_mgmt__list_sessions`, each row's `cwd`). Second, `git -C <path> status --porcelain` prints nothing.
+   Third, `git -C <path> rev-list --count HEAD --not origin/dev` prints 0. When all three hold, remove the folder with
+   `git worktree remove --force <path>` and keep its branch. Otherwise leave it alone. Run each worktree's commands alone,
+   or from a script in the scratchpad, because the isolation guard refuses git inside a loop. Report the result on the
+   GIT line: `worktrees removed <n>, kept <names>`. A chat with a check mark should already have closed its own
+   worktree (CLAUDE.md, A finished chat closes its worktree); this step catches the ones it left.
+
 1. Version on disk:
    `grep -oE '<meta name="ia-version" content="[^"]+"' index.html` (`MAJOR.MINOR.PATCH`; a bare integer N is a pre-semver build, 0.N.0)
    Also `ls *.html` — there must be exactly one HTML file in the repo root.

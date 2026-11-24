@@ -192,7 +192,14 @@ issued D265 before the ruling was written, and it shipped as D266.
   chat's worktree (`.claude/worktrees/*`) commits on its `chat/<work>` branch. When Mario says push, `node tools/land.mjs`
   from the worktree fetches, checks (`dev` equals `origin/dev`; the branch is on top of `dev`; its new commits carry one
   Chat trailer), fast-forwards local `dev` and pushes it from the main checkout, in one step; `--dry-run` only checks.
-  When the work is finished the chat deletes its worktree and branch. On Post-V239 the semver worktree pushed three
+  **A finished chat closes its worktree (Mario, Post-v0.263.0).** When a chat gets its check mark (its release merged
+  and tagged, or its pass pushed), its last step removes its worktree and its branch: `ExitWorktree` with `remove`, or,
+  for a worktree it did not make itself, `git -C <main checkout> worktree remove <path>` and `git branch -D chat/<work>`.
+  It does so only when, in the worktree, `git status --porcelain` prints nothing and `git rev-list --count HEAD --not
+  origin/dev` prints 0; otherwise it keeps the worktree and says why. Session start removes any other worktree left on
+  the same test when no open chat works in it (the session-start skill, step 0), and keeps its branch. On 2026-11-24
+  twenty-five finished worktrees held 58 GB of packages and iOS builds, the disk filled and Docker stopped.
+  On Post-V239 the semver worktree pushed three
   commits straight to `origin/dev` while the main checkout held four unpushed ones, and `dev` forked (4 ahead, 3
   behind); on 2026-11-08 one chat's push carried another chat's unpushed release. `.githooks/pre-push` refuses any push
   from a worktree, from the main checkout anything but local `dev`'s own commit to `dev` or a tag, and a push of `dev`
