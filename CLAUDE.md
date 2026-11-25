@@ -493,8 +493,9 @@ every open page reloads itself. The watcher (`backend/scripts/dev-watch.ts`) run
 `cd backend && npm run dev` starts it (building its image when needed) and follows its log: Ctrl-C stops following,
 never the container. `npm run dev:down` stops it; `npm run docker:up` puts back the plain production image. The container mounts the checkout the compose file sits in, so a chat runs `npm run dev` from ITS worktree's `backend/`
 to see its own edits; there is one container, and it follows the chat that last started it. When Mario
-wants to see an edit, check it answers (`curl -s localhost:3000/healthz`), run `npm run dev` in the background if not,
-and hand him the link to the page that changed. It shows; it proves nothing: no test or CI result comes
+wants to see an edit, run `npm run dev` in the background from this chat's own worktree every time, even when
+`curl -s localhost:3000/healthz` already answers (a healthy answer may be another chat's checkout, and it names none;
+Post-v0.263.0), wait for the health check, and hand him the link to the page that changed. It shows; it proves nothing: no test or CI result comes
 from it, and a version ships only through the session rhythm. The other paths stay for devices, deploys and full
 builds: `frontends/app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`; `backend/` `docker:up`, `mac-local-backend`,
 `heroku.sh deploy`, and `heroku:local` (Heroku's build and dyno on this Mac, offline: `npm run heroku:local -- --check`
