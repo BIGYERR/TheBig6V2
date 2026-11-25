@@ -18,16 +18,20 @@
 //
 // The compose project is named after this checkout, so two checkouts (or two sessions) never share containers,
 // images or a port.
+//
+// Each run cleans up after the checkouts that are gone: before it builds, it removes the images of every e2e project
+// that no checkout git knows owns any more (images.ts); after it, this project's untagged leftovers and build cache
+// nobody has used for a week. Cleaning never fails a run; what it did is in artifacts/docker/clean.log.
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { attachRun, duration, startRun } from '../../tools/runlog.mjs';
+import { e2eProject, liveProjects, staleProjects } from './images.ts';
 
 const E2E = dirname(fileURLToPath(import.meta.url));
 const REPO = join(E2E, '..', '..');
-const PROJECT = `iron-asylum-e2e-${createHash('sha256').update(E2E).digest('hex').slice(0, 8)}`;
+const PROJECT = e2eProject(E2E);
 const RUNNER = `${PROJECT}-runner`;
 const COMPOSE = ['compose', '-f', join(E2E, 'docker-compose.yml'), '-p', PROJECT];
 const KEEP = process.env['E2E_KEEP'] === '1';
@@ -68,6 +72,40 @@ function dockerLive(args: string[]): number {
   return spawnSync('docker', args, { stdio: ['ignore', 'inherit', 'inherit'] }).status ?? 1;
 }
 
+/** Runs one command for the cleanup, its output added to docker/clean.log; never throws. */
+function cleanStep(cmd: string, args: string[]): { ok: boolean; out: string } {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const out = `${res.stdout ?? ''}${res.stderr ?? ''}${res.error ? `\n${res.error.message}` : ''}`;
+  appendFileSync(join(LOGS, 'clean.log'), `$ ${cmd} ${args.join(' ')}\n${out}\n`);
+  return { ok: res.status === 0, out: res.stdout ?? '' };
+}
+
+/**
+ * Removes the images of every e2e project whose checkout is gone. Projects are read off the images' compose label, so
+ * an untagged leftover is found with its tagged sibling. An image a container still uses is never removed (no
+ * --force), and when git cannot list the checkouts nothing is removed at all.
+ */
+function removeStaleImages(): void {
+  const worktrees = cleanStep('git', ['-C', REPO, 'worktree', 'list', '--porcelain']);
+  if (!worktrees.ok) {
+    note('docker', 'clean: git listed no checkouts, so no other project\'s images were touched');
+    return;
+  }
+  const ids = cleanStep('docker', ['image', 'ls', '--quiet', '--filter', 'label=com.docker.compose.project']).out.split('\n').filter(Boolean);
+  if (!ids.length) return;
+  const labels = cleanStep('docker', ['image', 'inspect', '--format', '{{index .Config.Labels "com.docker.compose.project"}}', ...new Set(ids)]).out.split('\n');
+  const stale = staleProjects(labels, liveProjects(worktrees.out, PROJECT));
+  for (const project of stale) cleanStep('docker', ['image', 'prune', '--all', '--force', '--filter', `label=com.docker.compose.project=${project}`]);
+  if (stale.length) note('docker', `clean: removed the images of ${stale.length} project(s) whose checkout is gone (${stale.join(', ')})`);
+}
+
+/** After a run: this project's untagged leftovers of earlier builds, and build cache unused for a week. */
+function pruneAfterRun(): void {
+  cleanStep('docker', ['image', 'prune', '--force', '--filter', `label=com.docker.compose.project=${PROJECT}`]);
+  cleanStep('docker', ['builder', 'prune', '--force', '--filter', 'until=168h']);
+  note('docker', 'clean: this project\'s untagged images and week-old build cache pruned');
+}
+
 /** Removes the runner container if a run left one behind. Missing is fine. */
 function removeRunner(): void {
   spawnSync('docker', ['rm', '--force', RUNNER], { stdio: 'ignore' });
@@ -103,6 +141,7 @@ function main(): number {
   if (!run) rmSync(REPORT, { recursive: true, force: true });
   mkdirSync(LOGS, { recursive: true });
   removeRunner();
+  removeStaleImages();
 
   bundleApp();
   let t = Date.now();
@@ -137,6 +176,7 @@ function main(): number {
     } else {
       dockerLogged([...COMPOSE, 'down', '--remove-orphans'], 'down.log');
       note('docker', 'containers removed');
+      pruneAfterRun();
     }
   }
 
