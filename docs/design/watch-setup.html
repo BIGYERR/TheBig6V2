@@ -1,0 +1,398 @@
+<title>Watch Setup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: what the guide is, then a dashed strip of mockup controls, then one phone that plays the setup end to end.
+   The Track look (D263): neutral paper and ink, true black at night, no outlines, pills, signal only for what is live. */
+:root{
+  --bg:#F3F3F1; --surface:#FFFFFF; --surface2:#EDEDEA; --border:#E3E3DF; --border2:#CFCFCA;
+  --text:#111111; --muted:#6E6E6A; --accent:#111111; --on-ink:#FFFFFF;
+  --signal:#CF4E1A; --signal-rgb:207,78,26; --run:#5e8c54; --red:#9e3328; --glow:0.26;
+  --nav:rgba(255,255,255,0.92); --nav-on:rgba(0,0,0,0.06); --scrim:rgba(17,17,17,0.32); --sys:#F2F2F7; --sys-row:#FFFFFF;
+  --sans:-apple-system,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#000000; --surface:#161616; --surface2:#242424; --border:#262626; --border2:#3C3C3C;
+  --text:#FFFFFF; --muted:#A3A3A3; --accent:#FFFFFF; --on-ink:#000000;
+  --signal:#E2622B; --signal-rgb:226,98,43; --run:#86B27A; --red:#D9665A; --glow:0.64;
+  --nav:rgba(28,28,28,0.92); --nav-on:rgba(255,255,255,0.10); --scrim:rgba(0,0,0,0.55); --sys:#1C1C1E; --sys-row:#2C2C2E; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#161616; --surface2:#242424; --border:#262626; --border2:#3C3C3C;
+  --text:#FFFFFF; --muted:#A3A3A3; --accent:#FFFFFF; --on-ink:#000000;
+  --signal:#E2622B; --signal-rgb:226,98,43; --run:#86B27A; --red:#D9665A; --glow:0.64;
+  --nav:rgba(28,28,28,0.92); --nav-on:rgba(255,255,255,0.10); --scrim:rgba(0,0,0,0.55); --sys:#1C1C1E; --sys-row:#2C2C2E; color-scheme:dark }
+
+body{background:var(--bg);color:var(--text);font-family:var(--sans);margin:0;padding-block:20px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+.wrap{max-width:430px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:17px;font-weight:700;margin:0;text-wrap:balance}
+.lede{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
+.lede b{color:var(--text);font-weight:600}
+
+/* Mockup controls: dashed, so nobody mistakes them for the app. */
+.ctl{border:1.5px dashed var(--border2);border-radius:16px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:9px}
+.ctl .tag{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;align-items:center;gap:8px;min-width:0}
+.row .k{font-size:11px;font-weight:600;color:var(--muted);width:62px;flex:none}
+.seg{display:flex;gap:4px;flex-wrap:wrap;min-width:0}
+.seg button{border:0;background:var(--surface2);color:var(--muted);border-radius:999px;padding:6px 10px;font:600 11.5px var(--sans);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-ink)}
+.seg button:focus-visible,.p button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.ctl .note{font-size:11px;color:var(--muted);line-height:1.45;margin:0}
+
+/* The phone. */
+.phone{position:relative;overflow:hidden;background:var(--bg);border-radius:38px;box-shadow:0 0 0 8px var(--surface2),0 20px 50px rgba(0,0,0,0.18);
+  min-height:740px;display:flex;flex-direction:column}
+.p{position:relative;flex:1;display:flex;flex-direction:column;padding:54px 18px 96px;gap:14px}
+.p::before{content:"";position:absolute;inset:0 0 auto;height:260px;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% -10%,rgba(var(--signal-rgb),var(--glow)) 0%,rgba(var(--signal-rgb),0) 70%)}
+.p > *{position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px}
+.back{border:0;background:var(--surface);color:var(--text);border-radius:999px;padding:7px 13px;font:600 13px var(--sans);cursor:pointer}
+.stepof{font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.dots{display:flex;gap:5px}
+.dots i{width:22px;height:4px;border-radius:2px;background:var(--border2)}
+.dots i.on{background:var(--accent)}
+.h{font-size:28px;line-height:1.12;font-weight:800;letter-spacing:-0.01em;margin:6px 0 0;text-wrap:balance}
+.sub{font-size:15px;line-height:1.45;margin:0;color:var(--text)}
+.sub.m{color:var(--muted);font-size:14px}
+.card{background:var(--surface);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.lbl{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)}
+.spacer{flex:1}
+.btns{display:flex;flex-direction:column;gap:8px}
+.btn{border:0;border-radius:999px;padding:15px 18px;font:700 16px var(--sans);cursor:pointer;background:var(--surface);color:var(--text)}
+.btn.ink{background:var(--accent);color:var(--on-ink)}
+.btn.small{padding:10px 14px;font-size:14px}
+.link{border:0;background:none;color:var(--muted);font:600 14px var(--sans);padding:6px;cursor:pointer;align-self:center}
+
+/* Watch picker. */
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pick button{border:0;background:var(--surface);color:var(--text);border-radius:18px;padding:16px 12px;font:700 15px var(--sans);text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.pick button small{font:500 12px var(--sans);color:var(--muted)}
+.pick button[aria-pressed="true"]{background:var(--accent);color:var(--on-ink)}
+.pick button[aria-pressed="true"] small{color:var(--on-ink);opacity:0.7}
+
+/* The taps in another app, one numbered chip each, in the order they are tapped. */
+.path{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.path li{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600}
+.path li .n{width:24px;height:24px;border-radius:12px;background:var(--surface2);color:var(--text);font:700 12px var(--sans);display:grid;place-items:center;flex:none}
+.path li .app{color:var(--muted);font-weight:500}
+.turnon{display:flex;flex-wrap:wrap;gap:6px}
+.turnon span{background:var(--surface2);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:600}
+.hint{font-size:13px;color:var(--muted);line-height:1.45;margin:0}
+
+/* Result and checklist marks. */
+.mark{width:56px;height:56px;border-radius:28px;display:grid;place-items:center}
+.mark.ok{background:rgba(94,140,84,0.16);color:var(--run)}
+.mark.wait{background:var(--surface2);color:var(--muted)}
+.mark svg{width:28px;height:28px}
+.check{display:flex;flex-direction:column;gap:0;background:var(--surface);border-radius:22px;overflow:hidden}
+.ci{display:flex;gap:12px;padding:14px 16px;align-items:flex-start}
+.ci + .ci{border-top:1px solid var(--border)}
+.ci .st{width:26px;height:26px;border-radius:13px;flex:none;display:grid;place-items:center;margin-top:1px}
+.ci .st.ok{background:var(--run);color:#fff}
+.ci .st.no{background:var(--surface2);color:var(--muted)}
+.ci .st.warn{background:rgba(var(--signal-rgb),0.16);color:var(--signal)}
+.ci .st svg{width:15px;height:15px}
+.ci .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.ci .t{font-size:15px;font-weight:700}
+.ci .d{font-size:13px;color:var(--muted);line-height:1.4}
+.ci .more{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.ci .act{flex:none}
+.pill{border:0;border-radius:999px;padding:7px 12px;font:700 13px var(--sans);cursor:pointer;background:var(--surface2);color:var(--text)}
+.pill.ink{background:var(--accent);color:var(--on-ink)}
+.foot{font-size:12px;color:var(--muted);text-align:center;margin:0}
+
+/* This Week, as far as the entry needs. */
+.wk{display:flex;align-items:baseline;justify-content:space-between}
+.wk .t{font-size:30px;font-weight:800;letter-spacing:-0.01em}
+.wk .s{font-size:13px;color:var(--muted);font-weight:600}
+.invite{background:var(--surface);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.invite .t{font-size:18px;font-weight:800}
+.invite .row2{display:flex;gap:8px;align-items:center;margin-top:4px}
+.runcard{background:var(--surface);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.runcard .k{font-size:12px;font-weight:700;color:var(--run);letter-spacing:0.06em;text-transform:uppercase}
+.runcard .n{font-size:20px;font-weight:800}
+.runcard .dose{font-size:14px;color:var(--muted)}
+.runcard .rec{align-self:flex-start;border:0;border-radius:999px;padding:12px 18px;font:700 15px var(--sans);background:var(--accent);color:var(--on-ink);box-shadow:0 10px 26px rgba(var(--signal-rgb),0.35)}
+.done{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--border);padding-top:10px}
+.done .l{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.done .f{font-size:12px;color:var(--muted)}
+.tabbar{position:absolute;left:12px;right:12px;bottom:14px;display:flex;padding:6px;border-radius:34px;background:var(--nav);box-shadow:0 10px 30px rgba(0,0,0,0.18)}
+.tabbar button{flex:1;border:0;background:none;text-align:center;font:700 12px var(--sans);padding:13px 2px 12px;border-radius:28px;color:var(--muted);cursor:pointer;min-width:0}
+.tabbar button.on{background:var(--nav-on);color:var(--text)}
+/* The Bugs page's blocks, as the beta draws Engine and Backup: a label, a line, a button. */
+.blk{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.blk .bl{font-size:17px;font-weight:800}
+.blk .bn{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.blk.dim{opacity:0.45}
+.blk .fake{background:var(--surface2);border-radius:999px;padding:10px 14px;font:700 14px var(--sans)}
+.toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);background:var(--accent);color:var(--on-ink);font-size:14px;font-weight:600;padding:10px 16px;border-radius:999px;white-space:nowrap}
+
+/* iOS's own sheets (Health access, the sign in page), drawn plainly: they belong to the system, not the app. */
+.scrim{position:absolute;inset:0;background:var(--scrim);display:flex;align-items:flex-end;z-index:5}
+.sys{width:100%;background:var(--sys);border-radius:14px 14px 0 0;padding:14px 16px 26px;display:flex;flex-direction:column;gap:12px;color:var(--text)}
+.sys .bar{display:flex;justify-content:space-between;font:600 15px var(--sans)}
+.sys .bar button{border:0;background:none;color:#0A84FF;font:inherit;cursor:pointer;padding:0}
+.sys .bar .ttl{font-weight:700}
+.sys p{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.sys .grp{background:var(--sys-row);border-radius:10px;overflow:hidden}
+.sys .tg{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;font-size:15px}
+.sys .tg + .tg{border-top:1px solid var(--border)}
+.sw{width:46px;height:28px;border-radius:14px;background:#34C759;position:relative;flex:none}
+.sw::after{content:"";position:absolute;right:2px;top:2px;width:24px;height:24px;border-radius:12px;background:#fff}
+.sys .web{background:var(--sys-row);border-radius:10px;padding:18px 14px;display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.sys .web .f{height:40px;border-radius:8px;background:var(--sys)}
+.sys .web .go{height:44px;border-radius:10px;background:var(--text);opacity:0.85}
+@media (prefers-reduced-motion:no-preference){ .p{animation:in .22s ease} @keyframes in{from{transform:translateY(6px)}to{transform:none}} }
+</style>
+
+<div class="wrap">
+  <h1>Connect your watch</h1>
+  <p class="lede">The setup a runner walks through once, so a run recorded on the watch fills its run card by itself
+    (D292). It lives in a <b>Your watch</b> block on the Bugs page, which becomes the Profile page, and a one-time card
+    on This Week leads there the first time. <b>Steps</b> is a guide, one screen at a time, for the first setup.
+    <b>Checklist</b> is one page whose rows tick themselves: what Your watch opens every time after. The app reads Health first, then asks the
+    athlete to set up the watch's own app, so it can check that step the moment they come back.</p>
+
+  <div class="ctl" role="group" aria-label="Mockup controls">
+    <div class="tag">Mockup controls &middot; not in the app</div>
+    <div class="row"><span class="k">First time</span><div class="seg" data-k="variant">
+      <button data-v="steps">Steps</button><button data-v="check">Checklist</button></div></div>
+    <div class="row"><span class="k">Watch</span><div class="seg" data-k="watch">
+      <button data-v="coros">COROS</button><button data-v="garmin">Garmin</button><button data-v="apple">Apple Watch</button><button data-v="other">Other</button></div></div>
+    <div class="row"><span class="k">Health has</span><div class="seg" data-k="health">
+      <button data-v="found">Watch runs</button><button data-v="other">Other apps only</button><button data-v="none">Nothing</button></div></div>
+    <div class="row"><span class="k">Route</span><div class="seg" data-k="route">
+      <button data-v="health">Apple Health</button><button data-v="coros">COROS sign in</button></div></div>
+    <div class="row"><span class="k">Look</span><div class="seg" data-k="theme">
+      <button data-v="auto">Auto</button><button data-v="light">Day</button><button data-v="dark">Night</button></div>
+      <div class="spacer"></div><div class="seg"><button id="restart">Start over</button></div></div>
+    <p class="note">Health has: what the app finds when it checks. Watch runs is where Mario will be after his next run;
+      Other apps only is where he is today (runs from a phone app, none from COROS). The Garmin path is from Garmin's
+      app as remembered, to be checked before the build. COROS sign in is the fallback route if Health holds no distance. Tap
+      Bugs in the phone's tab bar for the Your watch block.</p>
+  </div>
+
+  <div class="phone" id="phone"></div>
+</div>
+
+<script>
+// One closure, so no name here shadows one the browser owns (a global function named top stops the whole script).
+(() => {
+const S = { variant:'steps', watch:'coros', health:'other', route:'health', theme:'auto',
+            screen:'week', from:'week', sheet:null, asked:false, open:false, connected:false, toast:'' };
+
+const WATCH = {
+  coros:  { name:'COROS', app:'COROS app', src:'COROS', path:['Profile','Setting','3rd Party Apps','Data Sync','Apple Health'],
+            on:['Workouts','Walking + Running Distance'], open:'Open the COROS app' },
+  garmin: { name:'Garmin', app:'Garmin Connect', src:'Garmin Connect', path:['More','Settings','Connected Apps','Apple Health'],
+            on:['Workouts','Walking + Running Distance'], open:'Open Garmin Connect' },
+  apple:  { name:'Apple Watch', app:'', src:'Apple Watch', path:[], on:[], open:'' },
+  other:  { name:'Another watch', app:"your watch's app", src:"your watch's app", path:['Settings','Apple Health'],
+            on:['Workouts','Walking + Running Distance'], open:'' },
+};
+const ICON = {
+  ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  wait:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6.5v7"/><path d="M12 17.5h.01"/></svg>',
+  dot:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3.5"/></svg>',
+};
+const phone = document.getElementById('phone');
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const W = () => WATCH[S.watch];
+
+function go(screen){ S.screen = screen; S.sheet = null; draw(); }
+
+function topBar(back, step){
+  const dots = step ? '<div class="dots" aria-hidden="true">' + [1,2,3].map((i) => '<i class="' + (i <= step ? 'on' : '') + '"></i>').join('') + '</div>' : '';
+  return '<div class="top">' + (back ? '<button class="back" data-go="' + back + '">Back</button>' : '<span></span>')
+    + (step ? '<span class="stepof">Step ' + step + ' of 3</span>' : '') + dots + '</div>';
+}
+
+function pathCard(){
+  const w = W();
+  if (S.watch === 'apple') return '<div class="card"><p class="sub">Nothing to do here. Your Apple Watch saves each run to Health by itself.</p></div>';
+  const steps = [w.app].concat(w.path).map((t, i) =>
+    '<li><span class="n">' + (i + 1) + '</span><span' + (i === 0 ? ' class="app"' : '') + '>' + esc(i === 0 ? 'Open ' + t : t) + '</span></li>').join('');
+  return '<div class="card"><ol class="path">' + steps + '</ol>'
+    + '<div class="lbl">Turn on</div><div class="turnon">' + w.on.map((t) => '<span>' + esc(t) + '</span>').join('') + '</div>'
+    + '<p class="hint">Then tap Allow. Come back here when you are done.</p></div>';
+}
+
+function result(){
+  const w = W();
+  if (S.health === 'found') return { mark:'ok', h:"You're set.",
+    sub:'Found 6 runs from ' + w.src + ' in the last 30 days.', m:'Your next run fills its run card by itself.' };
+  if (S.health === 'other') return { mark:'wait', h:'Almost there.',
+    sub:'Health is open to us. Nothing from ' + w.src + ' is in it yet.',
+    m: S.watch === 'apple' ? 'Your next run with the watch shows up here.' : 'Sync your watch in ' + (w.app || 'its app') + '. Your next run shows up after that.' };
+  return { mark:'wait', h:'No runs in Health yet.', sub:'Run once with your watch and let it sync. Then check again.',
+    m:'Turned access off? Open Health. Tap your picture, then Apps, then The Asylum. Turn on Workouts.' };
+}
+
+function screenWeek(){
+  const ran = S.connected && S.health === 'found';
+  const invite = S.connected ? '' :
+    '<div class="invite"><div class="lbl">Your watch</div><div class="t">Run with your watch</div>'
+    + '<p class="sub m">Your runs can fill in here by themselves. Set it up once. It takes two minutes.</p>'
+    + '<div class="row2"><button class="btn ink small" data-setup="week">Set it up</button>'
+    + '<button class="link">Not now</button></div></div>';
+  const card = '<div class="runcard"><div class="k">Run &middot; Friday</div><div class="n">Recovery Run</div><div class="dose">45 min &middot; 9:40/mi</div>'
+    + (ran ? '<div class="done"><span class="l">4.66 mi &middot; 45:00 &middot; 9:39/mi</span><span class="f">From your watch</span></div>'
+           : '<button class="rec">Record run</button>') + '</div>';
+  return '<div class="top"><span></span></div><div class="wk"><span class="t">This Week</span><span class="s">Week 11</span></div>'
+    + invite + card + '<div class="spacer"></div>';
+}
+
+function screenIntro(){
+  const pick = Object.keys(WATCH).map((k) => '<button data-watch="' + k + '" aria-pressed="' + (S.watch === k) + '">' + esc(WATCH[k].name)
+    + '<small>' + (k === 'apple' ? 'Saves to Health itself' : k === 'other' ? 'If it sends to Health' : 'Through Apple Health') + '</small></button>').join('');
+  return topBar(S.from) + '<h2 class="h">Run with your watch.</h2>'
+    + '<p class="sub">Record the run on your watch. It fills its run card here by itself.</p>'
+    + '<div class="lbl">Which watch?</div><div class="pick">' + pick + '</div>'
+    + '<div class="spacer"></div><div class="btns"><button class="btn ink" data-go="allow">Next</button></div>';
+}
+
+function screenAllow(){
+  return topBar('intro', 1) + '<h2 class="h">Let The Asylum read your runs.</h2>'
+    + '<p class="sub">iOS asks you once. Turn on all three, then tap Allow.</p>'
+    + '<div class="card"><div class="turnon"><span>Workouts</span><span>Walking + Running Distance</span><span>Workout Routes</span></div>'
+    + '<p class="hint">We read runs only. Nothing is written to Health.</p></div>'
+    + '<div class="spacer"></div><div class="btns"><button class="btn ink" data-sheet="health">Allow</button></div>';
+}
+
+function screenSend(){
+  const w = W();
+  const title = S.watch === 'apple' ? 'Your watch is ready.' : 'Send your runs to Health.';
+  const lead = S.watch === 'apple' ? '' : '<p class="sub">This part happens in ' + esc(w.app) + '.</p>';
+  const open = w.open ? '<button class="btn">' + esc(w.open) + '</button>' : '';
+  return topBar('allow', 2) + '<h2 class="h">' + title + '</h2>' + lead + pathCard()
+    + '<div class="spacer"></div><div class="btns">' + open + '<button class="btn ink" data-go="result">' + (S.watch === 'apple' ? 'Next' : 'I did it') + '</button></div>';
+}
+
+function screenResult(){
+  const r = result();
+  const btns = S.health === 'found'
+    ? '<button class="btn ink" data-done="1">Done</button>'
+    : '<button class="btn" data-recheck="1">Check again</button><button class="btn ink" data-done="1">Done for now</button>';
+  return topBar('send', 3) + '<div class="mark ' + r.mark + '">' + ICON[r.mark] + '</div><h2 class="h">' + r.h + '</h2>'
+    + '<p class="sub">' + esc(r.sub) + '</p><p class="sub m">' + esc(r.m) + '</p>'
+    + (S.health === 'found' ? '' : '<p class="hint">We check again each time you open the app.</p>')
+    + '<div class="spacer"></div><div class="btns">' + btns + '</div>';
+}
+
+function item(state, t, d, act, more){
+  return '<div class="ci"><span class="st ' + state + '">' + ICON[state === 'ok' ? 'ok' : state === 'warn' ? 'warn' : 'dot'] + '</span>'
+    + '<div class="tx"><span class="t">' + t + '</span><span class="d">' + d + '</span>' + (more || '') + '</div>'
+    + (act ? '<span class="act">' + act + '</span>' : '') + '</div>';
+}
+
+function screenCheck(){
+  const w = W();
+  const read = !S.asked ? item('no', 'The Asylum can read Health', 'iOS asks you once.', '<button class="pill ink" data-sheet="health">Allow</button>')
+    : S.health === 'none' ? item('warn', 'The Asylum can read Health', 'We asked. We see no runs at all. If you turned access off, open Health, tap your picture, then Apps, then The Asylum.')
+    : item('ok', 'The Asylum can read Health', 'Runs from your phone and your watch.');
+  const found = S.asked && S.health === 'found';
+  const how = S.open && S.watch !== 'apple' ? '<div class="more">' + pathCard().replace('class="card"', 'class="card" style="background:var(--surface2)"')
+    + (w.open ? '<button class="pill" style="align-self:flex-start">' + esc(w.open) + '</button>' : '') + '</div>' : '';
+  const send = S.watch === 'apple'
+    ? item(S.asked && S.health !== 'none' ? 'ok' : 'no', 'Apple Watch saves runs to Health', 'Nothing to set up.')
+    : item(found ? 'ok' : 'no', esc(w.src) + ' sends runs to Health', found ? '6 runs found in the last 30 days.' : 'Not yet. It takes a minute in ' + esc(w.app) + '.',
+           found ? '' : '<button class="pill" data-how="1">' + (S.open ? 'Hide' : 'How') + '</button>', found ? '' : how);
+  const next = item(found ? 'ok' : 'no', 'Runs fill their cards', found ? 'Your next run lands on its run card.' : 'Once the two above are done.');
+  return topBar(S.from) + '<h2 class="h">Your watch</h2><p class="sub m">Three things, once. Each one ticks itself.</p>'
+    + '<div class="check">' + read + send + next + '</div>'
+    + '<p class="foot">' + (S.asked ? 'Checked just now. We check each time you open the app.' : 'Start with the first one.') + '</p>'
+    + '<div class="spacer"></div><div class="btns">' + (S.asked && !found ? '<button class="btn" data-recheck="1">Check again</button>' : '')
+    + '<button class="btn ink" data-done="1">Done</button></div>';
+}
+
+function screenCoros(){
+  if (S.connected) return topBar(S.from) + '<div class="mark ok">' + ICON.ok + '</div><h2 class="h">COROS is connected.</h2>'
+    + '<p class="sub">Your runs fill their run cards by themselves.</p><p class="hint">Read each time you open the app.</p>'
+    + '<div class="spacer"></div><div class="btns"><button class="btn ink" data-done="1">Done</button><button class="link">Disconnect</button></div>';
+  return topBar(S.from) + '<h2 class="h">Connect COROS.</h2><p class="sub">Sign in to COROS once. Your runs fill in here by themselves.</p>'
+    + '<div class="card"><p class="hint">COROS asks you to allow The Asylum. We read your runs only. Nothing is written to your watch.</p></div>'
+    + '<div class="spacer"></div><div class="btns"><button class="btn ink" data-sheet="coros">Sign in with COROS</button></div>';
+}
+
+// Where Set it up and Your watch lead: COROS's sign in on that route, the checklist once set up, else the first time layout.
+function setupTarget(){
+  if (S.route === 'coros') return 'coros';
+  if (S.connected) return 'check';
+  return S.variant === 'steps' ? 'intro' : 'check';
+}
+
+// The Bugs page, which becomes Profile: Your watch first, then the beta's own Engine and Backup blocks, dimmed here.
+function screenBugs(){
+  const w = W();
+  const via = (S.watch === 'apple' ? 'Apple Watch' : w.src) + ' through Apple Health.';
+  const state = !S.connected ? 'Not set up. Runs from your watch can fill your run cards by themselves.'
+    : S.route === 'coros' ? 'COROS is connected. Read each time you open the app.'
+    : S.health === 'found' ? via + ' 6 runs found. Checked just now.'
+    : via + ' Waiting for your first run.';
+  return '<div class="top"><span></span></div><div class="wk"><span class="t">Bugs</span></div>'
+    + '<div class="blk"><div class="bl">Your watch</div><p class="bn">' + esc(state) + '</p>'
+    + '<button class="btn ink small" data-setup="bugs">' + (S.connected ? 'Open' : 'Set it up') + '</button></div>'
+    + '<div class="blk dim"><div class="bl">Engine</div><p class="bn">Builds the tested programs on this phone. Each one must match.</p><span class="fake">Run the check</span></div>'
+    + '<div class="blk dim"><div class="bl">Backup</div><p class="bn">Loads a backup file into this app and checks every key. Writes nothing back.</p><span class="fake">Load a backup</span></div>'
+    + '<div class="spacer"></div>';
+}
+
+function sheet(){
+  if (S.sheet === 'health') return '<div class="scrim"><div class="sys" role="dialog" aria-label="Health Access">'
+    + '<div class="bar"><button data-sheetx="1">Don\'t Allow</button><span class="ttl">Health Access</span><button data-allow="1">Allow</button></div>'
+    + '<p>The Asylum would like to read your data in Health. It reads your runs to fill your run cards.</p>'
+    + '<div class="grp"><div class="tg">Turn On All<span class="sw"></span></div></div>'
+    + '<div class="grp"><div class="tg">Walking + Running Distance<span class="sw"></span></div><div class="tg">Workout Routes<span class="sw"></span></div><div class="tg">Workouts<span class="sw"></span></div></div>'
+    + '<p>iOS\'s own sheet, drawn plainly. The app only names what it asks for.</p></div></div>';
+  if (S.sheet === 'coros') return '<div class="scrim"><div class="sys" role="dialog" aria-label="COROS sign in">'
+    + '<div class="bar"><button data-sheetx="1">Cancel</button><span class="ttl">mcp.coros.com</span><span></span></div>'
+    + '<div class="web"><div class="f"></div><div class="f"></div><div class="go"></div></div>'
+    + '<p>COROS\'s own sign in page opens here. Tap through to finish.</p><div class="btns"><button class="btn ink" data-signed="1">Allow</button></div></div></div>';
+  return '';
+}
+
+function draw(){
+  const map = { week:screenWeek, bugs:screenBugs, intro:screenIntro, allow:screenAllow, send:screenSend, result:screenResult, check:screenCheck, coros:screenCoros };
+  const tabs = (S.screen === 'week' || S.screen === 'bugs') ? '<div class="tabbar">' + [['home', 'Programs'], ['week', 'This Week'], ['progress', 'Progress'], ['bugs', 'Bugs']]
+    .map(([k, t]) => '<button data-tab="' + k + '"' + (S.screen === k ? ' class="on" aria-current="page"' : '') + '>' + t + '</button>').join('') + '</div>' : '';
+  phone.innerHTML = '<div class="p">' + map[S.screen]() + '</div>' + tabs + sheet() + (S.toast ? '<div class="toast">' + esc(S.toast) + '</div>' : '');
+  document.querySelectorAll('.seg[data-k]').forEach((g) => g.querySelectorAll('button').forEach((b) =>
+    b.setAttribute('aria-pressed', String(S[g.dataset.k] === b.dataset.v))));
+}
+
+phone.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  S.toast = '';
+  if (b.dataset.tab) { if (b.dataset.tab === 'week' || b.dataset.tab === 'bugs') go(b.dataset.tab); return; }
+  if (b.dataset.setup) { S.from = b.dataset.setup; go(setupTarget()); return; }
+  if (b.dataset.go) { if (b.dataset.go === 'result' && !S.asked) S.asked = true; go(b.dataset.go); return; }
+  if (b.dataset.watch) { S.watch = b.dataset.watch; draw(); return; }
+  if (b.dataset.sheet) { S.sheet = b.dataset.sheet; draw(); return; }
+  if (b.dataset.sheetx) { S.sheet = null; draw(); return; }
+  if (b.dataset.allow) { S.asked = true; S.sheet = null; if (S.screen === 'allow') S.screen = 'send'; draw(); return; }
+  if (b.dataset.signed) { S.connected = true; S.health = 'found'; S.sheet = null; draw(); return; }
+  if (b.dataset.how) { S.open = !S.open; draw(); return; }
+  if (b.dataset.recheck) { S.toast = 'Checked just now'; draw(); return; }
+  if (b.dataset.done) { S.connected = true; S.screen = S.from;
+    S.toast = S.route === 'coros' ? 'Runs from COROS fill your run cards.' : S.health === 'found' ? 'Your run is in.' : 'We check each time you open the app.'; draw(); }
+});
+
+document.querySelectorAll('.seg[data-k]').forEach((g) => g.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  S[g.dataset.k] = b.dataset.v;
+  if (g.dataset.k === 'theme') {
+    if (S.theme === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', S.theme);
+  } else if (g.dataset.k === 'route' || g.dataset.k === 'variant') {
+    Object.assign(S, { screen:'week', from:'week', sheet:null, asked:false, open:false, connected:false, toast:'' });
+  }
+  draw();
+}));
+document.getElementById('restart').addEventListener('click', () => {
+  Object.assign(S, { screen:'week', from:'week', sheet:null, asked:false, open:false, connected:false, toast:'' }); draw();
+});
+draw();
+})();
+</script>

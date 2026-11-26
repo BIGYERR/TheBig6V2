@@ -448,7 +448,8 @@ Mario's order is kept. Three changes, each with its reason:
 - **The race plans ruling (D270, proposed, not built) sits between phase 5 and phase 6.** It changes engine output, so
   it cannot run inside the migration, and the plans as they stand cannot go public (section 5, risk 3).
 
-**Total size: 30 to 39 sessions (estimate).** At one phase step per session, with Mario's phone checks between.
+**Total size: 31 to 40 sessions (estimate; the watch import added one to phase 4, section 6 decision 17).** At one
+phase step per session, with Mario's phone checks between.
 Phase 6's 2 to 3 are in that figure and are parked (section 6 decision 16): the migration ends at phase 5.
 
 ### Phase 1: golden records, then the logic into core (6 to 7 sessions)
@@ -613,7 +614,7 @@ match the old build's on the rehearsal backup and on the 10 seeded programs. Mar
 
 **Deleted:** nothing from the old app. It is still the daily driver.
 
-### Phase 4: GPS, the Live Activity and the widget (3 to 4 sessions)
+### Phase 4: GPS, the Live Activity, the widget and the watch import (4 to 5 sessions)
 
 **Entry gate:** phase 3's run card done. Mario's GO. (The floating rest timer is out of the Expo app, section 6
 decision 15: the rest timer is built here, on the Dynamic Island.)
@@ -626,9 +627,21 @@ counter and the barometer (D296, `docs/decisions/gps-recording.md`). That Swift 
 module; the distance (D293's 10 m rule) and the steps, cadence and climb are counted in `core/src/gps`, which stays, and
 the Expo screen draws the second row (Climb, Cadence, Steps) and each split's climb as today's does.
 
+**The watch import** (D292 with its three amendments, `docs/decisions/watch-import.md`; section 6 decision 17), one
+session of its own and new to the beta, since today's app has none: a run the watch records fills its run card by
+itself. It reads Apple Health, where the COROS app writes each run (the route Mario's own run settled on 2026-11-22);
+no server and no COROS sign in. HealthKit comes in as an Expo module (`@kingstinct/react-native-healthkit` with
+`react-native-nitro-modules`, measured 2026-11-15), with its read permission strings and the background delivery
+entitlement. HealthKit is a capability, so Mario ticks it on the App ID `com.bigyerr.ironasylum.next` and makes its
+App Store profile again (`IOS_PROFILE_NEXT_APP`); the widget's profile does not change. The setup is Amendment 3's:
+the one-time card on This Week, Steps the first time, and the Checklist behind the Your watch block on the Bugs page.
+The session's first step on the phone confirms COROS writes each run as a workout as well as its distance; if it
+does not, the import reads COROS's MCP instead and the ruling goes back to coach.
+
 **Exit gate:** a real run by Mario with the phone recording beside the COROS Pace 4, compared by
 `tests/measure/gps-recording_watch-compare.js`, no worse than today's app on the same route. The rest timer's Live
-Activity starts, holds and ends on the lock screen and the Dynamic Island. Both through TestFlight, not a cable.
+Activity starts, holds and ends on the lock screen and the Dynamic Island. A run Mario records on the watch alone
+fills its run card with nothing tapped, its fields as D292 rules. All through TestFlight, not a cable.
 
 **Deleted:** nothing.
 
@@ -920,6 +933,12 @@ Each with the session's pick first.
     still binds whenever that is: the race plans as they stand cannot go public, so D270 comes before any public
     release (section 5, risk 3). The 2026-11-11 decision that an App Store release is the end goal is not withdrawn;
     it has no date.
+17. **The watch import.** **Answered 2026-11-25: phase 4** ("yeah lets cook this into phase 4"). D292
+    (`docs/decisions/watch-import.md`) is built once, in the new app, as one more session of phase 4 beside the
+    recorder's move, and its exit gate gains a run recorded on the watch alone that fills its card. Pick was phase 4:
+    its HealthKit module, permission strings and signing profile are the kind of work phase 4 already does, and its
+    exit gate already runs with the watch. Against: phase 4 grows by a session, and building it after cutover would
+    have kept the migration to what today's app holds.
 
 ---
 
