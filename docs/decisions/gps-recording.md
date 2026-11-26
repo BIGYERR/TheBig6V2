@@ -409,3 +409,11 @@
   16.1 down) reads the watch's totals. In the coach hat: the 2 m band was read off the watch's altitude, and this is the
   first time the phone's barometer has been measured against it; one run cannot pick the fix. The climb stays as built,
   the next runs with the watch are measured by the same script, and a ruling follows when they agree on a cause.
+- **A map of ground height, tried on the same run** (Post-v0.263.0, `tests/measure/gps-recording_terrain.md`, on
+  Mario's yes to one 32 MB download of a public Copernicus 30 m tile, not committed): the map cannot count the climb
+  itself (it holds the tops of trees and roofs: 112.9 m up on the band), but as a slow reference it agrees with GPS
+  altitude that the barometer drifted about 11 to 12 m an hour. Taking a straight line of drift out of the barometer
+  reads 13.6 m up and 14.2 m down against GPS altitude, 14.3 and 13.7 against the map, the watch's laps 9.6 and 9.8 m
+  off in all against 13.3 as built. GPS altitude does it as well as the map, so the leading candidate needs no map.
+  The watch itself reads the run's end 5 m above its start, where the map and GPS read about level. Not ruled: a run
+  with a real hill decides it.
