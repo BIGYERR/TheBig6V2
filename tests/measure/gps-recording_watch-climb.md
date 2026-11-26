@@ -1,16 +1,16 @@
-# GPS recording: how the watch counts climb and cadence (measure, 2026-11-17, on v0.262.4)
+# GPS recording: how the watch counts climb and cadence (measure, on v0.262.4)
 
 The measure behind D296 (`docs/decisions/gps-recording.md`): the iPhone's barometer and step counter are counted the
 way the COROS Pace 4 counts its own, so the phone and the watch can be compared run against run.
 
-- **The files.** The watch's FIT files of the road run (2026-11-13) and the track test (2026-11-17), read through the
+- **The files.** The watch's FIT files of the road run and the track test, read through the
   COROS connector on Mario's yes; neither is committed.
 - **The script.** `node tests/measure/gps-recording_watch-climb.mjs <label>=<watch.fit> ...` printed everything below;
   nothing was added up by hand.
 
 ---
 
-## Road run, 2026-11-13
+## Road run
 
 - The watch's session: total ascent 11 m, total descent 17 m; its altitude track: 3595 points.
 
@@ -26,7 +26,7 @@ way the COROS Pace 4 counts its own, so the phone and the watch can be compared 
 
 - Cadence: 3590 records, mean 150.5 steps a minute; the session's average cadence (field 18) 75 strides a minute.
 
-## Track test, 2026-11-17
+## Track test
 
 - The watch's session: total ascent 0 m, total descent 0 m; its altitude track: 737 points.
 

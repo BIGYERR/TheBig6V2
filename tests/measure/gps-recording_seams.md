@@ -23,8 +23,8 @@ The before-picture for D267 P-GPSTEST (`docs/decisions/gps-recording.md`). Read 
 
 ## The watch (COROS, connected to Claude 2026-10-28, read only)
 - Devices: a COROS Pace 4 and a COROS heart rate monitor.
-- 10 runs between 2026-09-28 and 2026-10-28, each named after the program's session.
-- Lap data for one run (2026-10-26, "Week 10 tempo", 36:24, 5.64 km): 16 laps, distance in centimetres and pace in
+- 10 runs over the month before, each named after the program's session.
+- Lap data for one tempo run (36:24, 5.64 km): 16 laps, distance in centimetres and pace in
   seconds per km; auto-lap at 1 mile (160,934 cm). The workout laps match the NRC session "5K reps around a 10:00
   tempo": the six 2:00 reps ran 8:39, 8:35, 8:31, 8:44, 8:46 and 8:43 per mile, the 10:00 tempo 9:25 per mile
   (s/km × 1.609344).

@@ -95,7 +95,7 @@
   delivers during a pause are written raw like every other and count for nothing, so the GPX leaves them out. A run iOS
   ended without a finish mark reads as finished at its last line. The plugin skips iOS's "location unknown" error,
   which is iOS still looking. Shared files are named `asylum-run-<local date>-<hhmm>.gpx`.
-- **Proved (v0.255.0):** the FIT reader read the Pace 4's file of 2026-10-26 (93,169 bytes, 2,185 records, one a second
+- **Proved (v0.255.0):** the FIT reader read the Pace 4's file of one tempo run (93,169 bytes, 2,185 records, one a second
   but for one 20 s gap) and matched COROS's own summary: session 5,640.39 m, timer 36:24, 15 laps, the first 1,028.58 m
   in 420 s. The comparison, fed the watch's own track as the phone, read the tracks 0.0 m apart and the splits within
   1.3 s. On the simulator (iPhone 17 Pro, iOS 26.5, the debug build), a straight route played north at 4 m/s recorded
@@ -247,6 +247,12 @@
   This Week; Record run opens D267's recorder out of the run card with Ran without the phone? on it. The recording
   screen as R2 over R3, Save behind the gate, the live bar and "Back to your run" build next, then Can't run? (D249),
   in their own releases (Mario, 2026-11-08, "Screen now, rest next").
+- **Where items 3 to 5 build (Mario, 2026-11-22, "Phase 4, once"):** the recording screen as R2 over R3, Save behind
+  the gate, the live bar and "Back to your run" are built once, in the Expo app, in the migration's phase 4
+  (`MIGRATION.md`), and never in today's app. The session recommended it after the first run on v0.263.0: built now,
+  they would be built twice, and the climb (D296) is not settled. The case against: until phase 4 a recorded run does
+  not fill the day's log, so runs are logged by hand. No new D-code: the items and their words are unchanged, only
+  where they are built.
 
 ## D293 P-GPSSMOOTH: the recorder counts a fix only once it stands 10 m from the last one kept (proposed 2026-11-17, revised the same day, concurred 2026-11-18)
 
@@ -257,7 +263,7 @@
   **Bump:** MINOR, v0.263.0, with D296 (Mario: "MINOR 0.263.0, both"). **Shipped:** v0.263.0.
 - **The ask (Mario):** "damn i didnt do the 400m track thing but here is what the app got, STRAVA got and you can look up
   what my COROS watch got that day" (2026-11-15, the road run); "think we need anything else to make sure the phone is
-  accurate or what?"; the track run (2026-11-17); "yeah write it up"; then "hmm does speed matter at all? like would it
+  accurate or what?"; the track run; "yeah write it up"; then "hmm does speed matter at all? like would it
   work for cycling and things like that?" and "do you not have any other running apps or code that have solved this
   problem already? this cant be a new problem".
 - **The measure** (`tests/measure/gps-recording_track-test.md` and `tests/measure/gps-recording_speed.md`, their
@@ -266,7 +272,7 @@
     recording (+4.12%) and 1641.8 m for the run alone (+2.61%). Lap by lap: 407, 407, 409 and 409 m. Standing, it
     counted 13.2 m in the 37 s before the run and 10.9 m in the 68 s after. The watch read 1613.0 m over the run
     (+0.81%) and logged positions only while moving.
-  - **The road run (2026-11-13).** Over the 3,596 s both recorded, the phone read 9182.1 m against the watch's 9034.0 m
+  - **The road run.** Over the 3,596 s both recorded, the phone read 9182.1 m against the watch's 9034.0 m
     (+1.64%).
   - **The signal was good.** iOS's accuracy on the track: median 2.2 m, worst 7.4 m.
   - **The first proposal, withdrawn.** Each fix the mean of 9, no distance under 0.5 m/s: 1613.4 m (+0.84%) on the
@@ -326,6 +332,10 @@
   an invalid fix, a pause's gap, a straight track's splits, the GPX) keep their oracles: on a straight line at a steady
   speed the kept fixes lie on the line.
 - **Mario's calls, answered:** (1) the revised rule, concurred 2026-11-18; (2) MINOR v0.263.0 with D296, his pick.
+- **The first run on v0.263.0** (Post-v0.263.0, `tests/measure/gps-recording_first-run.md`): one road run of about 56
+  minutes with the watch, one fix a second, none worse than 10 m. The recorder read 7619.2 m against the watch's
+  7617.46 m (its lap data), +0.02%; every fix joined would have read +2.16%. Mile by mile the two part by up to 9.9 s
+  against the watch's laps and come back together, mile 4 ending 1.0 s apart. The rule holds, and nothing changes.
 
 ## D296 P-STEPCLIMB: the recorder counts the steps and the climb (ruled 2026-11-18)
 
@@ -390,3 +400,20 @@
   after a pause; a split carries the barometer's net change across its mile; the GPX points carry the step total and
   the barometer's altitude last read. `frontends/app/test/unit/run-recorder.test.ts`: the second row reads "33 ft",
   "150 spm" and "1,500"; a run with no readings reads blank; a split row reads "+10 ft" and "−7 ft".
+- **The first run on v0.263.0** (Post-v0.263.0, `tests/measure/gps-recording_first-run.md`): 8340 steps against the
+  watch's 150 steps a minute over 55:48 (8342 to 8398), 0.36% under the middle; cadence 149.3 against 150. The step
+  counter gave a new total at least every 5 s and the barometer a new reading at least every 7 s, the whole run through
+  (the file does not say whether the screen was locked). The climb read 23.3 m up and 12.7 m down against the watch's
+  15 and 10: the barometer drifted 10.2 m up over the run where GPS altitude stood 1.1 m up, and the drift counted as
+  climb. Neither a wider band (4 m: 16.3 up, 5.7 down) nor the barometer held to GPS altitude (over 5 min: 18.3 up,
+  16.1 down) reads the watch's totals. In the coach hat: the 2 m band was read off the watch's altitude, and this is the
+  first time the phone's barometer has been measured against it; one run cannot pick the fix. The climb stays as built,
+  the next runs with the watch are measured by the same script, and a ruling follows when they agree on a cause.
+- **A map of ground height, tried on the same run** (Post-v0.263.0, `tests/measure/gps-recording_terrain.md`, on
+  Mario's yes to one 32 MB download of a public Copernicus 30 m tile, not committed): the map cannot count the climb
+  itself (it holds the tops of trees and roofs: 112.9 m up on the band), but as a slow reference it agrees with GPS
+  altitude that the barometer drifted about 11 to 12 m an hour. Taking a straight line of drift out of the barometer
+  reads 13.6 m up and 14.2 m down against GPS altitude, 14.3 and 13.7 against the map, the watch's laps 9.6 and 9.8 m
+  off in all against 13.3 as built. GPS altitude does it as well as the map, so the leading candidate needs no map.
+  The watch itself reads the run's end 5 m above its start, where the map and GPS read about level. Not ruled: a run
+  with a real hill decides it.
