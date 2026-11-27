@@ -197,3 +197,41 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
   taps, and the tests name it.
 - **Held:** after its launch the beta's store equals the page's on every launch a test phone makes, and after
   every tap of the deck walks (1,246 taps for HALF_MANNY, 11,818 across the ten programs).
+
+## D297 P-NEXTKIND: the beta saves its backup under a kind of its own (2026-11-27)
+
+- **Date:** 2026-11-27. **Ruled by:** Mario ("Yes, its own kind"), on the session's recommendation, before Save a
+  backup was built in the Expo app (the React Native migration's phase 3, row 7, the Bugs tab). **Amends:** D287, whose
+  row wrote no file and shared none; D289 stands. **Bump:** none (a Post-v0.263.0 native pass; today's app, its page
+  and core do not move). **Shipped:** to be filled in at ship time.
+- **The finding (measured, `tests/measure/native-bugs-tab_today.md`, section E; ten phones):** the beta's store holds
+  the same `ia_` keys, so core's `takeBackup` on it writes today's file. Picked in today's app, a file saved that way
+  drew today's question on 10 of 10 phones (Backup from the day. N program. Loading it replaces everything on this
+  phone.), and Load it replaced every key with the beta's, none of today's left, on 10 of 10. The same file under the
+  kind `asylum-next-backup` was turned away on 10 of 10 (**That file is not an Asylum backup.**, no question), and so
+  was the same file as format 2 (**This backup is from a newer app. Update the app first.**); after Load it today's
+  keys were untouched on 10 of 10 each. Mario's rule: nothing moves from the beta to today's app.
+- **What changes (the Expo app only):**
+  1. **The file the beta saves** is core's snapshot of the beta's own store (every `ia_` key as stored, the release,
+     the instant) with one word changed: its `kind` is `asylum-next-backup`. Its format stays 1. Its name is
+     `asylum-next-backup-<date>.json`, the phone's local date, so the two apps' files are told apart in Files.
+  2. **Where it goes:** written into the beta's own cache folder, in its own container, and handed to iOS's share
+     sheet. It goes only where the athlete sends it. Nothing is sent anywhere else, and no key is stored by a save.
+  3. **The beta loads both kinds:** today's file (`asylum-backup`) and its own. Its own kind is read by core's reader
+     as it is: the beta hands the reader the same file under today's kind, and core does not change. Any other kind
+     is **That file is not an Asylum backup.**
+  4. **Today's app turns the beta's file away** in its own words, with no question, and keeps every key. That is
+     today's reader as it has stood since v0.253.0; nothing in today's app is changed to make it so.
+- **What deliberately does not change:** today's app, its page, its storage, its backup and its TestFlight lane;
+  core (`state-backup.ts`, `BACKUP_KIND`, `BACKUP_FORMAT`); the format's counter; what a backup holds; D287's check of
+  every key after a load; D289's words on Bugs; program output.
+- **Why the kind and not the format:** format 2 would make today's app say the file is from a newer app and to
+  update first, which sends the athlete after an update that does not exist, and it would spend the format's own
+  counter on something that is not a change of shape.
+- **The counter-argument, recorded:** a backup the beta saves is then of no use anywhere but the beta. That is
+  Mario's rule today. The kind is settled again at the cutover (phase 5), when the new app becomes the app: it reads
+  today's files for good (`MIGRATION.md`, rule 4), and which kind it then saves under is that session's question.
+- **Expected values** (typed by hand): the kind `asylum-next-backup`; format 1; the name
+  `asylum-next-backup-2026-11-27.json` for a save at any local time on 2026-11-27; the file's `data` equal to the
+  beta's store, key for key; today's page on that file: **That file is not an Asylum backup.**, no question, every
+  key as it was; the beta on that file and on today's: the question, then every key the file's.
