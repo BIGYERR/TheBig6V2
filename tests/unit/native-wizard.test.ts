@@ -962,6 +962,18 @@ describe('native wizard: a number field, as WebKit\'s was seen to keep and hand 
     assert.ok(wizard.includes('keyboardType="numbers-and-punctuation"'));
     assert.ok(wizard.includes("<NumField key={draws.current + sport + key} id={'wizard-field-' + sport + '-' + key} initial={value} placeholder={placeholder}"), 'a field is made again at each whole draw, with the draft\'s value');
   });
+  test('the keys can be put away: a number field\'s return key says done and closes them, and so does a drag on the page', () => {
+    // Mario's phone, IA Next 128: a mile time typed, and no way he could find to close the keys. WebKit draws a bar
+    // with Done over today's; this keyboard has none, its return key was an unlabelled arrow and a drag did nothing.
+    const wizard = strip(read('wizard/Wizard.tsx'));
+    const field = wizard.slice(wizard.indexOf('function NumField('), wizard.indexOf('export function Wizard('));
+    const input = field.slice(field.indexOf('<TextInput'), field.indexOf('/>'));
+    assert.ok(input.includes(' returnKeyType="done" '), 'the return key says done');
+    assert.ok(!/multiline|submitBehavior|blurOnSubmit/.test(input), 'and a one line field with none of these set lets go of the keys on return');
+    const scroll = wizard.slice(wizard.indexOf('<ScrollView testID="wizard-scroll"'));
+    assert.ok(scroll.slice(0, scroll.indexOf('>')).includes(' keyboardDismissMode="on-drag" '), 'a drag on the wizard\'s page closes the keys');
+    assert.ok(scroll.slice(0, scroll.indexOf('>')).includes(' keyboardShouldPersistTaps="handled" '), 'and a tap on a card still lands with the keys up');
+  });
 });
 
 describe('native app: the root\'s keyed children', () => {

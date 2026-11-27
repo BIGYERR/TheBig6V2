@@ -333,6 +333,11 @@ Each phase starts only on Mario's GO, one phase step per session.
   The look was measured beside today's own page in the simulator's Safari, every piece within a point. The ledger
   rows of the Wildcard's tests and of today's model test are filled. Found by the measure, today's own, not ruled:
   a Wildcard card is drawn and logged under the day last opened (the handoff's section 12).
+- **Merged 2026-11-27** (pull request 69, main 4d13ee7, pipeline run 46051140015, IA Next 129 uploading when read).
+  **Fixed in the same chat, from Mario's phone on build 128:** he could not put the keyboard away after typing a
+  mile time in the wizard. The number fields' return key now says done and a drag on the wizard's page closes the
+  keys (`docs/decisions/angular-screens.md`, the cardio goals entry); one test, three breaks, seen on the
+  simulator. It goes up with the beta's next build.
 - **Next:** row 7's second session, the Bugs tab. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which

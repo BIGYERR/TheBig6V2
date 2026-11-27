@@ -58,12 +58,14 @@ function Icon({ name, size, color }: { name: string; size: number; color: string
 /**
  * A number field of the wizard: a text field that keeps each key WebKit's number field keeps and hands its handler
  * the value WebKit's hands back (number-field.ts). A key that is not kept still calls the handler, as WebKit's does.
+ * WebKit draws a bar with Done over its keys and this keyboard has none, so its return key says done and closes
+ * the keys, and a drag on the page closes them too (the scroll below).
  */
 function NumField({ id, initial, placeholder, hint, color, style, onValue }: { id: string; initial: string; placeholder: string; hint: string; color: string; style: object; onValue: (v: string) => void }) {
   const [text, setText] = useState(initial);
   const held = useRef(initial);
   return (
-    <TextInput testID={id} value={text} placeholder={placeholder} placeholderTextColor={hint} keyboardType="numbers-and-punctuation" autoCorrect={false} autoCapitalize="none" spellCheck={false}
+    <TextInput testID={id} value={text} placeholder={placeholder} placeholderTextColor={hint} keyboardType="numbers-and-punctuation" returnKeyType="done" autoCorrect={false} autoCapitalize="none" spellCheck={false}
       onChangeText={(t) => { held.current = keptText(held.current, t); setText(held.current); onValue(fieldValue(held.current)); }} style={[style, { color }]} />
   );
 }
@@ -500,7 +502,7 @@ export function Wizard({ palette: p, store, say, report, onDate, onClose, onDone
 
   return (
     <View testID="wizard" accessibilityViewIsModal style={[StyleSheet.absoluteFill, { backgroundColor: p.bg }]}>
-      <ScrollView testID="wizard-scroll" contentContainerStyle={s.page} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
+      <ScrollView testID="wizard-scroll" contentContainerStyle={s.page} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets>
         <View style={[s.bar, { paddingTop: insets.top, backgroundColor: p.bg, borderBottomColor: p.border }]}>
           <Pressable testID="wizard-back" accessibilityRole="button" onPress={back} style={[s.back, { backgroundColor: p.surface, borderColor: p.border2 }]}><Text style={[s.backText, { color: p.text }]}>{W.back}</Text></Pressable>
           <View style={[s.progress, { backgroundColor: p.surface2 }]}><View testID="wizard-fill" style={[s.fill, { backgroundColor: p.accent, width: drawn.shell.fill as `${number}%` }]} /></View>

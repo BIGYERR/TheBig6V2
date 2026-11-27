@@ -886,3 +886,19 @@ what is stored.
   program on the Race / Event path, a goal pressed, its fields typed, the race date's calendar, a day, Reset,
   Continue and Generate. Nothing named to fix.
 - **Release:** Post-v0.263.0, no build of today's app. IA Next `0.263.0 (128)`, run 46008968268.
+- **On Mario's phone, build 128, the keys** (2026-11-27, a screenshot, given while IA Next 129 was uploading): "when
+  you input a time here you cant make the keyboard go away", on the mile time's two fields. **Proved on the
+  simulator** on the code the merge carried (its wizard is build 128's): the keyboard is iOS's numbers and
+  punctuation, with no bar over it. Its return key, an unlabelled arrow, closed it, and so did a tap on a blank
+  spot of the page; a drag on the page did not, and most of the page over the keys is cards, which take the tap.
+  Today's fields are WebKit's, which draws a bar with Done over its keys (today's app sets nothing about the
+  keyboard, `frontends/app/config.xml`). **Fixed in the beta, no ruling:** the keys are iOS's, not a word or a
+  behaviour of the page, so the form was the session's to decide. A number field's return key says done (iOS 26
+  draws it as a blue check), and a drag on the wizard's page closes the keys, as Progress and the sheets already
+  do. The other form, a bar with Done over the keys as WebKit's, is closer to today's and a component of its own
+  on every field; not built. **Proof:** one test in `tests/unit/native-wizard.test.ts`, red on the commit before
+  on a copy of its tree (`tools/tree-at.mjs`: 1 failed, 76 passed); three breaks added to the wizard's list, each
+  red alone, and the whole set run again in four parts, 515 of 515 red (6 of them on the sweep alone) (`tests/measure/native-wizard_breaks.md`). **Seen on the simulator**
+  (`sim-ios:fast`, iPhone 17 Pro, iOS 26.5): the check on the key, and the keys closed by it and by a drag; the
+  store put back (`278ba57f3f6a382b` before and after). Not yet seen on the phone: it goes up with the beta's next
+  build.
