@@ -338,6 +338,9 @@ Each phase starts only on Mario's GO, one phase step per session.
   mile time in the wizard. The number fields' return key now says done and a drag on the wizard's page closes the
   keys (`docs/decisions/angular-screens.md`, the cardio goals entry); one test, three breaks, seen on the
   simulator. It goes up with the beta's next build.
+- **Seen on his phone, IA Next 129** (2026-11-27, run 46051140015): "Good push!", after three reports on Random
+  Workout that were each today's own and not ruled (no check for a Wildcard, D64; no mark before the program
+  starts; no undo of one Wildcard; `docs/decisions/wildcard.md`). Row 7's first session is done.
 - **Next:** row 7's second session, the Bugs tab. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which

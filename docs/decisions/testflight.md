@@ -446,4 +446,5 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   the calendar (D64: a Wildcard is never a completion); the calendar showed no Wildcard mark, on a program that
   starts ten days on (today's own: off the program's calendar a Wildcard counts and stamps no day); and a
   Wildcard marked done cannot be undone (today's own: only Reset, which clears the whole counter). His word on the
-  rest of build 129 is still to come.
+  rest of build 129, once each was read to him: "Good push!" (2026-11-27). Random Workout is seen on his phone,
+  and the keyboard fix was pushed on that word.

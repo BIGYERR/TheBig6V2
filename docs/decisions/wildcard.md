@@ -105,3 +105,4 @@ and `frontends/app/test/unit/random-workout.test.ts`; the Expo app's are `tests/
   12):** whether a Wildcard done before a program starts should show anywhere, and whether one Wildcard can be
   undone. Either would change today's app and the page too. The simulator's store was put back after each look
   (sha256 278ba57f before and after).
+  **His word on the rest of build 129:** "Good push!" (2026-11-27). Random Workout is seen on his phone.
