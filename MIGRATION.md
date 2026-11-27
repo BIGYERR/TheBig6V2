@@ -316,9 +316,8 @@ Each phase starts only on Mario's GO, one phase step per session.
   within a point beside today's own page in the simulator's Safari. Fixed on the way: the wizard was built again
   on its first step when a calendar closed (the root's keys). The ledger row of the page's cardio goal step test
   is filled. **Row 6 is built.**
-- **Next:** Mario's phone on the next IA Next build (Race / Event: a sport, a goal, its fields typed; the race
-  date's calendar, a day, Reset, the check; the card under it and the shorter plan's link; Just building fitness;
-  Hybrid; Continue to the name step and Generate; Reset's dim on the start date). Then row 7. Still not
+- **Seen on his phone, IA Next 128** (2026-11-27, run 46008968268): "All good in IA 128". Row 6 is done.
+- **Next:** row 7. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,

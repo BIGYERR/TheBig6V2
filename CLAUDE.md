@@ -146,10 +146,16 @@ issued D265 before the ruling was written, and it shipped as D266.
    **Push only when Mario asks**, with `node tools/land.mjs` from the worktree (local `dev` fast-forwarded and pushed in one step; One chat per worktree), and never wait on CI (Mario, Post-v0.250.0): the push runs the full suite there and Mario
    reviews it himself; read a run (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) only when he asks. **Mario opens
    every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one (Mario, Post-V239).** When he has merged it, tag what merged: `node tools/land.mjs --tag v<version>` from the chat's worktree (it fetches, makes the tag on `origin/main` when there is none, refuses unless the commit it names carries that version and is on `main`, and pushes the tag from the main checkout, the one place the push hook lets a tag through; Post-v0.261.5: a worktree chat could make the tag and not push it).
-   **The next chat's prompt waits for the merge** (Mario, Post-v0.261.7: "give me the prompt for the new chat once i tell
-   you its merged, so it improves the workflow"). At commit and at push, give the summary and say the prompt follows the
-   merge. When Mario says it is merged: tag it (above), read the deploy picture (step 7), then give the prompt, written
-   against what landed, its model and effort on top. A run the prompt names is the pipeline run both `testflight.mjs leg`
+   **The next chat's prompt waits for the merge, and for Mario's phone when the merge put a build on it** (Mario,
+   Post-v0.261.7: "give me the prompt for the new chat once i tell you its merged, so it improves the workflow";
+   Post-v0.263.0: "What's the point of me doing this on my phone when you give me the next prompt already?"). At commit
+   and at push, give the summary and say the prompt follows the merge. When Mario says it is merged: tag it (above) and
+   read the deploy picture (step 7). When a `testflight.mjs leg` line names a build this merge's run uploaded, tell him
+   what to tap on it and wait for his word: no prompt yet. What he finds that is the build's own is fixed in this chat,
+   which holds the context, and goes up as the next build. Then give the prompt, written against what landed and what
+   he saw, its model and effort on top; it asks the next chat for no phone report. When he says "skip the phone", the
+   prompt is given at once and carries the check as its first step. A merge that uploaded no build gives the prompt
+   after the deploy picture, as before. A run the prompt names is the pipeline run both `testflight.mjs leg`
    lines print, by that number, never one read off the merge's page (Post-v0.262.4: a prompt named 43978883963, the Pages
    build of the merge; its TestFlight notices were in the pipeline run, 43978885142). Every prompt for a next chat carries the same closing.
    **Every push ends with its pull request summary in chat** (Mario, Post-v0.259.3: "when i say push go ahead and throw the
@@ -193,7 +199,9 @@ issued D265 before the ruling was written, and it shipped as D266.
   from the worktree fetches, checks (`dev` equals `origin/dev`; the branch is on top of `dev`; its new commits carry one
   Chat trailer), fast-forwards local `dev` and pushes it from the main checkout, in one step; `--dry-run` only checks.
   **A finished chat closes its worktree (Mario, Post-v0.263.0).** When a chat gets its check mark (its release merged
-  and tagged, or its pass pushed), its last step removes its worktree and its branch: `ExitWorktree` with `remove`, or,
+  and tagged, or its pass pushed; and, where the merge put a build on his phone, his word on that build, since a fix
+  he asks for is made in this chat: the cardio goals chat closed its worktree at the merge and opened another for the
+  phone's record), its last step removes its worktree and its branch: `ExitWorktree` with `remove`, or,
   for a worktree it did not make itself, `git -C <main checkout> worktree remove <path>` and `git branch -D chat/<work>`.
   It does so only when, in the worktree, `git status --porcelain` prints nothing and `git rev-list --count HEAD --not
   origin/dev` prints 0; otherwise it keeps the worktree and says why. Session start removes any other worktree left on

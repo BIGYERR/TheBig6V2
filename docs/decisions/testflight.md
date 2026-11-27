@@ -410,3 +410,19 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   door, Continue and Back, the rest days' floor and its toast, the name, the pick, Generate and its figure, This
   Week on the new program, the race path's sports opening and shutting) is good, and he named no jump back to the
   first step after a calendar pick.
+- **Seen on `main`, pull request 67's run, the beta's lane alone** (run 46008968268, merge b927039, 2026-11-27
+  08:39 EST; the merge carried no version: 6c6da29, the wizard's cardio goals step in the Expo app, and four tests
+  and docs commits; read in the session that built it, after the run had ended): the two gates went together (12 s
+  today's, 10 s the beta's). Today's lane skipped its upload, as ruled. The beta's lane archived, signed and
+  uploaded `0.263.0 (128)` (360 s, done 08:46:31) and read it back as processed (129 s, done 08:48:42); its upload
+  job started 2 s after its gate. The build number moved from 127 to 128 on one commit, 6c6da29, the only one of
+  the merge that changed `frontends/native`, `core` or `tests/semver.js` (`git log f702836..b927039` on those paths
+  prints it alone). The run ended green: 6 jobs passed and 8 skipped by rule. Both `testflight.mjs leg` lines, read
+  after the merge: `testflight 0.263.0 processed (uploaded before this run; a version goes up once, a fix is the
+  next PATCH) (run 46008968268, b927039)` and `testflight next 0.263.0 (128) processed (run 46008968268, b927039)`.
+- **On Mario's phone, build 128** (his report, 2026-11-27, no screenshot; `docs/decisions/angular-screens.md`, the
+  cardio goals step's entry): "All good in IA 128". He was asked to start a new program, pick Race / Event, press a
+  goal, type its fields, open the race date, pick a day, press Reset, then Continue and Generate. He named nothing
+  to fix. His question before it, on being handed the next chat's prompt ahead of the check ("What's the point of
+  me doing this on my phone when you give me the next prompt already? I feel like that's bad workflow"), is now a
+  rule (CLAUDE.md, Session rhythm step 6: the prompt waits for his word on a build the merge uploaded).

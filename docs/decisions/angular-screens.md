@@ -881,5 +881,8 @@ what is stored.
   session began on and the one the last session left (`e5624736887b4a21` after the look at build 127's code,
   `d628e3f891129cb9` after the last pass). **Not seen there:** the seed offer (the backup's copy holds no logged
   recovery pace; the walks hold it on a test phone), Generate from a goal picked by taps (the walks hold it), the
-  pop-up after its gap was set. **Not yet seen:** Mario's phone.
-- **Release:** Post-v0.263.0, no build of today's app. On the phone with the next IA Next build.
+  pop-up after its gap was set.
+- **On Mario's phone, build 128** (2026-11-27; `docs/decisions/testflight.md`): "All good in IA 128", after a new
+  program on the Race / Event path, a goal pressed, its fields typed, the race date's calendar, a day, Reset,
+  Continue and Generate. Nothing named to fix.
+- **Release:** Post-v0.263.0, no build of today's app. IA Next `0.263.0 (128)`, run 46008968268.
