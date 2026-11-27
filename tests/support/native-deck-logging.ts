@@ -49,12 +49,12 @@ const plain = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 export const held = (s: StateStore): Record<string, string> => Object.fromEntries(s.keys().filter((k) => k.startsWith('ia_')).sort().map((k) => [k, s.get(k)!]));
 
 /** An element of the page, as far as today's handlers read and change one. */
-interface El {
+export interface El {
   id: string; value: string; placeholder: string; textContent: string; dataset: Record<string, string>; style: Record<string, string>;
   classList: { add(c: string): void; remove(c: string): void; contains(c: string): boolean; toggle(c: string, on?: boolean): boolean };
   getAttribute(n: string): string | null;
 }
-function el(id: string, value = '', placeholder = '', cls = '', rx: string | null = null, text = ''): El {
+export function el(id: string, value = '', placeholder = '', cls = '', rx: string | null = null, text = ''): El {
   const set = new Set(cls.split(' ').filter(Boolean));
   // An input holds text: whatever a handler assigns to its value or its placeholder is turned into a string, as the
   // browser turns it (reuseWeight assigns the pill's number).

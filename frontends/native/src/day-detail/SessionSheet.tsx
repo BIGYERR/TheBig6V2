@@ -34,7 +34,7 @@ import { AddSheet } from '../add-sheet/AddSheet';
 import type { AddSheetView } from '../add-sheet/add-sheet-model';
 import type { CardAct } from '../deck/deck-model';
 import { parseRx } from '../deck/deck-readers';
-import type { DeckProgram, Fields } from '../deck/deck-screen';
+import type { DayInHand, DeckProgram, Fields } from '../deck/deck-screen';
 import type { RestAsk, RestProgram } from '../rest-sheet/rest-sheet-model';
 import { type SwapOpen, swapSheetOf } from '../deck/deck-swaps';
 import { type Session, acceptNudge, act, dismissNudge, leftField, nudgeWords, swapMove, tapFill, tapLog, tapReuse, tapStep, undoSwap } from '../deck/deck-writes';
@@ -81,7 +81,7 @@ function Icon({ name, size, color }: { name: string; size: number; color: string
 }
 
 /** What a move's controls call, by the move's key (the deck's set, with a round's minus and its undo). */
-interface Handlers {
+export interface SheetHandlers {
   step: (exKey: string, s: number, step: number) => void;
   rep: (exKey: string, s: number, text: string) => void;
   setLoad: (exKey: string, s: number, text: string) => void;
@@ -98,8 +98,10 @@ interface Handlers {
   remove: (name: string) => void;
 }
 
-export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, onProgram, onOver, onRest, onLogged, onGoing, say }: {
+export function SessionSheet({ palette: p, store, open, inHand, calm, onClose, onDone, onProgram, onOver, onRest, onLogged, onGoing, say }: {
   palette: Palette; store: StateStore; open: SheetOpen; calm: boolean;
+  /** What a day's open leaves behind for the app's life: each draw of the sheet sets it, as today's open() does. */
+  inHand: DayInHand;
   /** The sheet is gone, by Back or after a Skip. */
   onClose: () => void;
   /** Done: the day is stored and the sheet has slid away; the app raises the completion pop-up over This Week. */
@@ -186,7 +188,7 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
   };
   /** The whole sheet drawn again after an edit, as the page's openDetail draws it: every field and the log's form afresh. */
   const redraw = (g: SheetProgram = prog): void => {
-    const next = sheetView(store, g, open.week, open.dayKey, Date.now());
+    const next = sheetView(store, g, open.week, open.dayKey, Date.now(), inHand);
     if (!next) return;
     setView(next);
     apply(sheetFields(next));
@@ -233,7 +235,7 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nudge]);
 
-  const h: Handlers = {
+  const h: SheetHandlers = {
     step: (exKey, k, step) => { leave(); apply(tapStep(session, fieldsNow.current, exKey, k, step, Date.now())); },
     rep: (exKey, k, text) => typed(exKey, (f) => typeRep(f, k, text)),
     setLoad: (exKey, k, text) => typed(exKey, (f) => typeSetLoad(f, k, text)),
@@ -350,51 +352,6 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
   const frame = sheetFrame(view, open.only, prog);
   const rpeText = form.touched ? form.rpe + ' — ' + (RPE_LABELS[+form.rpe] || '') : log.view.rpeText;
 
-  const card = (x: ExView, k: number, inBlock: boolean, last: boolean) => (
-    <Move key={k} x={x} p={p} inBlock={inBlock} last={last} open={x.kind === 'card' && !!setsOpen[x.exKey]} f={x.kind === 'card' ? fields[x.exKey] : undefined}
-      fv={x.kind === 'card' && fields[x.exKey] && x.log ? fieldsView(fields[x.exKey]!, rxOf[x.exKey] ?? null, unit) : null} h={h} />
-  );
-  const section = (sec: SectionView, k: number) => {
-    if (sec.kind === 'skippedRound') {
-      return (
-        <View key={k} style={[s.skipped, { backgroundColor: p.surface2, borderColor: p.border2 }]}>
-          <Text style={[s.skippedLbl, { color: p.muted }]}>Skipped</Text>
-          <Text numberOfLines={1} style={[s.skippedName, { color: p.muted }]}>{sec.text}</Text>
-          <Text testID={'sheet-roundback-' + sec.secIdx} accessibilityRole="button" onPress={() => h.edit({ kind: 'round', secIdx: sec.secIdx }, false)} style={[s.skippedUndo, { color: p.muted }]}>Put it back</Text>
-        </View>
-      );
-    }
-    const b = sec.body;
-    return (
-      <View key={k} style={s.section}>
-        {sec.label !== null && <Text style={[s.secLabel, { color: p.muted }]}>{plain(sec.label)}</Text>}
-        {b.kind === 'block' && (
-          <View>
-            {b.label && <Text style={[s.secLabel, { color: tokenColor(p, b.label.color, p.muted) }]}>{plain(b.label.text)}</Text>}
-            {b.items.map((x, i) => card(x, i, false, i === b.items.length - 1))}
-          </View>
-        )}
-        {b.kind === 'core' && (
-          <View style={[s.wrap, { backgroundColor: tint(p.core, 0.1), borderColor: tint(p.core, 0.25) }]}>
-            <Text style={[s.wrapHead, { color: p.core, backgroundColor: tint(p.core, 0.12) }]}>{plain(b.header)}</Text>
-            {b.items.map((x, i) => card(x, i, true, i === b.items.length - 1))}
-          </View>
-        )}
-        {b.kind === 'round' && (
-          <View style={[s.wrap, { backgroundColor: p.surface, borderColor: p.signal }]}>
-            <View style={[s.roundHead, { backgroundColor: 'rgba(' + p.signalRgb + ',0.10)' }]}>
-              <Text style={[s.roundTxt, { color: p.signal }]}>{plain(b.header)}</Text>
-              <Pressable testID={'sheet-roundminus-' + b.secIdx} accessibilityRole="button" accessibilityLabel="Skip this round" hitSlop={8} onPress={() => h.edit({ kind: 'round', secIdx: b.secIdx }, true)} style={[s.roundMinus, { backgroundColor: 'rgba(' + p.signalRgb + ',0.10)', borderColor: 'rgba(' + p.signalRgb + ',0.35)' }]}>
-                <Icon name="minus" size={15} color={p.signal} />
-              </Pressable>
-            </View>
-            {b.items.map((x, i) => card(x, i, true, i === b.items.length - 1))}
-          </View>
-        )}
-      </View>
-    );
-  };
-
   return (
     <Animated.View testID="session-sheet" accessibilityViewIsModal style={[StyleSheet.absoluteFill, { backgroundColor: p.bg, transform: [{ translateY: y.interpolate({ inputRange: [0, 1], outputRange: [0, height] }) }] }]}>
       {/* The header's band is dark by day and by night, so the clock over it is light while the sheet is up. */}
@@ -459,7 +416,7 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
               </Text>
             );
           }
-          if (blk.kind === 'sections') return <View key={k} style={s.sections}>{blk.sections.map(section)}</View>;
+          if (blk.kind === 'sections') return <SheetSections key={k} sections={blk.sections} p={p} fields={fields} setsOpen={setsOpen} rxOf={rxOf} unit={unit} h={h} />;
           if (blk.kind === 'cardio') return <Cardio key={k} c={blk.card} p={p} />;
           if (blk.kind === 'log') {
             return (
@@ -516,6 +473,63 @@ export function SessionSheet({ palette: p, store, open, calm, onClose, onDone, o
       {add && <AddSheet palette={p} view={add} calm={calm} onPick={added} onClose={() => setAdd(null)} />}
     </Animated.View>
   );
+}
+
+/**
+ * A day's sections with their cards, as the session sheet draws them. Random Workout draws a Wildcard's with the same
+ * component, as today's draws both with SessionSections.
+ */
+export function SheetSections({ sections, p, fields, setsOpen, rxOf, unit, h, gap }: {
+  sections: SectionView[]; p: Palette; fields: Fields; setsOpen: Record<string, boolean>; rxOf: Record<string, Rx | null>; unit: string; h: SheetHandlers;
+  /** The space between two sections where it is not the session sheet's own (Random Workout's column lays 16 between its pieces). */
+  gap?: number;
+}) {
+  const s = styles;
+  const card = (x: ExView, k: number, inBlock: boolean, last: boolean) => (
+    <Move key={k} x={x} p={p} inBlock={inBlock} last={last} open={x.kind === 'card' && !!setsOpen[x.exKey]} f={x.kind === 'card' ? fields[x.exKey] : undefined}
+      fv={x.kind === 'card' && fields[x.exKey] && x.log ? fieldsView(fields[x.exKey]!, rxOf[x.exKey] ?? null, unit) : null} h={h} />
+  );
+  const section = (sec: SectionView, k: number) => {
+    if (sec.kind === 'skippedRound') {
+      return (
+        <View key={k} style={[s.skipped, { backgroundColor: p.surface2, borderColor: p.border2 }]}>
+          <Text style={[s.skippedLbl, { color: p.muted }]}>Skipped</Text>
+          <Text numberOfLines={1} style={[s.skippedName, { color: p.muted }]}>{sec.text}</Text>
+          <Text testID={'sheet-roundback-' + sec.secIdx} accessibilityRole="button" onPress={() => h.edit({ kind: 'round', secIdx: sec.secIdx }, false)} style={[s.skippedUndo, { color: p.muted }]}>Put it back</Text>
+        </View>
+      );
+    }
+    const b = sec.body;
+    return (
+      <View key={k} style={s.section}>
+        {sec.label !== null && <Text style={[s.secLabel, { color: p.muted }]}>{plain(sec.label)}</Text>}
+        {b.kind === 'block' && (
+          <View>
+            {b.label && <Text style={[s.secLabel, { color: tokenColor(p, b.label.color, p.muted) }]}>{plain(b.label.text)}</Text>}
+            {b.items.map((x, i) => card(x, i, false, i === b.items.length - 1))}
+          </View>
+        )}
+        {b.kind === 'core' && (
+          <View style={[s.wrap, { backgroundColor: tint(p.core, 0.1), borderColor: tint(p.core, 0.25) }]}>
+            <Text style={[s.wrapHead, { color: p.core, backgroundColor: tint(p.core, 0.12) }]}>{plain(b.header)}</Text>
+            {b.items.map((x, i) => card(x, i, true, i === b.items.length - 1))}
+          </View>
+        )}
+        {b.kind === 'round' && (
+          <View style={[s.wrap, { backgroundColor: p.surface, borderColor: p.signal }]}>
+            <View style={[s.roundHead, { backgroundColor: 'rgba(' + p.signalRgb + ',0.10)' }]}>
+              <Text style={[s.roundTxt, { color: p.signal }]}>{plain(b.header)}</Text>
+              <Pressable testID={'sheet-roundminus-' + b.secIdx} accessibilityRole="button" accessibilityLabel="Skip this round" hitSlop={8} onPress={() => h.edit({ kind: 'round', secIdx: b.secIdx }, true)} style={[s.roundMinus, { backgroundColor: 'rgba(' + p.signalRgb + ',0.10)', borderColor: 'rgba(' + p.signalRgb + ',0.35)' }]}>
+                <Icon name="minus" size={15} color={p.signal} />
+              </Pressable>
+            </View>
+            {b.items.map((x, i) => card(x, i, true, i === b.items.length - 1))}
+          </View>
+        )}
+      </View>
+    );
+  };
+  return <View style={[s.sections, gap !== undefined && { gap }]}>{sections.map(section)}</View>;
 }
 
 /**
@@ -628,7 +642,7 @@ function Cardio({ c, p }: { c: CardioCardView; p: Palette }) {
   );
 }
 
-interface MoveProps { x: ExView; p: Palette; inBlock: boolean; last: boolean; open: boolean; f: MoveFields | undefined; fv: FieldsView | null; h: Handlers }
+interface MoveProps { x: ExView; p: Palette; inBlock: boolean; last: boolean; open: boolean; f: MoveFields | undefined; fv: FieldsView | null; h: SheetHandlers }
 
 /** One exercise card (session-sections.ts as the sheet draws it): every set behind its summary, the load, the pills, Log. */
 function Move({ x, p, inBlock, last, open, f, fv, h }: MoveProps) {

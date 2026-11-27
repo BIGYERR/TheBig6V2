@@ -49,6 +49,24 @@ export interface DeckProgram {
  */
 export interface StaleWarn { shown: boolean; src: string }
 
+/**
+ * What a day's open leaves behind on the page, for the app's life: the day last opened (currentDayKey), the unit its
+ * cards were drawn in (_unitLabel, pounds until a day opens) and the stale warning as that open's draws left it.
+ * The deck and the session sheet set all three as they open (deck.ts open(), day-detail.ts open()); a program made
+ * active clears the day (loadActiveProgram). Random Workout reads them and sets none: its cards are drawn and logged
+ * under the day last opened, as today's are (tests/measure/native-row7_today.md).
+ */
+export interface DayInHand { dayKey: string | null; unit: 'kg' | 'lbs'; warn: StaleWarn }
+export const newDayInHand = (): DayInHand => ({ dayKey: null, unit: 'lbs', warn: { shown: false, src: '' } });
+/** A deck or a sheet opens on a day: the warning starts afresh, the unit is the program's, the day is this one. */
+export function openedDay(hand: DayInHand, prog: DeckProgram, dayKey: string): StaleWarn {
+  hand.warn.shown = false;
+  hand.warn.src = '';
+  hand.unit = prog.cfg && prog.cfg.unit === 'kg' ? 'kg' : 'lbs';
+  hand.dayKey = dayKey;
+  return hand.warn;
+}
+
 /** The lift log as the page holds it after its launch: old keys folded into today's, on a copy. */
 export function liftLog(store: StateStore, programId: string): Record<string, { entries?: ExEntry[] } | undefined> {
   const log = JSON.parse(JSON.stringify(readLiftLog(store, programId) || {})) as Record<string, { entries?: ExEntry[] } | undefined>;

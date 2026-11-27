@@ -59,7 +59,7 @@ const BREAKS = [
   [FIELDS, 'a set shows no difference from its target', "return diff === 0 ? '' : diff < 0 ? String(diff) : '+' + diff;", "return '';"],
   // What a tap stores.
   [WRITES, 'Log stores the load field, not the heaviest set', 'if (top > 0) { storedW = top; hasW = true; dispW = Math.max(...dispSets); }', 'if (top > 0) { hasW = true; }'],
-  [WRITES, 'a kilogram program stores each set\'s load unconverted', 'setsW = dispSets.map((x) => toStoreW(x, kg));', 'setsW = dispSets.slice();'],
+  [WRITES, 'a kilogram program stores each set\'s load unconverted', 'setsW = dispSets.map((x) => toStoreW(x, s.label ? s.label === \'kg\' : kg));', 'setsW = dispSets.slice();'],
   [WRITES, 'a kilogram program stores the load field unconverted', 'storedW = kg ? Math.round(v * 2.20462) : v; hasW = true;', 'storedW = v; hasW = true;'],
   [WRITES, 'Log leaves the draft in the day\'s log', "  dropSetDraft(s.store, s.prog.id, s.week, s.dayKey, exKey);\n  return { ok: true,", '  return { ok: true,'],
   [WRITES, 'Log does not snapshot the day', '    if (s.dayKey) snapshotDay(s);\n', ''],
@@ -81,7 +81,7 @@ const BREAKS = [
   ]],
   [WRITES, 'a skip does not store the edit', '  if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name);', '  if (!off) dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name);'],
   [WRITES, 'a put back does not clear the edit', '  if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name);', '  if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name);'],
-  [WRITES, 'a skip does not renew the day\'s snapshot', "  resnapshotDay(s);\n  return off ? name + ' is off today.", "  return off ? name + ' is off today."],
+  [WRITES, 'a skip does not renew the day\'s snapshot', "    resnapshotDay(s);\n  }\n  return off ? name + ' is off today.", "  }\n  return off ? name + ' is off today."],
   [WRITES, 'a put back leaves the move marked on the day', 'it._skipped = off ? true : (undefined as unknown as boolean); hit = true;', 'it._skipped = true; hit = true;'],
   [WRITES, 'a round is stored under another token', 'if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, ssSkipToken(secIdx));', "if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, 'round:' + secIdx);"],
   [WRITES, 'the skip\'s words change', "' is off today. Tap to put it back.' : name + ' is back on the card.'", "' is skipped.' : name + ' is back.'"],

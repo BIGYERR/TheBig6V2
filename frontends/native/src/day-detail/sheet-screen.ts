@@ -15,7 +15,7 @@ import { cardioEntryLogged, dayStoreKey, readDayLogs } from '@ia/core/engine/sta
 import { dayStatus, readCompleted } from '@ia/core/engine/state-day-status.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
-import { type DeckDay, type DeckProgram, type Fields, type StaleWarn, deckReads, liftLog } from '../deck/deck-screen';
+import { type DayInHand, type DeckDay, type DeckProgram, type Fields, type StaleWarn, deckReads, liftLog, openedDay } from '../deck/deck-screen';
 import { fieldsOf } from '../deck/set-fields';
 import { DAY_FULL, type ReadDay, type RestLog, dayIsTravel, restLogLines, runSessionCode, wildcardOn } from '../this-week/week-readers';
 import { type CardioRx, cardioCard } from './cardio-card-model';
@@ -69,11 +69,12 @@ export function sheetDay(prog: SheetProgram, week: number, dayKey: string): Shee
  * The Angular sheet's open() (day-detail.ts), as far as it reads: the whole day drawn anew. Every draw starts the
  * stale load warning afresh, as the page's openDetail does on an open and on every redraw after an edit.
  */
-export function sheetView(store: StateStore, prog: SheetProgram, week: number, dayKey: string, nowMs: number): SheetView | null {
+export function sheetView(store: StateStore, prog: SheetProgram, week: number, dayKey: string, nowMs: number, hand?: DayInHand): SheetView | null {
   const day = sheetDay(prog, week, dayKey);
   if (!day) return null;
   const id = prog.id;
-  const warn: StaleWarn = { shown: false, src: '' };
+  // With the app's day in hand, this draw is the page's open(): the warning afresh, the unit and the day set.
+  const warn: StaleWarn = hand ? openedDay(hand, prog, dayKey) : { shown: false, src: '' };
   const unit = prog.cfg && prog.cfg.unit === 'kg' ? 'kg' : 'lbs';
   const key = dayStoreKey(week, dayKey);
   const comp = readCompleted(store, id)[key];

@@ -111,7 +111,11 @@ export interface SwapOpen { ctx: SwapCtx; view: SwapSheetView }
  */
 export function swapSheetOf(prog: DeckProgram, week: number, dayKey: string, secIdx: number, itemIdx: number): SwapOpen | null {
   const wk = prog && prog.weeks && prog.weeks[week];
-  const day = (wk && wk[dayKey]) as SwapDay | null | undefined;
+  return swapSheetOn(prog, (wk && wk[dayKey]) as DeckDay | null | undefined, secIdx, itemIdx);
+}
+/** The same sheet for a lift of any day in hand: a program's, or the Wildcard's own working day (the page's _editDay, D250). */
+export function swapSheetOn(prog: DeckProgram, on: DeckDay | null | undefined, secIdx: number, itemIdx: number): SwapOpen | null {
+  const day = on as SwapDay | null | undefined;
   const sec = day && day.sections && day.sections[secIdx];
   const item = sec && sec.items && sec.items[itemIdx];
   if (!sec || !item || !item.name) return null;

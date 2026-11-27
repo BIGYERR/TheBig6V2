@@ -16,6 +16,8 @@
 // Build New Program on the Programs tab opens the wizard (wizard/Wizard.tsx) over the whole screen: its steps, the
 // length's pop-up and the generating screen, which stores the new program (wizard/wizard-writes.ts) and lands on This
 // Week's first week. The cardio goals' forms are the row's second session.
+// Random Workout (random-workout/RandomWorkout.tsx) opens from This Week's button on a fresh draw, over the whole
+// screen; Complete writes the Wildcard's record, and its own pop-up follows 380 ms on.
 // The floating rest timer is not here: it comes back on the Dynamic Island (D295, phase 4).
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -36,7 +38,7 @@ import type { DateAsk } from './date-box/date-box';
 import { SessionSheet } from './day-detail/SessionSheet';
 import type { SheetOpen } from './day-detail/sheet-screen';
 import { DeckOpening } from './deck/DeckOpening';
-import type { DeckOpen, DeckProgram } from './deck/deck-screen';
+import { type DeckOpen, type DeckProgram, newDayInHand } from './deck/deck-screen';
 import { EngineCheck } from './EngineCheck';
 import { MileNudge } from './mile-nudge/MileNudge';
 import { nudgeText } from './mile-nudge/mile-nudge-model';
@@ -47,6 +49,9 @@ import { PopUp } from './pop-up/PopUp';
 import { Programs } from './program-list/Programs';
 import { type MileOpen, newListState, refreshReport, tabRefused } from './program-list/list-screen';
 import { Progress } from './progress/Progress';
+import { RandomWorkout, type ResetAsk } from './random-workout/RandomWorkout';
+import { type RandProgram, type RandSheet, newRandState, openRandom } from './random-workout/random-screen';
+import { WILD_POP_MS, fireWildcardPopup } from './random-workout/random-writes';
 import { newProgressState } from './progress/progress-screen';
 import { RestSheet } from './rest-sheet/RestSheet';
 import { type RestAsk, type RestDraft, type RestLogs, type RestProgram, openRest } from './rest-sheet/rest-sheet-model';
@@ -205,6 +210,15 @@ function Shell() {
   // The program in hand is This Week's (today's activeProg), read where the tap lands, so a second date picked in
   // an open calendar writes on the program the first one handed back.
   const hand = useRef<WeekHand>({ prog: null, own: null }).current;
+  // ── Random Workout (random-wildcard.ts; ./random-workout) ──
+  // What a day's open leaves behind for the app's life (the page's currentDayKey, _unitLabel and stale warning): the
+  // deck and the session sheet set it as they open, a program made active clears its day, and a Wildcard's cards
+  // read it. The filter, the last draw and the reset's ask outlive the sheet, as today's screen keeps them.
+  const inHand = useRef(newDayInHand()).current;
+  const randState = useRef(newRandState()).current;
+  const randReset = useRef<ResetAsk>({ pending: false }).current;
+  const [random, setRandom] = useState<{ prog: RandProgram; week: number; opened: RandSheet; n: number } | null>(null);
+  const randomN = useRef(0);
   // ── The wizard (wizard.ts, wizard-generate.ts; ./wizard) ──
   // Open over the whole screen, a count so each Build New Program is a wizard of its own with a draft of its own.
   // EVERY KEYED CHILD OF THE ROOT NAMES ITS KIND IN ITS KEY. Each is counted from one, and they are siblings: keyed by
@@ -258,6 +272,10 @@ function Shell() {
       const draft = ask.kind === 'hurt' ? openInjury(ovDraft.current, s.prog, now) : openTravel(ovDraft.current, now);
       ovDraft.current = draft;
       setChange({ session: s, draft, n: ++changeN.current });
+    } else if (ask.kind === 'random') {
+      // The page's openRandom: a fresh draw under the week in hand, its cards read as the last opened day left things.
+      const prog = s.prog as unknown as RandProgram, week = hand.own || 1;
+      setRandom({ prog, week, opened: openRandom(randState, phoneStore, prog, inHand, week, Math.random, now.getTime()), n: ++randomN.current });
     } else if (ask.kind === 'remove') took(s, removeOverlay(s, ask.id, now.getTime(), report));
     else if (ask.kind === 'back') took(s, imBackFromInjury(s, ask.id, now.getTime(), report));
     else if (ask.kind === 'answer') took(s, injReassess(s, ask.id, ask.ans, now.getTime()));
@@ -268,10 +286,11 @@ function Shell() {
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
       {tab === 'home' ? (
-        <Programs key={'programs' + homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />
+        <Programs key={'programs' + homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => { inHand.dayKey = null; go('week'); }}
+          onGone={(id) => { if (progress.viewId === id) progress.viewId = null; if (hand.prog && hand.prog.id === id) inHand.dayKey = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />
       ) : tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
-          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
+          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} inHand={inHand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
         </Animated.View>
       ) : tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
@@ -285,7 +304,7 @@ function Shell() {
           onDone={(prog, week, dayKey) => { setDeck(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
       {sheet && (
-        <SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
+        <SessionSheet palette={p} store={phoneStore} open={sheet} inHand={inHand} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
           onRest={askRest} onLogged={(week, dayKey) => logged(sheet.prog.id, week, dayKey)} onGoing={() => setGoing(true)}
           onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
@@ -296,7 +315,21 @@ function Shell() {
             // The page's doGenerate: the current week is 1, then This Week is shown and drawn.
             hand.land = landingTitle(prog, midnight(new Date()));
             quiet.current = true;
+            inHand.dayKey = null;
             setWizard(null); setHeld(null); setTick((n) => n + 1); setTab('week');
+          }} />
+      )}
+      {random && (
+        <RandomWorkout key={'random' + random.n} palette={p} store={phoneStore} prog={random.prog} week={random.week} hand={inHand} opened={random.opened} state={randState} reset={randReset} calm={calm} say={say}
+          onClose={() => setRandom(null)} onWrote={() => setWrites((n) => n + 1)}
+          onComplete={(r) => {
+            // The page's completeWildcard: This Week drawn again, then the Wildcard's own pop-up.
+            const prog = random.prog;
+            setWrites((n) => n + 1);
+            timers.current.push(setTimeout(() => {
+              const ps = { store: phoneStore, prog } as unknown as PopSession, now = new Date();
+              raise(ps, popOf(ps, fireWildcardPopup(phoneStore, prog, r.isTraining, now), now, Math.random), null);
+            }, WILD_POP_MS));
           }} />
       )}
       {rest && (

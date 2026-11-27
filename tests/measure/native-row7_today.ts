@@ -216,6 +216,31 @@ thirds.forEach((s, n) => {
   step('Reset, tapped twice', 'resetWildcardCounter();resetWildcardCounter();');
   step('Back', 'closeRandom();');
 });
+// The same card taps with a day opened first: the Wildcard's cards are read and written under the day last opened.
+thirds.forEach((s, n) => {
+  const P = phoneOf(s), id = ids[n]!;
+  const week: number = P.ev('currentWeek');
+  const d = (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const).find((k) => { const x = P.day(week, k); return x && !x.rest && Array.isArray(x.sections) && x.sections.length; });
+  if (!d) return;
+  P.open(week, d);
+  P.ev('openRandom();');
+  const c: { name: string; detail: string } = JSON.parse(P.ev('JSON.stringify(_wildDraw.sections[0].items[0])'));
+  const key: string = P.ev(`exStoreKey(${J(c.name)})`);
+  let pre = P.dump();
+  P.type(`exset_${key}_0`, '6');
+  P.ev(`autoSaveSets(${J(key)});`);
+  let post = P.dump();
+  tap('A day opened first, then a set changed on a Wildcard card', diff(pre, post, id));
+  const draft = JSON.parse(post['ia_logs_' + id] || '{}')['w' + week + '_' + d];
+  tap('Where that set\'s draft is kept', draft && draft.sets && draft.sets[key] ? 'in the log of the day last opened' : 'nowhere');
+  pre = post;
+  P.clearFields();
+  P.logLift(c.name, c.detail, [5, 5], [100, 100]); P.settle();
+  post = P.dump();
+  tap('A day opened first, then Log on that card', diff(pre, post, id));
+  const e = (JSON.parse(post['ia_exw_' + id] || '{}')[key] || { entries: [] }).entries.slice(-1)[0];
+  tap('The day that entry carries', e && e.day === d ? 'the day last opened' : 'another');
+});
 say('Ten phones, each on its third week. Every tap, and the stored keys it changed (the count is how many of the ten):');
 say();
 say('| Tap | Stored keys changed | Phones |'); say('|---|---|---|');
@@ -320,6 +345,9 @@ say();
 say('Found, today\'s own, not ruled:');
 say();
 say('- A Log on a Wildcard card writes the lift history (`ia_exw_<id>`) under the week being viewed and the day last opened, blank when none was. The draw sets `currentRandDayKey` to today\'s weekday and nothing reads it.');
+say('- With a day opened since the launch, a set changed on a Wildcard card is kept as a draft in that day\'s log (`ia_logs_<id>`), and the day is snapshotted (`ia_hist_<id>`) as a day trained is. With none opened, a changed set is kept nowhere until Log.');
+say('- A Wildcard\'s cards are drawn in pounds until a day has been opened, whatever the program\'s unit: the unit is set as a deck or a session sheet opens (`_unitLabel`).');
+say('- On a kilogram program with no day opened, a card\'s Log turns the load field by the program\'s unit and its toast says kg (`saveExWeight` reads the program\'s unit), while each set\'s load is stored as the pounds the card shows (`toStoreW` reads the label). Read from the code and held by the beta\'s walk (`tests/integration/native-random-workout.test.ts`), not counted here: the ten seeded programs are in pounds.');
 say('- A goal with no pool of its own draws from `balanced` (endurance, 2 of the 10 programs; known since V195, D66).');
 
 writeFileSync(join(REPO, 'tests', 'measure', 'native-row7_today.md'), out.join('\n') + '\n');

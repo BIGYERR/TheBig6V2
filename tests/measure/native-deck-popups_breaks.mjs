@@ -94,7 +94,7 @@ const BREAKS = [
   [POPS, 'Done\'s toast reads otherwise', "complete: 'Locked in ✓'", "complete: 'Done ✓'"],
   [POPS, 'Skip\'s toast reads otherwise', "skipped: 'Skipped ✕ — the week moves on'", "skipped: 'Skipped ✕'"],
   // The nudge's two answers.
-  [WRITES, 'a swap never says the nudge is due', 'const nudge = !!countSwap(s.store, s.prog.id, from, to);', 'countSwap(s.store, s.prog.id, from, to);\n  const nudge = false;'],
+  [WRITES, 'a swap never says the nudge is due', 'const nudge = wild ? false : !!countSwap(s.store, s.prog.id, from, to);', 'countSwap(s.store, s.prog.id, from, to);\n  const nudge = false;'],
   [WRITES, 'the nudge\'s words name no job', 'return nudgeText(from, to, _pattern(from));', 'return nudgeText(from, to, null);'],
   [WRITES, 'Leave the plan alone does not mark the pair offered', '  if (s.prog && s.prog.id) markSwapNudged(s.store, s.prog.id, from);\n', ''],
   [WRITES, 'Make the change writes the preference the wrong way round', 'recordSwapPreference(s.store, s.prog.id, from, to);', 'recordSwapPreference(s.store, s.prog.id, to, from);'],

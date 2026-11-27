@@ -114,6 +114,10 @@ Ten phones, each on its third week. Every tap, and the stored keys it changed (t
 | The same workout drawn again | Done Before, no Complete button | 10 |
 | Reset, tapped twice | `ia_wild_<id>` changed | 10 |
 | Back | nothing | 10 |
+| A day opened first, then a set changed on a Wildcard card | `ia_logs_<id>` changed | 10 |
+| Where that set's draft is kept | in the log of the day last opened | 10 |
+| A day opened first, then Log on that card | `ia_exw_<id>` changed, `ia_logs_<id>` changed | 10 |
+| The day that entry carries | the day last opened | 10 |
 
 Draws made by tapping a filter 200 times in a row: 0 repeated the workout before it (the draw is made again while it lands on the last one).
 Swaps made on a Wildcard card: 10. Cards taken off: 10. Rounds taken off: 10. None is stored: they live on the sheet's own copy of the draw, which a new draw, a filter or Back throws away.
@@ -239,4 +243,7 @@ Not in row 7, and not proposed: the update banner (`update-check.ts` fetches the
 Found, today's own, not ruled:
 
 - A Log on a Wildcard card writes the lift history (`ia_exw_<id>`) under the week being viewed and the day last opened, blank when none was. The draw sets `currentRandDayKey` to today's weekday and nothing reads it.
+- With a day opened since the launch, a set changed on a Wildcard card is kept as a draft in that day's log (`ia_logs_<id>`), and the day is snapshotted (`ia_hist_<id>`) as a day trained is. With none opened, a changed set is kept nowhere until Log.
+- A Wildcard's cards are drawn in pounds until a day has been opened, whatever the program's unit: the unit is set as a deck or a session sheet opens (`_unitLabel`).
+- On a kilogram program with no day opened, a card's Log turns the load field by the program's unit and its toast says kg (`saveExWeight` reads the program's unit), while each set's load is stored as the pounds the card shows (`toStoreW` reads the label). Read from the code and held by the beta's walk (`tests/integration/native-random-workout.test.ts`), not counted here: the ten seeded programs are in pounds.
 - A goal with no pool of its own draws from `balanced` (endurance, 2 of the 10 programs; known since V195, D66).

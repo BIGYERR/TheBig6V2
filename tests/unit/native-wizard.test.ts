@@ -710,7 +710,7 @@ describe('native wizard: the screens\' words and wiring', () => {
     assert.ok(app.includes("{icon !== null && <SvgXml xml={asyIcon(icon, 13).replace(/ style=\"[^\"]*\"/, '')} color=\"#0a0a0a\" width={13} height={13} />}"), 'the toast draws the mark the page writes before its words');
   });
   test('after Generate the app shows This Week where the wizard lands, with no reminder for that launch', () => {
-    assert.match(app, /hand\.land = landingTitle\(prog, midnight\(new Date\(\)\)\);\s*quiet\.current = true;\s*setWizard\(null\); setHeld\(null\); setTick\(\(n\) => n \+ 1\); setTab\('week'\);/);
+    assert.match(app, /hand\.land = landingTitle\(prog, midnight\(new Date\(\)\)\);\s*quiet\.current = true;\s*inHand\.dayKey = null;\s*setWizard\(null\); setHeld\(null\); setTick\(\(n\) => n \+ 1\); setTab\('week'\);/);
     assert.ok(app.includes('if (quiet.current) { quiet.current = false; return; }'));
     assert.ok(week.includes('const land = useRef(hand.land || null).current;') && week.includes('const [shownPick, setShown] = useState<number | null>(land ? land.pick : null);'), 'the screen opens on the landing\'s title');
     assert.ok(week.includes('if (hand.land && prog) { hand.own = hand.land.own; hand.land = null; }'), 'takes the week as its own, and takes the landing once');
@@ -970,8 +970,8 @@ describe('native app: the root\'s keyed children', () => {
     // build the wizard again, on its first step with a new draft (seen on the simulator after the race date's check).
     const app = strip(read('App.tsx'));
     const keys = [...app.matchAll(/<(\w+) key=\{([^}]*)\}/g)].map((m) => [m[1]!, m[2]!]);
-    assert.deepEqual(keys.map((k) => k[0]).sort(), ['ChangeSheet', 'DateBox', 'PopUp', 'Programs', 'Progress', 'RestSheet', 'Toast', 'Wizard']);
+    assert.deepEqual(keys.map((k) => k[0]).sort(), ['ChangeSheet', 'DateBox', 'PopUp', 'Programs', 'Progress', 'RandomWorkout', 'RestSheet', 'Toast', 'Wizard']);
     const kinds = keys.map((k) => (/^'(\w+)' \+ /.exec(k[1]!) || [])[1]);
-    assert.deepEqual(kinds.sort(), ['change', 'date', 'pop', 'programs', 'progress', 'rest', 'toast', 'wizard'], 'every key starts with its own kind: ' + JSON.stringify(keys));
+    assert.deepEqual(kinds.sort(), ['change', 'date', 'pop', 'programs', 'progress', 'random', 'rest', 'toast', 'wizard'], 'every key starts with its own kind: ' + JSON.stringify(keys));
   });
 });
