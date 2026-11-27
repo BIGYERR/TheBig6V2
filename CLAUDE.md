@@ -590,6 +590,10 @@ before a merge into `main` touches the build).
   Every screen of a new step is read against its reference before the first setting is changed, and what they show
   is fixed in one build: a look tuned one finding at a time costs a simulator build each (Post-v0.263.0: the cardio
   goals step was built seven times, five of them for a point or less on five screens read in turn).
+  A screen that draws at random is measured on a look build that hands the beta the pieces the reference drew. The
+  force is a temporary edit, never committed: it is taken out and the app built once more before the simulator is
+  read as the code, and the report says so (Post-v0.263.0: Random Workout's look build forced one workout, so both
+  apps drew the same one; the final build was made without it).
   A control of the beta that stands in for one of WebKit's (a date field, a select) is tried in the simulator's
   Safari before it is built: on a field set as today's Angular screens set theirs (a value bound as a property is
   not an attribute, and Reset goes back to the attribute), each tap is made and read, what it writes and when,

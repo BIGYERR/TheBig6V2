@@ -42,7 +42,14 @@ import type { SwapCtx } from './deck-swaps';
 import { type MoveFields, afterLog, fillLoads, loadVals, rawLoads, rawReps, repVals, reuseLoad, stepRep } from './set-fields';
 
 /** The page's globals a write reads: the store, the program a launch handed back, the week and the day in hand. */
-export interface Session { store: StateStore; prog: DeckProgram; week: number; dayKey: string }
+export interface Session {
+  store: StateStore; prog: DeckProgram; week: number; dayKey: string;
+  /**
+   * The page's unit label (window._unitLabel) where it is not the program's: a deck or a sheet sets it to the
+   * program's as it opens, and a Wildcard's cards carry the last opened day's (random-screen.ts wildSession).
+   */
+  label?: 'kg' | 'lbs';
+}
 
 const dayOf = (s: Session): DeckDay | null => { const wk = s.prog.weeks[s.week]; return (wk && wk[s.dayKey]) || null; };
 const unitOf = (s: Session): string => (s.prog.cfg && s.prog.cfg.unit) || 'lbs';
@@ -90,8 +97,9 @@ export function saveLift(s: Session, exKey: string, exName: string, setsReps: st
   }
   let setsW: number[] = [];
   if (dispSets.length && dispSets.some((x) => x > 0)) {
-    // The deck sets the page's unit label to kg only for a kilogram program, pounds for anything else.
-    setsW = dispSets.map((x) => toStoreW(x, kg));
+    // The deck sets the page's unit label to kg only for a kilogram program, pounds for anything else. The page turns
+    // each set's load by that label (toStoreW) and the load field by the program's unit, which a Wildcard can tell apart.
+    setsW = dispSets.map((x) => toStoreW(x, s.label ? s.label === 'kg' : kg));
     const top = Math.max(...setsW);
     if (top > 0) { storedW = top; hasW = true; dispW = Math.max(...dispSets); }
   }
@@ -148,41 +156,52 @@ export function markDay(s: Session, title: string, rpe: number | null, notes: st
   setDayStatus(s.store, s.prog.id, s.week, s.dayKey, title, 'complete', now);
 }
 
+/**
+ * The Wildcard's own working day (the page's _wildDraw, v0.246.0 D250 P-WILDEDIT): a copy of the draw's sections and
+ * the swaps made on it. An edit handed one changes the copy and stores nothing: no record, no count, no snapshot.
+ */
+export interface WildDay extends DeckDay { swaps: { from: string; to: string; rx: SwapPlace[] }[] }
+
 /** The page's skipExercise and unskipExercise: the move marked on the day in hand, the edit stored, the snapshot renewed. */
-function skipMove(s: Session, name: string, off: boolean): string | null {
-  const day = dayOf(s);
+function skipMove(s: Session, name: string, off: boolean, wild?: WildDay | null): string | null {
+  const day = wild || dayOf(s);
   if (!day || !s.prog.id) return null;
   let hit = false;
   (day.sections || []).forEach((sec) => (sec.items || []).forEach((it) => {
     if (it && it.name === name) { it._skipped = off ? true : (undefined as unknown as boolean); hit = true; }
   }));
   if (off && !hit) return null;
-  if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name);
-  resnapshotDay(s);
+  if (!wild) {
+    if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, name);
+    resnapshotDay(s);
+  }
   return off ? name + ' is off today. Tap to put it back.' : name + ' is back on the card.';
 }
 
 /** The page's skipSuperset and unskipSuperset: the round marked, its token stored, the snapshot renewed. */
-function skipRound(s: Session, secIdx: number, off: boolean): string | null {
-  const day = dayOf(s);
+function skipRound(s: Session, secIdx: number, off: boolean, wild?: WildDay | null): string | null {
+  const day = wild || dayOf(s);
   if (!day || !s.prog.id) return null;
   const sec = (day.sections || [])[secIdx];
   if (off && !sec) return null;
   if (sec) sec._skipped = off ? true : (undefined as unknown as boolean);
-  if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, ssSkipToken(secIdx)); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, ssSkipToken(secIdx));
-  resnapshotDay(s);
+  if (!wild) {
+    if (off) addSkipEdit(s.store, s.prog.id, s.week, s.dayKey, ssSkipToken(secIdx)); else dropSkipEdit(s.store, s.prog.id, s.week, s.dayKey, ssSkipToken(secIdx));
+    resnapshotDay(s);
+  }
   return off ? 'Round is off today. Tap to put it back.' : 'Round is back on the card.';
 }
 
 /**
  * The deck's act (deck.ts): a skip or its undo through the page's own handlers, one move, a round, or each name of a
  * block in turn. The grid's day is changed in place, as the page changes activeProg. Returns the last toast raised.
+ * `wild` is a Wildcard card's source (the page's src 'wild'): the edit lands on the Wildcard's own day and is not stored.
  */
-export function act(s: Session, a: CardAct, off: boolean): string | null {
-  if (a.kind === 'exercise') return skipMove(s, a.name, off);
-  if (a.kind === 'round') return skipRound(s, a.secIdx, off);
+export function act(s: Session, a: CardAct, off: boolean, wild?: WildDay | null): string | null {
+  if (a.kind === 'exercise') return skipMove(s, a.name, off, wild);
+  if (a.kind === 'round') return skipRound(s, a.secIdx, off, wild);
   let toast: string | null = null;
-  for (const n of a.names) toast = skipMove(s, n, off) ?? toast;
+  for (const n of a.names) toast = skipMove(s, n, off, wild) ?? toast;
   return toast;
 }
 
@@ -200,10 +219,11 @@ export interface Swapped { toast: string; nudge: boolean }
  * prescribed again (_swapDetailFor); on an injured day the plan's filter decides what the card shows and the dose
  * before it is kept beside the card; a label naming the lift names the new one. Then the record, the count and the
  * snapshot. Null where the sheet's lift is no longer there, as the page closes the sheet and does nothing.
+ * On a Wildcard card (`wild`, D250) the swap lives on the Wildcard's own day: no record, no count, no nudge, no snapshot.
  */
-export function swapMove(s: Session, ctx: SwapCtx, to: string, now: number): Swapped | null {
+export function swapMove(s: Session, ctx: SwapCtx, to: string, now: number, wild?: WildDay | null): Swapped | null {
   if (!ctx || !s.prog || !s.prog.id) return null;
-  const day = dayOf(s);
+  const day = wild || dayOf(s);
   const sec = day && day.sections && day.sections[ctx.secIdx];
   const item = sec && sec.items && (sec.items[ctx.itemIdx] as ExItem | undefined);
   if (!day || !sec || !item) return null;
@@ -233,9 +253,10 @@ export function swapMove(s: Session, ctx: SwapCtx, to: string, now: number): Swa
     } catch { /* as the page: a filter that throws leaves the card as the carry wrote it */ }
   }
   if (sec.label && sec.label.indexOf(from) >= 0) sec.label = sec.label.split(from).join(to);
-  addSwapRecord(s.store, s.prog.id, s.week, s.dayKey, from, to, undoRx, now);
-  const nudge = !!countSwap(s.store, s.prog.id, from, to);
-  resnapshotDay(s);
+  if (wild) wild.swaps.push({ from, to, rx: undoRx });
+  else addSwapRecord(s.store, s.prog.id, s.week, s.dayKey, from, to, undoRx, now);
+  const nudge = wild ? false : !!countSwap(s.store, s.prog.id, from, to);
+  if (!wild) resnapshotDay(s);
   const lead = to + ' in, ' + from.toLowerCase() + ' out. ';
   const toast = held
     ? (rx.win
@@ -256,12 +277,13 @@ export function swapMove(s: Session, ctx: SwapCtx, to: string, now: number): Swa
  * place gets its own prescription back, at its place where `from` stands there again, else on the first `from` not
  * yet written; a record from before D177 has no places, and the name alone comes back. Then the record goes and the
  * snapshot is renewed. The count is not taken back. Null where the day holds no record of `from`.
+ * On a Wildcard card (`wild`, D250) the record is the Wildcard's own, and leaves its own list.
  */
-export function undoSwap(s: Session, from: string): string | null {
+export function undoSwap(s: Session, from: string, wild?: WildDay | null): string | null {
   if (!s.prog || !s.prog.id) return null;
-  const day = dayOf(s);
+  const day = wild || dayOf(s);
   if (!day) return null;
-  const list = readSwaps(s.store, s.prog.id)['w' + s.week + '_' + s.dayKey] || [];
+  const list = wild ? wild.swaps || [] : readSwaps(s.store, s.prog.id)['w' + s.week + '_' + s.dayKey] || [];
   const hit = list.filter((e) => e && e.from === from)[0];
   if (!hit) return null;
   const back: Record<string, string> = {};
@@ -282,8 +304,8 @@ export function undoSwap(s: Session, from: string): string | null {
       }
     });
   }
-  dropSwapRecord(s.store, s.prog.id, s.week, s.dayKey, from);
-  resnapshotDay(s);
+  if (wild) wild.swaps = (wild.swaps || []).filter((e) => e && e.from !== from);
+  else { dropSwapRecord(s.store, s.prog.id, s.week, s.dayKey, from); resnapshotDay(s); }
   return from + ' is back on the card.';
 }
 

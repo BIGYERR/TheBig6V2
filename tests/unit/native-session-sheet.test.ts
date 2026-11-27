@@ -876,7 +876,7 @@ describe('native session sheet: which files write, and what the screen calls', (
     assert.ok(sheet.includes("onPress={() => status(btn.status, view.footTitle)}") && sheet.includes("onPress={() => status('complete', blk.title)}"));
   });
   test('an edit draws the whole sheet again: every field and the log\'s form afresh', () => {
-    assert.ok(sheet.includes('const next = sheetView(store, g, open.week, open.dayKey, Date.now());\n    if (!next) return;\n    setView(next);\n    apply(sheetFields(next));\n    hold(formOf(logOf(next)));\n    holdCardio(cardioOf(next, g));\n    setDrawn((n) => n + 1);\n    setSetsOpen({});'));
+    assert.ok(sheet.includes('const next = sheetView(store, g, open.week, open.dayKey, Date.now(), inHand);\n    if (!next) return;\n    setView(next);\n    apply(sheetFields(next));\n    hold(formOf(logOf(next)));\n    holdCardio(cardioOf(next, g));\n    setDrawn((n) => n + 1);\n    setSetsOpen({});'));
   });
   test('the sheet draws every block of its frame, and the run\'s fields inside its log', () => {
     assert.ok(sheet.includes('drawnBlocks(frame).map('));
@@ -933,11 +933,11 @@ describe('native session sheet: which files write, and what the screen calls', (
     const week = read('this-week/ThisWeek.tsx');
     assert.ok(week.includes("else if (r.to === 'day') { if (onReopen) onReopen(k.week, k.key); }") && week.includes("onPress={() => tap('reopen')}"));
     assert.ok(week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from); else openSheet(week, key);'));
-    assert.ok(week.includes('const view = sheetView(store, grid, week, key, Date.now());\n    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });'));
+    assert.ok(week.includes('const view = sheetView(store, grid, week, key, Date.now(), inHand);\n    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });'));
     assert.ok(week.includes('onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={'));
     const app = read('App.tsx');
     assert.ok(app.includes('onSheet={(s) => { setGoing(false); setSheet(s); }}'));
     assert.ok(app.includes('onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />'), 'Done closes the sheet and raises the completion pop-up over This Week');
-    assert.ok(app.includes('<SessionSheet palette={p} store={phoneStore} open={sheet} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}'));
+    assert.ok(app.includes('<SessionSheet palette={p} store={phoneStore} open={sheet} inHand={inHand} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}'));
   });
 });

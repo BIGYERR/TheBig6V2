@@ -317,7 +317,23 @@ Each phase starts only on Mario's GO, one phase step per session.
   on its first step when a calendar closed (the root's keys). The ledger row of the page's cardio goal step test
   is filled. **Row 6 is built.**
 - **Seen on his phone, IA Next 128** (2026-11-27, run 46008968268): "All good in IA 128". Row 6 is done.
-- **Next:** row 7. Still not
+- **Done, phase 3's sixteenth session, row 7's first of two (Post-v0.263.0, no build):** what is left of row 7
+  measured on today's page (`tests/measure/native-row7_today.md`: of the row the beta already held the swap sheet,
+  the add sheet, the toast and eight of nine pop-up callers; Random Workout's pools are the page's own, 149
+  workouts and 668 cards, the session sheet's own with their log; only Complete, the reset and a card's Log store
+  anything), the cut put to Mario as two sessions with the Bugs tab built as today's, and taken ("Concur, build
+  it"). Built (`docs/decisions/wildcard.md`, the Expo entry): This Week's button with its counter, the sheet over
+  the whole screen (the two filters, the two tap reset, the badge and title, the cardio block, the cards, the
+  note, Complete or the done block), a swap, a minus and each put back on a Wildcard's own working day, a card's
+  Log and drafts where today's go, Complete with its toast, This Week drawn again and the Wildcard's own pop-up 380
+  ms on. What a day's open leaves behind on the page (the day last opened, the unit, the stale warning) is kept
+  for the app's life, since a Wildcard's cards read it. After every tap the stores, the toasts, the counter, every
+  field and, after every draw, the sheet whole stay equal to today's page: on The Half Manny and on the ten seeded
+  programs (1,579 taps, 908 draws, every workout of See All shown on both). 137 breaks, every one red; the first whole run let 3 of 136 through, each closed before the whole set ran again.
+  The look was measured beside today's own page in the simulator's Safari, every piece within a point. The ledger
+  rows of the Wildcard's tests and of today's model test are filled. Found by the measure, today's own, not ruled:
+  a Wildcard card is drawn and logged under the day last opened (the handoff's section 12).
+- **Next:** row 7's second session, the Bugs tab. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
@@ -596,7 +612,7 @@ The order is the session's reading of what Mario uses daily (no usage numbers ex
 | 4 | Progress: journal, charts, ledger, estimator | 2 to 3 (taken in 2: the run cards' drawing second) |
 | 5 | The program list and its sheets (goal, mile, mile lock, injury and travel, rest day) | 2 to 3 (taken in 3: the list with the goal sheet and the mile pencil; the rest day sheet with the mile nudge; injury and travel) |
 | 6 | The wizard and generating | 2 |
-| 7 | Swap, add, Random Workout, pop-ups, the toast, the Bugs tab, backup, theme | 1 to 2 |
+| 7 | Swap, add, Random Workout, pop-ups, the toast, the Bugs tab, backup, theme | 1 to 2 (taken in 2: Random Workout; then the Bugs tab with the Look row, the backup and the bug report) |
 
 The session sheet is taken in two sessions, not three (Mario, 2026-11-16, "Concur build", on the measure's
 proposal): its log's run fields and wheels move to row 3 with the cardio sheet, which is the same piece.
@@ -611,6 +627,12 @@ five card steps, the name step with its start date and Generate first, which mak
 strength path; then the cardio goals step's goals, their forms and number fields, the seed offer, the race date
 and the card under it, and the shorter plan's link. In the first, the cardio goals step opens and shuts its sports
 and lists their goals, and a goal takes no press.
+
+Row 7 is taken in two sessions (Mario, 2026-11-27, "Concur, build it", on the measure's proposal): the swap sheet,
+the add sheet, the toast and eight of the nine pop-up callers were already built with the screens they belong to,
+so what was left is Random Workout, taken first with the ninth pop-up, and the Bugs tab as today draws it (the bug
+report, the Look row, Save a backup and Load a backup with its question). The Bugs tab is built as today's; the
+Profile page Mario named on 2026-11-22 is set for phase 4, when Your watch has something to show on it.
 
 Each screen: built from the lifted logic and the Angular screen's pure model where one exists, its tests written from
 the ledger, then **checked against the old build** on the same backup (section 3.3).

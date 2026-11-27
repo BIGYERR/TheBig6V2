@@ -8,8 +8,8 @@
 // Nothing here writes. A tap on a week title or on a day changes what is shown, not what is stored. The rest card's
 // links open the rest day sheet (rest-sheet/RestSheet.tsx). Hurt?, Traveling?, the chips of the changes still live
 // (change-sheet/ChangeChips.tsx: I'm back, the ✕, the check in), the race date and Program Start are handed up to
-// the app as asks (WeekAsk), which draws their sheets over the screen and writes to this app's own store. Drawn as
-// today's and doing nothing until its own screen exists: Random Workout.
+// the app as asks (WeekAsk), which draws their sheets over the screen and writes to this app's own store. Random
+// Workout's button carries its counter, read from the store at each draw, and asks the app for its sheet.
 import { type ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,7 +22,8 @@ import { type CardioOnly, cardRoute } from '../day-detail/cardio-sheet-model';
 import { type SheetOpen, type SheetProgram, sheetView } from '../day-detail/sheet-screen';
 import { ChangeChips } from '../change-sheet/ChangeChips';
 import { type OverlayProgram, overlayChips } from '../change-sheet/overlay-readers';
-import { type DeckOpen, type DeckProgram, deckView } from '../deck/deck-screen';
+import { type DayInHand, type DeckOpen, type DeckProgram, deckView, openedDay } from '../deck/deck-screen';
+import { type RandProgram, randCounter } from '../random-workout/random-screen';
 import type { GrowBox } from '../deck/grow-motion';
 import type { RestAsk, RestProgram } from '../rest-sheet/rest-sheet-model';
 import { currentWeek } from './week-readers';
@@ -59,18 +60,20 @@ export interface WeekHand {
    */
   land?: { pick: number | null; own: number } | null;
 }
-/** A tap the app answers: Hurt?, Traveling?, a chip's I'm back or ✕, the check in's answer, a date box of the row. */
+/** A tap the app answers: Hurt?, Traveling?, Random Workout, a chip's I'm back or ✕, the check in's answer, a date box of the row. */
 export type WeekAsk =
-  | { kind: 'hurt' } | { kind: 'travel' }
+  | { kind: 'hurt' } | { kind: 'travel' } | { kind: 'random' }
   | { kind: 'back'; id: string } | { kind: 'remove'; id: string } | { kind: 'answer'; id: string; ans: 'better' | 'same' | 'worse' }
   | { kind: 'date'; which: 'race' | 'start'; value: string };
 
-export function ThisWeek({ palette: p, store, tick, held, hand, resets, onAsk, onDeck, onSheet, onRest, onLaunch }: {
+export function ThisWeek({ palette: p, store, tick, held, hand, inHand, resets, onAsk, onDeck, onSheet, onRest, onLaunch }: {
   palette: Palette; store: StateStore; tick: number;
   /** The program Make the change handed back since the launch, to hold in place of the launch's own; null for none. */
   held: DeckProgram | null;
   /** The program in hand and the screen's own week, kept where the app can read them. */
   hand: WeekHand;
+  /** What a day's open leaves behind for the app's life (the day, the unit, the stale warning), set here as a day opens. */
+  inHand: DayInHand;
   /** Counts the dates set that send the title back to the one holding today (week-dates/week-dates.ts titleAfterDate). */
   resets: number;
   onAsk: (ask: WeekAsk) => void;
@@ -214,7 +217,7 @@ export function ThisWeek({ palette: p, store, tick, held, hand, resets, onAsk, o
     if (!prog) return;
     hand.own = week;
     const grid = prog as unknown as SheetProgram;
-    const view = sheetView(store, grid, week, key, Date.now());
+    const view = sheetView(store, grid, week, key, Date.now(), inHand);
     if (view) onSheet({ prog: grid, week, dayKey: key, view, only });
   };
   // Start lift, Start session: the day opened as a deck, or as its session sheet where today's app opens that instead
@@ -223,7 +226,7 @@ export function ThisWeek({ palette: p, store, tick, held, hand, resets, onAsk, o
     if (!prog) return;
     hand.own = week;
     const grid = prog as unknown as DeckProgram;
-    const warn = { shown: false, src: '' };
+    const warn = openedDay(inHand, grid, key);
     const view = deckView(store, grid, week, key, Date.now(), warn);
     if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from); else openSheet(week, key);
   };
@@ -309,10 +312,11 @@ export function ThisWeek({ palette: p, store, tick, held, hand, resets, onAsk, o
 
         <View style={s.settings}>
           <View style={s.actions}>
-            <View testID="week-random" accessibilityRole="button" accessibilityState={{ disabled: true }} style={[s.action, { borderColor: p.border2 }]}>
+            <Pressable testID="week-random" accessibilityRole="button" onPress={() => onAsk({ kind: 'random' })} style={({ pressed }) => [s.action, { borderColor: p.border2 }, pressed && s.sunk]}>
               <Die color={p.signal} />
-              <Text style={[s.actionText, { color: p.text }]}>Random Workout</Text>
-            </View>
+              <Text style={[s.actionText, s.randomText, { color: p.text }]}>Random Workout</Text>
+              <Text testID="week-random-counter" style={[s.counter, { color: p.muted }]}>{randCounter(store, prog as unknown as RandProgram | null)}</Text>
+            </Pressable>
             <Pressable testID="week-travel" accessibilityRole="button" onPress={() => onAsk({ kind: 'travel' })} style={({ pressed }) => [s.action, { borderColor: p.border2, justifyContent: 'center' }, pressed && s.sunk]}>
               <Bag color={p.text} />
               <Text style={[s.actionText, { color: p.text }]}>Traveling?</Text>
@@ -605,4 +609,9 @@ const styles = StyleSheet.create({
   sunk: { transform: [{ scale: 0.98 }] },
   action: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1.5, borderRadius: 999, paddingVertical: 13, paddingHorizontal: 14 },
   actionText: { fontFamily: DISPLAY, fontSize: 15, fontWeight: '700' },
+  // Today's button gives its words what its mark and its counter leave, so they stand centred on two lines at this
+  // width, 19.85 apart, and the two buttons are as tall as that makes them (measured in the simulator's Safari).
+  randomText: { flex: 1, textAlign: 'center', lineHeight: 19.85 },
+  // The counter at the button's right (.rand-counter, look.css: 12 at 600, which WebKit draws with the Bold).
+  counter: { fontFamily: DISPLAY, fontSize: 12, fontWeight: '700' },
 });

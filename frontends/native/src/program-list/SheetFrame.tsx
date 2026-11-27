@@ -16,10 +16,12 @@ const SLIDE_OUT = 360;
 /** Slides the sheet away, running `before` first; a second call while it leaves does nothing. */
 export type Leave = (before?: () => void) => void;
 
-export function SheetFrame({ id, palette: p, calm, onClose, children }: {
+export function SheetFrame({ id, palette: p, calm, onClose, head, children }: {
   id: string; palette: Palette; calm: boolean;
   /** The sheet is gone. */
   onClose: () => void;
+  /** What stands in the header beside Back (Random Workout's filters and its reset), or nothing. */
+  head?: ReactNode;
   children: (leave: Leave) => ReactNode;
 }) {
   const insets = useSafeAreaInsets();
@@ -43,6 +45,7 @@ export function SheetFrame({ id, palette: p, calm, onClose, children }: {
         <Pressable testID={id + '-back'} accessibilityRole="button" hitSlop={10} onPress={() => leave()} style={[styles.back, { backgroundColor: p.surface, borderColor: p.border2 }]}>
           <Text style={[styles.backText, { color: p.text }]}>← Back</Text>
         </Pressable>
+        {head}
       </View>
       <ScrollView contentContainerStyle={[styles.body, { paddingBottom: 60 + insets.bottom }]} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets>
         {children(leave)}

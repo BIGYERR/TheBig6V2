@@ -626,7 +626,7 @@ describe('native change sheet: the screens\' wiring', () => {
     assert.ok(week.includes("<Pressable testID=\"week-travel\" accessibilityRole=\"button\" onPress={() => onAsk({ kind: 'travel' })}"));
     assert.ok(week.includes("<Pressable testID=\"week-race\" accessibilityRole=\"button\" accessibilityLabel=\"Race date\" onPress={() => onAsk({ kind: 'date', which: 'race', value: view.row.iso })}"));
     assert.ok(week.includes("<Pressable testID=\"week-start\" accessibilityRole=\"button\" accessibilityLabel=\"Program start date\" onPress={() => onAsk({ kind: 'date', which: 'start', value: view.row.iso })}"));
-    assert.ok(week.includes('<View testID="week-random" accessibilityRole="button" accessibilityState={{ disabled: true }}'), 'Random Workout still takes no press');
+    assert.ok(week.includes("<Pressable testID=\"week-random\" accessibilityRole=\"button\" onPress={() => onAsk({ kind: 'random' })}"), 'Random Workout asks the app as its neighbour does (tests/unit/native-random-workout.test.ts)');
   });
   test('This Week keeps the program in hand and the week it last wrote where the app reads them', () => {
     assert.ok(week.includes('hand.prog = prog;'));
@@ -638,7 +638,7 @@ describe('native change sheet: the screens\' wiring', () => {
     assert.ok(week.includes('useEffect(() => { place(); }, [place, progId, placeTick]);'), 'and the strip is placed anew');
   });
   test('the app answers each ask on the program in hand as the tap lands', () => {
-    assert.ok(app.includes('<ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} resets={resets} onAsk={asked} onDeck='), 'This Week is handed where it keeps the program, the count of title resets, and the one answerer');
+    assert.ok(app.includes('<ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} inHand={inHand} resets={resets} onAsk={asked} onDeck='), 'This Week is handed where it keeps the program, the count of title resets, and the one answerer');
     assert.ok(app.includes('const hand = useRef<WeekHand>({ prog: null, own: null }).current;'));
     assert.ok(app.includes('const session = (): OverlaySession | null => (hand.prog ? { store: phoneStore, prog: hand.prog as unknown as OverlayProgram } : null);'));
     assert.ok(app.includes("const draft = ask.kind === 'hurt' ? openInjury(ovDraft.current, s.prog, now) : openTravel(ovDraft.current, now);") && app.includes('ovDraft.current = draft;\n      setChange({ session: s, draft, n: ++changeN.current });'));
