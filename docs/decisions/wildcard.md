@@ -91,3 +91,17 @@ and `frontends/app/test/unit/random-workout.test.ts`; the Expo app's are `tests/
   the simulator, on a copy of Mario's backup, and the simulator's store put back after (sha256 278ba57f before and
   after).
 - **Released:** Post-v0.263.0 (no build of today's app).
+- **On Mario's phone, build 129** (2026-11-27; run 46051140015, `docs/decisions/testflight.md`). Three reports,
+  each read before anything was changed, none a fault of the build. **"hit done and no complete check in the
+  calender":** made on the simulator on a copy of his backup, where Complete on a rest day drew the Wildcard mark
+  in today's circle, the Wildcard done tag under the hero and the counter at 1/30, and no check: D64, a Wildcard is
+  a substitute and never a completion (the other Done, the reminder's, drew its check on the day it settled).
+  **"it does not show the W":** his screenshot of This Week showed a program in its first week whose calendar
+  starts ten days on, so today is off the program's calendar, where today's `wildcardDayFor` hands back no day
+  and the record is stored with none: the Wildcard counts and no mark is drawn, in today's app as in the beta
+  (`random-writes.ts wildcardDayFor`, the page's own; held equal by the walks). **"you cant undo a done at the
+  bottom of the wildacard workout":** today's own; a workout done before reads "You've done this one before" and
+  nothing more, and only Reset clears it, with the whole counter. **Not ruled, carried (the handoff's section
+  12):** whether a Wildcard done before a program starts should show anywhere, and whether one Wildcard can be
+  undone. Either would change today's app and the page too. The simulator's store was put back after each look
+  (sha256 278ba57f before and after).
