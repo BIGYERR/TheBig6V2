@@ -207,6 +207,10 @@ function Shell() {
   const hand = useRef<WeekHand>({ prog: null, own: null }).current;
   // ── The wizard (wizard.ts, wizard-generate.ts; ./wizard) ──
   // Open over the whole screen, a count so each Build New Program is a wizard of its own with a draft of its own.
+  // EVERY KEYED CHILD OF THE ROOT NAMES ITS KIND IN ITS KEY. Each is counted from one, and they are siblings: keyed by
+  // the bare count, the first wizard and the first calendar were both "1", and closing the calendar made React build
+  // the wizard again, on its first step with a new draft (seen on the simulator after a race date's pick, Reset and
+  // check; once the session before after a start date's).
   const [wizard, setWizard] = useState<number | null>(null);
   const wizardN = useRef(0);
   // After Generate This Week shows the new program with no launch's reminder: the page makes no launch there.
@@ -264,12 +268,12 @@ function Shell() {
     <View style={[styles.root, { backgroundColor: p.bg }]}>
       <StatusBar style={p === NIGHT ? 'light' : 'dark'} />
       {tab === 'home' ? (
-        <Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />
+        <Programs key={'programs' + homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />
       ) : tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
           <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
         </Animated.View>
-      ) : tab === 'progress' ? <Progress key={progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}
+      ) : tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
         <TabButton id="tab-home" label="Programs" on={tab === 'home'} palette={p} onPress={() => go('home')} icon={(c) => <Home color={c} />} />
         <TabButton id="tab-week" label="This Week" on={tab === 'week'} palette={p} onPress={() => go('week')} icon={(c) => <Calendar color={c} size={22} />} />
@@ -287,7 +291,7 @@ function Shell() {
       )}
       {cover}
       {wizard !== null && (
-        <Wizard key={wizard} palette={p} store={phoneStore} say={say} report={report} onDate={openDate} onClose={() => setWizard(null)}
+        <Wizard key={'wizard' + wizard} palette={p} store={phoneStore} say={say} report={report} onDate={openDate} onClose={() => setWizard(null)}
           onDone={(prog) => {
             // The page's doGenerate: the current week is 1, then This Week is shown and drawn.
             hand.land = landingTitle(prog, midnight(new Date()));
@@ -296,7 +300,7 @@ function Shell() {
           }} />
       )}
       {rest && (
-        <RestSheet key={rest.n} palette={p} session={{ store: phoneStore, prog: rest.prog }} draft={rest.draft} calm={calm} say={say} onClose={() => setRest(null)}
+        <RestSheet key={'rest' + rest.n} palette={p} session={{ store: phoneStore, prog: rest.prog }} draft={rest.draft} calm={calm} say={say} onClose={() => setRest(null)}
           onWrote={() => { setWrites((n) => n + 1); if (rest.wrote) rest.wrote(); }} />
       )}
       {mile && (
@@ -305,15 +309,15 @@ function Shell() {
           onDone={(o) => { if (o.prog) setHeld(o.prog as unknown as DeckProgram); if (o.toast) say(o.toast); }} />
       )}
       {change && (
-        <ChangeSheet key={change.n} palette={p} session={change.session} draft={change.draft} calm={calm} say={say} report={report}
+        <ChangeSheet key={'change' + change.n} palette={p} session={change.session} draft={change.draft} calm={calm} say={say} report={report}
           onDraft={(d) => { ovDraft.current = d; }} onDate={openDate} onClose={() => setChange(null)}
           onDone={(r) => { if (r.prog) setHeld(r.prog as unknown as DeckProgram); setWrites((n) => n + 1); }} />
       )}
-      {dateAsk && <DateBox key={dateAsk.n} palette={p} ask={dateAsk.ask} calm={calm} onClose={() => setDateAsk(null)} />}
-      {toast && <Toast key={toast.n} text={toast.text} icon={toast.icon} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
+      {dateAsk && <DateBox key={'date' + dateAsk.n} palette={p} ask={dateAsk.ask} calm={calm} onClose={() => setDateAsk(null)} />}
+      {toast && <Toast key={'toast' + toast.n} text={toast.text} icon={toast.icon} palette={p} bottom={96 + insets.bottom} onDone={() => setToast((t) => (t && t.n === toast.n ? null : t))} />}
       {over}
       {nudge && <MileNudge palette={p} text={nudgeText(nudge.offer)} calm={calm} onUpdate={() => answered(true)} onKeep={() => answered(false)} />}
-      {pop && <PopUp key={pop.n} palette={p} view={pop.view} calm={calm} onAct={answer} onClose={() => setPop(null)} />}
+      {pop && <PopUp key={'pop' + pop.n} palette={p} view={pop.view} calm={calm} onAct={answer} onClose={() => setPop(null)} />}
     </View>
   );
 }

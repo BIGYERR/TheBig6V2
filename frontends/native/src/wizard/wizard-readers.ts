@@ -14,16 +14,17 @@
 // Nothing here writes to the store. The name step reads it once, for the default name's number.
 // tests/support/native-wizard.ts holds each of these equal to today's page, draft for draft.
 import { ALL_DAYS_ORDER, _ISO_ORDER, _isoOf, _parseLocalDate } from '@ia/core/engine/calendar.ts';
-import { isSpeedGoal, sportDayTargets } from '@ia/core/engine/cardio-progression.ts';
+import { isSpeedGoal, runAnchorInfo, sportDayTargets } from '@ia/core/engine/cardio-progression.ts';
+import { _clkMS, _fmtMileAnchor } from '@ia/core/engine/clock-format.ts';
 import { LIFTING_FOCUS_TO_GOAL } from '@ia/core/engine/exercise-library.ts';
 import { asyIcon } from '@ia/core/engine/icons.ts';
 import { NRC_SHORTER, raceAlignment, raceCountdown, raceCountdownWords } from '@ia/core/engine/nrc-race-bike-swim.ts';
-import { calcProgramLength } from '@ia/core/engine/nsw-cardio.ts';
+import { calcProgramLength, paceGoalTarget } from '@ia/core/engine/nsw-cardio.ts';
 import { readPrograms } from '@ia/core/engine/state-programs.ts';
 import { progTestPin } from '@ia/core/engine/state-refresh.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
 
-import { CARDIO_GOALS_BY_TYPE } from '../program-list/list-readers';
+import { CARDIO_GOALS_BY_TYPE, type MileEntry, mileEntryState } from '../program-list/list-readers';
 import { fmtStartDay } from '../this-week/week-readers';
 import { type ResolvedStart, resolveStartDate, rsRace } from '../week-dates/week-dates';
 import { alignedPips } from './cardio-goal-model';
@@ -338,4 +339,177 @@ export function nameView(store: StateStore, d: Draft, now: Date): NameView {
     resolveCopy: al ? '' : startResolveCopy(sr),
     rows,
   };
+}
+
+// ── The cardio goals (the second session) ───────────────────────────────────────────────────────────────────────
+// The page's own, line for line: SWIM_GOAL_DIST, progLenLineHTML, _mileFieldHelp, assessRunPaceCeiling,
+// paceCeilingSentence, paceCeilingOfferHTML, and the one repaint of the step, updateRaceDateFeedback, with its
+// internals updatePaceDisplay and updatePaceFeasibility (wizard.ts, wizard-generate.ts). The page repaints seven
+// lines of the step in place, between whole draws; CardioPaint holds them as they stand, and each function here
+// hands back what its page twin would have left on the page.
+
+/** The fixed distances of the swim time goals, in the unit chosen (SWIM_GOAL_DIST). */
+export const SWIM_GOAL_DIST: Record<string, number> = { swim_500_time: 500, swim_100_time: 100 };
+/** Seconds a mile a week of training takes off, by level: core's own table (nrc-race-bike-swim.ts keeps it to itself), held equal to the page's by the tests. */
+export const PACE_IMPROVE: Record<string, number> = { beginner: 3, intermediate: 3, advanced: 2 };
+
+/** The page's _mileEntryState with no arguments: the draft's run goal, and its level as it stands. */
+export const draftMileState = (d: Draft): MileEntry => mileEntryState((d.cardioGoals || {})['run'] as never, d.experience as string);
+/** The length the goals ask for, as the step's header asks core for it; 6 with no sport. */
+const headerLength = (d: Draft): number => ((d.cardioTypes || []).length
+  ? calcProgramLength(d.cardioTypes as never, lengthGoals(d, true) as never, (LIFTING_FOCUS_TO_GOAL as Record<string, string | undefined>)[d.liftingFocus || ''] || 'balanced').weeks : 6);
+
+type Pin = NonNullable<ReturnType<typeof wizardTestPin>>;
+
+/** The header sentence of the box under the cards (progLenLineHTML): a dated test prints its test week, any other goal its length. */
+export function progLenLine(d: Draft, now: Date, pin?: Pin | null, length?: number): string {
+  const p = pin === undefined ? wizardTestPin(d, now) : pin;
+  const len = length === undefined ? (p ? p.len : headerLength(d)) : length;
+  if (!(p && p.tw) && draftMileState(d).blank) return '<b style="color:var(--accent)">Program length: your mile time sets it.</b> Enter your current mile time and the length appears.';
+  const n = (p && p.tw) || len;
+  return '<b style="color:var(--accent)">Program length: ' + n + (n === 1 ? ' week.' : ' weeks.') + '</b> ' + ((p && p.tw) ? 'Your test sets it.' : 'Set by your longest cardio goal and your experience.');
+}
+
+/** The words beside Current mile time (_mileFieldHelp). */
+export function mileFieldHelp(d: Draft): string {
+  const g = (d.cardioGoals && d.cardioGoals['run']) || {}; const exp = d.experience || 'intermediate';
+  if (g.id === 'run_pace_goal' && exp !== 'beginner') return 'Required. Your paces and your program length start from it.';
+  const a = runAnchorInfo({ cardioTypes: ['run'], cardioGoals: { run: { id: g.id || 'run_base' } }, experience: exp } as never); if (!a) return 'Optional.';
+  const m = _fmtMileAnchor(a.anchorSec as number), art = /^(8|11|18):/.test(m) ? 'an' : 'a';
+  return 'Optional. Leave it blank and your paces come from ' + art + ' ' + m + ' mile, the ' + exp + ' default. Enter a mile only if you have timed one.';
+}
+
+/** What the pace ceiling found (assessRunPaceCeiling): what L weeks reach from where the athlete is. */
+export interface PaceCeiling { L: number; achievable: number; safeTotal: number; tTotal: number; cur: number; fromMile: boolean; exp: string; distLabel: string }
+/** The page's assessRunPaceCeiling (D183): null when the goal is no pace goal, the target is no faster than now, or it sits within 45 s a mile of what L weeks reach. */
+export function assessRunPaceCeiling(d: Draft, L: number): PaceCeiling | null {
+  const g = d.cardioGoals['run'] as Record<string, unknown> | undefined;
+  if (!g || g['id'] !== 'run_pace_goal' || g['targetMins'] === undefined || g['targetMins'] === '' || !g['targetDist']) return null;
+  const exp = d.experience || 'intermediate';
+  const age = d.ageBracket || '18-35';
+  const rawDist = parseFloat(g['targetDist'] as string) || 1.5;
+  const tDist = (g['paceUnit'] === 'km') ? rawDist * 0.621 : rawDist;
+  const tTotal = (+(g['targetMins'] as number) || 0) * 60 + (+(g['targetSecs'] as number) || 0);
+  if (!(tDist > 0) || !(tTotal > 0)) return null;
+  const tPacePerMile = tTotal / tDist;
+  const expCurrentPace = ({ beginner: 690, intermediate: 570, advanced: 450 } as Record<string, number>)[exp] || 570;
+  const mileBest = (g['mileBestMins'] !== undefined && g['mileBestMins'] !== '')
+    ? (+(g['mileBestMins'] as number) || 0) * 60 + (+(g['mileBestSecs'] as number) || 0)
+    : null;
+  const currentPace = mileBest || expCurrentPace;
+  if (tPacePerMile >= currentPace) return null;
+  const paceImprove = PACE_IMPROVE[exp] || PACE_IMPROVE['intermediate']!;
+  const agePaceScale = ({ '55+': 0.65, '36-54': 0.85, '18-35': 1.0 } as Record<string, number>)[age] || 1.0;
+  const ageSafePaceImprove = +(paceImprove * agePaceScale).toFixed(2);
+  const ageMult = ({ '55+': 1.15, '36-54': 1.07, '18-35': 1.0 } as Record<string, number>)[age] || 1.0;
+  const improvingWeeks = Math.max(0, ((L - 1) / ageMult - 4) / 1.25);
+  const achievable = Math.max(currentPace - improvingWeeks * ageSafePaceImprove, 240);
+  if (achievable - tPacePerMile < 45) return null;
+  const safeTotal = achievable * tDist;
+  return { L, achievable, safeTotal, tTotal, cur: currentPace, fromMile: !!mileBest, exp, distLabel: ((g['targetDist'] as string) || '1.5') + ' ' + ((g['paceUnit'] as string) || 'mi') };
+}
+/** The one sentence that reads the athlete (paceCeilingSentence). */
+export function paceCeilingSentence(f: PaceCeiling): string {
+  const wk = f.L + (f.L === 1 ? ' week' : ' weeks');
+  const reach = ' In ' + wk + ' that reaches about ' + f.distLabel + ' in ' + _clkMS(f.safeTotal) + '. Your goal is ' + _clkMS(f.tTotal) + '.';
+  if (f.fromMile) return 'Your mile is ' + _clkMS(f.cur) + '.' + reach + ' Keep it or change it above.';
+  return 'You have not entered a mile time. The ' + f.exp + ' default is ' + _clkMS(f.cur) + ' per mile.' + reach + ' Enter your mile above and this updates.';
+}
+/** The frame under the pace goal's target when no race date owns the pace's words (paceCeilingOfferHTML). */
+export function paceCeilingOfferHTML(f: PaceCeiling): string {
+  return '<div style="color:var(--accent);font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:var(--accent)18;border-radius:16px;border:1px solid var(--accent)44">'
+    + paceCeilingSentence(f)
+    + '</div>';
+}
+
+/**
+ * The seven lines the page repaints in place, as they stand, and the race date's field. Null is a line the step does
+ * not hold (its form or its block is not drawn); '' is one that is hidden or empty. A line with markup is kept as the
+ * page writes it.
+ */
+export interface CardioPaint {
+  /** The race date's field: the day it shows, blank, or null with no field on the step. */
+  raceField: string | null;
+  progLen: string | null;
+  pace: string | null;
+  feas: string | null;
+  card: string | null;
+  swimPace: string | null;
+  mileAdvisory: { text: string; color: string } | null;
+  swimAdvisory: { text: string; color: string } | null;
+}
+
+/** The pace line under the run target (updatePaceDisplay): '<time> is <pace> per mile.', or hidden. */
+function paceDisplay(d: Draft): string {
+  const g = d.cardioGoals['run'] as Record<string, unknown> | undefined;
+  if (!g || g['targetMins'] === undefined || g['targetMins'] === '' || !g['targetDist']) return '';
+  const t = paceGoalTarget(g as never) as { tTotalSecs?: number | null; tPacePerMile?: number | null };
+  if (!t.tPacePerMile) return '';
+  return asyIcon('🎯', 13) + ' ' + _clkMS(t.tTotalSecs as number) + ' is ' + _clkMS(t.tPacePerMile) + ' per mile.';
+}
+/** The pace line under the swim target (updateSwimPaceDisplay): '<time> is <pace> per 100 <unit>.', or hidden. */
+export function swimPaceDisplay(d: Draft): string {
+  const g = d.cardioGoals['swim'] as Record<string, unknown>;
+  const totalSecs = (+(g['targetMins'] as number) || 0) * 60 + (+(g['targetSecs'] as number) || 0);
+  if (!(totalSecs > 0)) return '';
+  const dist = SWIM_GOAL_DIST[g['id'] as string] || 500;
+  const unit = (g['swimUnit'] as string) || 'yd';
+  return asyIcon('🎯', 13) + ' ' + _clkMS(totalSecs) + ' is ' + _clkMS(totalSecs / (dist / 100)) + ' per 100 ' + unit + '.';
+}
+
+/**
+ * The step's one repaint (updateRaceDateFeedback, D183): the race date read back from its field when the field holds
+ * one, then the test pin, the length and the pace ceiling once, and from them the header, the pace line, the pace
+ * frame and the card under the race date. It writes the draft's race date and its week count as the page does, the
+ * week count only while the card is on the step.
+ */
+export function raceFeedback(d: Draft, now: Date, paint: CardioPaint): CardioPaint {
+  const out: CardioPaint = { ...paint };
+  if (paint.raceField) d.raceDate = paint.raceField;
+  const p = wizardTestPin(d, now);
+  const len = p ? p.len : headerLength(d);
+  const f = draftMileState(d).blank ? null : assessRunPaceCeiling(d, (p && p.tw) || len);
+  if (paint.progLen !== null) out.progLen = progLenLine(d, now, p, len);
+  if (paint.pace !== null) out.pace = paceDisplay(d);
+  if (paint.feas !== null) out.feas = ((d.primaryPath === 'event' && d.eventTargeted && d.raceDate) || !f) ? '' : paceCeilingOfferHTML(f);
+  if (paint.card === null) return out;
+  if (!d.raceDate) { out.card = ''; return out; }
+  const cd = raceCountdown(d.raceDate, isoToday(now));
+  if (!cd) { out.card = ''; return out; }
+  d.raceDateWeeks = cd.weeks;
+  if (cd.days < 0) {
+    out.card = '<div style="color:var(--red);font-size:12px;margin-top:6px">' + asyIcon('⚠', 13) + ' That date has already passed.</div>';
+    return out;
+  }
+  const card = (color: string, html: string): string => '<div style="color:' + color + ';font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:' + color + '18;border-radius:16px;border:1px solid ' + color + '44">' + html + '</div>';
+  if (p) {
+    const reach = f ? '<div style="margin-top:5px">' + paceCeilingSentence(f) + '</div>' : '';
+    if (p.tw! >= 2) out.card = card(f ? 'var(--accent)' : 'var(--run)', 'Your test is in week ' + p.tw + '. The program ends on it. The taper lands in front of it.' + reach);
+    else if (p.tw === 1 && p.holdsTest) out.card = card('var(--signal)', 'Your test is in week 1. Nothing is left to train before it. You get the test week only.' + reach);
+    else if (p.tw === 1) out.card = card('var(--accent)', 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.' + reach);
+    else if (p.week === null) out.card = card('var(--signal)', 'Your test is before your first training day. This program starts after it and does not include it.');
+    else out.card = card('var(--accent)', 'Your test is in week ' + p.week + '. The test block is ' + p.cap + ' weeks. This program builds ' + p.len + (p.len === 1 ? ' week' : ' weeks') + ' now. Start a test block when the test is ' + p.cap + ' weeks out.');
+    return out;
+  }
+  if (cd.weeks < 1) {
+    out.card = '<div style="color:var(--red);font-size:12px;margin-top:6px">' + asyIcon('⚠', 13) + ' Less than a week away. Not enough time to train.</div>';
+    return out;
+  }
+  const al = wizardAlignment(d, now);
+  if (al) {
+    out.card = card(al.underFloor ? 'var(--signal)' : 'var(--run)', alignedStartCopy(d, al));
+    return out;
+  }
+  const diff = cd.weeks - len;
+  if (diff > 0) {
+    out.card = card('var(--run)', 'Your ' + len + '-week program finishes ' + diff + ' week' + (diff > 1 ? 's' : '') + ' before race day. Use the extra time to stay sharp.');
+    return out;
+  }
+  if (diff === 0) {
+    out.card = card('var(--run)', 'Perfect timing. Your ' + len + '-week program peaks on race day.');
+    return out;
+  }
+  const color = diff >= -2 ? 'var(--accent)' : 'var(--red)';
+  out.card = card(color, cd.weeks + (cd.weeks === 1 ? ' week' : ' weeks') + ' is short for this goal. The floor is ' + len + '. Your full ' + len + '-week program stays intact. Your race lands in week ' + cd.weeks + '.');
+  return out;
 }

@@ -165,3 +165,22 @@ D193, D194, D197) are recorded in the handoff and `docs/test-migration/13-injury
   only for a blank field. `DateBox.tsx` keeps that day (`opened`) and Reset sets the calendar to it. What Reset
   writes is unchanged: a blank. `tests/unit/native-change-sheet.test.ts` holds the line, and the three breaks of
   `tests/measure/native-change-sheet_breaks.mjs` that name it are pointed at it.
+
+## The date box: a field drawn with its value as an attribute, and a pressed look (Post-v0.263.0, the cardio goals' session)
+
+- **Seen in the simulator's Safari on 2026-11-26** on a field set as the wizard sets its race date (its value an
+  attribute, `min` today, read on `input`): a day picked is handed on at once and the calendar stays; `min` is not
+  enforced, a day before today is picked and handed on; **Reset does not blank this field**: it goes back to the
+  day it was drawn with, hands that day to its handler, and the calendar goes back to that day and stays. A field
+  whose value is a property (the start date, the change sheet's dates, This Week's two) was tried again the same
+  day: Reset fires its change with a blank and the calendar keeps a day circled, as recorded above.
+- **Built:** a `DateAsk` may name `reset`, the day the field was drawn with; `resetWrites` and `resetDay`
+  (`date-box.ts`) hand that day on and put the calendar on it, and with none Reset writes a blank as before. The
+  wizard's race date is the one ask that names it.
+- **Mario's phone on IA Next 127 (2026-11-26): "the reset button doesnt click".** On a field already on today, Reset
+  writes its blank and nothing on the screen moves, on today's app as on the beta. Reset and the check now dim
+  under the finger (`PRESSED_DIM`), as WebKit's own buttons do. What Reset writes is unchanged. Still today's, and
+  not ruled: Reset leaves a day chosen in the calendar and the field blank (the handoff's section 12).
+- `tests/unit/native-change-sheet.test.ts` holds each; the three Reset breaks of
+  `tests/measure/native-change-sheet_breaks.mjs` are pointed at the line as it stands, and the wizard's list holds
+  five more (`tests/measure/native-wizard_breaks.mjs`).

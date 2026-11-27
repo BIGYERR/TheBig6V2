@@ -12,13 +12,18 @@
 // are compared with the white space between tags taken out and every other run of it read as one space: every tag,
 // attribute and word is held, the template's line breaks are not.
 //
-// THE CARDIO GOALS, THIS SESSION. The Expo app draws the sports and their goals; a goal's fields and the box under
-// the cards are the second session's. The step's markup is compared whenever the draft holds no goal (every draft a
-// walk of this session's taps can make), and counted as not compared when a draft set whole holds one.
+// THE CARDIO GOALS (the second session). The step is drawn whole by a goal, a sport, a unit, a race button, the
+// seed's buttons, the shorter plan link, Continue and Back: its markup is then held equal, every tag of every form.
+// A typed field and a picked race day draw nothing whole: the page repaints a few lines in place. After every tap,
+// whole or not, the seven lines the page repaints (the length line, the pace line, the pace frame, the card under
+// the race date, the swim pace line, the mile's advisory, the swim's) and the race date's field are held equal as
+// they stand on the page, a stale one included.
 //
 // THE PAGE'S ELEMENTS. The harness hands the page an element for any id. The lines the wizard repaints in place are
 // here only while the step's markup holds them, as on a real page, so a repaint of a line that is not drawn writes
-// nothing (the race date's card would otherwise write the draft's week count on a step with no card).
+// nothing (the race date's card would otherwise write the draft's week count on a step with no card). Each whole
+// draw replaces them, as a real page does: their words, display, color and value are the markup's until the page
+// writes to one in place.
 //
 // THE CLOCK. The page's clock is pinned for a launch. Core's build reads the clock itself (a program's id, its seed
 // when the config holds none, the instant it was made), so the Expo app's build runs with this process's clock
@@ -29,13 +34,17 @@ import type { StateStore } from '@ia/core/engine/state-store.ts';
 import type { ScreenProgram } from '../../frontends/native/src/this-week/week-screen.ts';
 import { currentWeek } from '../../frontends/native/src/this-week/week-readers.ts';
 import { launch, midnight } from '../../frontends/native/src/this-week/week-screen.ts';
+import {
+  type Advisory, type CardioField, type CardioFooter, type CardioForm, type CardioStep, type MileField, type SeedView, type TimePair, baselineSuffix, raceButtonStyle, unitButtonStyle,
+} from '../../frontends/native/src/wizard/cardio-goal-model.ts';
 import type { Choice } from '../../frontends/native/src/wizard/wizard-model.ts';
 import { unitStyle, WIZARD_STEPS } from '../../frontends/native/src/wizard/wizard-model.ts';
-import type { Draft } from '../../frontends/native/src/wizard/wizard-readers.ts';
+import type { CardioPaint, Draft } from '../../frontends/native/src/wizard/wizard-readers.ts';
 import { getDayAdvisories, getMinTrainDays } from '../../frontends/native/src/wizard/wizard-readers.ts';
 import {
-  type FloorToast, type StepView, WIZARD_WORDS as W, type WizardState, floorToastMarkup, landingTitle, liftOnly, setChoice, setName, setStart, setUnit, startWizard,
-  toggleCardioTypeSport, toggleRestDay, wizardBack, wizardNext, wizardView,
+  type CardioView, type FloorToast, type StepView, WIZARD_WORDS as W, type WizardState, applySeedData, copyRuns, dismissSeedData, editCardioField, floorToastMarkup, landingTitle, liftOnly,
+  offerShorterPlan, raceTargeted, setCardioGoal, setChoice, setName, setPaceUnit, setRaceDate, setStart, setSwimUnit, setUnit, startWizard, toggleCardioTypeSport, toggleRestDay, wizardBack,
+  wizardNext, wizardView,
 } from '../../frontends/native/src/wizard/wizard-screen.ts';
 import { GENERATING, LENGTH_WORDS, beginGenerate, finishGenerate, lengthWarning, refusal } from '../../frontends/native/src/wizard/wizard-writes.ts';
 import { launchNow, nativeView, pageShown, pageView, phoneStore } from './native-this-week.ts';
@@ -108,15 +117,7 @@ export function stepMarkup(v: StepView): string {
     return head(W.equipment) + '<div style="display:flex;flex-direction:column;gap:10px">' + v.choices.map((e) => typeCard(e.sel, 'WD.equipment=\'' + e.id + '\';renderWizardStep()', '', '<div class="cardio-type-icon">' + asyIcon(e.icon, 26) + '</div>',
       '<div style="flex:1"><div class="cardio-type-name" style="color:' + (e.sel ? 'var(--accent)' : 'var(--text)') + '">' + e.label + '</div><div class="cardio-type-desc">' + e.desc + '</div></div>')).join('') + '</div>';
   }
-  if (v.step === 'cardio_goal') {
-    return head(W.cardio) + '<div style="display:flex;flex-direction:column;gap:10px">' + v.sports.map((s) =>
-      '<div style="background:var(--surface);border:1.5px solid ' + (s.sel ? 'var(--accent)' : 'var(--border)') + ';border-radius:16px;overflow:hidden"><div onclick="toggleCardioTypeSport(\'' + s.id + '\')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:'
-      + (s.sel ? 'var(--accent-dim)' : 'transparent') + '"><div>' + asyIcon(s.icon, 24) + '</div><div style="flex:1"><div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:' + (s.sel ? 'var(--accent)' : 'var(--text)') + '">' + s.name
-      + '</div><div style="font-size:11px;color:var(--muted);margin-top:2px">' + s.desc + '</div></div><div style="font-size:20px;color:var(--accent);opacity:' + (s.sel ? 1 : 0) + '">✓</div></div>'
-      + (s.sel ? '<div style="padding:0 14px 14px;border-top:1px solid var(--border)"><div style="padding-top:10px;display:flex;flex-direction:column;gap:6px">'
-        + s.goals.map((g) => '<div class="goal-option' + (g.sel ? ' selected' : '') + '" onclick="setCardioGoal(\'' + s.id + '\',\'' + g.id + '\')"><div class="goal-option-label">' + g.label + '</div><div class="goal-option-desc">' + g.desc + '</div></div>').join('')
-        + '</div></div>' : '') + '</div>').join('') + '</div>';
-  }
+  if (v.step === 'cardio_goal') return cardioMarkup(v.cardio);
   if (v.step === 'lifting_focus') {
     const l = v.lifting;
     const sport = (sel: boolean, click: string, icon: string, name: string): string => typeCard(sel, click, ' style="padding:10px 14px"', '<div style="flex-shrink:0">' + asyIcon(icon, 22) + '</div>',
@@ -158,16 +159,160 @@ export function warningMarkup(w: { msg: string; weeks: number }): string {
     + '<button id="confirmGenBtn" style="flex:2;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0;padding:12px;border-radius:999px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer;">' + LENGTH_WORDS.build(w.weeks) + '</button></div></div>';
 }
 
+// ── The cardio goals as the page's markup (typed by hand from renderWizardStep's cardio_goal branch) ─────────────
+const CAPTION = 'font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0;';
+const numberField = (style: string, placeholder: string, value: string, oninput: string, limits: string): string =>
+  '<input type="number" class="input-field" style="' + style + '" placeholder="' + placeholder + '" value="' + value + '" oninput="' + oninput + '" ' + limits + '>';
+/** A minutes and seconds pair with their captions (the target times, the mile). */
+const captioned = (p: TimePair, sport: string, after: string): string => {
+  const on = (key: string): string => 'WD.cardioGoals[\'' + sport + '\'].' + key + '=this.value;' + after;
+  return '<div style="display:flex;align-items:center;gap:6px"><div style="flex:1;text-align:center">' + numberField('text-align:center', 'min', p.mins, on(p.minsKey), 'min="' + p.lo + '" max="' + p.hi + '"')
+    + '<div style="' + CAPTION + '">minutes</div></div><div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div><div style="flex:1;text-align:center">'
+    + numberField('text-align:center', 'sec', p.secs, on(p.secsKey), 'min="0" max="59"') + '<div style="' + CAPTION + '">seconds</div></div></div>';
+};
+/** A minutes and seconds pair with no captions (the swim's current times). */
+const flat = (mins: string, secs: string, minsKey: string, secsKey: string): string => {
+  const on = (key: string): string => 'WD.cardioGoals[\'swim\'].' + key + '=this.value;updateSwimAdvisory()';
+  return '<div style="display:flex;align-items:center;gap:6px">' + numberField('text-align:center;flex:1', 'min', mins, on(minsKey), 'min="0" max="99"')
+    + '<div style="font-size:20px;color:var(--muted);font-weight:300;flex-shrink:0">:</div>' + numberField('text-align:center;flex:1', 'sec', secs, on(secsKey), 'min="0" max="59"') + '</div>';
+};
+const advisoryLine = (id: string, a: Advisory): string =>
+  '<div id="' + id + '" style="font-size:11px;line-height:1.45;margin-top:6px;display:' + (a.text ? 'block' : 'none') + ';color:' + a.color + '">' + a.text + '</div>';
+const unitPair = (fn: string, a: string, b: string, on: string): string =>
+  '<div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0"><button onclick="' + fn + '(\'' + a + '\')" style="' + unitButtonStyle(on === a, false) + '">' + a
+  + '</button><button onclick="' + fn + '(\'' + b + '\')" style="' + unitButtonStyle(on === b, true) + '">' + b + '</button></div>';
+const seedBanner = (sd: SeedView | null): string => (!sd ? ''
+  : sd.applied ? '<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">' + asyIcon('chart', 12) + ' Estimated from “' + sd.prog + '”. Edit if you know better.</div>'
+    : '<div style="background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:12px 14px;margin-bottom:12px"><div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0;color:var(--text);margin-bottom:4px">'
+      + asyIcon('chart', 13) + ' Seed from “' + sd.prog + '”?</div><div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px">' + sd.found
+      + '</div><div style="display:flex;gap:8px"><button class="prog-action-btn primary" style="flex:1" onclick="applySeedData()">Use this data</button><button class="prog-action-btn" style="flex:1" onclick="dismissSeedData()">Start fresh</button></div></div>');
+const mileBlock = (m: MileField): string =>
+  '<div class="input-group" style="margin-top:8px"><div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">' + m.help + '</span></div>'
+  + captioned(m.pair, 'run', 'WD.cardioGoals[\'run\'].mileBestSrc={kind:\'entered\'};updateRaceDateFeedback();updateMileAdvisory()') + advisoryLine('mileAdvisory', m.advisory) + '</div>';
+
+function formMarkup(sport: string, f: CardioForm): string {
+  const label = (t: string): string => '<div class="input-label" style="margin-bottom:6px">' + t + '</div>';
+  if (f.kind === 'swim') {
+    return '<div style="margin-top:10px">' + label('Distance') + '<div style="display:flex;gap:0;align-items:stretch"><input type="number" class="input-field" style="border-radius:12px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" value="' + f.dist + '" readonly>'
+      + unitPair('setSwimUnit', 'yd', 'm', f.unit) + '</div></div>'
+      + '<div style="margin-top:10px">' + label('Target time') + captioned(f.target, 'swim', 'updatePaceTime(\'swim\');updateSwimPaceDisplay()')
+      + '<div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:' + (f.paceShown ? 'block' : 'none') + '">' + f.paceLine + '</div></div>'
+      + '<div style="margin-top:8px">' + label(f.baseLabel) + flat(f.baseMins, f.baseSecs, 'baseMins', 'baseSecs') + advisoryLine('swimAdvisory', f.advisory) + '</div>'
+      + (f.base500 ? '<div style="margin-top:8px">' + label(f.base500.label) + '<div style="font-size:11px;line-height:1.45;color:var(--muted);margin-bottom:6px">Your repeats key off your 500 pace. Your 100 time sets the goal.</div>'
+        + flat(f.base500.mins, f.base500.secs, 'base500Mins', 'base500Secs') + '</div>' : '');
+  }
+  if (f.kind === 'pace') {
+    return '<div style="margin-top:10px">' + label('Target distance') + '<div style="display:flex;gap:0;align-items:stretch">'
+      + numberField('border-radius:12px 0 0 8px;flex:1', 'e.g. 1.5', f.dist, 'WD.cardioGoals[\'run\'].targetDist=this.value;updateRaceDateFeedback()', 'min="0.1" step="0.1"') + unitPair('setPaceUnit', 'mi', 'km', f.unit) + '</div></div>'
+      + '<div style="margin-top:10px">' + label('Target time') + captioned(f.target, 'run', 'updatePaceTime(\'run\');updateRaceDateFeedback()')
+      + '<div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:' + (f.paceShown ? 'block' : 'none') + '">' + f.paceLine + '</div><div id="paceFeasLine" style="display:none"></div></div>'
+      + seedBanner(f.seed) + '<div class="input-group" style="margin-top:8px"><div class="input-label">How far can you currently run? (optional)</div><div style="display:flex;gap:8px;align-items:center">'
+      + numberField('flex:1', 'e.g. 1.5', f.baseline, 'WD.cardioGoals[\'run\'].baselineDist=this.value;WD.cardioGoals[\'run\'].baseline=this.value+(WD.cardioGoals[\'run\']?.paceUnit||\'mi\');updateRaceDateFeedback()', 'min="0" step="0.1"')
+      + '<span style="font-size:13px;color:var(--muted);flex-shrink:0">' + f.unit + '</span></div></div>' + mileBlock(f.mile);
+  }
+  return seedBanner(f.seed) + '<div class="input-group" style="margin-top:10px"><div class="input-label">' + f.question + ' (optional)</div><div style="display:flex;gap:8px;align-items:center">'
+    + numberField('flex:1', f.placeholder, f.baseline, 'WD.cardioGoals[\'' + sport + '\'].baselineDist=this.value;WD.cardioGoals[\'' + sport + '\'].baseline=this.value+\'' + baselineSuffix(sport) + '\'' + (sport === 'run' ? ';updateRaceDateFeedback()' : ''), 'min="0" step="' + f.step + '"')
+    + '<span style="font-size:13px;color:var(--muted);flex-shrink:0">' + f.unitWord + '</span></div></div>' + (f.mile ? mileBlock(f.mile) : '');
+}
+
+const RACE_LABEL = 'font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0;';
+const RACE_ON = 'WD.eventTargeted=true;if(!WD.raceDate){const t=new Date();WD.raceDate=t.getFullYear()+\'-\'+String(t.getMonth()+1).padStart(2,\'0\')+\'-\'+String(t.getDate()).padStart(2,\'0\');}renderWizardStep()';
+const RACE_OFF = 'WD.eventTargeted=false;WD.raceDate=\'\';WD.raceDateWeeks=null;renderWizardStep()';
+function footerMarkup(ft: CardioFooter): string {
+  const r = ft.race;
+  return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:12px 14px;margin-top:4px"><div style="font-size:12px;color:var(--muted);line-height:1.6"> <span id="progLenLine">' + ft.progLen + '</span> '
+    + (ft.multi ? '<br>Sessions rotate across training days. Each sport gets its own days.' : '') + ' </div>'
+    + (r ? '<div style="margin-top:10px"><div style="' + RACE_LABEL + 'margin-bottom:6px">Race date</div><div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:8px">'
+      + '<button onclick="' + RACE_ON + '" style="' + raceButtonStyle(r.targeted) + '">✓ I have a race date</button><button onclick="' + RACE_OFF + '" style="' + raceButtonStyle(!r.targeted) + '">✕ Just building fitness</button></div>'
+      + (r.targeted ? '<div><div style="' + RACE_LABEL + 'margin-bottom:8px">Race date</div><input type="date" id="raceDateInput" value="' + r.value + '" min="' + r.min + '" oninput="WD.raceDate=this.value;updateRaceDateFeedback()" '
+        + 'style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:12px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">'
+        + '<div id="raceDateFeedback" style="margin-top:8px"></div><div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open the calendar. The final weeks taper so you arrive fresh.</div></div>'
+        : '<div style="font-size:11px;color:var(--muted);line-height:1.5">' + r.copy + '</div>') + '</div>' : '') + '</div>';
+}
+
+/** The Expo app's cardio goals step as the markup today's page writes for a whole draw (before its tail repaints the lines it owns). */
+export function cardioMarkup(c: CardioStep): string {
+  return head(W.cardio) + '<div style="display:flex;flex-direction:column;gap:10px">' + c.sports.map((s) =>
+    '<div style="background:var(--surface);border:1.5px solid ' + (s.sel ? 'var(--accent)' : 'var(--border)') + ';border-radius:16px;overflow:hidden"><div onclick="toggleCardioTypeSport(\'' + s.id + '\')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:'
+    + (s.sel ? 'var(--accent-dim)' : 'transparent') + '"><div>' + asyIcon(s.icon, 24) + '</div><div style="flex:1"><div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:' + (s.sel ? 'var(--accent)' : 'var(--text)') + '">' + s.name
+    + '</div><div style="font-size:11px;color:var(--muted);margin-top:2px">' + s.desc + '</div></div><div style="font-size:20px;color:var(--accent);opacity:' + (s.sel ? 1 : 0) + '">✓</div></div>'
+    + (s.sel ? '<div style="padding:0 14px 14px;border-top:1px solid var(--border)"><div style="padding-top:10px;display:flex;flex-direction:column;gap:6px">'
+      + s.goals.map((g) => '<div class="goal-option' + (g.sel ? ' selected' : '') + '" onclick="setCardioGoal(\'' + s.id + '\',\'' + g.id + '\')"><div class="goal-option-label">' + g.label + '</div><div class="goal-option-desc">' + g.desc + '</div></div>').join('')
+      + '</div>' + (s.form ? formMarkup(s.id, s.form) : '') + '</div>' : '') + '</div>').join('') + '</div>' + (c.footer ? footerMarkup(c.footer) : '');
+}
+
+// ── The kinds the cardio goals draw (the measure's names) ────────────────────────────────────────────────────────
+const plain = (h: string): string => h.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+export const cardKind = (h: string | null): string => {
+  if (h === null) return 'none on the step';
+  const t = plain(h), hue = ' [' + ((/color:var\(--([\w-]+)\)/.exec(h) || [])[1] || '') + ']';
+  if (!t) return 'empty';
+  if (/already passed/.test(t)) return 'the date has passed' + hue;
+  if (/Less than a week away/.test(t)) return 'less than a week away' + hue;
+  if (/The program ends on it/.test(t)) return 'test in week 2 or later' + (/that reaches/.test(t) ? ', with the reach sentence' : '') + hue;
+  if (/Your test is in week 1\. Nothing is left/.test(t)) return 'test in week 1, nothing left to train' + (/that reaches/.test(t) ? ', with the reach sentence' : '') + hue;
+  if (/Your test is this week/.test(t)) return 'test this week' + (/that reaches/.test(t) ? ', with the reach sentence' : '') + hue;
+  if (/before your first training day/.test(t)) return 'test before the first training day' + hue;
+  if (/The test block is/.test(t)) return 'test past the test block' + hue;
+  if (/so it peaks on race week/.test(t)) return 'race plan starts later' + hue;
+  if (/You open in/.test(t)) return 'race plan opens in a week' + (/are behind you/.test(t) ? ', weeks behind' : '') + (/I don’t recommend under/.test(t) ? ', under the floor' : '') + (/fits this window better/.test(t) ? ', the shorter plan offered' : '') + hue;
+  if (/before race day\. Use the extra time/.test(t)) return 'finishes before race day' + hue;
+  if (/Perfect timing/.test(t)) return 'peaks on race day' + hue;
+  if (/is short for this goal/.test(t)) return 'short for this goal' + hue;
+  return 'UNNAMED ' + t.slice(0, 50);
+};
+const lengthKind = (h: string): string => { const t = plain(h); return (/your mile time sets it/.test(t) ? 'your mile time sets it' : /Your test sets it/.test(t) ? 'the test sets it' : /Set by your longest/.test(t) ? 'set by the longest goal' : 'UNNAMED ' + t) + (/: 1 week\./.test(t) ? ' (1 week)' : ''); };
+const reachKind = (h: string): string => (!h ? 'hidden' : /Your mile is/.test(h) ? 'from the mile entered' : /You have not entered a mile time/.test(h) ? 'from the level default' : 'UNNAMED ' + plain(h).slice(0, 40));
+const mileAdvKind = (t: string): string => (!t ? 'none' : /^Required/.test(t) ? 'required' : /not a real time/.test(t) ? 'not a real time' : /Under 3:00/.test(t) ? 'under 3:00' : /Over 25:00/.test(t) ? 'over 25:00' : /fastest row/.test(t) ? 'the chart\'s fastest row' : /12:00 row/.test(t) ? 'the chart\'s slowest row' : 'UNNAMED ' + t);
+const mileHelpKind = (t: string): string => (/^Required/.test(t) ? 'required' : t === 'Optional.' ? 'optional, bare' : /come from an /.test(t) ? 'optional, an N mile' : /come from a /.test(t) ? 'optional, a N mile' : 'UNNAMED ' + t);
+const swimAdvKind = (t: string): string => (!t ? 'none' : /timed 500/.test(t) ? 'required, the 500' : /timed 100/.test(t) ? 'required, the 100' : /not a real time/.test(t) ? 'not a real time' : /faster than your 100/.test(t) ? '500 pace faster than the 100' : 'UNNAMED ' + t);
+/** The number fields a form draws, each with the key it writes and the kind of field it is to its handler. */
+export function formFields(sport: string, f: CardioForm): { key: string; field: CardioField }[] {
+  if (f.kind === 'swim') {
+    return [{ key: 'targetMins', field: 'swimTarget' }, { key: 'targetSecs', field: 'swimTarget' }, { key: 'baseMins', field: 'swimBase' }, { key: 'baseSecs', field: 'swimBase' },
+      ...(f.base500 ? [{ key: 'base500Mins', field: 'swimBase' as const }, { key: 'base500Secs', field: 'swimBase' as const }] : [])] as { key: string; field: CardioField }[];
+  }
+  const mile: { key: string; field: CardioField }[] = [{ key: 'mileBestMins', field: 'mile' }, { key: 'mileBestSecs', field: 'mile' }];
+  if (f.kind === 'pace') return [{ key: 'targetDist', field: 'runDist' }, { key: 'targetMins', field: 'runTarget' }, { key: 'targetSecs', field: 'runTarget' }, { key: 'baselineDist', field: 'paceBaseline' }, ...mile];
+  return [{ key: 'baselineDist', field: 'baseline' }, ...(sport === 'run' ? mile : [])];
+}
+function countCardio(T: WizardTally, v: CardioView, whole: boolean): void {
+  const k = (s: string, n = 1): void => bump(T, 'cardio_goal: ' + s, n);
+  k(whole ? 'whole draws' : 'repaints in place');
+  const c = v.cardio, p = v.paint;
+  for (const s of c.sports) {
+    const f = s.form;
+    if (!f) { if (s.sel) k('a sport open with no goal picked'); continue; }
+    k('form: ' + (f.kind === 'swim' ? (f.base500 ? 'swim 100 (the 500 row too)' : 'swim 500') : f.kind === 'pace' ? 'run pace goal' : 'baseline, ' + s.id));
+    k('number fields', formFields(s.id, f).length + (f.kind === 'swim' ? 1 : 0));
+    if (f.kind !== 'swim') { k('seed banner: ' + (f.seed ? (f.seed.applied ? 'applied line' : 'the offer') : 'none')); if (f.mile) k('mile help: ' + mileHelpKind(f.mile.help)); }
+  }
+  if (!c.footer) k('no box under the cards');
+  else {
+    if (c.footer.multi) k('the line for more than one sport');
+    k('race block: ' + (!c.footer.race ? 'none (not the race path)' : c.footer.race.targeted ? 'the date field' : /time trial/.test(c.footer.race.copy) ? 'the time trial copy' : 'the holds copy'));
+  }
+  if (p.progLen !== null) k('length line: ' + lengthKind(p.progLen));
+  k('card under the date: ' + cardKind(p.card));
+  if (p.feas !== null) k('pace reach: ' + reachKind(p.feas));
+  if (p.pace !== null) k('pace line ' + (p.pace ? 'shown' : 'hidden'));
+  if (p.swimPace !== null) k('swim pace line ' + (p.swimPace ? 'shown' : 'hidden'));
+  if (p.mileAdvisory) k('mile advisory: ' + mileAdvKind(p.mileAdvisory.text));
+  if (p.swimAdvisory) k('swim advisory: ' + swimAdvKind(p.swimAdvisory.text));
+}
+
 // ── The kinds a draw holds ───────────────────────────────────────────────────────────────────────────────────────
 const resolveKind = (t: string): string => (/That week holds your test/.test(t) ? 'the week holds the test' : /Nothing left to train that week/.test(t) ? 'moved to the next Monday' : /Week 1 is short/.test(t) ? 'a short first week' : 'a whole first week');
 const alignedKind = (t: string): string => (/so it peaks on race week/.test(t) ? 'starts later' : 'opens in a week' + (/are behind you/.test(t) ? ', weeks behind' : '')) + (/I don’t recommend under/.test(t) ? ', under the floor' : '') + (/fits this window better/.test(t) ? ', the shorter plan\'s link' : '');
 const raceRowKind = (r: string | undefined): string => (r === undefined ? 'none' : /No date set/.test(r) ? 'no date set' : / away\)$/.test(r) ? 'a date, N away' : /\(race day\)$/.test(r) ? 'a date, race day' : /\(behind you\)$/.test(r) ? 'a date, behind you' : 'a date alone');
-function countStep(T: WizardTally, v: StepView): void {
+function countStep(T: WizardTally, v: StepView, whole = true): void {
   const k = (s: string, n = 1): void => bump(T, v.step + ': ' + s, n);
-  k('draws');
+  if (whole) k('draws');
+  if (v.step === 'cardio_goal') countCardio(T, v, whole);
+  if (!whole) return;
   if (v.step === 'primary' || v.step === 'equipment') { k('cards', v.choices.length); k('a card chosen', v.choices.filter((c) => c.sel).length); }
   else if (v.step === 'profile') { k('experience ' + (v.profile.experience.find((c) => c.sel)?.id || 'none')); k(v.profile.ageLabel.replace(':', '')); k(v.profile.kg ? 'kg' : 'lbs'); }
-  else if (v.step === 'cardio_goal') { for (const s of v.sports) { k(s.sel ? 'sport open' : 'sport shut'); k('goal options', s.goals.length); k('a goal chosen', s.goals.filter((g) => g.sel).length); } }
+  else if (v.step === 'cardio_goal') { for (const s of v.cardio.sports) { k(s.sel ? 'sport open' : 'sport shut'); k('goal options', s.goals.length); k('a goal chosen', s.goals.filter((g) => g.sel).length); } }
   else if (v.step === 'lifting_focus') { k('focus cards', v.lifting.choices.length); k(v.lifting.addOn ? (v.lifting.addOn.liftOnly ? 'add-on, Lift Only chosen' : 'add-on, a sport chosen') : 'no add-on'); }
   else if (v.step === 'days') {
     k('days resting', v.days.days.filter((x) => x.rest).length); k('days locked', v.days.days.filter((x) => x.blocked).length);
@@ -198,6 +343,9 @@ export class TwoWizards {
   readonly T: WizardTally;
   readonly what: string;
   st!: WizardState;
+  /** The step in hand as the Expo app last drew it whole, its repainted lines as they stand since. */
+  view!: StepView;
+  private shell!: { fill: string; label: string; next: string };
   /** Every pop-up overlay the page appended to its body, newest last. */
   private overlays: { innerHTML: string }[] = [];
 
@@ -205,13 +353,29 @@ export class TwoWizards {
     this.P = P; this.T = T; this.what = what; this.store = store;
     const doc = P.IA.window['document'];
     const base = doc.getElementById;
+    P.IA.ctx['__renders'] = 0;
+    P.ev('renderWizardStep=(function(o){return function(){__renders++;return o.apply(this,arguments);};})(renderWizardStep)');
+    let seen = -1;
     doc.getElementById = (id: string) => {
       if (!IN_BODY.includes(id)) return base(id);
-      const m = new RegExp('<[^>]*\\bid="' + id + '"[^>]*>').exec(String(base('wizardBody').innerHTML || ''));
-      if (!m) return null;
-      const el = base(id), val = /\bvalue="([^"]*)"/.exec(m[0]);
-      if (val && el.__tag !== m[0]) { el.value = val[1]; el.__tag = m[0]; }
-      return el;
+      const body = String(base('wizardBody').innerHTML || '');
+      const n: number = P.ev('__renders');
+      if (n !== seen) {
+        seen = n;
+        for (const x of IN_BODY) {
+          const m = new RegExp('<(\\w+)[^>]*\\bid="' + x + '"[^>]*>').exec(body);
+          if (!m) continue;
+          const el = base(x), tag = m[0];
+          const val = /\bvalue="([^"]*)"/.exec(tag); if (val) el.value = val[1];
+          el.style.display = (/display:\s*(\w+)/.exec(tag) || [])[1] || '';
+          el.style.color = (/[;"]color:([^;"]+)/.exec(tag) || [])[1] || '';
+          if (m[1] !== 'input') {
+            const rest = body.slice(m.index + tag.length), inner = rest.slice(0, rest.indexOf('</' + m[1] + '>'));
+            el.innerHTML = inner; el.textContent = inner.replace(/<[^>]+>/g, '');
+          }
+        }
+      }
+      return new RegExp('\\bid="' + id + '"').test(body) ? base(id) : null;
     };
     const add = doc.body.appendChild;
     doc.body.appendChild = (x: { innerHTML: string }) => { this.overlays.push(x); return add.call(doc.body, x); };
@@ -222,21 +386,22 @@ export class TwoWizards {
   private pageDraft(): string { return this.P.ev('JSON.stringify(WD)') as string; }
 
   /** Both apps held equal: the step, the draft, the bar, the step's markup, and every ia_ key. */
-  same(tap: string): StepView {
+  same(tap: string, whole = true): StepView {
     const what = this.what + ', ' + tap;
     assert.equal(this.st.step, this.pageStep, what + ': the step');
-    const { shell, view } = wizardView(this.store, this.st, this.now);
+    if (whole) { const drawn = wizardView(this.store, this.st, this.now); this.shell = drawn.shell; this.view = drawn.view; }
+    const shell = this.shell, view = this.view;
     // The page's draw wrote its defaults before this (a race date, a name); the Expo app's view just did.
     sameText(J(this.draft), this.pageDraft(), what + ': the draft');
     const el = (id: string, prop: string): string => String(this.P.ev(`(function(){var v=document.getElementById(${J(id)}).${prop};return v==null?'':v;})()`));
     assert.equal(shell.label, el('wizardStepLabel', 'textContent'), what + ': the count');
     assert.equal(shell.next, el('wizardNext', 'textContent'), what + ': the last button');
     assert.equal(shell.fill, el('wizardFill', 'style.width'), what + ': the bar');
-    const page = tight(el('wizardBody', 'innerHTML'));
-    if (view.step === 'cardio_goal' && Object.keys(this.draft.cardioGoals || {}).length) bump(this.T, 'cardio_goal: not compared, the draft holds a goal (the second session\'s)');
-    else sameText(tight(stepMarkup(view)), page, what + ': the step\'s markup');
+    // A whole draw: every tag, attribute and word of the step, as the page wrote it before its tail repainted.
+    if (whole) sameText(tight(stepMarkup(view)), tight(el('wizardBody', 'innerHTML')), what + ': the step\'s markup');
+    if (view.step === 'cardio_goal') this.samePaint(view.paint, what);
     assert.equal(view.step, WIZARD_STEPS[this.st.step], what + ': the view\'s step');
-    countStep(this.T, view);
+    countStep(this.T, view, whole);
     sameStore(held(this.store), this.P.dump(), what + ': the store');
     return view;
   }
@@ -264,7 +429,7 @@ export class TwoWizards {
     const toast = mine() || null;
     const said = this.P.toasts.slice(t0);
     assert.deepEqual(toast ? [floorToastMarkup(toast)] : [], said, this.what + ', ' + name + ': the toast');
-    if (toast) bump(this.T, 'toast: ' + (/needs \d training days/.test(toast.text) ? 'the floor, a goal named' : 'the floor, three days'));
+    if (toast) bump(this.T, 'toast: ' + (/^Switched to the /.test(toast.text) ? 'switched to the shorter plan' : /needs \d training days/.test(toast.text) ? 'the floor, a goal named' : 'the floor, three days'));
     bump(this.T, 'taps');
     return this.same(name);
   }
@@ -299,7 +464,7 @@ export class TwoWizards {
     const what = this.what + ', the start date ' + (v || 'blank');
     this.P.ev('WD.startDate=' + J(v) + ';updateStartResolve()');
     setStart(this.st, v);
-    const { view } = wizardView(this.store, this.st, this.now);
+    const { view } = wizardView(this.store, JSON.parse(J(this.st)) as WizardState, this.now);
     assert.equal(view.step, 'name');
     if (view.step === 'name' && !view.name.aligned) {
       sameText(view.name.resolveCopy, String(this.P.ev("document.getElementById('startResolve').innerHTML")), what + ': the copy under the field, repainted in place');
@@ -311,6 +476,94 @@ export class TwoWizards {
     this.P.ev('renderWizardStep()');
     bump(this.T, 'taps');
     return this.same('the start date ' + (v || 'blank'));
+  }
+
+
+  // ── The cardio goals' taps (the second session) ──────────────────────────────────────────────────────────────
+  /** The step's markup as the page last wrote it whole. */
+  private body(): string { return String(this.P.ev("document.getElementById('wizardBody').innerHTML")); }
+  /** The one handler of its kind on the page that holds `part`: read out of the markup the page wrote, never typed in. */
+  private handler(attr: 'onclick' | 'oninput', part: string): string {
+    const card = /\bid="raceDateFeedback"/.test(this.body()) ? String(this.P.ev("document.getElementById('raceDateFeedback').innerHTML")) : '';
+    const hits = [...(this.body() + card).matchAll(new RegExp('\\b' + attr + '="([^"]*)"', 'g'))].map((m) => m[1]!).filter((h) => h.includes(part));
+    assert.equal(hits.length, 1, this.what + ': one ' + attr + ' on the page holds "' + part + '", found ' + hits.length);
+    return hits[0]!;
+  }
+  /** The cardio goals step in hand, as the Expo app holds it. */
+  private get cardio(): Extract<StepView, { step: 'cardio_goal' }> {
+    assert.equal(this.view.step, 'cardio_goal', this.what + ': on the cardio goals');
+    return this.view as Extract<StepView, { step: 'cardio_goal' }>;
+  }
+  /** A line the page repaints in place, as it stands on the page: null when the step does not hold it, '' when hidden. */
+  private pageLine(id: string, prop: 'innerHTML' | 'textContent'): string | null {
+    if (!new RegExp('\\bid="' + id + '"').test(this.body())) return null;
+    return String(this.P.ev(`(function(){var e=document.getElementById(${J(id)});return e.style.display==='none'?'':String(e.${prop});})()`));
+  }
+  private pageAdvisory(id: string): { text: string; color: string } | null {
+    const text = this.pageLine(id, 'textContent');
+    return text === null ? null : { text, color: String(this.P.ev(`document.getElementById(${J(id)}).style.color`)) };
+  }
+  /** The seven lines the page repaints in place and the race date's field, held equal to the Expo app's as they stand. */
+  private samePaint(p: CardioPaint, what: string): void {
+    const page: CardioPaint = {
+      raceField: /\bid="raceDateInput"/.test(this.body()) ? String(this.P.ev("document.getElementById('raceDateInput').value")) : null,
+      progLen: this.pageLine('progLenLine', 'innerHTML'), pace: this.pageLine('paceDisplayLine', 'innerHTML'), feas: this.pageLine('paceFeasLine', 'innerHTML'),
+      card: this.pageLine('raceDateFeedback', 'innerHTML'), swimPace: this.pageLine('swimPaceLine', 'innerHTML'),
+      mileAdvisory: this.pageAdvisory('mileAdvisory'), swimAdvisory: this.pageAdvisory('swimAdvisory'),
+    };
+    for (const k of Object.keys(page) as (keyof CardioPaint)[]) sameText(J(p[k]), J(page[k]), what + ': the line the page repaints in place, ' + k);
+  }
+  /** A tap that draws the cardio goals whole on the page: its own onclick, and the Expo app's tap. */
+  private wholeTap(name: string, part: string, mine: () => FloorToast | null | void): StepView {
+    return this.tap(name, this.handler('onclick', part), mine);
+  }
+  goal(sport: string, id: string): StepView { return this.wholeTap('the goal ' + id, 'setCardioGoal(\'' + sport + '\',\'' + id + '\')', () => setCardioGoal(this.st, sport, id)); }
+  paceUnit(u: string): StepView { return this.wholeTap('the pace unit ' + u, 'setPaceUnit(\'' + u + '\')', () => setPaceUnit(this.st, u)); }
+  swimUnit(u: string): StepView { return this.wholeTap('the swim unit ' + u, 'setSwimUnit(\'' + u + '\')', () => setSwimUnit(this.st, u)); }
+  seedUse(): StepView { return this.wholeTap('Use this data', 'applySeedData()', () => { assert.equal(applySeedData(this.st), true, this.what + ': a seed to apply'); }); }
+  seedFresh(): StepView { return this.wholeTap('Start fresh', 'dismissSeedData()', () => dismissSeedData(this.st)); }
+  targeted(on: boolean): StepView { return this.wholeTap(on ? 'I have a race date' : 'Just building fitness', 'WD.eventTargeted=' + on + ';', () => raceTargeted(this.st, on, this.now)); }
+  /** The shorter plan's link, in the card under the race date or under a start set by a race date: the goal the Expo app's own line names. */
+  shorter(): StepView {
+    const v = this.view;
+    const html = v.step === 'cardio_goal' ? v.paint.card || '' : v.step === 'name' && v.name.aligned ? v.name.aligned.copy : '';
+    const link = copyRuns(html).find((r) => r.link !== null);
+    assert.ok(link, this.what + ': the Expo app\'s line holds the shorter plan\'s link');
+    const view = this.wholeTap('the shorter plan link', 'offerShorterPlan(\'' + link!.link + '\')', () => offerShorterPlan(this.st, link!.link!));
+    bump(this.T, 'the shorter plan link tapped, on ' + view.step);
+    return view;
+  }
+  /**
+   * A value handed back by one of the step's number fields: the page's own oninput with it, and the Expo app's
+   * handler for that field. Nothing is drawn whole: the lines each repaints are held equal as they stand.
+   */
+  type(sport: string, key: string, v: string): StepView {
+    const what = this.what + ', ' + sport + '.' + key + ' typed "' + v + '"';
+    const form = this.cardio.cardio.sports.find((s) => s.id === sport)!.form;
+    assert.ok(form, what + ': the sport\'s form is drawn');
+    const f = formFields(sport, form!).find((x) => x.key === key);
+    assert.ok(f, what + ': the form draws that field');
+    this.P.IA.ctx['__v'] = v;
+    this.P.ev('(function(){' + this.handler('oninput', 'cardioGoals[\'' + sport + '\'].' + key + '=this.value') + '}).call({value:__v})');
+    this.cardio.paint = editCardioField(this.st, this.cardio.paint, f!.field, sport, key, v, this.now);
+    bump(this.T, 'taps'); bump(this.T, 'values typed');
+    return this.same(sport + '.' + key + ' typed "' + v + '"', false);
+  }
+  /** A day handed back by the race date's field (a pick, or Reset's day): the field's own oninput, and the Expo app's. */
+  raceDay(v: string): StepView {
+    this.P.IA.ctx['__v'] = v;
+    this.P.ev('(function(){var e=document.getElementById("raceDateInput");e.value=__v;(function(){' + this.handler('oninput', 'WD.raceDate=this.value') + '}).call(e);})()');
+    this.cardio.paint = setRaceDate(this.st, this.cardio.paint, v, this.now);
+    bump(this.T, 'taps'); bump(this.T, 'race days handed back');
+    return this.same('the race day ' + (v || 'blank'), false);
+  }
+  /** Reset on the race date's calendar: WebKit hands back the day the field was drawn with (its value attribute), which is the Expo app's footer value. */
+  raceReset(): StepView {
+    const attr = (/<input type="date" id="raceDateInput" value="([^"]*)"/.exec(tight(this.body())) || [])[1];
+    const mine = this.cardio.cardio.footer!.race!.value;
+    assert.equal(mine, attr, this.what + ': the day Reset goes back to is the day the field was drawn with');
+    bump(this.T, 'race date Reset');
+    return this.raceDay(mine);
   }
 
   /** The pop-up the page has up, as its markup; none is ''. */
@@ -501,12 +754,12 @@ export function addOnThenRaceWalk(P: Phone, T: WizardTally, what: string): void 
   two.choose('primaryPath', 'both');
   two.next(); two.next();
   const v = two.next();
-  assert.ok(v.step === 'cardio_goal' && v.sports.find((s) => s.id === 'swim')!.sel && v.sports.find((s) => s.id === 'swim')!.goals.length === 4, what + ': the swim card opens on the hybrid path\'s four goals');
+  assert.ok(v.step === 'cardio_goal' && v.cardio.sports.find((s) => s.id === 'swim')!.sel && v.cardio.sports.find((s) => s.id === 'swim')!.goals.length === 4, what + ': the swim card opens on the hybrid path\'s four goals');
   for (let i = 0; i < 3; i++) two.back();
   two.choose('primaryPath', 'event');
   two.next(); two.next();
   const w = two.next();
-  assert.ok(w.step === 'cardio_goal' && w.sports.find((s) => s.id === 'swim')!.goals.length === 5, what + ': and on the race path\'s five');
+  assert.ok(w.step === 'cardio_goal' && w.cardio.sports.find((s) => s.id === 'swim')!.goals.length === 5, what + ': and on the race path\'s five');
   for (let i = 0; i < 3; i++) two.back();
   two.leave();
 }
@@ -515,26 +768,20 @@ export function addOnThenRaceWalk(P: Phone, T: WizardTally, what: string): void 
 export const draftOf = (two: TwoWizards, cfg: unknown): Draft => ({ ...startWizard(two.now).draft, ...(JSON.parse(J(cfg)) as object) }) as Draft;
 
 /**
- * A config set whole into both drafts (a seeded program, or a draft no tap of this session reaches): every step drawn
- * by Continue from the first, the rest day step's readers, Back and forward again, then Generate.
- *
- * A draft that holds a goal is not walked through the cardio goals: today's draw of that step writes into the draft
- * (the seed it read, the weeks to the race date), and both are the second session's. The draft is set again on the
- * lifting step, as it stood, so the program generated is the one today's builds from that draft, as the seeded
- * histories build theirs (stored-state.ts generate).
+ * A config set whole into both drafts (a seeded program, or a draft no tap reaches): every step drawn by Continue
+ * from the first, the cardio goals among them (whose draw writes into the draft on both: the seed it read, the weeks
+ * to the race date), the rest day step's readers, Back to the first step and forward again, then Generate.
  */
 export function wholeWalk(P: Phone, cfg: unknown, T: WizardTally, what: string, goBack = false): Generated {
   const two = new TwoWizards(P, T, what);
   two.open();
   let v = two.whole(draftOf(two, cfg), 'primary');
-  const goal = Object.keys(two.draft.cardioGoals || {}).length > 0 && two.draft.primaryPath !== 'body';
   while (v.step !== 'name') {
-    v = goal && v.step === 'equipment' ? two.whole(JSON.parse(J(two.draft)), 'lifting_focus') : two.next();
+    v = two.next();
     if (v.step === 'days') sameDayReaders(two, what);
   }
-  while (two.st.step > (goal ? WIZARD_STEPS.indexOf('lifting_focus') : 0)) two.back();
+  while (two.st.step > 0) two.back();
   while (two.st.step < WIZARD_STEPS.length - 1) two.next();
-  if (goal) bump(T, 'whole drafts holding a goal: the cardio goals not walked');
   return two.generate(goBack);
 }
 
@@ -546,6 +793,198 @@ export function refusedWalk(P: Phone, cfg: unknown, T: WizardTally, what: string
   const g = two.generate();
   assert.ok(g.refused, what + ': refused');
   return g.refused!;
+}
+
+// ── The cardio goals' walks (the second session) ─────────────────────────────────────────────────────────────────
+/** A real entry for each field of each form. */
+export const FILL: Record<string, [string, string][]> = {
+  pace: [['targetDist', '1.5'], ['targetMins', '10'], ['targetSecs', '30'], ['baselineDist', '2'], ['mileBestMins', '9'], ['mileBestSecs', '0']],
+  run: [['baselineDist', '3'], ['mileBestMins', '9'], ['mileBestSecs', '0']],
+  bike: [['baselineDist', '20']],
+  swim: [['baselineDist', '400']],
+  swim500: [['targetMins', '8'], ['targetSecs', '0'], ['baseMins', '10'], ['baseSecs', '30']],
+  swim100: [['targetMins', '1'], ['targetSecs', '30'], ['baseMins', '1'], ['baseSecs', '50'], ['base500Mins', '10'], ['base500Secs', '30']],
+};
+/** The entry a goal's form is filled with. */
+export const fillOf = (sport: string, id: string): [string, string][] => FILL[id === 'run_pace_goal' ? 'pace' : id === 'swim_500_time' ? 'swim500' : id === 'swim_100_time' ? 'swim100' : sport]!;
+const cardioOf = (v: StepView): CardioView => { assert.equal(v.step, 'cardio_goal'); return v as unknown as CardioView; };
+const formOf = (v: StepView, sport: string): CardioForm => { const f = cardioOf(v).cardio.sports.find((s) => s.id === sport)!.form; assert.ok(f, 'the sport\'s form is drawn'); return f!; };
+
+/** Build New Program, a path (and a level, an age), then Continue to the cardio goals. */
+export function toCardioGoals(P: Phone, T: WizardTally, what: string, path: 'event' | 'both', more: { experience?: string; age?: string } = {}): TwoWizards {
+  const two = new TwoWizards(P, T, what);
+  two.open();
+  two.choose('primaryPath', path);
+  two.next();
+  if (more.experience) two.choose('experience', more.experience);
+  if (more.age) two.choose('ageBracket', more.age);
+  two.next();
+  assert.equal(two.next().step, 'cardio_goal', what + ': on the cardio goals');
+  return two;
+}
+
+/**
+ * Every goal a path offers, each picked in turn under its sport: each field of its form typed into with each of
+ * `values` from the form as first picked and again once the form is filled (so a line a field's handler does not
+ * repaint is held stale, as the page leaves it); the units; and on the race path a race day on each of `days` from
+ * today (the shorter plan's link tapped where the card offers it, and the goal picked back), Reset, both race
+ * buttons, and a blank handed to the field's handler. Then two sports held at once, and Back and Continue.
+ */
+export function goalsWalk(P: Phone, T: WizardTally, what: string, path: 'event' | 'both', values: string[], days: number[], experience?: string): void {
+  const two = toCardioGoals(P, T, what + ', every goal on ' + path, path, experience ? { experience } : {});
+  const t0 = todayOf(two);
+  for (const sport of ['run', 'bike', 'swim']) {
+    const ids = cardioOf(two.sport(sport)).cardio.sports.find((s) => s.id === sport)!.goals.map((g) => g.id);
+    assert.ok(ids.length >= 4, what + ': the sport lists its goals');
+    for (const id of ids) {
+      const keys = formFields(sport, formOf(two.goal(sport, id), sport)).map((f) => f.key);
+      const fill = fillOf(sport, id);
+      for (const k of keys) for (const x of values) two.type(sport, k, x);
+      for (const [k, x] of fill) two.type(sport, k, x);
+      for (const [k, back] of fill) { for (const x of values) two.type(sport, k, x); two.type(sport, k, back); }
+      if (id === 'run_pace_goal') { two.paceUnit('km'); two.type('run', 'targetDist', '3'); two.type('run', 'baselineDist', '4'); two.paceUnit('mi'); two.paceUnit('mi'); }
+      if (id === 'swim_500_time' || id === 'swim_100_time') { two.swimUnit('m'); two.type('swim', 'baseMins', ''); two.swimUnit('yd'); two.type('swim', 'baseMins', id === 'swim_500_time' ? '10' : '1'); }
+      // The 100's own time blank beside a 500 time: the advisory asks for the 100.
+      if (id === 'swim_100_time') { two.type('swim', 'baseMins', ''); two.type('swim', 'baseSecs', ''); two.type('swim', 'baseMins', '1'); two.type('swim', 'baseSecs', '50'); }
+      // A mile under five minutes: the advisory names the chart's fastest row.
+      if (sport === 'run') { two.type('run', 'mileBestMins', '4'); two.type('run', 'mileBestSecs', '30'); two.type('run', 'mileBestMins', '9'); two.type('run', 'mileBestSecs', '0'); }
+      if (path !== 'event') continue;
+      for (const n of days) {
+        const v = cardioOf(two.raceDay(day(t0, n)));
+        if (/offerShorterPlan/.test(v.paint.card || '')) { two.shorter(); two.goal(sport, id); }
+      }
+      two.raceReset();
+      two.targeted(false); two.targeted(false); two.targeted(true); two.targeted(true);
+      two.raceDay(day(t0, 70)); two.raceDay(''); two.type(sport, keys[0]!, fill[0]![1]);
+      two.goal(sport, id);
+    }
+    two.sport(sport);
+  }
+  two.sport('run'); two.goal('run', 'run_base'); two.sport('swim'); two.goal('swim', 'swim_base'); two.type('swim', 'baselineDist', '400');
+  two.back(); two.next();
+  two.sport('swim'); two.sport('run');
+}
+
+/**
+ * The pace goal's reach, where no race date owns the pace's words (the race path with Just building fitness, and the
+ * hybrid path): each run goal picked for its mile help, then the pace goal with each of five targets and four miles.
+ */
+export function reachWalk(P: Phone, T: WizardTally, what: string, path: 'event' | 'both', experience: string, age: string): void {
+  const two = toCardioGoals(P, T, what + ', the pace reach on ' + path + ', ' + experience + ', ' + age, path, { experience, age });
+  const ids = cardioOf(two.sport('run')).cardio.sports[0]!.goals.map((g) => g.id);
+  for (const id of ids) two.goal('run', id);
+  two.goal('run', 'run_pace_goal');
+  if (path === 'event') two.targeted(false);
+  for (const [dist, mm, ss, unit] of [['1.5', '9', '0', 'mi'], ['1.5', '10', '30', 'mi'], ['1.5', '13', '0', 'mi'], ['3', '14', '0', 'km'], ['1', '6', '0', 'mi']] as [string, string, string, string][]) {
+    two.paceUnit(unit);
+    for (const mile of [null, ['9', '0'], ['7', '0'], ['12', '30']] as ([string, string] | null)[]) {
+      two.type('run', 'targetDist', dist); two.type('run', 'targetMins', mm); two.type('run', 'targetSecs', ss);
+      two.type('run', 'mileBestMins', mile ? mile[0] : ''); two.type('run', 'mileBestSecs', mile ? mile[1] : '');
+    }
+  }
+}
+
+/**
+ * A week that holds the test: the pace goal on the race path (1.5 miles in `mins` minutes from a 9:00 mile: 9 is far
+ * and carries the reach sentence, 13 is in reach and carries none), days rested on the rest day step, the start moved
+ * on the name step, then a race day on each day from yesterday through nine days on, and three far ones.
+ */
+export function testWeekWalk(P: Phone, T: WizardTally, what: string, rest: string[], startIn: number | null, mins = '9'): void {
+  const two = toCardioGoals(P, T, what + ', a dated test with ' + (rest.join(' and ') || 'no day') + ' rested', 'event');
+  two.sport('run'); two.goal('run', 'run_pace_goal');
+  for (const [k, x] of [['targetDist', '1.5'], ['targetMins', mins], ['targetSecs', '0'], ['mileBestMins', '9'], ['mileBestSecs', '0']] as [string, string][]) two.type('run', k, x);
+  two.next(); two.next();
+  for (const d of rest) two.day(d);
+  if (startIn !== null) { two.next(); two.start(day(todayOf(two), startIn)); two.back(); }
+  two.back(); two.back();
+  for (let n = -1; n <= 9; n++) two.raceDay(day(todayOf(two), n));
+  for (const n of [70, 140, 210]) two.raceDay(day(todayOf(two), n));
+}
+
+/**
+ * The seed offer, on a phone whose history holds logged recovery paces: the offer under a run goal, Use this data and
+ * the line it leaves, the mile typed over it, the pace goal's form with the same line; then a wizard opened again,
+ * Start fresh, and no banner for the rest of it. Each wizard is walked on to Generate, which stores the seed's answer.
+ */
+export function seedWalk(P: Phone, T: WizardTally, what: string, path: 'event' | 'both'): Generated {
+  const use = toCardioGoals(P, T, what + ', the seed used on ' + path, path);
+  use.sport('bike'); use.goal('bike', 'bike_base');
+  use.sport('run');
+  let f = formOf(use.goal('run', 'run_base'), 'run');
+  assert.ok(f.kind === 'other' && f.seed && !f.seed.applied, what + ': the offer is drawn under a run goal');
+  f = formOf(use.seedUse(), 'run');
+  assert.ok(f.kind === 'other' && f.seed && f.seed.applied, what + ': Use this data leaves the line saying where the numbers came from');
+  use.type('run', 'mileBestSecs', '5');
+  f = formOf(use.goal('run', 'run_pace_goal'), 'run');
+  assert.ok(f.kind === 'pace' && f.seed && f.seed.applied, what + ': the pace goal\'s form keeps the line');
+  use.goal('run', 'run_base');
+  if (path === 'event') use.raceDay(day(todayOf(use), 84));
+  for (let i = 0; i < 3; i++) use.next();
+  const made = use.generate();
+  const fresh = toCardioGoals(P, T, what + ', the seed turned down on ' + path, path);
+  fresh.sport('run');
+  f = formOf(fresh.goal('run', 'run_pace_goal'), 'run');
+  assert.ok(f.kind === 'pace' && f.seed && !f.seed.applied, what + ': the offer is drawn under the pace goal');
+  f = formOf(fresh.seedFresh(), 'run');
+  assert.ok(f.kind === 'pace' && f.seed === null, what + ': Start fresh takes the banner away');
+  f = formOf(fresh.goal('run', 'run_10k'), 'run');
+  assert.ok(f.kind === 'other' && f.seed === null, what + ': and it stays away under another run goal');
+  for (const [k, x] of FILL['run']!) fresh.type('run', k, x);
+  if (path === 'event') fresh.targeted(false);
+  for (let i = 0; i < 3; i++) fresh.next();
+  fresh.generate();
+  return made;
+}
+
+/**
+ * A goal picked and filled by taps, then the wizard walked to the name step and Generate: the start a race date
+ * sets (the shorter plan's link under it tapped when it is offered, then the goal picked back on the cardio goals),
+ * the pop-up, the refusal, the build. `race` is days from today, null for Just building fitness (the race path) or
+ * for the hybrid path, which draws no race date.
+ */
+export function goalToGenerate(P: Phone, T: WizardTally, what: string, path: 'event' | 'both', sport: string, id: string, fill: [string, string][], race: number | null, goBack = false): Generated {
+  const two = toCardioGoals(P, T, what + ', ' + id + ' on ' + path + (race === null ? '' : ', a race day ' + race + ' days out'), path);
+  two.sport(sport); two.goal(sport, id);
+  for (const [k, x] of fill) two.type(sport, k, x);
+  if (path === 'event') { if (race === null) two.targeted(false); else two.raceDay(day(todayOf(two), race)); }
+  two.next(); two.next();
+  let v = two.next();
+  assert.equal(v.step, 'name');
+  if (v.step === 'name' && v.name.aligned && /offerShorterPlan/.test(v.name.aligned.copy)) {
+    two.shorter();
+    for (let i = 0; i < 3; i++) two.back();
+    two.goal(sport, id);
+    for (let i = 0; i < 3; i++) v = two.next();
+  }
+  return two.generate(goBack);
+}
+
+/**
+ * A seeded program's cardio goals made by taps. The config is set into both drafts with no sport and no goal, on the
+ * cardio goals step (on the race path with no race date either), and its goals are then made as an athlete makes
+ * them: the sport, the goal, the unit, each field the seeded goal holds that the form draws, the race date or Just
+ * building fitness. Then Continue to the name step, and Generate.
+ */
+export function seededGoalsWalk(P: Phone, cfg: unknown, T: WizardTally, what: string): Generated {
+  const two = new TwoWizards(P, T, what + ', its goals by taps');
+  two.open();
+  const c = JSON.parse(J(cfg)) as Draft;
+  const bare: Draft = { ...draftOf(two, c), cardioTypes: [], cardioGoals: {} };
+  if (c.primaryPath === 'event') { bare.eventTargeted = true; delete bare.raceDate; delete bare.raceDateWeeks; }
+  two.whole(bare, 'cardio_goal');
+  for (const sport of c.cardioTypes) {
+    two.sport(sport);
+    const g = c.cardioGoals[sport];
+    if (!g) continue;
+    const form = formOf(two.goal(sport, g.id!), sport);
+    if (g['swimUnit'] && g['swimUnit'] !== 'yd') two.swimUnit(g['swimUnit'] as string);
+    if (g['paceUnit'] && g['paceUnit'] !== 'mi') two.paceUnit(g['paceUnit'] as string);
+    for (const f of formFields(sport, form)) if (g[f.key] !== undefined && g[f.key] !== '') two.type(sport, f.key, String(g[f.key]));
+  }
+  if (c.primaryPath === 'event') { if (c.eventTargeted === false) two.targeted(false); else if (c.raceDate) two.raceDay(c.raceDate); }
+  while (two.st.step < WIZARD_STEPS.length - 1) two.next();
+  bump(T, 'seeded programs whose goals were made by taps');
+  return two.generate();
 }
 
 export { DAYS, day };
