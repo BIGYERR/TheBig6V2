@@ -398,6 +398,9 @@ which does reach him arrives with a recommendation.
   cannot read through (Post-v0.260.0, refused on every edit until the scripts moved to files). Piped in beside
   other commands it can also run nothing and say nothing: an edit made that way is not made until a grep of the
   file shows it (Post-v0.262.4: `python3 /dev/stdin <<'EOF'` after a `cd` left its file as it was, with no error).
+  The script is written with the Write tool, from the session's first edit: a long heredoc that writes or runs it is
+  refused as too complex (Post-v0.263.0: about ten refusals in the cardio goals session before every script went
+  that way).
 - Every shell pipeline that proves something is `bash -c 'set -eo pipefail; …'` with `;` separators. `set -e` alone lets a pipe swallow node's exit code. Delete artifacts before regenerating them, with `rm` on a literal path as a command of its own, never inside a `bash -c` string (Claude Code's safety check refuses an `rm` it cannot read through), or let `>` overwrite the file (Post-v0.259.0); an empty diff is a failure, not a clean result. In a chat's worktree, write every path out in full: the isolation guard refuses a command it cannot read through (a `bash -c "…"` string that expands a shell variable such as `$S`, a variable where an option may stand, git inside a loop), and `bash -c '…'` with literal paths runs as usual (Post-v0.257.0). It also refuses a compound command (a `;` chain, a pipe, a loop, a heredoc beside other commands) whose text holds the letters `git` anywhere, a path such as `dist-github-pages` included, and one it finds too long to read through: run that command alone, or put the work in a script in the scratchpad that builds the path itself (Post-v0.261.2). A `git commit` runs alone with its output unredirected, and a python heredoc whose text holds `git` goes in a scratchpad file run by its path (Post-v0.262.0: both refused in the SQLite store chat).
 - No process substitution `<(...)` — use temp files.
 - A count written into a record (the handoff, a decision file, a report to Mario) is one a command printed. A figure added up from several runs names each run and its count, never the sum alone (Post-v0.262.4: "143 files" was the unit and integration run's 105 and the sweeps' 38, added by hand).
@@ -576,12 +579,19 @@ before a merge into `main` touches the build).
   today's. A computed style says what the CSS asks for, not where WebKit puts the line (Post-v0.263.0: his phone on
   IA Next 123 found the Programs tab's fonts off; the rest sheet's reference then found a wheel's caption at 10 for
   12, a sheet's Back 2 short and a line height WebKit lays at whole points, before he saw it).
+  Every screen of a new step is read against its reference before the first setting is changed, and what they show
+  is fixed in one build: a look tuned one finding at a time costs a simulator build each (Post-v0.263.0: the cardio
+  goals step was built seven times, five of them for a point or less on five screens read in turn).
   A control of the beta that stands in for one of WebKit's (a date field, a select) is tried in the simulator's
   Safari before it is built: on a field set as today's Angular screens set theirs (a value bound as a property is
   not an attribute, and Reset goes back to the attribute), each tap is made and read, what it writes and when,
   whether the control stays open, and whether an attribute such as `min` is enforced at all (Post-v0.263.0: the
   date box was built to close on Reset and to offer no day before its earliest; WebKit's Reset blanks the field
   and stays open, and its calendar offers every day, so the box was built a second time).
+  Where the stand in holds a rule fitted to what the control was seen to do (which keys a number field keeps, what
+  it hands back), a text is typed in Safari for every clause of that rule before it is built, each one a text only
+  that clause decides (Post-v0.263.0: 45 texts fitted the number field's rule and none put a second sign after the
+  e, so a break of that clause turned no test red and the whole break set of 512 ran twice).
 
 ## Files
 - `index.html` — the app's page, generated. Its source is `frontends/app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta

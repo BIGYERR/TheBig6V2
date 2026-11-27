@@ -17,7 +17,7 @@ import {
   openInjury, openTravel, overlayBackCopy, overlayChips, overlaySpanLabel, setDraft, sheetView,
 } from '../../frontends/native/src/change-sheet/overlay-readers.ts';
 import { OVERLAY_TOASTS, applyInjuryDraft, applyOverlayDraft, imBackFromInjury, injReassess, injSnooze, removeOverlay } from '../../frontends/native/src/change-sheet/overlay-writes.ts';
-import { DATE_WORDS, RESET_VALUE, calendarDay, pickedValue } from '../../frontends/native/src/date-box/date-box.ts';
+import { DATE_WORDS, PRESSED_DIM, RESET_VALUE, calendarDay, pickedValue, resetDay, resetWrites } from '../../frontends/native/src/date-box/date-box.ts';
 import { COPIED, type ListProgram, progSelLines, runAnchorLine } from '../../frontends/native/src/program-list/list-readers.ts';
 import { copyText } from '../../frontends/native/src/program-list/list-screen.ts';
 import { DATE_TOASTS, type DatedProgram, resolveStartDate, rsRace, setProgRace, setProgStart, titleAfterDate } from '../../frontends/native/src/week-dates/week-dates.ts';
@@ -669,12 +669,22 @@ describe('native change sheet: the screens\' wiring', () => {
   });
   test('the date box, as WebKit\'s: a day picked is written at once and the box stays; Reset writes a blank, stays, and shows the day the box opened on; the check and a tap outside close', () => {
     assert.ok(box.includes("onChange={(e, d) => { if (e.type !== 'set' || !d) return; setDay(d); ask.onChange(pickedValue(d)); }}"));
-    assert.ok(box.includes('onPress={() => { ask.onChange(RESET_VALUE); setDay(opened); }}'), 'Reset does not close the box, and its calendar goes back to the day it opened on, as WebKit\'s does');
+    assert.ok(box.includes('onPress={() => { ask.onChange(resetWrites(ask)); setDay(resetDay(ask, opened, new Date())); }}'), 'Reset does not close the box, and its calendar goes back to the day it opened on, as WebKit\'s does');
+    // A field whose value is a property (every field but the wizard's race date): Reset writes a blank, the calendar back on the day it opened on.
+    const opened = new Date(2026, 10, 21);
+    assert.deepEqual([resetWrites({}), resetDay({}, opened, new Date(2026, 10, 20))], ['', opened]);
+    // A field whose value is an attribute (the wizard's race date, seen in the simulator's Safari on 2026-11-26): Reset hands back the day the field was drawn with, and the calendar goes to it.
+    assert.equal(resetWrites({ reset: '2026-12-20' }), '2026-12-20');
+    assert.deepEqual(resetDay({ reset: '2026-12-20' }, opened, new Date(2026, 10, 20)), new Date(2026, 11, 20));
+    assert.deepEqual(resetDay({ reset: '' }, opened, new Date(2026, 10, 20, 15, 30)), new Date(2026, 10, 20), 'a field drawn blank goes back to today');
+    // Reset and the check dim under the finger: with the day already today, Reset moves nothing else on the screen (Mario's phone, IA Next 127).
+    assert.equal(PRESSED_DIM, 0.55);
+    assert.equal((box.match(/pressed && \{ opacity: PRESSED_DIM \}/g) || []).length, 2, 'Reset and the check');
     assert.ok(box.includes('<Pressable testID="date-box-done" accessibilityRole="button" accessibilityLabel={DATE_WORDS.done} hitSlop={8} onPress={onClose}') && box.includes('<Pressable testID="date-box-out" accessibilityLabel="Close the calendar" onPress={onClose}'));
     assert.ok(box.includes('mode="date"') && box.includes('display="inline"') && box.includes('const opened = useRef(calendarDay(ask.value, new Date())).current;\n  const [day, setDay] = useState(opened);'));
     assert.doesNotMatch(box, /minimumDate|maximumDate/, 'every day is offered, as WebKit\'s calendar offers it: Apply change refuses a Through before From');
     assert.equal((box.match(/onClose/g) || []).length, 4, 'the box closes by its check and by a tap outside alone (the prop, its type, the two presses)');
-    assert.ok(app.includes('{dateAsk && <DateBox key={dateAsk.n} palette={p} ask={dateAsk.ask} calm={calm} onClose={() => setDateAsk(null)} />}'));
+    assert.ok(app.includes('{dateAsk && <DateBox key={\'date\' + dateAsk.n} palette={p} ask={dateAsk.ask} calm={calm} onClose={() => setDateAsk(null)} />}'));
     assert.ok(app.indexOf('{change && (') < app.indexOf('{dateAsk && <DateBox') && app.indexOf('{dateAsk && <DateBox') < app.indexOf('{toast && <Toast'), 'the calendar over the sheet, the toast over the calendar');
   });
 });

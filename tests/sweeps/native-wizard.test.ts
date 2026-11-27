@@ -1,16 +1,20 @@
-// The wizard and Generate in the Expo app against today's page, wide (MIGRATION.md phase 3, row 6, the first of two
-// sessions). support/native-wizard.ts holds the two apps equal after every tap; here it runs over the ten seeded
-// programs, each generated on an empty phone and beside a program with three weeks of history, and over the drafts
-// that draw every kind a step holds: every set of rest days under each goal and focus, the start date over two weeks
-// under each kind of goal, race plans from behind to weeks ahead, and each refusal. The floors at the end say what
-// was drawn, kind by kind, so a walk that stops drawing a kind fails here.
+// The wizard and Generate in the Expo app against today's page, wide (MIGRATION.md phase 3, row 6, both sessions).
+// support/native-wizard.ts holds the two apps equal after every tap; here it runs over the ten seeded programs, each
+// generated on an empty phone and beside a program with three weeks of history, set whole and with its goals made by
+// taps; over the cardio goals by taps (every goal of both paths at each level, every field typed into, the race day
+// from behind today to thirty weeks out, the seed offer, the pace reach, a dated test); and over the drafts that draw
+// every kind a step holds: every set of rest days under each goal and focus, the start date over two weeks under each
+// kind of goal, race plans from behind to weeks ahead, and each refusal. The floors at the end say what was drawn,
+// kind by kind, so a walk that stops drawing a kind fails here.
 import assert from 'node:assert/strict';
 import { describe, test } from 'vitest';
 import { PROGRAMS } from '../support/programs.ts';
+import { runsLife } from '../support/native-progress.ts';
 import { Phone, life } from '../support/stored-state.ts';
 import { twinAt } from '../support/native-program-list.ts';
 import {
-  TwoWizards, type WizardTally, addOnThenRaceWalk, day, draftOf, hybridWalk, raceWalk, refusedWalk, sameDayReaders, strengthWalk, wholeWalk, wizardTally,
+  TwoWizards, type WizardTally, addOnThenRaceWalk, day, draftOf, fillOf, goalToGenerate, goalsWalk, hybridWalk, raceWalk, reachWalk, refusedWalk, sameDayReaders, seedWalk, seededGoalsWalk, strengthWalk, testWeekWalk,
+  wholeWalk, wizardTally,
 } from '../support/native-wizard.ts';
 
 const NOW = '2026-08-29T09:00:00';   // a Saturday
@@ -163,6 +167,67 @@ describe('the Expo app\'s wizard on drafts set whole', () => {
   });
 });
 
+describe('the Expo app\'s cardio goals by taps, wide', () => {
+  const VALUES = ['', '0', '4', '5', '25', '60', '1.5', '007', '-1', '1e2'];
+  const DAYS_OUT = [-3, 0, 1, 3, 6, 7, 8, 10, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 112, 119, 126, 140, 210];
+  const runs = (): Phone => { const P = runsLife(CFGS[0], NOW).phone.launch('2026-09-23T09:00:00'); P.settle(); return P; };
+
+  test('every goal of the race path at each level: every field typed into with ten values, twenty four race days, Reset, the buttons', () => {
+    goalsWalk(fresh(), T, 'an empty phone', 'event', VALUES, DAYS_OUT);
+    goalsWalk(fresh(), T, 'an empty phone', 'event', ['', '9', '59'], [0, 7, 14, 56, 126], 'beginner');
+    goalsWalk(fresh(), T, 'an empty phone', 'event', ['', '9', '59'], [0, 7, 14, 56, 126], 'advanced');
+  });
+  test('every goal of the hybrid path at each level', () => {
+    for (const exp of ['beginner', 'intermediate', 'advanced']) goalsWalk(fresh(), T, 'an empty phone', 'both', VALUES, [], exp);
+  });
+  test('every goal on other days of the week, and beside a program with three weeks of history', () => {
+    for (const n of [2, 4, 6]) goalsWalk(fresh(day(TODAY, n) + 'T07:30:00'), T, 'the day ' + day(TODAY, n), 'event', ['', '9'], [0, 5, 8, 30, 120]);
+    const Q = twinAt(life(CFGS[0], NOW).phone, 1); Q.settle();
+    const before = JSON.stringify(Q.dump());
+    goalsWalk(Q, T, 'a walked phone', 'event', ['', '9'], [0, 8, 56]);
+    assert.equal(JSON.stringify(Q.dump()), before, 'the cardio goals store nothing, whatever is tapped or typed');
+  });
+  test('the pace goal\'s reach on both paths at each level and age', () => {
+    for (const path of ['event', 'both'] as const) for (const exp of ['beginner', 'intermediate', 'advanced']) for (const age of ['18-35', '36-54', '55+']) reachWalk(fresh(), T, 'an empty phone', path, exp, age);
+  });
+  test('a dated test: the days rested, the start moved, a target far and one in reach', () => {
+    for (const rest of [[], ['sat'], ['sat', 'sun'], ['sat', 'sun', 'mon']]) for (const start of [null, 3, 9]) for (const mins of ['9', '13']) testWeekWalk(fresh(), T, 'an empty phone', rest, start, mins);
+  });
+  test('the seed offer on both paths, on a phone with logged recovery paces', () => {
+    for (const path of ['event', 'both'] as const) {
+      const P = runs();
+      const before = P.dump();
+      seedWalk(P, T, 'a phone with three weeks of runs', path);
+      const after = P.dump();
+      assert.deepEqual(Object.keys({ ...before, ...after }).filter((k) => before[k] !== after[k]).sort(), ['ia_active', 'ia_programs'], 'the two programs generated change the list and the active program alone');
+      const made = (JSON.parse(after['ia_programs']!) as { cfg: Record<string, unknown> }[]).slice(-2).map((x) => x.cfg);
+      assert.deepEqual([made[0]!['_seedApplied'], made[1]!['_seedDismissed']], [true, true]);
+    }
+  });
+  test('each goal by taps to Generate: the race path with a race day from today to seventeen weeks out and with none, the hybrid path, and time goals left blank', () => {
+    const goals = (path: string): [string, string][] => Object.entries(GOALS).flatMap(([sport, ids]) => ids.filter(([id]) => path === 'event' || !HYB.has(id)).map(([id]) => [sport, id] as [string, string]));
+    let n = 0;
+    for (const [sport, id] of goals('event')) for (const race of [0, 10, 28, 56, 119, null]) goalToGenerate(fresh(), T, 'an empty phone', 'event', sport, id, fillOf(sport, id), race, n++ % 7 === 0);
+    for (const [sport, id] of goals('both')) goalToGenerate(fresh(), T, 'an empty phone', 'both', sport, id, fillOf(sport, id), null);
+    for (const [sport, id] of [['run', 'run_pace_goal'], ['swim', 'swim_500_time'], ['swim', 'swim_100_time']] as [string, string][]) {
+      assert.ok(goalToGenerate(fresh(), T, 'an empty phone', 'event', sport, id, [], 56).refused, id + ' with its times blank is refused');
+      assert.ok(goalToGenerate(fresh(), T, 'an empty phone', 'both', sport, id, [], null).refused);
+    }
+  });
+  test.each(NAMES.map((n, i) => [n, i] as const))('%s: its goals made by taps build the program its config set whole builds, on an empty phone and as a second program', (name, i) => {
+    const taps = seededGoalsWalk(fresh(), CFGS[i], T, name);
+    const whole = wholeWalk(fresh(), CFGS[i], wizardTally(), name);
+    assert.equal(taps.refused, null);
+    assert.equal(JSON.stringify(taps.prog.weeks), JSON.stringify(whole.prog.weeks), name + ': the grid from the goals made by taps is the grid from the seeded config');
+    assert.deepEqual([taps.prog.totalWeeks, taps.prog.startDate], [whole.prog.totalWeeks, whole.prog.startDate]);
+    const P = twinAt(life(CFGS[i], NOW).phone, 1); P.settle();
+    const before = P.dump();
+    seededGoalsWalk(P, { ...CFGS[i], name: 'Second' }, T, name + ', a second program');
+    const after = P.dump();
+    assert.deepEqual(Object.keys({ ...before, ...after }).filter((k) => before[k] !== after[k]).sort(), ['ia_active', 'ia_programs']);
+  });
+});
+
 describe('the Expo app\'s wizard: what the walks drew', () => {
   test('every kind a step holds was drawn and compared, each at least this many times', () => {
     // IA_TALLY=1 prints what was drawn, for setting a floor after a walk changes.
@@ -187,6 +252,29 @@ describe('the Expo app\'s wizard: what the walks drew', () => {
     for (const r of ['Required. Enter your most recent timed mile.', 'Required. Enter your most recent timed 500yd.', 'Required. Enter your most recent timed 100yd.', 'Your 500 pace is faster than your 100 time. Check both entries.']) floor('refused: ' + r, 1);
     // Drawn by no draft a path offers, on either app (tests/measure/native-wizard_today.md): the advisory box.
     assert.equal(T['days: advisory box'] || 0, 0, 'the advisory box is drawn by none of these drafts, as on today\'s');
-    assert.equal(Object.keys(T).filter((k) => /not compared/.test(k)).length, 0, 'every draw of the cardio goals was compared: no draft here holds a goal on that step');
+    // The cardio goals (the second session): every kind the step's model and its repaints can draw, by taps.
+    const cg = (k: string, n: number): void => floor('cardio_goal: ' + k, n);
+    cg('whole draws', 1400); cg('repaints in place', 6000); floor('values typed', 5000); floor('race days handed back', 1100); floor('race date Reset', 80);
+    cg('a goal chosen', 1000); cg('a sport open with no goal picked', 250); cg('no box under the cards', 400); cg('the line for more than one sport', 40);
+    cg('form: baseline, run', 2000); cg('form: baseline, bike', 900); cg('form: baseline, swim', 500); cg('form: run pace goal', 2400); cg('form: swim 500', 500); cg('form: swim 100 (the 500 row too)', 700);
+    cg('race block: the date field', 4000); cg('race block: the holds copy', 800); cg('race block: the time trial copy', 20); cg('race block: none (not the race path)', 2300);
+    cg('seed banner: the offer', 4); cg('seed banner: applied line', 8); cg('seed banner: none', 5000);
+    cg('mile help: required', 1800); cg('mile help: optional, a N mile', 1600); cg('mile help: optional, an N mile', 900);
+    for (const [k, n] of [['none', 3000], ['required', 350], ['not a real time', 130], ['under 3:00', 50], ['over 25:00', 190], ['the chart\'s fastest row', 100], ['the chart\'s slowest row', 280]] as [string, number][]) cg('mile advisory: ' + k, n);
+    for (const [k, n] of [['none', 800], ['required, the 500', 200], ['required, the 100', 10], ['not a real time', 100], ['500 pace faster than the 100', 70]] as [string, number][]) cg('swim advisory: ' + k, n);
+    cg('length line: set by the longest goal', 5000); cg('length line: the test sets it', 100); cg('length line: the test sets it (1 week)', 1500); cg('length line: your mile time sets it', 130);
+    cg('pace reach: hidden', 1400); cg('pace reach: from the mile entered', 900); cg('pace reach: from the level default', 120);
+    cg('pace line shown', 2200); cg('pace line hidden', 180); cg('swim pace line shown', 1100); cg('swim pace line hidden', 50);
+    for (const [k, n] of [['none on the step', 3500], ['empty', 150], ['the date has passed [red]', 28], ['less than a week away [red]', 2300], ['finishes before race day [run]', 90], ['peaks on race day [run]', 24],
+      ['short for this goal [accent]', 40], ['short for this goal [red]', 220], ['race plan starts later [run]', 60], ['race plan opens in a week [run]', 4], ['race plan opens in a week, weeks behind [run]', 40],
+      ['race plan opens in a week, weeks behind, under the floor [signal]', 24], ['race plan opens in a week, weeks behind, under the floor, the shorter plan offered [signal]', 130],
+      ['test this week [accent]', 210], ['test this week, with the reach sentence [accent]', 320], ['test in week 2 or later [run]', 36], ['test in week 2 or later, with the reach sentence [accent]', 68],
+      ['test in week 1, nothing left to train [signal]', 6], ['test in week 1, nothing left to train, with the reach sentence [signal]', 4], ['test before the first training day [signal]', 78], ['test past the test block [accent]', 17]] as [string, number][]) cg('card under the date: ' + k, n);
+    floor('the shorter plan link tapped, on cardio_goal', 40); floor('the shorter plan link tapped, on name', 7); floor('toast: switched to the shorter plan', 47);
+    floor('seeded programs whose goals were made by taps', 20);
+    // Named by the page's builders and drawn by no walk, on either app (tests/measure/native-wizard_cardio-goals.md): a mile's help with no anchor to name, and a race plan under its floor with no week behind it.
+    assert.equal(T['cardio_goal: mile help: optional, bare'] || 0, 0);
+    assert.equal(T['cardio_goal: card under the date: race plan opens in a week, under the floor [signal]'] || 0, 0);
+    assert.deepEqual(Object.keys(T).filter((k) => /UNNAMED/.test(k)), [], 'every line drawn is one of the kinds named here');
   });
 });

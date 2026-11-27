@@ -9,9 +9,12 @@
 // whole draw (the page repaints two lines only: repaintStart). The last button is Generate Program: the length's
 // pop-up, the refusals and the generating screen are wizard-writes.ts's, the one file here that writes to the store.
 //
-// THIS SESSION: the cardio goals step opens and shuts its sports and lists each sport's goals; a goal takes no
-// press yet, and its fields, the seed offer, the race date and the card under it are the second session's.
-// The start date's field is this app's date box (date-box/DateBox.tsx) where today's is WebKit's own.
+// THE CARDIO GOALS (the second session): a goal takes a press and draws its form. A typed field and a picked race
+// day draw nothing whole: the page repaints a few lines in place, and so does this screen (repaint, over
+// wizard-screen.ts's editCardioField and setRaceDate), so a line no handler repaints stays as the last whole draw
+// left it. A number field is a text field that keeps and hands back what WebKit's number field does
+// (number-field.ts), drawn again with the draft's value at each whole draw. The race date's field and the start
+// date's are this app's date box (date-box/DateBox.tsx) where today's are WebKit's own.
 //
 // THE LINES STAND WHERE WEBKIT PUTS THEM. Every text here carries the line height WebKit lays it at, measured in the
 // simulator's Safari on today's own markup (wizard-screen.ts titleLine has the title's): a line with no line height of
@@ -33,10 +36,13 @@ import type { DateAsk } from '../date-box/date-box';
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import type { ScreenProgram } from '../this-week/week-screen';
 import { Generating } from './Generating';
+import type { CardioField, CardioForm, MileField, SeedView, TimePair } from './cardio-goal-model';
+import { fieldValue, keptText } from './number-field';
 import type { Choice } from './wizard-model';
+import type { CardioPaint } from './wizard-readers';
 import {
-  type CopyRun, type FloorToast, WIZARD_WORDS as W, copyRuns, dateFieldText, liftOnly, titleLine, unbroken, repaintStart, setChoice, setName, setStart, setUnit, startWizard, toggleCardioTypeSport, toggleRestDay,
-  wizardBack, wizardNext, wizardView,
+  type CopyRun, type FloorToast, WIZARD_WORDS as W, applySeedData, cardParts, copyRuns, dateFieldText, dismissSeedData, editCardioField, liftOnly, offerShorterPlan, raceTargeted, repaintStart,
+  setCardioGoal, setChoice, setName, setPaceUnit, setRaceDate, setStart, setSwimUnit, setUnit, startWizard, titleLine, toggleCardioTypeSport, toggleRestDay, unbroken, wizardBack, wizardNext, wizardView,
 } from './wizard-screen';
 import { LENGTH_WORDS, beginGenerate, finishGenerate, lengthWarning, refusal } from './wizard-writes';
 
@@ -47,6 +53,19 @@ const EDGE = Math.floor(1.5 * PixelRatio.get()) / PixelRatio.get();
 
 function Icon({ name, size, color }: { name: string; size: number; color: string }) {
   return <SvgXml xml={asyIcon(name, size).replace(/ style="[^"]*"/, '')} color={color} width={size} height={size} />;
+}
+
+/**
+ * A number field of the wizard: a text field that keeps each key WebKit's number field keeps and hands its handler
+ * the value WebKit's hands back (number-field.ts). A key that is not kept still calls the handler, as WebKit's does.
+ */
+function NumField({ id, initial, placeholder, hint, color, style, onValue }: { id: string; initial: string; placeholder: string; hint: string; color: string; style: object; onValue: (v: string) => void }) {
+  const [text, setText] = useState(initial);
+  const held = useRef(initial);
+  return (
+    <TextInput testID={id} value={text} placeholder={placeholder} placeholderTextColor={hint} keyboardType="numbers-and-punctuation" autoCorrect={false} autoCapitalize="none" spellCheck={false}
+      onChangeText={(t) => { held.current = keptText(held.current, t); setText(held.current); onValue(fieldValue(held.current)); }} style={[style, { color }]} />
+  );
 }
 
 export function Wizard({ palette: p, store, say, report, onDate, onClose, onDone }: {
@@ -66,8 +85,20 @@ export function Wizard({ palette: p, store, say, report, onDate, onClose, onDone
   const { width } = useWindowDimensions();
   const st = useRef(startWizard(new Date())).current;
   const [drawn, setDrawn] = useState(() => wizardView(store, st, new Date()));
+  /** How many whole draws there have been: a number field is made again at each, with the draft's value. */
+  const draws = useRef(0);
+  const cur = useRef(drawn);
+  cur.current = drawn;
   /** The page's renderWizardStep: the step in hand, drawn whole. */
-  const render = (): void => setDrawn(wizardView(store, st, new Date()));
+  const render = (): void => { draws.current++; setDrawn(wizardView(store, st, new Date())); };
+  /** A repaint in place on the cardio goals: the lines one handler repaints, the rest of the step as it stood. */
+  const repaint = (lines: (was: CardioPaint) => CardioPaint): void => {
+    const d = cur.current;
+    if (d.view.step !== 'cardio_goal') return;
+    const now = { shell: d.shell, view: { ...d.view, paint: lines(d.view.paint) } };
+    cur.current = now;
+    setDrawn(now);
+  };
   const [warn, setWarn] = useState<{ msg: string; weeks: number } | null>(null);
   const [gen, setGen] = useState<{ first: string; lines: string[] } | null>(null);
   const done = useRef<ScreenProgram | null>(null);
@@ -76,7 +107,7 @@ export function Wizard({ palette: p, store, say, report, onDate, onClose, onDone
   // clamp(21px, 6.5vw, 28px)
   const titleSize = Math.min(28, Math.max(21, width * 0.065));
 
-  const toast = (t: FloorToast | null): void => { if (t) say(t.text, t.icon); };
+  const toast = (t: FloorToast | null): void => { if (t) say(t.text, t.icon ?? undefined); };
   /** Generate, once the pop-up is answered or there is none (doGenerate): the two checks, then the generating screen. */
   const go = (): void => {
     const no = refusal(st.draft);
@@ -123,10 +154,14 @@ export function Wizard({ palette: p, store, say, report, onDate, onClose, onDone
       <Text style={[s.check, { color: p.accent, opacity: on ? 1 : 0 }]}>✓</Text>
     </Pressable>
   );
-  /** A line the page writes as markup, wrapping as one text: its bold runs, and the shorter plan's link (the second session's press). */
+  /** The shorter plan's link (offerShorterPlan): the run goal switched, the step drawn again, the toast. */
+  const shorter = (goal: string): void => { toast(offerShorterPlan(st, goal)); render(); };
+  /** A line the page writes as markup, wrapping as one text: its bold runs, and the shorter plan's link, which takes a press. */
   const copy = (html: string, style: object, bold: object, key?: string) => (
     <Text key={key} style={style}>
-      {copyRuns(html).map((r: CopyRun, i) => (r.icon ? null : <Text key={i} style={[r.bold && bold, r.link !== null && [s.link, { color: p.text }]]}>{r.text}</Text>))}
+      {copyRuns(html).map((r: CopyRun, i) => (r.icon ? null : r.link !== null
+        ? <Text key={i} testID={'wizard-shorter-' + r.link} accessibilityRole="link" onPress={() => shorter(r.link!)} style={[s.link, { color: p.text }]}>{r.text}</Text>
+        : <Text key={i} style={r.bold && bold}>{r.text}</Text>))}
     </Text>
   );
   /** A line with icons in it (a summary row's value, an advisory): its runs in a row that wraps. */
@@ -183,11 +218,138 @@ export function Wizard({ palette: p, store, say, report, onDate, onClose, onDone
       </>
     );
   } else if (v.step === 'cardio_goal') {
+    const c = v.cardio, pt = v.paint;
+    const fieldBox = { backgroundColor: p.surface, borderColor: p.border2 };
+    /** A value from a number field: the draft's field, and the lines its handler repaints. */
+    const typed = (field: CardioField, sport: string, key: string) => (val: string): void => repaint((was) => editCardioField(st, was, field, sport, key, val, new Date()));
+    /** A number field of the step: drawn again at each whole draw with the draft's value, as the page's is. */
+    const num = (field: CardioField, sport: string, key: string, value: string, placeholder: string, style: object) => (
+      <NumField key={draws.current + sport + key} id={'wizard-field-' + sport + '-' + key} initial={value} placeholder={placeholder} hint={p.muted} color={p.text} style={[s.field, s.fieldText, s.numField, fieldBox, style]} onValue={typed(field, sport, key)} />
+    );
+    const colon = (big: boolean) => <Text style={[big ? s.colonBig : s.colon, { color: p.muted }]}>:</Text>;
+    /** A minutes and seconds pair with their captions (a target time, the mile). */
+    const captioned = (pair: TimePair, sport: string) => (
+      <View style={s.pair}>
+        <View style={s.grow}>{num(pair.field, sport, pair.minsKey, pair.mins, 'min', s.center)}<Text style={[s.caption, { color: p.muted }]}>minutes</Text></View>
+        {colon(true)}
+        <View style={s.grow}>{num(pair.field, sport, pair.secsKey, pair.secs, 'sec', s.center)}<Text style={[s.caption, { color: p.muted }]}>seconds</Text></View>
+      </View>
+    );
+    /** A minutes and seconds pair with no captions (the swim's current times). */
+    const flat = (mins: string, secs: string, minsKey: string, secsKey: string) => (
+      <View style={s.pair}>{num('swimBase', 'swim', minsKey, mins, 'min', [s.grow, s.center])}{colon(false)}{num('swimBase', 'swim', secsKey, secs, 'sec', [s.grow, s.center])}</View>
+    );
+    const unitPair = (kind: string, a: string, b: string, on: string, set: (u: string) => void) => (
+      <View style={[s.unitPair, { borderColor: p.border2 }]}>
+        {[a, b].map((u, i) => (
+          <Pressable key={u} testID={'wizard-' + kind + '-' + u} accessibilityRole="button" accessibilityState={{ selected: on === u }} onPress={() => { set(u); render(); }}
+            style={[s.unitBtn, i === 1 && { borderLeftWidth: 1, borderLeftColor: p.border2 }, { backgroundColor: on === u ? p.accent : p.surface2 }]}>
+            <Text style={[s.unitBtnText, { color: on === u ? p.onInk : p.muted }]}>{u}</Text>
+          </Pressable>
+        ))}
+      </View>
+    );
+    const advisory = (id: string, a: { text: string; color: string } | null) => (a && a.text
+      ? <Text testID={id} style={[s.advisoryLine, { color: a.color === 'var(--signal)' ? p.signal : p.muted }]}>{a.text}</Text> : null);
+    const paceLine = (id: string, html: string | null) => (html ? iconLine(html, 13, p.accent, [s.paceLine, { color: p.accent }], s.bold, [s.left, s.mt6], id) : null);
+    /** A line the page frames under the pace target or the race date: its colour, its words, the reach sentence under them. */
+    const framed = (id: string, html: string | null) => {
+      const f = html ? cardParts(html) : null;
+      if (!f) return null;
+      const col = f.hue === 'red' ? p.red : f.hue === 'signal' ? p.signal : f.hue === 'run' ? p.run : p.accent;
+      return (
+        <View testID={id} accessibilityLabel={f.hue} style={f.card ? s.frame : s.frameBare}>
+          {f.card ? copy(f.body, [s.frameText, { color: col }], s.bold) : iconLine(f.body, 13, col, [s.frameLine, { color: col }], s.bold, s.left)}
+          {f.reach !== null && <Text style={[s.frameText, s.mt5, { color: col }]}>{f.reach}</Text>}
+        </View>
+      );
+    };
+    const seedBanner = (sd: SeedView | null) => (!sd ? null : sd.applied
+      ? iconLine(asyIcon('chart', 12) + ' Estimated from “' + sd.prog + '”. Edit if you know better.', 12, p.muted, [s.seedApplied, { color: p.muted }], s.bold, [s.left, s.seedAppliedRow], 'seed')
+      : (
+        <View key="seed" testID="wizard-seed" style={[s.seed, { backgroundColor: p.surface, borderColor: p.accent }]}>
+          {iconLine(asyIcon('chart', 13) + ' Seed from “' + sd.prog + '”?', 13, p.text, [s.seedHead, { color: p.text }], s.bold, [s.left, s.mb4])}
+          <Text style={[s.seedFound, { color: p.muted }]}>{sd.found}</Text>
+          <View style={s.seedBtns}>
+            <Pressable testID="wizard-seed-use" accessibilityRole="button" onPress={() => { applySeedData(st); render(); }} style={({ pressed }) => [s.seedBtn, { backgroundColor: p.accent, borderColor: p.accent }, pressed && s.sunk]}><Text style={[s.seedBtnText, { color: p.onInk }]}>Use this data</Text></Pressable>
+            <Pressable testID="wizard-seed-fresh" accessibilityRole="button" onPress={() => { dismissSeedData(st); render(); }} style={({ pressed }) => [s.seedBtn, { borderColor: p.border2 }, pressed && s.sunk]}><Text style={[s.seedBtnText, { color: p.muted }]}>Start fresh</Text></Pressable>
+          </View>
+        </View>
+      ));
+    const mileBlock = (m: MileField) => (
+      <View style={[s.group, s.mt8]}>
+        <Text style={[s.inputLabel, { color: p.muted }]}>{'Current mile time '}<Text style={s.plain}>{m.help}</Text></Text>
+        {captioned(m.pair, 'run')}
+        {advisory('wizard-mile-advisory', pt.mileAdvisory)}
+      </View>
+    );
+    const label6 = (t: string) => <Text style={[s.inputLabel, s.mb6, { color: p.muted }]}>{t}</Text>;
+    const form = (sport: string, f: CardioForm) => {
+      if (f.kind === 'swim') {
+        return (
+          <>
+            <View style={s.mt10}>
+              {label6('Distance')}
+              <View style={s.joined}>
+                <Text testID="wizard-swim-dist" style={[s.field, s.fieldText, s.grow, s.joinedField, s.readOnly, { backgroundColor: p.surface2, borderColor: p.border2, color: p.muted }]}>{String(f.dist)}</Text>
+                {unitPair('swim-unit', 'yd', 'm', f.unit, (u) => setSwimUnit(st, u))}
+              </View>
+            </View>
+            <View style={s.mt10}>{label6('Target time')}{captioned(f.target, 'swim')}{paceLine('wizard-swim-pace', pt.swimPace)}</View>
+            <View style={s.mt8}>{label6(f.baseLabel)}{flat(f.baseMins, f.baseSecs, 'baseMins', 'baseSecs')}{advisory('wizard-swim-advisory', pt.swimAdvisory)}</View>
+            {f.base500 && (
+              <View style={s.mt8}>
+                {label6(f.base500.label)}
+                <Text style={[s.note500, { color: p.muted }]}>Your repeats key off your 500 pace. Your 100 time sets the goal.</Text>
+                {flat(f.base500.mins, f.base500.secs, 'base500Mins', 'base500Secs')}
+              </View>
+            )}
+          </>
+        );
+      }
+      if (f.kind === 'pace') {
+        return (
+          <>
+            <View style={s.mt10}>
+              {label6('Target distance')}
+              <View style={s.joined}>
+                {num('runDist', 'run', 'targetDist', f.dist, 'e.g. 1.5', [s.grow, s.joinedField])}
+                {unitPair('pace-unit', 'mi', 'km', f.unit, (u) => setPaceUnit(st, u))}
+              </View>
+            </View>
+            <View style={s.mt10}>{label6('Target time')}{captioned(f.target, 'run')}{paceLine('wizard-pace', pt.pace)}{framed('wizard-reach', pt.feas)}</View>
+            {seedBanner(f.seed)}
+            <View style={[s.group, s.mt8]}>
+              <Text style={[s.inputLabel, { color: p.muted }]}>How far can you currently run? (optional)</Text>
+              <View style={s.withUnit}>{num('paceBaseline', 'run', 'baselineDist', f.baseline, 'e.g. 1.5', s.grow)}<Text style={[s.unitWord, { color: p.muted }]}>{f.unit}</Text></View>
+            </View>
+            {mileBlock(f.mile)}
+          </>
+        );
+      }
+      return (
+        <>
+          {seedBanner(f.seed)}
+          <View style={[s.group, s.mt10]}>
+            <Text style={[s.inputLabel, { color: p.muted }]}>{f.question + ' (optional)'}</Text>
+            <View style={s.withUnit}>{num('baseline', sport, 'baselineDist', f.baseline, f.placeholder, s.grow)}<Text style={[s.unitWord, { color: p.muted }]}>{f.unitWord}</Text></View>
+          </View>
+          {f.mile && mileBlock(f.mile)}
+        </>
+      );
+    };
+    const ft = c.footer, race = ft ? ft.race : null;
+    const raceBtn = (on: boolean, targeted: boolean, words: string) => (
+      <Pressable testID={'wizard-race-' + (targeted ? 'dated' : 'undated')} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => { raceTargeted(st, targeted, new Date()); render(); }}
+        style={[s.raceBtn, { backgroundColor: on ? p.accent : 'transparent' }]}>
+        <Text style={[s.raceBtnText, { color: on ? p.onInk : p.muted }]}>{words}</Text>
+      </Pressable>
+    );
     body = (
       <>
         {title(W.cardio.title, W.cardio.subtitle)}
         <View style={s.col10}>
-          {v.sports.map((sp) => (
+          {c.sports.map((sp) => (
             <View key={sp.id} testID={'wizard-sport-' + sp.id} style={[s.sport, { backgroundColor: p.surface, borderColor: sp.sel ? p.accent : p.border }]}>
               <Pressable testID={'wizard-sport-tap-' + sp.id} accessibilityRole="button" accessibilityState={{ expanded: sp.sel }} onPress={() => { toggleCardioTypeSport(st, sp.id); render(); }}
                 style={[s.sportHead, { backgroundColor: sp.sel ? 'rgba(' + p.inkRgb + ',0.06)' : 'transparent' }]}>
@@ -202,18 +364,42 @@ export function Wizard({ palette: p, store, say, report, onDate, onClose, onDone
                 <View style={[s.sportBody, { borderTopColor: p.border }]}>
                   <View style={s.goals}>
                     {sp.goals.map((g) => (
-                      // A goal takes no press this session: its fields are the second session's.
-                      <View key={g.id} testID={'wizard-goal-' + g.id} style={[s.goal, { backgroundColor: p.surface, borderColor: p.border }, g.sel && sel]}>
+                      <Pressable key={g.id} testID={'wizard-goal-' + g.id} accessibilityRole="button" accessibilityState={{ selected: g.sel }} onPress={() => { setCardioGoal(st, sp.id, g.id); render(); }}
+                        style={[s.goal, { backgroundColor: p.surface, borderColor: p.border }, g.sel && sel]}>
                         <Text style={[s.optionLabel, { color: g.sel ? p.accent : p.text }]}>{g.label}</Text>
                         <Text style={[s.optionDesc, { color: p.muted }]}>{g.desc}</Text>
-                      </View>
+                      </Pressable>
                     ))}
                   </View>
+                  {sp.form && form(sp.id, sp.form)}
                 </View>
               )}
             </View>
           ))}
         </View>
+        {ft && (
+          <View testID="wizard-length-box" style={[s.lengthBox, { backgroundColor: p.surface, borderColor: p.border2 }]}>
+            {copy((pt.progLen || '') + (ft.multi ? '\nSessions rotate across training days. Each sport gets its own days.' : ''), [s.lengthLine, { color: p.muted }], [s.bold, { color: p.accent }])}
+            {race && (
+              <View style={s.mt10}>
+                <Text style={[s.raceLabel, s.mb6, { color: p.muted }]}>Race date</Text>
+                <View style={[s.raceBtns, { backgroundColor: p.surface2, borderColor: p.border2 }]}>{raceBtn(race.targeted, true, '✓ I have a race date')}{raceBtn(!race.targeted, false, '✕ Just building fitness')}</View>
+                {race.targeted ? (
+                  <View>
+                    <Text style={[s.raceLabel, s.mb8, { color: p.muted }]}>Race date</Text>
+                    <Pressable testID="wizard-race-date" accessibilityRole="button" accessibilityLabel={'Race date' + (pt.raceField ? ', ' + dateFieldText(pt.raceField) : '')}
+                      onPress={() => onDate({ value: pt.raceField || '', min: race.min, reset: race.value, onChange: (iso) => repaint((was) => setRaceDate(st, was, iso, new Date())) })}
+                      style={[s.raceField, { backgroundColor: p.surface2, borderColor: p.accent }]}>
+                      <Text style={[s.raceFieldText, { color: p.text }]}>{dateFieldText(pt.raceField || '') || ' '}</Text>
+                    </Pressable>
+                    <View style={s.mt8}>{framed('wizard-race-card', pt.card)}</View>
+                    <Text style={[s.raceNote, s.mt8, { color: p.muted }]}>Tap to open the calendar. The final weeks taper so you arrive fresh.</Text>
+                  </View>
+                ) : <Text testID="wizard-race-copy" style={[s.raceNote, { color: p.muted }]}>{race.copy}</Text>}
+              </View>
+            )}
+          </View>
+        )}
       </>
     );
   } else if (v.step === 'lifting_focus') {
@@ -401,6 +587,53 @@ const styles = StyleSheet.create({
   sportBody: { paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1 },
   goals: { paddingTop: 10, gap: 6 },
   goal: { borderWidth: EDGE, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 14 },
+  // A goal's form: .input-label, .input-field and the inline styles renderWizardStep writes.
+  inputLabel: { fontFamily: DISPLAY, fontSize: 13, lineHeight: 17, fontWeight: '700', marginTop: -PX },
+  plain: { fontWeight: '400' },
+  mb4: { marginBottom: 4 }, mb6: { marginBottom: 6 }, mt5: { marginTop: 5 }, mt8: { marginTop: 8 }, mt10: { marginTop: 10 },
+  center: { textAlign: 'center' },
+  // A number field is a text input, given WebKit's 47 as the name's field is. Its words stood a point high on every field of three forms beside today's own in the simulator's Safari,
+  // so the room under them is two points less than the name's. The swim distance is read only: a text in the field's own padding, which stands the same 47.
+  numField: { height: 47, paddingTop: 0, paddingBottom: 2.67 },
+  readOnly: { marginTop: -PX, overflow: 'hidden' },
+  pair: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  // Read beside today's own in the simulator's Safari: what follows a pair's captions stood a point high at 13, and what follows an advisory or the 500 row's note a point low at 16.
+  caption: { fontFamily: DISPLAY, fontSize: 10, lineHeight: 14, marginTop: 3 - PX, textAlign: 'center' },
+  colonBig: { fontFamily: TEXT, fontSize: 24, lineHeight: 31, fontWeight: '300', paddingBottom: 14 },
+  colon: { fontFamily: TEXT, fontSize: 20, lineHeight: 26, fontWeight: '300' },
+  joined: { flexDirection: 'row', alignItems: 'stretch' },
+  joinedField: { borderTopLeftRadius: 12, borderBottomLeftRadius: 8, borderTopRightRadius: 0, borderBottomRightRadius: 0 },
+  unitPair: { flexDirection: 'row', borderWidth: 1, borderLeftWidth: 0, borderTopRightRadius: 8, borderBottomRightRadius: 8, overflow: 'hidden' },
+  unitBtn: { paddingHorizontal: 12, justifyContent: 'center' },
+  unitBtnText: { fontFamily: DISPLAY, fontSize: 12, lineHeight: 16, fontWeight: '700' },
+  withUnit: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  unitWord: { fontFamily: TEXT, fontSize: 13, lineHeight: 18 },
+  advisoryLine: { fontFamily: TEXT, fontSize: 11, lineHeight: 15, marginTop: 6 - PX },
+  paceLine: { fontFamily: TEXT, fontSize: 12, lineHeight: 16 },
+  note500: { fontFamily: TEXT, fontSize: 11, lineHeight: 15, marginBottom: 6 - PX },
+  frame: { marginTop: 6, paddingVertical: 9, paddingHorizontal: 11 },
+  frameBare: { marginTop: 6 },
+  frameText: { fontFamily: TEXT, fontSize: 12, lineHeight: 19, marginTop: -PX },
+  frameLine: { fontFamily: TEXT, fontSize: 12, lineHeight: 16 },
+  seed: { borderWidth: 1, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 14, marginBottom: 12 },
+  seedHead: { fontFamily: DISPLAY, fontSize: 12, lineHeight: 16, fontWeight: '700' },
+  seedFound: { fontFamily: TEXT, fontSize: 12, lineHeight: 18, marginBottom: 10 - PX },
+  seedBtns: { flexDirection: 'row', gap: 8 },
+  seedBtn: { flex: 1, borderWidth: 1, borderRadius: 999, padding: 7, alignItems: 'center' },
+  seedBtnText: { fontFamily: DISPLAY, fontSize: 13, lineHeight: 17, fontWeight: '700', marginTop: -PX },
+  seedApplied: { fontFamily: TEXT, fontSize: 11, lineHeight: 15 },
+  seedAppliedRow: { marginTop: 2, marginBottom: 8 },
+  // The box under the cards: the program length, and on the race path the race date.
+  lengthBox: { borderWidth: 1, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 14, marginTop: 4 },
+  lengthLine: { fontFamily: TEXT, fontSize: 12, lineHeight: 19, marginTop: -PX },
+  // Beside today's own in the simulator's Safari the two Race date labels stood two device pixels low on three screens: they are set up by them.
+  raceLabel: { fontFamily: DISPLAY, fontSize: 11, lineHeight: 15, fontWeight: '700', marginTop: -PX, top: -2 * PX },
+  raceBtns: { flexDirection: 'row', borderWidth: 1, borderRadius: 16, overflow: 'hidden', marginBottom: 8 },
+  raceBtn: { flex: 1, padding: 9, alignItems: 'center' },
+  raceBtnText: { fontFamily: DISPLAY, fontSize: 12, lineHeight: 16, fontWeight: '700', marginTop: -PX },
+  raceField: { borderWidth: EDGE, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 14 },
+  raceFieldText: { fontFamily: DISPLAY, fontSize: 17, lineHeight: 22, fontWeight: '700', textAlign: 'center', marginTop: -PX },
+  raceNote: { fontFamily: TEXT, fontSize: 11, lineHeight: 16, marginTop: -PX },
   // The strength path's add-on.
   addOn: { marginTop: 12, borderWidth: 1, borderRadius: 16, overflow: 'hidden' },
   addOnHead: { fontFamily: DISPLAY, fontSize: 11, lineHeight: 15, fontWeight: '700', marginBottom: -PX, paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1 },
@@ -456,7 +689,8 @@ const styles = StyleSheet.create({
   warnWrap: { backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', padding: 20 },
   warnCard: { width: '100%', maxWidth: 360, borderWidth: 1, borderRadius: 16, padding: 24 },
   warnKicker: { fontFamily: DISPLAY, fontSize: 11, lineHeight: 15, fontWeight: '700', marginBottom: 10 - PX },
-  warnTitle: { fontFamily: DISPLAY, fontSize: 22, lineHeight: 28, fontWeight: '700', marginBottom: 12 - PX },
+  // The words under the title stood a point high beside today's own pop-up in the simulator's Safari: two device pixels more under it.
+  warnTitle: { fontFamily: DISPLAY, fontSize: 22, lineHeight: 28, fontWeight: '700', marginBottom: 12 - PX, paddingBottom: 2 * PX },
   warnBody: { fontFamily: TEXT, fontSize: 13, lineHeight: 20, marginBottom: 20 - PX },
   warnBtns: { flexDirection: 'row', gap: 10 },
   warnBtn: { padding: 12, borderRadius: 999, alignItems: 'center' },

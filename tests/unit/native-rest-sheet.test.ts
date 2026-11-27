@@ -469,7 +469,7 @@ describe('native rest sheet: the screens\' wiring', () => {
   });
   test('a door that is refused says its words and opens nothing; an open sheet is a sheet of its own', () => {
     assert.match(app, /const r = openRest\(ask\.prog, readDayLogs\(phoneStore, ask\.prog\.id\) as unknown as RestLogs, ask\.week, ask\.dayKey, ask\.view, new Date\(\)\);\s*if \('toast' in r\) \{ say\(r\.toast\); return; \}/);
-    assert.match(app, /<RestSheet key=\{rest\.n\}/);
+    assert.match(app, /<RestSheet key=\{'rest' \+ rest\.n\}/);
     assert.match(app, /onWrote=\{\(\) => \{ setWrites\(\(n\) => n \+ 1\); if \(rest\.wrote\) rest\.wrote\(\); \}\}/);
   });
   test('the layers are today\'s: the rest sheet and the pencil under the toast, the nudge over the toast and under the pop-ups', () => {
@@ -515,7 +515,7 @@ describe('native rest sheet: the screens\' wiring', () => {
     assert.ok(app.includes('onRest={askRest} onLogged='), 'the session sheet\'s Edit cardio, with what to draw again');
     assert.ok(app.includes('const askRest = (ask: RestAsk, wrote: (() => void) | null = null): void => {'));
     assert.ok(app.includes('setRest((was) => ({ prog: ask.prog, draft: r.draft, wrote, n: was ? was.n + 1 : 1 }));'));
-    assert.ok(app.includes('<RestSheet key={rest.n} palette={p} session={{ store: phoneStore, prog: rest.prog }} draft={rest.draft} calm={calm} say={say} onClose={() => setRest(null)}'));
+    assert.ok(app.includes('<RestSheet key={\'rest\' + rest.n} palette={p} session={{ store: phoneStore, prog: rest.prog }} draft={rest.draft} calm={calm} say={say} onClose={() => setRest(null)}'));
     assert.ok(app.includes('<MileSheet palette={p} store={phoneStore} open={mile} calm={calm} say={say} onClose={() => setMile(null)}'));
   });
   test('the nudge draws its five lines and answers by its two buttons alone', () => {

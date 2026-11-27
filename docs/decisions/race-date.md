@@ -49,3 +49,18 @@ and the Angular `frontends/app/src/app/screens/wizard/wizard.ts`. Tests: `tests/
   draft of `tests/sweeps/native-wizard.test.ts` and by hand tables in `tests/unit/native-wizard.test.ts`. The whole
   entry is `docs/decisions/angular-screens.md`, the wizard in the Expo app.
 - **Release:** Post-v0.263.0, no build of today's app. On the phone with the next IA Next build.
+
+## D182, D183, D184 and D14a in the Expo app's cardio goals (Post-v0.263.0, the migration's phase 3, row 6, the second of two sessions)
+
+- Carried unchanged into the Expo app's cardio goals step (`frontends/native/src/wizard/wizard-readers.ts`
+  `raceFeedback`, the page's `updateRaceDateFeedback` line for line): one countdown for the card and the weeks it
+  writes (D182); a dated test's rows, never red, with the reach sentence only where the test week is set, and the
+  pace frame only where no race date owns the pace's words (D183); a week that holds the test, and a test past the
+  test block (D184); a race plan counting back from its race, with the shorter plan's link under its floor (D14a).
+  Same words, same colours, same numbers: held equal to today's page after every tap, 17 kinds of card each with a
+  floor (`tests/sweeps/native-wizard.test.ts`). The link takes a press in the card and under a start set by a race
+  date. The build's entry is `docs/decisions/angular-screens.md`, the wizard's cardio goals step in the Expo app.
+- **Found by its measure, not ruled** (`tests/measure/native-wizard_cardio-goals.md`, section I): Hit a Pace / Time
+  Goal with no race date picked is dated today by the step, as the 5K and the 10K are on the hybrid path, and
+  builds its test week alone. The beta is held equal to it.
+- **Release:** Post-v0.263.0, no build of today's app.

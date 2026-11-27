@@ -657,7 +657,7 @@ describe('native program list: the screens\' words and wiring', () => {
     assert.ok(app.includes('const refused = tabRefused(phoneStore, t);\n    if (refused) { say(refused); return; }\n    if (t === \'week\' && tab !== \'week\')'), 'a tab that is refused says why and does not open');
     assert.ok(app.includes("<Text numberOfLines={2} style={[styles.toastText, icon !== null && styles.toastWords]}>{(icon !== null ? ' ' : '') + text}</Text>") && app.includes("color: '#0a0a0a', textAlign: 'center' },"), 'a long toast takes a second line, so the refusal is read whole');
     assert.ok(app.includes('const list = useRef(newListState()).current;') && app.includes("if (t === 'home') setHomeTaps((n) => n + 1);"));
-    assert.ok(app.includes("<Programs key={homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />"));
+    assert.ok(app.includes("<Programs key={'programs' + homeTaps} palette={p} store={phoneStore} state={list} calm={calm} say={say} onSwitch={() => go('week')} onGone={(id) => { if (progress.viewId === id) progress.viewId = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />"));
     const home = app.indexOf('id="tab-home" label="Programs"'), week = app.indexOf('id="tab-week"'), bar = app.indexOf('testID="tab-bar"'), cover = app.indexOf('{cover}'), toast = app.indexOf('{toast && <Toast');
     assert.ok(home > 0 && home < week, 'Programs is the first tab');
     assert.ok(bar < cover && cover < toast, 'a sheet is drawn after the tab bar and before the toast');

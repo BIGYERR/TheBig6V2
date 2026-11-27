@@ -385,3 +385,28 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   back; the copy button and a paste. Nothing differed and no motion was named, so nothing was fixed from it
   (`docs/decisions/injury-overlays.md`, `docs/decisions/this-week.md` and `docs/decisions/active-program.md`, the
   build 126 entries).
+- **Seen on `main`, the twenty-third run, the beta's lane alone** (run 44946737852, merge ebbc374, pull request 60,
+  2026-11-21 15:31 EST; the merge carried no version: 9b5e165, the wizard and Generate in the Expo app, and four
+  tests and docs commits; read and recorded by the next session, the cardio goals step's, after the run had ended):
+  the two gates went together (10 s today's, 12 s the beta's). Today's lane skipped its upload, as ruled. The beta's
+  lane archived, signed and uploaded `0.263.0 (127)` (734 s, done 15:45:03) and read it back as processed (102 s,
+  done 15:46:47); its upload job started 3 s after its gate, with no wait for a runner. The build number moved from
+  126 to 127 on one commit, 9b5e165, which changed `frontends/native`. The run ended green: 6 jobs passed and 8
+  skipped by rule. Six merges followed it before that session began (pull requests 61 to 66, runs 45525634337,
+  45536449002, 45542355976, 45736787059, 45739735100 and 45744024374): none carried a commit that changed
+  `frontends/native`, `core` or `tests/semver.js` (`git log ebbc374..origin/main` on those paths prints none), and
+  each skipped both uploads, so 127 stayed the beta's newest build. Both `testflight.mjs leg` lines, read at the
+  cardio goals session's start: `testflight 0.263.0 processed (uploaded before this run; a version goes up once, a
+  fix is the next PATCH) (run 45744024374, f702836)` and `testflight next 0.263.0 (127) processed (uploaded before
+  this run; a build goes up once, the next change to the app is the next build) (run 45744024374, f702836)`.
+- **On Mario's phone, build 127** (his report, 2026-11-26, no screenshot; `docs/decisions/angular-screens.md`, the
+  wizard's build 127 entry). First: "i cant click specifics events for the cardio goals and the reset button doesnt
+  click". A goal takes no press on 127, as that session left it. Reset was tried on the simulator with 127's code
+  and in the simulator's Safari on a field set as today's: it presses on both, and with the day already today
+  nothing on the screen changes on either. He was then given eight checks with what each should show, and
+  answered: "from your equipment to lifting focus it goes from 2/6 to 4/6 and the reset button button doesnt clear
+  it from the calender pop up then makes the start date text block blank, the rest is good besides what i just
+  said". Both are today's app's own behaviour, held equal by the beta, and neither is ruled or fixed. The rest (the
+  door, Continue and Back, the rest days' floor and its toast, the name, the pick, Generate and its figure, This
+  Week on the new program, the race path's sports opening and shutting) is good, and he named no jump back to the
+  first step after a calendar pick.

@@ -304,10 +304,21 @@ Each phase starts only on Mario's GO, one phase step per session.
   today's date and text fields tried there. The ledger rows of the wizard's two models are filled.
   Found by the measure, not ruled: Hybrid with Run a 5K or Run a 10K builds a race plan whose race is today; the
   rest day step's advisory box is drawn in no state (the handoff's section 12).
-- **Next:** Mario's phone on the next IA Next build (Build New Program; each step of the strength path, Back and
-  Continue; the rest days down to the floor and the toast; the name and the start date in the calendar, Reset;
-  Generate, the figure and its lines, and This Week on the new program; the race path's cardio goals opening and
-  shutting their sports). Then row 6's second session, the cardio goals step whole. Still not
+- **Done, phase 3's fifteenth session, row 6's second of two (Post-v0.263.0, no build):** his phone on IA Next
+  build 127 (good but two things, both today's own and not ruled: the strength path's count reads 2/6 twice, and
+  Reset on a date leaves a day chosen and the field blank; section 12 of the handoff). Then today's cardio goals
+  step measured by taps (`tests/measure/native-wizard_cardio-goals.md`) and built on his "Concur, build it"
+  (`docs/decisions/angular-screens.md`, `race-date.md` and `injury-overlays.md`, each an Expo entry): a goal
+  takes a press and draws its form; number fields that keep and hand back what WebKit's do; the seed offer; the
+  race date in the app's calendar, Reset back to the day it was drawn with; the card under it; the shorter plan's
+  link; the start a race sets and the pop-up's race paths, now reached by taps. The seven lines the page repaints
+  in place are held as they stand after every tap, a stale one included. 512 breaks, every one red. The look
+  within a point beside today's own page in the simulator's Safari. Fixed on the way: the wizard was built again
+  on its first step when a calendar closed (the root's keys). The ledger row of the page's cardio goal step test
+  is filled. **Row 6 is built.**
+- **Next:** Mario's phone on the next IA Next build (Race / Event: a sport, a goal, its fields typed; the race
+  date's calendar, a day, Reset, the check; the card under it and the shorter plan's link; Just building fitness;
+  Hybrid; Continue to the name step and Generate; Reset's dim on the start date). Then row 7. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,

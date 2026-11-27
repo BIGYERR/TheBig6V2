@@ -199,7 +199,7 @@ const BREAKS = [
   [PAINT, "a fixed picture keeps the page's viewBox", "  return { viewBox: grown, width: width + 2 * grow,", "  return { viewBox, width: width + 2 * grow,"],
   [APP, "a tap on the Progress tab does not open the screen afresh", "    if (t === 'progress') setProgressTaps((n) => n + 1);\n", ""],
   [APP, "what Progress keeps is lost at each redraw of the app", "const progress = useRef(newProgressState()).current;", "const progress = newProgressState();"],
-  [APP, "the Progress screen is not opened anew by its tab", "<Progress key={progressTaps} palette={p}", "<Progress palette={p}"],
+  [APP, "the Progress screen is not opened anew by its tab", "<Progress key={'progress' + progressTaps} palette={p}", "<Progress palette={p}"],
   [APP, "the Progress tab is after Bugs", "        <TabButton id=\"tab-progress\" label=\"Progress\" on={tab === 'progress'} palette={p} onPress={() => go('progress')} icon={(c) => <Bars color={c} />} />\n", ""],
   [APP, "the Progress tab opens Bugs", ": tab === 'progress' ? <Progress", ": tab === 'week' ? <Progress"],
   [PROG, "a chip does not redraw", "show: (id: string): void => { showProgram(st, id); redraw(); },", "show: (id: string): void => { showProgram(st, id); },"],

@@ -60,6 +60,8 @@ const rootVar = (name: string): string => {
 describe('native look: no weight Helvetica Neue does not have', () => {
   // The two that ask the system face, which has both weights: the backup screen's key name and the Bugs placeholder.
   const SYSTEM_FACE = new Set(['BackupLoad.tsx|600', 'App.tsx|800']);
+  // Helvetica Neue has a Light, and today's sheet asks it for the colon between a minutes field and a seconds field (font-weight:300, the wizard's cardio goals): two styles.
+  const LIGHT = ['wizard/Wizard.tsx|300', 'wizard/Wizard.tsx|300'];
 
   test('every font weight in the app is 400, 500 or 700, but for two styles on the system face', () => {
     const files = sources(NATIVE);
@@ -73,8 +75,10 @@ describe('native look: no weight Helvetica Neue does not have', () => {
       }
     }
     assert.ok(seen > 200, 'the scan read the app\'s weights: ' + seen);
-    assert.deepEqual(odd.filter((x) => !SYSTEM_FACE.has(x)), []);
-    assert.deepEqual(odd.sort(), [...SYSTEM_FACE].sort());
+    assert.deepEqual(odd.filter((x) => !SYSTEM_FACE.has(x)), LIGHT);
+    assert.deepEqual(odd.sort(), [...SYSTEM_FACE, ...LIGHT].sort());
+    const colons = readFileSync(NATIVE + '/wizard/Wizard.tsx', 'utf8');
+    assert.ok(colons.includes("  colonBig: { fontFamily: TEXT, fontSize: 24, lineHeight: 31, fontWeight: '300', paddingBottom: 14 },") && colons.includes("  colon: { fontFamily: TEXT, fontSize: 20, lineHeight: 26, fontWeight: '300' },"), 'the two are the colons');
   });
 
   test('the two on the system face name no face', () => {

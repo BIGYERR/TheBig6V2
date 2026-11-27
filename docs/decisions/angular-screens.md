@@ -789,4 +789,97 @@ what is stored.
   tab. The store was put back after: `278ba57f3f6a382b`, the hash the session began on (`ce33f280b11127ed` with the
   test program in it). Once, after a pick and the check, the wizard stood on its first step; the same state and
   taps made three more times did not show it again. **Not yet seen:** Mario's phone.
+- **On Mario's phone, build 127** (2026-11-26, the cardio goals session; `docs/decisions/testflight.md`). Good: the
+  door, Continue and Back, the rest days' floor and its toast, the name, the start date's pick, Generate and its
+  figure, This Week on the new program, the race path's sports opening and shutting; he named no jump back to the
+  first step after a calendar pick. Two things he named, both today's app's own, neither ruled nor fixed. **The
+  count on the strength path** reads 1/6, 2/6, 2/6, 4/6, 5/6, 6/6: it says 2/6 on About you and on Your equipment
+  and never 3/6 (`renderWizardStep`'s count, `wizardShell` in today's model; `tests/measure/native-wizard_today.md`,
+  section A, printed it the session before). **Reset on the start date** writes a blank and leaves a day chosen in
+  the calendar: with the day already today nothing on the screen moves, and the field reads blank once the box is
+  shut (the Summary's row reads today). Tried the same day in the simulator's Safari on a field set as today's (its
+  value a property): WebKit's Reset fires its change with a blank and its calendar keeps today circled, as the
+  beta's does. His first words were that Reset "doesnt click": it presses, and shows no sign of it. The cardio goals
+  session gives the box's Reset and its check a pressed look, which WebKit's own buttons have.
+- **Release:** Post-v0.263.0, no build of today's app. On the phone with the next IA Next build.
+
+## The wizard's cardio goals step in the Expo app (Post-v0.263.0, the migration's phase 3, row 6, the second of two sessions)
+
+- **Date:** 2026-11-26. **Ruled by:** no new ruling. Mario took the build on the measure's report ("Concur, build
+  it"). Each ruling the step carries keeps its own code, drawn here with the same words and behaviour: D183
+  P-SAFEPACE (the one repaint, the card's rows, the reach sentence and its frame), D184 P-TESTLEN (a week that holds
+  the test, a test past the test block), D182 P-RACEDATE (one countdown), D14a (a race plan counts back from its
+  race), D188 and D189 (the mile field at every level, its help and its advisory), D110a (a swim time goal needs a
+  current time), D9 (the mile's checks), the seed offer (V156, D7b's source on the goal). `MIGRATION.md`, section 6.
+- **The finding (`tests/measure/native-wizard_cardio-goals.md`, by taps, every handler read out of the page's own
+  markup):** 16 goals on the race path and 12 on the hybrid path, in six forms; a value is written as typed, a
+  string, with no clamp; of 1,680 typed values 96 left the program length line stale, every one a bike, swim or swim
+  time field, whose handlers do not repaint it; 528 race day picks drew 17 kinds of card; the shorter plan's link
+  was offered on 25; the seed offer is drawn on every run goal of a phone with logged recovery paces and on none of
+  Mario's backup's copy; 114 walks to Generate; the ten seeded programs' goals made by taps build the seeded grid,
+  10 of 10. **Tried in the simulator's Safari:** a number field keeps a digit always, a point while the text holds
+  no point and no e, e while it holds none, a sign at the start or after the e, and nothing else, fires its handler
+  on a key it does not keep, and hands back the text when it is a whole number as written, less a plus at its start
+  and a point at its end (45 texts typed key by key); the race date's field, whose value is an attribute, goes back
+  on Reset to the day it was drawn with and hands that day on, where a field whose value is a property is blanked;
+  its `min` is not enforced. **Found, not ruled, carried as today's:** Hit a Pace / Time Goal with no race date
+  picked is dated today by the step and builds its test week alone (on the hybrid path nothing on the screen but
+  the length line says so); a typed bike, swim or swim time field leaves the length line as it was; every program
+  made after a run goal was drawn stores the seed reader's answer in its config.
+- **What is built (`frontends/native/src/wizard/`):** `wizard-readers.ts` gains the page's `progLenLineHTML`,
+  `_mileFieldHelp`, `assessRunPaceCeiling`, `paceCeilingSentence`, `paceCeilingOfferHTML`, `updatePaceDisplay`,
+  `updateSwimPaceDisplay` and the step's one repaint, `updateRaceDateFeedback` (`raceFeedback`), function for
+  function. `wizard-screen.ts` gains the whole draw (`cardioDraw`: today's model, handed this app's readers, then
+  the repaint) and the taps: `setCardioGoal`, `setPaceUnit`, `setSwimUnit`, `applySeedData`, `dismissSeedData`,
+  `offerShorterPlan`, the race date's two buttons, a typed field (`editCardioField`, the Angular screen's `edit`)
+  and a day from the race date's field (`setRaceDate`). The two models are still today's files, byte for byte.
+  **A whole draw and a repaint:** the page repaints seven lines of the step in place (the length line, the pace
+  line, the pace frame, the card under the race date, the swim pace line, the mile's advisory, the swim's);
+  `CardioPaint` holds them as they stand, each typed field repaints what its page handler repaints and no more, and
+  a line no handler repaints stays as the last whole draw left it. `number-field.ts` is the number field as Safari
+  showed it. `Wizard.tsx` draws the six forms, the seed banner, the box under the cards with the race date and its
+  card, and the shorter plan's link, which takes a press in the card and under a start set by a race date.
+  `date-box.ts` and `DateBox.tsx`: an ask may name the day Reset goes back to (the race date's), and Reset and the
+  check dim under the finger.
+- **Fixed on the way, the beta's own: the wizard built again on its first step when a calendar closed.** The app's
+  root keyed eight of its children by a bare count, each counted from one; the first wizard and the first calendar
+  of a launch were both "1", and closing that calendar made React build the wizard again with a new draft. Seen on
+  the simulator after the race date's pick, Reset and check, and once the session before after a start date's;
+  each key now names its kind (`App.tsx`), and the same taps leave the wizard where it stood.
+  `tests/unit/native-wizard.test.ts` holds it.
+- **What does not change:** today's app and the page; core; any program; any `ia_` key on any phone but the beta's
+  own store, which Generate alone writes (`ia_programs`, `ia_active`).
+- **Proof.** After every tap the step, the draft, the bar, the toast, every `ia_` key and the seven repainted lines
+  as they stand (a stale one included) equal today's page; after every whole draw so does every tag, attribute and
+  word of the step's markup; after Generate the pop-up, the lines, the program in hand whole, every `ia_` key and
+  This Week (`tests/support/native-wizard.ts`). Walked: every goal of both paths at each level, each field of its
+  form typed into with ten values from the form as first picked and again filled, the units, twenty four race days
+  from behind today to thirty weeks out, Reset, both race buttons, the shorter plan's link, the seed offer used and
+  turned down, the pace reach at each level and age, a dated test with days rested and the start moved, each goal
+  by taps to Generate, and the ten seeded programs' goals made by taps, each building the grid its config set whole
+  builds. A floor for every kind the step can draw (`tests/sweeps/native-wizard.test.ts`); two kinds the page's
+  builders name are drawn by no walk on either app (a mile's help with no anchor, a race plan under its floor with
+  no week behind it). 512 breaks (`tests/measure/native-wizard_breaks.md`), every one red, 6 of them on the sweep alone. The first part alone, run first, made 128 and let none through. The whole set's first run let 2 of 512 through: a second sign kept in a number's exponent, which no text read in Safari had typed (two more were typed there, `1e2-3` and `1e+-2`, both dropping it, and are pinned), and a target at the mile itself flagged, which shows only on a mile under 3:15 (pinned by hand). The whole set was then run again. In the wizard's own list eleven breaks were pointed at the code as it stands and two dropped, their rules reversed by this session (a goal now takes a press; a goal in the draft is now read for its form). In four older lists 8 breaks were pointed at the code as it stands, their rules unchanged (the change sheet's three on Reset; five that name a key of the root: one of the deck pop-ups', one of Progress's, three of the rest sheet's), each run again alone on its list's files, each red. Every list checks clean (`--check`, eleven lists). The new tests pass where the Expo packages are absent (`tools/tree-at.mjs --working`: 8 files, 406 tests, and the type check). On the commit before the build the changed tests are red: `tests/unit/native-wizard.test.ts` cannot load (it imports `number-field.ts`, which that commit does not have), 10 of the 12 integration tests fail (the six new ones among them; the two that pass guard the strength path and the refusals, which must not change), and the one changed test of each of the change sheet's, the look's, the program list's and Progress's files and the two of the rest sheet's fail on the lines they now pin. The 60-second check: passed in 49.8 s.
+- **The look,** measured beside today's own page in the simulator's Safari (iPhone 17 Pro, iOS 26.5), today's
+  built page driven to each state by its own handlers and the text bands of both screenshots read from the pixels:
+  a run goal's form with the box under the cards (every band within a point), the pace goal's form in two halves
+  (within a point, and within two thirds), the name step with a start set by a race date (25 of 26 bands, none more
+  than two thirds of a point off, the two screens standing at the same height), the length's pop-up (7 of 7, its
+  words a point high) and the swim 100's form. Set from it, each two device pixels or a point: a bold run that
+  carries its own colour (the length line's) is drawn bold; the pop-up's words under its title; the two Race date
+  labels; a pair's captions stand at 14, an advisory and the 500 row's note at 15; a number field's words stood a
+  point high on every field of three forms. Read again on the final code: the swim 100's form, 21 bands, none more
+  than a third of a point from today's. Today's framed card draws no
+  frame: `background:var(--accent)18` is not a colour to WebKit, so the card is its words in their colour, padded,
+  and the beta draws that. The colon between two fields is Helvetica Neue's Light, as today's sheet asks.
+- **Seen on the simulator** (iPhone 17 Pro, iOS 26.5; `npm run sim-ios`, then `sim-ios:fast` after each change, the
+  last on the final code) on a copy of Mario's backup: a run goal, the pace goal, the half marathon and the swim
+  100 picked and their forms drawn; the race date's calendar (a day picked and written at once, Reset back to the
+  day the field was drawn with, the check); the name step with a start set by a race date, its copy, its link and
+  its pips; the length's pop-up; and on the final code two fields typed into (a letter dropped, the swim pace line
+  repainted, the length line left as it was). The store was put back each time: `278ba57f3f6a382b`, the hash the
+  session began on and the one the last session left (`e5624736887b4a21` after the look at build 127's code,
+  `d628e3f891129cb9` after the last pass). **Not seen there:** the seed offer (the backup's copy holds no logged
+  recovery pace; the walks hold it on a test phone), Generate from a goal picked by taps (the walks hold it), the
+  pop-up after its gap was set. **Not yet seen:** Mario's phone.
 - **Release:** Post-v0.263.0, no build of today's app. On the phone with the next IA Next build.
