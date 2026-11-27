@@ -24,10 +24,23 @@ Run these, in order, and report the six lines. Do not begin design or edits unti
    that is not this chat's, check three things. First, no open chat has it as its folder
    (`mcp__ccd_session_mgmt__list_sessions`, each row's `cwd`). Second, `git -C <path> status --porcelain` prints nothing.
    Third, `git -C <path> rev-list --count HEAD --not origin/dev` prints 0. When all three hold, remove the folder with
-   `git worktree remove --force <path>` and keep its branch. Otherwise leave it alone. Run each worktree's commands alone,
-   or from a script in the scratchpad, because the isolation guard refuses git inside a loop. Report the result on the
-   GIT line: `worktrees removed <n>, kept <names>`. A chat with a check mark should already have closed its own
-   worktree (CLAUDE.md, A finished chat closes its worktree); this step catches the ones it left.
+   `git worktree remove --force <path>`, then remove its iOS build folder (`~/Library/Caches/iron-asylum-ios/worktrees/<name>`,
+   `rm -rf` on that literal path as a command of its own). Otherwise leave it alone. Run each worktree's commands alone,
+   or from a script in the scratchpad, because the isolation guard refuses git inside a loop.
+
+   **Then delete merged branches (Mario, Post-v0.263.0).** Every `chat/*` branch that `git branch --merged origin/dev`
+   lists and no worktree holds is deleted (`git branch -D`). A branch that is not merged is kept: it is the only copy
+   of its work.
+
+   **Then name stale work (Mario, Post-v0.263.0).** A worktree left alone above for uncommitted or unpushed work, whose
+   newest commit is more than 7 days old (`git -C <path> log -1 --format=%cr`) and which no open chat holds, is named to
+   Mario: its branch, each unlanded commit's subject, the age, its size, and a recommendation (land it, keep the branch
+   and remove the folder, or drop both). Nothing is removed until he answers. On 2026-11-27 `native-this-week` had held
+   one unlanded docs commit and 4.1 GB for 13 days, and no session had said so.
+
+   Report the result on the GIT line: `worktrees removed <n>, kept <names>, branches deleted <n>, stale <names>`. A
+   chat with a check mark should already have closed its own worktree (CLAUDE.md, A finished chat closes its
+   worktree); this step catches the ones it left.
 
 1. Version on disk:
    `grep -oE '<meta name="ia-version" content="[^"]+"' index.html` (`MAJOR.MINOR.PATCH`; a bare integer N is a pre-semver build, 0.N.0)
