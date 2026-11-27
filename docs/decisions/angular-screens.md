@@ -789,4 +789,16 @@ what is stored.
   tab. The store was put back after: `278ba57f3f6a382b`, the hash the session began on (`ce33f280b11127ed` with the
   test program in it). Once, after a pick and the check, the wizard stood on its first step; the same state and
   taps made three more times did not show it again. **Not yet seen:** Mario's phone.
+- **On Mario's phone, build 127** (2026-11-26, the cardio goals session; `docs/decisions/testflight.md`). Good: the
+  door, Continue and Back, the rest days' floor and its toast, the name, the start date's pick, Generate and its
+  figure, This Week on the new program, the race path's sports opening and shutting; he named no jump back to the
+  first step after a calendar pick. Two things he named, both today's app's own, neither ruled nor fixed. **The
+  count on the strength path** reads 1/6, 2/6, 2/6, 4/6, 5/6, 6/6: it says 2/6 on About you and on Your equipment
+  and never 3/6 (`renderWizardStep`'s count, `wizardShell` in today's model; `tests/measure/native-wizard_today.md`,
+  section A, printed it the session before). **Reset on the start date** writes a blank and leaves a day chosen in
+  the calendar: with the day already today nothing on the screen moves, and the field reads blank once the box is
+  shut (the Summary's row reads today). Tried the same day in the simulator's Safari on a field set as today's (its
+  value a property): WebKit's Reset fires its change with a blank and its calendar keeps today circled, as the
+  beta's does. His first words were that Reset "doesnt click": it presses, and shows no sign of it. The cardio goals
+  session gives the box's Reset and its check a pressed look, which WebKit's own buttons have.
 - **Release:** Post-v0.263.0, no build of today's app. On the phone with the next IA Next build.

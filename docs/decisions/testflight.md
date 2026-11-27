@@ -399,3 +399,14 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   cardio goals session's start: `testflight 0.263.0 processed (uploaded before this run; a version goes up once, a
   fix is the next PATCH) (run 45744024374, f702836)` and `testflight next 0.263.0 (127) processed (uploaded before
   this run; a build goes up once, the next change to the app is the next build) (run 45744024374, f702836)`.
+- **On Mario's phone, build 127** (his report, 2026-11-26, no screenshot; `docs/decisions/angular-screens.md`, the
+  wizard's build 127 entry). First: "i cant click specifics events for the cardio goals and the reset button doesnt
+  click". A goal takes no press on 127, as that session left it. Reset was tried on the simulator with 127's code
+  and in the simulator's Safari on a field set as today's: it presses on both, and with the day already today
+  nothing on the screen changes on either. He was then given eight checks with what each should show, and
+  answered: "from your equipment to lifting focus it goes from 2/6 to 4/6 and the reset button button doesnt clear
+  it from the calender pop up then makes the start date text block blank, the rest is good besides what i just
+  said". Both are today's app's own behaviour, held equal by the beta, and neither is ruled or fixed. The rest (the
+  door, Continue and Back, the rest days' floor and its toast, the name, the pick, Generate and its figure, This
+  Week on the new program, the race path's sports opening and shutting) is good, and he named no jump back to the
+  first step after a calendar pick.
