@@ -900,5 +900,6 @@ what is stored.
   on a copy of its tree (`tools/tree-at.mjs`: 1 failed, 76 passed); three breaks added to the wizard's list, each
   red alone, and the whole set run again in four parts, 515 of 515 red (6 of them on the sweep alone) (`tests/measure/native-wizard_breaks.md`). **Seen on the simulator**
   (`sim-ios:fast`, iPhone 17 Pro, iOS 26.5): the check on the key, and the keys closed by it and by a drag; the
-  store put back (`278ba57f3f6a382b` before and after). Not yet seen on the phone: it goes up with the beta's next
-  build.
+  store put back (`278ba57f3f6a382b` before and after). **On Mario's phone, build 130** (2026-11-27, no
+  screenshot; run 46062522849): "All good!". He was asked to type a mile time in the wizard and close the keys by
+  the blue check and, again, by a drag. Nothing named to fix.
