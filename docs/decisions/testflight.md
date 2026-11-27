@@ -426,3 +426,25 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   to fix. His question before it, on being handed the next chat's prompt ahead of the check ("What's the point of
   me doing this on my phone when you give me the next prompt already? I feel like that's bad workflow"), is now a
   rule (CLAUDE.md, Session rhythm step 6: the prompt waits for his word on a build the merge uploaded).
+- **Seen on `main`, pull request 68's run** (run 46028068491, merge d1fa083, 2026-11-27 10:47 EST; the merge carried
+  no version and one docs commit, 8f68d74): both lanes skipped their uploads as held, `0.263.0` and `0.263.0 (128)`.
+  The run ended green: 4 jobs passed and 10 skipped by rule.
+- **Seen on `main`, pull request 69's run, the beta's lane alone** (run 46051140015, merge 4d13ee7, 2026-11-27
+  13:39 EST; the merge carried no version: 08726ce, Random Workout in the Expo app, and two tests and docs commits;
+  read in the session that built it, while it ran and after it had ended). Today's lane skipped its upload, as
+  ruled. The beta's lane archived, signed and uploaded `0.263.0 (129)` (done 13:55:20) and read it back as
+  processed (done 13:57:33). The build number moved from 128 to 129 on one commit, 08726ce, the only one of the
+  merge that changed `frontends/native`, `core` or `tests/semver.js` (`git rev-list --count` on those paths at
+  4d13ee7 prints 129). The run ended green: 6 jobs passed and 8 skipped by rule. Both `testflight.mjs leg` lines,
+  read after it ended: `testflight 0.263.0 processed (uploaded before this run; a version goes up once, a fix is
+  the next PATCH) (run 46051140015, 4d13ee7)` and `testflight next 0.263.0 (129) processed (run 46051140015,
+  4d13ee7)`.
+- **On Mario's phone, builds 128 and 129** (2026-11-27, two screenshots; `docs/decisions/angular-screens.md`, the
+  cardio goals entry, and `docs/decisions/wildcard.md`, the Expo entry). On 128, given after the merge: he could
+  not put the keyboard away after typing a mile time in the wizard; fixed in the chat that built it, for the
+  beta's next build. On 129, Random Workout, three things, none a fault of the build: Complete draws no check on
+  the calendar (D64: a Wildcard is never a completion); the calendar showed no Wildcard mark, on a program that
+  starts ten days on (today's own: off the program's calendar a Wildcard counts and stamps no day); and a
+  Wildcard marked done cannot be undone (today's own: only Reset, which clears the whole counter). His word on the
+  rest of build 129, once each was read to him: "Good push!" (2026-11-27). Random Workout is seen on his phone,
+  and the keyboard fix was pushed on that word.

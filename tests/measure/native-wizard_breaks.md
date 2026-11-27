@@ -2,7 +2,7 @@
 
 Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each break is made in a copy of the tree and put back).
 
-- The fast files, run on each break: `unit/native-wizard.test.ts`, `integration/native-wizard.test.ts`, `unit/native-program-list.test.ts`, `unit/native-change-sheet.test.ts`, `unit/native-look.test.ts`. Unbroken, they hold 235 tests and all pass.
+- The fast files, run on each break: `unit/native-wizard.test.ts`, `integration/native-wizard.test.ts`, `unit/native-program-list.test.ts`, `unit/native-change-sheet.test.ts`, `unit/native-look.test.ts`. Unbroken, they hold 236 tests and all pass.
 - The sweep, run only on a break the fast files let through: `sweeps/native-wizard.test.ts` (46 tests, all passing unbroken).
 
 | # | File | The rule broken | Files red | Tests red | Which |
@@ -50,7 +50,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 41 | `wizard-readers.ts` | a moved start is not said | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
 | 42 | `wizard-readers.ts` | a moved start's words | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
 | 43 | `wizard-readers.ts` | a short week is not said | **2** | 9 | integration/native-wizard 7, unit/native-wizard 2 |
-| 44 | `wizard-readers.ts` | a short week's days are a day late | **2** | 9 | integration/native-wizard 7, unit/native-wizard 2 |
+| 44 | `wizard-readers.ts` | a short week's days are a day late | **2** | 9 | unit/native-wizard 2, integration/native-wizard 7 |
 | 45 | `wizard-readers.ts` | a short week of one day is listed as several | **2** | 4 | integration/native-wizard 2, unit/native-wizard 2 |
 | 46 | `wizard-readers.ts` | a short week's last day joins with a comma | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
 | 47 | `wizard-readers.ts` | a short week's full week starts this Monday | **2** | 9 | integration/native-wizard 7, unit/native-wizard 2 |
@@ -92,14 +92,14 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 83 | `wizard-readers.ts` | a lift only program is four weeks | **2** | 3 | integration/native-wizard 1, unit/native-wizard 2 |
 | 84 | `wizard-readers.ts` | the name step's length forgets the test week | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
 | 85 | `wizard-readers.ts` | the default name counts the stored programs alone | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
-| 86 | `wizard-readers.ts` | a draft with no name stays unnamed | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
-| 87 | `wizard-readers.ts` | the default name carries the focus's id | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
+| 86 | `wizard-readers.ts` | a draft with no name stays unnamed | **2** | 7 | unit/native-wizard 1, integration/native-wizard 6 |
+| 87 | `wizard-readers.ts` | the default name carries the focus's id | **2** | 7 | unit/native-wizard 1, integration/native-wizard 6 |
 | 88 | `wizard-readers.ts` | a draft with no start stays without one | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 89 | `wizard-readers.ts` | the cardio row's Lift only | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 90 | `wizard-readers.ts` | the cardio row joins sports with a comma | **1** | 3 | integration/native-wizard 3 |
 | 91 | `wizard-readers.ts` | the cardio row leaves the goal out | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
 | 92 | `wizard-readers.ts` | the cardio row's icon size | **2** | 10 | integration/native-wizard 9, unit/native-wizard 1 |
-| 93 | `wizard-readers.ts` | the race date row on any path | **2** | 3 | unit/native-wizard 1, integration/native-wizard 2 |
+| 93 | `wizard-readers.ts` | the race date row on any path | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
 | 94 | `wizard-readers.ts` | race day reads as away | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
 | 95 | `wizard-readers.ts` | the race date row has no year | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
 | 96 | `wizard-readers.ts` | no date set's words | **2** | 4 | integration/native-wizard 3, unit/native-wizard 1 |
@@ -116,7 +116,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 107 | `wizard-screen.ts` | Continue walks past the last step | **2** | 10 | integration/native-wizard 8, unit/native-wizard 2 |
 | 108 | `wizard-screen.ts` | the hybrid path skips the cardio goals too | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 109 | `wizard-screen.ts` | a unit writes nothing | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
-| 110 | `wizard-screen.ts` | a training day rests below the floor | **2** | 3 | integration/native-wizard 1, unit/native-wizard 2 |
+| 110 | `wizard-screen.ts` | a training day rests below the floor | **2** | 3 | unit/native-wizard 2, integration/native-wizard 1 |
 | 111 | `wizard-screen.ts` | the floor's toast carries a lock | **2** | 3 | integration/native-wizard 1, unit/native-wizard 2 |
 | 112 | `wizard-screen.ts` | a resting day at the floor stays resting | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 113 | `wizard-screen.ts` | a resting day does not come back | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
@@ -126,7 +126,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 117 | `wizard-screen.ts` | a sport shut keeps its goal | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
 | 118 | `wizard-screen.ts` | a sport opened goes to the front | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
 | 119 | `wizard-screen.ts` | Lift Only keeps the goals | **1** | 1 | unit/native-wizard 1 |
-| 120 | `wizard-screen.ts` | Lift Only keeps the sports | **2** | 2 | unit/native-wizard 1, integration/native-wizard 1 |
+| 120 | `wizard-screen.ts` | Lift Only keeps the sports | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 121 | `wizard-screen.ts` | the name is trimmed as typed | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 122 | `wizard-screen.ts` | a blank start is not written | **2** | 3 | integration/native-wizard 1, unit/native-wizard 2 |
 | 123 | `wizard-screen.ts` | the landing always shows the launch's title | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
@@ -165,14 +165,14 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 156 | `wizard-screen.ts` | the floor's words with no goal | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 157 | `wizard-screen.ts` | the name step's line | **1** | 9 | integration/native-wizard 9 |
 | 158 | `wizard-screen.ts` | the derived start's source | **2** | 4 | integration/native-wizard 3, unit/native-wizard 1 |
-| 159 | `wizard-screen.ts` | the summary's heading | **2** | 10 | unit/native-wizard 1, integration/native-wizard 9 |
+| 159 | `wizard-screen.ts` | the summary's heading | **2** | 10 | integration/native-wizard 9, unit/native-wizard 1 |
 | 160 | `wizard-screen.ts` | Back's words | **1** | 1 | unit/native-wizard 1 |
 | 161 | `wizard-writes.ts` | the length never warns | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 162 | `wizard-writes.ts` | the pop-up's length is a week long | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 163 | `wizard-writes.ts` | the pop-up's kicker | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 164 | `wizard-writes.ts` | the pop-up's title | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 165 | `wizard-writes.ts` | the pop-up's first words | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
-| 166 | `wizard-writes.ts` | the pop-up's bold run | **2** | 6 | unit/native-wizard 1, integration/native-wizard 5 |
+| 166 | `wizard-writes.ts` | the pop-up's bold run | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 167 | `wizard-writes.ts` | the pop-up's last words | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 168 | `wizard-writes.ts` | Go Back's words | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 169 | `wizard-writes.ts` | Build's words | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
@@ -203,9 +203,9 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 194 | `wizard-writes.ts` | any other start is the day entered | **1** | 1 | unit/native-wizard 1 |
 | 195 | `wizard-writes.ts` | the start's resolver is not told the test date | **1** | 1 | sweeps/native-wizard 1 (the sweep was run) |
 | 196 | `wizard-writes.ts` | the wizard's start stays in the stored config | **2** | 9 | integration/native-wizard 7, unit/native-wizard 2 |
-| 197 | `wizard-writes.ts` | the start is not applied | **2** | 8 | unit/native-wizard 1, integration/native-wizard 7 |
+| 197 | `wizard-writes.ts` | the start is not applied | **2** | 8 | integration/native-wizard 7, unit/native-wizard 1 |
 | 198 | `wizard-writes.ts` | the new program goes first in the list | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
-| 199 | `wizard-writes.ts` | the list is not stored | **2** | 9 | unit/native-wizard 2, integration/native-wizard 7 |
+| 199 | `wizard-writes.ts` | the list is not stored | **2** | 9 | integration/native-wizard 7, unit/native-wizard 2 |
 | 200 | `wizard-writes.ts` | the ready line names six weeks | **1** | 4 | integration/native-wizard 4 |
 | 201 | `wizard-writes.ts` | the program handed back is the one built, not the one loaded | **1** | 7 | integration/native-wizard 7 |
 | 202 | `generating-figure.ts` | a squat every 1.2 s | **1** | 2 | unit/native-wizard 2 |
@@ -404,7 +404,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 395 | `wizard-readers.ts` | the pace line shows with no distance | **1** | 2 | integration/native-wizard 2 |
 | 396 | `wizard-readers.ts` | the swim pace is per 50 | **2** | 5 | integration/native-wizard 3, unit/native-wizard 2 |
 | 397 | `wizard-readers.ts` | the swim pace line shows at zero | **1** | 2 | integration/native-wizard 2 |
-| 398 | `wizard-readers.ts` | the swim pace line's unit is metres unless said | **2** | 5 | unit/native-wizard 2, integration/native-wizard 3 |
+| 398 | `wizard-readers.ts` | the swim pace line's unit is metres unless said | **2** | 5 | integration/native-wizard 3, unit/native-wizard 2 |
 | 399 | `wizard-readers.ts` | the weeks to the race are not written | **2** | 8 | integration/native-wizard 6, unit/native-wizard 2 |
 | 400 | `wizard-readers.ts` | yesterday's date has not passed | **1** | 1 | integration/native-wizard 1 |
 | 401 | `wizard-readers.ts` | the pace frame shows beside a race date | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
@@ -423,7 +423,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 414 | `wizard-readers.ts` | the length line is not repainted | **1** | 3 | integration/native-wizard 3 |
 | 415 | `wizard-screen.ts` | the race date's field is not held | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
 | 416 | `wizard-screen.ts` | the swim pace line is drawn hidden | **1** | 3 | integration/native-wizard 3 |
-| 417 | `wizard-screen.ts` | the mile's advisory is not held | **2** | 9 | unit/native-wizard 2, integration/native-wizard 7 |
+| 417 | `wizard-screen.ts` | the mile's advisory is not held | **2** | 9 | integration/native-wizard 7, unit/native-wizard 2 |
 | 418 | `wizard-screen.ts` | the swim's advisory is not held | **2** | 4 | integration/native-wizard 3, unit/native-wizard 1 |
 | 419 | `wizard-screen.ts` | a whole draw skips the step's repaint | **2** | 9 | integration/native-wizard 7, unit/native-wizard 2 |
 | 420 | `wizard-screen.ts` | the model reads no swim distance | **2** | 4 | integration/native-wizard 3, unit/native-wizard 1 |
@@ -433,7 +433,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 424 | `wizard-screen.ts` | a goal picked over another drops its baseline | **2** | 5 | integration/native-wizard 4, unit/native-wizard 1 |
 | 425 | `wizard-screen.ts` | a goal is named by its id | **2** | 7 | integration/native-wizard 6, unit/native-wizard 1 |
 | 426 | `wizard-screen.ts` | the pace unit is written as the swim's | **2** | 4 | integration/native-wizard 3, unit/native-wizard 1 |
-| 427 | `wizard-screen.ts` | the swim unit is written as the pace's | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
+| 427 | `wizard-screen.ts` | the swim unit is written as the pace's | **2** | 3 | unit/native-wizard 1, integration/native-wizard 2 |
 | 428 | `wizard-screen.ts` | the seed's mile keeps sixty seconds | **1** | 1 | unit/native-wizard 1 |
 | 429 | `wizard-screen.ts` | the seed's mile is marked as entered | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 430 | `wizard-screen.ts` | the seed's baseline is always in miles | **1** | 1 | unit/native-wizard 1 |
@@ -443,7 +443,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 434 | `wizard-screen.ts` | Just building fitness keeps the weeks | **1** | 1 | unit/native-wizard 1 |
 | 435 | `wizard-screen.ts` | I have a race date sets today over a date picked | **1** | 1 | unit/native-wizard 1 |
 | 436 | `wizard-screen.ts` | the shorter plan's toast loses its check | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
-| 437 | `wizard-screen.ts` | the shorter plan keeps the longer one's name | **2** | 3 | integration/native-wizard 2, unit/native-wizard 1 |
+| 437 | `wizard-screen.ts` | the shorter plan keeps the longer one's name | **2** | 3 | unit/native-wizard 1, integration/native-wizard 2 |
 | 438 | `wizard-screen.ts` | a target's seconds are not padded | **2** | 5 | integration/native-wizard 4, unit/native-wizard 1 |
 | 439 | `wizard-screen.ts` | a swim target does not write its m:ss | **2** | 4 | integration/native-wizard 3, unit/native-wizard 1 |
 | 440 | `wizard-screen.ts` | a swim target repaints nothing | **2** | 5 | integration/native-wizard 3, unit/native-wizard 2 |
@@ -456,7 +456,7 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 447 | `wizard-screen.ts` | a baseline is stored with no unit | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
 | 448 | `wizard-screen.ts` | a typed bike or swim baseline repaints the length line | **1** | 1 | integration/native-wizard 1 |
 | 449 | `wizard-screen.ts` | a run baseline repaints nothing | **1** | 2 | integration/native-wizard 2 |
-| 450 | `wizard-screen.ts` | a picked race day is not held by the field | **2** | 6 | integration/native-wizard 5, unit/native-wizard 1 |
+| 450 | `wizard-screen.ts` | a picked race day is not held by the field | **2** | 6 | unit/native-wizard 1, integration/native-wizard 5 |
 | 451 | `wizard-screen.ts` | a blank from the race date's field is not written | **2** | 2 | integration/native-wizard 1, unit/native-wizard 1 |
 | 452 | `wizard-screen.ts` | a framed line's reach sentence is not cut out | **1** | 1 | unit/native-wizard 1 |
 | 453 | `wizard-screen.ts` | the red line is read as a card | **1** | 1 | unit/native-wizard 1 |
@@ -487,37 +487,40 @@ Written by `node tests/measure/native-wizard_breaks.mjs` (read-only here; each b
 | 478 | `Wizard.tsx` | a key that is not kept does not call the handler | **1** | 1 | unit/native-wizard 1 |
 | 479 | `Wizard.tsx` | a number field hands back its text | **1** | 1 | unit/native-wizard 1 |
 | 480 | `Wizard.tsx` | a number field shows the number pad | **1** | 1 | unit/native-wizard 1 |
-| 481 | `Wizard.tsx` | a unit's press draws nothing | **1** | 1 | unit/native-wizard 1 |
-| 482 | `Wizard.tsx` | a race button writes nothing | **1** | 1 | unit/native-wizard 1 |
-| 483 | `Wizard.tsx` | Use this data applies nothing | **1** | 1 | unit/native-wizard 1 |
-| 484 | `Wizard.tsx` | Start fresh turns nothing down | **1** | 1 | unit/native-wizard 1 |
-| 485 | `Wizard.tsx` | the race date's Reset blanks the field | **1** | 1 | unit/native-wizard 1 |
-| 486 | `Wizard.tsx` | a picked race day writes nothing | **1** | 1 | unit/native-wizard 1 |
-| 487 | `Wizard.tsx` | the shorter plan's link says nothing | **1** | 1 | unit/native-wizard 1 |
-| 488 | `Wizard.tsx` | the shorter plan's link takes no press | **1** | 1 | unit/native-wizard 1 |
-| 489 | `Wizard.tsx` | a repaint draws the step whole | **1** | 1 | unit/native-wizard 1 |
-| 490 | `Wizard.tsx` | an advisory that refuses is drawn muted | **1** | 1 | unit/native-wizard 1 |
-| 491 | `Wizard.tsx` | the red line is drawn in the ink | **1** | 1 | unit/native-wizard 1 |
-| 492 | `Wizard.tsx` | the reach sentence is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 493 | `Wizard.tsx` | the mile's help is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 494 | `Wizard.tsx` | the mile's advisory is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 495 | `Wizard.tsx` | the swim's advisory is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 496 | `Wizard.tsx` | the 500 row is never drawn | **1** | 1 | unit/native-wizard 1 |
-| 497 | `Wizard.tsx` | the pace reach frame is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 498 | `Wizard.tsx` | the swim pace line is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 499 | `Wizard.tsx` | the line for more than one sport is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 500 | `Wizard.tsx` | the card under the race date is not drawn | **1** | 1 | unit/native-wizard 1 |
-| 501 | `Wizard.tsx` | the race date's field shows the day as stored | **1** | 1 | unit/native-wizard 1 |
-| 502 | `Wizard.tsx` | the box under the cards is always drawn | **1** | 1 | unit/native-wizard 1 |
-| 503 | `Wizard.tsx` | the seed banner is drawn under the pace goal alone | **1** | 1 | unit/native-wizard 1 |
-| 504 | `Wizard.tsx` | a form's goal draws no form | **1** | 1 | unit/native-wizard 1 |
-| 505 | `Wizard.tsx` | the Race date labels stand as measured before | **1** | 1 | unit/native-wizard 1 |
-| 506 | `Wizard.tsx` | the pop-up's words stand a point high | **1** | 1 | unit/native-wizard 1 |
-| 507 | `Wizard.tsx` | a framed line stands at 18 | **1** | 1 | unit/native-wizard 1 |
-| 508 | `Wizard.tsx` | a number field's words stand a point high | **1** | 1 | unit/native-wizard 1 |
-| 509 | `Wizard.tsx` | a caption stands at 13 | **1** | 1 | unit/native-wizard 1 |
-| 510 | `Wizard.tsx` | an advisory stands at 16 | **1** | 1 | unit/native-wizard 1 |
-| 511 | `Wizard.tsx` | the colon is drawn in the regular face | **1** | 1 | unit/native-look 1 |
-| 512 | `Wizard.tsx` | the race date's field has a whole 1.5 edge | **1** | 1 | unit/native-wizard 1 |
+| 481 | `Wizard.tsx` | a number field's return key does not say done | **1** | 1 | unit/native-wizard 1 |
+| 482 | `Wizard.tsx` | a number field keeps the keys up on return | **1** | 1 | unit/native-wizard 1 |
+| 483 | `Wizard.tsx` | a drag on the wizard's page leaves the keys up | **1** | 1 | unit/native-wizard 1 |
+| 484 | `Wizard.tsx` | a unit's press draws nothing | **1** | 1 | unit/native-wizard 1 |
+| 485 | `Wizard.tsx` | a race button writes nothing | **1** | 1 | unit/native-wizard 1 |
+| 486 | `Wizard.tsx` | Use this data applies nothing | **1** | 1 | unit/native-wizard 1 |
+| 487 | `Wizard.tsx` | Start fresh turns nothing down | **1** | 1 | unit/native-wizard 1 |
+| 488 | `Wizard.tsx` | the race date's Reset blanks the field | **1** | 1 | unit/native-wizard 1 |
+| 489 | `Wizard.tsx` | a picked race day writes nothing | **1** | 1 | unit/native-wizard 1 |
+| 490 | `Wizard.tsx` | the shorter plan's link says nothing | **1** | 1 | unit/native-wizard 1 |
+| 491 | `Wizard.tsx` | the shorter plan's link takes no press | **1** | 1 | unit/native-wizard 1 |
+| 492 | `Wizard.tsx` | a repaint draws the step whole | **1** | 1 | unit/native-wizard 1 |
+| 493 | `Wizard.tsx` | an advisory that refuses is drawn muted | **1** | 1 | unit/native-wizard 1 |
+| 494 | `Wizard.tsx` | the red line is drawn in the ink | **1** | 1 | unit/native-wizard 1 |
+| 495 | `Wizard.tsx` | the reach sentence is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 496 | `Wizard.tsx` | the mile's help is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 497 | `Wizard.tsx` | the mile's advisory is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 498 | `Wizard.tsx` | the swim's advisory is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 499 | `Wizard.tsx` | the 500 row is never drawn | **1** | 1 | unit/native-wizard 1 |
+| 500 | `Wizard.tsx` | the pace reach frame is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 501 | `Wizard.tsx` | the swim pace line is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 502 | `Wizard.tsx` | the line for more than one sport is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 503 | `Wizard.tsx` | the card under the race date is not drawn | **1** | 1 | unit/native-wizard 1 |
+| 504 | `Wizard.tsx` | the race date's field shows the day as stored | **1** | 1 | unit/native-wizard 1 |
+| 505 | `Wizard.tsx` | the box under the cards is always drawn | **1** | 1 | unit/native-wizard 1 |
+| 506 | `Wizard.tsx` | the seed banner is drawn under the pace goal alone | **1** | 1 | unit/native-wizard 1 |
+| 507 | `Wizard.tsx` | a form's goal draws no form | **1** | 1 | unit/native-wizard 1 |
+| 508 | `Wizard.tsx` | the Race date labels stand as measured before | **1** | 1 | unit/native-wizard 1 |
+| 509 | `Wizard.tsx` | the pop-up's words stand a point high | **1** | 1 | unit/native-wizard 1 |
+| 510 | `Wizard.tsx` | a framed line stands at 18 | **1** | 1 | unit/native-wizard 1 |
+| 511 | `Wizard.tsx` | a number field's words stand a point high | **1** | 1 | unit/native-wizard 1 |
+| 512 | `Wizard.tsx` | a caption stands at 13 | **1** | 1 | unit/native-wizard 1 |
+| 513 | `Wizard.tsx` | an advisory stands at 16 | **1** | 1 | unit/native-wizard 1 |
+| 514 | `Wizard.tsx` | the colon is drawn in the regular face | **1** | 1 | unit/native-look 1 |
+| 515 | `Wizard.tsx` | the race date's field has a whole 1.5 edge | **1** | 1 | unit/native-wizard 1 |
 
-- Breaks made: **512** of 512. Let through by the fast files, so swept: 6. Let through by every file: **0**.
+- Breaks made: **515** of 515. Let through by the fast files, so swept: 6. Let through by every file: **0**.
