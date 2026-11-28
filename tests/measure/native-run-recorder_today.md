@@ -147,6 +147,8 @@ none.
 
 ## J. The cut, put to Mario
 
+**His answer, 2026-11-28: "One session".** Built in the two steps below.
+
 **One session or two.** Recommended: one, built in two steps. First the module, the screen and the Bugs row, seen
 on the simulator with a moving location and committed. Then Record run's door. If the first step shows trouble,
 the session stops there and tells him, and the door moves to the next session.

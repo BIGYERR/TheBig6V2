@@ -379,7 +379,7 @@ Each phase starts only on Mario's GO, one phase step per session.
 - **The recorder measured (Post-v0.263.0, no build; 2026-11-28):** today's recorder, call by call and state by
   state, and what the beta holds (`tests/measure/native-run-recorder_today.md`). The build needs no capability,
   no entitlement and no profile change: two permission strings and the location background mode, Info.plist
-  lines all. The cut put to him: one session or two, one recommended, built in two steps. Waiting on his answer.
+  lines all. The cut put to him: one session or two, one recommended, built in two steps. His answer, 2026-11-28: "One session".
 - **Next:** phase 4's next session, the recorder as today's (the module, the screen, the Bugs row, Record run
   opening it). Still not ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which

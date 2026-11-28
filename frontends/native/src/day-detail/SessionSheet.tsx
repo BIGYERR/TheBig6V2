@@ -627,7 +627,7 @@ function Slider({ p, value, onChange }: { p: Palette; value: number; onChange: (
 }
 
 /** The cardio card (cardio-card.ts over cardio-card-model.ts): the session's name, its segments or its words, its note, the retest strip. */
-function Cardio({ c, p }: { c: CardioCardView; p: Palette }) {
+export function Cardio({ c, p }: { c: CardioCardView; p: Palette }) {
   const s = styles;
   const kind = c.blockCls.replace('-block', '');
   const ink = kind === 'run' ? p.run : kind === 'bike' || kind === 'swim' ? p.bike : p.text;

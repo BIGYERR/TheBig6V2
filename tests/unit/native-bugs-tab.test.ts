@@ -461,11 +461,11 @@ describe('native Bugs tab: the screen, top to bottom, in today\'s sizes', () => 
     const order = ['testID="bugs-top"', '{W.app}', '{W.title}', '{W.intro}', 'testID="bug-text"', 'testID="bug-send"', 'testID="bug-status"', '{W.attached}',
       '<Row id="look-row" label={W.look}', 'id="look-auto"', 'id="look-day"', 'id="look-night"', '{W.lookNote}',
       '<Row id="data-row" label={W.data}', '{W.dataNote}', 'id="backup-own-copy"', 'id="backup-save"', 'id="backup-load"', 'id="backup-msg"', 'id="backup-ask"',
-      '<EngineCheck palette={p} state={engine} />', '<Text testID="bug-version" style={[s.version, { color: p.muted }]}>{buildLabel(VERSION)}</Text>'];
+      '<EngineCheck palette={p} state={engine} />', '{onRecorder && <RecorderRow palette={p} onOpen={onRecorder} />}', '<Text testID="bug-version" style={[s.version, { color: p.muted }]}>{buildLabel(VERSION)}</Text>'];
     const at = order.map((o) => bugs.indexOf(o));
     at.forEach((i, n) => assert.ok(i > 0, 'the screen draws ' + order[n]));
     assert.deepStrictEqual([...at].sort((a, b) => a - b), at, 'in today\'s order');
-    assert.ok(!/recorder/i.test(bugs.replace(/^\/\/.*$/gm, '')), 'the Run recorder\'s row is phase 4\'s');
+    // The Run recorder's row (phase 4) stands after Engine, where the build holds the GPS module: tests/unit/native-run-recorder.test.ts.
   });
   test('the body, the field, the button and the small lines carry today\'s values', () => {
     // Typed from today's template: 16 above, 20 at the sides, 14 between the parts, 40 under them, and the tab bar's room.

@@ -1,7 +1,8 @@
 // The Bugs tab of the Expo app (MIGRATION.md phase 3, row 7, the second session), drawn as today's
 // (frontends/app/src/app/screens/bug-report/bug-report.ts, element for element): the top bar, the bug report, then
 // the rows Look (D261), Your data (D264; the file's kind this app's own, D297) and Engine (D286), and the build's
-// label. The Run recorder's row is phase 4's. D289's words stay under Your data until the cutover.
+// label. The Run recorder's row (D267) stands after Engine where the build holds the GPS module, and its screen is
+// the app's to draw over the tab bar (run-recorder/RunRecorder.tsx). D289's words stay under Your data until the cutover.
 // The words and the reads are bugs-screen.ts, the writes bugs-writes.ts. This file draws, picks the file and hands
 // the saved one to the share sheet: the one file this app writes, into its own cache, and it deletes none.
 import { useRef, useState } from 'react';
@@ -16,6 +17,7 @@ import { EngineCheck } from '../EngineCheck';
 import { type EngineState, newEngineState } from '../engine-check-state';
 import { SWIFT_ANSWER } from '../native-spike';
 import { swiftLine } from '../spike-line';
+import { RecorderRow } from '../run-recorder/RunRecorder';
 import { DISPLAY, type Palette, TEXT } from '../theme';
 import { Glow } from '../this-week/marks';
 import { BUGS_WORDS as W, type DataBlock, type Look, OWN_COPY, betaContext, buildLabel, cancelLoad, choose, newDataBlock } from './bugs-screen';
@@ -47,9 +49,11 @@ export interface BugsProps {
   inHand: () => { program: { name?: string; goal?: string; id?: string } | null; week: number | string };
   /** A backup loaded: the app starts afresh, as today's page reloads. */
   onAfresh: () => void;
+  /** Open on the Run recorder's row, or null where the build has no GPS module: no row, as today's has none in a browser. */
+  onRecorder: (() => void) | null;
 }
 
-export function Bugs({ palette: p, state, store, look, onLook, say, inHand, onAfresh }: BugsProps) {
+export function Bugs({ palette: p, state, store, look, onLook, say, inHand, onAfresh, onRecorder }: BugsProps) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const [headH, setHeadH] = useState(0);
@@ -160,6 +164,7 @@ export function Bugs({ palette: p, state, store, look, onLook, say, inHand, onAf
           )}
         </Row>
         <EngineCheck palette={p} state={engine} />
+        {onRecorder && <RecorderRow palette={p} onOpen={onRecorder} />}
         <Text testID="bug-version" style={[s.version, { color: p.muted }]}>{buildLabel(VERSION)}</Text>
       </View>
       </ScrollView>

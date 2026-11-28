@@ -57,6 +57,8 @@ import { RestSheet } from './rest-sheet/RestSheet';
 import { type RestAsk, type RestDraft, type RestLogs, type RestProgram, openRest } from './rest-sheet/rest-sheet-model';
 import type { PopView } from './pop-up/pop-up-model';
 import { type PopSession, type Reminder, fireCompletionPopup, maybeShowReminder, popOf, resolveReminder } from './pop-up/pop-ups';
+import { GPS } from './run-recorder/gps';
+import { RunRecorder } from './run-recorder/RunRecorder';
 import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
 import { Bars, Bug, Calendar, Home } from './this-week/marks';
@@ -100,6 +102,8 @@ function Shell({ afresh, onAfresh }: { afresh: boolean; onAfresh: () => void }) 
   const [deck, setDeck] = useState<{ open: DeckOpen; from: DeckFrom | null } | null>(null);
   // The day open as its session sheet, over the whole screen and the tab bar, or none.
   const [sheet, setSheet] = useState<SheetOpen | null>(null);
+  // The Run recorder open from its row on Bugs (D267), over the whole screen and the tab bar, or not.
+  const [bench, setBench] = useState(false);
   // This Week's size under the deck (D275 call 16): 96% while the deck is open, its own again as it closes.
   const under = useRef(new Animated.Value(1)).current;
   // Today's toast (rest-day-shell.ts showToast): one line over everything, gone after 2.2 s.
@@ -299,7 +303,7 @@ function Shell({ afresh, onAfresh }: { afresh: boolean; onAfresh: () => void }) 
           <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} inHand={inHand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
         </Animated.View>
       ) : tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : (
-        <Bugs palette={p} state={bugs} store={phoneStore} look={look} say={say} onAfresh={onAfresh}
+        <Bugs palette={p} state={bugs} store={phoneStore} look={look} say={say} onAfresh={onAfresh} onRecorder={GPS ? () => setBench(true) : null}
           onLook={(l) => { setLook(phoneStore, l); setLookNow(readLook(phoneStore)); }}
           inHand={() => ({ program: hand.prog as { name?: string; goal?: string; id?: string } | null, week: hand.own || 1 })} />
       )}
@@ -318,6 +322,7 @@ function Shell({ afresh, onAfresh }: { afresh: boolean; onAfresh: () => void }) 
           onRest={askRest} onLogged={(week, dayKey) => logged(sheet.prog.id, week, dayKey)} onGoing={() => setGoing(true)}
           onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
+      {bench && GPS && <RunRecorder palette={p} gps={GPS} heading={null} workout={null} onClose={() => setBench(false)} onHandLog={() => setBench(false)} />}
       {cover}
       {wizard !== null && (
         <Wizard key={'wizard' + wizard} palette={p} store={phoneStore} say={say} report={report} onDate={openDate} onClose={() => setWizard(null)}

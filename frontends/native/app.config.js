@@ -45,6 +45,15 @@ module.exports = () => {
       // The export compliance answer, as today's app gives it in config.xml: no encryption of its own, so TestFlight
       // offers a processed build without a question.
       config: { usesNonExemptEncryption: false },
+      // The Run recorder (modules/ia-gps), in today's words (frontends/app/plugins-src/ia-gps/plugin.xml): location
+      // while the app is in use, Motion & Fitness for the steps and the climb (D296), and the location background
+      // mode, so a run keeps recording with the screen locked under the blue pill. Each is a line of Info.plist.
+      // None is a capability on the App ID or an entitlement, so the signing profiles do not change.
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription: 'The Asylum records your route while you run. It stays on this phone.',
+        NSMotionUsageDescription: 'The Asylum counts your steps and your climb while you record a run. It stays on this phone.',
+        UIBackgroundModes: ['location'],
+      },
     },
     // The widget target (targets/RestTimerWidget), added to the generated project on every prebuild.
     plugins: ['@bacons/apple-targets'],

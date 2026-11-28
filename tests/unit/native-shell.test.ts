@@ -152,16 +152,20 @@ describe('native shell: a backup is loaded by core\'s own code and checked (D287
     assert.doesNotMatch(all, /localStorage|AsyncStorage|openDatabase/);
   });
 
-  test('the app writes one file, the backup it saves, into its own cache; it shares that one and deletes none', () => {
+  test('the app writes two files into its own cache, the backup it saves and a run\'s GPX; it shares those and deletes none', () => {
     const rel = (f: string): string => f.slice(NATIVE.length + 1);
     const bugs = join('src', 'bugs', 'Bugs.tsx');
     const usesFile = files.filter((f) => /new File\(/.test(readFileSync(f, 'utf8'))).map(rel);
-    assert.deepStrictEqual(usesFile, [bugs], 'one file of the app opens a file');
+    const recorder = join('src', 'run-recorder', 'RunRecorder.tsx');
+    assert.deepStrictEqual(usesFile, [bugs, recorder], 'two files of the app open a file');
     const text = readFileSync(join(NATIVE, bugs), 'utf8');
     assert.deepStrictEqual(text.match(/new File\([^)]*\)/g), ['new File(Paths.cache, r.name)', 'new File(got.assets[0].uri)'], 'the saved backup in the cache, and the picked copy, which is only read');
-    assert.equal(all.match(/\.write\(/g)?.length, 1, 'one write in the app');
+    assert.equal(all.match(/\.write\(/g)?.length, 2, 'two writes in the app');
+    const rec = readFileSync(join(NATIVE, recorder), 'utf8');
+    assert.deepStrictEqual(rec.match(/new File\([^)]*\)/g), ['new File(Paths.cache, fileName)'], 'the shared run in the cache');
+    assert.match(rec, /await file\.write\(text\);\n\s+await SystemShare\.share\(\{ url: file\.uri \}\);/, 'the recorder hands the share sheet that file and nothing else');
     assert.match(text, /await file\.write\(r\.text\);/);
-    assert.deepStrictEqual(files.filter((f) => /Share\.share\(/.test(readFileSync(f, 'utf8'))).map(rel), [bugs]);
+    assert.deepStrictEqual(files.filter((f) => /Share\.share\(/.test(readFileSync(f, 'utf8'))).map(rel), [bugs, recorder]);
     assert.match(text, /await Share\.share\(\{ url: file\.uri \}\);/, 'the share sheet is handed that file and nothing else');
     assert.doesNotMatch(all, /\.(delete|move|copy)\(|writeAsString|expo-sharing|Sharing\./);
     assert.match(all, /copyToCacheDirectory: true/, 'the picker hands over a copy');
@@ -207,8 +211,11 @@ describe('native shell: the engine check is core\'s, as it is', () => {
     // Hurt? and Traveling? stamp a change with it, which is also its id (the page's applyInjuryDraft and applyOverlayDraft).
     // The wizard hands it to the build's switch and rebuild (the page's doGenerate and loadActiveProgram).
     // Random Workout reads it as the session sheet does: to draw its cards, and to stamp each write.
+    // The Run recorder's clock is the one exception to never timing by it, and is today's: a run's lines carry the
+    // wall clock's stamps, which the module wrote, so the clock over them is the wall clock's too (run-recorder.ts,
+    // its now signal). The span itself is taken in core (gpsSummary), from the stamps.
     const dated = files.filter((f) => /Date\.now\(\)/.test(readFileSync(f, 'utf8'))).map((f) => f.slice(NATIVE.length + 1)).sort();
-    assert.deepStrictEqual(dated, [join('src', 'App.tsx'), join('src', 'change-sheet', 'ChangeSheet.tsx'), join('src', 'day-detail', 'SessionSheet.tsx'), join('src', 'deck', 'Deck.tsx'), join('src', 'goal-sheet', 'GoalSheet.tsx'), join('src', 'mile-sheet', 'MileSheet.tsx'), join('src', 'program-list', 'Programs.tsx'), join('src', 'progress', 'Progress.tsx'), join('src', 'random-workout', 'RandomWorkout.tsx'), join('src', 'rest-sheet', 'RestSheet.tsx'), join('src', 'this-week', 'ThisWeek.tsx'), join('src', 'wizard', 'Wizard.tsx')]);
+    assert.deepStrictEqual(dated, [join('src', 'App.tsx'), join('src', 'change-sheet', 'ChangeSheet.tsx'), join('src', 'day-detail', 'SessionSheet.tsx'), join('src', 'deck', 'Deck.tsx'), join('src', 'goal-sheet', 'GoalSheet.tsx'), join('src', 'mile-sheet', 'MileSheet.tsx'), join('src', 'program-list', 'Programs.tsx'), join('src', 'progress', 'Progress.tsx'), join('src', 'random-workout', 'RandomWorkout.tsx'), join('src', 'rest-sheet', 'RestSheet.tsx'), join('src', 'run-recorder', 'RunRecorder.tsx'), join('src', 'this-week', 'ThisWeek.tsx'), join('src', 'wizard', 'Wizard.tsx')]);
     assert.doesNotMatch(all, /Date\.now\(\)\s*-|-\s*Date\.now\(\)/, 'no span of time is taken from the date');
   });
 });
