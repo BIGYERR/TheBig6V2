@@ -306,4 +306,7 @@ and its saved report. Tests: `tests/unit/data-backup.test.ts` and `tests/integra
   check started, another tab opened and Bugs opened again, the words still in the field and the check's line
   further on. No report was sent. The simulator's store
   was saved aside before the first build and put back after (`278ba57f3f6a382b`, 36 keys, before and after), and
-  the file the save left in the simulator's Files was removed. Not yet seen on the phone.
+  the file the save left in the simulator's Files was removed. **On Mario's phone, IA Next 131** (2026-11-27, no
+  screenshot; run 46096340908): "All good on 131, got Sent ✓". He was asked to tap Day, Night and Auto, Save a
+  backup, Load a backup and read its question, Load it, leave a report typed and come back to it, and run the
+  check. Nothing named to fix.
