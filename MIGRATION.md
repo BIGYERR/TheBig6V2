@@ -364,6 +364,9 @@ Each phase starts only on Mario's GO, one phase step per session.
   sessions put to him: the rest timer on the Dynamic Island; the recorder as today's; the recording screen as D272
   rules it; the watch import's read; the Profile page with Your watch and the guided setup. His answer, 2026-11-27:
   "Go, island first" (section 6, decision 18). Nothing built in that session.
+- **Seen on `main`, pull requests 73 and 74** (2026-11-28, runs 46111488110 and 46154862677, merges e9fdd0c and
+  fa88061): docs commits alone, so both TestFlight lanes were held on both runs and nothing new reached his phone
+  (`docs/decisions/testflight.md`). IA Next stays at 131.
 - **Next:** phase 4's first build session, the rest timer on the Dynamic Island. It opens with a measure of
   today's rest timer and one call put to him: what on a screen starts, stops and resets a rest (D295). Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
