@@ -26,17 +26,28 @@ process.env['TZ'] = 'America/New_York';
 const CREATED = '2026-08-29T09:00:00';
 const J = JSON.stringify;
 
+// Each history is walked once for the file: the keys are plain data, and every walk copies them onto phones of its
+// own, so the three tests share them (the 60-second check runs this file beside five other lanes).
+const walked = new Map<unknown, Record<string, Keys>>();
 /** Each stretch of a program's standard history, as keys a walk is handed. */
 function stretches(cfg: unknown): Record<string, Keys> {
-  const out: Record<string, Keys> = {};
-  life(cfg as never, CREATED, undefined, (stage, P) => { out[stage] = keysOf(P); });
+  let out = walked.get(cfg);
+  if (!out) {
+    const made: Record<string, Keys> = {};
+    life(cfg as never, CREATED, undefined, (stage, P) => { made[stage] = keysOf(P); });
+    walked.set(cfg, out = made);
+  }
   return out;
 }
+let other: { text: string; from: Keys } | null = null;
 /** Another phone's backup, saved by today's page under the Day look: a second seeded program on its third week. */
 function another(): { text: string; from: Keys } {
-  const other = Object.values(PROGRAMS).find((c) => J(c) !== J(fixtures.HALF_MANNY))!;
-  const from = stretches(other)['3 third week']!;
-  return { text: todaysBackup(from, 'day'), from };
+  if (!other) {
+    const cfg = Object.values(PROGRAMS).find((c) => J(c) !== J(fixtures.HALF_MANNY))!;
+    const from = stretches(cfg)['3 third week']!;
+    other = { text: todaysBackup(from, 'day'), from };
+  }
+  return other;
 }
 
 test('HALF_MANNY: the Bugs tab worked through on both apps at each stretch, every load followed by its start afresh', async () => {
