@@ -7,8 +7,7 @@ import { createHash } from 'node:crypto';
 import { describe, test } from 'vitest';
 import { memoryStore } from '@ia/core/engine/state-store.ts';
 import type { StateStore } from '@ia/core/engine/state-store.ts';
-import { held, importBackup, importLine, misses, utf8Bytes } from '../../frontends/native/src/store/backup-import.ts';
-import type { ImportResult } from '../../frontends/native/src/store/backup-import.ts';
+import { held, importBackup, misses, utf8Bytes } from '../../frontends/native/src/store/backup-import.ts';
 import { sqliteTestStore } from '../support/sqlite-kv.ts';
 
 const sha256 = (s: string): string => createHash('sha256').update(s, 'utf8').digest('hex');
@@ -99,18 +98,5 @@ describe('the size in UTF-8 bytes', () => {
     for (const s of ['', 'abc', 'é', '€', '💪🏽', '中文', 'a\uD83Db', '\uDC00', 'x\uD83D', 'a\u0000b', DATA['ia_logs_P1']!]) {
       assert.equal(utf8Bytes(s), Buffer.byteLength(s, 'utf8'), JSON.stringify(s));
     }
-  });
-});
-
-describe('the lines (the copy rule: short declarative sentences, no dashes)', () => {
-  const ok: ImportResult = { ok: true, held: { keys: [{ key: 'ia_a', bytes: 1, sha256: '' }, { key: 'ia_b', bytes: 1, sha256: '' }], programs: [] }, version: '0.261.0', made: '' };
-  test('each outcome says what happened', () => {
-    assert.equal(importLine(ok), 'Loaded 2 of 2 keys. Every hash matches the file. Saved by version 0.261.0.');
-    assert.equal(importLine({ ...ok, version: '' }), 'Loaded 2 of 2 keys. Every hash matches the file.');
-    assert.equal(importLine({ ok: false, why: 'newer', misses: [] }), 'This backup is from a newer app. Update the app first.');
-    assert.equal(importLine({ ok: false, why: 'bad', misses: [] }), 'That file is not an Asylum backup.');
-    assert.equal(importLine({ ok: false, why: 'refused', misses: [] }), 'The phone refused the write. Nothing was kept.');
-    assert.equal(importLine({ ok: false, why: 'mismatch', misses: ['ia_x differs'] }), '1 key does not match the file. Nothing was kept. First miss: ia_x differs.');
-    assert.equal(importLine({ ok: false, why: 'mismatch', misses: ['ia_x differs', 'ia_y missing'] }), '2 keys do not match the file. Nothing was kept. First miss: ia_x differs.');
   });
 });

@@ -87,3 +87,24 @@ and the setting that picks it. Measure: `tests/measure/night-mode_colour-literal
 - **Expected values:** `tests/integration/night-mode.test.ts` (the row on the Bugs page in both builds, none on the home
   screen) and `tests/unit/night-mode.test.ts` (the tint channels and the same-in-both list).
 - **Released:** v0.251.0 (Minor, Mario 2026-10-28).
+
+## D261 in the Expo app: the Look row on the Bugs tab (Post-v0.263.0, the migration's phase 3, row 7)
+
+- **Date:** 2026-11-27. **Ruled by:** the session (form); the row, its three buttons, its note and its key are
+  D261's with Amendment 1, carried unchanged, in Mario's brief for the Bugs tab built as today's. No new D-code.
+  **Bump:** none. **Shipped:** Post-v0.263.0, no build of today's app (`frontends/native`, on `chat/bugs-tab` until Mario merges it; the beta's next build carries it). The proof and the simulator's look are in
+  `docs/decisions/data-backup.md`, the Expo entry: one walk and one break list hold the whole tab.
+- **The finding (measured, `tests/measure/native-bugs-tab_today.md`, section B; ten phones):** Night and Day store
+  `ia_theme`, Auto and any other word remove it; a second tap on the look already chosen writes nothing; a launch
+  reads Day or Night as stored and Auto for nothing, an empty value or any other word. The beta followed the phone
+  alone, and a look that a loaded backup carried was stored and never read.
+- **What changes (the Expo app only):** the row, as today's (`frontends/native/src/bugs/`): **Look**, then **Auto**,
+  **Day** and **Night**, the stored one drawn on ink, and **Auto follows your phone.** A tap writes the beta's own
+  store as today's `setTheme` writes (`bugs-writes.ts setLook`), and the app draws by the stored look from then on
+  and at each start (`bugs-screen.ts readLook`, `lookFace`): Day and Night outrank the phone, Auto follows it. iOS
+  is told the same look (`Appearance.setColorScheme`), so its own keys and wheels follow; under Auto it is told
+  nothing. A backup loaded carries its look, as today's.
+- **What deliberately does not change:** today's app and its page; the two palettes (`theme.ts`, D263); core.
+- **Expected values** (typed by hand, `tests/unit/native-bugs-tab.test.ts`): the read's table (nothing, `day`,
+  `night`, an empty value, `auto`, `Night`, `dusk`, ` day`); the six faces of three looks on a light and a dark
+  phone; each tap's key.

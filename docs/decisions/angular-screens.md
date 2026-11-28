@@ -900,5 +900,36 @@ what is stored.
   on a copy of its tree (`tools/tree-at.mjs`: 1 failed, 76 passed); three breaks added to the wizard's list, each
   red alone, and the whole set run again in four parts, 515 of 515 red (6 of them on the sweep alone) (`tests/measure/native-wizard_breaks.md`). **Seen on the simulator**
   (`sim-ios:fast`, iPhone 17 Pro, iOS 26.5): the check on the key, and the keys closed by it and by a drag; the
-  store put back (`278ba57f3f6a382b` before and after). Not yet seen on the phone: it goes up with the beta's next
-  build.
+  store put back (`278ba57f3f6a382b` before and after). **On Mario's phone, build 130** (2026-11-27, no
+  screenshot; run 46062522849): "All good!". He was asked to type a mile time in the wizard and close the keys by
+  the blue check and, again, by a drag. Nothing named to fix.
+
+## The bug report in the Expo app, and the Bugs tab drawn as today's (Post-v0.263.0, the migration's phase 3, row 7, the second session)
+
+- **Date:** 2026-11-27. **Ruled by:** Mario's brief (the Bugs tab built as today's; the Profile page is phase 4);
+  the session for form. The rows keep their D-codes and their own entries: Look, D261
+  (`docs/decisions/night-mode.md`); Your data, D264 with D297 (`docs/decisions/data-backup.md`); Engine, D286
+  (`docs/decisions/engine-check.md`). **Bump:** none. **Shipped:** Post-v0.263.0, no build of today's app (`frontends/native`, on `chat/bugs-tab` until Mario merges it; the beta's next build carries it).
+  The proof and the simulator's look are in `docs/decisions/data-backup.md`, the Expo entry.
+- **The finding (measured, `tests/measure/native-bugs-tab_today.md`, sections A and F):** a send ends six ways
+  (nothing typed, sent, three refusals, a network error), each with its own line and colour; a report filed clears
+  the text and raises one toast; the report carries the athlete's words and eight lines of context. The beta's Bugs
+  tab was a screen of its own words: a title, two lines about the runtime, the Engine card and the Backup card.
+- **What changes (the Expo app only):** `frontends/native/src/bugs/Bugs.tsx` draws today's screen top to bottom:
+  the top bar (**The Asylum**, **Report a Bug**), the note, the text field, **Send Bug Report**, the line, the
+  context note, then Look, Your data and Engine, and **Build v0.263.0**. The report's model is today's file, a copy
+  held to the byte (`bugs/bug-report-model.ts`), sent by `bugs-writes.ts sendBug` as the Angular `send()` sends it.
+- **The context, where the beta differs by design:** today's eight lines, in order. `build`, `time`, `viewport` and
+  `program` read as today's. `ua` names the app in place of a browser: **IA Next; iOS 26.1; Hermes; Swift
+  answers.** (the two lines the old screen showed about the runtime ride here). `url` is the bundle id,
+  **com.bigyerr.ironasylum.next**. `standalone` is **yes**: it runs as an app of its own, never in a browser's tab.
+- **What goes from the beta's screen, with the reason:** its own title **Bugs** and the two lines under it (**Runs
+  on Hermes. Version 0.263.0.** and **Swift answers.**). Today's screen has no place for them; both facts ride in
+  every report, and the version is the build's label.
+- **Not built, with its owner:** the Run recorder's row (phase 4). The update banner is not the beta's (TestFlight).
+- **Not known:** whether the form takes a report from the beta. Its key is registered to the live page's address,
+  and a request from React Native carries none. No report was sent by a test or by the session; one sent from the
+  phone, or from the simulator on Mario's word, settles it.
+- **What deliberately does not change:** today's app and its page; core; the form, its key and its address.
+- **Expected values** (typed by hand, `tests/unit/native-bugs-tab.test.ts`): every word of the screen; the six
+  endings; the context, whole, for one program and for none.

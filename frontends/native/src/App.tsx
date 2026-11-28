@@ -3,10 +3,11 @@
 // drawn from the stored state, whose Start lift opens the swipe deck (phase 3, its first screen), which logs into
 // this app's own SQLite store (D289), with the pop-ups today's app raises over it (the completion pop-up after Mark
 // the day done, the day-after reminder 600 ms after a launch, and its answer), and whose Reopen on a done lift opens the
-// day's session sheet (phase 3, its second screen: day-detail/SessionSheet.tsx); and Bugs: the engine check under Hermes (session 1), the Backup row, a backup
-// loaded into that store in place of everything in it (session 2), and one line saying whether the app's own Swift
-// module answered (session 3, the native spike); and Progress (phase 3, row 4: progress/Progress.tsx), which reads
-// the same store and writes to it on Restore and Delete Forever alone.
+// day's session sheet (phase 3, its second screen: day-detail/SessionSheet.tsx); and Bugs (phase 3, row 7:
+// bugs/Bugs.tsx), today's screen: the bug report, the Look row, whose choice this file reads to pick the palette,
+// Your data, whose Load it replaces everything in that store and starts the app afresh, and the engine check under
+// Hermes; and Progress (phase 3, row 4: progress/Progress.tsx), which reads the same store and writes to it on
+// Restore and Delete Forever alone.
 // The rest day sheet (rest-sheet/RestSheet.tsx: Move a session here, Log cardio, Clear) opens from This Week's rest
 // card and from the session sheet's Edit cardio, and the coach's mile nudge (D274, mile-nudge/MileNudge.tsx) rises
 // over This Week 700 ms after it shows again once a run's Log earned it; both write to this app's own store.
@@ -21,14 +22,15 @@
 // The floating rest timer is not here: it comes back on the Dynamic Island (D295, phase 4).
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { AccessibilityInfo, Animated, Appearance, Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { VERSION } from '@ia/core';
 import { asyIcon } from '@ia/core/engine/icons.ts';
 import { readDayLogs } from '@ia/core/engine/state-day-log.ts';
 
-import { BackupLoad } from './BackupLoad';
+import { Bugs, newBugsState } from './bugs/Bugs';
+import { type Look, lookFace, readLook } from './bugs/bugs-screen';
+import { firstScreen, setLook } from './bugs/bugs-writes';
 import { ChangeSheet } from './change-sheet/ChangeSheet';
 import type { OverlayDraft } from './change-sheet/change-sheet-model';
 import { type OverlayProgram, newOverlayDraft, openInjury, openTravel } from './change-sheet/overlay-readers';
@@ -39,12 +41,10 @@ import { SessionSheet } from './day-detail/SessionSheet';
 import type { SheetOpen } from './day-detail/sheet-screen';
 import { DeckOpening } from './deck/DeckOpening';
 import { type DeckOpen, type DeckProgram, newDayInHand } from './deck/deck-screen';
-import { EngineCheck } from './EngineCheck';
 import { MileNudge } from './mile-nudge/MileNudge';
 import { nudgeText } from './mile-nudge/mile-nudge-model';
 import { NUDGE_DELAY_MS, type PendingNudge, afterLog, answer as answerNudge, update as nudgeMile } from './mile-nudge/nudge-screen';
 import { MileSheet } from './mile-sheet/MileSheet';
-import { SWIFT_ANSWER } from './native-spike';
 import { PopUp } from './pop-up/PopUp';
 import { Programs } from './program-list/Programs';
 import { type MileOpen, newListState, refreshReport, tabRefused } from './program-list/list-screen';
@@ -57,7 +57,6 @@ import { RestSheet } from './rest-sheet/RestSheet';
 import { type RestAsk, type RestDraft, type RestLogs, type RestProgram, openRest } from './rest-sheet/rest-sheet-model';
 import type { PopView } from './pop-up/pop-up-model';
 import { type PopSession, type Reminder, fireCompletionPopup, maybeShowReminder, popOf, resolveReminder } from './pop-up/pop-ups';
-import { swiftLine } from './spike-line';
 import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
 import { Bars, Bug, Calendar, Home } from './this-week/marks';
@@ -65,30 +64,37 @@ import { type DeckFrom, ThisWeek, type WeekAsk, type WeekHand } from './this-wee
 import { type DatedProgram, setProgRace, setProgStart, titleAfterDate } from './week-dates/week-dates';
 import { Wizard } from './wizard/Wizard';
 import { landingTitle } from './wizard/wizard-screen';
-import { midnight, storedProgram } from './this-week/week-screen';
-
-/** Which JavaScript engine runs this bundle: Hermes sets HermesInternal on the global object. */
-function engineName(): string {
-  return typeof (globalThis as { HermesInternal?: unknown }).HermesInternal === 'object' ? 'Hermes' : 'another engine';
-}
+import { midnight } from './this-week/week-screen';
 
 type Tab = 'home' | 'week' | 'progress' | 'bugs';
 
 export default function App() {
+  // A backup loaded on Bugs starts the app afresh, as today's page reloads (data-backup.ts applyBackup): the shell is
+  // built again from the store, so nothing a screen kept for the app's life outlives the load.
+  const [boots, setBoots] = useState(0);
   return (
     <SafeAreaProvider>
-      <Shell />
+      <Shell key={'boot' + boots} afresh={boots > 0} onAfresh={() => setBoots((n) => n + 1)} />
     </SafeAreaProvider>
   );
 }
 
-function Shell() {
-  const p = useColorScheme() === 'dark' ? NIGHT : DAY;
+function Shell({ afresh, onAfresh }: { afresh: boolean; onAfresh: () => void }) {
+  // The look (D261, theme.ts): Day or Night as stored, else the phone's. iOS is told the same, so its own keys and
+  // wheels follow; under Auto it is told nothing and follows the phone.
+  const [look, setLookNow] = useState<Look>(() => readLook(phoneStore));
+  const p = lookFace(look, useColorScheme() === 'dark') === 'night' ? NIGHT : DAY;
+  useEffect(() => { Appearance.setColorScheme(look === 'auto' ? 'unspecified' : look === 'night' ? 'dark' : 'light'); }, [look]);
   const insets = useSafeAreaInsets();
+  // What the Bugs tab keeps while another tab is open (the report being typed, the file waiting on its question, the
+  // engine check, which runs on), for the app's life: today's screen stays in the page behind the others.
+  const bugs = useRef(newBugsState()).current;
   // This Week when the store holds a program, as today's app opens; Bugs, where a backup is loaded, until it does.
-  // Asked of the stored program, not of a launch: the screen makes the one launch when it mounts.
-  const [tab, setTab] = useState<Tab>(() => (storedProgram(phoneStore) ? 'week' : 'bugs'));
-  // Counts the visits to This Week, so it reads the store again after a backup is loaded on Bugs.
+  // After a backup is loaded, today's first screen: This Week, or Programs when the file holds no program to open.
+  // Asked of the stored program, not of a launch: the screen makes the one launch when it mounts. With no program
+  // to open, a pointer that leads to none is cleared here, as today's init clears it (bugs/bugs-writes.ts).
+  const [tab, setTab] = useState<Tab>(() => firstScreen(phoneStore, afresh));
+  // Counts the visits to This Week, so it reads the store again each time its tab is opened.
   const [tick, setTick] = useState(0);
   // The day open as a swipe deck, over the whole screen and the tab bar (deck.css: above the tab bar), or none.
   const [deck, setDeck] = useState<{ open: DeckOpen; from: DeckFrom | null } | null>(null);
@@ -292,7 +298,11 @@ function Shell() {
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
           <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} inHand={inHand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
         </Animated.View>
-      ) : tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}
+      ) : tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : (
+        <Bugs palette={p} state={bugs} store={phoneStore} look={look} say={say} onAfresh={onAfresh}
+          onLook={(l) => { setLook(phoneStore, l); setLookNow(readLook(phoneStore)); }}
+          inHand={() => ({ program: hand.prog as { name?: string; goal?: string; id?: string } | null, week: hand.own || 1 })} />
+      )}
       <View testID="tab-bar" style={[styles.tabbar, { bottom: Math.max(12, insets.bottom), backgroundColor: p.nav, borderColor: p.navEdge }]}>
         <TabButton id="tab-home" label="Programs" on={tab === 'home'} palette={p} onPress={() => go('home')} icon={(c) => <Home color={c} />} />
         <TabButton id="tab-week" label="This Week" on={tab === 'week'} palette={p} onPress={() => go('week')} icon={(c) => <Calendar color={c} size={22} />} />
@@ -385,28 +395,8 @@ function TabButton({ id, label, on, palette: p, onPress, icon }: { id: string; l
   );
 }
 
-function Bugs({ palette: p }: { palette: Palette }) {
-  return (
-    <ScrollView contentContainerStyle={styles.scroll}>
-      <Text style={[styles.title, { color: p.text }]}>Bugs</Text>
-      <Text testID="runtime-line" style={[styles.meta, { color: p.muted }]}>
-        {'Runs on ' + engineName() + '. Version ' + VERSION + '.'}
-      </Text>
-      <Text testID="swift-line" style={[styles.meta, styles.second, { color: p.muted }]}>
-        {swiftLine(SWIFT_ANSWER)}
-      </Text>
-      <EngineCheck palette={p} />
-      <BackupLoad palette={p} />
-    </ScrollView>
-  );
-}
-
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  scroll: { paddingTop: 72, paddingHorizontal: 16, paddingBottom: 140 },
-  title: { fontSize: 34, fontWeight: '800', letterSpacing: -0.5 },
-  meta: { fontSize: 13, marginTop: 4, marginBottom: 20 },
-  second: { marginTop: -16 },
   // The floating tab bar (look.css .tabbar, D263): 12 from the sides, above the home indicator.
   tabbar: { position: 'absolute', left: 12, right: 12, flexDirection: 'row', padding: 6, borderRadius: 34, borderWidth: 1, boxShadow: '0 10px 30px rgba(0,0,0,0.18)' },
   tab: { flex: 1, alignItems: 'center', gap: 3, paddingTop: 9, paddingHorizontal: 4, paddingBottom: 8, borderRadius: 28 },

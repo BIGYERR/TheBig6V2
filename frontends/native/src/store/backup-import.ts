@@ -1,8 +1,9 @@
-// Loading a backup into the Expo app, read only (MIGRATION.md phase 2; D287 P-NATIVEIMPORT,
-// docs/decisions/data-backup.md). The file is read by core's reader and loaded by core's all or nothing loader, as
-// today's app loads it. Then every ia_ key the store holds is checked against the file: the same key set, and each
-// value equal to the file's, character for character and by sha256. A miss puts back what the store held before, so
-// a refused import keeps nothing. Nothing here writes a file or reaches today's app: the store is this app's own.
+// Loading a backup into the Expo app (MIGRATION.md phase 2; D287 P-NATIVEIMPORT, docs/decisions/data-backup.md).
+// The file is read by core's reader and loaded by core's all or nothing loader, as today's app loads it. Then every
+// ia_ key the store holds is checked against the file: the same key set, and each value equal to the file's,
+// character for character and by sha256. A miss puts back what the store held before, so a refused import keeps
+// nothing. Nothing here writes a file or reaches today's app: the store is this app's own. The Bugs tab's Load it
+// (../bugs/bugs-writes.ts) loads through loadChecked, with the file already read and its question answered.
 import { backupKeys, loadBackupInto, readBackupText } from '@ia/core/engine/state-backup.ts';
 import type { BackupData } from '@ia/core/engine/state-backup.ts';
 import { sha256Hex } from '@ia/core/engine/engine-check.ts';
@@ -65,29 +66,26 @@ function releaseOf(text: string): string {
   try { const f = JSON.parse(text); return typeof f.version === 'string' ? f.version : ''; } catch { return ''; }
 }
 
-/** Reads a backup's text, loads it into `store` and checks every key. Refused, the store holds what it held before. */
-export function importBackup(store: StateStore, text: string): ImportResult {
-  const read = readBackupText(text);
-  if (!read.ok) return { ok: false, why: read.why, misses: [] };
+/** How a load ended: every key the file's, or the store as it was before, refused or with a key that does not match. */
+export type Loaded = { ok: true } | { ok: false; why: 'refused' | 'mismatch'; misses: string[] };
+/** Loads a file's data into `store`, all or nothing, and checks every key. Refused, the store holds what it held before. */
+export function loadChecked(store: StateStore, data: BackupData): Loaded {
   const before: BackupData = {};
   backupKeys(store).forEach((k) => { const v = store.get(k); if (v != null) before[k] = v; });
-  if (!loadBackupInto(store, read.data)) return { ok: false, why: 'refused', misses: [] };
-  const found = misses(store, read.data);
+  if (!loadBackupInto(store, data)) return { ok: false, why: 'refused', misses: [] };
+  const found = misses(store, data);
   if (found.length) {
     loadBackupInto(store, before);
     return { ok: false, why: 'mismatch', misses: found };
   }
-  return { ok: true, held: held(store), version: releaseOf(text), made: read.made };
+  return { ok: true };
 }
 
-/** The line under the button (the copy rule: short declarative sentences, no dashes). */
-export function importLine(r: ImportResult): string {
-  if (r.ok) {
-    const n = r.held.keys.length;
-    return 'Loaded ' + n + ' of ' + n + ' keys. Every hash matches the file.' + (r.version ? ' Saved by version ' + r.version + '.' : '');
-  }
-  if (r.why === 'newer') return 'This backup is from a newer app. Update the app first.';
-  if (r.why === 'bad') return 'That file is not an Asylum backup.';
-  if (r.why === 'refused') return 'The phone refused the write. Nothing was kept.';
-  return r.misses.length + (r.misses.length === 1 ? ' key does' : ' keys do') + ' not match the file. Nothing was kept. First miss: ' + r.misses[0] + '.';
+/** Reads a backup's text, loads it into `store` and checks every key. Refused, the store holds what it held before. */
+export function importBackup(store: StateStore, text: string): ImportResult {
+  const read = readBackupText(text);
+  if (!read.ok) return { ok: false, why: read.why, misses: [] };
+  const done = loadChecked(store, read.data);
+  if (!done.ok) return done;
+  return { ok: true, held: held(store), version: releaseOf(text), made: read.made };
 }

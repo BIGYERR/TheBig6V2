@@ -123,17 +123,19 @@ describe('native shell: the native spike, a widget target and a Swift module wit
     assert.equal(all.match(/\bask\(\)/g)?.length, 2, 'ask is declared once and called once');
   });
 
-  test('the screen says whether Swift answered, in a sentence', () => {
+  test('the bug report says whether Swift answered, in a sentence', () => {
     assert.equal(SWIFT_WORD, 'swift');
     assert.equal(swiftLine('swift'), 'Swift answers.');
     assert.equal(swiftLine(null), 'Swift does not answer.');
     assert.equal(swiftLine(''), 'Swift does not answer.');
     assert.equal(swiftLine('Swift'), 'Swift does not answer.');
-    assert.match(all, /<Text testID="swift-line"[^>]*>\s*\{swiftLine\(SWIFT_ANSWER\)\}\s*<\/Text>/);
+    // The line stood on the old Bugs screen; on today's screen it rides in the report's context (bugs/Bugs.tsx).
+    assert.match(all, /swift: swiftLine\(SWIFT_ANSWER\)/);
+    assert.equal(all.match(/swiftLine\(SWIFT_ANSWER\)/g)?.length, 1, 'one place reads the answer');
   });
 });
 
-describe('native shell: the backup is read only, and loaded by core\'s own code (D287)', () => {
+describe('native shell: a backup is loaded by core\'s own code and checked (D287), and saved as one file (D297)', () => {
   const files = sources(join(NATIVE, 'src'));
   const all = files.map((f) => readFileSync(f, 'utf8')).join('\n');
 
@@ -150,16 +152,19 @@ describe('native shell: the backup is read only, and loaded by core\'s own code 
     assert.doesNotMatch(all, /localStorage|AsyncStorage|openDatabase/);
   });
 
-  test('nothing in the app writes a file, shares one, or deletes one', () => {
-    assert.doesNotMatch(all, /\.(write|delete|move|copy)\(|writeAsString|expo-sharing|Sharing\./);
+  test('the app writes one file, the backup it saves, into its own cache; it shares that one and deletes none', () => {
+    const rel = (f: string): string => f.slice(NATIVE.length + 1);
+    const bugs = join('src', 'bugs', 'Bugs.tsx');
+    const usesFile = files.filter((f) => /new File\(/.test(readFileSync(f, 'utf8'))).map(rel);
+    assert.deepStrictEqual(usesFile, [bugs], 'one file of the app opens a file');
+    const text = readFileSync(join(NATIVE, bugs), 'utf8');
+    assert.deepStrictEqual(text.match(/new File\([^)]*\)/g), ['new File(Paths.cache, r.name)', 'new File(got.assets[0].uri)'], 'the saved backup in the cache, and the picked copy, which is only read');
+    assert.equal(all.match(/\.write\(/g)?.length, 1, 'one write in the app');
+    assert.match(text, /await file\.write\(r\.text\);/);
+    assert.deepStrictEqual(files.filter((f) => /Share\.share\(/.test(readFileSync(f, 'utf8'))).map(rel), [bugs]);
+    assert.match(text, /await Share\.share\(\{ url: file\.uri \}\);/, 'the share sheet is handed that file and nothing else');
+    assert.doesNotMatch(all, /\.(delete|move|copy)\(|writeAsString|expo-sharing|Sharing\./);
     assert.match(all, /copyToCacheDirectory: true/, 'the picker hands over a copy');
-  });
-
-  test('the row carries D287\'s words', () => {
-    assert.match(all, />Backup</);
-    assert.match(all, /Loads a backup file into this app and checks every key\. Writes nothing back\./);
-    assert.match(all, /'Load a backup'/);
-    assert.match(all, /'Checking'/);
   });
 });
 
@@ -179,14 +184,14 @@ describe('native shell: the engine check is core\'s, as it is', () => {
   });
 
   test('the row carries D286\'s words', () => {
-    assert.match(all, />Engine</);
+    assert.match(all, /label=\{'Engine'\}/);
     assert.match(all, /Builds the tested programs on this phone\. Each one must match\./);
     assert.match(all, /'Run the check'/);
     assert.match(all, /'Checking'/);
   });
 
   test('it times its slices on performance.now(), never the date', () => {
-    const check = readFileSync(join(NATIVE, 'src', 'EngineCheck.tsx'), 'utf8');
+    const check = readFileSync(join(NATIVE, 'src', 'engine-check-state.ts'), 'utf8');
     assert.match(check, /performance\.now\(\)/);
     assert.doesNotMatch(check, /Date\.now\(\)/);
     // The app reads the date to say what day it is and to stamp what it stores, never to time anything: the instant

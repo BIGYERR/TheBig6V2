@@ -448,3 +448,15 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   Wildcard marked done cannot be undone (today's own: only Reset, which clears the whole counter). His word on the
   rest of build 129, once each was read to him: "Good push!" (2026-11-27). Random Workout is seen on his phone,
   and the keyboard fix was pushed on that word.
+- **Seen on `main`, pull request 70's run, the beta's lane alone** (run 46062522849, merge 93cd85f, 2026-11-27
+  15:16 EST; the merge carried no version: e5d89aa, the wizard's keys in the Expo app, and three docs commits; read
+  by the next session, after it had ended). Today's lane skipped its upload, as ruled. The beta's lane archived,
+  signed and uploaded `0.263.0 (130)` (done 15:27:14) and read it back as processed (done 15:30:31). The build
+  number moved from 129 to 130 on one commit, e5d89aa, the only one of the merge that changed `frontends/native`,
+  `core` or `tests/semver.js` (`git rev-list --count` on those paths at 93cd85f prints 130). The run ended green:
+  6 jobs passed and 8 skipped by rule. Both `testflight.mjs leg` lines, read after it ended: `testflight 0.263.0
+  processed (uploaded before this run; a version goes up once, a fix is the next PATCH) (run 46062522849,
+  93cd85f)` and `testflight next 0.263.0 (130) processed (run 46062522849, 93cd85f)`.
+- **On Mario's phone, build 130** (his report, 2026-11-27, no screenshot; `docs/decisions/angular-screens.md`, the
+  cardio goals step's entry): "All good!". The wizard's keyboard closes by the blue check and by a drag. He named
+  nothing to fix.

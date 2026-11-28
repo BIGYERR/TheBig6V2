@@ -982,8 +982,8 @@ describe('native app: the root\'s keyed children', () => {
     // build the wizard again, on its first step with a new draft (seen on the simulator after the race date's check).
     const app = strip(read('App.tsx'));
     const keys = [...app.matchAll(/<(\w+) key=\{([^}]*)\}/g)].map((m) => [m[1]!, m[2]!]);
-    assert.deepEqual(keys.map((k) => k[0]).sort(), ['ChangeSheet', 'DateBox', 'PopUp', 'Programs', 'Progress', 'RandomWorkout', 'RestSheet', 'Toast', 'Wizard']);
+    assert.deepEqual(keys.map((k) => k[0]).sort(), ['ChangeSheet', 'DateBox', 'PopUp', 'Programs', 'Progress', 'RandomWorkout', 'RestSheet', 'Shell', 'Toast', 'Wizard']);
     const kinds = keys.map((k) => (/^'(\w+)' \+ /.exec(k[1]!) || [])[1]);
-    assert.deepEqual(kinds.sort(), ['change', 'date', 'pop', 'programs', 'progress', 'random', 'rest', 'toast', 'wizard'], 'every key starts with its own kind: ' + JSON.stringify(keys));
+    assert.deepEqual(kinds.sort(), ['boot', 'change', 'date', 'pop', 'programs', 'progress', 'random', 'rest', 'toast', 'wizard'], 'every key starts with its own kind: ' + JSON.stringify(keys));
   });
 });
