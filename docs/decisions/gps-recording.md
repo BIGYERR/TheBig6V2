@@ -481,4 +481,5 @@
   after the session's launches and one tap on the day after reminder, and put back: `278ba57f3f6a…575af3` again.
   The two runs the session recorded there and the made-up one were deleted, and the beta's location and motion
   permissions on the simulator reset. Nothing of Mario's was read: the recorder holds no stored state.
-- **Release:** IA Next, the first build after the merge (filled in when `testflight.mjs leg` names it).
+- **Release:** IA Next, the first build after the merge: 133 by the lane's count on `chat/run-recorder` (filled in
+  when `testflight.mjs leg` names it).
