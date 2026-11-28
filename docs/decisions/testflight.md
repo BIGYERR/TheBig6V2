@@ -484,3 +484,15 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   processed (uploaded before this run; a build goes up once, the next change to the app is the next build) (run
   46154862677, fa88061)`. The session's prompt named run 46111488110 and one commit on `dev` ahead of `main`;
   pull request 74 had merged since, and `dev` held nothing ahead of `main` at session start.
+- **Seen on `main`, pull request 75, both lanes held** (read 2026-11-28 by the run recorder's session, after the
+  run had ended). Pull request 75 (run 46168564029, merge 861d06b, 2026-11-28 12:05 EST) carried four docs commits
+  alone, 3e481a9, eafb125, a99617a and 5977e7e: the rest island's measure, the rest timer put off until after the
+  migration (D295 amended) and one rule wording. No version moved and nothing under `frontends/native`, `core` or
+  `tests/semver.js` changed, so the run's two gates passed and its four upload and processed jobs were skipped, as
+  ruled: nothing new reached the phone. The run ended green: 4 jobs passed and 10 skipped by rule. Both
+  `testflight.mjs leg` lines, read after it: `testflight 0.263.0 processed (uploaded before this run; a version
+  goes up once, a fix is the next PATCH) (run 46168564029, 861d06b)` and `testflight next 0.263.0 (131) processed
+  (uploaded before this run; a build goes up once, the next change to the app is the next build) (run 46168564029,
+  861d06b)`. **Its push landed without a green 60-second check, on Mario's word:** the check hit its limit four
+  times with no test red while another chat used the simulator (his prompt to this session, 2026-11-28). The
+  branch held docs alone. CI's run on that push and this run on `main` are the proof it has.

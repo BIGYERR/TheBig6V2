@@ -372,6 +372,14 @@ Each phase starts only on Mario's GO, one phase step per session.
   put D295's open call to him with a mockup. His answers: the timer on the island and the lock screen and nowhere
   else; then, once the simulator showed that iOS hides an app's own island while the app is in front, "we will
   build it later after the migration" (section 6, decision 19). Nothing built. Phase 4 is four sessions.
+- **Seen on `main`, pull request 75** (2026-11-28, run 46168564029, merge 861d06b): four docs commits alone, so
+  both TestFlight lanes were held and nothing new reached his phone (`docs/decisions/testflight.md`). IA Next stays
+  at 131. Its push landed on his word without a green 60-second check: the check hit its limit four times with no
+  test red while another chat used the simulator.
+- **The recorder measured (Post-v0.263.0, no build; 2026-11-28):** today's recorder, call by call and state by
+  state, and what the beta holds (`tests/measure/native-run-recorder_today.md`). The build needs no capability,
+  no entitlement and no profile change: two permission strings and the location background mode, Info.plist
+  lines all. The cut put to him: one session or two, one recommended, built in two steps. Waiting on his answer.
 - **Next:** phase 4's next session, the recorder as today's (the module, the screen, the Bugs row, Record run
   opening it). Still not ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
