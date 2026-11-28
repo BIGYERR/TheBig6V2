@@ -115,3 +115,27 @@ him with a mockup of the deck and a working island: three places for one button 
 card's rest line) and two readings of a tap (a new rest from zero each time; as today, where Start carries on from
 the time held). In each the island and the lock screen are today's, and so is who stops it: Mark the day done,
 Done and Skip at zero, an open and a redraw while idle.
+
+## H. His answer, and what iOS does with it (2026-11-28)
+
+**Mario, on the mockup of section G:** "i only want the timer on the dynamic island. nowhere else and it should be
+on the lock screen too". So the beta draws no clock and no rest button on any screen of its own.
+
+Measured after his answer, on the simulator's copy of today's app (a prototype's build, section E, but the rule is
+iOS's and not the widget's): with a rest running and the app in front, the island stays plain; on the home screen
+the same rest shows on it at once. **iOS never shows an app's own Live Activity on the island while that app is in
+front.** Two screenshots, one of each, taken a few seconds apart on one running rest.
+
+What follows, read off the platform and not yet built:
+
+- Inside the beta a rest is seen nowhere. It is seen on the lock screen, and on the island from the home screen or
+  another app.
+- The small island holds no button: a tap on it opens the app. Buttons can stand on the lock screen and on the
+  island held open, from iOS 17 on (a button that runs an app intent). They need no capability and no entitlement.
+- A button needs an activity to stand on, and an activity can only be asked for while the app is in front. So the
+  app would put the rest up, ready at zero, when a session opens, and take it down as today (Mark the day done,
+  Done, Skip, the launch).
+- D233 R5 rules the activity display only: no buttons, no intents. Buttons on it amend that, for the beta.
+
+Put to him as one question: Start, Stop and Reset on the lock screen and on the opened island, the rest put up
+ready when a session opens. Not ruled.
