@@ -10,8 +10,8 @@
 // Expected values are typed by hand from look.css and base.css; the second group reads the same values out of
 // today's sheets, so a change to today's look turns this file red until the beta follows.
 //
-// Five tests here guard what must not change, and so pass on the release before this one too: the three on today's
-// sheets, the two styles on the system face naming no face, and no weight written in a form the scan cannot read.
+// Four tests here guard what must not change, and so pass on the release before this one too: the three on today's
+// sheets, and no weight written in a form the scan cannot read.
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -58,12 +58,12 @@ const rootVar = (name: string): string => {
 };
 
 describe('native look: no weight Helvetica Neue does not have', () => {
-  // The two that ask the system face, which has both weights: the backup screen's key name and the Bugs placeholder.
-  const SYSTEM_FACE = new Set(['BackupLoad.tsx|600', 'App.tsx|800']);
   // Helvetica Neue has a Light, and today's sheet asks it for the colon between a minutes field and a seconds field (font-weight:300, the wizard's cardio goals): two styles.
   const LIGHT = ['wizard/Wizard.tsx|300', 'wizard/Wizard.tsx|300'];
 
-  test('every font weight in the app is 400, 500 or 700, but for two styles on the system face', () => {
+  // Two styles asked the system face for 600 and 800 until the Bugs tab was drawn as today's (the old Backup card's
+  // key name, the old Bugs title); none does now.
+  test('every font weight in the app is 400, 500 or 700, but for the wizard\'s two colons', () => {
     const files = sources(NATIVE);
     assert.ok(files.length > 40, 'the walk found the app\'s files: ' + files.length);
     const odd: string[] = [];
@@ -75,15 +75,9 @@ describe('native look: no weight Helvetica Neue does not have', () => {
       }
     }
     assert.ok(seen > 200, 'the scan read the app\'s weights: ' + seen);
-    assert.deepEqual(odd.filter((x) => !SYSTEM_FACE.has(x)), LIGHT);
-    assert.deepEqual(odd.sort(), [...SYSTEM_FACE, ...LIGHT].sort());
+    assert.deepEqual(odd.sort(), [...LIGHT].sort());
     const colons = readFileSync(NATIVE + '/wizard/Wizard.tsx', 'utf8');
     assert.ok(colons.includes("  colonBig: { fontFamily: TEXT, fontSize: 24, lineHeight: 31, fontWeight: '300', paddingBottom: 14 },") && colons.includes("  colon: { fontFamily: TEXT, fontSize: 20, lineHeight: 26, fontWeight: '300' },"), 'the two are the colons');
-  });
-
-  test('the two on the system face name no face', () => {
-    lacks('BackupLoad.tsx', 'keyName', 'fontFamily');
-    lacks('App.tsx', 'title', 'fontFamily');
   });
 
   test('no weight is written as a number or a word, which the scan would not read', () => {

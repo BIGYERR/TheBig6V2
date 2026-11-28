@@ -341,7 +341,22 @@ Each phase starts only on Mario's GO, one phase step per session.
 - **Seen on his phone, IA Next 129** (2026-11-27, run 46051140015): "Good push!", after three reports on Random
   Workout that were each today's own and not ruled (no check for a Wildcard, D64; no mark before the program
   starts; no undo of one Wildcard; `docs/decisions/wildcard.md`). Row 7's first session is done.
-- **Next:** row 7's second session, the Bugs tab. Still not
+- **Seen on his phone, IA Next 130** (2026-11-27, run 46062522849): "All good!" (the wizard's keyboard closes by
+  the blue check and by a drag).
+- **Done, phase 3's seventeenth session, row 7's second of two (Post-v0.263.0, no build):** today's Bugs tab
+  measured piece by piece (`tests/measure/native-bugs-tab_today.md`), and one question put to Mario before Save a
+  backup was built: a file the beta saves in today's format was loaded by today's page on 10 of 10 phones, every key
+  replaced. His answer, "Yes, its own kind" (D297 P-NEXTKIND, `docs/decisions/data-backup.md`): the beta saves under
+  `asylum-next-backup`, which today's app turns away, and loads both kinds. Built (`frontends/native/src/bugs/`): the
+  screen as today's, top to bottom: the bug report (today's model, a copy held to the byte), the Look row (D261;
+  the app draws by the stored look), Your data (Save a backup through the share sheet; Load a backup with its
+  question, then the app started afresh, as today's reload), the Engine row in today's form, and the build's label.
+  D287's check still runs under every load. After every tap the stores, the toasts, the look, the block and the
+  report stay equal to today's page, on The Half Manny and on the ten seeded programs. 197 breaks of the tab's rules, every one red on the final code (`tests/measure/native-bugs-tab_breaks.md`). On the way: the first part of the first list, run alone, let none of 45 through; that list's whole set let 3 of 178 through, each a break that changed nothing (it took out half of a rule the code keeps twice), and each was made a real break; then 19 breaks were added for what the tab keeps while another tab is open and the whole set ran again, which let 1 of 197 through, a break whose own replacement had gone stale with that change; it was put right and run again alone.
+  The look was measured beside today's own app on the simulator, every line of the first screen within a point.
+  The ledger rows of the backup's, the look's and the bug report's tests are filled. Not known until one is sent:
+  whether the form takes a report from the beta. **Row 7 is built, and with it every row of phase 3.**
+- **Next:** Mario's phone on the beta's next build, then phase 3's exit gate and phase 4. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,

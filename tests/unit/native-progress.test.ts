@@ -547,7 +547,8 @@ describe('native progress: the screen\'s words and wiring', () => {
     assert.ok(app.includes("type Tab = 'home' | 'week' | 'progress' | 'bugs';"));
     assert.ok(app.includes('const progress = useRef(newProgressState()).current;'));
     assert.ok(app.includes("if (t === 'progress') setProgressTaps((n) => n + 1);"));
-    assert.ok(app.includes(": tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : <Bugs palette={p} />}"));
+    assert.ok(app.includes(": tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : ("));
+    assert.ok(app.includes('<Bugs palette={p} state={bugs} store={phoneStore} look={look} say={say} onAfresh={onAfresh}'));
     const week = app.indexOf('id="tab-week"'), prog = app.indexOf('id="tab-progress" label="Progress"'), bugs = app.indexOf('id="tab-bugs"');
     assert.ok(week > 0 && week < prog && prog < bugs);
   });

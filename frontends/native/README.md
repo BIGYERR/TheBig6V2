@@ -53,11 +53,19 @@ and every `ia_` key equal to today's page after every tap.
 **There is no floating rest timer** (D295, `docs/decisions/rest-timer.md`): the one built with the cardio sheet was
 taken out again, and the rest timer comes back on the Dynamic Island in phase 4. The page keeps its own.
 
-**Bugs**, with two rows and a line saying whether its Swift module answered: the engine check (D286, `docs/decisions/engine-check.md`), core's
-`core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the engine, under Hermes, which reads and writes
-no stored key; and the Backup row (D287, `docs/decisions/data-backup.md`), which loads a backup file into the app's own SQLite
-store in place of everything in it and checks every key against the file by value and by sha256. Under it, D289's
-line: what is logged in this app stays in this app, and loading a backup replaces it.
+**Bugs** (`src/bugs/`), drawn as today's Bugs screen, top to bottom: the bug report (today's model, a copy held to the
+byte; its context names this app, iOS, the engine and whether Swift answered); **Look** (D261,
+`docs/decisions/night-mode.md`): Auto, Day or Night, stored under `ia_theme` and read by the app to pick its palette;
+**Your data** (D264, `docs/decisions/data-backup.md`): Save a backup, which writes one file into the app's own cache
+and hands it to the share sheet, under a kind of its own, `asylum-next-backup`, which today's app turns away (D297);
+and Load a backup, which reads today's files and its own, asks before it replaces anything, loads all or nothing with
+every key checked against the file (D287), and starts the app afresh. Under its note, D289's line: what is logged in
+this app stays in this app, and loading a backup replaces it. Then **Engine** (D286,
+`docs/decisions/engine-check.md`), core's `core/src/engine/engine-check.ts` run as it is, with `buildProgram` as the
+engine, under Hermes, which reads and writes no stored key (`src/EngineCheck.tsx` over `src/engine-check-state.ts`);
+and the build's label. The Run recorder's row is phase 4's. What the tab holds while another tab is open (a report
+half typed, a file waiting on its question, a check still running) is the app's to keep, as today's screen stays in
+the page; a backup loaded starts the app afresh, and these with it.
 
 **The store** (`src/store/`): core's `StateStore` on expo-sqlite/kv-store (`sqlite-store.ts`, which imports nothing of
 Expo's, so the tests in `tests/` run it on SQLite under `node:sqlite`), the phone's one database `iron-asylum-state`
@@ -104,8 +112,8 @@ runs it).
   `com.bigyerr.ironasylum.next.RestTimerWidget`. It is empty on purpose (one `EmptyWidgetConfiguration`); phase 4
   moves the rest stopwatch's Swift in. It takes the app's version and build number.
 - **The Swift module**, `modules/ia-spike/`: a local Expo module found by Expo's autolinking. It does nothing. The
-  app asks it one question when the bundle loads (`src/native-spike.ts`), and the Bugs screen reads "Swift answers."
-  or "Swift does not answer." (`src/spike-line.ts`). `IAGps` and `IAIsland` arrive the same way in phase 4.
+  app asks it one question when the bundle loads (`src/native-spike.ts`), and every bug report says "Swift answers."
+  or "Swift does not answer." in its context (`src/spike-line.ts`, `src/bugs/Bugs.tsx`). `IAGps` and `IAIsland` arrive the same way in phase 4.
 
 `tests/unit/native-shell.test.ts` holds both.
 

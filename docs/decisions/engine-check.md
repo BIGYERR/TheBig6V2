@@ -116,3 +116,15 @@ and `Math.pow`).
 - **Result on Mario's phone (2026-11-13, IA Next 0.262.0 (100) from TestFlight, Hermes, his screenshot):** Lattice 864
   of 864 match. Half Manny matches. Took 92 s. About 106 ms a build, against 155 ms on the simulator. The phase 2 exit
   gate's engine leg is seen.
+
+## D286 in the Expo app: the row in today's form (Post-v0.263.0, the migration's phase 3, row 7)
+
+- **Date:** 2026-11-27. **Ruled by:** the session (form). No new D-code: the label, the note, the button and the
+  lines are D286's, unchanged, and so is the check. **Bump:** none. **Shipped:** Post-v0.263.0, no build of today's app (`frontends/native`, on `chat/bugs-tab` until Mario merges it; the beta's next build carries it).
+  On the simulator the row read **Lattice 864 of 864 match. Half Manny matches.** (136 s, beside a break run).
+- **What changes (the Expo app only):** the row is drawn as the Bugs tab's other rows are (`bugs/rows.tsx`): a rule
+  above, the label, the note, one pill, the line under it. It stood in a card of its own with an ink button.
+  The check itself moved to `engine-check-state.ts`, slice for slice, and the app holds the run and its line for
+  its life: a check still running when the screen comes back shows where it is, as today's (`engineCheckNow`,
+  `engineCheckListen`). Before, the beta's check lost its line when another tab was opened.
+- **What deliberately does not change:** core's check, its cases and its lines; today's app.

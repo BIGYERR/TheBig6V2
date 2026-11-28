@@ -428,8 +428,9 @@ describe('native deck logging: which files write', () => {
     for (const words of ["'Nothing to log here'", "' logged ✓'", "'Logged ✓'", "' is off today. Tap to put it back.'", "' is back on the card.'", "'Round is off today. Tap to put it back.'", "'Round is back on the card.'"]) assert.ok(writes.includes(words), words);
     // Mark the day done raises the completion pop-up where the toast stood (D179; tests/unit/native-pop-ups.test.ts).
     assert.ok(!readFileSync(join(dir, 'Deck.tsx'), 'utf8').includes("say('Done ✓');"), 'no toast stands in for the pop-up any more');
-    const bugs = readFileSync(join(REPO, 'frontends/native/src/BackupLoad.tsx'), 'utf8');
-    assert.ok(bugs.includes('>Loads a backup file into this app and checks every key. Writes nothing back.<'));
-    assert.ok(bugs.includes(">Sets you log here stay in this app. Today's app does not see them. Loading a backup replaces everything here.<"));
+    // D289's words stand under Your data on the Bugs tab, now drawn as today's (tests/unit/native-bugs-tab.test.ts).
+    const words = readFileSync(join(REPO, 'frontends/native/src/bugs/bugs-screen.ts'), 'utf8');
+    assert.ok(words.includes("export const OWN_COPY = 'Sets you log here stay in this app. Today\\'s app does not see them. Loading a backup replaces everything here.';"));
+    assert.ok(readFileSync(join(REPO, 'frontends/native/src/bugs/Bugs.tsx'), 'utf8').includes('<Note id="backup-own-copy" palette={p}>{OWN_COPY}</Note>'));
   });
 });
