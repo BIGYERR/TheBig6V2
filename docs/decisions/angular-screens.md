@@ -927,9 +927,10 @@ what is stored.
   on Hermes. Version 0.263.0.** and **Swift answers.**). Today's screen has no place for them; both facts ride in
   every report, and the version is the build's label.
 - **Not built, with its owner:** the Run recorder's row (phase 4). The update banner is not the beta's (TestFlight).
-- **Not known:** whether the form takes a report from the beta. Its key is registered to the live page's address,
-  and a request from React Native carries none. No report was sent by a test or by the session; one sent from the
-  phone, or from the simulator on Mario's word, settles it.
+- **Settled on Mario's phone, IA Next 131** (2026-11-27, run 46096340908): the form takes a report from the beta.
+  He sent one and read **Sent ✓**: "All good on 131, got Sent ✓". The form's key is registered to the live page's
+  address and a request from React Native carries none; the form takes it all the same. No report was sent by a
+  test or by a session.
 - **What deliberately does not change:** today's app and its page; core; the form, its key and its address.
 - **Expected values** (typed by hand, `tests/unit/native-bugs-tab.test.ts`): every word of the screen; the six
   endings; the context, whole, for one program and for none.

@@ -460,3 +460,16 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
 - **On Mario's phone, build 130** (his report, 2026-11-27, no screenshot; `docs/decisions/angular-screens.md`, the
   cardio goals step's entry): "All good!". The wizard's keyboard closes by the blue check and by a drag. He named
   nothing to fix.
+- **Seen on `main`, pull request 72's run, the beta's lane alone** (run 46096340908, merge b48f1c4, 2026-11-27
+  21:05 EST; the merge carried no version: cd307ce, the Bugs tab in the Expo app, and five docs and tests commits;
+  read by the next session, after it had ended). Today's lane skipped its upload, as ruled. The beta's lane archived,
+  signed and uploaded `0.263.0 (131)` (done 21:17:45) and read it back as processed (done 21:19:59). The build
+  number moved from 130 to 131 on one commit, cd307ce, the only one of the merge that changed `frontends/native`,
+  `core` or `tests/semver.js` (`git rev-list --count` on those paths at b48f1c4 prints 131). The run ended green:
+  6 jobs passed and 8 skipped by rule. Both `testflight.mjs leg` lines, read after it ended: `testflight 0.263.0
+  processed (uploaded before this run; a version goes up once, a fix is the next PATCH) (run 46096340908,
+  b48f1c4)` and `testflight next 0.263.0 (131) processed (run 46096340908, b48f1c4)`.
+- **On Mario's phone, build 131** (his report, 2026-11-27, no screenshot; `docs/decisions/data-backup.md` and
+  `docs/decisions/angular-screens.md`, the Bugs tab's entries): "All good on 131, got Sent ✓". The Bugs tab as
+  today's: Look, Save a backup, Load a backup with its question, Load it, the report kept across tabs, the engine
+  check. The bug form takes a report from the beta. He named nothing to fix.

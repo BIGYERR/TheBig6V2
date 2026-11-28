@@ -354,9 +354,16 @@ Each phase starts only on Mario's GO, one phase step per session.
   D287's check still runs under every load. After every tap the stores, the toasts, the look, the block and the
   report stay equal to today's page, on The Half Manny and on the ten seeded programs. 197 breaks of the tab's rules, every one red on the final code (`tests/measure/native-bugs-tab_breaks.md`). On the way: the first part of the first list, run alone, let none of 45 through; that list's whole set let 3 of 178 through, each a break that changed nothing (it took out half of a rule the code keeps twice), and each was made a real break; then 19 breaks were added for what the tab keeps while another tab is open and the whole set ran again, which let 1 of 197 through, a break whose own replacement had gone stale with that change; it was put right and run again alone.
   The look was measured beside today's own app on the simulator, every line of the first screen within a point.
-  The ledger rows of the backup's, the look's and the bug report's tests are filled. Not known until one is sent:
-  whether the form takes a report from the beta. **Row 7 is built, and with it every row of phase 3.**
-- **Next:** Mario's phone on the beta's next build, then phase 3's exit gate and phase 4. Still not
+  The ledger rows of the backup's, the look's and the bug report's tests are filled. The form takes a report from the beta
+  (settled on his phone, IA Next 131, below). **Row 7 is built, and with it every row of phase 3.**
+- **Seen on his phone, IA Next 131** (2026-11-27, run 46096340908): "All good on 131, got Sent ✓" (the Bugs tab
+  as today's, and the bug form takes a report from the beta). **Phase 3 is done:** all seven rows built and seen
+  on his phone.
+- **Phase 4 measured and cut, waiting on his GO (Post-v0.263.0, no build):** what today's app holds, what the beta
+  holds and what each piece needs, piece by piece (`tests/measure/native-phase4_pieces.md`), with a cut into five
+  sessions put to him: the rest timer on the Dynamic Island; the recorder as today's; the recording screen as D272
+  rules it; the watch import's read; the Profile page with Your watch and the guided setup. Nothing built.
+- **Next:** Mario's word on phase 4's cut, then its first session. Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
