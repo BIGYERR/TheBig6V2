@@ -74,3 +74,16 @@ there (`recorder-screen.ts` `drawnLabel`), and the label the GPX is named by is 
   Delete tapped twice: no question came up and the run stayed. The page's `confirm()` returned without one. Whether
   the phone does the same is not known. The beta asks the question D267 rules and deletes on OK. The question's
   title, **IA Next**, is this session's pick, since today's showed none to copy.
+
+## 5. Record run's door (step two)
+
+- **Out of the run card.** Record run on today's card (a recovery run) opened the recorder under the day's when
+  line and the run's name, with the run's workout card above the GPS line (the session sheet's own card), Start,
+  and **Ran without the phone?** under it, then Past runs. Its lines stand where the test bench's do; the link's
+  words stand 30.7 under the button, today's 30.3.
+- **Ran without the phone?** closed the recorder and opened the run's own sheet, Log This Session.
+- **A live run and the card.** Start from the card recorded; Back closed the recorder into the card while the file
+  kept growing; Record run again read the run back (0:28, 0.07 mi) under the day's line, with no hand log link;
+  Finish wrote the finish mark.
+- **The final build** (made after the archive, with the binary check naming the module: 14 symbols) reads the same
+  as the measured one, band for band.

@@ -934,7 +934,7 @@ describe('native session sheet: which files write, and what the screen calls', (
     assert.ok(week.includes("else if (r.to === 'day') { if (onReopen) onReopen(k.week, k.key); }") && week.includes("onPress={() => tap('reopen')}"));
     assert.ok(week.includes('if (view) onDeck({ prog: grid, week, dayKey: key, view, warn }, from); else openSheet(week, key);'));
     assert.ok(week.includes('const view = sheetView(store, grid, week, key, Date.now(), inHand);\n    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });'));
-    assert.ok(week.includes('onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={'));
+    assert.ok(week.includes('onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRecord={record} onRest={'));
     const app = read('App.tsx');
     assert.ok(app.includes('onSheet={(s) => { setGoing(false); setSheet(s); }}'));
     assert.ok(app.includes('onDone={(prog, week, dayKey) => { setSheet(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />'), 'Done closes the sheet and raises the completion pop-up over This Week');

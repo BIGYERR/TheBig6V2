@@ -373,3 +373,16 @@ record of the sheet as a screen, from the React Native migration on.
 - **What follows:** nothing differed from today's app and no motion was named (`MIGRATION.md` section 6, decision
   14), so nothing was fixed from it. The cardio sheet stands as built. The rest of his line is a ruling of its own:
   the floating rest timer comes out of the Expo app (D295 P-ISLANDONLY, `docs/decisions/rest-timer.md`).
+
+## D294 ends: Record run opens the recorder (2026-11-28)
+
+- **Date:** 2026-11-28, Post-v0.263.0, phase 4's recorder session. **Ruled by:** D294 itself, which held "until
+  the recorder is built". No new D-code.
+- **What changes:** in the Expo app, Record run and Record the race on a run card open the Run recorder out of the
+  card (D272 item 6, Amendment 2; `docs/decisions/gps-recording.md`), as today's iOS app does. The run's own hand
+  log is behind **Ran without the phone?** on the recorder, before Start, as on today's.
+- **Does not change:** Log the ride, Log the swim and a done run's Reopen still open that cardio's own sheet. A
+  build without the GPS module offers no Record run, and its run card's button is the hand log.
+- **Tests:** `tests/unit/native-cardio-sheet.test.ts` (the card's routes) and
+  `tests/unit/native-run-recorder.test.ts` (the door).
+- **Release:** IA Next, the first build after the merge.

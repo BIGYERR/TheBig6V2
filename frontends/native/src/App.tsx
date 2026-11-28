@@ -58,6 +58,8 @@ import { type RestAsk, type RestDraft, type RestLogs, type RestProgram, openRest
 import type { PopView } from './pop-up/pop-up-model';
 import { type PopSession, type Reminder, fireCompletionPopup, maybeShowReminder, popOf, resolveReminder } from './pop-up/pop-ups';
 import { GPS } from './run-recorder/gps';
+import { RecordOpening } from './run-recorder/RecordOpening';
+import type { RecordFrom } from './run-recorder/recorder-screen';
 import { RunRecorder } from './run-recorder/RunRecorder';
 import { phoneStore } from './store/phone-store';
 import { DAY, DISPLAY, NIGHT, type Palette } from './theme';
@@ -104,6 +106,8 @@ function Shell({ afresh, onAfresh }: { afresh: boolean; onAfresh: () => void }) 
   const [sheet, setSheet] = useState<SheetOpen | null>(null);
   // The Run recorder open from its row on Bugs (D267), over the whole screen and the tab bar, or not.
   const [bench, setBench] = useState(false);
+  // Record run (D272): the recorder open out of a run card, with the run it records and the card's place, or none.
+  const [record, setRecord] = useState<{ rec: RecordFrom; from: DeckFrom | null } | null>(null);
   // This Week's size under the deck (D275 call 16): 96% while the deck is open, its own again as it closes.
   const under = useRef(new Animated.Value(1)).current;
   // Today's toast (rest-day-shell.ts showToast): one line over everything, gone after 2.2 s.
@@ -300,7 +304,7 @@ function Shell({ afresh, onAfresh }: { afresh: boolean; onAfresh: () => void }) 
           onGone={(id) => { if (progress.viewId === id) progress.viewId = null; if (hand.prog && hand.prog.id === id) inHand.dayKey = null; }} onCover={setCover} onBuild={() => setWizard(++wizardN.current)} />
       ) : tab === 'week' ? (
         <Animated.View testID="week-under" style={{ flex: 1, transform: [{ scale: under }] }}>
-          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} inHand={inHand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRest={(ask) => askRest(ask)} onLaunch={launched} />
+          <ThisWeek palette={p} store={phoneStore} tick={tick} held={held} hand={hand} inHand={inHand} resets={resets} onAsk={asked} onDeck={(open, from) => setDeck({ open, from })} onSheet={(s) => { setGoing(false); setSheet(s); }} onRecord={GPS ? (rec, from) => setRecord({ rec, from }) : null} onRest={(ask) => askRest(ask)} onLaunch={launched} />
         </Animated.View>
       ) : tab === 'progress' ? <Progress key={'progress' + progressTaps} palette={p} store={phoneStore} state={progress} say={say} /> : (
         <Bugs palette={p} state={bugs} store={phoneStore} look={look} say={say} onAfresh={onAfresh} onRecorder={GPS ? () => setBench(true) : null}
@@ -317,6 +321,7 @@ function Shell({ afresh, onAfresh }: { afresh: boolean; onAfresh: () => void }) 
         <DeckOpening palette={p} store={phoneStore} open={deck.open} from={deck.from} calm={calm} under={under} onClose={() => setDeck(null)} onProgram={setHeld} onOver={setOver} say={say}
           onDone={(prog, week, dayKey) => { setDeck(null); complete({ store: phoneStore, prog } as unknown as PopSession, week, dayKey); }} />
       )}
+      {record && GPS && <RecordOpening palette={p} gps={GPS} rec={record.rec} from={record.from} calm={calm} under={under} onClose={() => setRecord(null)} />}
       {sheet && (
         <SessionSheet palette={p} store={phoneStore} open={sheet} inHand={inHand} calm={calm} onClose={() => setSheet(null)} onProgram={setHeld} onOver={setOver} say={say}
           onRest={askRest} onLogged={(week, dayKey) => logged(sheet.prog.id, week, dayKey)} onGoing={() => setGoing(true)}

@@ -145,9 +145,14 @@ function build() {
   const symbols = spawnSync('nm', ['-gU', binary], { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
   // Swift mangles the class IASpikeModule of the module IASpike as "7IASpike0A6Module" (the repeated word is a back
   // reference), so the module's own name is what a symbol carries, never the class name spelled out.
-  const swift = (symbols.stdout || '').split('\n').filter((l) => l.includes('7IASpike')).length;
-  console.log(`ios.mjs: Swift module IASpike ${swift ? `present (${swift} symbols)` : 'MISSING'}`);
-  if (!swift) fail('the app binary holds no symbol of the IASpike module: the local Swift module was not built in');
+  // The GPS recorder (modules/ia-gps, phase 4) is checked the same way: IAGpsModule of the module IAGps is
+  // "5IAGps0A6Module". Shown on a simulator build before it was trusted: 14 symbols, and none for a name that is
+  // not there.
+  for (const [name, mark] of [['IASpike', '7IASpike'], ['IAGps', '5IAGps']]) {
+    const swift = (symbols.stdout || '').split('\n').filter((l) => l.includes(mark)).length;
+    console.log(`ios.mjs: Swift module ${name} ${swift ? `present (${swift} symbols)` : 'MISSING'}`);
+    if (!swift) fail(`the app binary holds no symbol of the ${name} module: the local Swift module was not built in`);
+  }
   return { appPath, id: facts.id };
 }
 

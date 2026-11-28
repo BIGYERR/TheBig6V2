@@ -380,8 +380,18 @@ Each phase starts only on Mario's GO, one phase step per session.
   state, and what the beta holds (`tests/measure/native-run-recorder_today.md`). The build needs no capability,
   no entitlement and no profile change: two permission strings and the location background mode, Info.plist
   lines all. The cut put to him: one session or two, one recommended, built in two steps. His answer, 2026-11-28: "One session".
-- **Next:** phase 4's next session, the recorder as today's (the module, the screen, the Bugs row, Record run
-  opening it). Still not ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
+- **The recorder built as today's (Post-v0.263.0, no version; 2026-11-28, `chat/run-recorder`):** phase 4's first
+  build session, in two steps on his "One session". Today's `IAGps.swift` is a local Expo module, its Cordova
+  plumbing replaced and every other line kept (`modules/ia-gps`); the app's side hands the screen today's eleven
+  calls and one event; the screen draws today's rows and states with the second row and each split's climb; the
+  Bugs tab has its Run recorder row; Record run opens the recorder out of the run card, with the workout above the
+  clock and Ran without the phone?, so D294's door ends. The permission strings and the location background mode
+  are Info.plist lines in `app.config.js`: no capability, no entitlement, no profile change. Seen on the simulator
+  with a moving location, every line within 0.7 of a point of today's markup in WebKit
+  (`tests/measure/native-run-recorder_look.md`; `docs/decisions/gps-recording.md`). Three sessions of phase 4 are
+  left: the recording screen as D272 rules it, the watch import's read, the Profile page.
+- **Next:** phase 4's next session, the recording screen as D272 items 3 to 5 rule it (R2 over R3, the summary,
+  Save to the day, the live bar). Still not ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
   `docs/decisions/data-backup.md`) and built in phase 3's second session: the beta writes to its own copy, its

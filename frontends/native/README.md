@@ -113,7 +113,15 @@ runs it).
   moves the rest stopwatch's Swift in. It takes the app's version and build number.
 - **The Swift module**, `modules/ia-spike/`: a local Expo module found by Expo's autolinking. It does nothing. The
   app asks it one question when the bundle loads (`src/native-spike.ts`), and every bug report says "Swift answers."
-  or "Swift does not answer." in its context (`src/spike-line.ts`, `src/bugs/Bugs.tsx`). `IAGps` and `IAIsland` arrive the same way in phase 4.
+  or "Swift does not answer." in its context (`src/spike-line.ts`, `src/bugs/Bugs.tsx`).
+- **The GPS recorder**, `modules/ia-gps/` (phase 4): today's `IAGps.swift` with its Cordova plumbing replaced
+  (`ios/IAGps.swift`) behind an Expo module of today's eleven calls and one event (`ios/IAGpsModule.swift`). The
+  app's side is `src/run-recorder/`: `gps.ts` finds the module, `gps-bridge.ts` hands the screen today's
+  `window.iaGps` shape. Its two permission strings and the location background mode are `ios.infoPlist` in
+  `app.config.js`: Info.plist lines, no capability and no entitlement, so the signing profiles are unchanged. A
+  run is one raw file in this app's own `Application Support/ia-gps/`. The simulator moves with
+  `xcrun simctl location booted run "City Run"`; it has no step counter and no barometer. The build's binary check
+  names this module beside the spike's. `tests/unit/native-run-recorder.test.ts` holds it.
 
 `tests/unit/native-shell.test.ts` holds both.
 

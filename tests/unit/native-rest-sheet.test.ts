@@ -510,7 +510,7 @@ describe('native rest sheet: the screens\' wiring', () => {
   });
   test('every door reaches the app, and the app draws the sheet it was asked for', () => {
     assert.ok(weekScreen.includes('onRest={(week, key, view) => { if (prog) { hand.own = week; onRest({ prog: prog as unknown as RestProgram, week, dayKey: key, view }); } }}'), 'This Week hands the program in hand, the day and the view');
-    assert.ok(weekScreen.includes('onCardio={onCardio} />)}') && /function Days\(\{ d, p, onPick, onStart, onReopen, onCardio, onRest \}/.test(weekScreen));
+    assert.ok(weekScreen.includes('onCardio={onCardio} onRecord={onRecord} />)}') && /function Days\(\{ d, p, onPick, onStart, onReopen, onCardio, onRecord, onRest \}/.test(weekScreen));
     assert.ok(app.includes('onRest={(ask) => askRest(ask)} onLaunch={launched}'), 'This Week\'s links');
     assert.ok(app.includes('onRest={askRest} onLogged='), 'the session sheet\'s Edit cardio, with what to draw again');
     assert.ok(app.includes('const askRest = (ask: RestAsk, wrote: (() => void) | null = null): void => {'));

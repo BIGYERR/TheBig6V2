@@ -195,7 +195,7 @@ const BREAKS = [
   [WEEK, 'This Week does not hand the sheet its day', "    if (view) onSheet({ prog: grid, week, dayKey: key, view, only });\n", ''],
   [APP, 'Done on the sheet raises no pop-up', "setSheet(null); complete(", "setSheet(null); void ("],
   [APP, 'the sheet\'s Back does not close it', "open={sheet} inHand={inHand} calm={calm} onClose={() => setSheet(null)}", "open={sheet} inHand={inHand} calm={calm} onClose={() => {}}"],
-  [APP, 'This Week\'s Reopen reaches no sheet', "onSheet={(s) => { setGoing(false); setSheet(s); }} onRest", "onSheet={() => {}} onRest"],
+  [APP, 'This Week\'s Reopen reaches no sheet', "onSheet={(s) => { setGoing(false); setSheet(s); }} onRecord", "onSheet={() => {}} onRecord"],
   // ── The sheet's second session: what the add sheet lists (sheet-adds.ts) ──
   [ADDS, 'a move already on the card is offered again', "    if (onCard[n.toLowerCase()]) return;\n", ''],
   [ADDS, 'the card\'s names are matched to the kit\'s by their exact case', "onCard[it.name.toLowerCase()] = 1;", "onCard[it.name] = 1;"],

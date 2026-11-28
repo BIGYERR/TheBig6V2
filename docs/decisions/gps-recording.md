@@ -417,3 +417,68 @@
   off in all against 13.3 as built. GPS altitude does it as well as the map, so the leading candidate needs no map.
   The watch itself reads the run's end 5 m above its start, where the map and GPS read about level. Not ruled: a run
   with a real hill decides it.
+
+## The Run recorder in the Expo app, as today's (D267, D293, D296, and D272 items 6 and 7 with Amendment 2 and its open item, carried unchanged; 2026-11-28)
+
+- **Date:** 2026-11-28, Post-v0.263.0, phase 4 of the React Native migration (`MIGRATION.md`), its first build
+  session. **Ruled by:** nothing new is ruled. Each ruling above is carried into the Expo app (IA Next) with its
+  words and its behaviour, so each keeps its D-code. Mario's one call was the cut, put to him on the measure
+  (`tests/measure/native-run-recorder_today.md`): **"One session"**, built in two steps (the module, the screen and
+  the Bugs row; then Record run's door). **Bump:** none: `index.html` and `ia-version` do not move.
+- **What is built:**
+  1. **The module** (`frontends/native/modules/ia-gps`): today's `IAGps.swift` with its Cordova plumbing replaced
+     and every other line kept (181 of its 299 lines of code are not Cordova's, and each stands in the module in
+     today's order), behind an Expo module of today's eleven calls and one event, each call on the main queue. A
+     call that can fail answers `{ok, why}` in today's words. A run is one raw file in the beta's own
+     `Application Support/ia-gps/`. The runs today's app recorded stay in today's app's container.
+  2. **The app's side** (`src/run-recorder/gps-bridge.ts`, `gps.ts`): today's `window.iaGps` shape over the
+     module, so the screen's rules are today's line for line. A build without the module has no recorder: no Bugs
+     row and no Record run, as today's page has neither in a browser.
+  3. **The model** (`run-recorder-model.ts`): today's file, but for the one line that names core.
+  4. **The screen** (`recorder-screen.ts`, `RunRecorder.tsx`): today's rows and states (D267), the second row and
+     each split's climb (D296), the miles by the 10 m rule (D293, core's, not edited). The app coming to the front
+     stands in for the page becoming visible. Share writes the GPX into the app's cache and hands it to the share
+     sheet. Delete asks the system's own question first.
+  5. **The Bugs tab's Run recorder row** (D267), after Engine.
+  6. **Record run opens the recorder out of the run card** (D272 item 6, Amendment 2), with the run's workout
+     above the clock (D278 item 2) and **Ran without the phone?** before Start (D272's open item), which closes
+     the recorder and opens the run's own hand log. D294's door to the hand log ends
+     (`docs/decisions/session-sheet.md`).
+  7. **What the app asks of iOS** (`app.config.js`): today's two permission strings, word for word, and the
+     location background mode. Info.plist lines all: no capability, no entitlement, no profile change.
+- **Where the beta cannot be today's to the letter, and what it does:**
+  - *A run's start.* iOS writes **12:35 PM** with a narrow space that WebKit draws and React Native's text does
+    not. The screen draws a plain space there; the GPX's name is left as iOS wrote it.
+  - *Delete's question.* Today's is the page's `confirm()`. The beta raises the system's alert with the same
+    words, Cancel and OK, under the app's name, **IA Next**.
+  - *The permission words* still name **The Asylum**, as today's do, and so does the line that says location is
+    off. Mario may want **IA Next** there before cutover; not asked in this session.
+- **Does not change:** today's app and the page; `core/src/gps`, which is read and not edited; any stored state
+  (the recorder reads and writes none); the signing profiles and the secrets. Save to the day, the recording
+  screen as R2 over R3, the live bar and "Back to your run" (D272 items 3 to 5) are the next session's.
+- **Two things that are today's own, seen in this session, not ruled and not changed**
+  (`tests/measure/native-run-recorder_look.md`): by day, Back on the recorder is a white pill with white words,
+  and the beta draws it so; and on the simulator today's Delete (0.255.2) raised no question and deleted nothing.
+- **The look:** measured beside today's markup drawn by WebKit in the simulator's Safari. Every line stands within
+  0.7 of a point of today's.
+- **Tests:** `tests/unit/native-run-recorder.test.ts` (new; it cannot load on the release before, whose tree has no
+  `frontends/native/src/run-recorder`), with changed assertions in `tests/unit/native-cardio-sheet.test.ts`,
+  `tests/unit/native-shell.test.ts` and `tests/unit/native-bugs-tab.test.ts`. A break per rule:
+  `tests/measure/native-run-recorder_breaks.md`.
+- **Not yet seen:** the phone. The simulator has no step counter and no barometer, and does not lock: Climb,
+  Cadence and Steps on a live run, and a run with the screen locked, are his phone's to show.
+- **Proof:** the unit and integration run holds 126 files and 2,748 tests, all passing. On the release before
+  (`dev` 5977e7e, a copy of its tree): the three files the new test file imports are not there, so it cannot load;
+  and the 7 tests whose assertions changed in the six older files are red, the other 279 green. A break per rule:
+  286 breaks. One part first, alone (72 breaks): 1 let through, a read that handed the module another run's id,
+  closed by a test that reads the module's calls. Then the whole set in four copies: 1 let through, the title's own
+  line, which the root view's label also named; closed, and that file's 66 breaks run again, all red. As it stands:
+  286 of 286 red. Five breaks of four older lists whose text the door moved were pointed at the code as it stands
+  and run again alone: 5 red. `npm run archive-ios` passed: IA Next 0.263.0 (132), unsigned, for a device, its
+  Info.plist carrying the three lines, its entitlements file empty, and the module in it (137 of its symbols in the
+  archive's dSYM, none for a wrong name).
+- **The simulator's store:** saved aside before the first build (sha256 `278ba57f3f6a…575af3`), `66e8fad91cd0…580263`
+  after the session's launches and one tap on the day after reminder, and put back: `278ba57f3f6a…575af3` again.
+  The two runs the session recorded there and the made-up one were deleted, and the beta's location and motion
+  permissions on the simulator reset. Nothing of Mario's was read: the recorder holds no stored state.
+- **Release:** IA Next, the first build after the merge (filled in when `testflight.mjs leg` names it).

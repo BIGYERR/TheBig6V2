@@ -327,7 +327,7 @@ const BREAKS = [
   [SHEET, "Move it here is drawn before a pick by the screen", "{v.apply && apply('rest-move',", "{apply('rest-move',"],
   [SHEET, "the box is drawn as a wheel", "{v.dist && ('wheel' in v.dist ? wheel(v.dist.wheel) : (", "{v.dist && ('box' in v.dist ? wheel(v.dist.wheel) : ("],
   [SHEET, "a picked row carries no check", "{r.sel && <Text style={[s.eqChk,", "{false && <Text style={[s.eqChk,"],
-  [WEEK, "the day's cards are handed no rest link", "function Days({ d, p, onPick, onStart, onReopen, onCardio, onRest }: {", "function Days({ d, p, onPick, onStart, onReopen, onCardio }: {"],
+  [WEEK, "the day's cards are handed no rest link", "function Days({ d, p, onPick, onStart, onReopen, onCardio, onRecord, onRest }: {", "function Days({ d, p, onPick, onStart, onReopen, onCardio, onRecord }: {"],
   // ── Found by the measure beside today's own sheet in the simulator's Safari (the look) ──
   [N + 'day-detail/Wheel.tsx', "a wheel's caption is the component sheet's 10", "cap: { fontFamily: DISPLAY, fontSize: 12,", "cap: { fontFamily: DISPLAY, fontSize: 10,"],
   [N + 'program-list/SheetFrame.tsx', "a sheet's Back is iOS's own height", "fontWeight: '700', paddingBottom: 2.3 },", "fontWeight: '700' },"],

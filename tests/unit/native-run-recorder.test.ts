@@ -57,6 +57,9 @@ function plugin(files: Record<string, string> = {}, live: string | null = null) 
       calls.push('finish');
       if (!st.id) { if (fail) fail('no run is recording'); return; }
       const id = st.id;
+      // The finish mark is written into the run's file before the answer (IAGps.swift finish: writeMark, then the id).
+      const last = (files[id] || '').trim().split('\n').map((l) => (JSON.parse(l) as { t: number }).t).pop() || 0;
+      files[id] = (files[id] || '') + JSON.stringify({ t: last, mark: 'finish' }) + '\n';
       st.id = null; st.recording = false; st.paused = false;
       done(id);
     },
@@ -258,14 +261,17 @@ describe('native run recorder: today\'s calls over the Swift module', () => {
 
   test('finish, read and remove hand back the answer, or why not in the module\'s own words', async () => {
     const got: string[] = [];
-    const ok = gpsOver(native().n);
+    const asked = native();
+    const ok = gpsOver(asked.n);
     ok.finish((id) => got.push('finished ' + id), (why) => got.push('no: ' + why));
     ok.read(RUN, (text) => got.push('read ' + JSON.stringify(text)), (why) => got.push('no: ' + why));
-    ok.remove(RUN, () => got.push('removed'), (why) => got.push('no: ' + why));
+    ok.remove(OLD, () => got.push('removed'), (why) => got.push('no: ' + why));
     await settle();
     assert.deepStrictEqual(got, ['finished ' + RUN, 'read "x\\n"', 'removed']);
+    // The module is asked for the run the screen named, each time.
+    assert.deepStrictEqual(asked.calls, ['finish', 'read ' + RUN, 'remove ' + OLD]);
     got.length = 0;
-    const no = gpsOver(native({ finish: { ok: false, why: 'no run is recording' }, read: { ok: false, why: 'no such run' }, remove: { ok: false, why: 'that run cannot be deleted' } }).n);
+    const no = gpsOver(native({ finish: { ok: false, id: RUN, why: 'no run is recording' }, read: { ok: false, text: 'x', why: 'no such run' }, remove: { ok: false, why: 'that run cannot be deleted' } }).n);
     no.finish((id) => got.push('finished ' + id), (why) => got.push('no: ' + why));
     no.read(RUN, (text) => got.push('read ' + text), (why) => got.push('no: ' + why));
     no.remove(RUN, () => got.push('removed'), (why) => got.push('no: ' + why));
@@ -298,7 +304,7 @@ describe('native run recorder: today\'s calls over the Swift module', () => {
 
   test('status and list hand back today\'s shapes: an id or null, and the runs as the module lists them', async () => {
     const got: unknown[] = [];
-    const idle = gpsOver(native({ status: { recording: 0, paused: 0, id: null } }).n);
+    const idle = gpsOver(native({ status: { recording: 0, paused: 0 } }).n);
     idle.status((s) => got.push(s));
     const live = gpsOver(native({ status: { recording: true, paused: true, id: RUN }, list: [{ id: RUN, bytes: 9 }, { id: OLD, bytes: 4 }] }).n);
     live.status((s) => got.push(s));
@@ -338,6 +344,69 @@ describe('native run recorder: the screen\'s rules, as today\'s', () => {
     assert.deepStrictEqual(st.past.map((r) => r.id), [OLD]);
     const v = recorderDrawn(st, T0 + 600000);
     assert.deepStrictEqual([v.state, v.buttons, v.time, v.distance, v.avgPace, v.splits], ['recording', ['pause', 'finish'], '10:00', '1.49', '6:42', [{ mile: 1, time: '6:42', climb: '' }]]);
+  });
+
+  test('a status is a live run only when it says it is recording and names the run', () => {
+    for (const odd of [{ recording: false, paused: false, id: RUN }, { recording: true, paused: false, id: null }]) {
+      const p = plugin({ [RUN]: file(meridian(5)) });
+      Object.assign(p.st, odd);
+      const { st, d } = screen(p);
+      recorderResync(st, d);
+      assert.deepStrictEqual([st.live, st.runId, st.lines], [false, null, []], JSON.stringify(odd));
+      // The past runs are listed all the same, without the run the status names.
+      assert.deepStrictEqual(st.past.map((r) => r.id), odd.id === RUN ? [] : [RUN], JSON.stringify(odd));
+    }
+  });
+
+  test('the live clock runs on the wall clock, past the run\'s last line', () => {
+    const p = plugin({ [RUN]: file(meridian(600)) }, RUN);
+    const { st, d } = screen(p);
+    recorderOpened(st, d);
+    assert.equal(recorderDrawn(st, T0 + 660000).time, '11:00');
+    st.live = false;
+    assert.equal(recorderDrawn(st, T0 + 660000).time, '10:00');
+  });
+
+  test('every answer the module gives is drawn, once for each thing it changes', () => {
+    const runs = (): Record<string, string> => ({ [RUN]: file(meridian(5)), [OLD]: file(meridian(10, T0 - 86400000)) });
+    const count = (s: ReturnType<typeof screen>, act: () => void): [number, number] => { const a = s.seen.draws, c = s.seen.closed; act(); return [s.seen.draws - a, s.seen.closed - c]; };
+    // Opening on a live run: its lines, the past runs, the status itself.
+    const p = plugin(runs(), RUN);
+    const s = screen(p);
+    assert.deepStrictEqual(count(s, () => recorderOpened(s.st, s.d)), [3, 0]);
+    // The start mark: the mark, then the id its status hands back. Every other event: one.
+    assert.deepStrictEqual(count(s, () => p.send({ type: 'mark', line: { t: T0, mark: 'start' } })), [2, 0]);
+    assert.deepStrictEqual(count(s, () => p.send({ type: 'auth', status: 'granted' })), [1, 0]);
+    assert.deepStrictEqual(count(s, () => p.send({ type: 'motion', line: { t: T0, steps: 1 } })), [1, 0]);
+    assert.deepStrictEqual(count(s, () => recorderPress(s.st, s.d, 'pause')), [1, 0]);
+    // Finish: the run read back, the past runs, the answer, the tap.
+    assert.deepStrictEqual(count(s, () => recorderPress(s.st, s.d, 'finish')), [4, 0]);
+    // Finish again, with no run recording: the reason, the tap.
+    assert.deepStrictEqual(count(s, () => recorderPress(s.st, s.d, 'finish')), [2, 0]);
+    assert.deepStrictEqual(count(s, () => recorderPress(s.st, s.d, 'share')), [2, 0]);
+    assert.deepStrictEqual(count(s, () => recorderOpenRun(s.st, s.d, OLD)), [1, 0]);
+    // Back from a finished run draws the start; Back from the start closes and draws nothing.
+    assert.deepStrictEqual(count(s, () => recorderBack(s.st, s.d)), [1, 0]);
+    assert.deepStrictEqual(count(s, () => recorderBack(s.st, s.d)), [0, 1]);
+    // Delete with a yes: the past runs, the delete, the tap. With a no: the tap alone. Refused: the reason, the tap.
+    recorderOpenRun(s.st, s.d, OLD);
+    assert.deepStrictEqual(count(s, () => recorderPress(s.st, s.d, 'delete')), [3, 0]);
+    const no = screen(plugin(runs()), { agree: false });
+    recorderOpenRun(no.st, no.d, OLD);
+    assert.deepStrictEqual(count(no, () => recorderPress(no.st, no.d, 'delete')), [1, 0]);
+    const gone = plugin(runs());
+    const g = screen(gone, { share: 'fail' });
+    recorderOpenRun(g.st, g.d, OLD);
+    delete gone.files[OLD];
+    assert.deepStrictEqual(count(g, () => recorderPress(g.st, g.d, 'delete')), [2, 0]);
+    g.st.runId = RUN;
+    assert.deepStrictEqual(count(g, () => recorderPress(g.st, g.d, 'share')), [2, 0]);
+    // The last past run deleted: the empty list is drawn too.
+    const one = plugin({ [OLD]: file(meridian(10, T0 - 86400000)) });
+    const o = screen(one);
+    recorderOpenRun(o.st, o.d, OLD);
+    assert.deepStrictEqual(count(o, () => recorderPress(o.st, o.d, 'delete')), [3, 0]);
+    assert.deepStrictEqual(o.st.past, []);
   });
 
   test('with no past run the list is empty, and it is drawn', () => {
@@ -408,10 +477,13 @@ describe('native run recorder: the screen\'s rules, as today\'s', () => {
   });
 
   test('Finish: the run is over, read back from its file, and the past runs listed again with it', () => {
-    const files = { [RUN]: file([...meridian(600), { t: T0 + 600000, mark: 'finish' }]), [OLD]: file(meridian(10, T0 - 86400000)) };
+    const files = { [RUN]: file(meridian(600)), [OLD]: file(meridian(10, T0 - 86400000)) };
     const p = plugin(files, RUN);
     const { st, d } = screen(p);
     recorderOpened(st, d);
+    assert.deepStrictEqual([st.live, st.lines.length, st.past.map((r) => r.id)], [true, 602, [OLD]]);
+    // A start mark whose status has not answered yet: the screen holds no id until Finish hands it one.
+    st.runId = null;
     const before = p.calls.length;
     recorderPress(st, d, 'finish');
     assert.deepStrictEqual(p.calls.slice(before), ['finish', 'read ' + RUN, 'list', 'read ' + RUN, 'read ' + OLD]);
@@ -599,7 +671,9 @@ describe('native run recorder: the screen, top to bottom, as today\'s', () => {
     for (const part of [
       'onPress={() => recorderBack(st, d)}', 'onPress={() => recorderPress(st, d, b)}', 'onPress={() => recorderOpenRun(st, d, r.id)}', 'onPress={onHandLog}',
       '{offersHandLog(st, heading) && (', "{st.message !== '' && <Note id=\"rec-message\"", '{view.splits.length > 0 && (', '{st.past.length > 0 && (', '{workout && <View testID="rec-workout"><Cardio c={workout} p={p} /></View>}',
-      '{recorderOver(st, heading)}', '{recorderTitle(heading)}', '{RECORDER_COPY.noPhone}', 'const view = recorderDrawn(st, now);',
+      '<Text testID="rec-over" style={[s.over, { color: on(0.6) }]}>{recorderOver(st, heading)}</Text>',
+      '<Text testID="rec-title" accessibilityRole="header" style={[s.title, { color: p.onBand }]}>{recorderTitle(heading)}</Text>',
+      'accessibilityLabel={recorderTitle(heading)}', '{RECORDER_COPY.noPhone}', 'const view = recorderDrawn(st, now);',
     ]) assert.ok(rec.includes(part), part);
   });
 
@@ -663,6 +737,88 @@ describe('native run recorder: the screen, top to bottom, as today\'s', () => {
       "style={[s.run, { borderColor: p.border2 }]}", "style={[s.runText, { color: p.muted }]}", "style={[StyleSheet.absoluteFill, { backgroundColor: p.bg }]}",
       "contentContainerStyle={[s.body, { paddingBottom: 20 + insets.bottom }]}", "const on = (a: number): string => 'rgba(255,255,255,' + a + ')';",
     ]) assert.ok(rec.includes(part), part);
+  });
+});
+
+describe('native run recorder: Record run opens it out of the run card (D272 item 6, Amendment 2; D294 ends)', () => {
+  const week = read('src', 'this-week', 'ThisWeek.tsx'), app = read('src', 'App.tsx'), opening = read('src', 'run-recorder', 'RecordOpening.tsx');
+
+  test('Record run is offered only where the build holds the recorder, as today\'s page offers it only with its plugin', () => {
+    assert.ok(app.includes('onRecord={GPS ? (rec, from) => setRecord({ rec, from }) : null}'));
+    assert.ok(week.includes('const screen = prog ? drawWeek(store, prog, now, { shown: shownNow, picked: picks.current.get(shownNow) ?? null }, !!onRecord) : null;'));
+    assert.ok(week.includes('  onRecord: ((rec: RecordFrom, from: DeckFrom | null) => void) | null;'));
+    // Today's: the model is handed whether window.iaGps is there (a guard: this passes on the release before too).
+    const theirs = today('src', 'app', 'screens', 'week-view', 'week-view.ts');
+    assert.ok(theirs.includes('private readonly gps = recorderAvailable(window as { iaGps?: unknown });') && theirs.includes('      gps: this.gps,'));
+  });
+
+  test('the card\'s tap goes to the recorder with the card\'s place, under the day\'s when line and the run\'s name', () => {
+    assert.ok(week.includes("    else if (r.to === 'record') record();\n    else if (onCardio) onCardio(k.week, k.key, r.sheet);"));
+    assert.ok(week.includes("  const record = (): void => {\n    if (!onRecord) return;\n    const head = { over: when || '', title: k.title };\n    const el = box.current;\n    if (!el) { onRecord(k.week, k.key, head, null); return; }\n"
+      + "    el.measureInWindow((x, y, w, h) => onRecord(k.week, k.key, head, w > 0 && h > 0 ? { box: { t: y, l: x, w, h }, card: k } : null));\n  };"));
+    assert.ok(week.includes('onCardio={openSheet} onRecord={record} onRest={') && week.includes('onCardio={onCardio} onRecord={onRecord} />'));
+  });
+
+  test('the run it records carries its day, its words, its workout as the session sheet draws it, and the way to its own hand log', () => {
+    assert.ok(week.includes("  const record = (week: number, key: string, head: CardioOnly, from: DeckFrom | null): void => {\n    if (!prog || !onRecord) return;\n"));
+    assert.ok(week.includes('    const day = weeks && weeks[week] ? weeks[week]![key] : null;\n'
+      + '    onRecord({ week, key, over: head.over, title: head.title, workout: recordWorkout(day), handLog: () => openSheet(week, key, head) }, from);'));
+    const rules = read('src', 'run-recorder', 'recorder-screen.ts');
+    assert.ok(rules.includes('export interface RecordFrom { week: number; key: string; over: string; title: string; workout: CardioCardView | null; handLog: () => void }'));
+    // Today's record() and its openDay (a guard: this passes on the release before too).
+    const theirs = today('src', 'app', 'screens', 'week-view', 'week-view.ts');
+    assert.ok(theirs.includes('const from: RecordFrom = { week: k.week, key: k.key, over: when, title: k.title, workout: recordWorkout(day) };'));
+    assert.ok(theirs.includes('this.recorder.openDay = (r) => this.openCardio(r.week, r.key, { over: r.over, title: r.title });'));
+  });
+
+  test('the app draws it over This Week and the tab bar, under a sheet, and takes it away once it has closed', () => {
+    assert.ok(app.includes('const [record, setRecord] = useState<{ rec: RecordFrom; from: DeckFrom | null } | null>(null);'));
+    const line = '{record && GPS && <RecordOpening palette={p} gps={GPS} rec={record.rec} from={record.from} calm={calm} under={under} onClose={() => setRecord(null)} />}';
+    assert.ok(app.includes(line));
+    assert.ok(app.indexOf('testID="tab-bar"') < app.indexOf(line) && app.indexOf(line) < app.indexOf('{sheet && ('), 'the hand log it opens is drawn over where it stood');
+  });
+
+  test('the recorder is drawn once inside the frame, with the card\'s words and workout, and both ways out close into the card first', () => {
+    assert.ok(opening.includes("  const heading = useMemo(() => ({ over: rec.over, title: rec.title }), [rec.over, rec.title]);"));
+    assert.ok(opening.includes("    <RunRecorder palette={p} gps={gps} heading={heading} workout={rec.workout}\n      onClose={() => way.current.close()}\n      onHandLog={() => way.current.close(way.current.rec.handLog)} />\n  ), [p, gps, heading, rec.workout]);"));
+    // The close: only once it is open; the app takes it away, then the hand log opens; at once where nothing moves.
+    assert.ok(opening.includes("  const close = (then?: () => void): void => {\n    if (stageNow.current !== 'open') return;\n    const done = (): void => { onClose(); if (then) then(); };\n    if (!moves) { done(); return; }\n    setStage('out');\n    run(growPlan().close, done);\n  };"));
+    assert.ok(opening.includes('  const [moves] = useState(!calm && !!from);'), 'at once under Reduce Motion, or when the card\'s place is not known');
+    assert.ok(opening.includes("    return <View testID=\"record-opening\" style={[StyleSheet.absoluteFill, { backgroundColor: p.bg }]}>{body}</View>;"));
+    assert.ok(opening.includes("<Animated.View pointerEvents={stage === 'open' ? 'auto' : 'none'}"), 'no tap lands while it moves');
+  });
+
+  test('its motion is the deck\'s own, line for line (P-DECK call 16: 168 ms lift, 420 ms open, 357 ms close)', () => {
+    const deck = read('src', 'deck', 'DeckOpening.tsx');
+    const shared = [
+      "const PARTS: readonly GrowPart[] = ['frame', 'shut', 'scrim', 'week', 'copyFade', 'copyScale', 'copyFill', 'deckFade', 'deckScale'];",
+      "  const [stage, setStage] = useState<Stage>(moves ? 'opening' : 'open');",
+      "  const v = useRef(Object.fromEntries(PARTS.filter((k) => k !== 'week').map((k) => [k, new Animated.Value((moves ? GROW_START : GROW_STILL)[k])])) as Record<GrowPart, Animated.Value>).current;",
+      '  v.week = under;',
+      "      toValue: s.to, duration: s.ms, delay: s.delay, easing: Easing.bezier(...growCurve(s.ease)), useNativeDriver: !GROW_LAYOUT.includes(s.part),",
+      '    if (!moves || waits.current) return;',
+      '    const plan = growPlan();',
+      "      run(plan.lift, () => run(plan.open, () => setStage('open')));",
+      '    waits.current = { frame: requestAnimationFrame(() => requestAnimationFrame(lift)), held: setTimeout(lift, 64) };',
+      '  const f = growFrames(from.box, vw, vh);',
+      "  const shut = stage === 'out';",
+      '    ? v.shut.interpolate({ inputRange: [0, 1], outputRange: [full, card] })',
+      '    : v.frame.interpolate({ inputRange: [0, 1, 2], outputRange: [card, lifted, full] }));',
+      '    ? v.shut.interpolate({ inputRange: [0, 1], outputRange: [p.bg, p.surface] })',
+      '    : v.frame.interpolate({ inputRange: [0, 1, 2], outputRange: [p.surface, p.surface2, p.bg] });',
+      "onLayout={drawn} style={{ position: 'absolute', overflow: 'hidden', top: at(f.card.t, f.lifted.t, 0), left: at(f.card.l, f.lifted.l, 0), width: at(f.card.w, f.lifted.w, vw), height: at(f.card.h, f.lifted.h, vh), borderRadius: at(f.card.r, f.lifted.r, 0), backgroundColor: fill }}>",
+      "        <Animated.View style={{ position: 'absolute', top: at(-f.card.t, -f.lifted.t, 0), left: at(-f.card.l, -f.lifted.l, 0), width: vw, height: vh }}>",
+      "style={[StyleSheet.absoluteFill, { opacity: v.deckFade, transform: [{ scale: v.deckScale }] }]}>",
+      "pointerEvents=\"none\" style={[StyleSheet.absoluteFill, { backgroundColor: '#000000', opacity: v.scrim }]} />",
+      "style={{ position: 'absolute', top: from.box.t, left: from.box.l, width: from.box.w, height: from.box.h, borderRadius: 24, overflow: 'hidden', opacity: v.copyFade, transform: [{ scale: v.copyScale }] }}>",
+      "          <Animated.View style={{ flex: 1, backgroundColor: v.copyFill.interpolate({ inputRange: [0, 1, 2], outputRange: [clear(p.surface2), p.surface2, p.surface] }) }}>",
+      '            <Card k={from.card} p={p} copy />',
+      "      {stage !== 'open' && (",
+    ];
+    for (const line of shared) {
+      assert.ok(deck.includes(line), 'the deck\'s opening holds: ' + line);
+      assert.ok(opening.includes(line), 'the recorder\'s opening holds: ' + line);
+    }
   });
 });
 

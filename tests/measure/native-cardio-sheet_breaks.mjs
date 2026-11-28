@@ -134,12 +134,12 @@ const BREAKS = [
   [SCREEN, 'the frame drops the whole day\'s counter', "counter: v.counter, body: v.body }, { chips: [], travel: false });", "counter: null, body: v.body }, { chips: [], travel: false });"],
   [SCREEN, 'one cardio alone keeps a travel tag', "body: v.body }, { chips: [], travel: false });", "body: v.body }, { chips: [], travel: true });"],
   // ── This Week's taps ──
-  [WEEK, 'the hand log opens the whole day', "else if (onCardio) onCardio(k.week, k.key, r.to === 'cardio' ? r.sheet : { over: when || '', title: k.title });", "else if (onReopen) onReopen(k.week, k.key);"],
+  [WEEK, 'the hand log opens the whole day', "else if (onCardio) onCardio(k.week, k.key, r.sheet);", "else if (onReopen) onReopen(k.week, k.key);"],
   [WEEK, 'Reopen on a done run opens nothing', "onPress={() => tap('reopen')}", "onPress={k.kind === 'lift' ? () => tap('reopen') : undefined}"],
   [WEEK, 'the sheet is opened without the cardio it was asked for', "if (view) onSheet({ prog: grid, week, dayKey: key, view, only });", "if (view) onSheet({ prog: grid, week, dayKey: key, view });"],
   [WEEK, 'a sunk button presses', "const starts = !!bt && !bt.sunk;", "const starts = !!bt;"],
   [WEEK, 'the when line is the card\'s own label', "when={first ? first.label : ''}", "when={k.label}"],
-  [WEEK, 'a card\'s cardio tap has nowhere to go', "onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRest={", "onStart={startDeck} onReopen={openSheet} onCardio={() => {}} onRest={"],
+  [WEEK, 'a card\'s cardio tap has nowhere to go', "onStart={startDeck} onReopen={openSheet} onCardio={openSheet} onRecord={", "onStart={startDeck} onReopen={openSheet} onCardio={() => {}} onRecord={"],
   // ── The sheet's wiring ──
   [SHEET, 'the cardio log is not drawn', "{log.view.cardio && form.wrap && (", "{log.view.cardio && !form.wrap && ("],
   [SHEET, 'the add button stands on one cardio alone', "{!frame.cardio && (\n            <Pressable testID=\"sheet-add\"", "{(\n            <Pressable testID=\"sheet-add\""],

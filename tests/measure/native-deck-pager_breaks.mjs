@@ -132,7 +132,7 @@ const BREAKS = [
   [WEEK, 'the copy keeps its button', '{bt && !copy && (', '{bt && ('],
   [WEEK, 'the copy keeps its skip pill', '{k.skip && !copy && (', '{k.skip && ('],
   [WEEK, 'the copy keeps a card\'s ground', "backgroundColor: copy ? 'transparent' : off ? p.cardOff : p.surface", 'backgroundColor: off ? p.cardOff : p.surface'],
-  [WEEK, 'Start hands on no place for the card', 'w > 0 && h > 0 ? { box: { t: y, l: x, w, h }, card: k } : null', 'null'],
+  [WEEK, 'Start hands on no place for the card', 'onStart(k.week, k.key, w > 0 && h > 0 ? { box: { t: y, l: x, w, h }, card: k } : null)', 'onStart(k.week, k.key, null)'],
   [APP, 'This Week wears no size under the deck', 'transform: [{ scale: under }]', 'transform: []'],
   [APP, 'the app forgets the card the deck opens out of', 'onDeck={(open, from) => setDeck({ open, from })}', 'onDeck={(open) => setDeck({ open, from: null })}'],
 ];

@@ -340,9 +340,9 @@ describe('native cardio sheet: one cardio alone, and where a card\'s tap goes (D
     assert.equal(liftOnDay([]), false);
     assert.equal(liftOnDay([{ items: [] }, { items: [{}] }]), true);
   });
-  test('This Week routes a card\'s button and its Reopen by cardRoute; Record run opens the run\'s own sheet until the recorder is built', () => {
+  test('This Week routes a card\'s button and its Reopen by cardRoute; Record run opens the recorder (D294\'s door to the hand log ended with it)', () => {
     const week = read('this-week/ThisWeek.tsx');
-    assert.ok(week.includes("const r = cardRoute(k, when || '', which);\n    if (!r) return;\n    if (r.to === 'deck') start();\n    else if (r.to === 'day') { if (onReopen) onReopen(k.week, k.key); }\n    else if (onCardio) onCardio(k.week, k.key, r.to === 'cardio' ? r.sheet : { over: when || '', title: k.title });"));
+    assert.ok(week.includes("const r = cardRoute(k, when || '', which);\n    if (!r) return;\n    if (r.to === 'deck') start();\n    else if (r.to === 'day') { if (onReopen) onReopen(k.week, k.key); }\n    else if (r.to === 'record') record();\n    else if (onCardio) onCardio(k.week, k.key, r.sheet);"));
     assert.ok(week.includes("onPress={() => tap('button')}") && week.includes("onPress={() => tap('reopen')}"));
     assert.ok(week.includes("when={first ? first.label : ''}"), 'the when line is the first card\'s label');
     assert.ok(week.includes('const openSheet = (week: number, key: string, only: CardioOnly | null = null): void => {') && week.includes('onCardio={openSheet}'));

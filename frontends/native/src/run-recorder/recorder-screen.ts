@@ -4,6 +4,7 @@
 // goes. The words are run-recorder-model.ts, today's file. RunRecorder.tsx draws and nothing else.
 // The module writes every fix to the run's file itself, so the screen can close, the phone can lock and the app can
 // sleep without losing a second. On its return the screen reads the file back.
+import type { CardioCardView } from '../day-detail/cardio-card-model';
 import {
   RECORDER_COPY,
   type GpsAuth,
@@ -41,6 +42,13 @@ export const newRecorderState = (): RecorderState => ({ lines: [], runId: null, 
 
 /** Opened from a day's run card (D272, D276): its when line and the run's name, in place of the test bench's. */
 export interface RecorderHeading { over: string; title: string }
+
+/**
+ * The run a run card records (today's RecordFrom, record-host.ts): its day, the words over the recorder, the run's
+ * workout drawn above the clock (D278 item 2), and the way to the run's own hand log, which Ran without the phone?
+ * takes once the recorder has closed (today's RecordState.openDay).
+ */
+export interface RecordFrom { week: number; key: string; over: string; title: string; workout: CardioCardView | null; handLog: () => void }
 
 export interface RecorderDeps {
   gps: GpsBridge | null;
