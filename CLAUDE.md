@@ -617,6 +617,10 @@ before a merge into `main` touches the build).
   it hands back), a text is typed in Safari for every clause of that rule before it is built, each one a text only
   that clause decides (Post-v0.263.0: 45 texts fitted the number field's rule and none put a second sign after the
   e, so a break of that clause turned no test red and the whole break set of 512 ran twice).
+  A mockup of a system surface (the Dynamic Island, the lock screen, a widget) is drawn only after the simulator has
+  shown what iOS does with that surface in each place the mockup draws it: with the app in front, from the home
+  screen and with the phone locked (Post-v0.263.0: the rest clock's first mockup drew the island live inside the
+  open app, which iOS never does; Mario's first answer was given on it, and the rule was measured only after).
 
 ## Files
 - `index.html` — the app's page, generated. Its source is `frontends/app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta
