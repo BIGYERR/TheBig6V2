@@ -367,9 +367,13 @@ Each phase starts only on Mario's GO, one phase step per session.
 - **Seen on `main`, pull requests 73 and 74** (2026-11-28, runs 46111488110 and 46154862677, merges e9fdd0c and
   fa88061): docs commits alone, so both TestFlight lanes were held on both runs and nothing new reached his phone
   (`docs/decisions/testflight.md`). IA Next stays at 131.
-- **Next:** phase 4's first build session, the rest timer on the Dynamic Island. It opens with a measure of
-  today's rest timer and one call put to him: what on a screen starts, stops and resets a rest (D295). Still not
-  ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
+- **The rest timer put off until after the migration (Post-v0.263.0, no build; 2026-11-28):** phase 4's first
+  build session measured today's rest stopwatch and its island (`tests/measure/native-rest-island_today.md`) and
+  put D295's open call to him with a mockup. His answers: the timer on the island and the lock screen and nowhere
+  else; then, once the simulator showed that iOS hides an app's own island while the app is in front, "we will
+  build it later after the migration" (section 6, decision 19). Nothing built. Phase 4 is four sessions.
+- **Next:** phase 4's next session, the recorder as today's (the module, the screen, the Bugs row, Record run
+  opening it). Still not ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
   `docs/decisions/data-backup.md`) and built in phase 3's second session: the beta writes to its own copy, its
@@ -681,13 +685,15 @@ match the old build's on the rehearsal backup and on the 10 seeded programs. Mar
 
 **Deleted:** nothing from the old app. It is still the daily driver.
 
-### Phase 4: GPS, the Live Activity, the widget and the watch import (5 to 6 sessions, cut 2026-11-27, section 6 decision 18)
+### Phase 4: GPS, the Live Activity, the widget and the watch import (4 to 5 sessions; cut 2026-11-27, section 6 decision 18; the Live Activity put off until after the migration, 2026-11-28, decision 19)
 
 **Entry gate:** phase 3's run card done. Mario's GO. (The floating rest timer is out of the Expo app, section 6
-decision 15: the rest timer is built here, on the Dynamic Island.)
+decision 15. The rest timer is not built here: decision 19 puts it after the migration.)
 
 `IAGps.swift` and `IAIsland.swift` become two local Expo modules, the Swift kept, the Cordova plumbing replaced.
 `RestTimerWidget.swift` and `RestTimerAttributes.swift` move unchanged into the widget target the spike proved.
+(Decision 19, 2026-11-28: the island's three files do not move in phase 4. `IAGps.swift` alone becomes a module,
+the widget target stays empty and `NSSupportsLiveActivities` is not set.)
 Background location, its permission strings and its App Store wording are set here. So is Motion & Fitness
 (`NSMotionUsageDescription`, today's words in `ia-gps/plugin.xml`): from v0.263.0 the recorder also reads the step
 counter and the barometer (D296, `docs/decisions/gps-recording.md`). That Swift is in `IAGps.swift`, so it moves with the
@@ -708,8 +714,8 @@ The session's first step on the phone confirms COROS writes each run as a workou
 does not, the import reads COROS's MCP instead and the ruling goes back to coach.
 
 **Exit gate:** a real run by Mario with the phone recording beside the COROS Pace 4, compared by
-`tests/measure/gps-recording_watch-compare.js`, no worse than today's app on the same route. The rest timer's Live
-Activity starts, holds and ends on the lock screen and the Dynamic Island. A run Mario records on the watch alone
+`tests/measure/gps-recording_watch-compare.js`, no worse than today's app on the same route. (The rest timer's
+Live Activity left this gate with decision 19.) A run Mario records on the watch alone
 fills its run card with nothing tapped, its fields as D292 rules. All through TestFlight, not a cable.
 
 **Deleted:** nothing.
@@ -1017,6 +1023,22 @@ Each with the session's pick first.
     Profile page, Your watch and the guided setup, its shape picked from a mockup first. Then the exit gate. Pick
     was the island first: the smallest Swift, seen whole on the simulator, and the first real code through the
     beta's lane. Against: the recorder first would have given him more runs on the beta before cutover.
+    Amended by decision 19: session (1) is put off until after the migration, and four are left.
+19. **The rest timer waits until after the migration.** **Answered 2026-11-28**, in phase 4's first build
+    session, after the measure of today's rest stopwatch (`tests/measure/native-rest-island_today.md`) and D295's
+    open call put to him. On a mockup of a rest button in the beta's deck: "i only want the timer on the dynamic
+    island. nowhere else and it should be on the lock screen too". The simulator then showed that iOS hides an
+    app's own island while that app is in front, so the open beta would show no clock and hold no way to start a
+    rest; its buttons would have to stand on the lock screen and on the island held open. His answer: the timer
+    waits, "we will build it later after the migration". Phase 4 loses its first session and is four: the
+    recorder as today's, the recording screen as D272 rules it, the watch import's read, the Profile page. The
+    island's Swift does not move, the widget target stays empty, `NSSupportsLiveActivities` is not set, and
+    phase 4's exit gate loses its Live Activity line. **What follows, his to overrule:** the Expo app has no rest
+    timer at cutover, so from cutover until it is built his phone has none (today's app has the floating timer
+    and the island; the page keeps its own, D295). Phase 5 settles what becomes of the rest timer's tests when
+    today's app goes: cannot break 5 asks for a replacement, and there will be none yet. Open for when it is
+    built: what starts a rest, with the iOS rule in hand (`docs/decisions/rest-timer.md`). Amends decisions 15
+    and 18 and D295's "Phase 4 builds its rest timer on the Dynamic Island".
 
 ---
 

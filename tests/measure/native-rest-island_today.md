@@ -138,4 +138,6 @@ What follows, read off the platform and not yet built:
 - D233 R5 rules the activity display only: no buttons, no intents. Buttons on it amend that, for the beta.
 
 Put to him as one question: Start, Stop and Reset on the lock screen and on the opened island, the rest put up
-ready when a session opens. Not ruled.
+ready when a session opens. He asked whether the island can show the timer while the app is open (it cannot),
+and then ruled that the timer waits: "we will build it later after the migration" (`MIGRATION.md`, section 6
+decision 19; `docs/decisions/rest-timer.md`, D295 amended). What starts a rest stays open until it is built.
