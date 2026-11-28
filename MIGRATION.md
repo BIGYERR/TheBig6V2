@@ -359,11 +359,13 @@ Each phase starts only on Mario's GO, one phase step per session.
 - **Seen on his phone, IA Next 131** (2026-11-27, run 46096340908): "All good on 131, got Sent ✓" (the Bugs tab
   as today's, and the bug form takes a report from the beta). **Phase 3 is done:** all seven rows built and seen
   on his phone.
-- **Phase 4 measured and cut, waiting on his GO (Post-v0.263.0, no build):** what today's app holds, what the beta
+- **Phase 4 measured and cut, and his GO given (Post-v0.263.0, no build):** what today's app holds, what the beta
   holds and what each piece needs, piece by piece (`tests/measure/native-phase4_pieces.md`), with a cut into five
   sessions put to him: the rest timer on the Dynamic Island; the recorder as today's; the recording screen as D272
-  rules it; the watch import's read; the Profile page with Your watch and the guided setup. Nothing built.
-- **Next:** Mario's word on phase 4's cut, then its first session. Still not
+  rules it; the watch import's read; the Profile page with Your watch and the guided setup. His answer, 2026-11-27:
+  "Go, island first" (section 6, decision 18). Nothing built in that session.
+- **Next:** phase 4's first build session, the rest timer on the Dynamic Island. It opens with a measure of
+  today's rest timer and one call put to him: what on a screen starts, stops and resets a rest (D295). Still not
   ruled, and belonging with the freeze: the Monday after the clocks go forward (decision 12), a session moved off a
   day that already has a logged lift (section 7), and a stored config whose sports or rest days are not a list, which
   stops the page's launch where the Expo seam hands back the stored program. Ruled 2026-11-14 (D289 P-NATIVEWRITES,
@@ -676,7 +678,7 @@ match the old build's on the rehearsal backup and on the 10 seeded programs. Mar
 
 **Deleted:** nothing from the old app. It is still the daily driver.
 
-### Phase 4: GPS, the Live Activity, the widget and the watch import (4 to 5 sessions)
+### Phase 4: GPS, the Live Activity, the widget and the watch import (5 to 6 sessions, cut 2026-11-27, section 6 decision 18)
 
 **Entry gate:** phase 3's run card done. Mario's GO. (The floating rest timer is out of the Expo app, section 6
 decision 15: the rest timer is built here, on the Dynamic Island.)
@@ -1003,6 +1005,15 @@ Each with the session's pick first.
     its HealthKit module, permission strings and signing profile are the kind of work phase 4 already does, and its
     exit gate already runs with the watch. Against: phase 4 grows by a session, and building it after cutover would
     have kept the migration to what today's app holds.
+18. **Phase 4's cut and its GO.** **Answered 2026-11-27: "Go, island first"**, on the measure of phase 4 piece by
+    piece (`tests/measure/native-phase4_pieces.md`). Five sessions, in this order: (1) the rest timer on the Dynamic
+    Island, with D295's open call, what on a screen starts a rest; (2) the recorder as today's (the module, the
+    screen, the Bugs row, Record run opening it); (3) the recording screen as D272 items 3 to 5 rule it, which may
+    take two sessions; (4) the watch import's read (D292), before which he ticks HealthKit on the App ID
+    `com.bigyerr.ironasylum.next`, makes its App Store profile again and replaces `IOS_PROFILE_NEXT_APP`; (5) the
+    Profile page, Your watch and the guided setup, its shape picked from a mockup first. Then the exit gate. Pick
+    was the island first: the smallest Swift, seen whole on the simulator, and the first real code through the
+    beta's lane. Against: the recorder first would have given him more runs on the beta before cutover.
 
 ---
 

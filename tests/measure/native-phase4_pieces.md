@@ -84,7 +84,7 @@ grep count a command printed on that commit. No ruling and no build.
   worktree has one uncommitted file, `tests/measure/gps-recording_first-run.mjs`. No piece above edits that file.
   Its climb fix would change `core/src/gps/track.ts`, which the recorder's two sessions read and do not edit.
 
-## E. The cut proposed (for Mario's word; nothing is built before it)
+## E. The cut (proposed 2026-11-27; concurred by Mario the same day: "Go, island first")
 
 | # | Session | Why here |
 |---|---|---|
