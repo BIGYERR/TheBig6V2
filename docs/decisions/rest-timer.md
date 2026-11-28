@@ -93,3 +93,34 @@ Tests: the island and PWA clock tests in `tests/integration/rest-timer.test.ts` 
 
 - D295 as built reached his phone with build 120. No rest timer on any tab was the last of eight things put to
   him. **His report:** "All good!" (`docs/decisions/progress.md`, the build 120 entry).
+
+## D295 amended: the Expo app's rest timer waits until after the migration (2026-11-28)
+
+- **Date:** 2026-11-28. **Ruled by:** Mario, in phase 4's first build session (`chat/rest-island`), which was to
+  build the rest timer on the Dynamic Island. **Bump:** none. No new D-code: it moves when D295's last line is
+  built and changes no behaviour of any app (`MIGRATION.md`, section 6 decision 19).
+- **The finding (`tests/measure/native-rest-island_today.md`):** today three taps start, stop and reset a rest, all
+  on the floating card; nothing a set does starts one, and in the beta a Log comes once a move, so no tap that is
+  already there marks the end of a set. The island and the lock screen draw the rest and take no tap but the one
+  that opens the app (D233 R5). And, seen on the simulator with a rest running in today's app: **iOS never shows
+  an app's own Live Activity on the island while that app is in front.** The island was plain inside the app and
+  showed the rest at once from the home screen.
+- **D295's open call, as it went:** a mockup of the beta's deck with a rest button in three places was put to him,
+  the session recommending beside Done. **His answer:** "i only want the timer on the dynamic island. nowhere else
+  and it should be on the lock screen too". With the iOS rule above that means: no clock and no way to start a rest
+  while the beta is open; Start, Stop and Reset as buttons on the lock screen and on the island held open (app
+  intents, from iOS 17, which would amend D233 R5's display only), the rest put up ready when a session opens.
+  Put to him with the mockup redrawn. He asked whether the island can show the timer while the app is open. It
+  cannot. **His ruling:** the timer waits, "we will build it later after the migration".
+- **What changes:** the last line of D295's "What changes" ("Phase 4 builds its rest timer on the Dynamic Island")
+  no longer holds. The Expo app's rest timer is built after the migration, and phase 4 builds none of it:
+  `IAIsland.swift`, `RestTimerAttributes.swift` and `RestTimerWidget.swift` stay with today's app, the beta's
+  widget target stays empty, and `NSSupportsLiveActivities` is not set in the beta.
+- **What deliberately does not change:** the rest of D295 (the beta has no floating rest timer); D233 and D235 on
+  the page and in today's iOS app, which keep the floating timer and the island as they are; no stored key; what a
+  program prescribes.
+- **What follows, his to overrule:** the beta has no rest timer at cutover, so from cutover until it is built his
+  phone has none. Phase 5 settles what becomes of the rest timer's tests when today's app goes.
+- **Open for when it is built, not ruled:** what starts, stops and resets a rest. His word so far is the island
+  and the lock screen and nowhere else; the iOS rule above stands against seeing it with the app open.
+- **Tests:** none written or changed. **Release:** none; nothing built.

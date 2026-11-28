@@ -473,3 +473,14 @@ it (D288): `frontends/native/scripts/`, its setup in `frontends/native/README.md
   `docs/decisions/angular-screens.md`, the Bugs tab's entries): "All good on 131, got Sent ✓". The Bugs tab as
   today's: Look, Save a backup, Load a backup with its question, Load it, the report kept across tabs, the engine
   check. The bug form takes a report from the beta. He named nothing to fix.
+- **Seen on `main`, pull requests 73 and 74, both lanes held** (read 2026-11-28 by the rest island's session, after
+  both runs had ended). Pull request 73 (run 46111488110, merge e9fdd0c, 2026-11-28 00:18 EST) carried docs
+  commits alone: phase 4's measure and cut, and Mario's GO. Pull request 74 (run 46154862677, merge fa88061,
+  2026-11-28 09:28 EST) carried the two rule wording commits, 6830317 and 1600ad9. No version moved and nothing
+  under `frontends/native`, `core` or `tests/semver.js` changed, so each run's two gates passed and its four upload
+  and processed jobs were skipped, as ruled: nothing new reached the phone. Both runs ended green. Both
+  `testflight.mjs leg` lines, read after the second: `testflight 0.263.0 processed (uploaded before this run; a
+  version goes up once, a fix is the next PATCH) (run 46154862677, fa88061)` and `testflight next 0.263.0 (131)
+  processed (uploaded before this run; a build goes up once, the next change to the app is the next build) (run
+  46154862677, fa88061)`. The session's prompt named run 46111488110 and one commit on `dev` ahead of `main`;
+  pull request 74 had merged since, and `dev` held nothing ahead of `main` at session start.

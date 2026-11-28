@@ -86,6 +86,10 @@ grep count a command printed on that commit. No ruling and no build.
 
 ## E. The cut (proposed 2026-11-27; concurred by Mario the same day: "Go, island first")
 
+**Amended 2026-11-28:** row 1 is put off until after the migration (Mario, in the island's own session;
+`MIGRATION.md`, section 6 decision 19; `docs/decisions/rest-timer.md`). Four sessions are left, rows 2 to 5, and
+the exit gate loses its rest on the lock screen and the island.
+
 | # | Session | Why here |
 |---|---|---|
 | 1 | The rest timer on the Dynamic Island, with the call on what starts a rest | The smallest Swift (298 lines), seen whole on the simulator, and the first real code through the module, the widget target and the beta's lane. It gives back what the beta lost at build 120 |
