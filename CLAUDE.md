@@ -224,7 +224,10 @@ issued D265 before the ruling was written, and it shipped as D266.
   HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint, the production build with its budgets), frontends (the website's and the admin's type check and lint), backend (type checks, tests, lint) and native (the Expo app's type check against core; on a change to `core/` alone it is skipped with a note when no `frontends/native/node_modules` is here or borrowable, since CI's `native (Expo)` job checks it, Post-v0.262.0). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
   slower belongs in CI. The check runs alone, never beside the sweeps, a break check or a simulator build: sharing the
-  processors it hits its limit with no test red (Post-v0.262.3). In a chat's worktree the check borrows the main checkout's `node_modules` of the app, the website,
+  processors it hits its limit with no test red (Post-v0.262.3). After a check that hit its limit, wait until its test
+  processes have ended and the load has settled before running it again: they run on after the limit (Post-v0.263.0:
+  the phase 4 cut's push hit the limit twice with no test red, the second run beside the first run's leftovers, and
+  passed in 49.8 s on a quiet Mac). In a chat's worktree the check borrows the main checkout's `node_modules` of the app, the website,
   the backend and the Expo app when this branch's lockfile is the main checkout's, and otherwise names the `npm ci` to run
   (`tools/worktree-deps.mjs`, Post-v0.259.1); it installs the tests' own with `npm ci`. It borrows package by package,
   and a package installed from a `file:` spec (the app's two plugins; the tests' `@ia/core` when a session borrows that
